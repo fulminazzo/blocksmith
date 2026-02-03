@@ -18,4 +18,6 @@ public class Person {
 
     int age = 23;
 
+    double income = 0.0;
+
 }
