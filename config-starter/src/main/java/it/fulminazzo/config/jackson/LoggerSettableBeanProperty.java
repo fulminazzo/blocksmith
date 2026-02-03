@@ -66,7 +66,7 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
                                   final @NotNull DeserializationContext context,
                                   final @NotNull Object instance) {
         try {
-            super.deserializeAndSet(parser, context, instance);
+            deserializeSetAndReturn(parser, context, instance);
         } catch (DeserializationException e) {
             handleDeserializationException(instance, e);
         } catch (Exception e) {
@@ -79,7 +79,9 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
                                           final @NotNull DeserializationContext context,
                                           final @NotNull Object instance) {
         try {
-            return super.deserializeSetAndReturn(parser, context, instance);
+            Object value = deserialize(parser, context);
+            set(instance, value);
+            return value;
         } catch (DeserializationException e) {
             return handleDeserializationException(instance, e);
         } catch (Exception e) {
