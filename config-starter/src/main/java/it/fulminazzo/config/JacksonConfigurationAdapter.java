@@ -3,11 +3,11 @@ package it.fulminazzo.config;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.deser.NullValueProvider;
+import com.fasterxml.jackson.databind.deser.std.MapDeserializer;
+import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A special implementation of {@link ConfigurationAdapter}
@@ -136,6 +138,53 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
             String finalPath = String.join("", path);
             if (!finalPath.isEmpty()) finalPath = finalPath.substring(1);
             return finalPath;
+        }
+
+    }
+
+    /**
+     * A special type of {@link MapDeserializer} that will remove
+     * any {@link #INVALID_KEY_MARKER} key from the deserialization result.
+     */
+    static class LenientMapDeserializer extends MapDeserializer {
+
+        /**
+         * Instantiates a new Lenient map deserializer.
+         *
+         * @param delegate the delegate deserializer
+         */
+        public LenientMapDeserializer(final @NotNull MapDeserializer delegate) {
+            super(delegate);
+        }
+
+        @Override
+        protected MapDeserializer withResolved(final KeyDeserializer keyDeserializer,
+                                               final TypeDeserializer valueTypeDeserializer,
+                                               final JsonDeserializer<?> valueDeserializer,
+                                               final NullValueProvider nuller,
+                                               final Set<String> ignorable,
+                                               final Set<String> includable) {
+            return new LenientMapDeserializer(
+                    super.withResolved(keyDeserializer, valueTypeDeserializer, valueDeserializer, nuller, ignorable, includable)
+            );
+        }
+
+        @Override
+        public Map<Object, Object> deserialize(final JsonParser parser,
+                                                         final DeserializationContext context) throws IOException {
+            return cleanupMap(super.deserialize(parser, context));
+        }
+
+        @Override
+        public Map<Object, Object> deserialize(final JsonParser parser,
+                                                         final DeserializationContext context,
+                                                         final Map<Object, Object> result) throws IOException {
+            return cleanupMap(super.deserialize(parser, context, result));
+        }
+
+        private static @Nullable Map<Object, Object> cleanupMap(final @Nullable Map<Object, Object> map) {
+            if (map != null) map.remove(INVALID_KEY_MARKER);
+            return map;
         }
 
     }
