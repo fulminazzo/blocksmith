@@ -30,7 +30,7 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
                         'age'     : 23,
                         'street'  : 'Duomo square'
                 ],
-//                'person2': new Person('Camilla', 'Drinkwater', 20)
+                'person2': new Person('Camilla', 'Drinkwater', 20, 118.0)
         ])
 
         and:
@@ -46,7 +46,7 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
         and:
         value == [
                 'person1': new Person(),
-//                'person2': new Person('Camilla', 'Drinkwater', 20)
+                'person2': new Person('Camilla', 'Drinkwater', 20, 118.0)
         ]
 
         and:
@@ -101,6 +101,7 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
 
         and:
         1 * logger.warn('Invalid value for property \'income\': expected double but got \'invalid\' (path: \'income\')')
+        1 * logger.warn('Using default value: {}', 0.0)
     }
 
     def 'test that handleWeirdNumberValue logs correctly and returns default value on error'() {
@@ -122,6 +123,7 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
 
         and:
         1 * logger.warn('Invalid value for property \'age\': expected int but got \'9223372036854775807\' (path: \'age\')')
+        1 * logger.warn('Using default value: {}', 23)
     }
 
     def 'test that handleUnexpectedToken logs correctly and returns default value on error'() {
@@ -144,6 +146,7 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
 
         and:
         1 * logger.warn('Invalid value for property \'income\': expected double but got token \'START_ARRAY\' (path: \'income[0]\')')
+        1 * logger.warn('Using default value: {}', 0.0)
     }
 
     private static class StrictIntDeserializer extends StdDeserializer<Integer> {
