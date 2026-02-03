@@ -26,6 +26,16 @@ import java.util.LinkedList;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 final class JacksonConfigurationAdapter implements ConfigurationAdapter {
+    /**
+     * Represents an error on deserialization of a key for a {@link java.util.Map}.
+     */
+    final static @NotNull Object INVALID_KEY_MARKER = new Object() {
+        @Override
+        public String toString() {
+            return "INVALID_KEY_MARKER";
+        }
+    };
+
     @NotNull ObjectMapper mapper;
 
     @Override
@@ -64,9 +74,15 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
         public Object handleWeirdKey(final DeserializationContext context,
                                      final Class<?> rawKeyType,
                                      final String keyValue,
-                                     final String failureMsg) throws IOException {
+                                     final String failureMsg) {
             // when the key of a Map cannot be converted to the expected type (e.g. Integer)
-            return super.handleWeirdKey(context, rawKeyType, keyValue, failureMsg);
+            String path = getCurrentPath(context.getParser());
+            logger.warn("Invalid key '{}' for map: expected {} (path: '{}')",
+                    keyValue,
+                    rawKeyType.getCanonicalName(),
+                    path
+            );
+            return INVALID_KEY_MARKER;
         }
 
         @Override
