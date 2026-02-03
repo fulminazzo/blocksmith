@@ -4,10 +4,16 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import jakarta.validation.*;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * A special type of {@link SettableBeanProperty} that will not throw
@@ -18,6 +24,7 @@ import org.slf4j.Logger;
 final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
     @NotNull Logger logger;
     @NotNull AnnotatedField field;
+    @NotNull Validator validator;
 
     /**
      * Instantiates a new Logger settable bean property.
@@ -32,6 +39,9 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
         super(delegate);
         this.logger = logger;
         this.field = field;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            this.validator = factory.getValidator();
+        }
     }
 
     @Override
@@ -40,16 +50,22 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
     }
 
     @Override
+    public void set(final @NotNull Object instance, final Object value) throws IOException {
+        validateValue(instance.getClass(), value);
+        super.set(instance, value);
+    }
+
+    private <T> void validateValue(final @NotNull Class<T> beanType, final @Nullable Object value) {
+        Set<ConstraintViolation<T>> violations = validator.validateValue(beanType, field.getName(), value);
+        Optional<ConstraintViolation<T>> first = violations.stream().findFirst();
+        if (first.isPresent()) throw new ViolationException(first.get());
+    }
+
+    @Override
     public void deserializeAndSet(final @NotNull JsonParser parser,
                                   final @NotNull DeserializationContext context,
                                   final @NotNull Object instance) {
-        try {
-            super.deserializeAndSet(parser, context, instance);
-        } catch (DeserializationException e) {
-            handleDeserializationException(instance, e);
-        } catch (Exception e) {
-            handleGeneralException(parser, instance, e);
-        }
+        deserializeSetAndReturn(parser, context, instance);
     }
 
     @Override
@@ -57,7 +73,9 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
                                           final @NotNull DeserializationContext context,
                                           final @NotNull Object instance) {
         try {
-            return super.deserializeSetAndReturn(parser, context, instance);
+            Object value = deserialize(parser, context);
+            set(instance, value);
+            return value;
         } catch (DeserializationException e) {
             return handleDeserializationException(instance, e);
         } catch (Exception e) {
@@ -82,7 +100,8 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
         if (message == null) message = "unknown error";
         message = message.split("\n")[0];
         logger.warn("Invalid value for property '{}': {} (path: {})", field.getName(), message, path);
-        logger.debug("Invalid value for property '{}': {} (path: {})", field.getName(), message, path, exception);
+        if (!(exception instanceof ViolationException))
+            logger.debug("Invalid value for property '{}': {} (path: {})", field.getName(), message, path, exception);
         return getAndLogDefaultValueUsage(instance);
     }
 
@@ -107,6 +126,22 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
         public DeserializationException(final @NotNull String message,
                                         final Object @NotNull ... arguments) {
             super(String.format(message, arguments));
+        }
+
+    }
+
+    /**
+     * Represents an exception thrown during a failed {@link #validateValue(Class, Object)}
+     */
+    static final class ViolationException extends RuntimeException {
+
+        /**
+         * Instantiates a new Violation exception.
+         *
+         * @param constraintViolation the constraint violation that triggered the exception
+         */
+        public ViolationException(final @NotNull ConstraintViolation<?> constraintViolation) {
+            super(constraintViolation.getMessage());
         }
 
     }

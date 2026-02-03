@@ -9,6 +9,45 @@ import spock.mock.MockMakers
 
 class JacksonUtilsTest extends Specification {
 
+    def 'test that mapper does not throw on constraint violation'() {
+        given:
+        def logger = Mock(Logger)
+        def mapper = JacksonUtils.setupMapper(new ObjectMapper(), logger)
+
+        and:
+        def json = mapper.writeValueAsString(data)
+
+        when:
+        def value = mapper.readValue(json, Person)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        value == new Person()
+
+        and:
+        1 * logger.warn('Invalid value for property \'{}\': {} (path: {})',
+                _, message, _
+        )
+        0 * logger.debug('Invalid value for property \'{}\': {} (path: {})',
+                _, message, _, _
+        )
+        1 * logger.warn('Using default value: {}', defaultValue)
+
+        where:
+        data                                                                 || message                            | defaultValue
+        ['name': null, 'lastname': null, 'age': 17, 'income': -1]            || 'name cannot be null or empty'     | 'Alex'
+        ['name': '', 'lastname': null, 'age': 17, 'income': -1]              || 'name cannot be null or empty'     | 'Alex'
+        ['name': '     ', 'lastname': null, 'age': 17, 'income': -1]         || 'name cannot be null or empty'     | 'Alex'
+        ['name': 'Alex', 'lastname': null, 'age': 17, 'income': -1]          || 'lastname cannot be null or empty' | 'Fulminazzo'
+        ['name': 'Alex', 'lastname': '', 'age': 17, 'income': -1]            || 'lastname cannot be null or empty' | 'Fulminazzo'
+        ['name': 'Alex', 'lastname': '     ', 'age': 17, 'income': -1]       || 'lastname cannot be null or empty' | 'Fulminazzo'
+        ['name': 'Alex', 'lastname': 'Fulminazzo', 'age': 17, 'income': -1]  || 'minimum age must be 18 years'     | 23
+        ['name': 'Alex', 'lastname': 'Fulminazzo', 'age': 111, 'income': -1] || 'maximum age must be 110 years'    | 23
+        ['name': 'Alex', 'lastname': 'Fulminazzo', 'age': 23, 'income': -1]  || 'income cannot be negative'        | 0.0
+    }
+
     def 'test that mapper does not throw on exception'() {
         given:
         def logger = Mock(Logger)
@@ -16,10 +55,10 @@ class JacksonUtilsTest extends Specification {
 
         and:
         def json = mapper.writeValueAsString([
-                'name': 'Alex',
+                'name'    : 'Alex',
                 'lastname': 'Fulminazzo',
-                'age': 9999999999999999,
-                'income': 0.0
+                'age'     : 9999999999999999,
+                'income'  : 0.0
         ])
 
         when:
