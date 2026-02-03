@@ -1,1 +1,1 @@
-rootProject.name = "Blocksmith"
+rootProject.name = "blocksmith"
