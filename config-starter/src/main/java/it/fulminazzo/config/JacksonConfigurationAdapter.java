@@ -1,6 +1,7 @@
 package it.fulminazzo.config;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 
 /**
  * A special implementation of {@link ConfigurationAdapter}
@@ -102,9 +104,21 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
          * @return the current path
          */
         static @NotNull String getCurrentPath(final @NotNull JsonParser parser) {
-            return parser.getParsingContext().pathAsPointer().toString()
-                    .substring(1)
-                    .replace("/", ".");
+            LinkedList<String> path = new LinkedList<>();
+
+            JsonStreamContext context = parser.getParsingContext();
+            while (context != null) {
+                if (context.inArray()) path.addFirst(String.format("[%s]", context.getCurrentIndex()));
+                else {
+                    String currentName = context.getCurrentName();
+                    if (currentName != null) path.addFirst("." + currentName);
+                }
+                context = context.getParent();
+            }
+
+            String finalPath = String.join("", path);
+            if (!finalPath.isEmpty()) finalPath = finalPath.substring(1);
+            return finalPath;
         }
 
     }
