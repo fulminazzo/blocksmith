@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerBuilder;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
@@ -26,6 +27,32 @@ import java.util.LinkedList;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class JacksonUtils {
+
+    /**
+     * Sets up the given {@link ObjectMapper} so that many exceptions
+     * (like missing property, extra property or invalid key/property type)
+     * are replaced with a log warning.
+     *
+     * @param <M>    the type of the mapper
+     * @param mapper the mapper
+     * @param logger the logger
+     * @return the updated mapper
+     */
+    @SuppressWarnings("unchecked")
+    public static <M extends ObjectMapper> M setupMapper(final @NotNull M mapper,
+                                                         final @NotNull Logger logger) {
+        return (M) mapper
+                .registerModule(new SimpleModule() {
+
+                    @Override
+                    public void setupModule(final @NotNull SetupContext context) {
+                        super.setupModule(context);
+                        context.addBeanDeserializerModifier(new JacksonBeanDeserializerModifier(logger));
+                    }
+
+                })
+                .addHandler(new LoggerDeserializationProblemHandler(logger));
+    }
 
     /**
      * Given the parser, returns the path of the current context in a <b>dot notation</b>.
@@ -51,26 +78,9 @@ final class JacksonUtils {
         return finalPath;
     }
 
-    /**
-     * A special {@link SimpleModule} to apply all the rules preventing
-     * throwing exceptions on errors.
-     */
     @RequiredArgsConstructor
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-    static final class JacksonConfigurationModule extends SimpleModule {
-        @NotNull Logger logger;
-
-        @Override
-        public void setupModule(final SetupContext context) {
-            super.setupModule(context);
-            context.addBeanDeserializerModifier(new JacksonConfigurationBeanDeserializerModifier(logger));
-        }
-
-    }
-
-    @RequiredArgsConstructor
-    @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-    private static final class JacksonConfigurationBeanDeserializerModifier extends BeanDeserializerModifier {
+    private static final class JacksonBeanDeserializerModifier extends BeanDeserializerModifier {
         @NotNull Logger logger;
 
         @Override
