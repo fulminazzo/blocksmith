@@ -3,6 +3,7 @@ package it.fulminazzo.blacksmith.config;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * A specialized adapter to load and store <b>Java beans</b>
@@ -21,7 +22,7 @@ public interface ConfigurationAdapter {
      * @return the loaded configuration
      */
     <T> @NotNull T load(final @NotNull File file,
-                        final @NotNull Class<T> type);
+                        final @NotNull Class<T> type) throws IOException;
 
     /**
      * Stores the given configuration to file.
