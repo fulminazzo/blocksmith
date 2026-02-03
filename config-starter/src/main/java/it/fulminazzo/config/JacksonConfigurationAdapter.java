@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -58,11 +59,11 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
         @NotNull Logger logger;
 
         @Override
-        public boolean handleUnknownProperty(final DeserializationContext context,
-                                             final JsonParser parser,
-                                             final JsonDeserializer<?> deserializer,
-                                             final Object beanOrClass,
-                                             final String propertyName) throws IOException {
+        public boolean handleUnknownProperty(final @Nullable DeserializationContext context,
+                                             final @NotNull JsonParser parser,
+                                             final @Nullable JsonDeserializer<?> deserializer,
+                                             final @Nullable Object beanOrClass,
+                                             final @NotNull String propertyName) throws IOException {
             // when the JSON contains a property not present in the bean
             String path = getCurrentPath(parser);
             logger.warn("Ignoring unrecognized property '{}' (path: '{}')", propertyName, path);
@@ -71,10 +72,10 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
         }
 
         @Override
-        public Object handleWeirdKey(final DeserializationContext context,
-                                     final Class<?> rawKeyType,
-                                     final String keyValue,
-                                     final String failureMsg) {
+        public @NotNull Object handleWeirdKey(final @NotNull DeserializationContext context,
+                                              final @NotNull Class<?> rawKeyType,
+                                              final @NotNull String keyValue,
+                                              final @Nullable String failureMsg) {
             // when the key of a Map cannot be converted to the expected type (e.g. Integer)
             String path = getCurrentPath(context.getParser());
             logger.warn("Invalid key '{}' for map: expected {} (path: '{}')",
