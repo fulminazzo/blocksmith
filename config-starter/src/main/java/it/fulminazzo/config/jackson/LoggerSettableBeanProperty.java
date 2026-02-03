@@ -80,6 +80,7 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
         String path = JacksonUtils.getCurrentPath(parser);
         String message = exception.getMessage();
         if (message == null) message = "unknown error";
+        message = message.split("\n")[0];
         logger.warn("Invalid value for property '{}': {} (path: {})", field.getName(), message, path);
         logger.debug("Invalid value for property '{}': {} (path: {})", field.getName(), message, path, exception);
         return getAndLogDefaultValueUsage(instance);
