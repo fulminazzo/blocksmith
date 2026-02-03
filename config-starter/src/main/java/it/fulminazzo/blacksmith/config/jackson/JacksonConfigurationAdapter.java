@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * A special implementation of {@link ConfigurationAdapter}
@@ -27,8 +28,8 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) {
-        throw new UnsupportedOperationException();
+    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
+        return mapper.readValue(file, type);
     }
 
     @Override
