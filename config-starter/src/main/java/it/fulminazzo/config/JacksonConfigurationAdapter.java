@@ -32,15 +32,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 final class JacksonConfigurationAdapter implements ConfigurationAdapter {
-    /**
-     * Represents an error on deserialization of a key for a {@link java.util.Map}.
-     */
-    final static @NotNull Object INVALID_KEY_MARKER = new Object() {
-        @Override
-        public String toString() {
-            return "INVALID_KEY_MARKER";
-        }
-    };
 
     @NotNull ObjectMapper mapper;
 
@@ -77,10 +68,10 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
         }
 
         @Override
-        public @NotNull Object handleWeirdKey(final @NotNull DeserializationContext context,
-                                              final @NotNull Class<?> rawKeyType,
-                                              final @NotNull String keyValue,
-                                              final @Nullable String failureMsg) {
+        public @Nullable Object handleWeirdKey(final @NotNull DeserializationContext context,
+                                               final @NotNull Class<?> rawKeyType,
+                                               final @NotNull String keyValue,
+                                               final @Nullable String failureMsg) {
             // when the key of a Map cannot be converted to the expected type (e.g. Integer)
             String path = getCurrentPath(context.getParser());
             logger.warn("Invalid key '{}' for map: expected {} (path: '{}')",
@@ -88,7 +79,7 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
                     rawKeyType.getCanonicalName(),
                     path
             );
-            return INVALID_KEY_MARKER;
+            return null;
         }
 
         @Override
@@ -173,7 +164,7 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
 
     /**
      * A special type of {@link MapDeserializer} that will remove
-     * any {@link #INVALID_KEY_MARKER} key from the deserialization result.
+     * any <code>null</code> key from the deserialization result.
      */
     static class LenientMapDeserializer extends MapDeserializer {
 
@@ -200,19 +191,19 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
 
         @Override
         public Map<Object, Object> deserialize(final JsonParser parser,
-                                                         final DeserializationContext context) throws IOException {
+                                               final DeserializationContext context) throws IOException {
             return cleanupMap(super.deserialize(parser, context));
         }
 
         @Override
         public Map<Object, Object> deserialize(final JsonParser parser,
-                                                         final DeserializationContext context,
-                                                         final Map<Object, Object> result) throws IOException {
+                                               final DeserializationContext context,
+                                               final Map<Object, Object> result) throws IOException {
             return cleanupMap(super.deserialize(parser, context, result));
         }
 
         private static @Nullable Map<Object, Object> cleanupMap(final @Nullable Map<Object, Object> map) {
-            if (map != null) map.remove(INVALID_KEY_MARKER);
+            if (map != null) map.remove(null);
             return map;
         }
 
