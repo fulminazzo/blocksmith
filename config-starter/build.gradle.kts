@@ -3,7 +3,7 @@ dependencies {
 
     api(libs.json)
 
-    api(libs.validation)
+    api(libs.bundles.validation)
 
     testImplementation(libs.slf4j)
     testImplementation(libs.bundles.log4j)
