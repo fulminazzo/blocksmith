@@ -86,7 +86,8 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
         def json = mapper.writeValueAsString([
                 'name': 'Alex',
                 'lastname': 'Fulminazzo',
-                'age': 'invalid'
+                'age': 23,
+                'income': 'invalid'
         ])
 
         when:
@@ -99,7 +100,7 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
         value == new Person()
 
         and:
-        1 * logger.warn('Invalid value for property \'age\': expected int but got \'invalid\' (path: \'age\')')
+        1 * logger.warn('Invalid value for property \'income\': expected double but got \'invalid\' (path: \'income\')')
     }
 
     def 'test that handleWeirdNumberValue logs correctly and returns default value on error'() {
