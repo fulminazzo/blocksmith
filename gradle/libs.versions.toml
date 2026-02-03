@@ -3,7 +3,6 @@ lombok = "1.18.42"
 jetbrains_annotations = "26.0.2"
 
 spock_core = "2.4-groovy-4.0"
-byte_buddy = "1.18.2"
 mockito_core = "4.11.0"
 
 slf4j = "2.0.17"
@@ -16,7 +15,6 @@ lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jetbrains_annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains_annotations" }
 
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock_core" }
-byte_buddy = { module = "net.bytebuddy:byte-buddy", version.ref = "byte_buddy" }
 mockito_core = { module = "org.mockito:mockito-core", version.ref = "mockito_core" }
 
 slf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -29,6 +27,6 @@ json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "
 [bundles]
 annotations = ["lombok", "jetbrains_annotations"]
 
-test_framework = ["spock_core", "byte_buddy", "mockito_core"]
+test_framework = ["spock_core", "mockito_core"]
 
 log4j = ["log4j_api", "log4j_core", "log4j_slf4j"]
