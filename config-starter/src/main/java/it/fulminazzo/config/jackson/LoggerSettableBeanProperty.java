@@ -65,13 +65,7 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
     public void deserializeAndSet(final @NotNull JsonParser parser,
                                   final @NotNull DeserializationContext context,
                                   final @NotNull Object instance) {
-        try {
-            deserializeSetAndReturn(parser, context, instance);
-        } catch (DeserializationException e) {
-            handleDeserializationException(instance, e);
-        } catch (Exception e) {
-            handleGeneralException(parser, instance, e);
-        }
+        deserializeSetAndReturn(parser, context, instance);
     }
 
     @Override
