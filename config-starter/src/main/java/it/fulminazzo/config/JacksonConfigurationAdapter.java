@@ -4,10 +4,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.deser.NullValueProvider;
 import com.fasterxml.jackson.databind.deser.std.MapDeserializer;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.type.MapType;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -138,6 +141,32 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
             String finalPath = String.join("", path);
             if (!finalPath.isEmpty()) finalPath = finalPath.substring(1);
             return finalPath;
+        }
+
+    }
+
+    /**
+     * A special {@link SimpleModule} to link {@link LenientMapDeserializer} for map deserialization.
+     */
+    static class LenientMapModule extends SimpleModule {
+
+        @Override
+        public void setupModule(final SetupContext context) {
+            super.setupModule(context);
+
+            context.addBeanDeserializerModifier(new BeanDeserializerModifier() {
+
+                @Override
+                public JsonDeserializer<?> modifyMapDeserializer(final DeserializationConfig config,
+                                                                 final MapType type,
+                                                                 final BeanDescription beanDesc,
+                                                                 final JsonDeserializer<?> deserializer) {
+                    if (deserializer instanceof MapDeserializer)
+                        return new LenientMapDeserializer((MapDeserializer) deserializer);
+                    else return deserializer;
+                }
+
+            });
         }
 
     }
