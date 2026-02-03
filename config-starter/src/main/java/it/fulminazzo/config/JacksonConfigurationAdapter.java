@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +40,10 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
      * An implementation of {@link DeserializationProblemHandler} to
      * catch deserialization errors and send warning messages.
      */
+    @RequiredArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
     static class LoadProblemHandler extends DeserializationProblemHandler {
+        @NotNull Logger logger;
 
         @Override
         public boolean handleUnknownProperty(final DeserializationContext context,
@@ -48,7 +52,12 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
                                              final Object beanOrClass,
                                              final String propertyName) throws IOException {
             // when the JSON contains a property not present in the bean
-            return super.handleUnknownProperty(context, parser, deserializer, beanOrClass, propertyName);
+            String path = getCurrentPath(parser);
+
+            logger.warn("Ignoring unrecognized property '{}' (path: '{}')", propertyName, path);
+
+            parser.skipChildren();
+            return true;
         }
 
         @Override
@@ -86,6 +95,18 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
                                             final String failureMsg) throws IOException {
             // when the value is different from the expected type
             return super.handleUnexpectedToken(context, targetType, token, parser, failureMsg);
+        }
+
+        /**
+         * Given the parser, returns the path of the current context in a <b>dot notation</b>.
+         *
+         * @param parser the parser
+         * @return the current path
+         */
+        static @NotNull String getCurrentPath(final @NotNull JsonParser parser) {
+            return parser.getParsingContext().pathAsPointer().toString()
+                    .substring(1)
+                    .replace("/", ".");
         }
 
     }
