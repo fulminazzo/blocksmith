@@ -37,7 +37,7 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
 
         and:
         value == [
-                'person1': new Person('Alex', 'Fulminazzo', 23),
+                'person1': new Person(),
                 'person2': new Person('Camilla', 'Drinkwater', 20)
         ]
 
@@ -71,6 +71,27 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
 
         and:
         1 * logger.warn('Invalid key \'{}\' for map: expected {} (path: \'{}\')', 'invalid', Integer.canonicalName, 'invalid')
+    }
+
+    def 'test that handleWeirdStringValue logs correctly and returns default value on error'() {
+        given:
+        def json = mapper.writeValueAsString([
+                'name': 'Alex',
+                'lastname': 'Fulminazzo',
+                'age': 'invalid'
+        ])
+
+        when:
+        def value = mapper.readValue(json, Person)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        value == new Person()
+
+        and:
+        1 * logger.warn('Invalid value for property \'age\': expected int but got \'invalid\' (path: \'age\')')
     }
 
 }
