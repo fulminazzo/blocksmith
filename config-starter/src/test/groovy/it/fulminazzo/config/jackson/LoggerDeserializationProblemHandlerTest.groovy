@@ -10,9 +10,7 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
 
     void setup() {
         logger = Mock()
-        mapper = new ObjectMapper()
-                .registerModule(new JacksonConfigurationAdapter.JacksonConfigurationModule())
-                .addHandler(new LoggerDeserializationProblemHandler(logger))
+        mapper = JacksonUtils.setupMapper(new ObjectMapper(), logger)
     }
 
     def 'test that handleUnknownProperty logs correctly'() {
