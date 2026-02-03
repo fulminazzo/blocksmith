@@ -1,4 +1,4 @@
-package it.fulminazzo.config;
+package it.fulminazzo.config.jackson;
 
 import lombok.*;
 

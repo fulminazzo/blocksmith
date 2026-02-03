@@ -1,4 +1,4 @@
-package it.fulminazzo.config
+package it.fulminazzo.config.jackson
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
