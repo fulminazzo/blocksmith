@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,7 +71,17 @@ final class NonNullKeyMapDeserializer extends MapDeserializer {
      * @return the given map (without the key)
      */
     static @Nullable Map<Object, Object> cleanupMap(final @Nullable Map<Object, Object> map) {
-        if (map != null) map.remove(null);
+        if (map != null) {
+            try {
+                map.remove(null);
+            } catch (UnsupportedOperationException ignored) {
+                Map<Object, Object> clone = new HashMap<>();
+                map.forEach((k, v) -> {
+                    if (k != null) clone.put(k, v);
+                });
+                return Collections.unmodifiableMap(clone);
+            }
+        }
         return map;
     }
 
