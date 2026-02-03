@@ -2,10 +2,44 @@ package it.fulminazzo.config.jackson
 
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonStreamContext
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.slf4j.Logger
 import spock.lang.Specification
 import spock.mock.MockMakers
 
 class JacksonUtilsTest extends Specification {
+
+    def 'test that mapper does not throw on exception'() {
+        given:
+        def logger = Mock(Logger)
+        def mapper = JacksonUtils.setupMapper(new ObjectMapper(), logger)
+
+        and:
+        def json = mapper.writeValueAsString([
+                'name': 'Alex',
+                'lastname': 'Fulminazzo',
+                'age': 9999999999999999,
+                'income': 0.0
+        ])
+
+        when:
+        def value = mapper.readValue(json, Person)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        value == new Person()
+
+        and:
+        1 * logger.warn('Invalid value for property \'{}\': {} (path: {})',
+                'age', 'Numeric value (9999999999999999) out of range of int (-2147483648 - 2147483647)', 'age'
+        )
+        1 * logger.debug('Invalid value for property \'{}\': {} (path: {})',
+                'age', 'Numeric value (9999999999999999) out of range of int (-2147483648 - 2147483647)', 'age', _
+        )
+        1 * logger.warn('Using default value: {}', 23)
+    }
 
     def 'test that getCurrentPath returns expected'() {
         given:
