@@ -1,7 +1,6 @@
 package it.fulminazzo.config.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
@@ -15,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.LinkedList;
 
 /**
  * A special implementation of {@link DeserializationProblemHandler} to
@@ -33,7 +31,7 @@ final class LoggerDeserializationProblemHandler extends DeserializationProblemHa
                                          final @Nullable Object beanOrClass,
                                          final @NotNull String propertyName) throws IOException {
         // when the JSON contains a property not present in the bean
-        String path = getCurrentPath(parser);
+        String path = JacksonUtils.getCurrentPath(parser);
         logger.warn("Ignoring unrecognized property '{}' (path: '{}')", propertyName, path);
         parser.skipChildren();
         return true;
@@ -45,7 +43,7 @@ final class LoggerDeserializationProblemHandler extends DeserializationProblemHa
                                            final @NotNull String keyValue,
                                            final @Nullable String failureMsg) {
         // when the key of a Map cannot be converted to the expected type (e.g. Integer)
-        String path = getCurrentPath(context.getParser());
+        String path = JacksonUtils.getCurrentPath(context.getParser());
         logger.warn("Invalid key '{}' for map: expected {} (path: '{}')",
                 keyValue,
                 rawKeyType.getCanonicalName(),
@@ -80,30 +78,6 @@ final class LoggerDeserializationProblemHandler extends DeserializationProblemHa
                                         final String failureMsg) throws IOException {
         // when the value is different from the expected type
         return super.handleUnexpectedToken(context, targetType, token, parser, failureMsg);
-    }
-
-    /**
-     * Given the parser, returns the path of the current context in a <b>dot notation</b>.
-     *
-     * @param parser the parser
-     * @return the current path
-     */
-    static @NotNull String getCurrentPath(final @NotNull JsonParser parser) {
-        LinkedList<String> path = new LinkedList<>();
-
-        JsonStreamContext context = parser.getParsingContext();
-        while (context != null) {
-            if (context.inArray()) path.addFirst(String.format("[%s]", context.getCurrentIndex()));
-            else {
-                String currentName = context.getCurrentName();
-                if (currentName != null) path.addFirst("." + currentName);
-            }
-            context = context.getParent();
-        }
-
-        String finalPath = String.join("", path);
-        if (!finalPath.isEmpty()) finalPath = finalPath.substring(1);
-        return finalPath;
     }
 
 }
