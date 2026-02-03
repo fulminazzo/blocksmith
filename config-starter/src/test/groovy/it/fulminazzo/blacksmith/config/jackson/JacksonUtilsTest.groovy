@@ -1,4 +1,4 @@
-package it.fulminazzo.config.jackson
+package it.fulminazzo.blacksmith.config.jackson
 
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonStreamContext

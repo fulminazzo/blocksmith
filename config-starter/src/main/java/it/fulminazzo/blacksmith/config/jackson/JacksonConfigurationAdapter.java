@@ -1,7 +1,7 @@
-package it.fulminazzo.config.jackson;
+package it.fulminazzo.blacksmith.config.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.fulminazzo.config.ConfigurationAdapter;
+import it.fulminazzo.blacksmith.config.ConfigurationAdapter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

@@ -1,4 +1,4 @@
-package it.fulminazzo.config.jackson;
+package it.fulminazzo.blacksmith.config.jackson;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
