@@ -4,15 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import spock.lang.Specification
 
-class LoadProblemHandlerTest extends Specification {
+class LoggerDeserializationProblemHandlerTest extends Specification {
     private Logger logger
     private ObjectMapper mapper
 
     void setup() {
         logger = Mock()
         mapper = new ObjectMapper()
-                .registerModule(new JacksonConfigurationAdapter.LenientMapModule())
-                .addHandler(new JacksonConfigurationAdapter.LoadProblemHandler(logger))
+                .registerModule(new JacksonConfigurationAdapter.JacksonConfigurationModule())
+                .addHandler(new LoggerDeserializationProblemHandler(logger))
     }
 
     def 'test that handleUnknownProperty logs correctly'() {
