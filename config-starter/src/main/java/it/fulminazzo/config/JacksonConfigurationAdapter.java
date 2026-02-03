@@ -51,7 +51,7 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
      */
     @RequiredArgsConstructor
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-    static class LoadProblemHandler extends DeserializationProblemHandler {
+    static final class LoadProblemHandler extends DeserializationProblemHandler {
         @NotNull Logger logger;
 
         @Override
@@ -139,7 +139,7 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
     /**
      * A special {@link SimpleModule} to link {@link LenientMapDeserializer} for map deserialization.
      */
-    static class LenientMapModule extends SimpleModule {
+    static final class LenientMapModule extends SimpleModule {
 
         @Override
         public void setupModule(final SetupContext context) {
@@ -166,7 +166,7 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
      * A special type of {@link MapDeserializer} that will remove
      * any <code>null</code> key from the deserialization result.
      */
-    static class LenientMapDeserializer extends MapDeserializer {
+    static final class LenientMapDeserializer extends MapDeserializer {
 
         /**
          * Instantiates a new Lenient map deserializer.
