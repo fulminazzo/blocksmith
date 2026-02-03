@@ -11,6 +11,7 @@ class LoadProblemHandlerTest extends Specification {
     void setup() {
         logger = Mock()
         mapper = new ObjectMapper()
+                .registerModule(new JacksonConfigurationAdapter.LenientMapModule())
                 .addHandler(new JacksonConfigurationAdapter.LoadProblemHandler(logger))
     }
 
@@ -27,12 +28,8 @@ class LoadProblemHandlerTest extends Specification {
         ])
 
         and:
-        def typeFactory = mapper.getTypeFactory();
-        def mapType = typeFactory.constructMapType(
-                Map.class,
-                String.class,
-                Person.class
-        );
+        def typeFactory = mapper.typeFactory
+        def mapType = typeFactory.constructMapType(Map, String, Person)
 
         when:
         def value = mapper.readValue(json, mapType)
@@ -48,6 +45,34 @@ class LoadProblemHandlerTest extends Specification {
 
         and:
         1 * logger.warn('Ignoring unrecognized property \'{}\' (path: \'{}\')', 'street', 'person1.street')
+    }
+
+    def 'test that handleWeirdKey logs correctly and returns a map without the marker'() {
+        given:
+        def json = mapper.writeValueAsString([
+                1        : 'Alex',
+                2        : 'Fulminazzo',
+                'invalid': 'invisible'
+        ])
+
+        and:
+        def typeFactory = mapper.typeFactory
+        def mapType = typeFactory.constructMapType(Map, Integer, String)
+
+        when:
+        def value = mapper.readValue(json, mapType)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        value == [
+                1: 'Alex',
+                2: 'Fulminazzo'
+        ]
+
+        and:
+        1 * logger.warn('Invalid key \'{}\' for map: expected {} (path: \'{}\')', 'invalid', Integer.canonicalName, 'invalid')
     }
 
 }
