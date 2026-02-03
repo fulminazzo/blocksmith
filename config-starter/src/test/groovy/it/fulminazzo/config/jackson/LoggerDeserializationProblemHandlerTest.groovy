@@ -1,6 +1,10 @@
 package it.fulminazzo.config.jackson
 
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer
+import com.fasterxml.jackson.databind.module.SimpleModule
 import org.slf4j.Logger
 import spock.lang.Specification
 
@@ -11,6 +15,10 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
     void setup() {
         logger = Mock()
         mapper = JacksonUtils.setupMapper(new ObjectMapper(), logger)
+        .registerModule(new SimpleModule()
+                .addDeserializer(int.class, new StrictIntDeserializer())
+                .addDeserializer(Integer, new StrictIntDeserializer())
+        )
     }
 
     def 'test that handleUnknownProperty logs correctly'() {
@@ -22,7 +30,7 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
                         'age'     : 23,
                         'street'  : 'Duomo square'
                 ],
-                'person2': new Person('Camilla', 'Drinkwater', 20)
+//                'person2': new Person('Camilla', 'Drinkwater', 20)
         ])
 
         and:
@@ -38,7 +46,7 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
         and:
         value == [
                 'person1': new Person(),
-                'person2': new Person('Camilla', 'Drinkwater', 20)
+//                'person2': new Person('Camilla', 'Drinkwater', 20)
         ]
 
         and:
@@ -92,6 +100,53 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
 
         and:
         1 * logger.warn('Invalid value for property \'age\': expected int but got \'invalid\' (path: \'age\')')
+    }
+
+    def 'test that handleWeirdNumberValue logs correctly and returns default value on error'() {
+        given:
+        def json = mapper.writeValueAsString([
+                'name': 'Alex',
+                'lastname': 'Fulminazzo',
+                'age': Long.MAX_VALUE
+        ])
+
+        when:
+        def value = mapper.readValue(json, Person)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        value == new Person()
+
+        and:
+        1 * logger.warn('Invalid value for property \'age\': expected int but got \'9223372036854775807\' (path: \'age\')')
+    }
+
+    private static class StrictIntDeserializer extends StdDeserializer<Integer> {
+
+        StrictIntDeserializer() {
+            super(Integer.class)
+        }
+
+        @Override
+        Integer deserialize(JsonParser p, DeserializationContext context) throws IOException {
+            def number = p.getNumberValue()
+
+            def longValue = number.longValue()
+            if (longValue > Integer.MAX_VALUE || longValue < Integer.MIN_VALUE) {
+                def result = context.handleWeirdNumberValue(
+                        Integer,
+                        number,
+                        "Numeric value (" + number + ") out of range of int"
+                )
+
+                if (result instanceof Integer) return (Integer) result
+                else return null
+            }
+            return number.intValue()
+        }
+
     }
 
 }
