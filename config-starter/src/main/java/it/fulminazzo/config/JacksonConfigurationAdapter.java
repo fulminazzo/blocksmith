@@ -53,9 +53,7 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
                                              final String propertyName) throws IOException {
             // when the JSON contains a property not present in the bean
             String path = getCurrentPath(parser);
-
             logger.warn("Ignoring unrecognized property '{}' (path: '{}')", propertyName, path);
-
             parser.skipChildren();
             return true;
         }
