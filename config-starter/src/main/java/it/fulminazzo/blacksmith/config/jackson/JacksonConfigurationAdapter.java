@@ -2,10 +2,8 @@ package it.fulminazzo.blacksmith.config.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.fulminazzo.blacksmith.config.ConfigurationAdapter;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.io.File;
 
@@ -14,11 +12,19 @@ import java.io.File;
  * that uses the <a href="https://github.com/FasterXML/jackson">jackson project</a>
  * for serialization and deserialization.
  */
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 final class JacksonConfigurationAdapter implements ConfigurationAdapter {
+    private final @NotNull ObjectMapper mapper;
 
-    @NotNull ObjectMapper mapper;
+    /**
+     * Instantiates a new Jackson configuration adapter.
+     *
+     * @param mapper the object mapper
+     * @param logger the logger
+     */
+    public JacksonConfigurationAdapter(final @NotNull ObjectMapper mapper,
+                                       final @NotNull Logger logger) {
+        this.mapper = JacksonUtils.setupMapper(mapper, logger);
+    }
 
     @Override
     public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) {
