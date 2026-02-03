@@ -123,6 +123,28 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
         1 * logger.warn('Invalid value for property \'age\': expected int but got \'9223372036854775807\' (path: \'age\')')
     }
 
+    def 'test that handleUnexpectedToken logs correctly and returns default value on error'() {
+        given:
+        def json = mapper.writeValueAsString([
+                'name': 'Alex',
+                'lastname': 'Fulminazzo',
+                'age': 23,
+                'income': [1, 2, 3]
+        ])
+
+        when:
+        def value = mapper.readValue(json, Person)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        value == new Person()
+
+        and:
+        1 * logger.warn('Invalid value for property \'income\': expected double but got token \'START_ARRAY\' (path: \'income[0]\')')
+    }
+
     private static class StrictIntDeserializer extends StdDeserializer<Integer> {
 
         StrictIntDeserializer() {
