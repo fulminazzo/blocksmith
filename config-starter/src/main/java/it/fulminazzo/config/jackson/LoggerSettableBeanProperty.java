@@ -9,8 +9,6 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import java.io.IOException;
-
 /**
  * A special type of {@link SettableBeanProperty} that will not throw
  * exceptions during deserialization and setting operations,
@@ -44,22 +42,26 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
     @Override
     public void deserializeAndSet(final @NotNull JsonParser parser,
                                   final @NotNull DeserializationContext context,
-                                  final @NotNull Object instance) throws IOException {
+                                  final @NotNull Object instance) {
         try {
             super.deserializeAndSet(parser, context, instance);
         } catch (DeserializationException e) {
             handleDeserializationException(instance, e);
+        } catch (Exception e) {
+            handleGeneralException(parser, instance, e);
         }
     }
 
     @Override
     public Object deserializeSetAndReturn(final @NotNull JsonParser parser,
                                           final @NotNull DeserializationContext context,
-                                          final @NotNull Object instance) throws IOException {
+                                          final @NotNull Object instance) {
         try {
             return super.deserializeSetAndReturn(parser, context, instance);
         } catch (DeserializationException e) {
             return handleDeserializationException(instance, e);
+        } catch (Exception e) {
+            return handleGeneralException(parser, instance, e);
         }
     }
 
@@ -69,6 +71,22 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
                 .replace("<name>", field.getName())
                 .replace("<type>", field.getRawType().getCanonicalName())
         );
+        return getAndLogDefaultValueUsage(instance);
+    }
+
+    private Object handleGeneralException(final @NotNull JsonParser parser,
+                                          final @NotNull Object instance,
+                                          final @NotNull Exception exception) {
+        String path = JacksonUtils.getCurrentPath(parser);
+        String message = exception.getMessage();
+        if (message == null) message = "unknown error";
+        logger.warn("Invalid value for property '{}': {} (path: {})", field.getName(), message, path);
+        logger.debug("Invalid value for property '{}': {} (path: {})", field.getName(), message, path, exception);
+        return getAndLogDefaultValueUsage(instance);
+    }
+
+    private Object getAndLogDefaultValueUsage(@NotNull Object instance) {
+        field.fixAccess(true);
         Object defaultValue = field.getValue(instance);
         logger.warn("Using default value: {}", defaultValue);
         return defaultValue;
