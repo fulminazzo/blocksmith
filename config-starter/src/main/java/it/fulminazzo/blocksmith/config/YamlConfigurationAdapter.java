@@ -1,15 +1,21 @@
 package it.fulminazzo.blocksmith.config;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.core.io.IOContext;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.fasterxml.jackson.dataformat.yaml.util.StringQuotingChecker;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+import org.yaml.snakeyaml.DumperOptions;
 
 import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Implementation of {@link ConfigurationAdapter} for YAML.
@@ -53,6 +59,67 @@ public final class YamlConfigurationAdapter implements ConfigurationAdapter {
             String commentText = comment.value().replace("\\n", "\n");
             for (String t : commentText.split("\n"))
                 generator.writeRaw("# " + t + "\n");
+        }
+
+    }
+
+    /**
+     * A special {@link YAMLGenerator} that writes {@link String} values
+     * in {@link DumperOptions.ScalarStyle#SINGLE_QUOTED} format.
+     */
+    static class SingleQuoteYAMLGenerator extends YAMLGenerator {
+
+        /**
+         * Instantiates a new Single quote yaml generator.
+         *
+         * @param context        the context
+         * @param jsonFeatures   the JSON features
+         * @param yamlFeatures   the YAML features
+         * @param quotingChecker the quoting checker
+         * @param codec          the codec
+         * @param out            the out
+         * @param version        the version
+         * @throws IOException the io exception
+         */
+        public SingleQuoteYAMLGenerator(final IOContext context,
+                                        final int jsonFeatures,
+                                        final int yamlFeatures,
+                                        final StringQuotingChecker quotingChecker,
+                                        final ObjectCodec codec,
+                                        final Writer out,
+                                        final DumperOptions.Version version) throws IOException {
+            super(context, jsonFeatures, yamlFeatures, quotingChecker, codec, out, version);
+        }
+
+        /**
+         * Instantiates a new Single quote yaml generator.
+         *
+         * @param context        the context
+         * @param jsonFeatures   the JSON features
+         * @param yamlFeatures   the YAML features
+         * @param quotingChecker the quoting checker
+         * @param codec          the codec
+         * @param out            the out
+         * @param dumperOptions  the dumper options
+         * @throws IOException the io exception
+         */
+        public SingleQuoteYAMLGenerator(final IOContext context,
+                                        final int jsonFeatures,
+                                        final int yamlFeatures,
+                                        final StringQuotingChecker quotingChecker,
+                                        final ObjectCodec codec,
+                                        final Writer out,
+                                        final DumperOptions dumperOptions) throws IOException {
+            super(context, jsonFeatures, yamlFeatures, quotingChecker, codec, out, dumperOptions);
+        }
+
+        @Override
+        protected void _writeScalar(final @NotNull String value,
+                                    final @NotNull String type,
+                                    @NotNull DumperOptions.ScalarStyle style) throws IOException {
+            if (type.equals("string") && style == DumperOptions.ScalarStyle.DOUBLE_QUOTED)
+                style = DumperOptions.ScalarStyle.SINGLE_QUOTED;
+            super._writeScalar(value, type, style);
         }
 
     }
