@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -48,6 +49,30 @@ public final class ReflectionUtils {
             throw new ReflectionException(e, "Could not initialize %s(%s): %s",
                     type.getCanonicalName(), parameterTypesNames, e.getMessage());
         }
+    }
+
+    /**
+     * Attempts to find a method in the given class (or superclasses)
+     * with the given name and arguments types.
+     *
+     * @param container      the container of the method
+     * @param methodName     the method name
+     * @param argumentsTypes the arguments types
+     * @return the method
+     */
+    public static @NotNull Method getMethod(final @NotNull Class<?> container,
+                                            final @NotNull String methodName,
+                                            final @NotNull Collection<Class<?>> argumentsTypes) {
+        Class<?> curr = container;
+        while (curr != null && !curr.equals(Objects.class)) {
+            try {
+                return curr.getDeclaredMethod(methodName, argumentsTypes.toArray(new Class[0]));
+            } catch (NoSuchMethodException ignored) {
+                curr = curr.getSuperclass();
+            }
+        }
+        throw new ReflectionException("Could not invoke method '%s' from '%s': no such method was found",
+                methodName, container.getCanonicalName());
     }
 
     /**
@@ -103,6 +128,7 @@ public final class ReflectionUtils {
         /**
          * Instantiates a new Reflection exception.
          *
+         * @param cause     the cause
          * @param format    the format of the message
          * @param arguments the arguments to parse in the message
          */
