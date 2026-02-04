@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.type.MapType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -79,9 +78,8 @@ final class JacksonUtils {
     }
 
     @RequiredArgsConstructor
-    @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
     private static final class JacksonBeanDeserializerModifier extends BeanDeserializerModifier {
-        @NotNull Logger logger;
+        private final @NotNull Logger logger;
 
         @Override
         public BeanDeserializerBuilder updateBuilder(final DeserializationConfig config,
