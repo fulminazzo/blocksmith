@@ -1,7 +1,7 @@
-package it.fulminazzo.blacksmith.config.jackson;
+package it.fulminazzo.blocksmith.config.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.fulminazzo.blacksmith.config.ConfigurationAdapter;
+import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 

@@ -1,4 +1,4 @@
-package it.fulminazzo.blacksmith.config.jackson;
+package it.fulminazzo.blocksmith.config.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;

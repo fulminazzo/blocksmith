@@ -1,9 +1,9 @@
-package it.fulminazzo.blacksmith.config.jackson;
+package it.fulminazzo.blocksmith.config.jackson;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
-import it.fulminazzo.blacksmith.config.Comment;
+import it.fulminazzo.blocksmith.config.Comment;
 import org.jetbrains.annotations.NotNull;
 
 /**

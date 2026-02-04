@@ -1,4 +1,4 @@
-package it.fulminazzo.blacksmith.config;
+package it.fulminazzo.blocksmith.config;
 
 import org.jetbrains.annotations.NotNull;
 
