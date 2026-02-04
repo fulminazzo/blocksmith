@@ -29,11 +29,11 @@ public interface ConfigurationAdapter {
      * Stores the given configuration to file.
      *
      * @param <T>           the type of the configuration
-     * @param configuration the configuration
      * @param file          the file
+     * @param configuration the configuration
      * @throws IOException in case of any errors
      */
-    <T> void store(final @NotNull T configuration,
-                   final @NotNull File file) throws IOException;
+    <T> void store(final @NotNull File file,
+                   final @NotNull T configuration) throws IOException;
 
 }
