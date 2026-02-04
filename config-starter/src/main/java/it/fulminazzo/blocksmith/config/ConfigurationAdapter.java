@@ -20,6 +20,7 @@ public interface ConfigurationAdapter {
      * @param file the file
      * @param type the class of the configuration
      * @return the loaded configuration
+     * @throws IOException in case of any errors
      */
     <T> @NotNull T load(final @NotNull File file,
                         final @NotNull Class<T> type) throws IOException;
@@ -30,8 +31,9 @@ public interface ConfigurationAdapter {
      * @param <T>           the type of the configuration
      * @param configuration the configuration
      * @param file          the file
+     * @throws IOException in case of any errors
      */
     <T> void store(final @NotNull T configuration,
-                   final @NotNull File file);
+                   final @NotNull File file) throws IOException;
 
 }
