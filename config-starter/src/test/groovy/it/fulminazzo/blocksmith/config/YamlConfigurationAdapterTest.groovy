@@ -6,6 +6,29 @@ import spock.lang.Specification
 @Slf4j
 class YamlConfigurationAdapterTest extends Specification {
 
+    def 'test that load correctly loads file'() {
+        given:
+        def file = new File('build/resources/test/load.yml')
+
+        and:
+        def adapter = new YamlConfigurationAdapter(log)
+
+        when:
+        def actual = adapter.load(file, MockConfig)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        actual == new MockConfig(
+                false,
+                'Blocksmith',
+                null,
+                ['Fulminazzo', 'Camilla', 'Alex'],
+                new MockConfig.Internal(1.0)
+        )
+    }
+
     def 'test that store correctly saves file'() {
         given:
         def file = new File('build/resources/test/store.yml')
