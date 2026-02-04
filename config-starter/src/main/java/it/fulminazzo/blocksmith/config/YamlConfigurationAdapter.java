@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.config;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.core.io.IOContext;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactoryBuilder;
@@ -22,7 +23,7 @@ import org.yaml.snakeyaml.events.Event;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Implementation of {@link ConfigurationAdapter} for YAML.
@@ -42,7 +43,10 @@ public final class YamlConfigurationAdapter implements ConfigurationAdapter {
         this.delegate = new JacksonConfigurationAdapter(
                 new YAMLMapper(new SingleQuoteYAMLFactory(
                         YAMLFactory.builder().dumperOptions(options)
-                )),
+                ))
+                        .configure(YAMLGenerator.Feature.WRITE_DOC_START_MARKER, false)
+                        .configure(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE, true)
+                        .setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE),
                 logger,
                 YamlCommentPropertyWriter.class
         );
@@ -72,7 +76,7 @@ public final class YamlConfigurationAdapter implements ConfigurationAdapter {
                 ReflectionUtils.invokeMethod(
                         generator,
                         "_emit",
-                        Arrays.asList(Event.class),
+                        Collections.singleton(Event.class),
                         new CommentEvent(CommentType.BLOCK, " " + t, null, null)
                 );
         }
