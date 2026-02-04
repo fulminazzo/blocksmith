@@ -27,6 +27,7 @@ log4j_slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.r
 
 json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
+toml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-toml", version.ref = "jackson" }
 
 validation = { module = "jakarta.validation:jakarta.validation-api", version.ref = "validation" }
 validator = { module = "org.apache.bval:bval-jsr", version.ref = "validator" }
