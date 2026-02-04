@@ -6,7 +6,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -50,6 +52,61 @@ public final class ReflectionUtils {
     }
 
     /**
+     * Attempts to find a method in the given class (or superclasses)
+     * with the given name and arguments types.
+     *
+     * @param container      the container of the method
+     * @param methodName     the method name
+     * @param argumentsTypes the arguments types
+     * @return the method
+     */
+    public static @NotNull Method getMethod(final @NotNull Class<?> container,
+                                            final @NotNull String methodName,
+                                            final @NotNull Collection<Class<?>> argumentsTypes) {
+        Class<?> curr = container;
+        while (curr != null && !curr.equals(Objects.class)) {
+            try {
+                return curr.getDeclaredMethod(methodName, argumentsTypes.toArray(new Class[0]));
+            } catch (NoSuchMethodException ignored) {
+                curr = curr.getSuperclass();
+            }
+        }
+        throw new ReflectionException("Could not invoke method '%s' from '%s': no such method was found",
+                methodName, container.getCanonicalName());
+    }
+
+    /**
+     * Invokes a method from the given object.
+     *
+     * @param <T>            the return type
+     * @param caller         the object to call the method from
+     * @param methodName     the method name
+     * @param argumentsTypes the types of the arguments
+     * @param arguments      the arguments
+     * @return the returned object
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T invokeMethod(final @NotNull Object caller,
+                                     final @NotNull String methodName,
+                                     final @NotNull Collection<Class<?>> argumentsTypes,
+                                     final Object... arguments) {
+        Class<?> clazz = caller instanceof Class ? (Class<?>) caller : caller.getClass();
+        try {
+            Method function = getMethod(clazz, methodName, argumentsTypes);
+            function.setAccessible(true);
+            return (T) function.invoke(caller, arguments);
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+            else throw new RuntimeException(cause);
+        } catch (IllegalAccessException e) {
+            throw new ReflectionException(e, "Could not invoke method '%s' from '%s': %s",
+                    methodName, clazz.getCanonicalName(), e.getMessage()
+            );
+        }
+    }
+
+    /**
      * An exception thrown by {@link ReflectionUtils} failed operations.
      */
     static final class ReflectionException extends RuntimeException {
@@ -68,6 +125,7 @@ public final class ReflectionUtils {
         /**
          * Instantiates a new Reflection exception.
          *
+         * @param cause     the cause
          * @param format    the format of the message
          * @param arguments the arguments to parse in the message
          */

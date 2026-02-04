@@ -1,0 +1,65 @@
+package it.fulminazzo.blocksmith.config
+
+import groovy.util.logging.Slf4j
+import spock.lang.Specification
+
+@Slf4j
+class YamlConfigurationAdapterTest extends Specification {
+
+    def 'test that load correctly loads file'() {
+        given:
+        def file = new File('build/resources/test/load.yml')
+
+        and:
+        def adapter = new YamlConfigurationAdapter(log)
+
+        when:
+        def actual = adapter.load(file, MockConfig)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        actual == new MockConfig(
+                false,
+                'Blocksmith',
+                null,
+                ['Fulminazzo', 'Camilla', 'Alex'],
+                new MockConfig.Internal(1.0)
+        )
+    }
+
+    def 'test that store correctly saves file'() {
+        given:
+        def file = new File('build/resources/test/store.yml')
+        if (file.exists()) file.delete()
+
+        and:
+        def adapter = new YamlConfigurationAdapter(log)
+
+        when:
+        adapter.store(file, new MockConfig())
+
+        then:
+        noExceptionThrown()
+
+        and:
+        file.readLines() == [
+                '# Example comment',
+                'comments-enabled: true',
+                '# This comment should be',
+                '# Multiline!',
+                'name: \'blocksmith\'',
+                'description: |-',
+                '  This is the description for the configuration file.',
+                '  Should be written in multiline format.',
+                'authors:',
+                '- \'Fulminazzo\'',
+                '- \'Camilla\'',
+                'internal:',
+                '  # This comment should be indented',
+                '  version: 1.0'
+        ]
+    }
+
+}
