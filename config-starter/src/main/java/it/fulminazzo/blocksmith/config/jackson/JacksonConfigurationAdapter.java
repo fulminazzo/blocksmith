@@ -35,7 +35,7 @@ public final class JacksonConfigurationAdapter implements ConfigurationAdapter {
     }
 
     @Override
-    public <T> void store(final @NotNull T configuration, final @NotNull File file) throws IOException {
+    public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
         mapper.writeValue(file, configuration);
     }
 
