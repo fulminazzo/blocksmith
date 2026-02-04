@@ -44,8 +44,8 @@ final class YamlConfigurationAdapter implements ConfigurationAdapter {
                 new YAMLMapper(new SingleQuoteYAMLFactory(
                         YAMLFactory.builder().dumperOptions(options)
                 ))
-                        .configure(YAMLGenerator.Feature.WRITE_DOC_START_MARKER, false)
-                        .configure(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE, true)
+                        .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+                        .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)
                         .setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE),
                 logger,
                 YamlCommentPropertyWriter.class

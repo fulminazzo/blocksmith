@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 /**
- * Implementation of {@link ConfigurationAdapter} for YAML.
+ * Implementation of {@link ConfigurationAdapter} for JSON.
  */
 final class JsonConfigurationAdapter implements ConfigurationAdapter {
     @Delegate
@@ -27,7 +27,7 @@ final class JsonConfigurationAdapter implements ConfigurationAdapter {
     public JsonConfigurationAdapter(final @NotNull Logger logger) {
         this.delegate = new JacksonConfigurationAdapter(
                 new ObjectMapper()
-                        .configure(SerializationFeature.INDENT_OUTPUT, true)
+                        .enable(SerializationFeature.INDENT_OUTPUT)
                         .setDefaultPrettyPrinter(new JsonPrettyPrinter()),
                 logger,
                 JsonCommentPropertyWriter.class
