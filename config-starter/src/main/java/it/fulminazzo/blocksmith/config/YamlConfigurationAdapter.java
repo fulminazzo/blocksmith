@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.core.io.IOContext;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.util.StringQuotingChecker;
@@ -59,6 +60,26 @@ public final class YamlConfigurationAdapter implements ConfigurationAdapter {
             String commentText = comment.value().replace("\\n", "\n");
             for (String t : commentText.split("\n"))
                 generator.writeRaw("# " + t + "\n");
+        }
+
+    }
+
+    /**
+     * A special {@link YAMLFactory} that uses {@link SingleQuoteYAMLGenerator} as generator.
+     */
+    static class SingleQuoteYAMLFactory extends YAMLFactory {
+
+        @Override
+        protected YAMLGenerator _createGenerator(final Writer out,
+                                                 final IOContext context) throws IOException {
+            int feats = _yamlGeneratorFeatures;
+            if (_dumperOptions == null) {
+                return new SingleQuoteYAMLGenerator(context, _generatorFeatures, feats,
+                        _quotingChecker, _objectCodec, out, _version);
+            } else {
+                return new SingleQuoteYAMLGenerator(context, _generatorFeatures, feats,
+                        _quotingChecker, _objectCodec, out, _dumperOptions);
+            }
         }
 
     }
