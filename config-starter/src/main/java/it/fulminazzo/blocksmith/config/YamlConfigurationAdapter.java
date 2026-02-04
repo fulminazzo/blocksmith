@@ -28,9 +28,9 @@ import java.util.Collections;
 /**
  * Implementation of {@link ConfigurationAdapter} for YAML.
  */
-public final class YamlConfigurationAdapter implements ConfigurationAdapter {
+final class YamlConfigurationAdapter implements ConfigurationAdapter {
     @Delegate
-    private final @NotNull JacksonConfigurationAdapter delegate;
+    private final @NotNull ConfigurationAdapter delegate;
 
     /**
      * Instantiates a new YAML configuration adapter.
