@@ -1,7 +1,10 @@
 package it.fulminazzo.blocksmith.config;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
@@ -23,7 +26,9 @@ final class JsonConfigurationAdapter implements ConfigurationAdapter {
      */
     public JsonConfigurationAdapter(final @NotNull Logger logger) {
         this.delegate = new JacksonConfigurationAdapter(
-                new ObjectMapper(),
+                new ObjectMapper()
+                        .configure(SerializationFeature.INDENT_OUTPUT, true)
+                        .setDefaultPrettyPrinter(new JsonPrettyPrinter()),
                 logger,
                 JsonCommentPropertyWriter.class
         );
@@ -48,6 +53,26 @@ final class JsonConfigurationAdapter implements ConfigurationAdapter {
         @Override
         protected void writeComment(final @NotNull JsonGenerator generator,
                                     final @NotNull Comment comment) {
+        }
+
+    }
+
+    /**
+     * A special {@link DefaultPrettyPrinter} that overrides {@link #_objectFieldValueSeparatorWithSpaces}.
+     */
+    static final class JsonPrettyPrinter extends DefaultPrettyPrinter {
+
+        /**
+         * Instantiates a new JSON pretty printer.
+         */
+        public JsonPrettyPrinter() {
+            _objectFieldValueSeparatorWithSpaces = ": ";
+            indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
+        }
+
+        @Override
+        public DefaultPrettyPrinter createInstance() {
+            return new JsonPrettyPrinter();
         }
 
     }
