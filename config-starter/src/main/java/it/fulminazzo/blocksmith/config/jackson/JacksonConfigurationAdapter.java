@@ -13,7 +13,7 @@ import java.io.IOException;
  * that uses the <a href="https://github.com/FasterXML/jackson">jackson project</a>
  * for serialization and deserialization.
  */
-final class JacksonConfigurationAdapter implements ConfigurationAdapter {
+public final class JacksonConfigurationAdapter implements ConfigurationAdapter {
     private final @NotNull ObjectMapper mapper;
 
     /**
