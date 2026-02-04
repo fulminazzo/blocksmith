@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import it.fulminazzo.blocksmith.config.Comment;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+
 /**
  * A special {@link BeanPropertyWriter} that supports
  * writing of comments for a property.
@@ -38,8 +40,9 @@ public abstract class CommentPropertyWriter extends BeanPropertyWriter {
      *
      * @param generator the generator
      * @param comment   the comment
+     * @throws IOException in case of any errors
      */
     protected abstract void writeComment(final @NotNull JsonGenerator generator,
-                                         final @NotNull Comment comment);
+                                         final @NotNull Comment comment) throws IOException;
 
 }
