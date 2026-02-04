@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.core.io.IOContext;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactoryBuilder;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.util.StringQuotingChecker;
@@ -36,8 +37,12 @@ public final class YamlConfigurationAdapter implements ConfigurationAdapter {
      * @param logger the logger to warn about errors
      */
     public YamlConfigurationAdapter(final @NotNull Logger logger) {
+        DumperOptions options = new DumperOptions();
+        options.setProcessComments(true);
         this.delegate = new JacksonConfigurationAdapter(
-                new YAMLMapper(new SingleQuoteYAMLFactory()),
+                new YAMLMapper(new SingleQuoteYAMLFactory(
+                        YAMLFactory.builder().dumperOptions(options)
+                )),
                 logger,
                 YamlCommentPropertyWriter.class
         );
@@ -78,6 +83,15 @@ public final class YamlConfigurationAdapter implements ConfigurationAdapter {
      * A special {@link YAMLFactory} that uses {@link SingleQuoteYAMLGenerator} as generator.
      */
     static class SingleQuoteYAMLFactory extends YAMLFactory {
+
+        /**
+         * Instantiates a new Single quote YAML factory.
+         *
+         * @param builder the builder to create this object from
+         */
+        public SingleQuoteYAMLFactory(final @NotNull YAMLFactoryBuilder builder) {
+            super(builder);
+        }
 
         @Override
         protected YAMLGenerator _createGenerator(final Writer out,
