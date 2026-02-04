@@ -1,0 +1,10 @@
+# Example comment
+commentsEnabled = false
+# This comment should be
+# Multiline!
+description = ''
+name = 'Blocksmith'
+authors = ['Fulminazzo', 'Camilla', "Alex"]
+[internal]
+# This comment should be indented
+version = true
