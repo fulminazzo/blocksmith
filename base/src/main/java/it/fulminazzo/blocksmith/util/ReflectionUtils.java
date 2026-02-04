@@ -92,12 +92,9 @@ public final class ReflectionUtils {
                                      final Object... arguments) {
         Class<?> clazz = caller instanceof Class ? (Class<?>) caller : caller.getClass();
         try {
-            Method function = clazz.getDeclaredMethod(methodName, argumentsTypes.toArray(new Class[0]));
+            Method function = getMethod(clazz, methodName, argumentsTypes);
             function.setAccessible(true);
             return (T) function.invoke(caller, arguments);
-        } catch (NoSuchMethodException e) {
-            throw new ReflectionException("Could not invoke method '%s' from '%s': no such method was found",
-                    methodName, clazz.getCanonicalName());
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
             if (cause instanceof RuntimeException) throw (RuntimeException) cause;
