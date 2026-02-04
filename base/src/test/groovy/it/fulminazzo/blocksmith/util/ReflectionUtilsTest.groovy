@@ -67,7 +67,7 @@ class ReflectionUtilsTest extends Specification {
         def actual = ReflectionUtils.invokeMethod(new JavaBean(), 'message', [])
 
         then:
-        actual == 'Hello, world'
+        actual == 'Hello, world!'
     }
 
     def 'test that invokeMethod with #methodName throws #expected'() {
