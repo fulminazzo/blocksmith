@@ -12,7 +12,7 @@ class JacksonUtilsTest extends Specification {
     def 'test that mapper does not throw on constraint violation'() {
         given:
         def logger = Mock(Logger)
-        def mapper = JacksonUtils.setupMapper(new ObjectMapper(), logger)
+        def mapper = JacksonUtils.setupMapper(new ObjectMapper(), logger, MockCommentPropertyWrapper)
 
         and:
         def json = mapper.writeValueAsString(data)
@@ -51,7 +51,7 @@ class JacksonUtilsTest extends Specification {
     def 'test that mapper does not throw on exception'() {
         given:
         def logger = Mock(Logger)
-        def mapper = JacksonUtils.setupMapper(new ObjectMapper(), logger)
+        def mapper = JacksonUtils.setupMapper(new ObjectMapper(), logger, MockCommentPropertyWrapper)
 
         and:
         def json = mapper.writeValueAsString([

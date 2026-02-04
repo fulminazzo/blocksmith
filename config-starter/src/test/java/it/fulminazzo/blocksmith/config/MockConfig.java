@@ -19,6 +19,7 @@ public class MockConfig {
             "Multiline!")
     String name = "blocksmith";
 
+    @Comment("") // this comment should not appear
     String description = "This is the description for the configuration file.\n" +
             "Should be written in multiline format.";
 
