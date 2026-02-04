@@ -53,7 +53,6 @@ final class TomlConfigurationAdapter implements ConfigurationAdapter {
             String commentText = comment.value().replace("\\n", "\n");
             for (String t : commentText.split("\n"))
                 generator.writeRaw("# " + t + "\n");
-            generator.writeNull();
         }
 
     }
