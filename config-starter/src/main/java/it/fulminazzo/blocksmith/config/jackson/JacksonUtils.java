@@ -35,14 +35,16 @@ final class JacksonUtils {
      * (like missing property, extra property or invalid key/property type)
      * are replaced with a log warning.
      *
-     * @param <M>    the type of the mapper
-     * @param mapper the mapper
-     * @param logger the logger
+     * @param <M>                       the type of the mapper
+     * @param mapper                    the mapper
+     * @param logger                    the logger
+     * @param commentPropertyWriterType the type of {@link CommentPropertyWriter} responsible for writing comments
      * @return the updated mapper
      */
     @SuppressWarnings("unchecked")
     public static <M extends ObjectMapper> M setupMapper(final @NotNull M mapper,
-                                                         final @NotNull Logger logger) {
+                                                         final @NotNull Logger logger,
+                                                         final @NotNull Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
         return (M) mapper
                 .registerModule(new SimpleModule() {
 
@@ -50,6 +52,7 @@ final class JacksonUtils {
                     public void setupModule(final @NotNull SetupContext context) {
                         super.setupModule(context);
                         context.addBeanDeserializerModifier(new JacksonBeanDeserializerModifier(logger));
+                        context.addBeanSerializerModifier(new JacksonBeanSerializerModifier<>(commentPropertyWriterType));
                     }
 
                 })
