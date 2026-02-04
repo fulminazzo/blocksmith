@@ -10,13 +10,18 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.util.StringQuotingChecker;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
+import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.comments.CommentType;
+import org.yaml.snakeyaml.events.CommentEvent;
+import org.yaml.snakeyaml.events.Event;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Arrays;
 
 /**
  * Implementation of {@link ConfigurationAdapter} for YAML.
@@ -56,10 +61,15 @@ public final class YamlConfigurationAdapter implements ConfigurationAdapter {
 
         @Override
         protected void writeComment(final @NotNull JsonGenerator generator,
-                                    final @NotNull Comment comment) throws IOException {
+                                    final @NotNull Comment comment) {
             String commentText = comment.value().replace("\\n", "\n");
             for (String t : commentText.split("\n"))
-                generator.writeRaw("# " + t + "\n");
+                ReflectionUtils.invokeMethod(
+                        generator,
+                        "_emit",
+                        Arrays.asList(Event.class),
+                        new CommentEvent(CommentType.BLOCK, " " + t, null, null)
+                );
         }
 
     }
