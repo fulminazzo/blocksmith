@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -46,6 +47,40 @@ public final class ReflectionUtils {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ReflectionException(e, "Could not initialize %s(%s): %s",
                     type.getCanonicalName(), parameterTypesNames, e.getMessage());
+        }
+    }
+
+    /**
+     * Invokes a method from the given object.
+     *
+     * @param <T>            the return type
+     * @param caller         the object to call the method from
+     * @param methodName     the method name
+     * @param argumentsTypes the types of the arguments
+     * @param arguments      the arguments
+     * @return the returned object
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T invokeMethod(final @NotNull Object caller,
+                                     final @NotNull String methodName,
+                                     final @NotNull Collection<Class<?>> argumentsTypes,
+                                     final Object... arguments) {
+        Class<?> clazz = caller instanceof Class ? (Class<?>) caller : caller.getClass();
+        try {
+            Method function = clazz.getDeclaredMethod(methodName, argumentsTypes.toArray(new Class[0]));
+            function.setAccessible(true);
+            return (T) function.invoke(caller, arguments);
+        } catch (NoSuchMethodException e) {
+            throw new ReflectionException("Could not invoke method '%s' from '%s': no such method was found",
+                    methodName, clazz.getCanonicalName());
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+            else throw new RuntimeException(cause);
+        } catch (IllegalAccessException e) {
+            throw new ReflectionException(e, "Could not invoke method '%s' from '%s': %s",
+                    methodName, clazz.getCanonicalName(), e.getMessage()
+            );
         }
     }
 
