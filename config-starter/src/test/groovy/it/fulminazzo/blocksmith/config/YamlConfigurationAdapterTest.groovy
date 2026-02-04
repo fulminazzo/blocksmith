@@ -26,11 +26,16 @@ class YamlConfigurationAdapterTest extends Specification {
                 'comments-enabled: true',
                 '# This comment should be',
                 '# Multiline!',
-                'name: "blocksmith"',
+                'name: \'blocksmith\'',
+                'description: |-',
+                '  This is the description for the configuration file.',
+                '  Should be written in multiline format.',
+                'authors:',
+                '- \'Fulminazzo\'',
+                '- \'Camilla\'',
                 'internal:',
                 '  # This comment should be indented',
-                '  version: 1.0',
-                ''
+                '  version: 1.0'
         ]
     }
 
