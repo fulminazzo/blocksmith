@@ -2,24 +2,27 @@ package it.fulminazzo.blocksmith.config.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonStreamContext;
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerBuilder;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.deser.std.MapDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.type.MapType;
+import it.fulminazzo.blocksmith.config.Comment;
+import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A collection of utilities to work with jackson.
@@ -110,6 +113,31 @@ final class JacksonUtils {
             if (deserializer instanceof MapDeserializer)
                 return new NonNullKeyMapDeserializer((MapDeserializer) deserializer);
             else return deserializer;
+        }
+
+    }
+
+    @RequiredArgsConstructor
+    private static final class JacksonBeanSerializerModifier<W extends CommentPropertyWriter> extends BeanSerializerModifier {
+        private final @NotNull Class<W> commentPropertyWriterType;
+
+        @Override
+        public List<BeanPropertyWriter> changeProperties(final SerializationConfig config,
+                                                         final BeanDescription beanDescription,
+                                                         final List<BeanPropertyWriter> beanProperties) {
+            for (int i = 0; i < beanProperties.size(); i++) {
+                BeanPropertyWriter beanProperty = beanProperties.get(i);
+                Comment comment = beanProperty.getAnnotation(Comment.class);
+                if (comment != null && !comment.value().trim().isEmpty()) {
+                    W commentWriter = ReflectionUtils.initialize(
+                            commentPropertyWriterType,
+                            Arrays.asList(BeanPropertyWriter.class, Comment.class),
+                            beanProperty, comment
+                    );
+                    beanProperties.set(i, commentWriter);
+                }
+            }
+            return beanProperties;
         }
 
     }
