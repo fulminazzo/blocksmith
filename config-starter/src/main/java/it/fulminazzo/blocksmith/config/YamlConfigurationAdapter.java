@@ -32,7 +32,7 @@ public final class YamlConfigurationAdapter implements ConfigurationAdapter {
      */
     public YamlConfigurationAdapter(final @NotNull Logger logger) {
         this.delegate = new JacksonConfigurationAdapter(
-                new YAMLMapper(),
+                new YAMLMapper(new SingleQuoteYAMLFactory()),
                 logger,
                 YamlCommentPropertyWriter.class
         );
