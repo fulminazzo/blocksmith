@@ -21,6 +21,9 @@ allprojects {
         annotationProcessor(rootProject.libs.lombok)
         testAnnotationProcessor(rootProject.libs.lombok)
 
+        val baseProjectName = "base"
+        if (project.name != baseProjectName) api(project(":$baseProjectName"))
+
         testImplementation(rootProject.libs.bundles.annotations)
         testImplementation(rootProject.libs.bundles.test.framework)
     }
