@@ -54,7 +54,68 @@ class ReflectionUtilsTest extends Specification {
         RuntimeExceptionConstructor | []              | []         || new RuntimeException('Test runtime exception')
     }
 
-    static class JavaBean {}
+    def 'test that invokeMethod works'() {
+        when:
+        def actual = ReflectionUtils.invokeMethod(Integer, 'parseInt', [String], '1')
+
+        then:
+        actual == 1
+    }
+
+    def 'test that invokeMethod is able to invoke methods from superclass'() {
+        when:
+        def actual = ReflectionUtils.invokeMethod(new JavaBean(), 'message', [])
+
+        then:
+        actual == 'Hello, world'
+    }
+
+    def 'test that invokeMethod with #methodName throws #expected'() {
+        when:
+        ReflectionUtils.invokeMethod(JavaBean, methodName, [])
+
+        then:
+        def actual = thrown(expected.class)
+        actual.message == expected.message
+
+        and:
+        def eCause = expected.cause
+        def aCause = actual.cause
+        if (eCause == null) assert aCause == null
+        else {
+            assert aCause != null
+            assert eCause.class == aCause.class
+            assert eCause.message == aCause.message
+        }
+
+        where:
+        methodName         || expected
+        'notFound'         || new ReflectionUtils.ReflectionException(
+                "Could not invoke method 'notFound' from '${JavaBean.canonicalName}': " +
+                        "no such method was found")
+        'exception'        || new RuntimeException(new Exception('Test exception'))
+        'runtimeException' || new RuntimeException('Test runtime exception')
+    }
+
+    static class Parent {
+
+        String message() {
+            return 'Hello, world!'
+        }
+
+    }
+
+    static class JavaBean extends Parent {
+
+        static void exception() {
+            throw new Exception('Test exception')
+        }
+
+        static void runtimeException() {
+            throw new RuntimeException('Test runtime exception')
+        }
+
+    }
 
     static class MockObject {
         final String name
