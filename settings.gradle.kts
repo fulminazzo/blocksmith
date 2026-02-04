@@ -1,5 +1,7 @@
 rootProject.name = "blocksmith"
 
+include("base")
+
 include("scheduler-starter")
 
 include("scheduler-starter:scheduler-starter-bukkit")
