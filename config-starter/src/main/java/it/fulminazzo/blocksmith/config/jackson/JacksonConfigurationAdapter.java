@@ -19,12 +19,14 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
     /**
      * Instantiates a new Jackson configuration adapter.
      *
-     * @param mapper the object mapper
-     * @param logger the logger
+     * @param mapper                    the object mapper
+     * @param logger                    the logger
+     * @param commentPropertyWriterType the type of {@link CommentPropertyWriter} responsible for writing comments
      */
     public JacksonConfigurationAdapter(final @NotNull ObjectMapper mapper,
-                                       final @NotNull Logger logger) {
-        this.mapper = JacksonUtils.setupMapper(mapper, logger);
+                                       final @NotNull Logger logger,
+                                       final @NotNull Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
+        this.mapper = JacksonUtils.setupMapper(mapper, logger, commentPropertyWriterType);
     }
 
     @Override
@@ -33,8 +35,8 @@ final class JacksonConfigurationAdapter implements ConfigurationAdapter {
     }
 
     @Override
-    public <T> void store(final @NotNull T configuration, final @NotNull File file) {
-        throw new UnsupportedOperationException();
+    public <T> void store(final @NotNull T configuration, final @NotNull File file) throws IOException {
+        mapper.writeValue(file, configuration);
     }
 
 }
