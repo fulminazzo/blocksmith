@@ -26,6 +26,7 @@ log4j_core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "lo
 log4j_slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
 
 json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 
 validation = { module = "jakarta.validation:jakarta.validation-api", version.ref = "validation" }
 validator = { module = "org.apache.bval:bval-jsr", version.ref = "validator" }
