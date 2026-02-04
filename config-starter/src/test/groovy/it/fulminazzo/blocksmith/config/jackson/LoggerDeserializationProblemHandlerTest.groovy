@@ -14,7 +14,7 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
 
     void setup() {
         logger = Mock()
-        mapper = JacksonUtils.setupMapper(new ObjectMapper(), logger)
+        mapper = JacksonUtils.setupMapper(new ObjectMapper(), logger, MockCommentPropertyWrapper)
         .registerModule(new SimpleModule()
                 .addDeserializer(int.class, new StrictIntDeserializer())
                 .addDeserializer(Integer, new StrictIntDeserializer())
