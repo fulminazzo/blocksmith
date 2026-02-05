@@ -14,9 +14,9 @@ class ConfigUtilsTest extends Specification {
         and:
         def expected = CommentedConfig.inMemory()
         expected.set('simple', 'Hello, world!')
-        expected.setComment('version', 'This is the first comment')
+        expected.setComment('version', ' This is the first comment')
         expected.set('version', 1.0d)
-        expected.setComment('players', 'This comment is multiline\nHope it will work!')
+        expected.setComment('players', ' This comment is multiline\n Hope it will work!')
         expected.set('players', 2)
         expected.set('allowed', null)
         expected.set('current', null)
@@ -26,21 +26,21 @@ class ConfigUtilsTest extends Specification {
         authors.set('Camilla', 'Drinkwater')
         expected.set('authors', authors)
 
-        expected.setComment('mentions', 'Special mentions')
+        expected.setComment('mentions', ' Special mentions')
         expected.set('mentions', ['Frank'])
 
         def internal = expected.createSubConfig()
-        internal.setComment('java_version', 'This comment is internal')
+        internal.setComment('java_version', ' This comment is internal')
         internal.set('java_version', 11.0d)
 
         def gradleVersion = internal.createSubConfig()
-        gradleVersion.setComment('gradle', 'Gradle version')
+        gradleVersion.setComment('gradle', ' Gradle version')
         gradleVersion.set('gradle', 8.14d)
-        gradleVersion.setComment('groovy', 'Groovy version')
+        gradleVersion.setComment('groovy', ' Groovy version')
         gradleVersion.set('groovy', 4.0d)
         internal.set('gradle_version', gradleVersion)
 
-        expected.setComment('internal', 'Internal data, should not be used')
+        expected.setComment('internal', ' Internal data, should not be used')
         expected.set('internal', internal)
 
         and:
