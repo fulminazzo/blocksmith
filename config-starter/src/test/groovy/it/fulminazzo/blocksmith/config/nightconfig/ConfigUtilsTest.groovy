@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.config.nightconfig
 
 import com.electronwill.nightconfig.core.CommentedConfig
 import com.electronwill.nightconfig.core.serde.ObjectSerializer
-import com.electronwill.nightconfig.toml.TomlWriter
 import spock.lang.Specification
 
 class ConfigUtilsTest extends Specification {
@@ -40,6 +39,7 @@ class ConfigUtilsTest extends Specification {
         gradleVersion.set('groovy', 4.0d)
         internal.set('gradle_version', gradleVersion)
 
+        expected.setComment('internal', 'Internal data, should not be used')
         expected.set('internal', internal)
 
         and:
@@ -56,13 +56,24 @@ class ConfigUtilsTest extends Specification {
         ConfigUtils.setComments(reference, config)
 
         then:
-        config == expected
+        checkEquals(config, expected)
+    }
 
-        when:
-        def writer = new TomlWriter()
+    def checkEquals(CommentedConfig actual, CommentedConfig expected) {
+        def expectedEntries = expected.entrySet()
+        def actualEntries = actual.entrySet()
 
-        then:
-        writer.writeToString(config) == writer.writeToString(expected)
+        assert actualEntries.size() == expectedEntries.size()
+
+        for (def entry : expectedEntries) {
+            def key = entry.key
+            assert actual.getComment(key) == expected.getComment(key)
+            def actualValue = actual.get(key)
+            def expectedValue = expected.get(key)
+            assert actualValue == expectedValue
+            if (expectedValue instanceof CommentedConfig)
+                checkEquals(actualValue, expectedValue)
+        }
     }
 
 }
