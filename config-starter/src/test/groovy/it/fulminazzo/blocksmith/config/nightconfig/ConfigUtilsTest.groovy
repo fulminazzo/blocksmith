@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.config.nightconfig
 
 import com.electronwill.nightconfig.core.CommentedConfig
 import com.electronwill.nightconfig.core.serde.ObjectSerializer
+import com.electronwill.nightconfig.toml.TomlWriter
 import spock.lang.Specification
 
 class ConfigUtilsTest extends Specification {
@@ -56,6 +57,12 @@ class ConfigUtilsTest extends Specification {
 
         then:
         config == expected
+
+        when:
+        def writer = new TomlWriter()
+
+        then:
+        writer.writeToString(config) == writer.writeToString(expected)
     }
 
 }
