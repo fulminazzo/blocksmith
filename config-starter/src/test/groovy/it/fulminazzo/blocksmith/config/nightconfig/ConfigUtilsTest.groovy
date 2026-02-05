@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.config.nightconfig
 
 import com.electronwill.nightconfig.core.CommentedConfig
 import com.electronwill.nightconfig.core.serde.ObjectSerializer
+import it.fulminazzo.blocksmith.config.Comment
 import spock.lang.Specification
 
 class ConfigUtilsTest extends Specification {
@@ -75,6 +76,24 @@ class ConfigUtilsTest extends Specification {
                 checkEquals(actualValue, expectedValue)
         }
         return true
+    }
+
+    def 'test that getCommentValue correctly indents comments'() {
+        given:
+        def comment = Mock(Comment)
+        comment.value() >> value
+
+        when:
+        def actual = ConfigUtils.getCommentValue(comment)
+
+        then:
+        actual == expected
+
+        where:
+        value           || expected
+        ''              || ' '
+        'Hello'         || ' Hello'
+        'Hello\nworld!' || ' Hello\n world!'
     }
 
 }
