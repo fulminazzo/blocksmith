@@ -1,7 +1,9 @@
 package it.fulminazzo.blocksmith.config;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.electronwill.nightconfig.core.io.WritingMode;
 import com.electronwill.nightconfig.toml.TomlFormat;
+import com.electronwill.nightconfig.toml.TomlWriter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
@@ -49,8 +51,20 @@ final class TomlConfigurationAdapter implements ConfigurationAdapter {
                 .build()) {
             config.load();
             ConfigUtils.setComments(configuration, config);
-            config.save();
+            newTomlWriter().write(config, file, WritingMode.REPLACE);
         }
+    }
+
+    /**
+     * Gets a new TOML writer with predefined configuration.
+     *
+     * @return the toml writer
+     */
+    static @NotNull TomlWriter newTomlWriter() {
+        TomlWriter writer = new TomlWriter();
+        writer.setIndent("");
+        writer.setIndentArrayElementsPredicate(l -> !l.isEmpty());
+        return writer;
     }
 
     /**
