@@ -59,7 +59,7 @@ class ConfigUtilsTest extends Specification {
         checkEquals(config, expected)
     }
 
-    def checkEquals(CommentedConfig actual, CommentedConfig expected) {
+    boolean checkEquals(CommentedConfig actual, CommentedConfig expected) {
         def expectedEntries = expected.entrySet()
         def actualEntries = actual.entrySet()
 
@@ -74,6 +74,7 @@ class ConfigUtilsTest extends Specification {
             if (expectedValue instanceof CommentedConfig)
                 checkEquals(actualValue, expectedValue)
         }
+        return true
     }
 
 }
