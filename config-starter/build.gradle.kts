@@ -1,8 +1,8 @@
 dependencies {
     compileOnly(libs.slf4j)
 
-    api(libs.json)
-    api(libs.yaml)
+    api(libs.jackson.json)
+    api(libs.jackson.yaml)
     api(libs.bundles.toml)
 
     api(libs.bundles.validation)

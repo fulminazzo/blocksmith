@@ -26,9 +26,10 @@ log4j_api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4
 log4j_core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
 log4j_slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
 
-json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
+jackson_json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson_yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 jackson_toml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-toml", version.ref = "jackson" }
+
 night_config_toml = { module = "com.electronwill.night-config:toml", version.ref = "night_config" }
 
 validation = { module = "jakarta.validation:jakarta.validation-api", version.ref = "validation" }
