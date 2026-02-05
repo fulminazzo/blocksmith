@@ -29,21 +29,26 @@ class ConfigUtilsTest extends Specification {
         expected.set('mentions', ['Frank'])
 
         def internal = expected.createSubConfig()
-        internal.setComment('javaVersion', 'This comment is internal')
-        internal.set('javaVersion', 11.0d)
+        internal.setComment('java_version', 'This comment is internal')
+        internal.set('java_version', 11.0d)
 
         def gradleVersion = internal.createSubConfig()
         gradleVersion.setComment('gradle', 'Gradle version')
         gradleVersion.set('gradle', 8.14d)
         gradleVersion.setComment('groovy', 'Groovy version')
         gradleVersion.set('groovy', 4.0d)
-        internal.set('gradleVersion', gradleVersion)
+        internal.set('gradle_version', gradleVersion)
 
         expected.set('internal', internal)
 
         and:
         def serializer = ObjectSerializer.standard()
-        def config = serializer.serialize(reference, CommentedConfig::inMemory)
+        CommentedConfig config = serializer.serialize(reference, CommentedConfig::inMemory) as CommentedConfig
+        CommentedConfig configInternal = config.get('internal')
+        configInternal.set('java_version', configInternal.get('javaVersion'))
+        configInternal.remove('javaVersion')
+        configInternal.set('gradle_version', configInternal.get('gradleVersion'))
+        configInternal.remove('gradleVersion')
         reference.current = reference
 
         when:
