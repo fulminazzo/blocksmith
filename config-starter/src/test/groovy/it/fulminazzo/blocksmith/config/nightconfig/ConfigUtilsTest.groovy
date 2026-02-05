@@ -91,7 +91,8 @@ class ConfigUtilsTest extends Specification {
 
         where:
         value           || expected
-        ''              || ' '
+        ''              || null
+        '    '          || null
         'Hello'         || ' Hello'
         'Hello\nworld!' || ' Hello\n world!'
     }
