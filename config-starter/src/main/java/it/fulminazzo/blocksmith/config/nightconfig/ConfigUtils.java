@@ -17,6 +17,9 @@ import java.util.Collection;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConfigUtils {
+    /**
+     * The Naming strategy.
+     */
     static final @NotNull NamingStrategyImpls NAMING_STRATEGY = NamingStrategyImpls.SNAKE_CASE;
 
     /**
@@ -33,7 +36,7 @@ public final class ConfigUtils {
             String propertyName = NAMING_STRATEGY.translate(field.getName());
             if (field.isAnnotationPresent(Comment.class)) {
                 Comment comment = field.getAnnotation(Comment.class);
-                configuration.setComment(propertyName, comment.value());
+                configuration.setComment(propertyName, getCommentValue(comment));
             }
             Class<?> fieldType = field.getType();
             if (fieldType.isPrimitive() || fieldType.equals(Object.class)) continue;
@@ -43,6 +46,16 @@ public final class ConfigUtils {
             if (configValue instanceof CommentedConfig)
                 setComments(fieldValue, (CommentedConfig) configValue);
         }
+    }
+
+    /**
+     * Gets the comment value, indented for each line.
+     *
+     * @param comment the comment
+     * @return the comment value
+     */
+    static @NotNull String getCommentValue(final @NotNull Comment comment) {
+        return comment.value().replaceAll("^|\n", "\n ").substring(1);
     }
 
 }
