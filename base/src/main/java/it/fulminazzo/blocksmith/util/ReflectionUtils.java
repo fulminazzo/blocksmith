@@ -54,10 +54,12 @@ public final class ReflectionUtils {
     /**
      * Attempts to find a method in the given class (or superclasses)
      * with the given name and arguments types.
+     * <br>
+     * The returned method can either be static or non-static.
      *
      * @param container      the container of the method
      * @param methodName     the method name
-     * @param argumentsTypes the arguments types
+     * @param argumentsTypes the types of the arguments
      * @return the method
      */
     public static @NotNull Method getMethod(final @NotNull Class<?> container,
@@ -76,7 +78,7 @@ public final class ReflectionUtils {
     }
 
     /**
-     * Invokes a method from the given object.
+     * Invokes a method (regardless if it is static or not) from the given object.
      *
      * @param <T>            the return type
      * @param caller         the object to call the method from
