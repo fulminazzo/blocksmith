@@ -8,6 +8,7 @@ import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -52,10 +53,12 @@ public final class ConfigUtils {
      * Gets the comment value, indented for each line.
      *
      * @param comment the comment
-     * @return the comment value
+     * @return the comment value (<code>null</code> if empty or only white spaces)
      */
-    static @NotNull String getCommentValue(final @NotNull Comment comment) {
-        return comment.value().replaceAll("^|\n", "\n ").substring(1);
+    static @Nullable String getCommentValue(final @NotNull Comment comment) {
+        String commentText = comment.value();
+        if (commentText.trim().isEmpty()) return null;
+        return commentText.replaceAll("^|\n", "\n ").substring(1);
     }
 
 }
