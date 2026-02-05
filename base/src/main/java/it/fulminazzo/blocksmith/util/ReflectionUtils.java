@@ -4,10 +4,11 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -48,6 +49,25 @@ public final class ReflectionUtils {
             throw new ReflectionException(e, "Could not initialize %s(%s): %s",
                     type.getCanonicalName(), parameterTypesNames, e.getMessage());
         }
+    }
+
+    /**
+     * Returns all the fields in the given class (or superclasses)
+     * that are not static.
+     *
+     * @param container the container of the fields
+     * @return the fields
+     */
+    public static @NotNull Collection<Field> getInstanceFields(final @NotNull Class<?> container) {
+        List<Field> fields = new ArrayList<>();
+        Class<?> curr = container;
+        while (curr != null && !curr.equals(Object.class)) {
+            fields.addAll(Arrays.stream(curr.getDeclaredFields())
+                    .filter(f -> !Modifier.isStatic(f.getModifiers()) && !Modifier.isTransient(f.getModifiers()))
+                    .collect(Collectors.toList()));
+            curr = curr.getSuperclass();
+        }
+        return fields;
     }
 
     /**
