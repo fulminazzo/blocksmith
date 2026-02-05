@@ -54,6 +54,17 @@ class ReflectionUtilsTest extends Specification {
         RuntimeExceptionConstructor | []              | []         || new RuntimeException('Test runtime exception')
     }
 
+    def 'test that getInstanceFields returns only non-static fields'() {
+        when:
+        def actual = ReflectionUtils.getInstanceFields(JavaBean)
+
+        then:
+        actual == [
+                JavaBean.getDeclaredField('name'),
+                Parent.getDeclaredField('version')
+        ]
+    }
+
     def 'test that invokeMethod works'() {
         when:
         def actual = ReflectionUtils.invokeMethod(Integer, 'parseInt', [String], '1')
@@ -98,6 +109,8 @@ class ReflectionUtilsTest extends Specification {
     }
 
     static class Parent {
+        double version
+        static String parentName
 
         String message() {
             return 'Hello, world!'
@@ -106,6 +119,8 @@ class ReflectionUtilsTest extends Specification {
     }
 
     static class JavaBean extends Parent {
+        String name
+        static String className
 
         static void exception() {
             throw new Exception('Test exception')
