@@ -3,7 +3,7 @@ dependencies {
 
     api(libs.json)
     api(libs.yaml)
-    api(libs.toml)
+    api(libs.bundles.toml)
 
     api(libs.bundles.validation)
 
