@@ -8,7 +8,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -66,7 +65,7 @@ public final class ReflectionUtils {
                                             final @NotNull String methodName,
                                             final @NotNull Collection<Class<?>> argumentsTypes) {
         Class<?> curr = container;
-        while (curr != null && !curr.equals(Objects.class)) {
+        while (curr != null && !curr.equals(Object.class)) {
             try {
                 return curr.getDeclaredMethod(methodName, argumentsTypes.toArray(new Class[0]));
             } catch (NoSuchMethodException ignored) {
