@@ -71,6 +71,31 @@ public final class ReflectionUtils {
     }
 
     /**
+     * Wrapper for:
+     * <pre>
+     * field.setAccessible(true);
+     * field.get(caller);
+     * </pre>
+     * In case of error throws the unchecked {@link ReflectionException}.
+     *
+     * @param caller the caller
+     * @param field  the field to get
+     * @param <T>    the type of the field value
+     * @return the value of the field
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getFieldValue(final @NotNull Object caller,
+                                      final @NotNull Field field) {
+        try {
+            field.setAccessible(true);
+            return (T) field.get(caller);
+        } catch (IllegalAccessException e) {
+            throw new ReflectionException(e, "Could not get value of %s.%s: %s",
+                    caller.getClass().getCanonicalName(), field.getName(), e.getMessage());
+        }
+    }
+
+    /**
      * Attempts to find a method in the given class (or superclasses)
      * with the given name and arguments types.
      * <br>
