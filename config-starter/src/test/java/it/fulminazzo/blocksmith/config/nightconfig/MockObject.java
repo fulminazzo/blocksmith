@@ -21,6 +21,7 @@ public class MockObject {
             "Hope it will work!")
     int players = 2;
 
+    @Comment("")
     Boolean allowed = null;
 
     MockObject current = null;
