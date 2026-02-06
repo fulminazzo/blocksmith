@@ -37,6 +37,8 @@ public class MockConfig {
         @Comment("This comment should be indented\nAnd should be multiline too")
         double version = 1.0;
 
+        Boolean verified = null;
+
     }
 
 }
