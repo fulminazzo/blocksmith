@@ -97,8 +97,27 @@ public final class ReflectionUtils {
     /**
      * Wrapper for:
      * <pre>
+     * Field field = getField(caller.getClass(), fieldName);
+     * return getFieldValue(caller, field);
+     * </pre>
+     * In case of error throws the unchecked {@link ReflectionException}.
+     *
+     * @param caller    the caller
+     * @param fieldName the name of the field to get
+     * @param <T>       the type of the field value
+     * @return the value of the field
+     */
+    public static <T> T getFieldValue(final @NotNull Object caller,
+                                      final @NotNull String fieldName) {
+        Field field = getField(caller.getClass(), fieldName);
+        return getFieldValue(caller, field);
+    }
+
+    /**
+     * Wrapper for:
+     * <pre>
      * field.setAccessible(true);
-     * field.get(caller);
+     * return field.get(caller);
      * </pre>
      * In case of error throws the unchecked {@link ReflectionException}.
      *
