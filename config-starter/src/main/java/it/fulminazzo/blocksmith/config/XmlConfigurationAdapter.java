@@ -26,7 +26,8 @@ final class XmlConfigurationAdapter implements ConfigurationAdapter {
      */
     public XmlConfigurationAdapter(final @NotNull Logger logger) {
         this.delegate = new JacksonConfigurationAdapter(
-                new XmlMapper(),
+                new XmlMapper()
+                        .setPropertyNamingStrategy(new PascalCaseStrategy()),
                 logger,
                 XmlCommentPropertyWriter.class
         );
