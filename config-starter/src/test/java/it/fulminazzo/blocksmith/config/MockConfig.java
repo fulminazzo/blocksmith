@@ -15,7 +15,7 @@ public class MockConfig {
     @Comment("Example comment")
     boolean commentsEnabled = true;
 
-        @Comment({
+    @Comment({
             "This comment should be",
             "Multiline!"
     })
