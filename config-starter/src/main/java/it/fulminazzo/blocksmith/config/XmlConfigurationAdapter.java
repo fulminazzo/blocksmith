@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import lombok.experimental.Delegate;
@@ -26,8 +27,10 @@ final class XmlConfigurationAdapter implements ConfigurationAdapter {
      */
     public XmlConfigurationAdapter(final @NotNull Logger logger) {
         this.delegate = new JacksonConfigurationAdapter(
-                new XmlMapper()
-                        .setPropertyNamingStrategy(new PascalCaseStrategy()),
+                XmlMapper.builder()
+                        .enable(ToXmlGenerator.Feature.WRITE_NULLS_AS_XSI_NIL)
+                        .propertyNamingStrategy(new PascalCaseStrategy())
+                        .build(),
                 logger,
                 XmlCommentPropertyWriter.class
         );
