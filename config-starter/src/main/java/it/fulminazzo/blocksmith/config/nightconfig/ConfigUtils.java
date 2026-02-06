@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.config.nightconfig;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.Config;
-import com.fasterxml.jackson.databind.util.NamingStrategyImpls;
 import it.fulminazzo.blocksmith.config.Comment;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
@@ -19,14 +18,10 @@ import java.util.HashSet;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConfigUtils {
-    /**
-     * The TOML standard property naming strategy.
-     */
-    static final @NotNull NamingStrategyImpls NAMING_STRATEGY = NamingStrategyImpls.SNAKE_CASE;
 
     /**
      * Updates all the properties names of the given configuration
-     * to match {@link #NAMING_STRATEGY}.
+     * to match the TOML default naming strategy.
      *
      * @param configuration the configuration
      */
@@ -34,7 +29,7 @@ public final class ConfigUtils {
         for (Config.Entry entry : new HashSet<>(configuration.entrySet())) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            String translation = NAMING_STRATEGY.translate(key);
+            String translation = formatToSnakeCase(key);
             if (!key.equals(translation)) {
                 configuration.remove(key);
                 configuration.set(translation, value);
@@ -54,7 +49,7 @@ public final class ConfigUtils {
                                    final @NotNull CommentedConfig configuration) {
         Collection<Field> fields = ReflectionUtils.getInstanceFields(reference.getClass());
         for (Field field : fields) {
-            String propertyName = NAMING_STRATEGY.translate(field.getName());
+            String propertyName = formatToSnakeCase(field.getName());
             if (field.isAnnotationPresent(Comment.class)) {
                 Comment comment = field.getAnnotation(Comment.class);
                 configuration.setComment(propertyName, getCommentValue(comment));
@@ -79,6 +74,19 @@ public final class ConfigUtils {
         String commentText = comment.value();
         if (commentText.trim().isEmpty()) return null;
         return commentText.replaceAll("^|\n", "\n ").substring(1);
+    }
+
+    /**
+     * Formats the given string to a snake case.
+     *
+     * @param string the string
+     * @return the snake case string
+     */
+    public static String formatToSnakeCase(String string) {
+        if (string == null) return null;
+        String result = string.replaceAll("([a-z0-9])([A-Z])", "$1_$2");
+        result = result.replaceAll("[\\s\\-.]", "_");
+        return result.toLowerCase().replaceAll("_{2,}", "_");
     }
 
 }
