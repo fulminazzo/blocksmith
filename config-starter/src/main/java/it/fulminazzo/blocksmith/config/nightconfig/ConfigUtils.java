@@ -27,24 +27,19 @@ public final class ConfigUtils {
     /**
      * Updates all the properties names of the given configuration
      * to match {@link #NAMING_STRATEGY}.
-     * Removes every <code>null</code> value.
      *
      * @param configuration the configuration
      */
-    public static void fixPropertyNamesAndRemoveNull(final @NotNull Config configuration) {
+    public static void fixPropertyNames(final @NotNull Config configuration) {
         for (Config.Entry entry : new HashSet<>(configuration.entrySet())) {
             String key = entry.getKey();
             Object value = entry.getValue();
             String translation = NAMING_STRATEGY.translate(key);
-            if (value == null) {
-                key = "";
-                value = "";
-            }
             if (!key.equals(translation)) {
-                configuration.set(key, null);
+                configuration.remove(key);
                 configuration.set(translation, value);
             }
-            if (value instanceof Config) fixPropertyNamesAndRemoveNull((Config) value);
+            if (value instanceof Config) fixPropertyNames((Config) value);
         }
     }
 
