@@ -15,6 +15,12 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CommentUtils {
 
+    /**
+     * Checks if the given comment is empty.
+     *
+     * @param comment the comment
+     * @return <code>true</code> if it is
+     */
     public static boolean isEmpty(final @NotNull Comment comment) {
         return getText(comment).stream().allMatch(l -> l.trim().isEmpty());
     }
