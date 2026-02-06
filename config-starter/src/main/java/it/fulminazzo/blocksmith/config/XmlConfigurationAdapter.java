@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import com.fasterxml.jackson.dataformat.xml.util.DefaultXmlPrettyPrinter;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import lombok.AccessLevel;
@@ -60,7 +59,9 @@ final class XmlConfigurationAdapter implements ConfigurationAdapter {
         @Override
         protected void writeComment(final @NotNull JsonGenerator generator,
                                     final @NotNull Comment comment) throws IOException {
-            //TODO: implement
+            for (String t : CommentUtils.getText(comment))
+                //TODO: missing indentation
+                generator.writeRaw(String.format("\n<!-- %s -->", t));
         }
 
     }
