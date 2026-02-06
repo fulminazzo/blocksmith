@@ -71,6 +71,30 @@ public final class ReflectionUtils {
     }
 
     /**
+     * Attempts to find a field in the given class (or superclasses)
+     * with the given name and arguments types.
+     * <br>
+     * The returned field can either be static or non-static.
+     *
+     * @param container      the container of the method
+     * @param fieldName     the field name
+     * @return the method
+     */
+    public static @NotNull Field getField(final @NotNull Class<?> container,
+                                          final @NotNull String fieldName) {
+        Class<?> curr = container;
+        while (curr != null && !curr.equals(Object.class)) {
+            try {
+                return curr.getDeclaredField(fieldName);
+            } catch (NoSuchFieldException ignored) {
+                curr = curr.getSuperclass();
+            }
+        }
+        throw new ReflectionException("Could not get field '%s' from '%s': no such method was found",
+                fieldName, container.getCanonicalName());
+    }
+
+    /**
      * Wrapper for:
      * <pre>
      * field.setAccessible(true);
