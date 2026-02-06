@@ -1,11 +1,38 @@
 package it.fulminazzo.blocksmith.config.nightconfig
 
 import com.electronwill.nightconfig.core.CommentedConfig
+import com.electronwill.nightconfig.core.Config
 import com.electronwill.nightconfig.core.serde.ObjectSerializer
 import it.fulminazzo.blocksmith.config.Comment
 import spock.lang.Specification
 
 class ConfigUtilsTest extends Specification {
+
+    def 'test that fixPropertyNamesAndRemoveNull correctly updates names and overrides nulls'() {
+        given:
+        def expected = Config.inMemory()
+        expected.set('first', 'Hello, world!')
+        expected.set('comments_enabled', true)
+        def sub = expected.createSubConfig()
+        sub.set('java', 11)
+        sub.set('gradle_version', 18)
+        expected.set('sub', sub)
+
+        and:
+        def actual = Config.inMemory()
+        actual.set('first', 'Hello, world!')
+        actual.set('commentsEnabled', true)
+        sub = actual.createSubConfig()
+        sub.set('java', 11)
+        sub.set('gradleVersion', 18)
+        actual.set('sub', sub)
+
+        when:
+        ConfigUtils.fixPropertyNames(actual)
+
+        then:
+        actual == expected
+    }
 
     def 'test that setComments correctly sets comments'() {
         given:
