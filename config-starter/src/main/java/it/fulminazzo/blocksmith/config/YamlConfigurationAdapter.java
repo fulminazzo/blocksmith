@@ -71,8 +71,7 @@ final class YamlConfigurationAdapter implements ConfigurationAdapter {
         @Override
         protected void writeComment(final @NotNull JsonGenerator generator,
                                     final @NotNull Comment comment) {
-            String commentText = comment.value().replace("\\n", "\n");
-            for (String t : commentText.split("\n"))
+            for (String t : CommentUtils.getText(comment))
                 ReflectionUtils.invokeMethod(
                         generator,
                         "_emit",

@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.config.nightconfig;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.Config;
 import it.fulminazzo.blocksmith.config.Comment;
+import it.fulminazzo.blocksmith.config.CommentUtils;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -71,7 +72,7 @@ public final class ConfigUtils {
      * @return the comment value (<code>null</code> if empty or only white spaces)
      */
     static @Nullable String getCommentValue(final @NotNull Comment comment) {
-        String commentText = comment.value();
+        String commentText = String.join("\n", CommentUtils.getText(comment));
         if (commentText.trim().isEmpty()) return null;
         return commentText.replaceAll("^|\n", "\n ").substring(1);
     }
