@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.config.jackson;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -25,7 +26,7 @@ public final class JacksonConfigurationAdapter implements ConfigurationAdapter {
      */
     public JacksonConfigurationAdapter(final @NotNull ObjectMapper mapper,
                                        final @NotNull Logger logger,
-                                       final @NotNull Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
+                                       final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
         this.mapper = JacksonUtils.setupMapper(mapper, logger, commentPropertyWriterType);
     }
 
