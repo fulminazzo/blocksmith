@@ -46,7 +46,8 @@ class ReflectionUtilsTest extends Specification {
         where:
         type                        | parametersTypes | parameters || expected
         JavaBean                    | [String]        | ['Alex']   || new ReflectionUtils.ReflectionException(
-                "Could not find constructor ${ReflectionUtilsTest.canonicalName}.JavaBean(${String.canonicalName})"
+                "Could not get constructor ${ReflectionUtilsTest.canonicalName}.JavaBean(${String.canonicalName}): " +
+                        'no such constructor is present'
         )
         ExceptionConstructor        | []              | []         || new RuntimeException(
                 new Exception('Test exception')
@@ -63,6 +64,45 @@ class ReflectionUtilsTest extends Specification {
                 JavaBean.getDeclaredField('name'),
                 Parent.getDeclaredField('version')
         ]
+    }
+
+    def 'test that getFieldValue of #fieldName returns #expected'() {
+        when:
+        def actual = ReflectionUtils.getFieldValue(new JavaBean(), fieldName)
+
+        then:
+        actual == expected
+
+        where:
+        fieldName || expected
+        'name'    || 'Bean'
+        'version' || 1.0
+    }
+
+    def 'test that getFieldValue of #field returns #expected'() {
+        when:
+        def actual = ReflectionUtils.getFieldValue(new JavaBean(), field)
+
+        then:
+        actual == expected
+
+        where:
+        field                              || expected
+        JavaBean.getDeclaredField('name')  || 'Bean'
+        Parent.getDeclaredField('version') || 1.0
+    }
+
+    def 'test that getField of #fieldName returns #expected'() {
+        when:
+        def actual = ReflectionUtils.getField(JavaBean, fieldName)
+
+        then:
+        actual == expected
+
+        where:
+        fieldName || expected
+        'name'    || JavaBean.getDeclaredField('name')
+        'version' || Parent.getDeclaredField('version')
     }
 
     def 'test that invokeMethod works'() {
@@ -102,14 +142,14 @@ class ReflectionUtilsTest extends Specification {
         where:
         methodName         || expected
         'notFound'         || new ReflectionUtils.ReflectionException(
-                "Could not invoke method 'notFound' from '${JavaBean.canonicalName}': " +
-                        "no such method was found")
+                "Could not get method ${JavaBean.canonicalName}#notFound(): " +
+                        'no such method is present')
         'exception'        || new RuntimeException(new Exception('Test exception'))
         'runtimeException' || new RuntimeException('Test runtime exception')
     }
 
     static class Parent {
-        double version
+        double version = 1.0
         static String parentName
 
         String message() {
@@ -119,7 +159,7 @@ class ReflectionUtilsTest extends Specification {
     }
 
     static class JavaBean extends Parent {
-        String name
+        String name = 'Bean'
         static String className
 
         static void exception() {
