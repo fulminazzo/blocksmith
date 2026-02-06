@@ -1,8 +1,8 @@
 package it.fulminazzo.blocksmith.config;
 
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
-import com.electronwill.nightconfig.toml.TomlFormat;
+import com.electronwill.nightconfig.core.serde.ObjectSerializer;
 import com.electronwill.nightconfig.toml.TomlWriter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -45,15 +45,11 @@ final class TomlConfigurationAdapter implements ConfigurationAdapter {
 
     @Override
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
-        delegate.store(file, configuration);
-        try (CommentedFileConfig config = CommentedFileConfig.builder(file, TomlFormat.instance())
-                .sync()
-                .preserveInsertionOrder()
-                .build()) {
-            config.load();
-            ConfigUtils.setComments(configuration, config);
-            newTomlWriter().write(config, file, WritingMode.REPLACE);
-        }
+        CommentedConfig config = (CommentedConfig) ObjectSerializer.standard()
+                .serialize(configuration, CommentedConfig::inMemory);
+        ConfigUtils.fixPropertyNames(config);
+        ConfigUtils.setComments(configuration, config);
+        newTomlWriter().write(config, file, WritingMode.REPLACE);
         indentArrays(file);
     }
 
