@@ -61,4 +61,33 @@ class TomlConfigurationAdapterTest extends Specification {
         ]
     }
 
+    def 'test that store with #array returns #expected'() {
+        given:
+        def file = new File('build/resources/test/store_array.toml')
+        if (file.exists()) file.delete()
+
+        and:
+        def adapter = new TomlConfigurationAdapter(log)
+
+        when:
+        adapter.store(file, ['data': array])
+
+        then:
+        noExceptionThrown()
+
+        and:
+        file.readLines() == expected
+
+        when:
+        def data = adapter.load(file, Map)
+
+        then:
+        data['data'] == array
+
+        where:
+        array || expected
+        []    || ['data = []']
+        [1]   || ['data = [', '    1', ']']
+    }
+
 }
