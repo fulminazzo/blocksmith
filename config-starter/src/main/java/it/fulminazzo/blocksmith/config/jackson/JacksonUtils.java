@@ -17,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
@@ -44,7 +45,7 @@ final class JacksonUtils {
     @SuppressWarnings("unchecked")
     public static <M extends ObjectMapper> M setupMapper(final @NotNull M mapper,
                                                          final @NotNull Logger logger,
-                                                         final @NotNull Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
+                                                         final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
         return (M) mapper
                 .registerModule(new SimpleModule() {
 
@@ -52,7 +53,8 @@ final class JacksonUtils {
                     public void setupModule(final @NotNull SetupContext context) {
                         super.setupModule(context);
                         context.addBeanDeserializerModifier(new JacksonBeanDeserializerModifier(logger));
-                        context.addBeanSerializerModifier(new JacksonBeanSerializerModifier<>(commentPropertyWriterType));
+                        if (commentPropertyWriterType != null)
+                            context.addBeanSerializerModifier(new JacksonBeanSerializerModifier<>(commentPropertyWriterType));
                     }
 
                 })
