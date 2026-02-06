@@ -4,6 +4,7 @@ dependencies {
     api(libs.jackson.json)
     api(libs.jackson.yaml)
     api(libs.bundles.toml)
+    api(libs.jackson.xml)
 
     api(libs.bundles.validation)
 

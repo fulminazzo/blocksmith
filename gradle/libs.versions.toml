@@ -29,6 +29,7 @@ log4j_slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.r
 jackson_json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 jackson_yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 jackson_toml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-toml", version.ref = "jackson" }
+jackson_xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
 
 night_config_toml = { module = "com.electronwill.night-config:toml", version.ref = "night_config" }
 
