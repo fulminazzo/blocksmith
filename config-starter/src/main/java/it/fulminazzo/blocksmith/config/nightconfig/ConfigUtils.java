@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * A collection of utilities to work with {@link Config} objects.
@@ -19,9 +20,33 @@ import java.util.Collection;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConfigUtils {
     /**
-     * The Naming strategy.
+     * The TOML standard property naming strategy.
      */
     static final @NotNull NamingStrategyImpls NAMING_STRATEGY = NamingStrategyImpls.SNAKE_CASE;
+
+    /**
+     * Updates all the properties names of the given configuration
+     * to match {@link #NAMING_STRATEGY}.
+     * Removes every <code>null</code> value.
+     *
+     * @param configuration the configuration
+     */
+    public static void fixPropertyNamesAndRemoveNull(final @NotNull Config configuration) {
+        for (Config.Entry entry : new HashSet<>(configuration.entrySet())) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            String translation = NAMING_STRATEGY.translate(key);
+            if (value == null) {
+                key = "";
+                value = "";
+            }
+            if (!key.equals(translation)) {
+                configuration.set(key, null);
+                configuration.set(translation, value);
+            }
+            if (value instanceof Config) fixPropertyNamesAndRemoveNull((Config) value);
+        }
+    }
 
     /**
      * Loops all the given object fields in search for the {@link Comment} annotation.
