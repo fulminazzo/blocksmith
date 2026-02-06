@@ -1,5 +1,5 @@
 # Example comment
-commentsEnabled = false
+comments_enabled = false
 # This comment should be
 # Multiline!
 description = ''
