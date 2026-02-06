@@ -108,7 +108,7 @@ class ConfigUtilsTest extends Specification {
     def 'test that getCommentValue correctly indents comments'() {
         given:
         def comment = Mock(Comment)
-        comment.value() >> value
+        comment.value() >> new String[]{value}
 
         when:
         def actual = ConfigUtils.getCommentValue(comment)

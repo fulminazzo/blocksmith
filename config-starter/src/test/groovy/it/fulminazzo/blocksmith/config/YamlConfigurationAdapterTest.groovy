@@ -58,6 +58,7 @@ class YamlConfigurationAdapterTest extends Specification {
                 '- \'Camilla\'',
                 'internal:',
                 '  # This comment should be indented',
+                '  # And should be multiline too',
                 '  version: 1.0'
         ]
     }
