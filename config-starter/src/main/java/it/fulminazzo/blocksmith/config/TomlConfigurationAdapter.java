@@ -4,11 +4,8 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import com.electronwill.nightconfig.core.serde.ObjectSerializer;
 import com.electronwill.nightconfig.toml.TomlWriter;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.dataformat.toml.TomlMapper;
-import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.nightconfig.ConfigUtils;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +31,7 @@ final class TomlConfigurationAdapter implements ConfigurationAdapter {
                 new TomlMapper()
                         .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE),
                 logger,
-                TomlCommentPropertyWriter.class
+                null // will be handled by night-config
         );
     }
 
@@ -85,30 +82,6 @@ final class TomlConfigurationAdapter implements ConfigurationAdapter {
         writer.setIndent("");
         writer.setIndentArrayElementsPredicate(l -> !l.isEmpty());
         return writer;
-    }
-
-    /**
-     * An implementation of {@link CommentPropertyWriter} for handling TOML comments.
-     * (These are actually handled by night-config)
-     */
-    static final class TomlCommentPropertyWriter extends CommentPropertyWriter {
-
-        /**
-         * Instantiates a new TOML comment property writer.
-         *
-         * @param base    the base
-         * @param comment the comment
-         */
-        public TomlCommentPropertyWriter(final @NotNull BeanPropertyWriter base,
-                                         final @NotNull Comment comment) {
-            super(base, comment);
-        }
-
-        @Override
-        protected void writeComment(final @NotNull JsonGenerator generator,
-                                    final @NotNull Comment comment) {
-        }
-
     }
 
 }
