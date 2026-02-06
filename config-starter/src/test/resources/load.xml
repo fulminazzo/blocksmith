@@ -1,0 +1,16 @@
+<MockConfig>
+    <!-- Example comment -->
+    <CommentsEnabled>false</CommentsEnabled>
+    <!-- This comment should be -->
+    <!-- Multiline! -->
+    <Name>Blocksmith</Name>
+    <Authors>
+        <Authors>Fulminazzo</Authors>
+        <Authors>Camilla</Authors>
+        <Authors>Alex</Authors>
+    </Authors>
+    <Internal>
+        <!-- This comment should be indented -->
+        <Version>true</Version>
+    </Internal>
+</MockConfig>
