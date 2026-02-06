@@ -7,6 +7,8 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ final class XmlConfigurationAdapter implements ConfigurationAdapter {
         this.delegate = new JacksonConfigurationAdapter(
                 XmlMapper.builder()
                         .enable(ToXmlGenerator.Feature.WRITE_NULLS_AS_XSI_NIL)
-                        .propertyNamingStrategy(new PascalCaseStrategy())
+                        .propertyNamingStrategy(PascalCaseStrategy.INSTANCE)
                         .build(),
                 logger,
                 XmlCommentPropertyWriter.class
@@ -63,7 +65,9 @@ final class XmlConfigurationAdapter implements ConfigurationAdapter {
     /**
      * Implements the Pascal case strategy for jackson.
      */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static final class PascalCaseStrategy extends PropertyNamingStrategies.NamingBase {
+        public static final @NotNull PascalCaseStrategy INSTANCE = new PascalCaseStrategy();
 
         @Override
         public @NotNull String translate(final @NotNull String propertyName) {
