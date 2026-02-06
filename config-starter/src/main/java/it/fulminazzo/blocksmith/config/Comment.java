@@ -17,11 +17,11 @@ public @interface Comment {
 
     /**
      * The text of the comment.
-     * If on JDK < 15, it is possible to use the newline character <code>\n</code>
-     * to create multiple lines comments.
+     * If on JDK < 15, it is possible to specify new lines as
+     * elements of the array (or using the newline character <code>\n</code>).
      *
      * @return the text
      */
-    @NotNull String value();
+    @NotNull String @NotNull [] value();
 
 }
