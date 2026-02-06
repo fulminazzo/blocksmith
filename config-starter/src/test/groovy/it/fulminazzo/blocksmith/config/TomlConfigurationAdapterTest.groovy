@@ -46,18 +46,21 @@ class TomlConfigurationAdapterTest extends Specification {
         and:
         file.readLines() == [
                 '# Example comment',
-                'commentsEnabled = true',
+                'comments_enabled = true',
                 '# This comment should be',
                 '# Multiline!',
-                'name = \'blocksmith\'',
-                'description = "This is the description for the configuration file.\\nShould be written in multiline format."',
+                'name = "blocksmith"',
+                'description = """',
+                'This is the description for the configuration file.',
+                'Should be written in multiline format."""',
                 'authors = [',
-                '    \'Fulminazzo\',',
-                '    \'Camilla\'',
+                '    "Fulminazzo",',
+                '    "Camilla"',
                 ']',
+                '',
                 '[internal]',
                 '# This comment should be indented',
-                'version = 1.0\n'
+                'version = 1.0'
         ]
     }
 
