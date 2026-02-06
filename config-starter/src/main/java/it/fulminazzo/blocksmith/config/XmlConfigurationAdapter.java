@@ -2,9 +2,11 @@ package it.fulminazzo.blocksmith.config;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import com.fasterxml.jackson.dataformat.xml.util.DefaultXmlPrettyPrinter;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import lombok.AccessLevel;
@@ -31,6 +33,7 @@ final class XmlConfigurationAdapter implements ConfigurationAdapter {
         this.delegate = new JacksonConfigurationAdapter(
                 XmlMapper.builder()
                         .enable(ToXmlGenerator.Feature.WRITE_NULLS_AS_XSI_NIL)
+                        .enable(SerializationFeature.INDENT_OUTPUT)
                         .propertyNamingStrategy(PascalCaseStrategy.INSTANCE)
                         .build(),
                 logger,
