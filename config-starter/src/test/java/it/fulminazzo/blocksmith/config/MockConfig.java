@@ -15,8 +15,10 @@ public class MockConfig {
     @Comment("Example comment")
     boolean commentsEnabled = true;
 
-    @Comment("This comment should be\n" +
-            "Multiline!")
+        @Comment({
+            "This comment should be",
+            "Multiline!"
+    })
     String name = "blocksmith";
 
     @Comment("") // this comment should not appear
@@ -32,7 +34,7 @@ public class MockConfig {
     @AllArgsConstructor
     public static class Internal {
 
-        @Comment("This comment should be indented")
+        @Comment("This comment should be indented\nAnd should be multiline too")
         double version = 1.0;
 
     }
