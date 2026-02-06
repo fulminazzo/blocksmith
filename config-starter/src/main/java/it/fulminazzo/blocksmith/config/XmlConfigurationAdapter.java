@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.config;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
@@ -51,6 +52,28 @@ final class XmlConfigurationAdapter implements ConfigurationAdapter {
         protected void writeComment(final @NotNull JsonGenerator generator,
                                     final @NotNull Comment comment) throws IOException {
             //TODO: implement
+        }
+
+    }
+
+    /**
+     * Implements the Pascal case strategy for jackson.
+     */
+    static final class PascalCaseStrategy extends PropertyNamingStrategies.NamingBase {
+
+        @Override
+        public @NotNull String translate(final @NotNull String propertyName) {
+            StringBuilder result = new StringBuilder();
+            String[] words = propertyName.split("[^a-zA-Z0-9]+");
+
+            for (String word : words) {
+                if (!word.isEmpty()) {
+                    result.append(Character.toUpperCase(word.charAt(0)));
+                    result.append(word.substring(1));
+                }
+            }
+
+            return result.toString();
         }
 
     }
