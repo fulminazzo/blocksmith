@@ -25,7 +25,7 @@ class YamlConfigurationAdapterTest extends Specification {
                 'Blocksmith',
                 null,
                 ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0)
+                new MockConfig.Internal(1.0, null)
         )
     }
 
@@ -59,7 +59,8 @@ class YamlConfigurationAdapterTest extends Specification {
                 'internal:',
                 '  # This comment should be indented',
                 '  # And should be multiline too',
-                '  version: 1.0'
+                '  version: 1.0',
+                '  verified: null'
         ]
     }
 

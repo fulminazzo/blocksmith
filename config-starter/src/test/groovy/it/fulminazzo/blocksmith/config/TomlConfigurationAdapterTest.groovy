@@ -25,7 +25,7 @@ class TomlConfigurationAdapterTest extends Specification {
                 'Blocksmith',
                 '',
                 ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0)
+                new MockConfig.Internal(1.0, null)
         )
     }
 

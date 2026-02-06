@@ -25,7 +25,7 @@ class PropertiesConfigurationAdapterTest extends Specification {
                 'Blocksmith',
                 '',
                 ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0)
+                new MockConfig.Internal(1.0, false)
         )
     }
 
@@ -55,7 +55,8 @@ class PropertiesConfigurationAdapterTest extends Specification {
                 'authors.2=Camilla',
                 '# This comment should be indented',
                 '# And should be multiline too',
-                'internal.version=1.0'
+                'internal.version=1.0',
+                'internal.verified='
         ]
     }
 

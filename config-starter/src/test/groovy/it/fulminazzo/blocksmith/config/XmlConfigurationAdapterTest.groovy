@@ -25,7 +25,7 @@ class XmlConfigurationAdapterTest extends Specification {
                 'Blocksmith',
                 null,
                 ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0)
+                new MockConfig.Internal(1.0, null)
         )
     }
 
@@ -61,6 +61,7 @@ class XmlConfigurationAdapterTest extends Specification {
                 '    <!-- This comment should be indented -->',
                 '    <!-- And should be multiline too -->',
                 '    <Version>1.0</Version>',
+                '    <Verified xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>',
                 '  </Internal>',
                 '</MockConfig>'
         ]

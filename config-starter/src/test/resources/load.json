@@ -4,6 +4,7 @@
   "description": null,
   "authors": ["Fulminazzo", "Camilla", "Alex"],
   "internal": {
-    "version": true
+    "version": true,
+    "verified": null
   }
 }

@@ -8,3 +8,4 @@ authors: ['Fulminazzo', Camilla, "Alex"]
 internal:
   # This comment should be indented
   version: true
+  verified: ~

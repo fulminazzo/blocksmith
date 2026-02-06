@@ -25,7 +25,7 @@ class JsonConfigurationAdapterTest extends Specification {
                 'Blocksmith',
                 null,
                 ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0)
+                new MockConfig.Internal(1.0, null)
         )
     }
 
@@ -54,7 +54,8 @@ class JsonConfigurationAdapterTest extends Specification {
                 '    "Camilla"',
                 '  ],',
                 '  "internal": {',
-                '    "version": 1.0',
+                '    "version": 1.0,',
+                '    "verified": null',
                 '  }',
                 '}'
         ]

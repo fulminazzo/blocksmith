@@ -13,5 +13,6 @@
     <Internal>
         <!-- This comment should be indented -->
         <Version>true</Version>
+        <Verified xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
     </Internal>
 </MockConfig>
