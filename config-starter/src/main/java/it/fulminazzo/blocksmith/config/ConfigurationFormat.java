@@ -29,7 +29,7 @@ public enum ConfigurationFormat {
      * @param logger the logger
      * @return the adapter
      */
-    @NotNull BaseConfigurationAdapter getAdapter(final @NotNull Logger logger) {
+    @NotNull BaseConfigurationAdapter newAdapter(final @NotNull Logger logger) {
         return adapterSupplier.apply(logger);
     }
 
