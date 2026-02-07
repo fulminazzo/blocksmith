@@ -15,22 +15,33 @@ class DelegateConfigurationAdapterTest extends Specification {
         data.internal.verified = true
 
         and:
-        def file = new File('build/resources/test/delegate.test')
+        def parentFile = new File('build/resources/test')
 
         when:
-        adapter.store(file, data)
+        adapter.store(parentFile, 'delegate', data)
 
         then:
         noExceptionThrown()
 
         when:
-        def actual = adapter.load(file, data.class)
+        def actual = adapter.load(parentFile, 'delegate', data.class)
 
         then:
         actual == data
 
         where:
         format << ConfigurationFormat.values()
+    }
+
+    def 'test that getFormat throws if not initialized'() {
+        given:
+        def adapter = new DelegateConfigurationAdapter(log)
+
+        when:
+        adapter.format
+
+        then:
+        thrown(IllegalStateException)
     }
 
     def 'test that getDelegate throws if not initialized'() {
