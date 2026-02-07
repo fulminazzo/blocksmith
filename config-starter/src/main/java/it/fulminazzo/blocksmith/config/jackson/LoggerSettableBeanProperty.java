@@ -22,9 +22,16 @@ import java.util.Set;
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
+    private static final @NotNull Validator validator;
+
+    static {
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
+    }
+
     @NotNull Logger logger;
     @NotNull AnnotatedField field;
-    @NotNull Validator validator;
 
     /**
      * Instantiates a new Logger settable bean property.
@@ -39,9 +46,6 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
         super(delegate);
         this.logger = logger;
         this.field = field;
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            this.validator = factory.getValidator();
-        }
     }
 
     @Override
