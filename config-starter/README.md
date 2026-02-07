@@ -20,10 +20,11 @@ It is possible to change the used format by using the method
 `setFormat([ConfigurationFormat](./src/main/java/it/fulminazzo/blocksmith/config/ConfigurationFormat.java))`.
 
 ```java
+File workingDir; // working directory
 Logger logger; // slf4j logger
 ConfigurationAdapter adapter = ConfigurationAdapter.newAdapter(logger, ConfigurationFormat.YAML);
-adapter.store(new File("data.yaml"), "Hello, world!");
+adapter.store(workingDir, "data", "Hello, world!"); // extension of the file automatically determined
 // change format language of the adapter
 adapter.setFormat(ConfigurationFormat.JSON);
-adapter.load(new File("data.json"), String.class);
+adapter.load(workingDir, "data", String.class);
 ```
