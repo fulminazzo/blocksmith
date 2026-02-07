@@ -15,8 +15,11 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum ConfigurationFormat {
-
-    ;
+    JSON(JsonConfigurationAdapter::new),
+    PROPERTIES(PropertiesConfigurationAdapter::new),
+    TOML(TomlConfigurationAdapter::new),
+    XML(XmlConfigurationAdapter::new),
+    YAML(YamlConfigurationAdapter::new);
 
     @NotNull Function<Logger, BaseConfigurationAdapter> adapterSupplier;
 
