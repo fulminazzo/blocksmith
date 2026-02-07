@@ -9,7 +9,7 @@ import java.io.IOException;
  * A specialized adapter to load and store <b>Java beans</b>
  * representing configuration files in different language data formats.
  */
-public interface ConfigurationAdapter {
+public interface BaseConfigurationAdapter {
 
     /**
      * Attempts to load the configuration file to the specified type.

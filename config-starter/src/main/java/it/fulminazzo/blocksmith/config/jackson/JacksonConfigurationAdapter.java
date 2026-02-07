@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.config.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
+import it.fulminazzo.blocksmith.config.BaseConfigurationAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -10,11 +10,11 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * A special implementation of {@link ConfigurationAdapter}
+ * A special implementation of {@link BaseConfigurationAdapter}
  * that uses the <a href="https://github.com/FasterXML/jackson">jackson project</a>
  * for serialization and deserialization.
  */
-public final class JacksonConfigurationAdapter implements ConfigurationAdapter {
+public final class JacksonConfigurationAdapter implements BaseConfigurationAdapter {
     private final @NotNull ObjectMapper mapper;
 
     /**

@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implementation of {@link ConfigurationAdapter} for TOML.
+ * Implementation of {@link BaseConfigurationAdapter} for TOML.
  */
-final class TomlConfigurationAdapter implements ConfigurationAdapter {
-    private final @NotNull ConfigurationAdapter delegate;
+final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
+    private final @NotNull BaseConfigurationAdapter delegate;
 
     /**
      * Instantiates a new TOML configuration adapter.

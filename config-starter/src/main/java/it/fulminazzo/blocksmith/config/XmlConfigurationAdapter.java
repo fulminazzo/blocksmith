@@ -21,11 +21,11 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * Implementation of {@link ConfigurationAdapter} for XML.
+ * Implementation of {@link BaseConfigurationAdapter} for XML.
  */
-final class XmlConfigurationAdapter implements ConfigurationAdapter {
+final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
     @Delegate
-    private final @NotNull ConfigurationAdapter delegate;
+    private final @NotNull BaseConfigurationAdapter delegate;
 
     /**
      * Instantiates a new XML configuration adapter.

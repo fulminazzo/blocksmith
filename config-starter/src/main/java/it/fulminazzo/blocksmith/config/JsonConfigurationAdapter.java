@@ -10,11 +10,11 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 /**
- * Implementation of {@link ConfigurationAdapter} for JSON.
+ * Implementation of {@link BaseConfigurationAdapter} for JSON.
  */
-final class JsonConfigurationAdapter implements ConfigurationAdapter {
+final class JsonConfigurationAdapter implements BaseConfigurationAdapter {
     @Delegate
-    private final @NotNull ConfigurationAdapter delegate;
+    private final @NotNull BaseConfigurationAdapter delegate;
 
     /**
      * Instantiates a new JSON configuration adapter.

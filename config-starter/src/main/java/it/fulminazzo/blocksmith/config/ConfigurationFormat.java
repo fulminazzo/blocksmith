@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 /**
  * Identifies the type of data format language to utilize
- * for the {@link ConfigurationAdapter}.
+ * for the {@link BaseConfigurationAdapter}.
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -18,7 +18,7 @@ public enum ConfigurationFormat {
 
     ;
 
-    @NotNull Function<Logger, ConfigurationAdapter> adapterSupplier;
+    @NotNull Function<Logger, BaseConfigurationAdapter> adapterSupplier;
 
     /**
      * Gets the adapter for the corresponding format.
@@ -26,7 +26,7 @@ public enum ConfigurationFormat {
      * @param logger the logger
      * @return the adapter
      */
-    @NotNull ConfigurationAdapter getAdapter(final @NotNull Logger logger) {
+    @NotNull BaseConfigurationAdapter getAdapter(final @NotNull Logger logger) {
         return adapterSupplier.apply(logger);
     }
 

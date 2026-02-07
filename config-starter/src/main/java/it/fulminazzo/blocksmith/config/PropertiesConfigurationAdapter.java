@@ -12,11 +12,11 @@ import org.slf4j.Logger;
 import java.io.IOException;
 
 /**
- * Implementation of {@link ConfigurationAdapter} for Properties.
+ * Implementation of {@link BaseConfigurationAdapter} for Properties.
  */
-final class PropertiesConfigurationAdapter implements ConfigurationAdapter {
+final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
     @Delegate
-    private final @NotNull ConfigurationAdapter delegate;
+    private final @NotNull BaseConfigurationAdapter delegate;
 
     /**
      * Instantiates a new Properties configuration adapter.

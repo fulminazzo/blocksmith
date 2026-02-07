@@ -26,11 +26,11 @@ import java.io.Writer;
 import java.util.Collections;
 
 /**
- * Implementation of {@link ConfigurationAdapter} for YAML.
+ * Implementation of {@link BaseConfigurationAdapter} for YAML.
  */
-final class YamlConfigurationAdapter implements ConfigurationAdapter {
+final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
     @Delegate
-    private final @NotNull ConfigurationAdapter delegate;
+    private final @NotNull BaseConfigurationAdapter delegate;
 
     /**
      * Instantiates a new YAML configuration adapter.
