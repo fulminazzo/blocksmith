@@ -121,7 +121,6 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
                     .execute();
             return records.stream()
                     .map(r -> r.get(idColumn))
-                    .map(i -> (ID) i)
                     .collect(Collectors.toList());
         }).thenCompose(this::findAllById);
     }
