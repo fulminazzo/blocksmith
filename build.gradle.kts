@@ -17,11 +17,11 @@ allprojects {
     }
 
     dependencies {
-        compileOnly(libs.bundles.annotations)
-        annotationProcessor(libs.lombok)
+        compileOnly(rootProject.libs.bundles.annotations)
+        annotationProcessor(rootProject.libs.lombok)
 
-        testImplementation(libs.bundles.annotations)
-        testImplementation(libs.bundles.test.framework)
+        testImplementation(rootProject.libs.bundles.annotations)
+        testImplementation(rootProject.libs.bundles.test.framework)
     }
     
     tasks.test {
