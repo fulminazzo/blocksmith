@@ -9,6 +9,8 @@ plugins {
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
+extra["testingModuleName"] = "testing"
+
 allprojects {
     apply { plugin("java-library") }
     apply { plugin("groovy") }
@@ -47,7 +49,9 @@ allprojects {
  * TESTING MODULES CONFIGURATION
  */
 subprojects {
-    if (project.name.endsWith("-testing")) {
+    val testingModuleName: String by rootProject.extra
+
+    if (project.name.endsWith("-$testingModuleName")) {
         apply { plugin("groovy") }
 
         dependencies {

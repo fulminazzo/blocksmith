@@ -1,3 +1,5 @@
+val testingModuleName: String by rootProject.extra
+
 dependencies {
     val projectName = project.name
 
@@ -14,9 +16,8 @@ dependencies {
 
             testImplementation(rootProject.libs.jackson.json)
 
-            val testingModuleName = "$projectName-testing"
-            if (project.name != testingModuleName)
-                testImplementation(project(":$projectName:$projectName-testing"))
+            if (!project.name.endsWith(testingModuleName))
+                testImplementation(project(":$projectName:$projectName-$testingModuleName"))
         }
 
     }
