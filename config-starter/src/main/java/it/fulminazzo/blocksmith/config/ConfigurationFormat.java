@@ -1,16 +1,15 @@
 package it.fulminazzo.blocksmith.config;
 
 import it.fulminazzo.blocksmith.ProjectInfo;
-import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.bval.util.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.joor.Reflect;
 import org.slf4j.Logger;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * Identifies the type of data format language to utilize
@@ -39,11 +38,7 @@ public enum ConfigurationFormat {
             String className = BaseConfigurationAdapter.class.getCanonicalName()
                     .replace("Base", type);
             Class<?> clazz = Class.forName(className);
-            return (BaseConfigurationAdapter) ReflectionUtils.initialize(
-                    clazz,
-                    List.of(Logger.class),
-                    logger
-            );
+            return Reflect.onClass(clazz).create(logger).get();
         } catch (ClassNotFoundException e) {
             String moduleName = String.format("%s.%s:%s-%s",
                     ProjectInfo.GROUP,

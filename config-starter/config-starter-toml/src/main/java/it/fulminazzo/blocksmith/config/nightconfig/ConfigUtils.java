@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joor.Reflect;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -57,7 +58,7 @@ public final class ConfigUtils {
             }
             Class<?> fieldType = field.getType();
             if (fieldType.isPrimitive() || fieldType.equals(Object.class)) continue;
-            Object fieldValue = ReflectionUtils.getFieldValue(reference, field);
+            Object fieldValue = Reflect.on(reference).field(field.getName()).get();
             if (fieldValue == null || fieldValue.equals(reference)) continue;
             Object configValue = configuration.get(propertyName);
             if (configValue instanceof CommentedConfig)

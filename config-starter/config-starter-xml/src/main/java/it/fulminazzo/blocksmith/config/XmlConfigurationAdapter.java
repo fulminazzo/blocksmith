@@ -10,15 +10,14 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.fasterxml.jackson.dataformat.xml.util.DefaultXmlPrettyPrinter;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
-import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
+import org.joor.Reflect;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Implementation of {@link BaseConfigurationAdapter} for XML.
@@ -65,15 +64,13 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
                                     final @NotNull Comment comment) throws IOException {
             PrettyPrinter prettyPrinter = generator.getPrettyPrinter();
             for (String t : CommentUtils.getText(comment)) {
-                if (prettyPrinter instanceof DefaultXmlPrettyPrinter) {
-                    Object objectIndenter = ReflectionUtils.getFieldValue(prettyPrinter, "_objectIndenter");
-                    ReflectionUtils.invokeMethod(
-                            objectIndenter,
-                            "writeIndentation",
-                            Arrays.asList(JsonGenerator.class, int.class),
-                            generator, ReflectionUtils.getFieldValue(prettyPrinter, "_nesting")
-                    );
-                }
+                if (prettyPrinter instanceof DefaultXmlPrettyPrinter)
+                    Reflect.on(prettyPrinter)
+                            .field("_objectIndenter")
+                            .call("writeIndentation",
+                                    generator,
+                                    Reflect.on(prettyPrinter).field("_nesting").get()
+                            );
                 generator.writeRaw(String.format("<!-- %s -->", t));
             }
         }

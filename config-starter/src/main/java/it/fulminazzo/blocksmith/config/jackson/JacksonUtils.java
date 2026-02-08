@@ -13,15 +13,14 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.type.MapType;
 import it.fulminazzo.blocksmith.config.Comment;
 import it.fulminazzo.blocksmith.config.CommentUtils;
-import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joor.Reflect;
 import org.slf4j.Logger;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -135,11 +134,9 @@ final class JacksonUtils {
                 BeanPropertyWriter beanProperty = beanProperties.get(i);
                 Comment comment = beanProperty.getAnnotation(Comment.class);
                 if (comment != null && !CommentUtils.isEmpty(comment)) {
-                    W commentWriter = ReflectionUtils.initialize(
-                            commentPropertyWriterType,
-                            Arrays.asList(BeanPropertyWriter.class, Comment.class),
-                            beanProperty, comment
-                    );
+                    W commentWriter = Reflect.onClass(commentPropertyWriterType)
+                            .create(beanProperty, comment)
+                            .get();
                     beanProperties.set(i, commentWriter);
                 }
             }
