@@ -52,6 +52,27 @@ abstract class RepositoryTest extends Specification {
         result == [FIRST, SECOND]
     }
 
+    def 'test that save correctly updates #data'() {
+        when:
+        def saved = repository.save(data).get()
+
+        then:
+        saved == data
+
+        when:
+        def actual = repository.findById(data.id).get()
+
+        then:
+        actual.isPresent()
+        actual.get() == data
+
+        where:
+        data << [
+                new User(FIRST.id, FIRST.username + '_', FIRST.age + 1),
+                new User(SECOND.id, SECOND.username + '_', SECOND.age + 1)
+        ]
+    }
+
     def 'test that save correctly saves #data'() {
         expect:
         !exists(data.id)
@@ -94,6 +115,26 @@ abstract class RepositoryTest extends Specification {
         actual == expected
     }
 
+    def 'test that saveAll correctly updates all data'() {
+        given:
+        def data = [
+                new User(FIRST.id, FIRST.username + '_', FIRST.age + 1),
+                new User(SECOND.id, SECOND.username + '_', SECOND.age + 1)
+        ]
+
+        when:
+        def saved = repository.saveAll(data).get()
+
+        then:
+        saved == data
+
+        when:
+        def actual = repository.findById(data.collect { it.id }).get()
+
+        then:
+        actual == data
+    }
+
     def 'test that saveAll correctly saves all data'() {
         given:
         def data = [UPDATE1, UPDATE2]
@@ -133,7 +174,8 @@ abstract class RepositoryTest extends Specification {
         actual == 2L
     }
 
-    abstract @NotNull Repository<User, Long> initializeRepository()
+    abstract @NotNull
+    Repository<User, Long> initializeRepository()
 
     /**
      * Checks if a data with the given id exists in the repository.
