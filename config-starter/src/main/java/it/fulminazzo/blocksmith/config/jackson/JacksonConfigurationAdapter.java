@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 /**
  * A special implementation of {@link BaseConfigurationAdapter}
@@ -37,6 +38,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
 
     @Override
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
+        Files.createDirectories(file.getParentFile().toPath());
         mapper.writeValue(file, configuration);
     }
 
