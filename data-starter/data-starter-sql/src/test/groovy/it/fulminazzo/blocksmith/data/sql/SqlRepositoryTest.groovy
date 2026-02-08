@@ -58,12 +58,12 @@ class SqlRepositoryTest extends RepositoryTest {
 
     @Override
     Repository<User, Long> initializeRepository() {
+        def table = dsl.meta().getTables(TABLE_NAME)[1]
         return new SqlRepository<>(
                 dsl,
-                TABLE_NAME,
-                ID_COLUMN,
-                User,
-                Long
+                table,
+                table.field(ID_COLUMN, Long),
+                User
         )
     }
 

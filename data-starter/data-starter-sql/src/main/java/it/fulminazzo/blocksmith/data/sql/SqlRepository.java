@@ -1,13 +1,17 @@
 package it.fulminazzo.blocksmith.data.sql;
 
 import it.fulminazzo.blocksmith.data.Repository;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Table;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,41 +23,12 @@ import java.util.stream.Collectors;
  * @param <ID> the type of the id of the data (should be unique)
  */
 @SuppressWarnings({"resource"})
+@RequiredArgsConstructor
 public class SqlRepository<T, ID> implements Repository<T, ID> {
     private final @NotNull DSLContext context;
     private final @NotNull Table<?> table;
     private final @NotNull Field<ID> idColumn;
     private final @NotNull Class<T> dataType;
-
-    /**
-     * Instantiates a new SQL repository.
-     *
-     * @param context      the context
-     * @param tableName    the table name
-     * @param idColumnName the id column name
-     * @param dataType     the data type
-     * @param idType       the id type
-     */
-    public SqlRepository(final @NotNull DSLContext context,
-                         final @NotNull String tableName,
-                         final @NotNull String idColumnName,
-                         final @NotNull Class<T> dataType,
-                         final @NotNull Class<ID> idType) {
-        this.context = context;
-        this.table = context.meta().getTables().stream()
-                .filter(t -> t.getName().equalsIgnoreCase(tableName))
-                .filter(t -> {
-                    Field<?> field = t.field(idColumnName);
-                    return field != null && idType.isAssignableFrom(field.getType());
-                })
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                        String.format("Could not find table '%s' with id column '%s' of type %s",
-                                tableName, idColumnName, idType.getSimpleName())
-                ));
-        this.idColumn = Objects.requireNonNull(this.table.field(idColumnName, idType));
-        this.dataType = dataType;
-    }
 
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
