@@ -1,7 +1,5 @@
 rootProject.name = "blocksmith"
 
-include("base")
-
 
 include("config-starter")
 include("config-starter:config-starter-testing")
