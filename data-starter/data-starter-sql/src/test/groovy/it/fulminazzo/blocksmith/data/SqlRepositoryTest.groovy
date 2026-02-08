@@ -8,6 +8,7 @@ import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.jooq.impl.SQLDataType
 
+import static org.jooq.impl.DSL.constraint
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.table;
 
@@ -32,6 +33,9 @@ class SqlRepositoryTest extends RepositoryTest {
                 .column(ID_COLUMN, SQLDataType.INTEGER.notNull().identity(true))
                 .column('USERNAME', SQLDataType.VARCHAR(16).notNull())
                 .column('AGE', SQLDataType.INTEGER.notNull())
+                .constraints(
+                        constraint("PK_$TABLE_NAME").primaryKey(ID_COLUMN)
+                )
                 .execute()
 
         setupRepository()
@@ -55,7 +59,8 @@ class SqlRepositoryTest extends RepositoryTest {
                 dsl,
                 TABLE_NAME,
                 ID_COLUMN,
-                User
+                User,
+                Integer
         )
     }
 
