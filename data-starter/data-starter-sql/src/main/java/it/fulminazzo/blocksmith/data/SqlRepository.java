@@ -6,16 +6,10 @@ import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Table;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static org.jooq.impl.DSL.field;
-import static org.jooq.impl.DSL.table;
 
 /**
  * A basic implementation of {@link Repository} for SQL databases.
@@ -45,8 +39,18 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
                          final @NotNull Class<T> dataType,
                          final @NotNull Class<ID> idType) {
         this.context = context;
-        this.table = table(tableName); //TODO: table should be fetched from context!
-        this.idColumn = field(idColumnName, idType);
+        this.table = context.meta().getTables().stream()
+                .filter(t -> t.getName().equalsIgnoreCase(tableName))
+                .filter(t -> {
+                    Field<?> field = t.field(idColumnName);
+                    return field != null && idType.isAssignableFrom(field.getType());
+                })
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("Could not find table '%s' with id column '%s' of type %s",
+                                tableName, idColumnName, idType.getSimpleName())
+                ));
+        this.idColumn = Objects.requireNonNull(this.table.field(idColumnName, idType));
         this.dataType = dataType;
     }
 
