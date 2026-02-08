@@ -103,7 +103,7 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> findById(final @NotNull Collection<ID> ids) {
+    public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
         return query(dsl -> dsl.selectFrom(table)
                 .where(idColumn.in(ids))
                 .fetchInto(dataType)
@@ -127,7 +127,7 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
                     .map(r -> r.get(idColumn))
                     .map(i -> (ID) i)
                     .collect(Collectors.toList());
-        }).thenCompose(this::findById);
+        }).thenCompose(this::findAllById);
     }
 
     @Override
