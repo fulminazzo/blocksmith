@@ -69,7 +69,7 @@ class XmlConfigurationAdapterTest extends Specification {
 
     def 'test that PascalCaseStrategy converts #string to #expected'() {
         given:
-        def strategy = new PascalCaseStrategy()
+        def strategy = new XmlConfigurationAdapter.PascalCaseStrategy()
 
         when:
         def actual = strategy.translate(string)

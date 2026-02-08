@@ -9,6 +9,7 @@ class ConfigurationAdapterTest extends Specification {
     def 'test documentation functioning'() {
         given:
         def directory = new File('build/resources/test')
+        if (!directory.exists()) directory.mkdirs()
 
         and:
         def yamlFile = new File(directory, 'data.yaml')
@@ -16,6 +17,7 @@ class ConfigurationAdapterTest extends Specification {
 
         and:
         def jsonFile = new File(directory, 'data.json')
+        jsonFile << '"Hello, world!"'
 
         when:
         def logger = log
