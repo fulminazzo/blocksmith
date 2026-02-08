@@ -9,7 +9,7 @@ abstract class RepositoryTest extends Specification {
     protected static final User UPDATE1 = new User(3, 'tiz_', 55)
     protected static final User UPDATE2 = new User(4, 'alex', 18)
 
-    protected Repository<User, Integer> repository
+    protected Repository<User, Long> repository
 
     void setupRepository() {
         repository = initializeRepository()
@@ -133,7 +133,7 @@ abstract class RepositoryTest extends Specification {
         actual == 2L
     }
 
-    abstract @NotNull Repository<User, Integer> initializeRepository()
+    abstract @NotNull Repository<User, Long> initializeRepository()
 
     /**
      * Checks if a data with the given id exists in the repository.
@@ -141,7 +141,7 @@ abstract class RepositoryTest extends Specification {
      * @param id the id
      * @return <code>true</code> if it does
      */
-    abstract boolean exists(final @NotNull Integer id)
+    abstract boolean exists(final @NotNull Long id)
 
     /**
      * Adds the given data to the repository.

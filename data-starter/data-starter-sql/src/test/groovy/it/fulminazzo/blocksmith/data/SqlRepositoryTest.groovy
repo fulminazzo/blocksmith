@@ -54,18 +54,18 @@ class SqlRepositoryTest extends RepositoryTest {
     }
 
     @Override
-    Repository<User, Integer> initializeRepository() {
+    Repository<User, Long> initializeRepository() {
         return new SqlRepository<>(
                 dsl,
                 TABLE_NAME,
                 ID_COLUMN,
                 User,
-                Integer
+                Long
         )
     }
 
     @Override
-    boolean exists(final @NotNull Integer id) {
+    boolean exists(final @NotNull Long id) {
         return dsl.selectFrom(table(TABLE_NAME))
                 .where(field(ID_COLUMN).eq(id))
                 .fetch()
