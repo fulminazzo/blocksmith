@@ -5,6 +5,12 @@ dependencies {
 
     api(libs.bundles.validation)
 
+    subprojects.forEach {
+        dependencies {
+            api(project(":${project.name}"))
+        }
+    }
+
     testImplementation(libs.slf4j)
     testImplementation(libs.bundles.log4j)
 
