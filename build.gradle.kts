@@ -46,6 +46,20 @@ allprojects {
 
 }
 
+/**
+ * TESTING MODULES CONFIGURATION
+ */
+subprojects {
+    if (project.name.endsWith("-testing")) {
+        apply { plugin("groovy") }
+
+        dependencies {
+            implementation(rootProject.libs.bundles.test.framework)
+        }
+    }
+
+}
+
 dependencies {
     subprojects.forEach { implementation(project(it.path)) }
 }
