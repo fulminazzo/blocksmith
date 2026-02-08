@@ -1,7 +1,10 @@
-package it.fulminazzo.blocksmith.data
+package it.fulminazzo.blocksmith.data.sql
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import it.fulminazzo.blocksmith.data.Repository
+import it.fulminazzo.blocksmith.data.RepositoryTest
+import it.fulminazzo.blocksmith.data.User
 import org.jetbrains.annotations.NotNull
 import org.jooq.DSLContext
 import org.jooq.SQLDialect

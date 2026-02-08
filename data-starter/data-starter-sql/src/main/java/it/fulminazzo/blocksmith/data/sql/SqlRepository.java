@@ -1,5 +1,6 @@
-package it.fulminazzo.blocksmith.data;
+package it.fulminazzo.blocksmith.data.sql;
 
+import it.fulminazzo.blocksmith.data.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
 import org.jooq.Field;
