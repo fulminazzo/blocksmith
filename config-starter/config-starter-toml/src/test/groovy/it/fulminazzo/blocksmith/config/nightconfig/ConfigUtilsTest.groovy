@@ -1,9 +1,9 @@
 package it.fulminazzo.blocksmith.config.nightconfig
 
-import com.electronwill.nightconfig.core.CommentedConfig
-import com.electronwill.nightconfig.core.Config
-import com.electronwill.nightconfig.core.serde.ObjectSerializer
-import it.fulminazzo.blocksmith.config.Comment
+import CommentedConfig
+import Config
+import ObjectSerializer
+import Comment
 import spock.lang.Specification
 
 class ConfigUtilsTest extends Specification {

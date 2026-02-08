@@ -25,7 +25,7 @@ class YamlConfigurationAdapterTest extends Specification {
                 'Blocksmith',
                 null,
                 ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0, null)
+                new Internal(1.0, null)
         )
     }
 

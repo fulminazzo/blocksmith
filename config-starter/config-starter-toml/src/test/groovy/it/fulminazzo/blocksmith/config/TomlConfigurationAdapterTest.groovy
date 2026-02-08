@@ -11,7 +11,7 @@ class TomlConfigurationAdapterTest extends Specification {
         def file = new File('build/resources/test/load.toml')
 
         and:
-        def adapter = new TomlConfigurationAdapter(log)
+        def adapter = new TomlConfigurationAdapter(TomlConfigurationAdapterTest.log)
 
         when:
         def actual = adapter.load(file, MockConfig)
@@ -25,7 +25,7 @@ class TomlConfigurationAdapterTest extends Specification {
                 'Blocksmith',
                 '',
                 ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0, null)
+                new Internal(1.0, null)
         )
     }
 
@@ -35,7 +35,7 @@ class TomlConfigurationAdapterTest extends Specification {
         if (file.exists()) file.delete()
 
         and:
-        def adapter = new TomlConfigurationAdapter(log)
+        def adapter = new TomlConfigurationAdapter(TomlConfigurationAdapterTest.log)
 
         when:
         adapter.store(file, new MockConfig())
@@ -71,7 +71,7 @@ class TomlConfigurationAdapterTest extends Specification {
         if (file.exists()) file.delete()
 
         and:
-        def adapter = new TomlConfigurationAdapter(log)
+        def adapter = new TomlConfigurationAdapter(TomlConfigurationAdapterTest.log)
 
         when:
         adapter.store(file, ['data': array])

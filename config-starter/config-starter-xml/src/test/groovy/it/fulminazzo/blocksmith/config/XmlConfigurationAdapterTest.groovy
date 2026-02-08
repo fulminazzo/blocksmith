@@ -25,7 +25,7 @@ class XmlConfigurationAdapterTest extends Specification {
                 'Blocksmith',
                 null,
                 ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0, null)
+                new Internal(1.0, null)
         )
     }
 
@@ -69,7 +69,7 @@ class XmlConfigurationAdapterTest extends Specification {
 
     def 'test that PascalCaseStrategy converts #string to #expected'() {
         given:
-        def strategy = new XmlConfigurationAdapter.PascalCaseStrategy()
+        def strategy = new PascalCaseStrategy()
 
         when:
         def actual = strategy.translate(string)

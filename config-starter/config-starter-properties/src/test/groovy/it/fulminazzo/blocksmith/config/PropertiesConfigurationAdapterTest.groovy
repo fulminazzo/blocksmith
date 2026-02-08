@@ -25,7 +25,7 @@ class PropertiesConfigurationAdapterTest extends Specification {
                 'Blocksmith',
                 '',
                 ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0, false)
+                new Internal(1.0, false)
         )
     }
 
