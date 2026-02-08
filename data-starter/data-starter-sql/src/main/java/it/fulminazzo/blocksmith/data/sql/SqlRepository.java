@@ -87,7 +87,8 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
             Record record = dsl.newRecord(table, data);
             return dsl.insertInto(table)
                     .set(record)
-                    .onDuplicateKeyUpdate()
+                    .onConflict(idColumn)
+                    .doUpdate()
                     .set(record)
                     .returning()
                     .fetchOneInto(dataType);
@@ -121,7 +122,8 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
             dsl.batch(
                             dsl.insertInto(table)
                                     .set(records.get(0))
-                                    .onDuplicateKeyUpdate()
+                                    .onConflict(idColumn)
+                                    .doUpdate()
                                     .set(records.get(0))
                     ).bind(
                             records.stream()
