@@ -13,7 +13,10 @@ dependencies {
             testImplementation(rootProject.libs.bundles.log4j)
 
             testImplementation(rootProject.libs.jackson.json)
-            testImplementation(project(":$projectName:$projectName-testing"))
+
+            val testingModuleName = "$projectName-testing"
+            if (project.name != testingModuleName)
+                testImplementation(project(":$projectName:$projectName-testing"))
         }
 
     }
@@ -23,10 +26,6 @@ dependencies {
         dependencies {
             compileOnly(rootProject.libs.slf4j)
             api(project(":$projectName"))
-
-            val testingModuleName = "$projectName-testing"
-            if (project.name != testingModuleName)
-                testImplementation(project(":$projectName:$testingModuleName"))
         }
 
     }
