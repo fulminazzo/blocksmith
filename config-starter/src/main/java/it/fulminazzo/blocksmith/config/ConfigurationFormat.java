@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.config;
 
+import it.fulminazzo.blocksmith.ProjectInfo;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +34,8 @@ public enum ConfigurationFormat {
      * @return the adapter
      */
     @NotNull BaseConfigurationAdapter newAdapter(final @NotNull Logger logger) {
+        final String type = StringUtils.capitalize(name());
         try {
-            String type = StringUtils.capitalize(name());
             String className = BaseConfigurationAdapter.class.getCanonicalName()
                     .replace("Base", type);
             Class<?> clazz = Class.forName(className);
@@ -44,8 +45,16 @@ public enum ConfigurationFormat {
                     logger
             );
         } catch (ClassNotFoundException e) {
-            //TODO: proper exception
-            throw new RuntimeException(e);
+            String moduleName = String.format("%s.%s:%s-%s",
+                    ProjectInfo.GROUP,
+                    ProjectInfo.PROJECT_NAME,
+                    ProjectInfo.MODULE_NAME,
+                    type.toLowerCase()
+            );
+            throw new IllegalStateException(
+                    String.format("Could not find suitable %s for %s. ", ConfigurationAdapter.class.getSimpleName(), type) +
+                            String.format("Please check that the module %s is correctly installed.", moduleName)
+            );
         }
     }
 
