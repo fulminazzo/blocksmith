@@ -80,15 +80,11 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     public @NotNull CompletableFuture<T> save(final @NotNull T data) {
         return query(dsl -> {
             Record record = dsl.newRecord(table, data);
-            dsl.insertInto(table)
+            return dsl.insertInto(table)
                     .set(record)
                     .onDuplicateKeyUpdate()
                     .set(record)
                     .returning()
-                    .fetchOneInto(dataType);
-            ID id = (ID) record.get(idColumn);
-            return dsl.selectFrom(table)
-                    .where(idColumn.eq(id))
                     .fetchOneInto(dataType);
         });
     }
