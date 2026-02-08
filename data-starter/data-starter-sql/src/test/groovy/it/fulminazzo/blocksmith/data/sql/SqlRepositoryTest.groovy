@@ -11,6 +11,8 @@ import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.jooq.impl.SQLDataType
 
+import java.util.concurrent.Executors
+
 import static org.jooq.impl.DSL.constraint
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.table;
@@ -63,7 +65,8 @@ class SqlRepositoryTest extends RepositoryTest {
                 dsl,
                 table,
                 table.field(ID_COLUMN, Long),
-                User
+                User,
+                Executors.newSingleThreadExecutor()
         )
     }
 

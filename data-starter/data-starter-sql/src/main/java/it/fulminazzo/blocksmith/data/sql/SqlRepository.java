@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,7 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     private final @NotNull Table<?> table;
     private final @NotNull Field<ID> idColumn;
     private final @NotNull Class<T> dataType;
+    private final @NotNull Executor executor;
 
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
@@ -142,7 +144,7 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
      * @return the result
      */
     public <R> @NotNull CompletableFuture<R> query(final @NotNull Function<DSLContext, R> queryFunction) {
-        return CompletableFuture.supplyAsync(() -> queryFunction.apply(context));
+        return CompletableFuture.supplyAsync(() -> queryFunction.apply(context), executor);
     }
 
 }
