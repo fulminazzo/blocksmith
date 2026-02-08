@@ -1,13 +1,15 @@
 package it.fulminazzo.blocksmith.config;
 
+import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.bval.util.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.File;
-import java.util.function.Function;
+import java.util.List;
 
 /**
  * Identifies the type of data format language to utilize
@@ -16,13 +18,12 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum ConfigurationFormat {
-    JSON(JsonConfigurationAdapter::new, "json"),
-    PROPERTIES(PropertiesConfigurationAdapter::new, "properties"),
-    TOML(TomlConfigurationAdapter::new, "toml"),
-    XML(XmlConfigurationAdapter::new, "xml"),
-    YAML(YamlConfigurationAdapter::new, "yml");
+    JSON("json"),
+    PROPERTIES("properties"),
+    TOML("toml"),
+    XML("xml"),
+    YAML("yml");
 
-    @NotNull Function<Logger, BaseConfigurationAdapter> adapterSupplier;
     @NotNull String fileExtension;
 
     /**
@@ -32,7 +33,20 @@ public enum ConfigurationFormat {
      * @return the adapter
      */
     @NotNull BaseConfigurationAdapter newAdapter(final @NotNull Logger logger) {
-        return adapterSupplier.apply(logger);
+        try {
+            String type = StringUtils.capitalize(name());
+            String className = BaseConfigurationAdapter.class.getCanonicalName()
+                    .replace("Base", type);
+            Class<?> clazz = Class.forName(className);
+            return (BaseConfigurationAdapter) ReflectionUtils.initialize(
+                    clazz,
+                    List.of(Logger.class),
+                    logger
+            );
+        } catch (ClassNotFoundException e) {
+            //TODO: proper exception
+            throw new RuntimeException(e);
+        }
     }
 
     /**
