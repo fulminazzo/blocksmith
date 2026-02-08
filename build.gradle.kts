@@ -65,7 +65,11 @@ subprojects {
 }
 
 dependencies {
-    subprojects.forEach { implementation(project(it.path)) }
+    val testingModuleName: String by rootProject.extra
+
+    subprojects
+        .filter { ! it.name.endsWith("-$testingModuleName") }
+        .forEach { implementation(project(it.path)) }
 }
 
 tasks.testCodeCoverageReport {
