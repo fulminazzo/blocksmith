@@ -51,7 +51,7 @@ public interface Repository<T, ID> {
      * @param id the id
      * @return nothing
      */
-    @NotNull CompletableFuture<Void> delete(final @NotNull ID id);
+    @NotNull CompletableFuture<?> delete(final @NotNull ID id);
 
     /**
      * Gets all the data with the associated it.
@@ -75,7 +75,7 @@ public interface Repository<T, ID> {
      * @param ids the ids
      * @return nothing
      */
-    @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<ID> ids);
+    @NotNull CompletableFuture<?> deleteAll(final @NotNull Collection<ID> ids);
 
     /**
      * Counts all the data currently stored.
