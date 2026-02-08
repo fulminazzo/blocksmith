@@ -117,11 +117,22 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
             List<Record> records = entries.stream()
                     .map(entry -> dsl.newRecord(table, entry))
                     .collect(Collectors.toList());
-            dsl.batch(dsl.insertInto(table)
-                            .set(records.get(0))
-                            .onDuplicateKeyUpdate()
-                            .set(records.get(0)))
-                    .bind(records.stream().map(Record::intoArray).toArray(Object[][]::new))
+            dsl.batch(
+                            dsl.insertInto(table)
+                                    .set(records.get(0))
+                                    .onDuplicateKeyUpdate()
+                                    .set(records.get(0))
+                    ).bind(
+                            records.stream()
+                                    .map(r -> {
+                                        Object[] original = r.intoArray();
+                                        Object[] doubled = new Object[original.length * 2];
+                                        System.arraycopy(original, 0, doubled, 0, original.length);
+                                        System.arraycopy(original, 0, doubled, original.length, original.length);
+                                        return doubled;
+                                    })
+                                    .toArray(Object[][]::new)
+                    )
                     .execute();
             return records.stream()
                     .map(r -> r.get(idColumn))
