@@ -1,4 +1,6 @@
 [versions]
+buildconfig = "5.7.1"
+
 lombok = "1.18.42"
 jetbrains_annotations = "26.0.2"
 
@@ -47,3 +49,6 @@ log4j = ["log4j_api", "log4j_core", "log4j_slf4j"]
 toml = ["jackson_toml", "night_config_toml"]
 
 validation = ["validation", "validator"]
+
+[plugins]
+buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
