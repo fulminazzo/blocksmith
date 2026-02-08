@@ -39,6 +39,7 @@ allprojects {
         packageName = "${rootProject.group}.${rootProject.name}"
         className = "ProjectInfo"
 
+        buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
         buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
         buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
     }
