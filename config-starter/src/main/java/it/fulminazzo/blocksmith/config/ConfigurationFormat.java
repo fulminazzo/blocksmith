@@ -34,7 +34,7 @@ public enum ConfigurationFormat {
      * @return the adapter
      */
     @NotNull BaseConfigurationAdapter newAdapter(final @NotNull Logger logger) {
-        final String type = StringUtils.capitalize(name());
+        final String type = StringUtils.capitalize(name().toLowerCase());
         try {
             String className = BaseConfigurationAdapter.class.getCanonicalName()
                     .replace("Base", type);
