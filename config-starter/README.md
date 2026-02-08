@@ -1,13 +1,16 @@
 This module provides functionality to **serialize** and **deserialize** configuration data from disk.
 The currently supported data formats are:
 
-- [YAML](https://yaml.org/)
-- [JSON](https://json.org/)
-- [TOML](https://toml.io/)
-- [XML](https://wikipedia.org/wiki/XML)
-- [Java properties](https://wikipedia.org/wiki/.properties)
+- [JSON](https://json.org/) (requires the module `it.fulminazzo.blocksmith:config-starter-json`);
+- [Java properties](https://wikipedia.org/wiki/.properties) (requires the module
+  `it.fulminazzo.blocksmith:config-starter-properties`);
+- [TOML](https://toml.io/) (requires the module `it.fulminazzo.blocksmith:config-starter-toml`);
+- [XML](https://wikipedia.org/wiki/XML) (requires the module `it.fulminazzo.blocksmith:config-starter-xml`);
+- [YAML](https://yaml.org/) (requires the module `it.fulminazzo.blocksmith:config-starter-yaml`);
 
 but more might come in the future in case of many requests!
+
+All of these can be accessed through the `it.fulminazzo.blocksmith:config-starter-all` module.
 
 <br>
 
