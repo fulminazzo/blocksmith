@@ -17,7 +17,6 @@ class ConfigurationAdapterTest extends Specification {
         and:
         def jsonFile = new File(directory, 'data.json')
 
-
         when:
         def logger = log
         def adapter = ConfigurationAdapter.newAdapter(logger, ConfigurationFormat.YAML)
