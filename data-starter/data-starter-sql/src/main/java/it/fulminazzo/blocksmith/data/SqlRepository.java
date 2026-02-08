@@ -1,9 +1,10 @@
 package it.fulminazzo.blocksmith.data;
 
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Table;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -22,19 +23,38 @@ import static org.jooq.impl.DSL.table;
  * @param <T>  the type of the data
  * @param <ID> the type of the id of the data (should be unique)
  */
-@SuppressWarnings({"resource", "unchecked"})
-@RequiredArgsConstructor
+@SuppressWarnings({"resource"})
 public class SqlRepository<T, ID> implements Repository<T, ID> {
     private final @NotNull DSLContext context;
-    private final @NotNull String tableName;
-    private final @NotNull String idColumn;
+    private final @NotNull Table<?> table;
+    private final @NotNull Field<ID> idColumn;
     private final @NotNull Class<T> dataType;
+
+    /**
+     * Instantiates a new SQL repository.
+     *
+     * @param context      the context
+     * @param tableName    the table name
+     * @param idColumnName the id column name
+     * @param dataType     the data type
+     * @param idType       the id type
+     */
+    public SqlRepository(final @NotNull DSLContext context,
+                         final @NotNull String tableName,
+                         final @NotNull String idColumnName,
+                         final @NotNull Class<T> dataType,
+                         final @NotNull Class<ID> idType) {
+        this.context = context;
+        this.table = table(tableName); //TODO: table should be fetched from context!
+        this.idColumn = field(idColumnName, idType);
+        this.dataType = dataType;
+    }
 
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
         return query(dsl ->
-                dsl.selectFrom(tableName)
-                        .where(field(idColumn).eq(id))
+                dsl.selectFrom(table)
+                        .where(idColumn.eq(id))
                         .fetchOptionalInto(dataType)
         );
     }
@@ -43,15 +63,15 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     public @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id) {
         return query(dsl -> dsl.fetchExists(
                 dsl.selectOne()
-                        .from(table(tableName))
-                        .where(field(idColumn).eq(id))
+                        .from(table)
+                        .where(idColumn.eq(id))
         ));
     }
 
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAll() {
         return query(dsl ->
-                dsl.selectFrom(tableName)
+                dsl.selectFrom(table)
                         .fetchInto(dataType)
         );
     }
@@ -59,16 +79,16 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<T> save(final @NotNull T data) {
         return query(dsl -> {
-            Record record = dsl.newRecord(table(tableName), data);
-            dsl.insertInto(table(tableName))
+            Record record = dsl.newRecord(table, data);
+            dsl.insertInto(table)
                     .set(record)
                     .onDuplicateKeyUpdate()
                     .set(record)
                     .returning()
                     .fetchOneInto(dataType);
             ID id = (ID) record.get(idColumn);
-            return dsl.selectFrom(table(tableName))
-                    .where(field(idColumn).eq(id))
+            return dsl.selectFrom(table)
+                    .where(idColumn.eq(id))
                     .fetchOneInto(dataType);
         });
     }
@@ -76,16 +96,16 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<?> delete(final @NotNull ID id) {
         return query(dsl ->
-                dsl.deleteFrom(table(tableName))
-                        .where(field(idColumn).eq(id))
+                dsl.deleteFrom(table)
+                        .where(idColumn.eq(id))
                         .execute()
         );
     }
 
     @Override
     public @NotNull CompletableFuture<Collection<T>> findById(final @NotNull Collection<ID> ids) {
-        return query(dsl -> dsl.selectFrom(table(tableName))
-                .where(field(idColumn).in(ids))
+        return query(dsl -> dsl.selectFrom(table)
+                .where(idColumn.in(ids))
                 .fetchInto(dataType)
         );
     }
@@ -95,9 +115,9 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
         if (entries.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         return query(dsl -> {
             List<Record> records = entries.stream()
-                    .map(entry -> dsl.newRecord(table(tableName), entry))
+                    .map(entry -> dsl.newRecord(table, entry))
                     .collect(Collectors.toList());
-            dsl.batch(dsl.insertInto(table(tableName))
+            dsl.batch(dsl.insertInto(table)
                             .set(records.get(0))
                             .onDuplicateKeyUpdate()
                             .set(records.get(0)))
@@ -113,8 +133,8 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<?> deleteAll(final @NotNull Collection<ID> ids) {
         return query(dsl ->
-                dsl.deleteFrom(table(tableName))
-                        .where(field(idColumn).in(ids))
+                dsl.deleteFrom(table)
+                        .where(idColumn.in(ids))
                         .execute()
         );
     }
@@ -122,7 +142,7 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<Long> count() {
         return query(dsl -> dsl.selectCount()
-                .from(table(tableName))
+                .from(table)
                 .fetchOne(0, Long.class));
     }
 
