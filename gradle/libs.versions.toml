@@ -6,6 +6,11 @@ spock_core = "2.4-groovy-4.0"
 byte_buddy = "1.18.2"
 mockito_core = "4.11.0"
 
+jooq = "3.20.11"
+hikaricp = "7.0.2"
+
+h2 = "2.4.240"
+
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jetbrains_annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains_annotations" }
@@ -13,6 +18,11 @@ jetbrains_annotations = { module = "org.jetbrains:annotations", version.ref = "j
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock_core" }
 byte_buddy = { module = "net.bytebuddy:byte-buddy", version.ref = "byte_buddy" }
 mockito_core = { module = "org.mockito:mockito-core", version.ref = "mockito_core" }
+
+jooq = { module = "org.jooq:jooq", version.ref = "jooq" }
+hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
+
+h2 = { module = "com.h2database:h2", version.ref = "h2" }
 
 [bundles]
 annotations = ["lombok", "jetbrains_annotations"]
