@@ -30,7 +30,7 @@ class SqlRepositoryTest extends RepositoryTest {
 
         dsl = DSL.using(dataSource, SQLDialect.H2)
         dsl.createTable(TABLE_NAME)
-                .column(ID_COLUMN, SQLDataType.INTEGER.notNull().identity(true))
+                .column(ID_COLUMN, SQLDataType.BIGINT.notNull().identity(true))
                 .column('USERNAME', SQLDataType.VARCHAR(16).notNull())
                 .column('AGE', SQLDataType.INTEGER.notNull())
                 .constraints(
