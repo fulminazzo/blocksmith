@@ -5,6 +5,8 @@ dependencies {
 
     compileOnly(libs.slf4j)
 
+    api(libs.joor)
+
     api(libs.jackson.json)
     api(libs.bundles.validation)
 
