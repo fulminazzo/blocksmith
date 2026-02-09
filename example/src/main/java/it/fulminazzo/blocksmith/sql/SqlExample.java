@@ -21,9 +21,9 @@ public class SqlExample {
                         .build()
         ) {
             Repository<User, Long> repository = dataSource.newRepository(
-                    Tables.USERS,
                     User.class,
-                    Long.class,
+                    Tables.USERS,
+                    Tables.USERS.ID,
                     executor
             );
             User user = new User(1337L, "Alexander", "Drinkwater", "alex@fulminazzo.it", 23);
