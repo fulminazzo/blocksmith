@@ -2,8 +2,8 @@ package it.fulminazzo.blocksmith.sql;
 
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
+import it.fulminazzo.blocksmith.util.TestUtils;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,21 +27,14 @@ public class SqlExample {
                     executor
             );
             User user = new User(1337L, "Alexander", "Drinkwater", "alex@fulminazzo.it", 23);
-            assertEquals(repository.existsById(user.getId()).join(), false, "User should not exist at start");
-            assertEquals(repository.save(user).join(), user, "Saved user should be equal to current");
-            assertEquals(repository.existsById(user.getId()).join(), true, "User should exist after save");
+            TestUtils.assertEquals(repository.existsById(user.getId()).join(), false, "User should not exist at start");
+            TestUtils.assertEquals(repository.save(user).join(), user, "Saved user should be equal to current");
+            TestUtils.assertEquals(repository.existsById(user.getId()).join(), true, "User should exist after save");
             repository.delete(user.getId()).join();
-            assertEquals(repository.existsById(user.getId()).join(), false, "User should not exist after delete");
+            TestUtils.assertEquals(repository.existsById(user.getId()).join(), false, "User should not exist after delete");
         } finally {
             executor.shutdown();
         }
-    }
-
-    private static void assertEquals(final Object expected,
-                                     final Object actual,
-                                     final String message) {
-        if (!Objects.equals(expected, actual))
-            throw new IllegalArgumentException(message + String.format("\n%s != %s", expected, actual));
     }
 
 }
