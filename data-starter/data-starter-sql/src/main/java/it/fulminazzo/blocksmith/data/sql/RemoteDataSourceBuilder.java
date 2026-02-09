@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A builder for {@link SqlDataSource} for host-port based databases.
  */
-public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder {
+public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteDataSourceBuilder> {
     private final @NotNull IDatabaseType databaseType;
     private @Nullable String host;
     private @Nullable Integer port;

@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("unchecked")
 @AllArgsConstructor
-abstract class ASqlDataSourceBuilder {
-
+abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
     protected final @NotNull HikariConfig config;
 
     protected @Nullable String database;
@@ -18,9 +18,9 @@ abstract class ASqlDataSourceBuilder {
      * @param database database
      * @return this object (for method chaining)
      */
-    public @NotNull ASqlDataSourceBuilder setDatabase(final @Nullable String database) {
+    public @NotNull B setDatabase(final @Nullable String database) {
         this.database = database;
-        return this;
+        return (B) this;
     }
 
     /**
@@ -29,9 +29,9 @@ abstract class ASqlDataSourceBuilder {
      * @param username the username
      * @return this object (for method chaining)
      */
-    public @NotNull ASqlDataSourceBuilder setUsername(final @Nullable String username) {
+    public @NotNull B setUsername(final @Nullable String username) {
         config.setUsername(username);
-        return this;
+        return (B) this;
     }
 
     /**
@@ -40,9 +40,9 @@ abstract class ASqlDataSourceBuilder {
      * @param password the password
      * @return this object (for method chaining)
      */
-    public @NotNull ASqlDataSourceBuilder setPassword(final @Nullable String password) {
+    public @NotNull B setPassword(final @Nullable String password) {
         config.setPassword(password);
-        return this;
+        return (B) this;
     }
 
     /**
@@ -51,9 +51,9 @@ abstract class ASqlDataSourceBuilder {
      * @param maximumPoolSize the maximum pool size
      * @return this object (for method chaining)
      */
-    public @NotNull ASqlDataSourceBuilder maximumPoolSize(final int maximumPoolSize) {
+    public @NotNull B maximumPoolSize(final int maximumPoolSize) {
         config.setMaximumPoolSize(maximumPoolSize);
-        return this;
+        return (B) this;
     }
 
     /**
@@ -62,9 +62,9 @@ abstract class ASqlDataSourceBuilder {
      * @param minimumIdle the minimum idle
      * @return this object (for method chaining)
      */
-    public @NotNull ASqlDataSourceBuilder minimumIdle(final int minimumIdle) {
+    public @NotNull B minimumIdle(final int minimumIdle) {
         config.setMinimumIdle(minimumIdle);
-        return this;
+        return (B) this;
     }
 
     /**
@@ -73,9 +73,9 @@ abstract class ASqlDataSourceBuilder {
      * @param connectionTimeout the connection timeout
      * @return this object (for method chaining)
      */
-    public @NotNull ASqlDataSourceBuilder connectionTimeout(final long connectionTimeout) {
+    public @NotNull B connectionTimeout(final long connectionTimeout) {
         config.setConnectionTimeout(connectionTimeout);
-        return this;
+        return (B) this;
     }
 
     /**
@@ -84,9 +84,9 @@ abstract class ASqlDataSourceBuilder {
      * @param idleTimeout the idle timeout
      * @return this object (for method chaining)
      */
-    public @NotNull ASqlDataSourceBuilder idleTimeout(final long idleTimeout) {
+    public @NotNull B idleTimeout(final long idleTimeout) {
         config.setIdleTimeout(idleTimeout);
-        return this;
+        return (B) this;
     }
 
     /**
@@ -95,9 +95,9 @@ abstract class ASqlDataSourceBuilder {
      * @param maxLifetime the max lifetime
      * @return this object (for method chaining)
      */
-    public @NotNull ASqlDataSourceBuilder maxLifeTime(final long maxLifetime) {
+    public @NotNull B maxLifeTime(final long maxLifetime) {
         config.setMaxLifetime(maxLifetime);
-        return this;
+        return (B) this;
     }
 
     /**
@@ -107,10 +107,10 @@ abstract class ASqlDataSourceBuilder {
      * @param value        the value
      * @return this object (for method chaining)
      */
-    public @NotNull ASqlDataSourceBuilder addDataSourceProperty(final @NotNull String propertyName,
+    public @NotNull B addDataSourceProperty(final @NotNull String propertyName,
                                                                 final Object value) {
         config.addDataSourceProperty(propertyName, value);
-        return this;
+        return (B) this;
     }
 
 }

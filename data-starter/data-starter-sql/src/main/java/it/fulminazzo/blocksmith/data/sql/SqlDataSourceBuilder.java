@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A builder for {@link SqlDataSource}.
  */
-public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder {
+public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSourceBuilder> {
     private static final int maximumPoolSize = 20;
     private static final int minimumIdle = 5;
     private static final long connectionTimeout = 30 * 1000;

@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * A builder for {@link SqlDataSource} for H2 databases.
  */
-public final class H2DataSourceBuilder extends ASqlDataSourceBuilder {
+public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourceBuilder> {
     private final @NotNull Map<String, String> parameters = new HashMap<>();
 
     private @Nullable String connectionMode;
