@@ -1,11 +1,66 @@
 package it.fulminazzo.blocksmith.data.sql
 
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.pool.HikariPool
 import org.jetbrains.annotations.NotNull
 import org.jooq.SQLDialect
 import spock.lang.Specification
 
+import java.sql.Connection
+
 class SqlDataSourceTest extends Specification {
+
+    private SqlDataSource dataSource
+    private Connection connection
+
+    void setup() {
+        def hikariConfig = new HikariConfig()
+        hikariConfig.jdbcUrl = 'jdbc:h2:mem:testdb'
+        hikariConfig.username = 'sa'
+        hikariConfig.password = ''
+
+        def hikariDataSource = new HikariDataSource(hikariConfig)
+        dataSource = new SqlDataSource(hikariDataSource, SQLDialect.H2)
+
+        connection = dataSource.getConnection()
+    }
+
+    void cleanup() {
+        connection?.close()
+        dataSource?.close()
+    }
+
+    def 'test executeScriptFromFile of #argument correctly updates database'() {
+        when:
+        dataSource.executeScriptFromFile(argument)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        def set = connection.prepareStatement('SELECT * FROM PUBLIC.LOGINS').executeQuery()
+
+        then:
+        set.next()
+
+        and:
+        set.getString('name') == 'Alex'
+        set.getInt('count') == 3
+
+        and:
+        !set.next()
+
+        where:
+        argument << [
+                'build/resources/test/h2_schema.sql',
+                new File('build/resources/test/h2_schema.sql')
+        ]
+    }
+
+    /*
+     * BUILDER TESTS
+     */
 
     /*
      * REMOTE
@@ -53,14 +108,15 @@ class SqlDataSourceTest extends Specification {
         actual == dialect
 
         where:
-        type                       || dialect
-        DatabaseType.MYSQL         || SQLDialect.MYSQL
-        DatabaseType.MARIADB       || SQLDialect.MARIADB
-        DatabaseType.POSTGRES      || SQLDialect.POSTGRES
+        type                                || dialect
+        DatabaseType.MYSQL                  || SQLDialect.MYSQL
+        DatabaseType.MARIADB                || SQLDialect.MARIADB
+        DatabaseType.POSTGRES               || SQLDialect.POSTGRES
         new IDatabaseType() {
 
             @Override
-            @NotNull String getJdbcName() {
+            @NotNull
+            String getJdbcName() {
                 return "unknown"
             }
 
@@ -69,7 +125,7 @@ class SqlDataSourceTest extends Specification {
                 return 1337
             }
 
-        }                                           || SQLDialect.DEFAULT
+        }                                   || SQLDialect.DEFAULT
     }
 
     /*
