@@ -2,11 +2,12 @@ package it.fulminazzo.blocksmith.data.sql;
 
 import com.zaxxer.hikari.HikariConfig;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A builder for {@link SqlRepository}.
  */
-public final class SqlRepositoryBuilder {
+public final class SqlDataSourceBuilder {
     private static final int maximumPoolSize = 20;
     private static final int minimumIdle = 5;
     private static final long connectionTimeout = 30 * 1000;
@@ -18,7 +19,7 @@ public final class SqlRepositoryBuilder {
     /**
      * Instantiates a new SQL repository builder.
      */
-    SqlRepositoryBuilder() {
+    SqlDataSourceBuilder() {
         this.config = new HikariConfig();
         maximumPoolSize(maximumPoolSize)
                 .minimumIdle(minimumIdle)
@@ -28,12 +29,34 @@ public final class SqlRepositoryBuilder {
     }
 
     /**
+     * Sets username.
+     *
+     * @param username the username
+     * @return this object (for method chaining)
+     */
+    public @NotNull SqlDataSourceBuilder setUsername(final @Nullable String username) {
+        config.setUsername(username);
+        return this;
+    }
+    
+    /**
+     * Sets password.
+     *
+     * @param password the password
+     * @return this object (for method chaining)
+     */
+    public @NotNull SqlDataSourceBuilder setPassword(final @Nullable String password) {
+        config.setPassword(password);
+        return this;
+    }
+    
+    /**
      * Sets the maximum number of concurrent connections.
      *
      * @param maximumPoolSize the maximum pool size
      * @return this object (for method chaining)
      */
-    public @NotNull SqlRepositoryBuilder maximumPoolSize(final int maximumPoolSize) {
+    public @NotNull SqlDataSourceBuilder maximumPoolSize(final int maximumPoolSize) {
         config.setMaximumPoolSize(maximumPoolSize);
         return this;
     }
@@ -44,7 +67,7 @@ public final class SqlRepositoryBuilder {
      * @param minimumIdle the minimum idle
      * @return this object (for method chaining)
      */
-    public @NotNull SqlRepositoryBuilder minimumIdle(final int minimumIdle) {
+    public @NotNull SqlDataSourceBuilder minimumIdle(final int minimumIdle) {
         config.setMinimumIdle(minimumIdle);
         return this;
     }
@@ -55,7 +78,7 @@ public final class SqlRepositoryBuilder {
      * @param connectionTimeout the connection timeout
      * @return this object (for method chaining)
      */
-    public @NotNull SqlRepositoryBuilder connectionTimeout(final long connectionTimeout) {
+    public @NotNull SqlDataSourceBuilder connectionTimeout(final long connectionTimeout) {
         config.setConnectionTimeout(connectionTimeout);
         return this;
     }
@@ -66,7 +89,7 @@ public final class SqlRepositoryBuilder {
      * @param idleTimeout the idle timeout
      * @return this object (for method chaining)
      */
-    public @NotNull SqlRepositoryBuilder idleTimeout(final long idleTimeout) {
+    public @NotNull SqlDataSourceBuilder idleTimeout(final long idleTimeout) {
         config.setIdleTimeout(idleTimeout);
         return this;
     }
@@ -77,7 +100,7 @@ public final class SqlRepositoryBuilder {
      * @param maxLifetime the max lifetime
      * @return this object (for method chaining)
      */
-    public @NotNull SqlRepositoryBuilder maxLifeTime(final long maxLifetime) {
+    public @NotNull SqlDataSourceBuilder maxLifeTime(final long maxLifetime) {
         config.setMaxLifetime(maxLifetime);
         return this;
     }
@@ -87,7 +110,7 @@ public final class SqlRepositoryBuilder {
      *
      * @return this object (for method chaining)
      */
-    public @NotNull SqlRepositoryBuilder mySql() {
+    public @NotNull SqlDataSourceBuilder mySql() {
         return addDataSourceProperty("cachePrepStmts", true)
                 .addDataSourceProperty("prepStmtCacheSize", 250)
                 .addDataSourceProperty("prepStmtCacheSqlLimit", 2048)
@@ -105,7 +128,7 @@ public final class SqlRepositoryBuilder {
      *
      * @return this object (for method chaining)
      */
-    public @NotNull SqlRepositoryBuilder postgres() {
+    public @NotNull SqlDataSourceBuilder postgres() {
         return addDataSourceProperty("tcpKeepAlive", true)
                 .addDataSourceProperty("prepareThreshold", 5);
     }
@@ -115,7 +138,7 @@ public final class SqlRepositoryBuilder {
      *
      * @return this object (for method chaining)
      */
-    public @NotNull SqlRepositoryBuilder oracle() {
+    public @NotNull SqlDataSourceBuilder oracle() {
         return addDataSourceProperty("implicitCachingEnabled", true)
                 .addDataSourceProperty("implicitStatementCacheSize", 100)
                 .addDataSourceProperty("maxStatementsLimit", 250);
@@ -128,7 +151,7 @@ public final class SqlRepositoryBuilder {
      * @param value        the value
      * @return this object (for method chaining)
      */
-    public @NotNull SqlRepositoryBuilder addDataSourceProperty(final @NotNull String propertyName,
+    public @NotNull SqlDataSourceBuilder addDataSourceProperty(final @NotNull String propertyName,
                                                                final Object value) {
         config.addDataSourceProperty(propertyName, value);
         return this;
