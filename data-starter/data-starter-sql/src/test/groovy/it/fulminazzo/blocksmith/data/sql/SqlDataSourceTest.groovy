@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.sql
 
 import com.zaxxer.hikari.pool.HikariPool
+import org.jooq.SQLDialect
 import spock.lang.Specification
 
 class SqlDataSourceTest extends Specification {
@@ -36,6 +37,32 @@ class SqlDataSourceTest extends Specification {
         type << DatabaseType.values()
     }
 
+    def 'test that #type returns #dialect'() {
+        given:
+        def builder = SqlDataSource.builder()
+                .setDatabase('sql_data_source')
+                .setUsername('user')
+                .setPassword('password')
+                .setDatabaseType(type)
+
+        when:
+        def actual = builder.getSQLDialect()
+
+        then:
+        actual == dialect
+
+        where:
+        type                       || dialect
+        DatabaseType.MYSQL         || SQLDialect.MYSQL
+        DatabaseType.MARIADB       || SQLDialect.MARIADB
+        DatabaseType.POSTGRES      || SQLDialect.POSTGRES
+        new IDatabaseType() {
+            @Override
+            String getJdbcName() {
+                return "unknown"
+            }
+        }                          || SQLDialect.DEFAULT
+    }
 
     /*
      * H2
@@ -113,6 +140,18 @@ class SqlDataSourceTest extends Specification {
         if (source != null) source.close()
     }
 
+    def 'test that SQLDialect is H2'() {
+        given:
+        def builder = SqlDataSource.builder()
+                .setDatabase('sql_data_source')
+                .setUsername('sa')
+                .setPassword('')
+                .h2()
+
+        expect:
+        builder.getSQLDialect() == SQLDialect.H2
+    }
+
     /*
      * SQL
      */
@@ -124,6 +163,21 @@ class SqlDataSourceTest extends Specification {
                 .setUsername('sa')
                 .setPassword('')
                 .build()
+
+        then:
+        thrown(IllegalStateException)
+
+        cleanup:
+        if (source != null) source.close()
+    }
+
+    def 'test initialize general SQL throws'() {
+        when:
+        def source = SqlDataSource.builder()
+                .setDatabase('sql_data_source')
+                .setUsername('sa')
+                .setPassword('')
+                .getSQLDialect()
 
         then:
         thrown(IllegalStateException)
