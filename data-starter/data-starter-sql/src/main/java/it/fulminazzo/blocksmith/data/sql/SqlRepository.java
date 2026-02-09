@@ -4,9 +4,9 @@ import it.fulminazzo.blocksmith.data.Repository;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Table;
-import org.jooq.TableField;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class SqlRepository<T, ID> implements Repository<T, ID> {
     private final @NotNull DSLContext context;
     private final @NotNull Table<?> table;
-    private final @NotNull TableField<?, ID> idColumn;
+    private final @NotNull Field<ID> idColumn;
     private final @NotNull Class<T> dataType;
     private final @NotNull Executor executor;
 
