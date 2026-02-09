@@ -15,9 +15,12 @@ import java.util.stream.Collectors;
  * A builder for {@link SqlDataSource} for H2 databases.
  */
 public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourceBuilder> {
+    private static final String INITIAL_SETUP_KEY = "INIT";
+
     private final @NotNull Map<String, String> parameters = new HashMap<>();
 
     private @Nullable String connectionMode;
+    private @Nullable String schemaName;
 
     /**
      * Instantiates a new H2 data source builder.
@@ -32,6 +35,10 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
 
     @Override
     protected @NotNull String getJdbcUrl() {
+        String schemaName = this.schemaName;
+        if (schemaName == null) schemaName = getDatabase();
+        setParameters(INITIAL_SETUP_KEY, "CREATE SCHEMA IF NOT EXISTS " + schemaName);
+        setParameters(INITIAL_SETUP_KEY, "SET SCHEMA " + schemaName);
         return String.format("jdbc:h2:%s",
                 Objects.requireNonNull(connectionMode, "The connection mode has not been specified yet. " +
                         "Please choose between memory, disk or server before building")
@@ -92,14 +99,14 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
 
     /**
      * Sets the schema name to the given one.
-     * Defaults to `PUBLIC`.
+     * Defaults to {@link #getDatabase()}.
      *
      * @param name the name
      * @return this object (for method chaining)
      */
     public @NotNull H2DataSourceBuilder schemaName(final @NotNull String name) {
-        return setParameters("INIT", String.format("CREATE SCHEMA IF NOT EXISTS %s", name))
-                .setParameters("INIT", String.format("SET SCHEMA %s", name));
+        schemaName = name;
+        return this;
     }
 
     /**
@@ -109,7 +116,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      * @return this object (for method chaining)
      */
     public @NotNull H2DataSourceBuilder initScript(final @NotNull String filePath) {
-        return setParameters("INIT", String.format("RUNSCRIPT FROM '%s'", filePath));
+        return setParameters(INITIAL_SETUP_KEY, String.format("RUNSCRIPT FROM '%s'", filePath));
     }
 
     /**
