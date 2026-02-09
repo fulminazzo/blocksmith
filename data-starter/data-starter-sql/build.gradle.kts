@@ -3,4 +3,5 @@ dependencies {
     api(libs.hikaricp)
 
     testImplementation(libs.h2)
+    testImplementation(libs.sqlite)
 }
