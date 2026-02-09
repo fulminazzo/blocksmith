@@ -11,6 +11,7 @@ import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.jooq.impl.SQLDataType
 
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 import static org.jooq.impl.DSL.constraint
@@ -21,6 +22,8 @@ class SqlRepositoryTest extends RepositoryTest {
     private static final String H2_PATH = 'jdbc:h2:mem:testdb'
     private static final String TABLE_NAME = 'USERS'
     private static final String ID_COLUMN = 'ID'
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor()
 
     private HikariDataSource dataSource
     private DSLContext dsl
@@ -47,6 +50,7 @@ class SqlRepositoryTest extends RepositoryTest {
     }
 
     void cleanup() {
+        executor.shutdown()
         dataSource.close()
     }
 
@@ -66,7 +70,7 @@ class SqlRepositoryTest extends RepositoryTest {
                 table,
                 table.field(ID_COLUMN, Long),
                 User,
-                Executors.newSingleThreadExecutor()
+                executor
         )
     }
 
