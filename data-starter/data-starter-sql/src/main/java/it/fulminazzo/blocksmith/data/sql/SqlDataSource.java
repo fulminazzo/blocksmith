@@ -8,7 +8,10 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import javax.sql.DataSource;
-import java.io.Closeable;
+import java.io.*;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.function.BiFunction;
 
@@ -76,6 +79,57 @@ public final class SqlDataSource implements DataSource, Closeable {
             final @NotNull Executor executor
     ) {
         return repositorySupplier.apply(context, executor);
+    }
+
+    /**
+     * Executes the given script.
+     *
+     * @param filePath the file to extract the script from
+     * @return this object (for method chaining)
+     * @throws IOException in case of any exception
+     */
+    public @NotNull SqlDataSource executeScriptFromFile(final @NotNull String filePath) throws IOException {
+        return executeScriptFromFile(new File(filePath));
+    }
+
+    /**
+     * Executes the given script.
+     *
+     * @param file the file to extract the script from
+     * @return this object (for method chaining)
+     * @throws IOException in case of any exception
+     */
+    public @NotNull SqlDataSource executeScriptFromFile(final @NotNull File file) throws IOException {
+        try (FileInputStream stream = new FileInputStream(file)) {
+            return executeScript(stream);
+        }
+    }
+
+    /**
+     * Executes the given script.
+     *
+     * @param resource the internal resource to extract the script from
+     * @return this object (for method chaining)
+     * @throws IOException in case of any exception
+     */
+    public @NotNull SqlDataSource executeScriptFromResource(final @NotNull String resource) throws IOException {
+        try (InputStream stream = SqlDataSource.class.getResourceAsStream(resource)) {
+            return executeScript(Objects.requireNonNull(stream, "Could not find resource: " + resource));
+        }
+    }
+
+    /**
+     * Executes the given script.
+     *
+     * @param stream the stream to extract the script from
+     * @return this object (for method chaining)
+     * @throws IOException in case of any exception
+     */
+    public @NotNull SqlDataSource executeScript(final @NotNull InputStream stream) throws IOException {
+        byte[] data = stream.readAllBytes();
+        String raw = new String(data, StandardCharsets.UTF_8);
+        context.parser().parse(raw).executeBatch();
+        return this;
     }
 
     /**
