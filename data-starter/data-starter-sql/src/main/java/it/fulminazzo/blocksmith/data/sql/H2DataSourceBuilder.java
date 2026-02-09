@@ -81,6 +81,16 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
     }
 
     /**
+     * Allows to run the given <b>SQL</b> script on startup.
+     *
+     * @param filePath the path of the script
+     * @return this object (for method chaining)
+     */
+    public @NotNull H2DataSourceBuilder initScript(final @NotNull String filePath) {
+        return setParameters("INIT", String.format("RUNSCRIPT FROM '%s'", filePath));
+    }
+
+    /**
      * Prevents the database to lose data if every connection to it closes.
      *
      * @return this object (for method chaining)
