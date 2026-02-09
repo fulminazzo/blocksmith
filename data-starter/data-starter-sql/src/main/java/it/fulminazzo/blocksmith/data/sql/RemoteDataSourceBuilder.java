@@ -4,6 +4,8 @@ import com.zaxxer.hikari.HikariConfig;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * A builder for {@link SqlDataSource} for host-port based databases.
  */
@@ -24,6 +26,16 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
                             final @NotNull IDatabaseType databaseType) {
         super(config, database);
         this.databaseType = databaseType;
+    }
+
+    @Override
+    protected @NotNull String getJdbcUrl() {
+        return String.format("jdbc:%s://%s:%s/%s",
+                databaseType.getJdbcName(),
+                Objects.requireNonNull(host, "host has not been specified yet"),
+                Objects.requireNonNull(port, "port has not been specified yet"),
+                getDatabase()
+        );
     }
 
     /**

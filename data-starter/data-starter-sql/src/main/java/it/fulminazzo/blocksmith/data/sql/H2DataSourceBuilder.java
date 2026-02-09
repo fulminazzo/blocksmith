@@ -6,6 +6,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * A builder for {@link SqlDataSource} for H2 databases.
@@ -24,6 +26,17 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
     H2DataSourceBuilder(final @NotNull HikariConfig config,
                         final @Nullable String database) {
         super(config, database);
+    }
+
+    @Override
+    protected @NotNull String getJdbcUrl() {
+        return String.format("jdbc:h2:%s:%s",
+                Objects.requireNonNull(connectionMode, "The connection mode has not been specified yet. " +
+                        "Please choose between memory, disk or server before building"),
+                getDatabase()
+        ) + parameters.entrySet().stream()
+                .map(e -> String.format(";%s=%s", e.getKey(), e.getValue()))
+                .collect(Collectors.joining());
     }
 
     /**

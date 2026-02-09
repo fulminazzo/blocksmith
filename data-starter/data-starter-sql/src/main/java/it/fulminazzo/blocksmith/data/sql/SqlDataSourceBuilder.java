@@ -25,6 +25,12 @@ public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSou
                 .maxLifeTime(maxLifeTime);
     }
 
+    @Override
+    protected @NotNull String getJdbcUrl() {
+        throw new IllegalStateException("A database type has not been set yet! " +
+                "Please use setDatabaseType or h2 before calling this method");
+    }
+
     /**
      * Sets the database type.
      *
