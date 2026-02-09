@@ -7,6 +7,7 @@ dependencies {
     implementation(project(":data-starter:data-starter-sql"))
     jooqGenerator(libs.h2)
     implementation(libs.h2)
+    implementation(libs.bundles.log4j)
 }
 
 jooq {
