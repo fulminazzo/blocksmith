@@ -6,9 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jooq.SQLDialect;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -17,7 +15,7 @@ import java.util.stream.Collectors;
 public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourceBuilder> {
     private static final String INITIAL_SETUP_KEY = "INIT";
 
-    private final @NotNull Map<String, String> parameters = new HashMap<>();
+    private final @NotNull Map<String, List<String>> parameters = new HashMap<>();
 
     private @Nullable String connectionMode;
     private @Nullable String schemaName;
@@ -43,7 +41,9 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
                 Objects.requireNonNull(connectionMode, "The connection mode has not been specified yet. " +
                         "Please choose between memory, disk or server before building")
         ) + parameters.entrySet().stream()
-                .map(e -> String.format(";%s=%s", e.getKey(), e.getValue()))
+                .map(e ->
+                        String.format(";%s=%s", e.getKey(), String.join("\\;", e.getValue()))
+                )
                 .collect(Collectors.joining());
     }
 
@@ -155,7 +155,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      */
     public @NotNull H2DataSourceBuilder setParameters(final @NotNull String name,
                                                       final @NotNull String value) {
-        parameters.put(name.toUpperCase(), value.toUpperCase());
+        parameters.computeIfAbsent(name, v -> new ArrayList<>()).add(value);
         return this;
     }
 
