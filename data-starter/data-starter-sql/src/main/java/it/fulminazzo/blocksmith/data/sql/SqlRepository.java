@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SqlRepository<T, ID> implements Repository<T, ID> {
     private final @NotNull DSLContext context;
-    private final @NotNull Table<?> table;
-    private final @NotNull Field<ID> idColumn;
+    protected final @NotNull Table<?> table;
+    protected final @NotNull Field<ID> idColumn;
     private final @NotNull Class<T> dataType;
     private final @NotNull Executor executor;
 
@@ -139,11 +139,11 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     /**
      * Executes a general query and returns the result.
      *
-     * @param <R>           the type parameter
+     * @param <R>           the type of the result
      * @param queryFunction the query
      * @return the result
      */
-    public <R> @NotNull CompletableFuture<R> query(final @NotNull Function<DSLContext, R> queryFunction) {
+    protected <R> @NotNull CompletableFuture<R> query(final @NotNull Function<DSLContext, R> queryFunction) {
         return CompletableFuture.supplyAsync(() -> queryFunction.apply(context), executor);
     }
 
