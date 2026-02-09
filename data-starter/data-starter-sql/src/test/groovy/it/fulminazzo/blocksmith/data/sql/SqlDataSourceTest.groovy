@@ -58,6 +58,27 @@ class SqlDataSourceTest extends Specification {
         ]
     }
 
+    def 'test executeScriptFromResource correctly updates database'() {
+        when:
+        dataSource.executeScriptFromResource('/h2_schema.sql')
+
+        then:
+        noExceptionThrown()
+
+        when:
+        def set = connection.prepareStatement('SELECT * FROM PUBLIC.LOGINS').executeQuery()
+
+        then:
+        set.next()
+
+        and:
+        set.getString('name') == 'Alex'
+        set.getInt('count') == 3
+
+        and:
+        !set.next()
+    }
+
     /*
      * BUILDER TESTS
      */
