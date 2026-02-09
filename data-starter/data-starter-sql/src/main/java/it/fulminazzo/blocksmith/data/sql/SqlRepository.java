@@ -22,12 +22,13 @@ import java.util.stream.Collectors;
  *
  * @param <T>  the type of the data
  * @param <ID> the type of the id of the data (should be unique)
+ * @param <TB> the type of the table
  */
 @SuppressWarnings({"resource"})
 @RequiredArgsConstructor
-public class SqlRepository<T, ID> implements Repository<T, ID> {
+public class SqlRepository<T, ID, TB extends Table<?>> implements Repository<T, ID> {
     private final @NotNull DSLContext context;
-    protected final @NotNull Table<?> table;
+    protected final @NotNull TB table;
     protected final @NotNull Field<ID> idColumn;
     private final @NotNull Class<T> dataType;
     private final @NotNull Executor executor;
@@ -35,7 +36,7 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
         return query(dsl ->
-                dsl.selectFrom(table)
+                dsl.selectFrom(table())
                         .where(idColumn.eq(id))
                         .fetchOptionalInto(dataType)
         );
@@ -45,7 +46,7 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     public @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id) {
         return query(dsl -> dsl.fetchExists(
                 dsl.selectOne()
-                        .from(table)
+                        .from(table())
                         .where(idColumn.eq(id))
         ));
     }
@@ -53,7 +54,7 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAll() {
         return query(dsl ->
-                dsl.selectFrom(table)
+                dsl.selectFrom(table())
                         .fetchInto(dataType)
         );
     }
@@ -61,8 +62,8 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<T> save(final @NotNull T data) {
         return query(dsl -> {
-            Record record = dsl.newRecord(table, data);
-            return dsl.insertInto(table)
+            Record record = dsl.newRecord(table(), data);
+            return dsl.insertInto(table())
                     .set(record)
                     .onConflict(idColumn)
                     .doUpdate()
@@ -75,7 +76,7 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<?> delete(final @NotNull ID id) {
         return query(dsl ->
-                dsl.deleteFrom(table)
+                dsl.deleteFrom(table())
                         .where(idColumn.eq(id))
                         .execute()
         );
@@ -83,7 +84,7 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
 
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
-        return query(dsl -> dsl.selectFrom(table)
+        return query(dsl -> dsl.selectFrom(table())
                 .where(idColumn.in(ids))
                 .fetchInto(dataType)
         );
@@ -94,10 +95,10 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
         if (entries.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         return query(dsl -> {
             List<Record> records = entries.stream()
-                    .map(entry -> dsl.newRecord(table, entry))
+                    .map(entry -> dsl.newRecord(table(), entry))
                     .collect(Collectors.toList());
             dsl.batch(
-                            dsl.insertInto(table)
+                            dsl.insertInto(table())
                                     .set(records.get(0))
                                     .onConflict(idColumn)
                                     .doUpdate()
@@ -123,7 +124,7 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<?> deleteAll(final @NotNull Collection<ID> ids) {
         return query(dsl ->
-                dsl.deleteFrom(table)
+                dsl.deleteFrom(table())
                         .where(idColumn.in(ids))
                         .execute()
         );
@@ -132,7 +133,7 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<Long> count() {
         return query(dsl -> dsl.selectCount()
-                .from(table)
+                .from(table())
                 .fetchOne(0, Long.class));
     }
 
@@ -145,6 +146,10 @@ public class SqlRepository<T, ID> implements Repository<T, ID> {
      */
     protected <R> @NotNull CompletableFuture<R> query(final @NotNull Function<DSLContext, R> queryFunction) {
         return CompletableFuture.supplyAsync(() -> queryFunction.apply(context), executor);
+    }
+
+    private @NotNull Table<?> table() {
+        return table;
     }
 
 }
