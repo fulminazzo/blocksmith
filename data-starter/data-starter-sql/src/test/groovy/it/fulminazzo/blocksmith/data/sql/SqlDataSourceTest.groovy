@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.sql
 
 import com.zaxxer.hikari.pool.HikariPool
+import org.jetbrains.annotations.NotNull
 import org.jooq.SQLDialect
 import spock.lang.Specification
 
@@ -58,7 +59,7 @@ class SqlDataSourceTest extends Specification {
         DatabaseType.POSTGRES      || SQLDialect.POSTGRES
         new IDatabaseType() {
             @Override
-            String getJdbcName() {
+            @NotNull String getJdbcName() {
                 return "unknown"
             }
         }                          || SQLDialect.DEFAULT
