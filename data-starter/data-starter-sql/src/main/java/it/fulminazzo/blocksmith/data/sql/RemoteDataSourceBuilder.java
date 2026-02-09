@@ -27,6 +27,7 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
                             final @NotNull IDatabaseType databaseType) {
         super(config, database);
         this.databaseType = databaseType;
+        host("0.0.0.0").port(databaseType.getPort());
     }
 
     @Override
