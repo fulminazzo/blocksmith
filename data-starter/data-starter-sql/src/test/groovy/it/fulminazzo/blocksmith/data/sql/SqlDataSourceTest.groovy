@@ -18,10 +18,10 @@ class SqlDataSourceTest extends Specification {
 
         when:
         def source = SqlDataSource.builder()
-                .setDatabase('sql_data_source')
-                .setUsername('user')
-                .setPassword('password')
-                .setDatabaseType(type)
+                .database('sql_data_source')
+                .username('user')
+                .password('password')
+                .databaseType(type)
                 .host('localhost')
                 .port(23692)
                 ."${methodName}"()
@@ -40,10 +40,10 @@ class SqlDataSourceTest extends Specification {
     def 'test that #type returns #dialect'() {
         given:
         def builder = SqlDataSource.builder()
-                .setDatabase('sql_data_source')
-                .setUsername('user')
-                .setPassword('password')
-                .setDatabaseType(type)
+                .database('sql_data_source')
+                .username('user')
+                .password('password')
+                .databaseType(type)
 
         when:
         def actual = builder.getSQLDialect()
@@ -71,9 +71,9 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize h2 memory connection'() {
         when:
         def source = SqlDataSource.builder()
-                .setDatabase('sql_data_source')
-                .setUsername('sa')
-                .setPassword('')
+                .database('sql_data_source')
+                .username('sa')
+                .password('')
                 .h2()
                 .memory()
                 .preventMemoryLoss()
@@ -89,9 +89,9 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize h2 disk connection'() {
         when:
         def source = SqlDataSource.builder()
-                .setDatabase('sql_data_source')
-                .setUsername('sa')
-                .setPassword('')
+                .database('sql_data_source')
+                .username('sa')
+                .password('')
                 .h2()
                 .disk('./build/resources/test/sql_data_source')
                 .allowSimultaneousFileConnections()
@@ -107,9 +107,9 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize h2 disk connection throws on non-existing'() {
         when:
         def source = SqlDataSource.builder()
-                .setDatabase('sql_data_source')
-                .setUsername('sa')
-                .setPassword('')
+                .database('sql_data_source')
+                .username('sa')
+                .password('')
                 .h2()
                 .disk('./build/resources/test/sql_data_source_invalid/')
                 .allowSimultaneousFileConnections()
@@ -126,9 +126,9 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize h2 server connection'() {
         when:
         def source = SqlDataSource.builder()
-                .setDatabase('sql_data_source')
-                .setUsername('sa')
-                .setPassword('')
+                .database('sql_data_source')
+                .username('sa')
+                .password('')
                 .h2()
                 .server('localhost', 18379)
                 .build()
@@ -143,9 +143,9 @@ class SqlDataSourceTest extends Specification {
     def 'test that SQLDialect is H2'() {
         given:
         def builder = SqlDataSource.builder()
-                .setDatabase('sql_data_source')
-                .setUsername('sa')
-                .setPassword('')
+                .database('sql_data_source')
+                .username('sa')
+                .password('')
                 .h2()
 
         expect:
@@ -159,9 +159,9 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize general SQL throws'() {
         when:
         def source = SqlDataSource.builder()
-                .setDatabase('sql_data_source')
-                .setUsername('sa')
-                .setPassword('')
+                .database('sql_data_source')
+                .username('sa')
+                .password('')
                 .build()
 
         then:
@@ -174,9 +174,9 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize general SQL throws'() {
         when:
         def source = SqlDataSource.builder()
-                .setDatabase('sql_data_source')
-                .setUsername('sa')
-                .setPassword('')
+                .database('sql_data_source')
+                .username('sa')
+                .password('')
                 .getSQLDialect()
 
         then:

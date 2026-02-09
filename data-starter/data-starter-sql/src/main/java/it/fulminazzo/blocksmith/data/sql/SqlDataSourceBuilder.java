@@ -44,7 +44,7 @@ public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSou
      * @param databaseType database type
      * @return this object (for method chaining)
      */
-    public @NotNull RemoteDataSourceBuilder setDatabaseType(final @NotNull IDatabaseType databaseType) {
+    public @NotNull RemoteDataSourceBuilder databaseType(final @NotNull IDatabaseType databaseType) {
         return new RemoteDataSourceBuilder(config, database, databaseType);
     }
 

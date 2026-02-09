@@ -60,7 +60,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @param database database
      * @return this object (for method chaining)
      */
-    public @NotNull B setDatabase(final @Nullable String database) {
+    public @NotNull B database(final @Nullable String database) {
         this.database = database;
         return (B) this;
     }
@@ -71,7 +71,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @param username the username
      * @return this object (for method chaining)
      */
-    public @NotNull B setUsername(final @Nullable String username) {
+    public @NotNull B username(final @Nullable String username) {
         config.setUsername(username);
         return (B) this;
     }
@@ -82,7 +82,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @param password the password
      * @return this object (for method chaining)
      */
-    public @NotNull B setPassword(final @Nullable String password) {
+    public @NotNull B password(final @Nullable String password) {
         config.setPassword(password);
         return (B) this;
     }
