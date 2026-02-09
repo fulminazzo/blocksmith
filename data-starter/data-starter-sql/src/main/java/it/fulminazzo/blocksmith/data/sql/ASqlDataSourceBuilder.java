@@ -101,45 +101,6 @@ abstract class ASqlDataSourceBuilder {
     }
 
     /**
-     * Sets the internal configuration for MySQL and MariaDB.
-     *
-     * @return this object (for method chaining)
-     */
-    public @NotNull ASqlDataSourceBuilder mySql() {
-        return addDataSourceProperty("cachePrepStmts", true)
-                .addDataSourceProperty("prepStmtCacheSize", 250)
-                .addDataSourceProperty("prepStmtCacheSqlLimit", 2048)
-                .addDataSourceProperty("useServerPrepStmts", true)
-                .addDataSourceProperty("useLocalSessionState", true)
-                .addDataSourceProperty("rewriteBatchedStatements", true)
-                .addDataSourceProperty("cacheResultSetMetadata", true)
-                .addDataSourceProperty("cacheServerConfiguration", true)
-                .addDataSourceProperty("elideSetAutoCommits", true)
-                .addDataSourceProperty("maintainTimeStats", false);
-    }
-
-    /**
-     * Sets the internal configuration for Postgres.
-     *
-     * @return this object (for method chaining)
-     */
-    public @NotNull ASqlDataSourceBuilder postgresql() {
-        return addDataSourceProperty("tcpKeepAlive", true)
-                .addDataSourceProperty("prepareThreshold", 5);
-    }
-
-    /**
-     * Sets the internal configuration for Oracle.
-     *
-     * @return this object (for method chaining)
-     */
-    public @NotNull ASqlDataSourceBuilder oracle() {
-        return addDataSourceProperty("implicitCachingEnabled", true)
-                .addDataSourceProperty("implicitStatementCacheSize", 100)
-                .addDataSourceProperty("maxStatementsLimit", 250);
-    }
-
-    /**
      * Sets a property for the final datasource.
      *
      * @param propertyName the property name
