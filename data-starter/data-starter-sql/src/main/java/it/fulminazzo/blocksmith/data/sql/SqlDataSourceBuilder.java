@@ -16,8 +16,13 @@ public final class SqlDataSourceBuilder {
 
     private final @NotNull HikariConfig config;
 
+    private @Nullable String databaseType;
+    private @Nullable String host;
+    private @Nullable Integer port;
+    private @Nullable String database;
+
     /**
-     * Instantiates a new SQL repository builder.
+     * Instantiates a new SQL data source builder.
      */
     SqlDataSourceBuilder() {
         this.config = new HikariConfig();
@@ -26,6 +31,50 @@ public final class SqlDataSourceBuilder {
                 .connectionTimeout(connectionTimeout)
                 .idleTimeout(idleTimeout)
                 .maxLifeTime(maxLifeTime);
+    }
+
+    /**
+     * Sets the databaseType.
+     *
+     * @param databaseType databaseType
+     * @return (this object (for method chaining)
+     */
+    public @NotNull SqlDataSourceBuilder setDatabaseType(final @Nullable String databaseType) {
+        this.databaseType = databaseType;
+        return this;
+    }
+
+    /**
+     * Sets the host.
+     *
+     * @param host host
+     * @return (this object (for method chaining)
+     */
+    public @NotNull SqlDataSourceBuilder setHost(final @Nullable String host) {
+        this.host = host;
+        return this;
+    }
+
+    /**
+     * Sets the port.
+     *
+     * @param port port
+     * @return (this object (for method chaining)
+     */
+    public @NotNull SqlDataSourceBuilder setPort(final @Nullable Integer port) {
+        this.port = port;
+        return this;
+    }
+
+    /**
+     * Sets the database.
+     *
+     * @param database database
+     * @return (this object (for method chaining)
+     */
+    public @NotNull SqlDataSourceBuilder setDatabase(final @Nullable String database) {
+        this.database = database;
+        return this;
     }
 
     /**
@@ -38,7 +87,7 @@ public final class SqlDataSourceBuilder {
         config.setUsername(username);
         return this;
     }
-    
+
     /**
      * Sets password.
      *
@@ -49,7 +98,7 @@ public final class SqlDataSourceBuilder {
         config.setPassword(password);
         return this;
     }
-    
+
     /**
      * Sets the maximum number of concurrent connections.
      *
