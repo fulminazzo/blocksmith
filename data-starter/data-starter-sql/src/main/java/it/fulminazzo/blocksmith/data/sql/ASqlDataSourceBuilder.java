@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jooq.SQLDialect;
 
 import java.util.Objects;
 
@@ -27,7 +28,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      */
     public @NotNull SqlDataSource build() {
         config.setJdbcUrl(getJdbcUrl());
-        return new SqlDataSource(new HikariDataSource(config));
+        return new SqlDataSource(new HikariDataSource(config), getSQLDialect());
     }
 
     /**
@@ -45,6 +46,13 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @return the jdbc url
      */
     protected abstract @NotNull String getJdbcUrl();
+
+    /**
+     * Gets the SQL dialect.
+     *
+     * @return the SQL dialect
+     */
+    protected abstract @NotNull SQLDialect getSQLDialect();
 
     /**
      * Sets the database.
