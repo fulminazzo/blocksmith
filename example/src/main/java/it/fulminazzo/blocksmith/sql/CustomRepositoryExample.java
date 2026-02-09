@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.sql;
 
 import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
 import it.fulminazzo.blocksmith.data.sql.SqlRepository;
+import it.fulminazzo.blocksmith.sql.tables.Users;
 import it.fulminazzo.blocksmith.util.TestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
@@ -42,7 +43,7 @@ public final class CustomRepositoryExample {
         }
     }
 
-    public static class UserRepository extends SqlRepository<User, Long> {
+    public static final class UserRepository extends SqlRepository<User, Long, Users> {
 
         public UserRepository(final @NotNull DSLContext context,
                               final @NotNull Executor executor) {
@@ -58,7 +59,7 @@ public final class CustomRepositoryExample {
         public @NotNull CompletableFuture<Optional<User>> findYoungestUser() {
             return query(dsl ->
                     dsl.selectFrom(table)
-                            .orderBy(Tables.USERS.AGE.asc())
+                            .orderBy(table.AGE.asc())
                             .limit(1)
                             .fetchOptionalInto(User.class)
             );
