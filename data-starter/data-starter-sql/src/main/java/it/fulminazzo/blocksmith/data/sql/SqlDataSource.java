@@ -4,10 +4,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import it.fulminazzo.blocksmith.data.Repository;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
-import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.Table;
-import org.jooq.TableField;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import javax.sql.DataSource;
@@ -47,10 +44,10 @@ public final class SqlDataSource implements DataSource, Closeable {
      * @param executor  the executor (for asynchronous operations)
      * @return the repository
      */
-    public <T, ID> @NotNull Repository<T, ID> newRepository(
+    public <R extends Record, T, ID> @NotNull Repository<T, ID> newRepository(
             final @NotNull Class<T> dataType,
-            final @NotNull Table<?> dataTable,
-            final @NotNull TableField<?, ID> idColumn,
+            final @NotNull Table<R> dataTable,
+            final @NotNull TableField<R, ID> idColumn,
             final @NotNull Executor executor
     ) {
         return new SqlRepository<>(
