@@ -81,6 +81,28 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
     }
 
     /**
+     * Enables or disables lowercase names in the database.
+     *
+     * @param value the value
+     * @return this object (for method chaining)
+     */
+    public @NotNull H2DataSourceBuilder lowercaseNames(final boolean value) {
+        return setParameters("DATABASE_TO_LOWER", String.valueOf(value).toUpperCase());
+    }
+
+    /**
+     * Sets the schema name to the given one.
+     * Defaults to `PUBLIC`.
+     *
+     * @param name the name
+     * @return this object (for method chaining)
+     */
+    public @NotNull H2DataSourceBuilder schemaName(final @NotNull String name) {
+        return setParameters("INIT", String.format("CREATE SCHEMA IF NOT EXISTS %s", name))
+                .setParameters("INIT", String.format("SET SCHEMA %s", name));
+    }
+
+    /**
      * Allows to run the given <b>SQL</b> script on startup.
      *
      * @param filePath the path of the script
