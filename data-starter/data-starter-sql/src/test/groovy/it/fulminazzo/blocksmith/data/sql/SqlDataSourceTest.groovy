@@ -150,13 +150,70 @@ class SqlDataSourceTest extends Specification {
     }
 
     /*
+     * SQLite
+     */
+
+    def 'test initialize sqlite memory connection'() {
+        when:
+        def source = SqlDataSource.builder()
+                .database('sqlite_data_source')
+                .username('sa')
+                .password('')
+                .sqlite()
+                .memory()
+                .build()
+
+        then:
+        noExceptionThrown()
+
+        cleanup:
+        if (source != null) source.close()
+    }
+
+    def 'test initialize sqlite disk connection'() {
+        given:
+        def expected = new File('build/resources/test/sqlite_data_source/sqlite_data_source.db')
+        expected.parentFile.mkdirs()
+
+        when:
+        def source = SqlDataSource.builder()
+                .database('sqlite_data_source')
+                .username('sa')
+                .password('')
+                .sqlite()
+                .disk('./build/resources/test/sqlite_data_source')
+                .build()
+
+        then:
+        noExceptionThrown()
+
+        and:
+        expected.exists()
+
+        cleanup:
+        if (source != null) source.close()
+    }
+
+    def 'test that SQLDialect is SQLITE'() {
+        given:
+        def builder = SqlDataSource.builder()
+                .database('sqlite_data_source')
+                .username('sa')
+                .password('')
+                .sqlite()
+
+        expect:
+        builder.getSQLDialect() == SQLDialect.SQLITE
+    }
+
+    /*
      * H2
      */
 
     def 'test initialize h2 memory connection'() {
         when:
         def source = SqlDataSource.builder()
-                .database('sql_data_source')
+                .database('h2_data_source')
                 .username('sa')
                 .password('')
                 .h2()
@@ -172,18 +229,24 @@ class SqlDataSourceTest extends Specification {
     }
 
     def 'test initialize h2 disk connection'() {
+        given:
+        def expected = new File('build/resources/test/h2_data_source/h2_data_source.mv.db')
+
         when:
         def source = SqlDataSource.builder()
-                .database('sql_data_source')
+                .database('h2_data_source')
                 .username('sa')
                 .password('')
                 .h2()
-                .disk('./build/resources/test/sql_data_source')
+                .disk('./build/resources/test/h2_data_source')
                 .allowSimultaneousFileConnections()
                 .build()
 
         then:
         noExceptionThrown()
+
+        and:
+        expected.exists()
 
         cleanup:
         if (source != null) source.close()
@@ -192,11 +255,11 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize h2 disk connection throws on non-existing'() {
         when:
         def source = SqlDataSource.builder()
-                .database('sql_data_source')
+                .database('h2_data_source')
                 .username('sa')
                 .password('')
                 .h2()
-                .disk('./build/resources/test/sql_data_source_invalid/')
+                .disk('./build/resources/test/h2_data_source_invalid/')
                 .allowSimultaneousFileConnections()
                 .preventConnectionOnNonExistingFile()
                 .build()
@@ -211,7 +274,7 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize h2 server connection'() {
         when:
         def source = SqlDataSource.builder()
-                .database('sql_data_source')
+                .database('h2_data_source')
                 .username('sa')
                 .password('')
                 .h2()
@@ -228,7 +291,7 @@ class SqlDataSourceTest extends Specification {
     def 'test that SQLDialect is H2'() {
         given:
         def builder = SqlDataSource.builder()
-                .database('sql_data_source')
+                .database('h2_data_source')
                 .username('sa')
                 .password('')
                 .h2()
