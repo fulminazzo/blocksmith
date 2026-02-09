@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.sql;
 
 import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +27,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      */
     public @NotNull SqlDataSource build() {
         config.setJdbcUrl(getJdbcUrl());
-        return new SqlDataSource(config.getDataSource());
+        return new SqlDataSource(new HikariDataSource(config));
     }
 
     /**
