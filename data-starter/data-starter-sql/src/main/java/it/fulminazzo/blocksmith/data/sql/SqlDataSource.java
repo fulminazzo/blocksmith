@@ -36,6 +36,7 @@ public final class SqlDataSource implements DataSource, Closeable {
     /**
      * Creates a new repository.
      *
+     * @param <R>       the type of the record in the table
      * @param <T>       the type of the data
      * @param <ID>      the type of the id
      * @param dataType  the data type
