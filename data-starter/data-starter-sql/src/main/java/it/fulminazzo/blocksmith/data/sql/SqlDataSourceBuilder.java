@@ -54,7 +54,7 @@ public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSou
      * @return this object (for method chaining)
      */
     public @NotNull H2DataSourceBuilder h2() {
-        return new H2DataSourceBuilder(config, database);
+        return new H2DataSourceBuilder(config, database).lowercaseNames(true);
     }
 
 }
