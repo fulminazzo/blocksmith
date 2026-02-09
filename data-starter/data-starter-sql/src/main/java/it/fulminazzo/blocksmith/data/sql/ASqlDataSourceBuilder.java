@@ -5,12 +5,45 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
+/**
+ * A general SQL data source builder.
+ *
+ * @param <B> the type of the builder
+ */
 @SuppressWarnings("unchecked")
 @AllArgsConstructor
 abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
     protected final @NotNull HikariConfig config;
 
     protected @Nullable String database;
+    
+    /**
+     * Creates a new SQL data source
+     *
+     * @return the SQL data source
+     */
+    public @NotNull SqlDataSource build() {
+        config.setJdbcUrl(getJdbcUrl());
+        return new SqlDataSource(config.getDataSource());
+    }
+
+    /**
+     * Gets the database name.
+     *
+     * @return the database
+     */
+    protected @NotNull String getDatabase() {
+        return Objects.requireNonNull(database, "database name has not been specified yet");
+    }
+
+    /**
+     * Gets the jdbc URL.
+     *
+     * @return the jdbc url
+     */
+    protected abstract @NotNull String getJdbcUrl();
 
     /**
      * Sets the database.
