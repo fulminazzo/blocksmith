@@ -22,4 +22,11 @@ public interface IDatabaseType {
      */
     @NotNull String getJdbcName();
 
+    /**
+     * Gets the default port for this database type.
+     *
+     * @return the port
+     */
+    int getPort();
+
 }

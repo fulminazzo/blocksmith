@@ -58,11 +58,18 @@ class SqlDataSourceTest extends Specification {
         DatabaseType.MARIADB       || SQLDialect.MARIADB
         DatabaseType.POSTGRES      || SQLDialect.POSTGRES
         new IDatabaseType() {
+
             @Override
             @NotNull String getJdbcName() {
                 return "unknown"
             }
-        }                          || SQLDialect.DEFAULT
+
+            @Override
+            int getPort() {
+                return 1337
+            }
+
+        }                                           || SQLDialect.DEFAULT
     }
 
     /*
