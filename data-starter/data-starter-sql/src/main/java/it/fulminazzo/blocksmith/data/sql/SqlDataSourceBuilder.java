@@ -57,4 +57,13 @@ public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSou
         return new H2DataSourceBuilder(config, database).lowercaseNames(true);
     }
 
+    /**
+     * Sets the database type to SQLite.
+     *
+     * @return this object (for method chaining)
+     */
+    public @NotNull SqliteDataSourceBuilder sqlite() {
+        return new SqliteDataSourceBuilder(config, database);
+    }
+
 }
