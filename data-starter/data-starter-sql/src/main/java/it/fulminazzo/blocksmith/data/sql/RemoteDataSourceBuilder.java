@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.data.sql;
 import com.zaxxer.hikari.HikariConfig;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jooq.SQLDialect;
 
 import java.util.Objects;
 
@@ -36,6 +37,15 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
                 Objects.requireNonNull(port, "port has not been specified yet"),
                 getDatabase()
         );
+    }
+
+    @Override
+    protected @NotNull SQLDialect getSQLDialect() {
+        try {
+            return SQLDialect.valueOf(databaseType.getJdbcName().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return SQLDialect.DEFAULT;
+        }
     }
 
     /**

@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.sql;
 
 import com.zaxxer.hikari.HikariConfig;
 import org.jetbrains.annotations.NotNull;
+import org.jooq.SQLDialect;
 
 /**
  * A builder for {@link SqlDataSource}.
@@ -27,6 +28,12 @@ public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSou
 
     @Override
     protected @NotNull String getJdbcUrl() {
+        throw new IllegalStateException("A database type has not been set yet! " +
+                "Please use setDatabaseType or h2 before calling this method");
+    }
+
+    @Override
+    protected @NotNull SQLDialect getSQLDialect() {
         throw new IllegalStateException("A database type has not been set yet! " +
                 "Please use setDatabaseType or h2 before calling this method");
     }

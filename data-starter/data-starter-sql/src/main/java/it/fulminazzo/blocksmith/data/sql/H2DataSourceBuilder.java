@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.data.sql;
 import com.zaxxer.hikari.HikariConfig;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jooq.SQLDialect;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +38,11 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
         ) + parameters.entrySet().stream()
                 .map(e -> String.format(";%s=%s", e.getKey(), e.getValue()))
                 .collect(Collectors.joining());
+    }
+
+    @Override
+    protected @NotNull SQLDialect getSQLDialect() {
+        return SQLDialect.H2;
     }
 
     /**
