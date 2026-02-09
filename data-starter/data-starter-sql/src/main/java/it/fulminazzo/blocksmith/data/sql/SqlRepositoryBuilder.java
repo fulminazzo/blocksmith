@@ -30,6 +30,7 @@ public final class SqlRepositoryBuilder {
     /**
      * Sets the maximum number of concurrent connections.
      *
+     * @param maximumPoolSize the maximum pool size
      * @return this object (for method chaining)
      */
     public @NotNull SqlRepositoryBuilder maximumPoolSize(final int maximumPoolSize) {
@@ -40,6 +41,7 @@ public final class SqlRepositoryBuilder {
     /**
      * Sets the minimum idle connections.
      *
+     * @param minimumIdle the minimum idle
      * @return this object (for method chaining)
      */
     public @NotNull SqlRepositoryBuilder minimumIdle(final int minimumIdle) {
@@ -50,6 +52,7 @@ public final class SqlRepositoryBuilder {
     /**
      * Sets the connections timeout.
      *
+     * @param connectionTimeout the connection timeout
      * @return this object (for method chaining)
      */
     public @NotNull SqlRepositoryBuilder connectionTimeout(final long connectionTimeout) {
@@ -60,6 +63,7 @@ public final class SqlRepositoryBuilder {
     /**
      * Sets the idle timeout for connections.
      *
+     * @param idleTimeout the idle timeout
      * @return this object (for method chaining)
      */
     public @NotNull SqlRepositoryBuilder idleTimeout(final long idleTimeout) {
@@ -70,10 +74,63 @@ public final class SqlRepositoryBuilder {
     /**
      * Sets the maximum lifetime of a connection.
      *
+     * @param maxLifetime the max lifetime
      * @return this object (for method chaining)
      */
     public @NotNull SqlRepositoryBuilder maxLifeTime(final long maxLifetime) {
         config.setMaxLifetime(maxLifetime);
+        return this;
+    }
+
+    /**
+     * Sets the internal configuration for MySQL and MariaDB.
+     *
+     * @return this object (for method chaining)
+     */
+    public @NotNull SqlRepositoryBuilder mySql() {
+        return addDataSourceProperty("cachePrepStmts", true)
+                .addDataSourceProperty("prepStmtCacheSize", 250)
+                .addDataSourceProperty("prepStmtCacheSqlLimit", 2048)
+                .addDataSourceProperty("useServerPrepStmts", true)
+                .addDataSourceProperty("useLocalSessionState", true)
+                .addDataSourceProperty("rewriteBatchedStatements", true)
+                .addDataSourceProperty("cacheResultSetMetadata", true)
+                .addDataSourceProperty("cacheServerConfiguration", true)
+                .addDataSourceProperty("elideSetAutoCommits", true)
+                .addDataSourceProperty("maintainTimeStats", false);
+    }
+
+    /**
+     * Sets the internal configuration for Postgres.
+     *
+     * @return this object (for method chaining)
+     */
+    public @NotNull SqlRepositoryBuilder postgres() {
+        return addDataSourceProperty("tcpKeepAlive", true)
+                .addDataSourceProperty("prepareThreshold", 5);
+    }
+
+    /**
+     * Sets the internal configuration for Oracle.
+     *
+     * @return this object (for method chaining)
+     */
+    public @NotNull SqlRepositoryBuilder oracle() {
+        return addDataSourceProperty("implicitCachingEnabled", true)
+                .addDataSourceProperty("implicitStatementCacheSize", 100)
+                .addDataSourceProperty("maxStatementsLimit", 250);
+    }
+
+    /**
+     * Sets a property for the final datasource.
+     *
+     * @param propertyName the property name
+     * @param value        the value
+     * @return this object (for method chaining)
+     */
+    public @NotNull SqlRepositoryBuilder addDataSourceProperty(final @NotNull String propertyName,
+                                                               final Object value) {
+        config.addDataSourceProperty(propertyName, value);
         return this;
     }
 
