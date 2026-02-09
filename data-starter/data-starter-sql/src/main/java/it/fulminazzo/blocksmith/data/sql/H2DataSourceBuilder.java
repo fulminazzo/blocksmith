@@ -94,7 +94,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      * @return this object (for method chaining)
      */
     public @NotNull H2DataSourceBuilder lowercaseNames(final boolean value) {
-        return setParameters("DATABASE_TO_LOWER", String.valueOf(value).toUpperCase());
+        return setParameters("DATABASE_TO_LOWER", value);
     }
 
     /**
@@ -125,7 +125,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      * @return this object (for method chaining)
      */
     public @NotNull H2DataSourceBuilder preventMemoryLoss() {
-        return setParameters("DB_CLOSE_DELAY", "-1");
+        return setParameters("DB_CLOSE_DELAY", -1);
     }
 
     /**
@@ -134,7 +134,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      * @return this object (for method chaining)
      */
     public @NotNull H2DataSourceBuilder allowSimultaneousFileConnections() {
-        return setParameters("AUTO_SERVER", "TRUE");
+        return setParameters("AUTO_SERVER", true);
     }
 
     /**
@@ -143,7 +143,19 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      * @return this object (for method chaining)
      */
     public @NotNull H2DataSourceBuilder preventConnectionOnNonExistingFile() {
-        return setParameters("IFEXISTS", "TRUE");
+        return setParameters("IFEXISTS", true);
+    }
+
+    /**
+     * Adds a new parameter to the final configuration of the database.
+     *
+     * @param name  the name of the parameter
+     * @param value the value
+     * @return this object (for method chaining)
+     */
+    public @NotNull H2DataSourceBuilder setParameters(final @NotNull String name,
+                                                      final @NotNull Object value) {
+        return setParameters(name, value.toString().toUpperCase());
     }
 
     /**
