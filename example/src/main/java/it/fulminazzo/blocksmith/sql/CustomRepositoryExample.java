@@ -21,8 +21,9 @@ public final class CustomRepositoryExample {
                 SqlDataSource dataSource = SqlDataSource.builder()
                         .username("sa")
                         .password("")
+                        .database("test")
                         .h2()
-                        .disk("./example/build/h2db/test")
+                        .disk("./example/build/h2db/")
                         .allowSimultaneousFileConnections()
                         .build()
         ) {

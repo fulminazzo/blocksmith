@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.SQLDialect;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -57,12 +58,12 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
     /**
      * Sets the connection mode to disk (using the file as storage).
      *
-     * @param filePath the file path
+     * @param directoryPath the directory where the database file will be stored
      * @return this object (for method chaining)
      */
-    public @NotNull H2DataSourceBuilder disk(@NotNull String filePath) {
-        if (filePath.endsWith("/")) filePath = filePath.substring(0, filePath.length() - 1);
-        connectionMode = filePath;
+    public @NotNull H2DataSourceBuilder disk(final @NotNull String directoryPath) {
+        File directory = new File(directoryPath);
+        connectionMode = new File(directory, getDatabase()).getAbsolutePath();
         return this;
     }
 
