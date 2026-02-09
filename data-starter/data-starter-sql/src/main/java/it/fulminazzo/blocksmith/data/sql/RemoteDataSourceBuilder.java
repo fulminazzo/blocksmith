@@ -65,7 +65,7 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
      *
      * @return this object (for method chaining)
      */
-    public @NotNull RemoteDataSourceBuilder mySql() {
+    public @NotNull RemoteDataSourceBuilder mysql() {
         return addDataSourceProperty("cachePrepStmts", true)
                 .addDataSourceProperty("prepStmtCacheSize", 250)
                 .addDataSourceProperty("prepStmtCacheSqlLimit", 2048)
@@ -86,17 +86,6 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
     public @NotNull RemoteDataSourceBuilder postgresql() {
         return addDataSourceProperty("tcpKeepAlive", true)
                 .addDataSourceProperty("prepareThreshold", 5);
-    }
-
-    /**
-     * Sets the internal configuration for Oracle.
-     *
-     * @return this object (for method chaining)
-     */
-    public @NotNull RemoteDataSourceBuilder oracle() {
-        return addDataSourceProperty("implicitCachingEnabled", true)
-                .addDataSourceProperty("implicitStatementCacheSize", 100)
-                .addDataSourceProperty("maxStatementsLimit", 250);
     }
 
 }
