@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS logins (
+CREATE TABLE logins (
     name VARCHAR(255) PRIMARY KEY,
     count INT
 );
