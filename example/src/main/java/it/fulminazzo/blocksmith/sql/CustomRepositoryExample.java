@@ -12,7 +12,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class CustomRepositoryExample {
+public final class CustomRepositoryExample {
 
     public static void main(String[] args) {
         ExecutorService executor = Executors.newSingleThreadExecutor();

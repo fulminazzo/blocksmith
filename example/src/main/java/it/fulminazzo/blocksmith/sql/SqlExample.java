@@ -7,7 +7,7 @@ import it.fulminazzo.blocksmith.util.TestUtils;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SqlExample {
+public final class SqlExample {
 
     public static void main(String[] args) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
