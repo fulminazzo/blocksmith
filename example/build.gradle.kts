@@ -4,6 +4,8 @@ plugins {
 }
 
 dependencies {
+    // Source: https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.7")
     implementation(project(":data-starter:data-starter-sql"))
     jooqGenerator(libs.h2)
     implementation(libs.h2)
@@ -16,7 +18,7 @@ jooq {
             jooqConfiguration.apply {
                 jdbc.apply {
                     driver = "org.h2.Driver"
-                    url = "jdbc:h2:./build/h2db/test;INIT=RUNSCRIPT FROM 'src/main/resources/schema.sql';AUTO_SERVER=true"
+                    url = "jdbc:h2:./build/h2db/test;DATABASE_TO_LOWER=TRUE;INIT=RUNSCRIPT FROM 'src/main/resources/schema.sql';AUTO_SERVER=true"
                     user = "sa"
                     password = ""
                 }
@@ -24,7 +26,8 @@ jooq {
                 generator.apply {
                     database.apply {
                         name = "org.jooq.meta.h2.H2Database"
-                        inputSchema = "PUBLIC"
+                        inputSchema = "public"
+                        outputSchema = "test"
                     }
 
                     target.apply {
