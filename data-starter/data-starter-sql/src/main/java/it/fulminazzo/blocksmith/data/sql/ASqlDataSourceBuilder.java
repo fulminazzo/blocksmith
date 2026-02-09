@@ -20,7 +20,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
     protected final @NotNull HikariConfig config;
 
     protected @Nullable String database;
-    
+
     /**
      * Creates a new SQL data source
      *
@@ -150,7 +150,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @return this object (for method chaining)
      */
     public @NotNull B addDataSourceProperty(final @NotNull String propertyName,
-                                                                final Object value) {
+                                            final Object value) {
         config.addDataSourceProperty(propertyName, value);
         return (B) this;
     }
