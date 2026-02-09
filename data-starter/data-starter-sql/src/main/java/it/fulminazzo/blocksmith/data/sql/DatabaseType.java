@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 public enum DatabaseType implements IDatabaseType {
     MYSQL,
     MARIADB,
-    POSTGRESQL
+    POSTGRES
     ;
 
     @Override

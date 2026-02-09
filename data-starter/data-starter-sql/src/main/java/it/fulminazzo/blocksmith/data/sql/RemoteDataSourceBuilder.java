@@ -93,7 +93,7 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
      *
      * @return this object (for method chaining)
      */
-    public @NotNull RemoteDataSourceBuilder postgresql() {
+    public @NotNull RemoteDataSourceBuilder postgres() {
         return addDataSourceProperty("tcpKeepAlive", true)
                 .addDataSourceProperty("prepareThreshold", 5);
     }
