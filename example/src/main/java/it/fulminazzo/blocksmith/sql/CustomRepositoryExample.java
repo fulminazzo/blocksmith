@@ -7,6 +7,8 @@ import it.fulminazzo.blocksmith.util.TestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -15,7 +17,7 @@ import java.util.concurrent.Executors;
 
 public final class CustomRepositoryExample {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try (
                 SqlDataSource dataSource = SqlDataSource.builder()
@@ -27,6 +29,7 @@ public final class CustomRepositoryExample {
                         .allowSimultaneousFileConnections()
                         .build()
         ) {
+            dataSource.executeScriptFromFile(new File("example/build/resources/main/schema.sql"));
             User first = new User(1L, "Alexander", "Drinkwater", "alex@fulminazzo.it", 23);
             User second = new User(1L, "Camilla", "Drinkwater", "cami@fulminazzo.it", 20);
             UserRepository repository = dataSource.newRepository(UserRepository::new, executor);

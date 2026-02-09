@@ -4,12 +4,14 @@ import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
 import it.fulminazzo.blocksmith.util.TestUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class SqlExample {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try (
                 SqlDataSource dataSource = SqlDataSource.builder()
@@ -21,6 +23,7 @@ public final class SqlExample {
                         .allowSimultaneousFileConnections()
                         .build()
         ) {
+            dataSource.executeScriptFromFile(new File("example/build/resources/main/schema.sql"));
             Repository<User, Long> repository = dataSource.newRepository(
                     User.class,
                     Tables.USERS,
