@@ -31,10 +31,9 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
 
     @Override
     protected @NotNull String getJdbcUrl() {
-        return String.format("jdbc:h2:%s:%s",
+        return String.format("jdbc:h2:%s",
                 Objects.requireNonNull(connectionMode, "The connection mode has not been specified yet. " +
-                        "Please choose between memory, disk or server before building"),
-                getDatabase()
+                        "Please choose between memory, disk or server before building")
         ) + parameters.entrySet().stream()
                 .map(e -> String.format(";%s=%s", e.getKey(), e.getValue()))
                 .collect(Collectors.joining());
@@ -51,7 +50,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      * @return this object (for method chaining)
      */
     public @NotNull H2DataSourceBuilder memory() {
-        connectionMode = "mem";
+        connectionMode = "mem:" + getDatabase();
         return this;
     }
 
@@ -76,7 +75,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      */
     public @NotNull H2DataSourceBuilder server(final @NotNull String host,
                                                final int port) {
-        connectionMode = String.format("tcp://%s:%s/", host, port);
+        connectionMode = String.format("tcp://%s:%s/%s", host, port, getDatabase());
         return this;
     }
 
