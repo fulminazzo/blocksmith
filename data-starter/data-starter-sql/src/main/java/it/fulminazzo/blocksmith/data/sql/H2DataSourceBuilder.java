@@ -70,7 +70,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      */
     public @NotNull H2DataSourceBuilder server(final @NotNull String host,
                                                final int port) {
-        connectionMode = String.format("tcp://%s:%s", host, port);
+        connectionMode = String.format("tcp://%s:%s/", host, port);
         return this;
     }
 
