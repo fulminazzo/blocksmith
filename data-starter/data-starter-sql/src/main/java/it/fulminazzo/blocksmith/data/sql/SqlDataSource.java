@@ -10,6 +10,7 @@ import org.jooq.impl.DSL;
 import javax.sql.DataSource;
 import java.io.Closeable;
 import java.util.concurrent.Executor;
+import java.util.function.BiFunction;
 
 /**
  * {@link DataSource} for general SQL databases.
@@ -58,6 +59,23 @@ public final class SqlDataSource implements DataSource, Closeable {
                 dataType,
                 executor
         );
+    }
+
+    /**
+     * Creates a new custom repository.
+     *
+     * @param <R>                the type of the repository
+     * @param <T>                the type of the data
+     * @param <ID>               the type of the id
+     * @param repositorySupplier the repository creation function
+     * @param executor           the executor (for asynchronous operations)
+     * @return the repository
+     */
+    public <R extends Repository<T, ID>, T, ID> @NotNull R newRepository(
+            final @NotNull BiFunction<DSLContext, Executor, R> repositorySupplier,
+            final @NotNull Executor executor
+    ) {
+        return repositorySupplier.apply(context, executor);
     }
 
     /**
