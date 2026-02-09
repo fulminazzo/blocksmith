@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A builder for {@link SqlRepository}.
  */
-public final class SqlDataSourceBuilder {
+public abstract class SqlDataSourceBuilder {
     private static final int maximumPoolSize = 20;
     private static final int minimumIdle = 5;
     private static final long connectionTimeout = 30 * 1000;
@@ -16,9 +16,7 @@ public final class SqlDataSourceBuilder {
 
     private final @NotNull HikariConfig config;
 
-    private @Nullable String databaseType;
-    private @Nullable String host;
-    private @Nullable Integer port;
+    private @Nullable IDatabaseType databaseType;
     private @Nullable String database;
 
     /**
@@ -39,30 +37,8 @@ public final class SqlDataSourceBuilder {
      * @param databaseType databaseType
      * @return (this object (for method chaining)
      */
-    public @NotNull SqlDataSourceBuilder setDatabaseType(final @Nullable String databaseType) {
+    public @NotNull SqlDataSourceBuilder setDatabaseType(final @Nullable IDatabaseType databaseType) {
         this.databaseType = databaseType;
-        return this;
-    }
-
-    /**
-     * Sets the host.
-     *
-     * @param host host
-     * @return (this object (for method chaining)
-     */
-    public @NotNull SqlDataSourceBuilder setHost(final @Nullable String host) {
-        this.host = host;
-        return this;
-    }
-
-    /**
-     * Sets the port.
-     *
-     * @param port port
-     * @return (this object (for method chaining)
-     */
-    public @NotNull SqlDataSourceBuilder setPort(final @Nullable Integer port) {
-        this.port = port;
         return this;
     }
 
@@ -177,7 +153,7 @@ public final class SqlDataSourceBuilder {
      *
      * @return this object (for method chaining)
      */
-    public @NotNull SqlDataSourceBuilder postgres() {
+    public @NotNull SqlDataSourceBuilder postgresql() {
         return addDataSourceProperty("tcpKeepAlive", true)
                 .addDataSourceProperty("prepareThreshold", 5);
     }
