@@ -113,4 +113,23 @@ class SqlDataSourceTest extends Specification {
         if (source != null) source.close()
     }
 
+    /*
+     * SQL
+     */
+
+    def 'test initialize general SQL throws'() {
+        when:
+        def source = SqlDataSource.builder()
+                .setDatabase('sql_data_source')
+                .setUsername('sa')
+                .setPassword('')
+                .build()
+
+        then:
+        thrown(IllegalStateException)
+
+        cleanup:
+        if (source != null) source.close()
+    }
+
 }
