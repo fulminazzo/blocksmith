@@ -1,5 +1,7 @@
 rootProject.name = "blocksmith"
 
+include("example")
+
 include("data-starter")
 include("data-starter:data-starter-testing")
 

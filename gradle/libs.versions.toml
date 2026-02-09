@@ -1,4 +1,6 @@
 [versions]
+shadow = "9.1.0"
+
 lombok = "1.18.42"
 jetbrains_annotations = "26.0.2"
 
@@ -36,3 +38,6 @@ annotations = ["lombok", "jetbrains_annotations"]
 test_framework = ["spock_core", "byte_buddy", "mockito_core"]
 
 log4j = ["log4j_api", "log4j_core", "log4j_slf4j"]
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
