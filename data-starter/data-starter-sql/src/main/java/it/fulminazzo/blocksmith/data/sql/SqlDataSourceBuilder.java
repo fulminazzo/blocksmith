@@ -2,8 +2,10 @@ package it.fulminazzo.blocksmith.data.sql;
 
 import com.zaxxer.hikari.HikariConfig;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+/**
+ * A builder for {@link SqlDataSource}.
+ */
 public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder {
     private static final int maximumPoolSize = 20;
     private static final int minimumIdle = 5;
@@ -29,9 +31,8 @@ public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder {
      * @param databaseType database type
      * @return this object (for method chaining)
      */
-    public @NotNull SqlDataSourceBuilder setDatabaseType(final @Nullable IDatabaseType databaseType) {
-        //TODO: proper builder
-        return this;
+    public @NotNull RemoteDataSourceBuilder setDatabaseType(final @NotNull IDatabaseType databaseType) {
+        return new RemoteDataSourceBuilder(config, database, databaseType);
     }
 
     /**
