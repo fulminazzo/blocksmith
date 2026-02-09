@@ -11,6 +11,7 @@ mockito_core = "4.11.0"
 log4j = "2.25.3"
 
 jooq = "3.16.23"
+jooq_gen = "7.2"
 hikaricp = "7.0.2"
 
 h2 = "2.4.240"
@@ -41,3 +42,4 @@ log4j = ["log4j_api", "log4j_core", "log4j_slf4j"]
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+jooq = { id = "nu.studer.jooq", version.ref = "jooq_gen" }
