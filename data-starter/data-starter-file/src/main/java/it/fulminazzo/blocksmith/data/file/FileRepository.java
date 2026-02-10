@@ -10,10 +10,7 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
@@ -119,7 +116,11 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
         return execute(() -> {
             if (workingDir.exists()) {
                 File[] files = workingDir.listFiles();
-                if (files != null) return (long) files.length;
+                if (files != null)
+                    return Arrays.stream(files)
+                            .map(File::getName)
+                            .filter(n -> n.endsWith("." + format.getFileExtension()))
+                            .count();
             }
             return 0L;
         });
