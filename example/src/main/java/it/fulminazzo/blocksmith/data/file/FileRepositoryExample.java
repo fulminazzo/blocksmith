@@ -16,7 +16,7 @@ public final class FileRepositoryExample {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
             Repository<User, Long> repository = FileRepository.builder(User.class)
-                    .dataDirectory(new File("build/resources/test/files"))
+                    .dataDirectory(new File("example/build/resources/main/data/file/simple"))
                     .executor(executor)
                     .dataLanguageFormat(ConfigurationFormat.YAML)
                     .logger(LoggerFactory.getLogger(FileRepositoryExample.class))

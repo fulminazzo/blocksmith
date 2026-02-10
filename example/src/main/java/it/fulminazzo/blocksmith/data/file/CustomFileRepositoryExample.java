@@ -23,7 +23,7 @@ public final class CustomFileRepositoryExample {
             User first = new User(1L, "Alexander", "Drinkwater", "alex@fulminazzo.it", 23);
             User second = new User(1L, "Camilla", "Drinkwater", "cami@fulminazzo.it", 20);
             UserRepository repository = new UserRepository(
-                    new File("build/resources/test/files"),
+                    new File("example/build/resources/main/data/file/custom"),
                     executor,
                     LoggerFactory.getLogger(FileRepositoryExample.class),
                     ConfigurationFormat.YAML
