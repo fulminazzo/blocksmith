@@ -1,8 +1,6 @@
-package it.fulminazzo.blocksmith.sql;
+package it.fulminazzo.blocksmith.data.sql;
 
-import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
-import it.fulminazzo.blocksmith.data.sql.SqlRepository;
-import it.fulminazzo.blocksmith.sql.tables.Users;
+import it.fulminazzo.blocksmith.data.sql.tables.Users;
 import it.fulminazzo.blocksmith.util.TestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;

@@ -1,7 +1,6 @@
-package it.fulminazzo.blocksmith.sql;
+package it.fulminazzo.blocksmith.data.sql;
 
 import it.fulminazzo.blocksmith.data.Repository;
-import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
 import it.fulminazzo.blocksmith.util.TestUtils;
 
 import java.io.File;

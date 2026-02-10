@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.sql;
+package it.fulminazzo.blocksmith.data.sql;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
