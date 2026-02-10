@@ -53,14 +53,6 @@ public class SqlRepository<T, ID, TB extends Table<?>> implements Repository<T, 
     }
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> findAll() {
-        return query(dsl ->
-                dsl.selectFrom(table())
-                        .fetchInto(dataType)
-        );
-    }
-
-    @Override
     public @NotNull CompletableFuture<T> save(final @NotNull T data) {
         return query(dsl -> {
             Record record = dsl.newRecord(table(), data);
@@ -84,7 +76,16 @@ public class SqlRepository<T, ID, TB extends Table<?>> implements Repository<T, 
     }
 
     @Override
+    public @NotNull CompletableFuture<Collection<T>> findAll() {
+        return query(dsl ->
+                dsl.selectFrom(table())
+                        .fetchInto(dataType)
+        );
+    }
+
+    @Override
     public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
+        if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         return query(dsl -> dsl.selectFrom(table())
                 .where(idColumn.in(ids))
                 .fetchInto(dataType)
@@ -124,6 +125,7 @@ public class SqlRepository<T, ID, TB extends Table<?>> implements Repository<T, 
 
     @Override
     public @NotNull CompletableFuture<?> deleteAll(final @NotNull Collection<ID> ids) {
+        if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         return query(dsl ->
                 dsl.deleteFrom(table())
                         .where(idColumn.in(ids))
