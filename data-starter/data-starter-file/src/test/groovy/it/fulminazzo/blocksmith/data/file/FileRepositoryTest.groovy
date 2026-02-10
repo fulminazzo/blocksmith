@@ -10,8 +10,11 @@ import it.fulminazzo.blocksmith.function.BiConsumerException
 import it.fulminazzo.blocksmith.function.BiFunctionException
 import it.fulminazzo.blocksmith.function.ConsumerException
 import it.fulminazzo.blocksmith.function.FunctionException
+import it.fulminazzo.blocksmith.function.RunnableException
+import it.fulminazzo.blocksmith.function.SupplierException
 import org.jetbrains.annotations.NotNull
 
+import java.util.concurrent.CompletionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -341,7 +344,34 @@ class FileRepositoryTest extends RepositoryTest {
         id << [FIRST, SECOND].collect { it.id }
     }
 
+
+    def 'test that execute throws CompletionException on IOException'() {
+        when:
+        repository.execute(function).join()
+
+        then:
+        def e = thrown(CompletionException)
+
+        and:
+        def cause = e.cause
+        (cause instanceof IOException)
+        cause.message == 'Test exception'
+
+        where:
+        function << [
+                (RunnableException<IOException>) (() -> {
+                    throw new IOException('Test exception')
+                }),
+                (SupplierException<?, IOException>) (() -> {
+                    throw new IOException('Test exception')
+                }),
+        ]
+    }
+
     def 'test that getDataFile creates directory if not existing'() {
+        given:
+        WORKING_DIR.deleteDir()
+
         when:
         repository.getDataFile(1L)
 
