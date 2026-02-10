@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.file;
 
 import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
+import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.function.BiConsumerException;
 import it.fulminazzo.blocksmith.function.BiFunctionException;
 import it.fulminazzo.blocksmith.function.ConsumerException;
@@ -15,6 +16,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
@@ -26,7 +28,7 @@ import java.util.function.Function;
  * @param <T>  the type of the data
  * @param <ID> the type of the id of the data (will be used as file names)
  */
-public class FileRepository<T, ID> {
+public class FileRepository<T, ID> implements Repository<T, ID> {
     protected final @NotNull ConfigurationAdapter adapter;
     private final @NotNull File workingDir;
     private final @NotNull Function<T, ID> idMapper;
@@ -56,6 +58,74 @@ public class FileRepository<T, ID> {
         this.dataType = dataType;
         this.executor = executor;
         this.format = format;
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
+        return executeOnSingle(id, f -> {
+            if (f.exists()) return Optional.of(adapter.load(f, dataType));
+            else return Optional.empty();
+        });
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id) {
+        return executeOnSingle(id, File::exists);
+    }
+
+    @Override
+    public @NotNull CompletableFuture<T> save(final @NotNull T data) {
+        return executeOnSingleData(data, f -> {
+            adapter.store(f, data);
+            return data;
+        });
+    }
+
+    @Override
+    public @NotNull CompletableFuture<?> delete(final @NotNull ID id) {
+        return executeOnSingle(id, f -> {
+            Files.deleteIfExists(f.toPath());
+        });
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Collection<T>> findAll() {
+        return executeOnMany(f -> {
+            return adapter.load(f, dataType);
+        });
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
+        return executeOnMany(ids, (f, i) -> {
+            return adapter.load(f, dataType);
+        });
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entries) {
+        return executeOnManyData(entries, (f, t) -> {
+            adapter.store(f, t);
+            return t;
+        });
+    }
+
+    @Override
+    public @NotNull CompletableFuture<?> deleteAll(final @NotNull Collection<ID> ids) {
+        return executeOnMany(ids, (f, i) -> {
+            Files.deleteIfExists(f.toPath());
+        });
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Long> count() {
+        return CompletableFuture.supplyAsync(() -> {
+            if (workingDir.exists()) {
+                File[] files = workingDir.listFiles();
+                if (files != null) return (long) files.length;
+            }
+            return 0L;
+        }, executor);
     }
 
     /*
