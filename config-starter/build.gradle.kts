@@ -6,10 +6,6 @@ dependencies {
 
     compileOnly(libs.slf4j)
 
-    compileOnly(libs.joor)
-
-    testImplementation(libs.joor)
-
     allprojects {
         dependencies {
             testImplementation(rootProject.libs.slf4j)
