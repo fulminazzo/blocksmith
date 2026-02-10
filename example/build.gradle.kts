@@ -4,8 +4,6 @@ plugins {
 }
 
 dependencies {
-    // Source: https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.7")
     implementation(project(":data-starter:data-starter-sql"))
     jooqGenerator(libs.h2)
     implementation(libs.h2)
