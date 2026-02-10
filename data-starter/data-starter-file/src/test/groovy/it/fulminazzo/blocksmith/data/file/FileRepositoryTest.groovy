@@ -28,6 +28,8 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
 
     void setup() {
         WORKING_DIR.deleteDir()
+        WORKING_DIR.mkdirs()
+        new File(WORKING_DIR, 'tmp').createNewFile()
 
         setupRepository()
     }
