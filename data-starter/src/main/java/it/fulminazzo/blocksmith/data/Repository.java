@@ -59,7 +59,7 @@ public interface Repository<T, ID> {
      * @param ids the ids
      * @return the data
      */
-    @NotNull CompletableFuture<Collection<T>> findById(final @NotNull Collection<ID> ids);
+    @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids);
 
     /**
      * Saves all the given entries.
