@@ -112,12 +112,23 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         data << [FIRST, SECOND]
     }
 
-    def 'test that batch findAllById correctly returns all data'() {
+    def 'test that findAllById correctly returns all data'() {
         given:
         def expected = [FIRST, SECOND]
 
         when:
         def actual = repository.findAllById(expected.collect { it.id }).get()
+
+        then:
+        actual == expected
+    }
+
+    def 'test that findAllById of empty returns empty'() {
+        given:
+        def expected = []
+
+        when:
+        def actual = repository.findAllById([]).get()
 
         then:
         actual == expected
@@ -160,6 +171,17 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         data.every { exists(it.id) }
     }
 
+    def 'test that saveAll of empty returns empty'() {
+        given:
+        def data = []
+
+        when:
+        def saved = repository.saveAll(data).get()
+
+        then:
+        saved == data
+    }
+
     def 'test that deleteAll correctly deletes all data'() {
         given:
         def data = [FIRST, SECOND]
@@ -172,6 +194,14 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
 
         then:
         data.every { !exists(it.id) }
+    }
+
+    def 'test that deleteAll of empty does not throw'() {
+        when:
+        repository.deleteAll([])
+
+        then:
+        noExceptionThrown()
     }
 
     def 'test that count correctly returns number of data'() {
