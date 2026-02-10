@@ -34,6 +34,25 @@ class FileRepositoryTest extends RepositoryTest {
     }
 
     def 'test executeOnMany throws CompletionException'() {
+        when:
+        repository.executeOnMany(function).join()
+
+        then:
+        def e = thrown(CompletionException)
+        (e.cause instanceof IOException)
+
+        where:
+        function << [
+                (ConsumerException<File, IOException>) (f -> {
+                    throw new IOException('test exception')
+                }),
+                (FunctionException<File, User, IOException>) (f -> {
+                    throw new IOException('test exception')
+                })
+        ]
+    }
+
+    def 'test executeOnMany throws CompletionException'() {
         given:
         def ids = [1L, 2L]
 
