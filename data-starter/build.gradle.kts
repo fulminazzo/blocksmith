@@ -1,19 +1,15 @@
+val projectName: String = project.name
 val testingModuleName: String by rootProject.extra
 
-dependencies {
-    val projectName = project.name
-
-    allprojects {
-        dependencies {
-            if (!project.name.endsWith(testingModuleName))
-                testImplementation(project(":$projectName:$projectName-$testingModuleName"))
-        }
+allprojects {
+    dependencies {
+        if (!project.name.endsWith(testingModuleName))
+            testImplementation(project(":$projectName:$projectName-$testingModuleName"))
     }
+}
 
-    subprojects {
-        dependencies {
-            api(project(":$projectName"))
-        }
+subprojects {
+    dependencies {
+        api(project(":$projectName"))
     }
-
 }
