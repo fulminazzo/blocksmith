@@ -1,9 +1,11 @@
 package it.fulminazzo.blocksmith.data.file;
 
+import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
+import it.fulminazzo.blocksmith.config.ConfigurationFormat;
 import it.fulminazzo.blocksmith.function.ConsumerException;
 import it.fulminazzo.blocksmith.function.FunctionException;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,11 +19,43 @@ import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
+/**
+ * A basic implementation of {@link Repository} that stores data on disk.
+ *
+ * @param <T>  the type of the data
+ * @param <ID> the type of the id of the data (will be used as file names)
+ */
 public class FileRepository<T, ID> {
+    protected final @NotNull ConfigurationAdapter adapter;
     private final @NotNull File workingDir;
     private final @NotNull Function<T, ID> idMapper;
+    private final @NotNull Class<T> dataType;
     private final @NotNull Executor executor;
+    private final @NotNull ConfigurationFormat format;
+
+    /**
+     * Instantiates a new File repository.
+     *
+     * @param workingDir the directory where the data will be stored
+     * @param dataType   the type of the data
+     * @param idMapper   the function to get the id from data
+     * @param executor   the executor
+     * @param logger     the logger
+     * @param format     the file format to use
+     */
+    public FileRepository(final @NotNull File workingDir,
+                          final @NotNull Class<T> dataType,
+                          final @NotNull Function<T, ID> idMapper,
+                          final @NotNull Executor executor,
+                          final @NotNull Logger logger,
+                          final @NotNull ConfigurationFormat format) {
+        this.adapter = ConfigurationAdapter.newAdapter(logger, format);
+        this.workingDir = workingDir;
+        this.idMapper = idMapper;
+        this.dataType = dataType;
+        this.executor = executor;
+        this.format = format;
+    }
 
     /**
      * Executes the given function on multiple data files.
@@ -195,7 +229,7 @@ public class FileRepository<T, ID> {
     protected @NotNull File getDataFile(final @NotNull ID id) throws IOException {
         if (!workingDir.isDirectory())
             Files.createDirectories(workingDir.toPath());
-        return new File(workingDir, id.toString());
+        return format.getFile(workingDir, id.toString());
     }
 
 }
