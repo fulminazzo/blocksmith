@@ -7,10 +7,8 @@ dependencies {
     compileOnly(libs.slf4j)
 
     compileOnly(libs.joor)
-    compileOnly(libs.bundles.validation)
 
     testImplementation(libs.joor)
-    testImplementation(libs.bundles.validation)
 
     allprojects {
         dependencies {

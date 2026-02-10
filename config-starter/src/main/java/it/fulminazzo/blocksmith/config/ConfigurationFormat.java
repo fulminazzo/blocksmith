@@ -4,7 +4,6 @@ import it.fulminazzo.blocksmith.ProjectInfo;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.apache.bval.util.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
 import org.slf4j.Logger;
@@ -33,7 +32,8 @@ public enum ConfigurationFormat {
      * @return the adapter
      */
     @NotNull BaseConfigurationAdapter newAdapter(final @NotNull Logger logger) {
-        final String type = StringUtils.capitalize(name().toLowerCase());
+        String type = name().toLowerCase();
+        type = Character.toUpperCase(type.charAt(0)) + type.substring(1);
         try {
             String className = BaseConfigurationAdapter.class.getCanonicalName()
                     .replace("Base", type);
