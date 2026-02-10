@@ -20,7 +20,7 @@ final class SerializableMapper implements Mapper {
             byte[] raw = output.toByteArray();
             return Base64.getEncoder().encodeToString(raw);
         } catch (IOException e) {
-            throw new SerializationException(e);
+            throw new MapperException(e);
         }
     }
 
@@ -34,21 +34,8 @@ final class SerializableMapper implements Mapper {
         ) {
             return dataType.cast(inputStream.readObject());
         } catch (IOException | ClassNotFoundException e) {
-            throw new SerializationException(e);
+            throw new MapperException(e);
         }
-    }
-
-    public static final class SerializationException extends RuntimeException {
-
-        /**
-         * Instantiates a new Serialization exception.
-         *
-         * @param cause the cause
-         */
-        public SerializationException(final @NotNull Throwable cause) {
-            super(cause.getMessage(), cause);
-        }
-
     }
 
 }

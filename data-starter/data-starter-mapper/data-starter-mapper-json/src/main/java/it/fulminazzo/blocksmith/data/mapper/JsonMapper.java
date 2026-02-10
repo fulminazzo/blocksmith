@@ -15,7 +15,7 @@ final class JsonMapper implements Mapper {
         try {
             return mapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
-            throw new JsonException(e);
+            throw new MapperException(e);
         }
     }
 
@@ -25,21 +25,8 @@ final class JsonMapper implements Mapper {
         try {
             return mapper.readValue(serialized, dataType);
         } catch (JsonProcessingException e) {
-            throw new JsonException(e);
+            throw new MapperException(e);
         }
-    }
-
-    public static final class JsonException extends RuntimeException {
-
-        /**
-         * Instantiates a new JSON exception.
-         *
-         * @param cause the cause
-         */
-        public JsonException(final @NotNull Throwable cause) {
-            super(cause.getMessage(), cause);
-        }
-
     }
 
 }

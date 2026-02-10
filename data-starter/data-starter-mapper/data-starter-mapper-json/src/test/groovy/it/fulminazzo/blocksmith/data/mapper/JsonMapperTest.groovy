@@ -31,7 +31,7 @@ class JsonMapperTest extends Specification {
         mapper.serialize(new Unserializable())
 
         then:
-        thrown(JsonMapper.JsonException)
+        thrown(MapperException)
     }
 
     def 'test that deserialize throws JsonException on IOException'() {
@@ -42,7 +42,7 @@ class JsonMapperTest extends Specification {
         mapper.deserialize('invalid_data', Unserializable)
 
         then:
-        thrown(JsonMapper.JsonException)
+        thrown(MapperException)
     }
 
     private static class Unserializable {
