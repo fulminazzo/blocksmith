@@ -14,7 +14,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public final class CustomRepositoryExample {
+public final class CustomSqlRepositoryExample {
 
     public static void main(String[] args) throws IOException {
         ExecutorService executor = Executors.newSingleThreadExecutor();

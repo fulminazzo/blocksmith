@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public final class SqlExample {
+public final class SqlRepositoryExample {
 
     public static void main(String[] args) throws IOException {
         ExecutorService executor = Executors.newSingleThreadExecutor();
