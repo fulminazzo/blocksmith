@@ -427,4 +427,15 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
         return format.getFile(dataDirectory, id.toString());
     }
 
+    /**
+     * Gets a new builder for this class.
+     *
+     * @param <T>      the type of the data
+     * @param dataType the data type
+     * @return the builder
+     */
+    public static <T> @NotNull FileRepositoryBuilder<T> builder(final @NotNull Class<T> dataType) {
+        return new FileRepositoryBuilder<>(dataType);
+    }
+
 }
