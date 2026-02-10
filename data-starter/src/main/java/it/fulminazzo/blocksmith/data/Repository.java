@@ -31,13 +31,6 @@ public interface Repository<T, ID> {
     @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id);
 
     /**
-     * Gets all the data currently stored.
-     *
-     * @return the data
-     */
-    @NotNull CompletableFuture<Collection<T>> findAll();
-
-    /**
      * Saves the given data.
      *
      * @param data the data
@@ -52,6 +45,13 @@ public interface Repository<T, ID> {
      * @return nothing
      */
     @NotNull CompletableFuture<?> delete(final @NotNull ID id);
+
+    /**
+     * Gets all the data currently stored.
+     *
+     * @return the data
+     */
+    @NotNull CompletableFuture<Collection<T>> findAll();
 
     /**
      * Gets all the data with the associated it.
