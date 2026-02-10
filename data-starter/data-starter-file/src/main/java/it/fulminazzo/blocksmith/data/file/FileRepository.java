@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  */
 public class FileRepository<T, ID> implements Repository<T, ID> {
     protected final @NotNull ConfigurationAdapter adapter;
-    private final @NotNull File workingDir;
+    private final @NotNull File dataDirectory;
     private final @NotNull Function<T, ID> idMapper;
     private final @NotNull Class<T> dataType;
     private final @NotNull Executor executor;
@@ -34,21 +34,21 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
     /**
      * Instantiates a new File repository.
      *
-     * @param workingDir the directory where the data will be stored
-     * @param dataType   the type of the data
-     * @param idMapper   the function to get the id from data
-     * @param executor   the executor
-     * @param logger     the logger
-     * @param format     the file format to use
+     * @param dataDirectory the directory where the data will be stored
+     * @param dataType      the type of the data
+     * @param idMapper      the function to get the id from data
+     * @param executor      the executor
+     * @param logger        the logger
+     * @param format        the file format to use
      */
-    protected FileRepository(final @NotNull File workingDir,
+    protected FileRepository(final @NotNull File dataDirectory,
                              final @NotNull Class<T> dataType,
                              final @NotNull Function<T, ID> idMapper,
                              final @NotNull Executor executor,
                              final @NotNull Logger logger,
                              final @NotNull ConfigurationFormat format) {
         this.adapter = ConfigurationAdapter.newAdapter(logger, format);
-        this.workingDir = workingDir;
+        this.dataDirectory = dataDirectory;
         this.idMapper = idMapper;
         this.dataType = dataType;
         this.executor = executor;
@@ -404,8 +404,8 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
      * @return the files
      */
     protected @NotNull Collection<File> getFiles() {
-        if (workingDir.exists()) {
-            File[] files = workingDir.listFiles();
+        if (dataDirectory.exists()) {
+            File[] files = dataDirectory.listFiles();
             if (files != null)
                 return Arrays.stream(files)
                         .filter(f -> f.getName().endsWith("." + format.getFileExtension()))
@@ -422,9 +422,9 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
      * @throws IOException in case of any exception
      */
     protected @NotNull File getDataFile(final @NotNull ID id) throws IOException {
-        if (!workingDir.isDirectory())
-            Files.createDirectories(workingDir.toPath());
-        return format.getFile(workingDir, id.toString());
+        if (!dataDirectory.isDirectory())
+            Files.createDirectories(dataDirectory.toPath());
+        return format.getFile(dataDirectory, id.toString());
     }
 
 }
