@@ -28,4 +28,30 @@ class SerializableMapperTest extends Specification {
         actual == expected
     }
 
+    def 'test that serialize throws SerializationException on IOException'() {
+        given:
+        def mapper = new SerializableMapper()
+
+        when:
+        mapper.serialize(new Unserializable())
+
+        then:
+        thrown(SerializableMapper.SerializationException)
+    }
+
+    def 'test that deserialize throws SerializationException on IOException'() {
+        given:
+        def mapper = new SerializableMapper()
+
+        when:
+        mapper.deserialize('invalid_data')
+
+        then:
+        thrown(SerializableMapper.SerializationException)
+    }
+
+    private static class Unserializable {
+
+    }
+
 }
