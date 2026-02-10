@@ -10,7 +10,6 @@ import it.fulminazzo.blocksmith.function.ConsumerException
 import it.fulminazzo.blocksmith.function.FunctionException
 import org.jetbrains.annotations.NotNull
 
-import java.nio.file.Files
 import java.util.concurrent.CompletionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -26,6 +25,8 @@ class FileRepositoryTest extends RepositoryTest {
     private final ExecutorService executor = Executors.newSingleThreadExecutor()
 
     void setup() {
+        workingDir.deleteDir()
+
         setupRepository()
     }
 
@@ -97,9 +98,6 @@ class FileRepositoryTest extends RepositoryTest {
     }
 
     def 'test that getDataFile creates directory if not existing'() {
-        given:
-        Files.deleteIfExists(workingDir.toPath())
-
         when:
         repository.getDataFile(1L)
 

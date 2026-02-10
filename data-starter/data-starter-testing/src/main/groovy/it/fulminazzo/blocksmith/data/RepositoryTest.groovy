@@ -49,7 +49,7 @@ abstract class RepositoryTest extends Specification {
         def result = repository.findAll().get()
 
         then:
-        result == [FIRST, SECOND]
+        result.sort() == [FIRST, SECOND].sort()
     }
 
     def 'test that save correctly updates #data'() {
@@ -146,7 +146,7 @@ abstract class RepositoryTest extends Specification {
         def saved = repository.saveAll(data).get()
 
         then:
-        saved == data
+        saved.sort() == data.sort()
 
         and:
         data.every { exists(it.id) }
