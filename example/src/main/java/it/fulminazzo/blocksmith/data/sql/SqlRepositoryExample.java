@@ -19,7 +19,7 @@ public final class SqlRepositoryExample {
                         .password("")
                         .database("test")
                         .h2()
-                        .disk("./example/build/h2db/")
+                        .disk("example/build/resources/main/data/sql")
                         .allowSimultaneousFileConnections()
                         .build()
         ) {

@@ -16,7 +16,7 @@ jooq {
             jooqConfiguration.apply {
                 jdbc.apply {
                     driver = "org.h2.Driver"
-                    url = "jdbc:h2:./build/h2db/test;" +
+                    url = "jdbc:h2:./build/resources/main/data/sql/test;" +
                             "DATABASE_TO_LOWER=TRUE;" +
                             "INIT=RUNSCRIPT FROM '${project.file("src/main/resources/schema.sql").absolutePath}';" +
                             "AUTO_SERVER=true"
