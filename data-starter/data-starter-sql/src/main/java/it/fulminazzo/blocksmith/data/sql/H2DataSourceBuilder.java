@@ -6,13 +6,16 @@ import org.jetbrains.annotations.Nullable;
 import org.jooq.SQLDialect;
 
 import java.io.File;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A builder for {@link SqlDataSource} for H2 databases.
  */
-public final class H2DataSourceBuilder extends ParametersDataSourceBuilder<H2DataSourceBuilder> {
+public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourceBuilder> {
     private static final String INITIAL_SETUP_KEY = "INIT";
+
+    private final @NotNull Map<String, List<String>> parameters = new HashMap<>();
 
     private @Nullable String connectionMode;
     private @Nullable String schemaName;
@@ -37,7 +40,11 @@ public final class H2DataSourceBuilder extends ParametersDataSourceBuilder<H2Dat
         return String.format("jdbc:h2:%s",
                 Objects.requireNonNull(connectionMode, "The connection mode has not been specified yet. " +
                         "Please choose between memory, disk or server before building")
-        ) + getParametersJdbcUrl();
+        ) + parameters.entrySet().stream()
+                .map(e ->
+                        String.format(";%s=%s", e.getKey(), String.join("\\;", e.getValue()))
+                )
+                .collect(Collectors.joining());
     }
 
     @Override
@@ -137,6 +144,31 @@ public final class H2DataSourceBuilder extends ParametersDataSourceBuilder<H2Dat
      */
     public @NotNull H2DataSourceBuilder preventConnectionOnNonExistingFile() {
         return setParameters("IFEXISTS", true);
+    }
+
+    /**
+     * Adds a new parameter to the final configuration of the database.
+     *
+     * @param name  the name of the parameter
+     * @param value the value
+     * @return this object (for method chaining)
+     */
+    public @NotNull H2DataSourceBuilder setParameters(final @NotNull String name,
+                                                      final @NotNull Object value) {
+        return setParameters(name, value.toString().toUpperCase());
+    }
+
+    /**
+     * Adds a new parameter to the final configuration of the database.
+     *
+     * @param name  the name of the parameter
+     * @param value the value
+     * @return this object (for method chaining)
+     */
+    public @NotNull H2DataSourceBuilder setParameters(final @NotNull String name,
+                                                      final @NotNull String value) {
+        parameters.computeIfAbsent(name, v -> new ArrayList<>()).add(value);
+        return this;
     }
 
 }
