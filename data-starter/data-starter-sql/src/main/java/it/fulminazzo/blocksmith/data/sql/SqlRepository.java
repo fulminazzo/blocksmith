@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.sql;
 
 import it.fulminazzo.blocksmith.data.Repository;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
  * @param <TB> the type of the table
  */
 @SuppressWarnings({"resource"})
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class SqlRepository<T, ID, TB extends Table<?>> implements Repository<T, ID> {
     private final @NotNull DSLContext context;
     protected final @NotNull TB table;
