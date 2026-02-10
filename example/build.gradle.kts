@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     implementation(project(":config-starter:config-starter-all"))
+    implementation(project(":data-starter:data-starter-file"))
 }
 
 tasks.jar {
