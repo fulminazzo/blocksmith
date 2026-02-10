@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.config;
 
 import it.fulminazzo.blocksmith.ProjectInfo;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +25,7 @@ public enum ConfigurationFormat {
     XML("xml"),
     YAML("yml");
 
+    @Getter
     @NotNull String fileExtension;
 
     /**
