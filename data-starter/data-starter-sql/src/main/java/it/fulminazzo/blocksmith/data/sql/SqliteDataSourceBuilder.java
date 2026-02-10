@@ -11,7 +11,7 @@ import java.util.Objects;
 /**
  * A builder for {@link SqlDataSource} for SQLite databases.
  */
-public final class SqliteDataSourceBuilder extends ParametersDataSourceBuilder<SqliteDataSourceBuilder> {
+public final class SqliteDataSourceBuilder extends ASqlDataSourceBuilder<SqliteDataSourceBuilder> {
     private @Nullable String connectionMode;
 
     /**
@@ -30,7 +30,7 @@ public final class SqliteDataSourceBuilder extends ParametersDataSourceBuilder<S
         return String.format("jdbc:sqlite:%s",
                 Objects.requireNonNull(connectionMode, "The connection mode has not been specified yet. " +
                         "Please choose between memory, disk or server before building")
-        ) + getParametersJdbcUrl();
+        );
     }
 
     @Override
