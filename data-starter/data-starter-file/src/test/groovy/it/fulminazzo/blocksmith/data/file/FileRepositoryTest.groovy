@@ -93,8 +93,11 @@ class FileRepositoryTest extends RepositoryTest {
     Repository<User, Long> initializeRepository() {
         return new FileRepository<>(
                 workingDir,
+                User,
                 User::getId,
-                executor
+                executor,
+                log,
+                FORMAT
         )
     }
 
