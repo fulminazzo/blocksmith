@@ -43,12 +43,12 @@ public class FileRepository<T, ID> {
      * @param logger     the logger
      * @param format     the file format to use
      */
-    public FileRepository(final @NotNull File workingDir,
-                          final @NotNull Class<T> dataType,
-                          final @NotNull Function<T, ID> idMapper,
-                          final @NotNull Executor executor,
-                          final @NotNull Logger logger,
-                          final @NotNull ConfigurationFormat format) {
+    protected FileRepository(final @NotNull File workingDir,
+                             final @NotNull Class<T> dataType,
+                             final @NotNull Function<T, ID> idMapper,
+                             final @NotNull Executor executor,
+                             final @NotNull Logger logger,
+                             final @NotNull ConfigurationFormat format) {
         this.adapter = ConfigurationAdapter.newAdapter(logger, format);
         this.workingDir = workingDir;
         this.idMapper = idMapper;
