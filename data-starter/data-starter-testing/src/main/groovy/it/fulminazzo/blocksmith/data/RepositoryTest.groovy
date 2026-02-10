@@ -3,13 +3,13 @@ package it.fulminazzo.blocksmith.data
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
-abstract class RepositoryTest extends Specification {
+abstract class RepositoryTest<R extends Repository<User, Long>> extends Specification {
     protected static final User FIRST = new User(1, 'fulminazzo', 23)
     protected static final User SECOND = new User(2, 'c4my', 20)
     protected static final User UPDATE1 = new User(3, 'tiz_', 55)
     protected static final User UPDATE2 = new User(4, 'alex', 18)
 
-    protected Repository<User, Long> repository
+    protected R repository
 
     void setupRepository() {
         repository = initializeRepository()
@@ -182,8 +182,7 @@ abstract class RepositoryTest extends Specification {
         actual == 2L
     }
 
-    abstract @NotNull
-    Repository<User, Long> initializeRepository()
+    abstract @NotNull R initializeRepository()
 
     /**
      * Checks if a data with the given id exists in the repository.
