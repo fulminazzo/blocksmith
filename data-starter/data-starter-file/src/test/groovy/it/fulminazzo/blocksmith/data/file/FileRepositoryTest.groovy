@@ -3,7 +3,6 @@ package it.fulminazzo.blocksmith.data.file
 import groovy.util.logging.Slf4j
 import it.fulminazzo.blocksmith.config.ConfigurationAdapter
 import it.fulminazzo.blocksmith.config.ConfigurationFormat
-import it.fulminazzo.blocksmith.data.Repository
 import it.fulminazzo.blocksmith.data.RepositoryTest
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.function.BiConsumerException
@@ -19,7 +18,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 @Slf4j
-class FileRepositoryTest extends RepositoryTest {
+class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
     private static final ConfigurationFormat FORMAT = ConfigurationFormat.JSON
     private static final File WORKING_DIR = new File('build/resources/test/file_repository')
 
@@ -381,7 +380,7 @@ class FileRepositoryTest extends RepositoryTest {
     }
 
     @Override
-    Repository<User, Long> initializeRepository() {
+    FileRepository<User, Long> initializeRepository() {
         return new FileRepository<>(
                 WORKING_DIR,
                 User,
