@@ -13,11 +13,84 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class FileRepository<ID> {
+public class FileRepository<T, ID> {
     private final @NotNull File workingDir;
+    private final @NotNull Function<T, ID> idMapper;
     private final @NotNull Executor executor;
+
+    /**
+     * Executes the given function on multiple data files.
+     *
+     * @param entries      the entries of the files
+     * @param function the function to execute
+     * @return the result
+     */
+    protected @NotNull CompletableFuture<?> executeOnManyData(
+            final @NotNull Collection<T> entries,
+            final @NotNull ConsumerException<File, IOException> function
+    ) {
+        return executeOnMany(
+                entries.stream().map(idMapper).collect(Collectors.toList()),
+                function
+        );
+    }
+
+    /**
+     * Executes the given function on multiple data files.
+     *
+     * @param <R>      the type of the result
+     * @param entries      the entries of the files
+     * @param function the function to execute
+     * @return a collection containing the results for each data
+     */
+    protected <R> @NotNull CompletableFuture<Collection<R>> executeOnSingleData(
+            final @NotNull Collection<T> entries,
+            final @NotNull FunctionException<File, R, IOException> function
+    ) {
+        return executeOnMany(
+                entries.stream().map(idMapper).collect(Collectors.toList()),
+                function
+        );
+    }
+
+    /**
+     * Executes the given function on a single data file.
+     *
+     * @param data       the data of the file
+     * @param function the function to execute
+     * @return the result
+     */
+    protected @NotNull CompletableFuture<?> executeOnSingleData(
+            final @NotNull T data,
+            final @NotNull ConsumerException<File, IOException> function
+    ) {
+        return executeOnSingle(
+                idMapper.apply(data),
+                function
+        );
+    }
+
+    /**
+     * Executes the given function on a single data file.
+     *
+     * @param <R>      the type of the result
+     * @param data       the data of the file
+     * @param function the function to execute
+     * @return the result
+     */
+    protected <R> @NotNull CompletableFuture<R> executeOnSingleData(
+            final @NotNull T data,
+            final @NotNull FunctionException<File, R, IOException> function
+    ) {
+        return executeOnSingle(
+                idMapper.apply(data),
+                function
+        );
+    }
 
     /**
      * Executes the given function on multiple data files.
