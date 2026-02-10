@@ -1,3 +1,4 @@
+val baseModuleName = "base"
 val testingModuleName: String by rootProject.extra
 
 dependencies {
@@ -5,32 +6,28 @@ dependencies {
 
     compileOnly(libs.slf4j)
 
-    api(libs.joor)
+    compileOnly(libs.joor)
+    compileOnly(libs.bundles.validation)
 
-    api(libs.jackson.json)
-    api(libs.bundles.validation)
+    testImplementation(libs.joor)
+    testImplementation(libs.bundles.validation)
 
     allprojects {
-
         dependencies {
             testImplementation(rootProject.libs.slf4j)
             testImplementation(rootProject.libs.bundles.log4j)
 
-            testImplementation(rootProject.libs.jackson.json)
-
             if (!project.name.endsWith(testingModuleName))
                 testImplementation(project(":$projectName:$projectName-$testingModuleName"))
         }
-
     }
 
     subprojects {
-
         dependencies {
             compileOnly(rootProject.libs.slf4j)
-            api(project(":$projectName"))
+            if (!project.name.endsWith(baseModuleName))
+                api(project(":$projectName:$projectName-$baseModuleName"))
         }
-
     }
 
 }
