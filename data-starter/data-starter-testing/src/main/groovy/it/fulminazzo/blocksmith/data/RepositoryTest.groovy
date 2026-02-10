@@ -104,12 +104,12 @@ abstract class RepositoryTest extends Specification {
         data << [FIRST, SECOND]
     }
 
-    def 'test that batch findById correctly returns all data'() {
+    def 'test that batch findAllById correctly returns all data'() {
         given:
         def expected = [FIRST, SECOND]
 
         when:
-        def actual = repository.findById(expected.collect { it.id }).get()
+        def actual = repository.findAllById(expected.collect { it.id }).get()
 
         then:
         actual == expected
@@ -129,7 +129,7 @@ abstract class RepositoryTest extends Specification {
         saved == data
 
         when:
-        def actual = repository.findById(data.collect { it.id }).get()
+        def actual = repository.findAllById(data.collect { it.id }).get()
 
         then:
         actual == data
