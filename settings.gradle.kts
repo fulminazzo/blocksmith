@@ -5,6 +5,7 @@ include("base")
 include("example")
 
 include("config-starter")
+include("config-starter:config-starter-base")
 include("config-starter:config-starter-testing")
 include("config-starter:config-starter-json")
 include("config-starter:config-starter-properties")
