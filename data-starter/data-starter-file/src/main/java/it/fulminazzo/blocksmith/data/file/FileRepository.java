@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * A basic implementation of {@link Repository} that stores data on disk.
@@ -113,17 +114,7 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
 
     @Override
     public @NotNull CompletableFuture<Long> count() {
-        return execute(() -> {
-            if (workingDir.exists()) {
-                File[] files = workingDir.listFiles();
-                if (files != null)
-                    return Arrays.stream(files)
-                            .map(File::getName)
-                            .filter(n -> n.endsWith("." + format.getFileExtension()))
-                            .count();
-            }
-            return 0L;
-        });
+        return execute(() -> (long) getFiles().size());
     }
 
     /*
@@ -140,12 +131,7 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
             final @NotNull ConsumerException<File, IOException> function
     ) {
         return execute(() -> {
-            if (workingDir.isDirectory()) {
-                File[] files = workingDir.listFiles();
-                if (files != null)
-                    for (File dataFile : files)
-                        function.accept(dataFile);
-            }
+            for (File dataFile : getFiles()) function.accept(dataFile);
         });
     }
 
@@ -161,12 +147,7 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
     ) {
         return execute(() -> {
             final List<R> result = new ArrayList<>();
-            if (workingDir.isDirectory()) {
-                File[] files = workingDir.listFiles();
-                if (files != null)
-                    for (File dataFile : files)
-                        result.add(function.apply(dataFile));
-            }
+            for (File dataFile : getFiles()) result.add(function.apply(dataFile));
             return result;
         });
     }
@@ -415,6 +396,22 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
                 throw new CompletionException(e);
             }
         }, executor);
+    }
+
+    /**
+     * Gets all the files of the data.
+     *
+     * @return the files
+     */
+    protected @NotNull Collection<File> getFiles() {
+        if (workingDir.exists()) {
+            File[] files = workingDir.listFiles();
+            if (files != null)
+                return Arrays.stream(files)
+                        .filter(f -> f.getName().endsWith("." + format.getFileExtension()))
+                        .collect(Collectors.toList());
+        }
+        return new ArrayList<>();
     }
 
     /**
