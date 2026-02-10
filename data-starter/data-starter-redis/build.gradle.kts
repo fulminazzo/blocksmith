@@ -1,4 +1,5 @@
 dependencies {
     api(libs.lettuce)
-    api(libs.jackson.json)
+
+    api(project(":data-starter:data-starter-mapper:data-starter-mapper-json"))
 }
