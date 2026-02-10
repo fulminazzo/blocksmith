@@ -2,6 +2,8 @@ package it.fulminazzo.blocksmith.data.file;
 
 import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
+import it.fulminazzo.blocksmith.function.BiConsumerException;
+import it.fulminazzo.blocksmith.function.BiFunctionException;
 import it.fulminazzo.blocksmith.function.ConsumerException;
 import it.fulminazzo.blocksmith.function.FunctionException;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +19,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * A basic implementation of {@link Repository} that stores data on disk.
@@ -66,12 +67,19 @@ public class FileRepository<T, ID> {
      */
     protected @NotNull CompletableFuture<?> executeOnManyData(
             final @NotNull Collection<T> entries,
-            final @NotNull ConsumerException<File, IOException> function
+            final @NotNull BiConsumerException<File, T, IOException> function
     ) {
-        return executeOnMany(
-                entries.stream().map(idMapper).collect(Collectors.toList()),
-                function
-        );
+        return CompletableFuture.runAsync(() -> {
+            try {
+                for (T data : entries) {
+                    ID id = idMapper.apply(data);
+                    File dataFile = getDataFile(id);
+                    function.accept(dataFile, data);
+                }
+            } catch (IOException e) {
+                throw new CompletionException(e);
+            }
+        }, executor);
     }
 
     /**
@@ -82,14 +90,23 @@ public class FileRepository<T, ID> {
      * @param function the function to execute
      * @return a collection containing the results for each data
      */
-    protected <R> @NotNull CompletableFuture<Collection<R>> executeOnSingleData(
+    protected <R> @NotNull CompletableFuture<Collection<R>> executeOnManyData(
             final @NotNull Collection<T> entries,
-            final @NotNull FunctionException<File, R, IOException> function
+            final @NotNull BiFunctionException<File, T, R, IOException> function
     ) {
-        return executeOnMany(
-                entries.stream().map(idMapper).collect(Collectors.toList()),
-                function
-        );
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                final List<R> result = new ArrayList<>();
+                for (T data : entries) {
+                    ID id = idMapper.apply(data);
+                    File dataFile = getDataFile(id);
+                    result.add(function.apply(dataFile, data));
+                }
+                return result;
+            } catch (IOException e) {
+                throw new CompletionException(e);
+            }
+        }, executor);
     }
 
     /**
@@ -185,13 +202,13 @@ public class FileRepository<T, ID> {
      */
     protected @NotNull CompletableFuture<?> executeOnMany(
             final @NotNull Collection<ID> ids,
-            final @NotNull ConsumerException<File, IOException> function
+            final @NotNull BiConsumerException<File, ID, IOException> function
     ) {
         return CompletableFuture.runAsync(() -> {
             try {
                 for (ID id : ids) {
                     File dataFile = getDataFile(id);
-                    function.accept(dataFile);
+                    function.accept(dataFile, id);
                 }
             } catch (IOException e) {
                 throw new CompletionException(e);
@@ -209,14 +226,14 @@ public class FileRepository<T, ID> {
      */
     protected <R> @NotNull CompletableFuture<Collection<R>> executeOnMany(
             final @NotNull Collection<ID> ids,
-            final @NotNull FunctionException<File, R, IOException> function
+            final @NotNull BiFunctionException<File, ID, R, IOException> function
     ) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 final List<R> result = new ArrayList<>();
                 for (ID id : ids) {
                     File dataFile = getDataFile(id);
-                    result.add(function.apply(dataFile));
+                    result.add(function.apply(dataFile, id));
                 }
                 return result;
             } catch (IOException e) {
