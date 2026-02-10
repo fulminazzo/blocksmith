@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.data.redis;
 import io.lettuce.core.RedisFuture;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.async.RedisAsyncCommands;
+import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,6 +21,7 @@ public class RedisRepository<T, ID> {
     private final @NotNull StatefulRedisConnection<String, String> connection;
     private final @NotNull Function<T, ID> idMapper;
     private final @NotNull Class<T> dataType;
+    private final @NotNull Mapper mapper;
 
     /**
      * Executes a general query and returns the result.
