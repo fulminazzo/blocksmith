@@ -124,6 +124,22 @@ public class FileRepository<T, ID> {
      */
     protected @NotNull CompletableFuture<?> executeOnManyData(
             final @NotNull Collection<T> entries,
+            final @NotNull ConsumerException<File, IOException> function
+    ) {
+        return executeOnManyData(entries, (f, t) -> {
+            function.accept(f);
+        });
+    }
+
+    /**
+     * Executes the given function on multiple data files.
+     *
+     * @param entries  the entries of the files
+     * @param function the function to execute
+     * @return the result
+     */
+    protected @NotNull CompletableFuture<?> executeOnManyData(
+            final @NotNull Collection<T> entries,
             final @NotNull BiConsumerException<File, T, IOException> function
     ) {
         return CompletableFuture.runAsync(() -> {
@@ -137,6 +153,23 @@ public class FileRepository<T, ID> {
                 throw new CompletionException(e);
             }
         }, executor);
+    }
+
+    /**
+     * Executes the given function on multiple data files.
+     *
+     * @param <R>      the type of the result
+     * @param entries  the entries of the files
+     * @param function the function to execute
+     * @return a collection containing the results for each data
+     */
+    protected <R> @NotNull CompletableFuture<Collection<R>> executeOnManyData(
+            final @NotNull Collection<T> entries,
+            final @NotNull FunctionException<File, R, IOException> function
+    ) {
+        return executeOnManyData(entries, (f, t) -> {
+            return function.apply(f);
+        });
     }
 
     /**
@@ -175,6 +208,22 @@ public class FileRepository<T, ID> {
      */
     protected @NotNull CompletableFuture<?> executeOnMany(
             final @NotNull Collection<ID> ids,
+            final @NotNull ConsumerException<File, IOException> function
+    ) {
+        return executeOnMany(ids, (f, i) -> {
+            function.accept(f);
+        });
+    }
+
+    /**
+     * Executes the given function on multiple data files.
+     *
+     * @param ids      the ids of the files
+     * @param function the function to execute
+     * @return the result
+     */
+    protected @NotNull CompletableFuture<?> executeOnMany(
+            final @NotNull Collection<ID> ids,
             final @NotNull BiConsumerException<File, ID, IOException> function
     ) {
         return CompletableFuture.runAsync(() -> {
@@ -187,6 +236,23 @@ public class FileRepository<T, ID> {
                 throw new CompletionException(e);
             }
         }, executor);
+    }
+
+    /**
+     * Executes the given function on multiple data files.
+     *
+     * @param <R>      the type of the result
+     * @param ids      the ids of the files
+     * @param function the function to execute
+     * @return a collection containing the results for each id
+     */
+    protected <R> @NotNull CompletableFuture<Collection<R>> executeOnMany(
+            final @NotNull Collection<ID> ids,
+            final @NotNull FunctionException<File, R, IOException> function
+    ) {
+        return executeOnMany(ids, (f, i) -> {
+            return function.apply(f);
+        });
     }
 
     /**
