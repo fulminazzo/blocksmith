@@ -10,6 +10,28 @@ import java.util.Objects;
 
 /**
  * A builder for {@link SqlDataSource} for SQLite databases.
+ * <br>
+ * Example usage:
+ * <ul>
+ *     <li>in memory database:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .database("test")
+ *                 .sqlite()
+ *                 .memory()
+ *                 .build();
+ *         }</pre>
+ *     </li>
+ *     <li>file based database:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .database("test")
+ *                 .sqlite()
+ *                 .disk("./database") // creates the database ./database/test.db
+ *                 .build();
+ *         }</pre>
+ *     </li>
+ * </ul>
  */
 public final class SqliteDataSourceBuilder extends ASqlDataSourceBuilder<SqliteDataSourceBuilder> {
     private @Nullable String connectionMode;

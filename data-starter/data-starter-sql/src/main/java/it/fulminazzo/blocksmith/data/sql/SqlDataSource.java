@@ -19,6 +19,54 @@ import java.util.function.BiFunction;
  * {@link DataSource} for general SQL databases.
  * <br>
  * Provides methods to create SQL repositories.
+ * <br>
+ * Example usage:
+ * <ul>
+ *     <li>general:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .username("username")
+ *                 .password("password")
+ *                 .database("database")
+ *                 .build(); // will fail if a database type was not specified
+ *          }
+ *          </pre>
+ *     Check {@link SqliteDataSourceBuilder} for more;</li>
+ *     <li>h2:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .username("sa")
+ *                 .password("")
+ *                 .database("DATABASE")
+ *                 .h2()
+ *                 .memory()
+ *                 .build();
+ *          }
+ *          </pre>
+ *     Check {@link H2DataSourceBuilder} for more;</li>
+ *     <li>sqlite:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .database("database")
+ *                 .sqlite()
+ *                 .disk("./sqlite")
+ *                 .build();
+ *          }
+ *          </pre>
+ *     Check {@link SqliteDataSourceBuilder} for more;</li>
+ *     <li>remote:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .username("user")
+ *                 .password("SuperSecurePassword")
+ *                 .database("database")
+ *                 .databaseType(DatabaseType.POSTGRES)
+ *                 .postgres()
+ *                 .build();
+ *          }
+ *          </pre>
+ *     Check {@link RemoteDataSourceBuilder} for more.</li>
+ * </ul>
  */
 public final class SqlDataSource implements DataSource, Closeable {
     @Delegate

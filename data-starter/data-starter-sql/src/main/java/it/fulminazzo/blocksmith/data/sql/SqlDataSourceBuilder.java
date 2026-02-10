@@ -6,6 +6,60 @@ import org.jooq.SQLDialect;
 
 /**
  * A builder for {@link SqlDataSource}.
+ * <br>
+ * Example usage:
+ * <ul>
+ *     <li>general:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .username("username")
+ *                 .password("password")
+ *                 .database("database")
+ *                 .maximumPoolSize(20) // default = 20
+ *                 .minimumIdle(5) // default = 5
+ *                 .connectionTimeout(30000) // default = 30 seconds
+ *                 .idleTimeout(600000) // default = 10 minutes
+ *                 .maxLifeTime(1800000) // default = 30 minutes
+ *                 .addDataSourceProperty("cachePrepStmts", true)
+ *                 .build(); // will fail if a database type was not specified
+ *          }
+ *          </pre>
+ *     </li>
+ *     <li>h2:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .username("sa")
+ *                 .password("")
+ *                 .database("DATABASE")
+ *                 .h2()
+ *                 .memory()
+ *                 .build();
+ *          }
+ *          </pre>
+ *     Check {@link H2DataSourceBuilder} for more;</li>
+ *     <li>sqlite:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .database("database")
+ *                 .sqlite()
+ *                 .disk("./sqlite")
+ *                 .build();
+ *          }
+ *          </pre>
+ *     Check {@link SqliteDataSourceBuilder} for more;</li>
+ *     <li>remote:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .username("user")
+ *                 .password("SuperSecurePassword")
+ *                 .database("database")
+ *                 .databaseType(DatabaseType.POSTGRES)
+ *                 .postgres()
+ *                 .build();
+ *          }
+ *          </pre>
+ *     Check {@link RemoteDataSourceBuilder} for more.</li>
+ * </ul>
  */
 public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSourceBuilder> {
     private static final int maximumPoolSize = 20;

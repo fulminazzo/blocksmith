@@ -9,6 +9,20 @@ import java.util.Objects;
 
 /**
  * A builder for {@link SqlDataSource} for host-port based databases.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * SqlDataSource dataSource = SqlDataSource.builder()
+ *        .username("username")
+ *        .password("password")
+ *        .database("test")
+ *        .databaseType(databaseType)
+ *        .host("127.0.0.1") // defaults to "0.0.0.0"
+ *        .port(1337) // defaults to the port of the database type
+ *        .mysql() // optimizations for MySQL/MariaDB
+ *        .postgres() // optimizations for PostgreSQL
+ *        .build();
+ * }</pre>
  */
 public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteDataSourceBuilder> {
     private final @NotNull IDatabaseType databaseType;

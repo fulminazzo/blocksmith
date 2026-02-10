@@ -11,6 +11,52 @@ import java.util.stream.Collectors;
 
 /**
  * A builder for {@link SqlDataSource} for H2 databases.
+ * <br>
+ * Example usage:
+ * <ul>
+ *     <li>general:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .database("test")
+ *                 .h2()
+ *                 .lowercaseNames(true) // DATABASE_TO_LOWER=TRUE
+ *                 .initScript("./resources/schema.sql") // INIT=RUNSCRIPT FROM ./resources/schema.sql
+ *                 // defaults to database value
+ *                 .schemaName("schema") // INIT=CREATE SCHEMA IF NOT EXISTS schema\;SET SCHEMA schema
+ *                 .build();
+ *          }</pre>
+ *     </li>
+ *     <li>in memory database:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .database("test")
+ *                 .h2()
+ *                 .memory() // mem:test
+ *                 .preventMemoryLoss() // DB_CLOSE_DELAY=-1
+ *                 .build();
+ *          }</pre>
+ *     </li>
+ *     <li>file based database:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .database("test")
+ *                 .h2()
+ *                 .disk("./database") // creates the database ./database/test.mv.db
+ *                 .allowSimultaneousFileConnections() // AUTO_SERVER=true
+ *                 .preventConnectionOnNonExistingFile() // IFEXISTS=true
+ *                 .build();
+ *          }</pre>
+ *     </li>
+ *     <li>server based database:
+ *          <pre>{@code
+ *          SqlDataSource dataSource = SqlDataSource.builder()
+ *                 .database("test")
+ *                 .h2()
+ *                 .server("localhost", 3306) // currently supports only tcp
+ *                 .build();
+ *          }</pre>
+ *     </li>
+ * </ul>
  */
 public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourceBuilder> {
     private static final String INITIAL_SETUP_KEY = "INIT";
