@@ -75,8 +75,8 @@ public enum ConfigurationFormat {
      * @param fileName  the file name
      * @return the file
      */
-    @NotNull File getFile(final @NotNull File parentDir,
-                          final @NotNull String fileName) {
+    public @NotNull File getFile(final @NotNull File parentDir,
+                                 final @NotNull String fileName) {
         return new File(parentDir, fileName + "." + fileExtension);
     }
 
