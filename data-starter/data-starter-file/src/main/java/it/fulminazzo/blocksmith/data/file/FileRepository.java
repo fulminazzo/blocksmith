@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -25,7 +26,7 @@ public class FileRepository<T, ID> {
     /**
      * Executes the given function on multiple data files.
      *
-     * @param entries      the entries of the files
+     * @param entries  the entries of the files
      * @param function the function to execute
      * @return the result
      */
@@ -43,7 +44,7 @@ public class FileRepository<T, ID> {
      * Executes the given function on multiple data files.
      *
      * @param <R>      the type of the result
-     * @param entries      the entries of the files
+     * @param entries  the entries of the files
      * @param function the function to execute
      * @return a collection containing the results for each data
      */
@@ -60,7 +61,7 @@ public class FileRepository<T, ID> {
     /**
      * Executes the given function on a single data file.
      *
-     * @param data       the data of the file
+     * @param data     the data of the file
      * @param function the function to execute
      * @return the result
      */
@@ -78,7 +79,7 @@ public class FileRepository<T, ID> {
      * Executes the given function on a single data file.
      *
      * @param <R>      the type of the result
-     * @param data       the data of the file
+     * @param data     the data of the file
      * @param function the function to execute
      * @return the result
      */
@@ -152,9 +153,9 @@ public class FileRepository<T, ID> {
             final @NotNull ID id,
             final @NotNull ConsumerException<File, IOException> function
     ) {
-        File dataFile = getDataFile(id);
         return CompletableFuture.runAsync(() -> {
             try {
+                File dataFile = getDataFile(id);
                 function.accept(dataFile);
             } catch (IOException e) {
                 throw new CompletionException(e);
@@ -174,9 +175,9 @@ public class FileRepository<T, ID> {
             final @NotNull ID id,
             final @NotNull FunctionException<File, R, IOException> function
     ) {
-        File dataFile = getDataFile(id);
         return CompletableFuture.supplyAsync(() -> {
             try {
+                File dataFile = getDataFile(id);
                 return function.apply(dataFile);
             } catch (IOException e) {
                 throw new CompletionException(e);
@@ -189,8 +190,11 @@ public class FileRepository<T, ID> {
      *
      * @param id the id
      * @return the data file
+     * @throws IOException in case of any exception
      */
-    protected @NotNull File getDataFile(final @NotNull ID id) {
+    protected @NotNull File getDataFile(final @NotNull ID id) throws IOException {
+        if (!workingDir.isDirectory())
+            Files.createDirectories(workingDir.toPath());
         return new File(workingDir, id.toString());
     }
 
