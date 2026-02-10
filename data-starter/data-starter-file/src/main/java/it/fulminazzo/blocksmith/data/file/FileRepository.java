@@ -3,10 +3,7 @@ package it.fulminazzo.blocksmith.data.file;
 import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
 import it.fulminazzo.blocksmith.data.Repository;
-import it.fulminazzo.blocksmith.function.BiConsumerException;
-import it.fulminazzo.blocksmith.function.BiFunctionException;
-import it.fulminazzo.blocksmith.function.ConsumerException;
-import it.fulminazzo.blocksmith.function.FunctionException;
+import it.fulminazzo.blocksmith.function.*;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -119,13 +116,13 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
 
     @Override
     public @NotNull CompletableFuture<Long> count() {
-        return CompletableFuture.supplyAsync(() -> {
+        return execute(() -> {
             if (workingDir.exists()) {
                 File[] files = workingDir.listFiles();
                 if (files != null) return (long) files.length;
             }
             return 0L;
-        }, executor);
+        });
     }
 
     /*
@@ -141,18 +138,14 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
     protected @NotNull CompletableFuture<?> executeOnMany(
             final @NotNull ConsumerException<File, IOException> function
     ) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                if (workingDir.isDirectory()) {
-                    File[] files = workingDir.listFiles();
-                    if (files != null)
-                        for (File dataFile : files)
-                            function.accept(dataFile);
-                }
-            } catch (IOException e) {
-                throw new CompletionException(e);
+        return execute(() -> {
+            if (workingDir.isDirectory()) {
+                File[] files = workingDir.listFiles();
+                if (files != null)
+                    for (File dataFile : files)
+                        function.accept(dataFile);
             }
-        }, executor);
+        });
     }
 
     /**
@@ -165,20 +158,16 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
     protected <R> @NotNull CompletableFuture<Collection<R>> executeOnMany(
             final @NotNull FunctionException<File, R, IOException> function
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                final List<R> result = new ArrayList<>();
-                if (workingDir.isDirectory()) {
-                    File[] files = workingDir.listFiles();
-                    if (files != null)
-                        for (File dataFile : files)
-                            result.add(function.apply(dataFile));
-                }
-                return result;
-            } catch (IOException e) {
-                throw new CompletionException(e);
+        return execute(() -> {
+            final List<R> result = new ArrayList<>();
+            if (workingDir.isDirectory()) {
+                File[] files = workingDir.listFiles();
+                if (files != null)
+                    for (File dataFile : files)
+                        result.add(function.apply(dataFile));
             }
-        }, executor);
+            return result;
+        });
     }
 
     /*
@@ -212,17 +201,13 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
             final @NotNull Collection<T> entries,
             final @NotNull BiConsumerException<File, T, IOException> function
     ) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                for (T data : entries) {
-                    ID id = idMapper.apply(data);
-                    File dataFile = getDataFile(id);
-                    function.accept(dataFile, data);
-                }
-            } catch (IOException e) {
-                throw new CompletionException(e);
+        return execute(() -> {
+            for (T data : entries) {
+                ID id = idMapper.apply(data);
+                File dataFile = getDataFile(id);
+                function.accept(dataFile, data);
             }
-        }, executor);
+        });
     }
 
     /**
@@ -254,19 +239,15 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
             final @NotNull Collection<T> entries,
             final @NotNull BiFunctionException<File, T, R, IOException> function
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                final List<R> result = new ArrayList<>();
-                for (T data : entries) {
-                    ID id = idMapper.apply(data);
-                    File dataFile = getDataFile(id);
-                    result.add(function.apply(dataFile, data));
-                }
-                return result;
-            } catch (IOException e) {
-                throw new CompletionException(e);
+        return execute(() -> {
+            final List<R> result = new ArrayList<>();
+            for (T data : entries) {
+                ID id = idMapper.apply(data);
+                File dataFile = getDataFile(id);
+                result.add(function.apply(dataFile, data));
             }
-        }, executor);
+            return result;
+        });
     }
 
     /**
@@ -296,16 +277,12 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
             final @NotNull Collection<ID> ids,
             final @NotNull BiConsumerException<File, ID, IOException> function
     ) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                for (ID id : ids) {
-                    File dataFile = getDataFile(id);
-                    function.accept(dataFile, id);
-                }
-            } catch (IOException e) {
-                throw new CompletionException(e);
+        return execute(() -> {
+            for (ID id : ids) {
+                File dataFile = getDataFile(id);
+                function.accept(dataFile, id);
             }
-        }, executor);
+        });
     }
 
     /**
@@ -337,18 +314,14 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
             final @NotNull Collection<ID> ids,
             final @NotNull BiFunctionException<File, ID, R, IOException> function
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                final List<R> result = new ArrayList<>();
-                for (ID id : ids) {
-                    File dataFile = getDataFile(id);
-                    result.add(function.apply(dataFile, id));
-                }
-                return result;
-            } catch (IOException e) {
-                throw new CompletionException(e);
+        return execute(() -> {
+            final List<R> result = new ArrayList<>();
+            for (ID id : ids) {
+                File dataFile = getDataFile(id);
+                result.add(function.apply(dataFile, id));
             }
-        }, executor);
+            return result;
+        });
     }
 
     /*
@@ -401,14 +374,7 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
             final @NotNull ID id,
             final @NotNull ConsumerException<File, IOException> function
     ) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                File dataFile = getDataFile(id);
-                function.accept(dataFile);
-            } catch (IOException e) {
-                throw new CompletionException(e);
-            }
-        }, executor);
+        return execute(() -> function.accept(getDataFile(id)));
     }
 
     /**
@@ -423,10 +389,27 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
             final @NotNull ID id,
             final @NotNull FunctionException<File, R, IOException> function
     ) {
+        return execute(() -> function.apply(getDataFile(id)));
+    }
+
+    private @NotNull CompletableFuture<?> execute(
+            final @NotNull RunnableException<IOException> function
+    ) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                function.run();
+            } catch (IOException e) {
+                throw new CompletionException(e);
+            }
+        }, executor);
+    }
+
+    private <R> @NotNull CompletableFuture<R> execute(
+            final @NotNull SupplierException<R, IOException> function
+    ) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                File dataFile = getDataFile(id);
-                return function.apply(dataFile);
+                return function.get();
             } catch (IOException e) {
                 throw new CompletionException(e);
             }
