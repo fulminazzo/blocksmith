@@ -24,15 +24,15 @@ final class SerializableMapper implements Mapper {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public @NotNull <T> T deserialize(final @NotNull String serialized) {
+    public @NotNull <T> T deserialize(final @NotNull String serialized,
+                                      final @NotNull Class<T> dataType) {
         byte[] raw = Base64.getDecoder().decode(serialized);
         try (
                 ByteArrayInputStream input = new ByteArrayInputStream(raw);
                 ObjectInputStream inputStream = new ObjectInputStream(input)
         ) {
-            return (T) inputStream.readObject();
+            return dataType.cast(inputStream.readObject());
         } catch (IOException | ClassNotFoundException e) {
             throw new SerializationException(e);
         }

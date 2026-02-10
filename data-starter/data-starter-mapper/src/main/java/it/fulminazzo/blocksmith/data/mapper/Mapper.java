@@ -23,6 +23,7 @@ public interface Mapper {
      * @param serialized the serialized
      * @return the data
      */
-    <T> @NotNull T deserialize(final @NotNull String serialized);
+    <T> @NotNull T deserialize(final @NotNull String serialized,
+                               final @NotNull Class<T> dataType);
 
 }

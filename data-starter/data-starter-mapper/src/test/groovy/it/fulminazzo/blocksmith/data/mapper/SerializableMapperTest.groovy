@@ -22,7 +22,7 @@ class SerializableMapperTest extends Specification {
                 'dW0AAAAAAAAAABIAAHhwdAAGRElFU0VM'
 
         when:
-        def actual = mapper.deserialize(serialized)
+        def actual = mapper.deserialize(serialized, Car)
 
         then:
         actual == expected
@@ -44,7 +44,7 @@ class SerializableMapperTest extends Specification {
         def mapper = new SerializableMapper()
 
         when:
-        mapper.deserialize('invalid_data')
+        mapper.deserialize('invalid_data', Unserializable)
 
         then:
         thrown(SerializableMapper.SerializationException)
