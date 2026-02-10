@@ -2,23 +2,22 @@ package it.fulminazzo.blocksmith.data.sql
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import it.fulminazzo.blocksmith.data.Repository
 import it.fulminazzo.blocksmith.data.RepositoryTest
 import it.fulminazzo.blocksmith.data.User
 import org.jetbrains.annotations.NotNull
 import org.jooq.DSLContext
+import org.jooq.Record
 import org.jooq.SQLDialect
+import org.jooq.Table
 import org.jooq.impl.DSL
 import org.jooq.impl.SQLDataType
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-import static org.jooq.impl.DSL.constraint
-import static org.jooq.impl.DSL.field;
-import static org.jooq.impl.DSL.table;
+import static org.jooq.impl.DSL.*
 
-class SqlRepositoryTest extends RepositoryTest {
+class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<? extends Record>>> {
     private static final String H2_PATH = 'jdbc:h2:mem:testdb'
     private static final String TABLE_NAME = 'USERS'
     private static final String ID_COLUMN = 'ID'
@@ -63,7 +62,7 @@ class SqlRepositoryTest extends RepositoryTest {
     }
 
     @Override
-    Repository<User, Long> initializeRepository() {
+    SqlRepository<User, Long, Table<? extends Record>> initializeRepository() {
         def table = dsl.meta().getTables(TABLE_NAME)[1]
         return new SqlRepository<>(
                 dsl,
