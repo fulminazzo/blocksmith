@@ -1,4 +1,6 @@
 [versions]
+buildconfig = "5.7.1"
+
 lombok = "1.18.42"
 jetbrains_annotations = "26.0.2"
 
@@ -26,3 +28,6 @@ lettuce = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
 annotations = ["lombok", "jetbrains_annotations"]
 
 test_framework = ["spock_core", "byte_buddy", "mockito_core"]
+
+[plugins]
+buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
