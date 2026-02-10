@@ -58,6 +58,63 @@ public class FileRepository<T, ID> {
         this.format = format;
     }
 
+    /*
+     * MULTIPLE
+     */
+
+    /**
+     * Executes the given function on multiple data files.
+     *
+     * @param function the function to execute
+     * @return the result
+     */
+    protected @NotNull CompletableFuture<?> executeOnMany(
+            final @NotNull ConsumerException<File, IOException> function
+    ) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                if (workingDir.isDirectory()) {
+                    File[] files = workingDir.listFiles();
+                    if (files != null)
+                        for (File dataFile : files)
+                            function.accept(dataFile);
+                }
+            } catch (IOException e) {
+                throw new CompletionException(e);
+            }
+        }, executor);
+    }
+
+    /**
+     * Executes the given function on multiple data files.
+     *
+     * @param <R>      the type of the result
+     * @param function the function to execute
+     * @return a collection containing the results for each id
+     */
+    protected <R> @NotNull CompletableFuture<Collection<R>> executeOnMany(
+            final @NotNull FunctionException<File, R, IOException> function
+    ) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                final List<R> result = new ArrayList<>();
+                if (workingDir.isDirectory()) {
+                    File[] files = workingDir.listFiles();
+                    if (files != null)
+                        for (File dataFile : files)
+                            result.add(function.apply(dataFile));
+                }
+                return result;
+            } catch (IOException e) {
+                throw new CompletionException(e);
+            }
+        }, executor);
+    }
+
+    /*
+     * MULTIPLE FILTERED
+     */
+
     /**
      * Executes the given function on multiple data files.
      *
@@ -101,90 +158,6 @@ public class FileRepository<T, ID> {
                     ID id = idMapper.apply(data);
                     File dataFile = getDataFile(id);
                     result.add(function.apply(dataFile, data));
-                }
-                return result;
-            } catch (IOException e) {
-                throw new CompletionException(e);
-            }
-        }, executor);
-    }
-
-    /**
-     * Executes the given function on a single data file.
-     *
-     * @param data     the data of the file
-     * @param function the function to execute
-     * @return the result
-     */
-    protected @NotNull CompletableFuture<?> executeOnSingleData(
-            final @NotNull T data,
-            final @NotNull ConsumerException<File, IOException> function
-    ) {
-        return executeOnSingle(
-                idMapper.apply(data),
-                function
-        );
-    }
-
-    /**
-     * Executes the given function on a single data file.
-     *
-     * @param <R>      the type of the result
-     * @param data     the data of the file
-     * @param function the function to execute
-     * @return the result
-     */
-    protected <R> @NotNull CompletableFuture<R> executeOnSingleData(
-            final @NotNull T data,
-            final @NotNull FunctionException<File, R, IOException> function
-    ) {
-        return executeOnSingle(
-                idMapper.apply(data),
-                function
-        );
-    }
-
-    /**
-     * Executes the given function on multiple data files.
-     *
-     * @param function the function to execute
-     * @return the result
-     */
-    protected @NotNull CompletableFuture<?> executeOnMany(
-            final @NotNull ConsumerException<File, IOException> function
-    ) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                if (workingDir.isDirectory()) {
-                    File[] files = workingDir.listFiles();
-                    if (files != null)
-                        for (File dataFile : files)
-                            function.accept(dataFile);
-                }
-            } catch (IOException e) {
-                throw new CompletionException(e);
-            }
-        }, executor);
-    }
-
-    /**
-     * Executes the given function on multiple data files.
-     *
-     * @param <R>      the type of the result
-     * @param function the function to execute
-     * @return a collection containing the results for each id
-     */
-    protected <R> @NotNull CompletableFuture<Collection<R>> executeOnMany(
-            final @NotNull FunctionException<File, R, IOException> function
-    ) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                final List<R> result = new ArrayList<>();
-                if (workingDir.isDirectory()) {
-                    File[] files = workingDir.listFiles();
-                    if (files != null)
-                        for (File dataFile : files)
-                            result.add(function.apply(dataFile));
                 }
                 return result;
             } catch (IOException e) {
@@ -240,6 +213,45 @@ public class FileRepository<T, ID> {
                 throw new CompletionException(e);
             }
         }, executor);
+    }
+
+    /*
+     * SINGLE
+     */
+
+    /**
+     * Executes the given function on a single data file.
+     *
+     * @param data     the data of the file
+     * @param function the function to execute
+     * @return the result
+     */
+    protected @NotNull CompletableFuture<?> executeOnSingleData(
+            final @NotNull T data,
+            final @NotNull ConsumerException<File, IOException> function
+    ) {
+        return executeOnSingle(
+                idMapper.apply(data),
+                function
+        );
+    }
+
+    /**
+     * Executes the given function on a single data file.
+     *
+     * @param <R>      the type of the result
+     * @param data     the data of the file
+     * @param function the function to execute
+     * @return the result
+     */
+    protected <R> @NotNull CompletableFuture<R> executeOnSingleData(
+            final @NotNull T data,
+            final @NotNull FunctionException<File, R, IOException> function
+    ) {
+        return executeOnSingle(
+                idMapper.apply(data),
+                function
+        );
     }
 
     /**
