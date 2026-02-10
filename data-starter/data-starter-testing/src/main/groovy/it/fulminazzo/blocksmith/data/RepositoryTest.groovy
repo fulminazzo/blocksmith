@@ -29,6 +29,14 @@ abstract class RepositoryTest extends Specification {
         expected << [FIRST, SECOND]
     }
 
+    def 'test that findById does not throw if not existing'() {
+        when:
+        def actual = repository.findById(3L).get()
+
+        then:
+        !actual.isPresent()
+    }
+
     def 'test that existsById of #user returns #expected'() {
         when:
         def actual = repository.existsById(user.id).get()
