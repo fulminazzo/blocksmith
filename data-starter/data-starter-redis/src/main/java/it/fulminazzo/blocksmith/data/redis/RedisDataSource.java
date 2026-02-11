@@ -10,6 +10,19 @@ import java.io.Closeable;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * Redis data source for handling connections and create Redis repositories.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * RedisDataSource dataSource = RedisDataSource.builder()
+ *         .encrypted(true) // defaults to false
+ *         .username("username")
+ *         .password("SuperSecurePassword")
+ *         .build();
+ * }</pre>
+ * Check {@link RedisDataSourceBuilder} for more.
+ */
 public final class RedisDataSource implements Closeable {
     private final @NotNull RedisClient redisClient;
     private final @NotNull StatefulRedisConnection<String, String> connection;

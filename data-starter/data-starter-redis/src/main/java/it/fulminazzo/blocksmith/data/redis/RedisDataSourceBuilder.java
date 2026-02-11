@@ -15,6 +15,38 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * A builder for {@link RedisDataSource}.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * RedisDataSource dataSource = RedisDataSource.builder()
+ *         .encrypted(true) // defaults to false
+ *         .username("username")
+ *         .password("password")
+ *         .host("127.0.0.1") // defaults to "0.0.0.0"
+ *         .port(1339) // defaults to 6379
+ *         .database(2) // defaults to 0
+ *         .socketOptions(s -> s
+ *                 .connectTimeout(Duration.ofSeconds(10))
+ *                 .keepAlive(
+ *                         SocketOptions.KeepAliveOptions.builder()
+ *                                 .idle(Duration.ofSeconds(5))
+ *                                 .interval(Duration.ofSeconds(5))
+ *                                 .count(3)
+ *                                 .enable()
+ *                                 .build()
+ *                 )
+ *         )
+ *         .clientOptions(c -> c
+ *                 .autoReconnect(true)
+ *                 .pingBeforeActivateConnection(true)
+ *                 .requestQueueSize(4096)
+ *         )
+ *         .mapper(Mappers.SERIALIZABLE) // defaults to JSON
+ *         .build();
+ * }</pre>
+ */
 public final class RedisDataSourceBuilder {
     private final @NotNull ClientOptions.Builder clientOptions = ClientOptions.builder();
     private final @NotNull SocketOptions.Builder socketOptions = SocketOptions.builder();
