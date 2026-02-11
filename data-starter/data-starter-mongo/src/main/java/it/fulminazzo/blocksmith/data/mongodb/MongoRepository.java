@@ -10,11 +10,13 @@ import org.jspecify.annotations.NonNull;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
 
 /**
  * A basic implementation of {@link Repository} for MongoDB databases.
@@ -68,12 +70,16 @@ public class MongoRepository<T, ID> implements Repository<T, ID> {
 
     @Override
     public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entries) {
-        throw new UnsupportedOperationException();
+        return query(collection ->
+                collection.insertMany(new ArrayList<>(entries))
+        ).thenApply(r -> entries);
     }
 
     @Override
     public @NotNull CompletableFuture<?> deleteAll(final @NotNull Collection<ID> ids) {
-        throw new UnsupportedOperationException();
+        return query(collection ->
+                collection.deleteMany(in(idFieldName, ids))
+        );
     }
 
     @Override
