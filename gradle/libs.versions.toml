@@ -7,6 +7,7 @@ byte_buddy = "1.18.2"
 mockito_core = "4.11.0"
 
 mongodb = "5.1.0"
+reactor = "3.8.3"
 
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
@@ -18,6 +19,7 @@ mockito_core = { module = "org.mockito:mockito-core", version.ref = "mockito_cor
 
 mongodb-driver-platform = { module = "org.mongodb:mongodb-driver-bom", version.ref = "mongodb" }
 mongodb-driver-async = { module = "org.mongodb:mongodb-driver-reactivestreams", version.ref = "mongodb" }
+reactor = { module = "io.projectreactor:reactor-core", version.ref = "reactor" }
 
 [bundles]
 annotations = ["lombok", "jetbrains_annotations"]
