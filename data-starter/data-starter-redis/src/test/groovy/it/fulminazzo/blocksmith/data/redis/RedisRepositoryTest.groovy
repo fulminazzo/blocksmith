@@ -7,18 +7,30 @@ import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.Mappers
 import org.jetbrains.annotations.NotNull
+import redis.embedded.RedisServer
 
 class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
     private static final Mapper mapper = Mappers.JSON
+    private static final int serverPort = 16379
 
+    private RedisServer server
     private RedisClient client
     private StatefulRedisConnection<String, String> connection
 
     void setup() {
-        client = RedisClient.create('redis://localhost')
+        server = new RedisServer(serverPort)
+        server.start()
+
+        client = RedisClient.create("redis://localhost:$serverPort")
         connection = client.connect()
 
         setupRepository()
+    }
+
+    void cleanup() {
+        connection.close()
+        client.shutdown()
+        server.stop()
     }
 
     def 'test that getValues returns #expected'() {
@@ -47,12 +59,7 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
         def actual = repository.allKeys.get()
 
         then:
-        actual == expected
-    }
-
-    void cleanup() {
-        connection.close()
-        client.shutdown()
+        actual.sort() == expected.sort()
     }
 
     @Override
