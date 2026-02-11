@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.sql;
 
 import com.zaxxer.hikari.HikariConfig;
+import it.fulminazzo.blocksmith.data.util.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -130,6 +131,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      */
     public @NotNull H2DataSourceBuilder server(final @NotNull String host,
                                                final @Range(from = 1, to = 65536) int port) {
+        ValidationUtils.checkPort(port);
         connectionMode = String.format("tcp://%s:%s/%s", host, port, getDatabase());
         return this;
     }

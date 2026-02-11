@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.sql;
 
 import com.zaxxer.hikari.HikariConfig;
+import it.fulminazzo.blocksmith.data.util.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -82,6 +83,7 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
      * @return this object (for method chaining)
      */
     public @NotNull RemoteDataSourceBuilder port(final @Range(from = 1, to = 65535) int port) {
+        ValidationUtils.checkPort(port);
         this.port = port;
         return this;
     }

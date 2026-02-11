@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.sql;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import it.fulminazzo.blocksmith.data.util.ValidationUtils;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -95,6 +96,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @return this object (for method chaining)
      */
     public @NotNull B maximumPoolSize(final @Range(from = 1, to = Integer.MAX_VALUE) int maximumPoolSize) {
+        ValidationUtils.checkNatural(maximumPoolSize, "maximum pool size");
         config.setMaximumPoolSize(maximumPoolSize);
         return (B) this;
     }
@@ -106,6 +108,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @return this object (for method chaining)
      */
     public @NotNull B minimumIdle(final @Range(from = 0, to = Integer.MAX_VALUE) int minimumIdle) {
+        ValidationUtils.checkPositive(minimumIdle, "minimum idle");
         config.setMinimumIdle(minimumIdle);
         return (B) this;
     }
@@ -117,6 +120,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @return this object (for method chaining)
      */
     public @NotNull B connectionTimeout(final @Range(from = 1, to = Long.MAX_VALUE) long connectionTimeout) {
+        ValidationUtils.checkNatural(connectionTimeout, "connection timeout");
         config.setConnectionTimeout(connectionTimeout);
         return (B) this;
     }
@@ -128,6 +132,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @return this object (for method chaining)
      */
     public @NotNull B idleTimeout(final @Range(from = 0, to = Long.MAX_VALUE) long idleTimeout) {
+        ValidationUtils.checkPositive(idleTimeout, "idle timeout");
         config.setIdleTimeout(idleTimeout);
         return (B) this;
     }
@@ -139,6 +144,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @return this object (for method chaining)
      */
     public @NotNull B maxLifeTime(final @Range(from = 0, to = Long.MAX_VALUE) long maxLifetime) {
+        ValidationUtils.checkPositive(maxLifetime, "maximum lifetime");
         config.setMaxLifetime(maxLifetime);
         return (B) this;
     }
