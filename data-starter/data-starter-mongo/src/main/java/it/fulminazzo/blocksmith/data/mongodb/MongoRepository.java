@@ -8,12 +8,17 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.CountDownLatch;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
@@ -85,6 +90,46 @@ public class MongoRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<Long> count() {
         return query(MongoCollection::countDocuments);
+    }
+
+    /**
+     * Executes a general query and returns all the results.
+     *
+     * @param <R>           the type of the results
+     * @param queryFunction the query function
+     * @return the results
+     */
+    protected <R> @NotNull CompletableFuture<Collection<R>> queryMany(
+            final @NotNull Function<MongoCollection<T>, Publisher<R>> queryFunction
+    ) {
+        final List<R> result = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(1);
+        Publisher<R> publisher = queryFunction.apply(collection);
+        publisher.subscribe(new Subscriber<>() {
+
+            @Override
+            public void onSubscribe(Subscription s) {
+                s.request(1);
+            }
+
+            @Override
+            public void onNext(R r) {
+                result.add(r);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                if (t instanceof RuntimeException) throw ((RuntimeException) t);
+                else throw new CompletionException(t);
+            }
+
+            @Override
+            public void onComplete() {
+                latch.countDown();
+            }
+
+        });
+        return Mono.from(publisher).toFuture().thenApply(r -> result);
     }
 
     /**
