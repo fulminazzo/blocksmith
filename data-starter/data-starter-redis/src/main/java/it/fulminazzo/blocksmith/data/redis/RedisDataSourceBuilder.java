@@ -9,6 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public final class RedisDataSourceBuilder {
@@ -32,6 +35,29 @@ public final class RedisDataSourceBuilder {
      */
     RedisDataSourceBuilder() {
         host("0.0.0.0").port(6379).database(0);
+    }
+
+    /**
+     * Gets the Redis url.
+     *
+     * @return the redis url
+     */
+    @NotNull String getRedisUrl() {
+        StringBuilder url = new StringBuilder("redis");
+        if (encrypted) url.append("s");
+        url.append("://");
+        if (username != null || password != null) {
+            String username = this.username == null ? "default" : this.username;
+            url.append(URLEncoder.encode(username, StandardCharsets.UTF_8));
+            if (password != null) url.append(URLEncoder.encode(password, StandardCharsets.UTF_8));
+            url.append("@");
+        }
+        return url
+                .append(Objects.requireNonNull(host, "host has not been specified yet")).append(":")
+                .append(port)
+                .append("/")
+                .append(database)
+                .toString();
     }
 
     /**
