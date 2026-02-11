@@ -2,7 +2,9 @@ package it.fulminazzo.blocksmith.data.mongodb;
 
 import com.mongodb.Function;
 import com.mongodb.client.model.CountOptions;
+import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.WriteModel;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import it.fulminazzo.blocksmith.data.Repository;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +14,11 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
@@ -76,9 +79,15 @@ public class MongoRepository<T, ID> implements Repository<T, ID> {
 
     @Override
     public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entries) {
-        return query(collection ->
-                collection.insertMany(new ArrayList<>(entries))
-        ).thenApply(r -> entries);
+        List<WriteModel<T>> writeModels = entries.stream()
+                .map(e -> new ReplaceOneModel<>(
+                        eq(idFieldName, idMapper.apply(e)),
+                        e,
+                        new ReplaceOptions().upsert(true)
+                ))
+                .collect(Collectors.toList());
+        return query(collection -> collection.bulkWrite(writeModels))
+                .thenApply(result -> entries);
     }
 
     @Override
