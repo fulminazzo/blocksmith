@@ -4,6 +4,7 @@ import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.Mappers;
+import it.fulminazzo.blocksmith.data.util.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -53,6 +54,7 @@ public final class RedisDataSourceBuilder {
      * @return this object (for method chaining)
      */
     public @NotNull RedisDataSourceBuilder port(final @Range(from = 1, to = 65535) int port) {
+        ValidationUtils.checkPort(port);
         this.port = port;
         return this;
     }
@@ -66,6 +68,7 @@ public final class RedisDataSourceBuilder {
      * @return this object (for method chaining)
      */
     public @NotNull RedisDataSourceBuilder database(final @Range(from = 0, to = 15) int database) {
+        ValidationUtils.checkInRange(database, "database", 0, 15);
         this.database = database;
         return this;
     }
