@@ -9,14 +9,11 @@ import org.jooq.DSLContext;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public final class CustomSqlRepositoryExample {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try (
                 SqlDataSource dataSource = SqlDataSource.builder()
@@ -32,15 +29,15 @@ public final class CustomSqlRepositoryExample {
             User first = new User(1L, "Alexander", "Drinkwater", "alex@fulminazzo.it", 23);
             User second = new User(1L, "Camilla", "Drinkwater", "cami@fulminazzo.it", 20);
             UserRepository repository = dataSource.newRepository(UserRepository::new, executor);
-            repository.save(first).join();
-            repository.save(second).join();
+            repository.save(first).get();
+            repository.save(second).get();
 
-            Optional<User> result = repository.findYoungestUser().join();
+            Optional<User> result = repository.findYoungestUser().get();
             TestUtils.assertEquals(result.isEmpty(), false, "Could not find youngest user");
             TestUtils.assertEquals(result.get(), second, "Youngest user was not youngest");
 
-            repository.delete(first.getId()).join();
-            repository.delete(second.getId()).join();
+            repository.delete(first.getId()).get();
+            repository.delete(second.getId()).get();
         } finally {
             executor.shutdown();
         }
