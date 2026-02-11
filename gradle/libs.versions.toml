@@ -6,7 +6,7 @@ spock_core = "2.4-groovy-4.0"
 byte_buddy = "1.18.2"
 mockito_core = "4.11.0"
 
-mongodb = "5.1.0"
+mongodb = "5.6.3"
 reactor = "3.8.3"
 
 [libraries]
