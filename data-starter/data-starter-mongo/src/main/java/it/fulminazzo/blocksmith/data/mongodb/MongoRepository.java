@@ -1,6 +1,5 @@
 package it.fulminazzo.blocksmith.data.mongodb;
 
-import com.mongodb.Function;
 import com.mongodb.client.model.CountOptions;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
@@ -20,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
