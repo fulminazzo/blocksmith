@@ -78,7 +78,7 @@ public class MongoRepository<T, ID> implements Repository<T, ID> {
 
     @Override
     public @NotNull CompletableFuture<Long> count() {
-        throw new UnsupportedOperationException();
+        return query(MongoCollection::countDocuments);
     }
 
     /**
