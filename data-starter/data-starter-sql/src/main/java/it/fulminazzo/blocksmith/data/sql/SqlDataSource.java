@@ -122,7 +122,7 @@ public final class SqlDataSource implements DataSource, Closeable {
      * @param executor           the executor (for asynchronous operations)
      * @return the repository
      */
-    public <R extends Repository<T, ID>, T, ID> @NotNull R newRepository(
+    public <R extends SqlRepository<T, ID, ?>, T, ID> @NotNull R newRepository(
             final @NotNull BiFunction<DSLContext, Executor, R> repositorySupplier,
             final @NotNull Executor executor
     ) {
