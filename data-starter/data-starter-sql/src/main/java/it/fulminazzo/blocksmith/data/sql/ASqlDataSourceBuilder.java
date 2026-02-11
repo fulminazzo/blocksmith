@@ -68,7 +68,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
     }
 
     /**
-     * Sets username.
+     * Sets the username.
      *
      * @param username the username
      * @return this object (for method chaining)
@@ -79,7 +79,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
     }
 
     /**
-     * Sets password.
+     * Sets the password.
      *
      * @param password the password
      * @return this object (for method chaining)
@@ -91,6 +91,8 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
 
     /**
      * Sets the maximum number of concurrent connections.
+     * <br>
+     * Default: <code>20</code>
      *
      * @param maximumPoolSize the maximum pool size
      * @return this object (for method chaining)
@@ -103,6 +105,8 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
 
     /**
      * Sets the minimum idle connections.
+     * <br>
+     * Default: <code>5</code>
      *
      * @param minimumIdle the minimum idle
      * @return this object (for method chaining)
@@ -115,6 +119,8 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
 
     /**
      * Sets the connections timeout.
+     * <br>
+     * Default: <code>30000</code> (30 seconds)
      *
      * @param connectionTimeout the connection timeout
      * @return this object (for method chaining)
@@ -127,6 +133,8 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
 
     /**
      * Sets the idle timeout for connections.
+     * <br>
+     * Default: <code>600000</code> (10 minutes)
      *
      * @param idleTimeout the idle timeout
      * @return this object (for method chaining)
@@ -139,6 +147,8 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
 
     /**
      * Sets the maximum lifetime of a connection.
+     * <br>
+     * Default: <code>1800000</code> (30 minutes)
      *
      * @param maxLifetime the max lifetime
      * @return this object (for method chaining)

@@ -67,6 +67,8 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
 
     /**
      * Sets the host to connect to.
+     * <br>
+     * Default: <code>0.0.0.0</code>
      *
      * @param host the host
      * @return this object (for method chaining)
@@ -78,6 +80,8 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
 
     /**
      * Sets the port to connect to.
+     * <br>
+     * Default: {@link IDatabaseType#getPort()}
      *
      * @param port the port
      * @return this object (for method chaining)

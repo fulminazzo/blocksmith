@@ -138,6 +138,8 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
 
     /**
      * Enables or disables lowercase names in the database.
+     * <br>
+     * Default: <code>true</code>
      *
      * @param value the value
      * @return this object (for method chaining)
@@ -148,7 +150,8 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
 
     /**
      * Sets the schema name to the given one.
-     * Defaults to {@link #getDatabase()}.
+     * <br>
+     * Default: {@link #getDatabase()}
      *
      * @param name the name
      * @return this object (for method chaining)
