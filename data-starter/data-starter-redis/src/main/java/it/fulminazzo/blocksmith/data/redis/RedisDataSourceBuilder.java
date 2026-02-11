@@ -15,6 +15,8 @@ public final class RedisDataSourceBuilder {
     private final @NotNull ClientOptions.Builder clientOptions = ClientOptions.builder();
     private final @NotNull SocketOptions.Builder socketOptions = SocketOptions.builder();
 
+    private boolean encrypted;
+
     private @Nullable String host;
     private int port;
 
@@ -30,6 +32,19 @@ public final class RedisDataSourceBuilder {
      */
     RedisDataSourceBuilder() {
         host("0.0.0.0").port(6379).database(0);
+    }
+
+    /**
+     * Enables or disables encryption.
+     * <br>
+     * Default: <code>false</code>
+     *
+     * @param encrypted <code>true</code> to enable
+     * @return this object (for method chaining)
+     */
+    public @NotNull RedisDataSourceBuilder encrypted(final boolean encrypted) {
+        this.encrypted = encrypted;
+        return this;
     }
 
     /**
