@@ -18,7 +18,7 @@ public final class ValidationUtils {
      * @param value     the value
      * @param valueName the value name
      */
-    public static void checkNatural(final int value,
+    public static void checkNatural(final long value,
                                     final @NotNull String valueName) {
         checkGreaterEqualThan(value, valueName, 1);
     }
@@ -29,7 +29,7 @@ public final class ValidationUtils {
      * @param value     the value
      * @param valueName the value name
      */
-    public static void checkPositive(final int value,
+    public static void checkPositive(final long value,
                                      final @NotNull String valueName) {
         checkGreaterEqualThan(value, valueName, 0);
     }
@@ -41,9 +41,9 @@ public final class ValidationUtils {
      * @param valueName the value name
      * @param min       the minimum allowed value
      */
-    public static void checkGreaterEqualThan(final int value,
+    public static void checkGreaterEqualThan(final long value,
                                              final @NotNull String valueName,
-                                             final int min) {
+                                             final long min) {
         if (value < min)
             throw new IllegalArgumentException(String.format("Invalid %s %s. Must be at least %s",
                     valueName, value, min
@@ -67,10 +67,10 @@ public final class ValidationUtils {
      * @param min       the minimum allowed value
      * @param max       the maximum allowed value
      */
-    public static void checkInRange(final int value,
+    public static void checkInRange(final long value,
                                     final @NotNull String valueName,
-                                    final int min,
-                                    final int max) {
+                                    final long min,
+                                    final long max) {
         if (value < min || value > max)
             throw new IllegalArgumentException(String.format("Invalid %s %s. Must be between %s and %s",
                     valueName, value, min, max
