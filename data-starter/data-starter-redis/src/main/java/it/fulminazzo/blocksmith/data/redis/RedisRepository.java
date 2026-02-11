@@ -28,7 +28,7 @@ public class RedisRepository<T, ID> implements Repository<T, ID> {
     private final @NotNull StatefulRedisConnection<String, String> connection;
     private final @NotNull Function<T, ID> idMapper;
     private final @NotNull Class<T> dataType;
-    private final @NotNull Mapper mapper;
+    protected final @NotNull Mapper mapper;
 
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
