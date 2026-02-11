@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.data.sql;
 import com.zaxxer.hikari.HikariConfig;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import org.jooq.SQLDialect;
 
 import java.util.Objects;
@@ -80,7 +81,7 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
      * @param port the port
      * @return this object (for method chaining)
      */
-    public @NotNull RemoteDataSourceBuilder port(final int port) {
+    public @NotNull RemoteDataSourceBuilder port(final @Range(from = 1, to = 65535) int port) {
         this.port = port;
         return this;
     }

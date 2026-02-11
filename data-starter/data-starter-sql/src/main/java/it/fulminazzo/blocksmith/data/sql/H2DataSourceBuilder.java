@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.data.sql;
 import com.zaxxer.hikari.HikariConfig;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import org.jooq.SQLDialect;
 
 import java.io.File;
@@ -128,7 +129,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      * @return this object (for method chaining)
      */
     public @NotNull H2DataSourceBuilder server(final @NotNull String host,
-                                               final int port) {
+                                               final @Range(from = 1, to = 65536) int port) {
         connectionMode = String.format("tcp://%s:%s/%s", host, port, getDatabase());
         return this;
     }

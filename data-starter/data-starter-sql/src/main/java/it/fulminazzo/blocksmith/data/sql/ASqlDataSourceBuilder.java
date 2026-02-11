@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import org.jooq.SQLDialect;
 
 import java.util.Objects;
@@ -93,7 +94,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @param maximumPoolSize the maximum pool size
      * @return this object (for method chaining)
      */
-    public @NotNull B maximumPoolSize(final int maximumPoolSize) {
+    public @NotNull B maximumPoolSize(final @Range(from = 1, to = Integer.MAX_VALUE) int maximumPoolSize) {
         config.setMaximumPoolSize(maximumPoolSize);
         return (B) this;
     }
@@ -104,7 +105,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @param minimumIdle the minimum idle
      * @return this object (for method chaining)
      */
-    public @NotNull B minimumIdle(final int minimumIdle) {
+    public @NotNull B minimumIdle(final @Range(from = 0, to = Integer.MAX_VALUE) int minimumIdle) {
         config.setMinimumIdle(minimumIdle);
         return (B) this;
     }
@@ -115,7 +116,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @param connectionTimeout the connection timeout
      * @return this object (for method chaining)
      */
-    public @NotNull B connectionTimeout(final long connectionTimeout) {
+    public @NotNull B connectionTimeout(final @Range(from = 1, to = Long.MAX_VALUE) long connectionTimeout) {
         config.setConnectionTimeout(connectionTimeout);
         return (B) this;
     }
@@ -126,7 +127,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @param idleTimeout the idle timeout
      * @return this object (for method chaining)
      */
-    public @NotNull B idleTimeout(final long idleTimeout) {
+    public @NotNull B idleTimeout(final @Range(from = 0, to = Long.MAX_VALUE) long idleTimeout) {
         config.setIdleTimeout(idleTimeout);
         return (B) this;
     }
@@ -137,7 +138,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      * @param maxLifetime the max lifetime
      * @return this object (for method chaining)
      */
-    public @NotNull B maxLifeTime(final long maxLifetime) {
+    public @NotNull B maxLifeTime(final @Range(from = 0, to = Long.MAX_VALUE) long maxLifetime) {
         config.setMaxLifetime(maxLifetime);
         return (B) this;
     }
