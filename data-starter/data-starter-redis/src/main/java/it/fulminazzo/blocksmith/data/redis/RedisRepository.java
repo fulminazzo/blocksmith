@@ -1,8 +1,8 @@
 package it.fulminazzo.blocksmith.data.redis;
 
-import io.lettuce.core.KeyScanCursor;
 import io.lettuce.core.KeyValue;
 import io.lettuce.core.RedisFuture;
+import io.lettuce.core.ScanCursor;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.api.async.RedisServerAsyncCommands;
@@ -10,6 +10,7 @@ import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -113,17 +114,18 @@ public class RedisRepository<T, ID> implements Repository<T, ID> {
      * @return the keys
      */
     protected @NotNull CompletableFuture<Collection<String>> getAllKeys() {
-        return scanAllKeys(connection.async(), new ArrayList<>(), new KeyScanCursor<>());
+        return scanAllKeys(connection.async(), new ArrayList<>(), ScanCursor.INITIAL);
     }
 
     private @NotNull CompletableFuture<Collection<String>> scanAllKeys(
             final @NotNull RedisAsyncCommands<String, String> async,
             final @NotNull List<String> keys,
-            final @NotNull KeyScanCursor<String> cursor
+            final @Nullable ScanCursor cursor
     ) {
-        return async.scan(cursor)
+        return (cursor == null ? async.scan() : async.scan(cursor))
                 .toCompletableFuture()
                 .thenCompose(c -> {
+                    keys.addAll(c.getKeys());
                     if (c.isFinished()) return CompletableFuture.completedFuture(keys);
                     else return scanAllKeys(async, keys, c);
                 });
