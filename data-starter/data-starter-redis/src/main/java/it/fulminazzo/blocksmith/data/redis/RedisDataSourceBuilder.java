@@ -48,7 +48,7 @@ public final class RedisDataSourceBuilder {
         url.append("://");
         if (username != null || password != null) {
             String username = this.username == null ? "default" : this.username;
-            url.append(URLEncoder.encode(username, StandardCharsets.UTF_8));
+            url.append(URLEncoder.encode(username, StandardCharsets.UTF_8)).append(":");
             if (password != null) url.append(URLEncoder.encode(password, StandardCharsets.UTF_8));
             url.append("@");
         }
