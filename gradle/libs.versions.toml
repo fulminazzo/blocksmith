@@ -1,5 +1,6 @@
 [versions]
 buildconfig = "5.7.1"
+shadow = "9.1.0"
 
 lombok = "1.18.42"
 jetbrains_annotations = "26.0.2"
@@ -41,3 +42,4 @@ log4j = ["log4j_api", "log4j_core", "log4j_slf4j"]
 
 [plugins]
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
