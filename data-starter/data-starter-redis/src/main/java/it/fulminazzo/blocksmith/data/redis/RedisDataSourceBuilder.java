@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.redis;
 
 import io.lettuce.core.ClientOptions;
+import io.lettuce.core.RedisClient;
 import io.lettuce.core.SocketOptions;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.Mappers;
@@ -35,6 +36,20 @@ public final class RedisDataSourceBuilder {
      */
     RedisDataSourceBuilder() {
         host("0.0.0.0").port(6379).database(0);
+    }
+
+    /**
+     * Creates a new Redis data source.
+     *
+     * @return the redis data source
+     */
+    public @NotNull RedisDataSource build() {
+        final RedisClient client = RedisClient.create(getRedisUrl());
+        client.setOptions(clientOptions
+                .socketOptions(socketOptions.build())
+                .build()
+        );
+        return new RedisDataSource(client, mapper);
     }
 
     /**
