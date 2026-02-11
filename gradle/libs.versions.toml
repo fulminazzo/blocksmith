@@ -20,6 +20,9 @@ hikaricp = "7.0.2"
 h2 = "2.4.240"
 sqlite = "3.51.1.0"
 
+lettuce = "7.4.0.RELEASE"
+embedded_redis = "0.7.3"
+
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jetbrains_annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains_annotations" }
@@ -32,13 +35,16 @@ log4j_api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4
 log4j_core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
 log4j_slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
 
+jackson_json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+
 jooq = { module = "org.jooq:jooq", version.ref = "jooq" }
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 
-jackson_json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
 sqlite = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite" }
+
+lettuce = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
+embedded_redis = { module = "it.ozimov:embedded-redis", version.ref = "embedded_redis" }
 
 [bundles]
 annotations = ["lombok", "jetbrains_annotations"]

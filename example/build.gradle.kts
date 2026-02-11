@@ -45,6 +45,12 @@ tasks.compileJava {
     dependsOn("generateJooq")
 }
 
+dependencies {
+    api(libs.embedded.redis)
+
+    api(project(":data-starter:data-starter-redis"))
+}
+
 tasks.jar {
     dependsOn(tasks.shadowJar)
 }

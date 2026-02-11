@@ -10,3 +10,4 @@ include("data-starter:data-starter-mapper")
 include("data-starter:data-starter-mapper:data-starter-mapper-json")
 
 include("data-starter:data-starter-sql")
+include("data-starter:data-starter-redis")
