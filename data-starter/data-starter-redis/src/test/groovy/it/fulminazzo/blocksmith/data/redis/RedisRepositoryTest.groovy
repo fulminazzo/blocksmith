@@ -21,6 +21,35 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
         setupRepository()
     }
 
+    def 'test that getValues returns #expected'() {
+        given:
+        def keys = expected.collect { it.id.toString() }
+
+        when:
+        def actual = repository.getValues(keys).get()
+
+        then:
+        actual.sort() == expected.sort()
+
+        where:
+        expected << [
+                [FIRST],
+                [SECOND],
+                [FIRST, SECOND]
+        ]
+    }
+
+    def 'test that getAllKeys returns all keys'() {
+        given:
+        def expected = [FIRST, SECOND].collect { it.id.toString() }
+
+        when:
+        def actual = repository.allKeys.get()
+
+        then:
+        actual == expected
+    }
+
     void cleanup() {
         connection.close()
         client.shutdown()
