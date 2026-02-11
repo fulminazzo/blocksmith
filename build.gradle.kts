@@ -25,6 +25,9 @@ allprojects {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
 
+        val baseProjectName = "base"
+        if (project.name != baseProjectName) api(project(":$baseProjectName"))
+
         testImplementation(rootProject.libs.bundles.annotations)
         testAnnotationProcessor(rootProject.libs.lombok)
         testImplementation(rootProject.libs.bundles.test.framework)
@@ -61,24 +64,12 @@ subprojects {
 
 }
 
-/**
- * TESTING MODULES CONFIGURATION
- */
-subprojects {
+dependencies {
     val testingModuleName: String by rootProject.extra
 
-    if (project.name.endsWith("-$testingModuleName")) {
-        apply { plugin("groovy") }
-
-        dependencies {
-            implementation(rootProject.libs.bundles.test.framework)
-        }
-    }
-
-}
-
-dependencies {
-    subprojects.forEach { implementation(project(it.path)) }
+    subprojects
+        .filter { ! it.name.endsWith("-$testingModuleName") }
+        .forEach { implementation(project(it.path)) }
 }
 
 tasks.testCodeCoverageReport {

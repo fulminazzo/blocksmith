@@ -1,0 +1,18 @@
+<MockConfig>
+    <!-- Example comment -->
+    <CommentsEnabled>false</CommentsEnabled>
+    <!-- This comment should be -->
+    <!-- Multiline! -->
+    <Name>Blocksmith</Name>
+    <Description xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+    <Authors>
+        <Authors>Fulminazzo</Authors>
+        <Authors>Camilla</Authors>
+        <Authors>Alex</Authors>
+    </Authors>
+    <Internal>
+        <!-- This comment should be indented -->
+        <Version>true</Version>
+        <Verified xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />
+    </Internal>
+</MockConfig>
