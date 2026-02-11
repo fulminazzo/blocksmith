@@ -23,23 +23,23 @@ class FileRepositoryBuilderTest extends Specification {
         noExceptionThrown()
 
         when:
-        def user = repository.save(new User(1, 'Alex', 13)).join()
+        def user = repository.save(new User(1, 'Alex', 13)).get()
 
         then:
         user != null
 
         when:
-        def result = repository.findById(user.id).join()
+        def result = repository.findById(user.id).get()
 
         then:
         result.isPresent()
         result.get() == user
 
         when:
-        repository.delete(user.id).join()
+        repository.delete(user.id).get()
 
         then:
-        !repository.existsById(user.id).join()
+        !repository.existsById(user.id).get()
     }
 
 }

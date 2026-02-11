@@ -10,14 +10,11 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public final class CustomFileRepositoryExample {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
             User first = new User(1L, "Alexander", "Drinkwater", "alex@fulminazzo.it", 23);
@@ -28,15 +25,15 @@ public final class CustomFileRepositoryExample {
                     LoggerFactory.getLogger(FileRepositoryExample.class),
                     ConfigurationFormat.YAML
             );
-            repository.save(first).join();
-            repository.save(second).join();
+            repository.save(first).get();
+            repository.save(second).get();
 
-            Optional<User> result = repository.findYoungestUser().join();
+            Optional<User> result = repository.findYoungestUser().get();
             TestUtils.assertEquals(result.isEmpty(), false, "Could not find youngest user");
             TestUtils.assertEquals(result.get(), second, "Youngest user was not youngest");
 
-            repository.delete(first.getId()).join();
-            repository.delete(second.getId()).join();
+            repository.delete(first.getId()).get();
+            repository.delete(second.getId()).get();
         } finally {
             executor.shutdown();
         }

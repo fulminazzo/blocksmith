@@ -13,7 +13,7 @@ import it.fulminazzo.blocksmith.function.RunnableException
 import it.fulminazzo.blocksmith.function.SupplierException
 import org.jetbrains.annotations.NotNull
 
-import java.util.concurrent.CompletionException
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -43,7 +43,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         if (WORKING_DIR.exists()) WORKING_DIR.deleteDir()
 
         when:
-        def actual = repository.count().join()
+        def actual = repository.count().get()
 
         then:
         actual == 0L
@@ -64,7 +64,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         when:
         repository.executeOnMany((ConsumerException<File, IOException>) (f -> {
             actual.add(f)
-        })).join()
+        })).get()
 
         then:
         actual.sort() == expected.sort()
@@ -81,7 +81,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         when:
         repository.executeOnMany((ConsumerException<File, IOException>) (f -> {
             actual.add(f)
-        })).join()
+        })).get()
 
         then:
         actual == expected
@@ -95,7 +95,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         ]
 
         when:
-        def actual = repository.executeOnMany((FunctionException<File, File, IOException>) (f -> f)).join()
+        def actual = repository.executeOnMany((FunctionException<File, File, IOException>) (f -> f)).get()
 
         then:
         actual.sort() == expected.sort()
@@ -109,7 +109,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         if (WORKING_DIR.exists()) WORKING_DIR.deleteDir()
 
         when:
-        def actual = repository.executeOnMany((FunctionException<File, File, IOException>) (f -> f)).join()
+        def actual = repository.executeOnMany((FunctionException<File, File, IOException>) (f -> f)).get()
 
         then:
         actual == expected
@@ -126,7 +126,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         when:
         repository.executeOnManyData(entries, (ConsumerException<File, IOException>) (f -> {
             actual.add(f)
-        })).join()
+        })).get()
 
         then:
         actual.sort() == expected.sort()
@@ -146,7 +146,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         repository.executeOnManyData(entries, (BiConsumerException<File, User, IOException>) ((f, u) -> {
             actualEntries.add(u)
             actual.add(f)
-        })).join()
+        })).get()
 
         then:
         actual.sort() == expected.sort()
@@ -162,7 +162,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         when:
         def actual = repository.executeOnManyData(entries,
                 (FunctionException<File, File, IOException>) (f -> f)
-        ).join()
+        ).get()
 
         then:
         actual.sort() == expected.sort()
@@ -183,7 +183,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
                     actualEntries.add(u)
                     return f
                 })
-        ).join()
+        ).get()
 
         then:
         actual.sort() == expected.sort()
@@ -202,7 +202,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         when:
         repository.executeOnMany(entries, (ConsumerException<File, IOException>) (f -> {
             actual.add(f)
-        })).join()
+        })).get()
 
         then:
         actual.sort() == expected.sort()
@@ -222,7 +222,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         repository.executeOnMany(entries, (BiConsumerException<File, Long, IOException>) ((f, l) -> {
             actualEntries.add(l)
             actual.add(f)
-        })).join()
+        })).get()
 
         then:
         actual.sort() == expected.sort()
@@ -238,7 +238,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         when:
         def actual = repository.executeOnMany(entries,
                 (FunctionException<File, File, IOException>) (f -> f)
-        ).join()
+        ).get()
 
         then:
         actual.sort() == expected.sort()
@@ -259,7 +259,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
                     actualEntries.add(l)
                     return f
                 })
-        ).join()
+        ).get()
 
         then:
         actual.sort() == expected.sort()
@@ -283,7 +283,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         when:
         repository.executeOnSingleData(data, (ConsumerException<File, IOException>) (f -> {
             actual = f
-        })).join()
+        })).get()
 
         then:
         actual == expected
@@ -301,7 +301,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
                 (FunctionException<File, File, IOException>) (f -> {
                     return f
                 })
-        ).join()
+        ).get()
 
         then:
         actual == expected
@@ -318,7 +318,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
         when:
         repository.executeOnSingle(id, (ConsumerException<File, IOException>) (f -> {
             actual = f
-        })).join()
+        })).get()
 
         then:
         actual == expected
@@ -336,7 +336,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
                 (FunctionException<File, File, IOException>) (f -> {
                     return f
                 })
-        ).join()
+        ).get()
 
         then:
         actual == expected
@@ -348,10 +348,10 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
 
     def 'test that execute throws CompletionException on IOException'() {
         when:
-        repository.execute(function).join()
+        repository.execute(function).get()
 
         then:
-        def e = thrown(CompletionException)
+        def e = thrown(ExecutionException)
 
         and:
         def cause = e.cause
