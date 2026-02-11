@@ -71,4 +71,13 @@ public final class RedisDataSource implements Closeable {
         redisClient.shutdown();
     }
 
+    /**
+     * Gets a new builder for this class.
+     *
+     * @return the builder
+     */
+    public static @NotNull RedisDataSourceBuilder builder() {
+        return new RedisDataSourceBuilder();
+    }
+
 }
