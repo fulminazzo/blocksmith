@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.mongodb;
 
 import com.mongodb.Function;
 import com.mongodb.client.model.CountOptions;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import it.fulminazzo.blocksmith.data.Repository;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,11 @@ public class MongoRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<T> save(final @NonNull T data) {
         return query(collection ->
-                collection.insertOne(data)
+                collection.replaceOne(
+                        eq(idFieldName, idMapper.apply(data)),
+                        data,
+                        new ReplaceOptions().upsert(true)
+                )
         ).thenApply(r -> data);
     }
 
