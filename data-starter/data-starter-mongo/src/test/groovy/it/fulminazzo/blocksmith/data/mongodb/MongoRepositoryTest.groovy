@@ -28,7 +28,7 @@ import reactor.core.publisher.Mono
 
 class MongoRepositoryTest extends RepositoryTest<MongoRepository<User, Long>> {
     private static final int port = 47017
-    private static final String idFieldName = 'id'
+    private static final String idFieldName = '_id'
 
     private TransitionWalker.ReachedState<RunningMongodProcess> server
     private MongoClient client
@@ -73,17 +73,17 @@ class MongoRepositoryTest extends RepositoryTest<MongoRepository<User, Long>> {
         setupRepository()
     }
 
+    void cleanup() {
+        if (client != null) client.close()
+        if (server != null) server.close()
+    }
+
     def 'test that query works'() {
         when:
         def documents = repository.query(c -> c.countDocuments()).get()
 
         then:
         documents == 2
-    }
-
-    void cleanup() {
-        if (client != null) client.close()
-        if (server != null) server.close()
     }
 
     @Override
