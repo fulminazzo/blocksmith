@@ -5,6 +5,10 @@ import com.mongodb.client.model.Filters
 import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.MongoClients
 import com.mongodb.reactivestreams.client.MongoCollection
+import de.flapdoodle.embed.mongo.distribution.Version
+import de.flapdoodle.embed.mongo.transitions.Mongod
+import de.flapdoodle.embed.mongo.transitions.RunningMongodProcess
+import de.flapdoodle.reverse.TransitionWalker
 import it.fulminazzo.blocksmith.data.RepositoryTest
 import it.fulminazzo.blocksmith.data.User
 import org.bson.codecs.configuration.CodecRegistries
@@ -16,10 +20,13 @@ class MongoRepositoryTest extends RepositoryTest<MongoRepository<User, Long>> {
     private static final int port = 47017
     private static final String idFieldName = 'id'
 
+    private TransitionWalker.ReachedState<RunningMongodProcess> server
     private MongoClient client
     private MongoCollection<User> collection
 
     void setup() {
+        server = Mongod.instance().start(Version.V7_0_0)
+
         def pojoCodec = CodecRegistries.fromRegistries(MongoClientSettings.defaultCodecRegistry,
                 CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
         )
@@ -31,6 +38,7 @@ class MongoRepositoryTest extends RepositoryTest<MongoRepository<User, Long>> {
 
     void cleanup() {
         if (client != null) client.close()
+        if (server != null) server.close()
     }
 
     @Override
