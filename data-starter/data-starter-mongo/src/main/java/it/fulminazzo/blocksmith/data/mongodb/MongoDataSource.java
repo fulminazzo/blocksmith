@@ -89,6 +89,29 @@ public final class MongoDataSource implements Closeable {
         );
     }
 
+    /**
+     * Creates a new custom repository.
+     *
+     * @param <R>                the type parameter
+     * @param <T>                the type of the data
+     * @param <ID>               the type of the id
+     * @param dataType           the data type
+     * @param databaseName       the name of the database
+     * @param collectionName     the name of the collection
+     * @param repositorySupplier the repository creation function
+     * @return the repository
+     */
+    public <R extends MongoRepository<T, ID>, T, ID> @NotNull Repository<T, ID> newCustomRepository(
+            final @NotNull Class<T> dataType,
+            final @NotNull String databaseName,
+            final @NotNull String collectionName,
+            final @NotNull Function<MongoCollection<T>, R> repositorySupplier
+    ) {
+        MongoDatabase database = client.getDatabase(databaseName);
+        MongoCollection<T> collection = database.getCollection(collectionName, dataType);
+        return repositorySupplier.apply(collection);
+    }
+
     @Override
     public void close() {
         client.close();
