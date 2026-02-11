@@ -10,6 +10,7 @@ spock_core = "2.4-groovy-4.0"
 byte_buddy = "1.18.2"
 mockito_core = "4.11.0"
 
+slf4j = "2.0.17"
 log4j = "2.25.3"
 
 jackson = "2.21.0"
@@ -23,6 +24,10 @@ sqlite = "3.51.1.0"
 lettuce = "7.4.0.RELEASE"
 embedded_redis = "0.7.3"
 
+mongodb = "5.6.3"
+reactor = "3.8.3"
+embedded_mongodb = "4.24.0"
+
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jetbrains_annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains_annotations" }
@@ -31,6 +36,7 @@ spock_core = { module = "org.spockframework:spock-core", version.ref = "spock_co
 byte_buddy = { module = "net.bytebuddy:byte-buddy", version.ref = "byte_buddy" }
 mockito_core = { module = "org.mockito:mockito-core", version.ref = "mockito_core" }
 
+slf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 log4j_api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
 log4j_core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
 log4j_slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
@@ -45,6 +51,11 @@ sqlite = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite" }
 
 lettuce = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
 embedded_redis = { module = "it.ozimov:embedded-redis", version.ref = "embedded_redis" }
+
+mongodb-driver-platform = { module = "org.mongodb:mongodb-driver-bom", version.ref = "mongodb" }
+mongodb-driver-async = { module = "org.mongodb:mongodb-driver-reactivestreams", version.ref = "mongodb" }
+reactor = { module = "io.projectreactor:reactor-core", version.ref = "reactor" }
+embedded_mongodb = { module = "de.flapdoodle.embed:de.flapdoodle.embed.mongo", version.ref = "embedded_mongodb" }
 
 [bundles]
 annotations = ["lombok", "jetbrains_annotations"]

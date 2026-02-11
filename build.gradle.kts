@@ -61,6 +61,22 @@ subprojects {
 
 }
 
+/**
+ * TESTING MODULES CONFIGURATION
+ */
+subprojects {
+    val testingModuleName: String by rootProject.extra
+
+    if (project.name.endsWith("-$testingModuleName")) {
+        apply { plugin("groovy") }
+
+        dependencies {
+            implementation(rootProject.libs.bundles.test.framework)
+        }
+    }
+
+}
+
 dependencies {
     subprojects.forEach { implementation(project(it.path)) }
 }

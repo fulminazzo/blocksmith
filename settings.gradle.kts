@@ -11,3 +11,4 @@ include("data-starter:data-starter-mapper:data-starter-mapper-json")
 
 include("data-starter:data-starter-sql")
 include("data-starter:data-starter-redis")
+include("data-starter:data-starter-mongo")
