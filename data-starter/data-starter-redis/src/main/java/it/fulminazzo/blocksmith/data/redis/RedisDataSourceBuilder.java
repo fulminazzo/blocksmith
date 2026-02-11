@@ -81,7 +81,7 @@ public final class RedisDataSourceBuilder {
      * @param host the host
      * @return this object (for method chaining)
      */
-    public @NotNull RedisDataSourceBuilder host(final @Nullable String host) {
+    public @NotNull RedisDataSourceBuilder host(final @NotNull String host) {
         this.host = host;
         return this;
     }
@@ -120,7 +120,7 @@ public final class RedisDataSourceBuilder {
      * @param username the username
      * @return this object (for method chaining)
      */
-    public @NotNull RedisDataSourceBuilder username(final @Nullable String username) {
+    public @NotNull RedisDataSourceBuilder username(final @NotNull String username) {
         this.username = username;
         return this;
     }
@@ -131,7 +131,7 @@ public final class RedisDataSourceBuilder {
      * @param password the password
      * @return this object (for method chaining)
      */
-    public @NotNull RedisDataSourceBuilder password(final @Nullable String password) {
+    public @NotNull RedisDataSourceBuilder password(final @NotNull String password) {
         this.password = password;
         return this;
     }
