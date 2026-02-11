@@ -44,7 +44,7 @@ class SerializableMapperTest extends Specification {
         def mapper = new SerializableMapper()
 
         when:
-        mapper.deserialize('invalid_data', Unserializable)
+        mapper.deserialize('invaliddata', Unserializable)
 
         then:
         thrown(MapperException)
