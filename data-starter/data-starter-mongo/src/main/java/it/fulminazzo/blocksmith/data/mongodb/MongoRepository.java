@@ -65,12 +65,12 @@ public class MongoRepository<T, ID> implements Repository<T, ID> {
 
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAll() {
-        throw new UnsupportedOperationException();
+        return queryMany(MongoCollection::find);
     }
 
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
-        throw new UnsupportedOperationException();
+        return queryMany(query -> query.find(in(idFieldName, ids)));
     }
 
     @Override
