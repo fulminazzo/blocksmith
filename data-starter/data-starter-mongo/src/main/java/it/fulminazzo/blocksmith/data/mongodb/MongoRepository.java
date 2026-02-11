@@ -15,6 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -74,11 +75,13 @@ public class MongoRepository<T, ID> implements Repository<T, ID> {
 
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
+        if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         return queryMany(query -> query.find(in(idFieldName, ids)));
     }
 
     @Override
     public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entries) {
+        if (entries.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         List<WriteModel<T>> writeModels = entries.stream()
                 .map(e -> new ReplaceOneModel<>(
                         eq(idFieldName, idMapper.apply(e)),
@@ -92,6 +95,7 @@ public class MongoRepository<T, ID> implements Repository<T, ID> {
 
     @Override
     public @NotNull CompletableFuture<?> deleteAll(final @NotNull Collection<ID> ids) {
+        if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         return query(collection ->
                 collection.deleteMany(in(idFieldName, ids))
         );
