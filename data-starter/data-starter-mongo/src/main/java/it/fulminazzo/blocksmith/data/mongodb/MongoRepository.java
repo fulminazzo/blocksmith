@@ -7,6 +7,7 @@ import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.WriteModel;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import it.fulminazzo.blocksmith.data.Repository;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
@@ -30,7 +31,7 @@ import static com.mongodb.client.model.Filters.in;
  * @param <T>  the type of the data
  * @param <ID> the type of the id of the data (should be unique)
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class MongoRepository<T, ID> implements Repository<T, ID> {
     private final @NotNull MongoCollection<T> collection;
     private final @NotNull String idFieldName;
