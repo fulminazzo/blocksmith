@@ -3,4 +3,6 @@ dependencies {
 
     api(libs.mongodb.driver.async)
     api(libs.reactor)
+
+    testImplementation(libs.embedded.mongodb)
 }
