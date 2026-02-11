@@ -34,6 +34,16 @@ class MongoRepositoryTest extends RepositoryTest<MongoRepository<User, Long>> {
         client = MongoClients.create("mongodb://localhost:$port")
         def database = client.getDatabase('test').withCodecRegistry(pojoCodec)
         collection = database.getCollection('users', User)
+
+        setupRepository()
+    }
+
+    def 'test that query works'() {
+        when:
+        def documents = repository.query(c -> c.countDocuments()).get()
+
+        then:
+        documents == 2
     }
 
     void cleanup() {
