@@ -17,6 +17,20 @@ import java.util.concurrent.CompletableFuture;
 public abstract class AbstractRepository<T, ID> implements Repository<T, ID> {
 
     @Override
+    public @NotNull CompletableFuture<Void> delete(final @NotNull ID id) {
+        return deleteImpl(id).thenApply(r -> null);
+    }
+
+    /**
+     * Internal implementation of {@link #delete(Object)}.
+     *
+     * @param id the id
+     * @return anything (result will be ignored)
+     * @deprecated FOR INTERNAL USE ONLY
+     */
+    protected abstract @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id);
+
+    @Override
     public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
         if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         return findAllByIdImpl(ids);
@@ -49,9 +63,9 @@ public abstract class AbstractRepository<T, ID> implements Repository<T, ID> {
     protected abstract @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entries);
 
     @Override
-    public @NotNull CompletableFuture<?> deleteAll(final @NotNull Collection<ID> ids) {
-        if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
-        return deleteAllImpl(ids);
+    public @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<ID> ids) {
+        if (ids.isEmpty()) return CompletableFuture.completedFuture(null);
+        return deleteAllImpl(ids).thenApply(r -> null);
     }
 
     /**
