@@ -1,5 +1,7 @@
 package it.fulminazzo.blocksmith.data;
 
+import it.fulminazzo.blocksmith.data.entity.EntityMapper;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -13,8 +15,10 @@ import java.util.concurrent.CompletableFuture;
  * @param <T>  the type of the data
  * @param <ID> the type of the id of the data (should be unique)
  */
+@RequiredArgsConstructor
 @SuppressWarnings("DeprecatedIsStillUsed")
 public abstract class AbstractRepository<T, ID> implements Repository<T, ID> {
+    protected final @NotNull EntityMapper<T, ID> entityMapper;
 
     @Override
     public @NotNull CompletableFuture<Void> delete(final @NotNull ID id) {
