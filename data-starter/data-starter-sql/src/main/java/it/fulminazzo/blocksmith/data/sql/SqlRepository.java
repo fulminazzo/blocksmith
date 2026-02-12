@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 /**
  * A basic implementation of {@link Repository} for SQL databases.
  *
- * @param <T>  the type of the data
- * @param <ID> the type of the id of the data (should be unique)
+ * @param <T>  the type of the entities
+ * @param <ID> the type of the id of the entities (should be unique)
  * @param <TB> the type of the table
  */
 @SuppressWarnings({"resource"})
@@ -63,9 +63,9 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
     }
 
     @Override
-    public @NotNull CompletableFuture<T> save(final @NotNull T data) {
+    public @NotNull CompletableFuture<T> save(final @NotNull T entity) {
         return query(dsl -> {
-            Record record = dsl.newRecord(table(), data);
+            Record record = dsl.newRecord(table(), entity);
             return dsl.insertInto(table())
                     .set(record)
                     .onConflict(idColumn)
@@ -102,9 +102,9 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
     }
 
     @Override
-    protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entries) {
+    protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities) {
         return query(dsl -> {
-            List<Record> records = entries.stream()
+            List<Record> records = entities.stream()
                     .map(entry -> dsl.newRecord(table(), entry))
                     .collect(Collectors.toList());
             dsl.batch(

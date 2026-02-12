@@ -12,8 +12,8 @@ import java.util.concurrent.CompletableFuture;
  * Abstract implementation of {@link Repository} with common checks
  * and support methods.
  *
- * @param <T>  the type of the data
- * @param <ID> the type of the id of the data (should be unique)
+ * @param <T>  the type of the entities
+ * @param <ID> the type of the id of the entities (should be unique)
  */
 @RequiredArgsConstructor
 @SuppressWarnings("DeprecatedIsStillUsed")
@@ -51,20 +51,20 @@ public abstract class AbstractRepository<T, ID> implements Repository<T, ID> {
     protected abstract @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids);
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entries) {
-        if (entries.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
-        return saveAllImpl(entries);
+    public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entities) {
+        if (entities.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
+        return saveAllImpl(entities);
     }
 
     /**
      * Internal implementation of {@link #saveAll(Collection)}.
      *
-     * @param entries the entries
-     * @return the saved entries (in case values are changed)
+     * @param entities the entities
+     * @return the saved entities (in case values are changed)
      * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY
      */
     @Deprecated
-    protected abstract @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entries);
+    protected abstract @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities);
 
     @Override
     public @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<ID> ids) {

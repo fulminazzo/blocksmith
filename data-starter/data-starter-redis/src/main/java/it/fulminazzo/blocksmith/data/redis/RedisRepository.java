@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 /**
  * A basic implementation of {@link Repository} for Redis databases.
  *
- * @param <T>  the type of the data
- * @param <ID> the type of the id of the data (will be used as file names)
+ * @param <T>  the type of the entities
+ * @param <ID> the type of the id of the entities (should be unique)
  */
 public class RedisRepository<T, ID> extends AbstractRepository<T, ID> {
     private final @NotNull StatefulRedisConnection<String, String> connection;
@@ -53,11 +53,11 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<T> save(final @NotNull T data) {
+    public @NotNull CompletableFuture<T> save(final @NotNull T entity) {
         return query(async -> async.set(
-                entityMapper.getId(data).toString(),
-                mapper.serialize(data)
-        )).thenApply(s -> data);
+                entityMapper.getId(entity).toString(),
+                mapper.serialize(entity)
+        )).thenApply(s -> entity);
     }
 
     @Override
@@ -76,13 +76,13 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID> {
     }
 
     @Override
-    protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entries) {
-        return query(async -> async.mset(entries.stream()
+    protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities) {
+        return query(async -> async.mset(entities.stream()
                 .collect(Collectors.toMap(
                         t -> entityMapper.getId(t).toString(),
                         mapper::serialize
                 )))
-        ).thenApply(s -> entries);
+        ).thenApply(s -> entities);
     }
 
     @Override

@@ -27,8 +27,8 @@ import static com.mongodb.client.model.Filters.in;
 /**
  * A basic implementation of {@link Repository} for MongoDB databases.
  *
- * @param <T>  the type of the data
- * @param <ID> the type of the id of the data (should be unique)
+ * @param <T>  the type of the entities
+ * @param <ID> the type of the id of the entities (should be unique)
  */
 public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
     private final @NotNull MongoCollection<T> collection;
@@ -54,14 +54,14 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<T> save(final @NonNull T data) {
+    public @NotNull CompletableFuture<T> save(final @NonNull T entity) {
         return query(collection ->
                 collection.replaceOne(
-                        eq(entityMapper.getIdFieldName(), entityMapper.getId(data)),
-                        data,
+                        eq(entityMapper.getIdFieldName(), entityMapper.getId(entity)),
+                        entity,
                         new ReplaceOptions().upsert(true)
                 )
-        ).thenApply(r -> data);
+        ).thenApply(r -> entity);
     }
 
     @Override
@@ -82,8 +82,8 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
     }
 
     @Override
-    protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entries) {
-        List<WriteModel<T>> writeModels = entries.stream()
+    protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities) {
+        List<WriteModel<T>> writeModels = entities.stream()
                 .map(e -> new ReplaceOneModel<>(
                         eq(entityMapper.getIdFieldName(), entityMapper.getId(e)),
                         e,
@@ -91,7 +91,7 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
                 ))
                 .collect(Collectors.toList());
         return query(collection -> collection.bulkWrite(writeModels))
-                .thenApply(result -> entries);
+                .thenApply(result -> entities);
     }
 
     @Override

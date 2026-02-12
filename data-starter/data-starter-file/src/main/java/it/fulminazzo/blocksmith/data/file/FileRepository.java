@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 /**
  * A basic implementation of {@link Repository} that stores data on disk.
  *
- * @param <T>  the type of the data
- * @param <ID> the type of the id of the data (will be used as file names)
+ * @param <T>  the type of the entities
+ * @param <ID> the type of the id of the entities (will be used as files names)
  */
 public class FileRepository<T, ID> extends AbstractRepository<T, ID> {
     protected final @NotNull ConfigurationAdapter adapter;
@@ -56,10 +56,10 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<T> save(final @NotNull T data) {
-        return executeOnSingleData(data, f -> {
-            adapter.store(f, data);
-            return data;
+    public @NotNull CompletableFuture<T> save(final @NotNull T entity) {
+        return executeOnSingleData(entity, f -> {
+            adapter.store(f, entity);
+            return entity;
         });
     }
 
@@ -85,8 +85,8 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID> {
     }
 
     @Override
-    protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entries) {
-        return executeOnManyData(entries, (f, t) -> {
+    protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities) {
+        return executeOnManyData(entities, (f, t) -> {
             adapter.store(f, t);
             return t;
         });

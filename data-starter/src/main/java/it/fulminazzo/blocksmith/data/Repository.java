@@ -7,23 +7,23 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * A general repository for handling data.
+ * A general repository for handling entities in a data source.
  *
- * @param <T>  the type of the data
- * @param <ID> the type of the id of the data (should be unique)
+ * @param <T>  the type of the entities
+ * @param <ID> the type of the id of the entities (should be unique)
  */
 public interface Repository<T, ID> {
 
     /**
-     * Gets the data with the associated id.
+     * Gets the entity with the associated id.
      *
      * @param id the id
-     * @return the data
+     * @return the entity
      */
     @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id);
 
     /**
-     * Checks if a data with the associated id exists.
+     * Checks if an entity with the associated id exists.
      *
      * @param id the id
      * @return <code>true</code> if it does
@@ -31,15 +31,15 @@ public interface Repository<T, ID> {
     @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id);
 
     /**
-     * Saves the given data.
+     * Saves the given entity.
      *
-     * @param data the data
-     * @return the saved data (in case values are changed)
+     * @param entity the entity
+     * @return the saved entity (in case values are changed)
      */
-    @NotNull CompletableFuture<T> save(final @NotNull T data);
+    @NotNull CompletableFuture<T> save(final @NotNull T entity);
 
     /**
-     * Deletes the data.
+     * Deletes the entities.
      *
      * @param id the id
      * @return nothing
@@ -47,30 +47,30 @@ public interface Repository<T, ID> {
     @NotNull CompletableFuture<Void> delete(final @NotNull ID id);
 
     /**
-     * Gets all the data currently stored.
+     * Gets all the entities currently stored.
      *
-     * @return the data
+     * @return the entities
      */
     @NotNull CompletableFuture<Collection<T>> findAll();
 
     /**
-     * Gets all the data with the associated it.
+     * Gets all the entities with the associated it.
      *
      * @param ids the ids
-     * @return the data
+     * @return the filtered entities
      */
     @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids);
 
     /**
-     * Saves all the given entries.
+     * Saves all the given entities.
      *
-     * @param entries the entries
-     * @return the saved entries (in case values are changed)
+     * @param entities the entities
+     * @return the saved entities (in case values are changed)
      */
-    @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entries);
+    @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entities);
 
     /**
-     * Deletes all the data with the associated id.
+     * Deletes all the entities with the associated id.
      *
      * @param ids the ids
      * @return nothing
@@ -78,7 +78,7 @@ public interface Repository<T, ID> {
     @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<ID> ids);
 
     /**
-     * Counts all the data currently stored.
+     * Counts all the entities currently stored.
      *
      * @return the amount
      */
