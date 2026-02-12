@@ -5,6 +5,7 @@ import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.WriteModel;
 import com.mongodb.reactivestreams.client.MongoCollection;
+import it.fulminazzo.blocksmith.data.AbstractRepository;
 import it.fulminazzo.blocksmith.data.Repository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ import static com.mongodb.client.model.Filters.in;
  * @param <ID> the type of the id of the data (should be unique)
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class MongoRepository<T, ID> implements Repository<T, ID> {
+public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
     private final @NotNull MongoCollection<T> collection;
     private final @NotNull String idFieldName;
     private final @NotNull Function<T, ID> idMapper;
@@ -75,14 +76,12 @@ public class MongoRepository<T, ID> implements Repository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
-        if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
+    protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
         return queryMany(query -> query.find(in(idFieldName, ids)));
     }
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entries) {
-        if (entries.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
+    protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entries) {
         List<WriteModel<T>> writeModels = entries.stream()
                 .map(e -> new ReplaceOneModel<>(
                         eq(idFieldName, idMapper.apply(e)),
@@ -95,8 +94,7 @@ public class MongoRepository<T, ID> implements Repository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<?> deleteAll(final @NotNull Collection<ID> ids) {
-        if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
+    protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids) {
         return query(collection ->
                 collection.deleteMany(in(idFieldName, ids))
         );

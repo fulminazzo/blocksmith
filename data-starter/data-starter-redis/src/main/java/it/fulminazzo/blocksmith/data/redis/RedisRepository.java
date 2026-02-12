@@ -6,6 +6,7 @@ import io.lettuce.core.ScanCursor;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.api.async.RedisServerAsyncCommands;
+import it.fulminazzo.blocksmith.data.AbstractRepository;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
  * @param <ID> the type of the id of the data (will be used as file names)
  */
 @RequiredArgsConstructor
-public class RedisRepository<T, ID> implements Repository<T, ID> {
+public class RedisRepository<T, ID> extends AbstractRepository<T, ID> {
     private final @NotNull StatefulRedisConnection<String, String> connection;
     private final @NotNull Function<T, ID> idMapper;
     private final @NotNull Class<T> dataType;
@@ -62,14 +63,12 @@ public class RedisRepository<T, ID> implements Repository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
-        if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
+    protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
         return getValues(ids.stream().map(Object::toString).collect(Collectors.toList()));
     }
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entries) {
-        if (entries.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
+    protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entries) {
         return query(async -> async.mset(entries.stream()
                 .collect(Collectors.toMap(
                         t -> idMapper.apply(t).toString(),
@@ -79,8 +78,7 @@ public class RedisRepository<T, ID> implements Repository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<?> deleteAll(final @NotNull Collection<ID> ids) {
-        if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
+    protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids) {
         return query(async ->
                 async.del(ids.stream().map(Object::toString).toArray(String[]::new))
         );

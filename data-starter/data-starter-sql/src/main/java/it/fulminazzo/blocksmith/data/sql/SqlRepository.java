@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.data.sql;
 
+import it.fulminazzo.blocksmith.data.AbstractRepository;
 import it.fulminazzo.blocksmith.data.Repository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings({"resource"})
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class SqlRepository<T, ID, TB extends Table<?>> implements Repository<T, ID> {
+public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepository<T, ID> {
     private final @NotNull DSLContext context;
     protected final @NotNull TB table;
     protected final @NotNull Field<ID> idColumn;
@@ -84,8 +85,7 @@ public class SqlRepository<T, ID, TB extends Table<?>> implements Repository<T, 
     }
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
-        if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
+    protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
         return query(dsl -> dsl.selectFrom(table())
                 .where(idColumn.in(ids))
                 .fetchInto(dataType)
@@ -93,8 +93,7 @@ public class SqlRepository<T, ID, TB extends Table<?>> implements Repository<T, 
     }
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entries) {
-        if (entries.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
+    protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entries) {
         return query(dsl -> {
             List<Record> records = entries.stream()
                     .map(entry -> dsl.newRecord(table(), entry))
@@ -124,7 +123,7 @@ public class SqlRepository<T, ID, TB extends Table<?>> implements Repository<T, 
     }
 
     @Override
-    public @NotNull CompletableFuture<?> deleteAll(final @NotNull Collection<ID> ids) {
+    protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids) {
         if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         return query(dsl ->
                 dsl.deleteFrom(table())

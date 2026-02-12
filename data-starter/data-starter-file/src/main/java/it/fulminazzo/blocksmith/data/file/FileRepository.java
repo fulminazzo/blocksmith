@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.file;
 
 import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
+import it.fulminazzo.blocksmith.data.AbstractRepository;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.function.*;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  * @param <T>  the type of the data
  * @param <ID> the type of the id of the data (will be used as file names)
  */
-public class FileRepository<T, ID> implements Repository<T, ID> {
+public class FileRepository<T, ID> extends AbstractRepository<T, ID> {
     protected final @NotNull ConfigurationAdapter adapter;
     private final @NotNull File dataDirectory;
     private final @NotNull Function<T, ID> idMapper;
@@ -91,14 +92,14 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
+    protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
         return executeOnMany(ids, (f, i) -> {
             return adapter.load(f, dataType);
         });
     }
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entries) {
+    protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entries) {
         return executeOnManyData(entries, (f, t) -> {
             adapter.store(f, t);
             return t;
@@ -106,7 +107,7 @@ public class FileRepository<T, ID> implements Repository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<?> deleteAll(final @NotNull Collection<ID> ids) {
+    protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids) {
         return executeOnMany(ids, (f, i) -> {
             Files.deleteIfExists(f.toPath());
         });
