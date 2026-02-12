@@ -9,6 +9,7 @@ import org.joor.Reflect;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,7 @@ public final class EntityMapper<T, ID> {
      * @return the id
      */
     public @NotNull ID getId(final @NotNull T entity) {
-        return idMapper.apply(entity);
+        return Objects.requireNonNull(idMapper.apply(entity), "ID should not be null");
     }
 
     /**
