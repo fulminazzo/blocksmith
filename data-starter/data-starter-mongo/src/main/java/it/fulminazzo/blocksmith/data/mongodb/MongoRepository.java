@@ -16,7 +16,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -64,7 +63,7 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<?> delete(final @NonNull ID id) {
+    protected @NotNull CompletableFuture<?> deleteImpl(final @NonNull ID id) {
         return query(collection ->
                 collection.deleteOne(eq(idFieldName, id))
         );
