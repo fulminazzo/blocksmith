@@ -78,7 +78,7 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<?> delete(final @NotNull ID id) {
+    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id) {
         return executeOnSingle(id, f -> {
             Files.deleteIfExists(f.toPath());
         });

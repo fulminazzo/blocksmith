@@ -64,7 +64,7 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<?> delete(final @NonNull ID id) {
+    protected @NotNull CompletableFuture<?> deleteImpl(final @NonNull ID id) {
         return query(collection ->
                 collection.deleteOne(eq(idFieldName, id))
         );

@@ -53,7 +53,7 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<?> delete(final @NotNull ID id) {
+    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id) {
         return query(async -> async.del(id.toString()));
     }
 

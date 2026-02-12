@@ -68,7 +68,7 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
     }
 
     @Override
-    public @NotNull CompletableFuture<?> delete(final @NotNull ID id) {
+    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id) {
         return query(dsl ->
                 dsl.deleteFrom(table())
                         .where(idColumn.eq(id))
