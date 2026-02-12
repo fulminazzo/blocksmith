@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 final class SimpleEntity {
 
-    public UUID uuid;
+    private UUID uuid;
 
     private String name;
 
