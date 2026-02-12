@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.entity;
 
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
@@ -21,17 +22,11 @@ import java.util.stream.Collectors;
 public final class EntityMapper<T, ID> {
     private static final @NotNull String defaultIdFieldName = "id";
 
-    private final @NotNull Class<T> entityType;
+    @Getter
+    private final @NotNull Class<T> type;
+    @Getter
+    private final @NotNull String idFieldName;
     private final @NotNull Function<T, ID> idMapper;
-
-    /**
-     * Gets the entity Java class.
-     *
-     * @return the type
-     */
-    public @NotNull Class<T> getType() {
-        return entityType;
-    }
 
     /**
      * Gets the ID of the entity.
@@ -97,6 +92,7 @@ public final class EntityMapper<T, ID> {
             );
         return create(
                 type,
+                idFieldName,
                 e -> Reflect.on(e).field(idFieldName).get()
         );
     }
@@ -104,17 +100,19 @@ public final class EntityMapper<T, ID> {
     /**
      * Creates a new Entity mapper.
      *
-     * @param <T>      the type of the entity
-     * @param <ID>     the type of the id of the entity (should be unique)
-     * @param type     the entity Java class
-     * @param idMapper the function to get the ID of the entity
+     * @param <T>         the type of the entity
+     * @param <ID>        the type of the id of the entity (should be unique)
+     * @param type        the entity Java class
+     * @param idFieldName the name of the field that represents the ID of the entity
+     * @param idMapper    the function to get the ID of the entity
      * @return the entity mapper
      */
     public static <T, ID> @NotNull EntityMapper<T, ID> create(
             final @NotNull Class<T> type,
+            final @NotNull String idFieldName,
             final @NotNull Function<T, ID> idMapper
     ) {
-        return new EntityMapper<>(type, idMapper);
+        return new EntityMapper<>(type, idFieldName, idMapper);
     }
 
 }
