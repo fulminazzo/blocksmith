@@ -6,7 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
 
+import java.lang.reflect.Field;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Responsible for accessing information of an entity.
@@ -16,6 +19,8 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EntityMapper<T, ID> {
+    private static final @NotNull String defaultIdFieldName = "id";
+
     private final @NotNull Class<T> entityType;
     private final @NotNull Function<T, ID> idMapper;
 
@@ -39,7 +44,42 @@ public final class EntityMapper<T, ID> {
     }
 
     /**
-     * Creates a new entity mapper.
+     * Creates a new Entity mapper.
+     * <br>
+     * The ID lookup will follow the logic:
+     * <ol>
+     *     <li>attempts to find a field annotated with {@link Id} (only ONE field must be annotated);</li>
+     *     <li>if it fails, attempts to find a field named {@link #defaultIdFieldName};</li>
+     *     <li>if it fails, an exception is thrown notifying the user.</li>
+     * </ol>
+     *
+     * @param <T>  the type of the entity
+     * @param <ID> the type of the id of the entity (should be unique)
+     * @param type the entity Java class
+     * @return the entity mapper
+     */
+    public static <T, ID> @NotNull EntityMapper<T, ID> create(final @NotNull Class<T> type) {
+        @NotNull List<Field> fields = ReflectionUtils.getInstanceFields(type).stream()
+                .filter(f -> f.isAnnotationPresent(Id.class))
+                .collect(Collectors.toList());
+        if (!fields.isEmpty()) {
+            if (fields.size() > 1)
+                throw new IllegalArgumentException(String.format(
+                        "Invalid entity '%s'. Detected %s annotated fields with %s. Please choose only one field",
+                        type.getCanonicalName(), fields.size(), Id.class.getSimpleName()
+                ));
+            return create(type, fields.get(0).getName());
+        }
+        if (ReflectionUtils.getInstanceField(type, defaultIdFieldName).isEmpty()) {
+            throw new IllegalArgumentException(String.format(
+                    "Invalid entity '%s'. Could not find field '%s' and no field annotated with %s was present",
+                    type.getCanonicalName(), defaultIdFieldName, Id.class.getSimpleName()
+            ));
+        } else return create(type, defaultIdFieldName);
+    }
+
+    /**
+     * Creates a new Entity mapper.
      *
      * @param <T>         the type of the entity
      * @param <ID>        the type of the id of the entity (should be unique)
@@ -62,7 +102,7 @@ public final class EntityMapper<T, ID> {
     }
 
     /**
-     * Creates a new entity mapper.
+     * Creates a new Entity mapper.
      *
      * @param <T>      the type of the entity
      * @param <ID>     the type of the id of the entity (should be unique)
