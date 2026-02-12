@@ -11,5 +11,10 @@ allprojects {
 subprojects {
     dependencies {
         api(project(":$projectName"))
+
+        val baseProjectName = "base"
+        if (project.name != baseProjectName)
+            api(project(":$projectName:$projectName-$baseProjectName"))
+
     }
 }
