@@ -10,52 +10,52 @@ import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
 
 /**
- * A basic implementation of {@link Repository} for MongoDB databases.
+ * Implementation of {@link Repository} for MongoDB databases.
  *
  * @param <T>  the type of the entities
  * @param <ID> the type of the id of the entities (should be unique)
  */
-public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
-    private final @NotNull MongoCollection<T> collection;
+public class MongoRepository<T, ID> extends AbstractRepository<T, ID, MongoQueryEngine<T, ID>> {
 
-    protected MongoRepository(final @NotNull MongoCollection<T> collection,
+    /**
+     * Instantiates a new MongoDB repository.
+     *
+     * @param queryEngine  the query engine
+     * @param entityMapper the entity mapper
+     */
+    protected MongoRepository(final @NonNull MongoQueryEngine<T, ID> queryEngine,
                               final @NotNull EntityMapper<T, ID> entityMapper) {
-        super(entityMapper);
-        this.collection = collection;
+        super(queryEngine, entityMapper);
     }
 
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NonNull ID id) {
-        return query(collection ->
+        return queryEngine.query(collection ->
                 collection.find(eq(entityMapper.getIdFieldName(), id))
         ).thenApply(Optional::ofNullable);
     }
 
     @Override
     public @NotNull CompletableFuture<Boolean> existsById(final @NonNull ID id) {
-        return query(collection ->
+        return queryEngine.query(collection ->
                 collection.countDocuments(eq(entityMapper.getIdFieldName(), id), new CountOptions().limit(1))
         ).thenApply(c -> c > 0);
     }
 
     @Override
     public @NotNull CompletableFuture<T> save(final @NonNull T entity) {
-        return query(collection ->
+        return queryEngine.query(collection ->
                 collection.replaceOne(
                         eq(entityMapper.getIdFieldName(), entityMapper.getId(entity)),
                         entity,
@@ -66,19 +66,19 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
 
     @Override
     protected @NotNull CompletableFuture<?> deleteImpl(final @NonNull ID id) {
-        return query(collection ->
+        return queryEngine.query(collection ->
                 collection.deleteOne(eq(entityMapper.getIdFieldName(), id))
         );
     }
 
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAll() {
-        return queryMany(MongoCollection::find);
+        return queryEngine.queryMany(MongoCollection::find);
     }
 
     @Override
     protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
-        return queryMany(query -> query.find(in(entityMapper.getIdFieldName(), ids)));
+        return queryEngine.queryMany(query -> query.find(in(entityMapper.getIdFieldName(), ids)));
     }
 
     @Override
@@ -90,49 +90,20 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
                         new ReplaceOptions().upsert(true)
                 ))
                 .collect(Collectors.toList());
-        return query(collection -> collection.bulkWrite(writeModels))
+        return queryEngine.query(collection -> collection.bulkWrite(writeModels))
                 .thenApply(result -> entities);
     }
 
     @Override
     protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids) {
-        return query(collection ->
+        return queryEngine.query(collection ->
                 collection.deleteMany(in(entityMapper.getIdFieldName(), ids))
         );
     }
 
     @Override
     public @NotNull CompletableFuture<Long> count() {
-        return query(MongoCollection::countDocuments);
-    }
-
-    /**
-     * Executes a general query and returns all the results.
-     *
-     * @param <R>           the type of the results
-     * @param queryFunction the query function
-     * @return the results
-     */
-    protected <R> @NotNull CompletableFuture<Collection<R>> queryMany(
-            final @NotNull Function<MongoCollection<T>, Publisher<R>> queryFunction
-    ) {
-        return Flux.from(queryFunction.apply(collection))
-                .collectList()
-                .toFuture()
-                .thenApply(l -> l);
-    }
-
-    /**
-     * Executes a general query and returns the result.
-     *
-     * @param <R>           the type of the result
-     * @param queryFunction the query
-     * @return the result
-     */
-    protected <R> @NotNull CompletableFuture<R> query(
-            final @NotNull Function<MongoCollection<T>, Publisher<R>> queryFunction
-    ) {
-        return Mono.from(queryFunction.apply(collection)).toFuture();
+        return queryEngine.query(MongoCollection::countDocuments);
     }
 
 }
