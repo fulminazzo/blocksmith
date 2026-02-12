@@ -13,7 +13,7 @@ subprojects {
         api(project(":$projectName"))
 
         val baseProjectName = "base"
-        if (project.name != baseProjectName)
+        if (!project.name.endsWith(baseProjectName))
             api(project(":$projectName:$projectName-$baseProjectName"))
 
     }
