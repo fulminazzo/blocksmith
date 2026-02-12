@@ -1,10 +1,10 @@
 package it.fulminazzo.blocksmith.data.entity;
 
+import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
-import org.joor.ReflectException;
 
 import java.util.function.Function;
 
@@ -51,17 +51,14 @@ public final class EntityMapper<T, ID> {
             final @NotNull Class<T> type,
             final @NotNull String idFieldName
     ) {
-        try {
-            Reflect.onClass(type).field(idFieldName);
-            return create(
-                    type,
-                    e -> Reflect.on(e).field(idFieldName).get()
-            );
-        } catch (ReflectException e) {
+        if (ReflectionUtils.getInstanceField(type, idFieldName).isEmpty())
             throw new IllegalArgumentException(String.format("Could not find field '%s' in %s",
                     idFieldName, type.getCanonicalName())
             );
-        }
+        return create(
+                type,
+                e -> Reflect.on(e).field(idFieldName).get()
+        );
     }
 
     /**
