@@ -8,12 +8,15 @@ import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.api.async.RedisServerAsyncCommands;
 import it.fulminazzo.blocksmith.data.AbstractRepository;
 import it.fulminazzo.blocksmith.data.Repository;
+import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -24,18 +27,23 @@ import java.util.stream.Collectors;
  * @param <T>  the type of the data
  * @param <ID> the type of the id of the data (will be used as file names)
  */
-@RequiredArgsConstructor
 public class RedisRepository<T, ID> extends AbstractRepository<T, ID> {
     private final @NotNull StatefulRedisConnection<String, String> connection;
-    private final @NotNull Function<T, ID> idMapper;
-    private final @NotNull Class<T> dataType;
     protected final @NotNull Mapper mapper;
+
+    protected RedisRepository(final @NotNull StatefulRedisConnection<String, String> connection,
+                              final @NotNull EntityMapper<T, ID> entityMapper,
+                              final @NotNull Mapper mapper) {
+        super(entityMapper);
+        this.connection = connection;
+        this.mapper = mapper;
+    }
 
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
         return query(async -> async.get(id.toString()))
                 .thenApply(Optional::ofNullable)
-                .thenApply(o -> o.map(s -> mapper.deserialize(s, dataType)));
+                .thenApply(o -> o.map(s -> mapper.deserialize(s, entityMapper.getType())));
     }
 
     @Override
@@ -47,7 +55,7 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID> {
     @Override
     public @NotNull CompletableFuture<T> save(final @NotNull T data) {
         return query(async -> async.set(
-                idMapper.apply(data).toString(),
+                entityMapper.getId(data).toString(),
                 mapper.serialize(data)
         )).thenApply(s -> data);
     }
@@ -71,7 +79,7 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID> {
     protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entries) {
         return query(async -> async.mset(entries.stream()
                 .collect(Collectors.toMap(
-                        t -> idMapper.apply(t).toString(),
+                        t -> entityMapper.getId(t).toString(),
                         mapper::serialize
                 )))
         ).thenApply(s -> entries);
@@ -101,7 +109,7 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID> {
         ).thenApply(l -> l.stream()
                 .filter(KeyValue::hasValue)
                 .map(KeyValue::getValue)
-                .map(v -> mapper.deserialize(v, dataType))
+                .map(v -> mapper.deserialize(v, entityMapper.getType()))
                 .collect(Collectors.toList())
         );
     }

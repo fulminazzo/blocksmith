@@ -7,8 +7,7 @@ import com.mongodb.client.model.WriteModel;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import it.fulminazzo.blocksmith.data.AbstractRepository;
 import it.fulminazzo.blocksmith.data.Repository;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.reactivestreams.Publisher;
@@ -31,23 +30,26 @@ import static com.mongodb.client.model.Filters.in;
  * @param <T>  the type of the data
  * @param <ID> the type of the id of the data (should be unique)
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
     private final @NotNull MongoCollection<T> collection;
-    private final @NotNull String idFieldName;
-    private final @NotNull Function<T, ID> idMapper;
+
+    protected MongoRepository(final @NotNull MongoCollection<T> collection,
+                              final @NotNull EntityMapper<T, ID> entityMapper) {
+        super(entityMapper);
+        this.collection = collection;
+    }
 
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NonNull ID id) {
         return query(collection ->
-                collection.find(eq(idFieldName, id))
+                collection.find(eq(entityMapper.getIdFieldName(), id))
         ).thenApply(Optional::ofNullable);
     }
 
     @Override
     public @NotNull CompletableFuture<Boolean> existsById(final @NonNull ID id) {
         return query(collection ->
-                collection.countDocuments(eq(idFieldName, id), new CountOptions().limit(1))
+                collection.countDocuments(eq(entityMapper.getIdFieldName(), id), new CountOptions().limit(1))
         ).thenApply(c -> c > 0);
     }
 
@@ -55,7 +57,7 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
     public @NotNull CompletableFuture<T> save(final @NonNull T data) {
         return query(collection ->
                 collection.replaceOne(
-                        eq(idFieldName, idMapper.apply(data)),
+                        eq(entityMapper.getIdFieldName(), entityMapper.getId(data)),
                         data,
                         new ReplaceOptions().upsert(true)
                 )
@@ -65,7 +67,7 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
     @Override
     protected @NotNull CompletableFuture<?> deleteImpl(final @NonNull ID id) {
         return query(collection ->
-                collection.deleteOne(eq(idFieldName, id))
+                collection.deleteOne(eq(entityMapper.getIdFieldName(), id))
         );
     }
 
@@ -76,14 +78,14 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
 
     @Override
     protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
-        return queryMany(query -> query.find(in(idFieldName, ids)));
+        return queryMany(query -> query.find(in(entityMapper.getIdFieldName(), ids)));
     }
 
     @Override
     protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entries) {
         List<WriteModel<T>> writeModels = entries.stream()
                 .map(e -> new ReplaceOneModel<>(
-                        eq(idFieldName, idMapper.apply(e)),
+                        eq(entityMapper.getIdFieldName(), entityMapper.getId(e)),
                         e,
                         new ReplaceOptions().upsert(true)
                 ))
@@ -95,7 +97,7 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID> {
     @Override
     protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids) {
         return query(collection ->
-                collection.deleteMany(in(idFieldName, ids))
+                collection.deleteMany(in(entityMapper.getIdFieldName(), ids))
         );
     }
 

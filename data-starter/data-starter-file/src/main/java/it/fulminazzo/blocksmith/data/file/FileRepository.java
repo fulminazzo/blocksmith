@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
 import it.fulminazzo.blocksmith.data.AbstractRepository;
 import it.fulminazzo.blocksmith.data.Repository;
+import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.function.*;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -15,7 +16,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -27,31 +27,17 @@ import java.util.stream.Collectors;
 public class FileRepository<T, ID> extends AbstractRepository<T, ID> {
     protected final @NotNull ConfigurationAdapter adapter;
     private final @NotNull File dataDirectory;
-    private final @NotNull Function<T, ID> idMapper;
-    private final @NotNull Class<T> dataType;
     private final @NotNull Executor executor;
     private final @NotNull ConfigurationFormat format;
 
-    /**
-     * Instantiates a new File repository.
-     *
-     * @param dataDirectory the directory where the data will be stored
-     * @param dataType      the type of the data
-     * @param idMapper      the function to get the id from data
-     * @param executor      the executor
-     * @param logger        the logger
-     * @param format        the file format to use
-     */
     protected FileRepository(final @NotNull File dataDirectory,
-                             final @NotNull Class<T> dataType,
-                             final @NotNull Function<T, ID> idMapper,
+                             final @NotNull EntityMapper<T, ID> entityMapper,
                              final @NotNull Executor executor,
                              final @NotNull Logger logger,
                              final @NotNull ConfigurationFormat format) {
+        super(entityMapper);
         this.adapter = ConfigurationAdapter.newAdapter(logger, format);
         this.dataDirectory = dataDirectory;
-        this.idMapper = idMapper;
-        this.dataType = dataType;
         this.executor = executor;
         this.format = format;
     }
@@ -59,7 +45,7 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID> {
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
         return executeOnSingle(id, f -> {
-            if (f.exists()) return Optional.of(adapter.load(f, dataType));
+            if (f.exists()) return Optional.of(adapter.load(f, entityMapper.getType()));
             else return Optional.empty();
         });
     }
@@ -87,14 +73,14 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID> {
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAll() {
         return executeOnMany(f -> {
-            return adapter.load(f, dataType);
+            return adapter.load(f, entityMapper.getType());
         });
     }
 
     @Override
     protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
         return executeOnMany(ids, (f, i) -> {
-            return adapter.load(f, dataType);
+            return adapter.load(f, entityMapper.getType());
         });
     }
 
@@ -186,7 +172,7 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID> {
     ) {
         return execute(() -> {
             for (T data : entries) {
-                ID id = idMapper.apply(data);
+                ID id = entityMapper.getId(data);
                 File dataFile = getDataFile(id);
                 function.accept(dataFile, data);
             }
@@ -225,7 +211,7 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID> {
         return execute(() -> {
             final List<R> result = new ArrayList<>();
             for (T data : entries) {
-                ID id = idMapper.apply(data);
+                ID id = entityMapper.getId(data);
                 File dataFile = getDataFile(id);
                 result.add(function.apply(dataFile, data));
             }
@@ -323,7 +309,7 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID> {
             final @NotNull ConsumerException<File, IOException> function
     ) {
         return executeOnSingle(
-                idMapper.apply(data),
+                entityMapper.getId(data),
                 function
         );
     }
@@ -341,7 +327,7 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID> {
             final @NotNull FunctionException<File, R, IOException> function
     ) {
         return executeOnSingle(
-                idMapper.apply(data),
+                entityMapper.getId(data),
                 function
         );
     }

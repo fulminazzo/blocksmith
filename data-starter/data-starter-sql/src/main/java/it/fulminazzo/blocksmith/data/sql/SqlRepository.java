@@ -2,8 +2,7 @@ package it.fulminazzo.blocksmith.data.sql;
 
 import it.fulminazzo.blocksmith.data.AbstractRepository;
 import it.fulminazzo.blocksmith.data.Repository;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -27,20 +26,30 @@ import java.util.stream.Collectors;
  * @param <TB> the type of the table
  */
 @SuppressWarnings({"resource"})
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepository<T, ID> {
     private final @NotNull DSLContext context;
     protected final @NotNull TB table;
     protected final @NotNull Field<ID> idColumn;
-    private final @NotNull Class<T> dataType;
     private final @NotNull Executor executor;
+
+    protected SqlRepository(final @NotNull DSLContext context,
+                            final @NotNull TB table,
+                            final @NotNull Field<ID> idColumn,
+                            final @NotNull EntityMapper<T, ID> entityMapper,
+                            final @NotNull Executor executor) {
+        super(entityMapper);
+        this.context = context;
+        this.table = table;
+        this.idColumn = idColumn;
+        this.executor = executor;
+    }
 
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
         return query(dsl ->
                 dsl.selectFrom(table())
                         .where(idColumn.eq(id))
-                        .fetchOptionalInto(dataType)
+                        .fetchOptionalInto(entityMapper.getType())
         );
     }
 
@@ -63,7 +72,7 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
                     .doUpdate()
                     .set(record)
                     .returning()
-                    .fetchOneInto(dataType);
+                    .fetchOneInto(entityMapper.getType());
         });
     }
 
@@ -80,7 +89,7 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
     public @NotNull CompletableFuture<Collection<T>> findAll() {
         return query(dsl ->
                 dsl.selectFrom(table())
-                        .fetchInto(dataType)
+                        .fetchInto(entityMapper.getType())
         );
     }
 
@@ -88,7 +97,7 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
     protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
         return query(dsl -> dsl.selectFrom(table())
                 .where(idColumn.in(ids))
-                .fetchInto(dataType)
+                .fetchInto(entityMapper.getType())
         );
     }
 
