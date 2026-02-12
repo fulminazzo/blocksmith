@@ -15,17 +15,17 @@ class EntityMapperTest extends Specification {
         id == expectedId
 
         where:
-        mapper                                                   | object       || expectedType  | expectedId
-        EntityMapper.create(ValidIdEntity)                       |
-                new ValidIdEntity(UUID.nameUUIDFromBytes('Alex'.bytes), 'Alex') || ValidIdEntity | UUID.nameUUIDFromBytes('Alex'.bytes)
-        EntityMapper.create(IdFieldEntity)                       |
-                new IdFieldEntity(UUID.nameUUIDFromBytes('Alex'.bytes), 'Alex') || IdFieldEntity | UUID.nameUUIDFromBytes('Alex'.bytes)
-        EntityMapper.create(SimpleEntity, 'uuid')                |
-                new SimpleEntity(UUID.nameUUIDFromBytes('Alex'.bytes), 'Alex')  || SimpleEntity  | UUID.nameUUIDFromBytes('Alex'.bytes)
-        EntityMapper.create(SimpleEntity, 'name')                |
-                new SimpleEntity(UUID.nameUUIDFromBytes('Alex'.bytes), 'Alex')  || SimpleEntity  | 'Alex'
-        EntityMapper.create(SimpleEntity, SimpleEntity::getUuid) |
-                new SimpleEntity(UUID.nameUUIDFromBytes('Alex'.bytes), 'Alex')  || SimpleEntity  | UUID.nameUUIDFromBytes('Alex'.bytes)
+        mapper                                                           | object || expectedType  | expectedId
+        EntityMapper.create(ValidIdEntity)                               |
+                new ValidIdEntity(UUID.nameUUIDFromBytes('Alex'.bytes), 'Alex')   || ValidIdEntity | UUID.nameUUIDFromBytes('Alex'.bytes)
+        EntityMapper.create(IdFieldEntity)                               |
+                new IdFieldEntity(UUID.nameUUIDFromBytes('Alex'.bytes), 'Alex')   || IdFieldEntity | UUID.nameUUIDFromBytes('Alex'.bytes)
+        EntityMapper.create(SimpleEntity, 'uuid')                        |
+                new SimpleEntity(UUID.nameUUIDFromBytes('Alex'.bytes), 'Alex')    || SimpleEntity  | UUID.nameUUIDFromBytes('Alex'.bytes)
+        EntityMapper.create(SimpleEntity, 'name')                        |
+                new SimpleEntity(UUID.nameUUIDFromBytes('Alex'.bytes), 'Alex')    || SimpleEntity  | 'Alex'
+        EntityMapper.create(SimpleEntity, 'uuid', SimpleEntity::getUuid) |
+                new SimpleEntity(UUID.nameUUIDFromBytes('Alex'.bytes), 'Alex')    || SimpleEntity  | UUID.nameUUIDFromBytes('Alex'.bytes)
     }
 
     def 'test that create(Class) throws IllegalArgumentException on #type'() {
