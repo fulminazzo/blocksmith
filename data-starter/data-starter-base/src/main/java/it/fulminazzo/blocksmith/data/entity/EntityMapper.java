@@ -14,7 +14,7 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EntityMapper<T, ID> {
-    private final @NotNull Class<T> dataType;
+    private final @NotNull Class<T> entityType;
     private final @NotNull Function<T, ID> idMapper;
 
     /**
@@ -23,7 +23,7 @@ public final class EntityMapper<T, ID> {
      * @return the type
      */
     public @NotNull Class<T> getType() {
-        return dataType;
+        return entityType;
     }
 
     /**
@@ -40,7 +40,7 @@ public final class EntityMapper<T, ID> {
      * Creates a new entity mapper.
      *
      * @param <T>      the type of the entity
-     * @param <ID>     the type of the id of the data (should be unique)
+     * @param <ID>     the type of the id of the entity (should be unique)
      * @param type     the entity Java class
      * @param idMapper the function to get the ID of the entity
      * @return the entity mapper
