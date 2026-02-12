@@ -6,10 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -19,8 +16,29 @@ import java.util.stream.Collectors;
 public final class ReflectionUtils {
 
     /**
-     * Returns all the fields in the given class (or superclasses)
-     * that are not static.
+     * Returns the field with the name in the given class (or superclasses) that is not static.
+     *
+     * @param container the container
+     * @param fieldName the field name
+     * @return the field (if found)
+     */
+    public static @NotNull Optional<Field> getInstanceField(final @NotNull Class<?> container,
+                                                            final @NotNull String fieldName) {
+        Class<?> curr = container;
+        while (curr != null && !curr.equals(Object.class)) {
+            try {
+                Field field = curr.getDeclaredField(fieldName);
+                if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers()))
+                    return Optional.of(field);
+            } catch (NoSuchFieldException ignored) {
+            }
+            curr = curr.getSuperclass();
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Returns all the fields in the given class (or superclasses) that are not static.
      *
      * @param container the container of the fields
      * @return the fields
