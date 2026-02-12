@@ -14,10 +14,12 @@ import java.util.concurrent.CompletableFuture;
  *
  * @param <T>  the type of the entities
  * @param <ID> the type of the id of the entities (should be unique)
+ * @param <E>  the type of the {@link QueryEngine} responsible for executing internal queries
  */
 @RequiredArgsConstructor
 @SuppressWarnings("DeprecatedIsStillUsed")
-public abstract class AbstractRepository<T, ID> implements Repository<T, ID> {
+public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> implements Repository<T, ID> {
+    protected final @NotNull E queryEngine;
     protected final @NotNull EntityMapper<T, ID> entityMapper;
 
     @Override
