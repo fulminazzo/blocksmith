@@ -9,6 +9,7 @@ import org.jooq.SQLDialect;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 /**
@@ -26,7 +27,8 @@ import java.util.stream.Collectors;
  *                 // defaults to database value
  *                 .schemaName("schema") // INIT=CREATE SCHEMA IF NOT EXISTS schema\;SET SCHEMA schema
  *                 .build();
- *          }</pre>
+ *          }
+ *          </pre>
  *     </li>
  *     <li>in memory database:
  *          <pre>{@code
@@ -36,7 +38,8 @@ import java.util.stream.Collectors;
  *                 .memory() // mem:test
  *                 .preventMemoryLoss() // DB_CLOSE_DELAY=-1
  *                 .build();
- *          }</pre>
+ *          }
+ *          </pre>
  *     </li>
  *     <li>file based database:
  *          <pre>{@code
@@ -47,7 +50,8 @@ import java.util.stream.Collectors;
  *                 .allowSimultaneousFileConnections() // AUTO_SERVER=true
  *                 .preventConnectionOnNonExistingFile() // IFEXISTS=true
  *                 .build();
- *          }</pre>
+ *          }
+ *          </pre>
  *     </li>
  *     <li>server based database:
  *          <pre>{@code
@@ -56,7 +60,8 @@ import java.util.stream.Collectors;
  *                 .h2()
  *                 .server("localhost", 3306) // currently supports only tcp
  *                 .build();
- *          }</pre>
+ *          }
+ *          </pre>
  *     </li>
  * </ul>
  */
@@ -73,10 +78,12 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      *
      * @param config   the config
      * @param database the database
+     * @param executor the executor
      */
     H2DataSourceBuilder(final @NotNull HikariConfig config,
-                        final @Nullable String database) {
-        super(config, database);
+                        final @Nullable String database,
+                        final @Nullable ExecutorService executor) {
+        super(config, database, executor);
     }
 
     @Override
