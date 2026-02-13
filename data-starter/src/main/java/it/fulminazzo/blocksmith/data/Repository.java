@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * A general repository for handling entities in a data source.
+ * A general repository for handling entities in a datasource.
  *
  * @param <T>  the type of the entities
  * @param <ID> the type of the id of the entities (should be unique)

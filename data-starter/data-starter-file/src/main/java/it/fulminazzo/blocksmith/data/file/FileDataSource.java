@@ -15,6 +15,39 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * Implementation of {@link RepositoryDataSource} for file-based repositories.
+ * Examples:
+ * <ul>
+ *     <li>creation:
+ *         <pre>{@code
+ *         ExecutorService executor = ...;
+ *         FileDataSource dataSource = FileDataSource.create(executor);
+ *         }</pre>
+ *     </li>
+ *     <li>creating new repository:
+ *         <pre>{@code
+ *         FileDataSource dataSource = ...;
+ *         Class<?> dataType = ...;
+ *         File dataDirectory = ...;
+ *         Logger logger = LoggerFactory.getLogger(FileRepository.class);
+ *         ConfigurationFormat format = ConfigurationFormat.YAML;
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 dataType,
+ *                 dataDirectory,
+ *                 logger,
+ *                 format
+ *         );
+ *         }</pre>
+ *         or, for more control:
+ *         <pre>{@code
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 EntityMapper.create(dataType, "idFieldName"),
+ *                 dataDirectory,
+ *                 logger,
+ *                 format
+ *         );
+ *         }</pre>
+ *     </li>
+ * </ul>
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class FileDataSource implements RepositoryDataSource {

@@ -9,17 +9,34 @@ import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Redis data source for handling connections and create Redis repositories.
+ * Redis datasource for handling connections and create Redis repositories.
  * <br>
- * Example usage:
- * <pre>{@code
- * RedisDataSource dataSource = RedisDataSource.builder()
- *         .encrypted(true) // defaults to false
- *         .username("username")
- *         .password("SuperSecurePassword")
- *         .build();
- * }*</pre>
- * Check {@link RedisDataSourceBuilder} for more.
+ * Examples:
+ * <ul>
+ *     <li>creation:
+ *         <pre>{@code
+ *         RedisDataSource dataSource = RedisDataSource.builder()
+ *                 .uri(u -> u
+ *                         .withHost("127.0.0.1") // defaults to "0.0.0.0"
+ *                         .withPort(6379) // defaults to 6379
+ *                         .withPassword("SuperSecurePassword")
+ *                         .withSsl(true)
+ *                 )
+ *                 .build();
+ *         }</pre>
+ *     </li>
+ *     <li>creating new repository:
+ *         <pre>{@code
+ *         RedisDataSource dataSource = ...;
+ *         Class<?> dataType = ...;
+ *         Repository<?, ?> = dataSource.newRepository(dataType);
+ *         }</pre>
+ *         or, for more control:
+ *         <pre>{@code
+ *         Repository<?, ?> = dataSource.newRepository(EntityMapper.create(dataType, "idFieldName"));
+ *         }</pre>
+ *     </li>
+ * </ul>
  */
 public final class RedisDataSource implements RepositoryDataSource {
     private final @NotNull RedisClient redisClient;
@@ -28,7 +45,7 @@ public final class RedisDataSource implements RepositoryDataSource {
     private final @NotNull Mapper mapper;
 
     /**
-     * Instantiates a new Redis data source.
+     * Instantiates a new Redis datasource.
      *
      * @param redisClient the redis client
      * @param mapper      the mapper

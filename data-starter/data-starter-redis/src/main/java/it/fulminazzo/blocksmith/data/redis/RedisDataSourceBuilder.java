@@ -17,12 +17,15 @@ import java.util.function.Consumer;
  * Example usage:
  * <pre>{@code
  * RedisDataSource dataSource = RedisDataSource.builder()
- *         .encrypted(true) // defaults to false
- *         .username("username")
- *         .password("password")
- *         .host("127.0.0.1") // defaults to "0.0.0.0"
- *         .port(1339) // defaults to 6379
- *         .database(2) // defaults to 0
+ *         .uri(u -> u
+ *                 .withHost("127.0.0.1") // defaults to "0.0.0.0"
+ *                 .withPort(6379) // defaults to 6379
+ *         )
+ *         .clientOptions(c -> c
+ *                 .autoReconnect(true)
+ *                 .pingBeforeActivateConnection(true)
+ *                 .requestQueueSize(4096)
+ *         )
  *         .socketOptions(s -> s
  *                 .connectTimeout(Duration.ofSeconds(10))
  *                 .keepAlive(
@@ -33,11 +36,6 @@ import java.util.function.Consumer;
  *                                 .enable()
  *                                 .build()
  *                 )
- *         )
- *         .clientOptions(c -> c
- *                 .autoReconnect(true)
- *                 .pingBeforeActivateConnection(true)
- *                 .requestQueueSize(4096)
  *         )
  *         .mapper(Mappers.SERIALIZABLE) // defaults to JSON
  *         .build();
@@ -52,7 +50,7 @@ public final class RedisDataSourceBuilder implements RepositoryDataSourceBuilder
     private @NotNull Mapper mapper = Mappers.JSON;
 
     /**
-     * Instantiates a new Redis data source builder.
+     * Instantiates a new Redis datasource builder.
      */
     RedisDataSourceBuilder() {
         this.redisURIbuilder = RedisURI.builder(RedisURI.create("redis://0.0.0.0:6379/0"));
