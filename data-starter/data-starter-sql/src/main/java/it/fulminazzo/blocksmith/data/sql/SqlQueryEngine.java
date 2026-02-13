@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.sql;
 
 import it.fulminazzo.blocksmith.data.QueryEngine;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -24,8 +25,7 @@ import java.util.function.BiFunction;
  * @param <ID> the type of the id of the entities
  * @param <TB> the type of the table containing the entities
  */
-//TODO: construction logic
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class SqlQueryEngine<T, ID, TB> implements QueryEngine<T, ID> {
     private final @NotNull DSLContext context;
     @Getter
