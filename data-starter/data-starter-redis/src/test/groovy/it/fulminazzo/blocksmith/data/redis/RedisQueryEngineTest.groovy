@@ -27,6 +27,12 @@ class RedisQueryEngineTest extends Specification {
         client = RedisClient.create("redis://localhost:$serverPort")
         connection = client.connect()
 
+        connection.async().mset(
+                [Users.SAVED1, Users.SAVED2].collectEntries {
+                    [(it.id.toString()): mapper.serialize(it)]
+                }
+        )
+
         engine = new RedisQueryEngine<>(
                 connection,
                 EntityMapper.create(User),
