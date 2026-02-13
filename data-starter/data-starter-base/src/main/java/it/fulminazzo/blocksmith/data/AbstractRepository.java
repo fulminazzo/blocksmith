@@ -6,7 +6,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * Abstract implementation of {@link Repository} with common checks
@@ -39,7 +41,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
         if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
-        return findAllByIdImpl(ids);
+        return findAllByIdImpl(ids.stream().filter(Objects::nonNull).collect(Collectors.toList()));
     }
 
     /**
@@ -47,7 +49,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
      *
      * @param ids the ids
      * @return the data
-     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY
+     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY AND ELEMENTS NOT <code>null</code>
      */
     @Deprecated
     protected abstract @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids);
@@ -55,7 +57,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
     @Override
     public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entities) {
         if (entities.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
-        return saveAllImpl(entities);
+        return saveAllImpl(entities.stream().filter(Objects::nonNull).collect(Collectors.toList()));
     }
 
     /**
@@ -63,7 +65,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
      *
      * @param entities the entities
      * @return the saved entities (in case values are changed)
-     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY
+     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY AND ELEMENTS NOT <code>null</code>
      */
     @Deprecated
     protected abstract @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities);
@@ -71,7 +73,8 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
     @Override
     public @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<ID> ids) {
         if (ids.isEmpty()) return CompletableFuture.completedFuture(null);
-        return deleteAllImpl(ids).thenApply(r -> null);
+        return deleteAllImpl(ids.stream().filter(Objects::nonNull).collect(Collectors.toList()))
+                .thenApply(r -> null);
     }
 
     /**
@@ -79,7 +82,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
      *
      * @param ids the ids
      * @return nothing
-     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY
+     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY AND ELEMENTS NOT <code>null</code>
      */
     @Deprecated
     protected abstract @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids);
