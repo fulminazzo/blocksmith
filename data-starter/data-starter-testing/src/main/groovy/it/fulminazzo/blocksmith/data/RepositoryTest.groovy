@@ -11,6 +11,11 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         insert(Users.SAVED1)
         insert(Users.SAVED2)
     }
+    
+    void clearData() {
+        remove(Users.SAVED1.id)
+        remove(Users.SAVED2.id)
+    }
 
     def 'test that findById returns #expected'() {
         when:
@@ -47,59 +52,59 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         Users.NEW2 || false
     }
 
-    def 'test that save correctly updates #data'() {
+    def 'test that save correctly updates #entity'() {
         when:
-        def saved = repository.save(data).get()
+        def saved = repository.save(entity).get()
 
         then:
-        saved == data
+        saved == entity
 
         when:
-        def actual = repository.findById(data.id).get()
+        def actual = repository.findById(entity.id).get()
 
         then:
         actual.isPresent()
-        actual.get() == data
+        actual.get() == entity
 
         where:
-        data << [
+        entity << [
                 new User(Users.SAVED1.id, Users.SAVED1.username + '_', Users.SAVED1.age + 1),
                 new User(Users.SAVED2.id, Users.SAVED2.username + '_', Users.SAVED2.age + 1)
         ]
     }
 
-    def 'test that save correctly saves #data'() {
+    def 'test that save correctly saves #entity'() {
         expect:
-        !exists(data.id)
+        !exists(entity.id)
 
         when:
-        def saved = repository.save(data).get()
+        def saved = repository.save(entity).get()
 
         then:
-        saved == data
+        saved == entity
 
         and:
-        exists(data.id)
+        exists(entity.id)
 
         where:
-        data << [Users.NEW1, Users.NEW2]
+        entity << [Users.NEW1, Users.NEW2]
     }
 
-    def 'test that delete correctly deletes #data'() {
+    def 'test that delete correctly deletes #entity'() {
         expect:
-        exists(data.id)
+        exists(entity.id)
 
         when:
-        repository.delete(data.id).get()
+        repository.delete(entity.id).get()
 
         then:
-        !exists(data.id)
+        !exists(entity.id)
 
         where:
-        data << [Users.SAVED1, Users.SAVED2]
+        entity << [Users.SAVED1, Users.SAVED2]
     }
 
-    def 'test that delete does not throw on not existing data'() {
+    def 'test that delete does not throw on not existing entity'() {
         when:
         repository.delete(3L).get()
 
@@ -107,7 +112,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         noExceptionThrown()
     }
 
-    def 'test that findAll returns all loaded data'() {
+    def 'test that findAll returns all loaded entity'() {
         when:
         def result = repository.findAll().get()
 
@@ -115,7 +120,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         result.sort() == [Users.SAVED1, Users.SAVED2].sort()
     }
 
-    def 'test that findAllById correctly returns all data'() {
+    def 'test that findAllById correctly returns all entity'() {
         given:
         def expected = [Users.SAVED1, Users.SAVED2]
 
@@ -126,7 +131,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         actual == expected
     }
 
-    def 'test that findAllById does not throw on null data'() {
+    def 'test that findAllById does not throw on null entity'() {
         given:
         def expected = [Users.SAVED1, Users.SAVED2]
 
@@ -148,97 +153,97 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         actual == expected
     }
 
-    def 'test that saveAll correctly updates all data'() {
+    def 'test that saveAll correctly updates all entity'() {
         given:
-        def data = [
+        def entity = [
                 new User(Users.SAVED1.id, Users.SAVED1.username + '_', Users.SAVED1.age + 1),
                 new User(Users.SAVED2.id, Users.SAVED2.username + '_', Users.SAVED2.age + 1)
         ]
 
         when:
-        def saved = repository.saveAll(data).get()
+        def saved = repository.saveAll(entity).get()
 
         then:
-        saved == data
+        saved == entity
 
         when:
-        def actual = repository.findAllById(data.collect { it.id }).get()
+        def actual = repository.findAllById(entity.collect { it.id }).get()
 
         then:
-        actual == data
+        actual == entity
     }
 
-    def 'test that saveAll correctly saves all data'() {
+    def 'test that saveAll correctly saves all entity'() {
         given:
-        def data = [Users.NEW1, Users.NEW2]
+        def entity = [Users.NEW1, Users.NEW2]
 
         expect:
-        data.every { !exists(it.id) }
+        entity.every { !exists(it.id) }
 
         when:
-        def saved = repository.saveAll(data).get()
+        def saved = repository.saveAll(entity).get()
 
         then:
-        saved.sort() == data.sort()
+        saved.sort() == entity.sort()
 
         and:
-        data.every { exists(it.id) }
+        entity.every { exists(it.id) }
     }
 
-    def 'test that saveAll does not throw on null data'() {
+    def 'test that saveAll does not throw on null entity'() {
         given:
-        def data = [Users.NEW1, Users.NEW2]
+        def entity = [Users.NEW1, Users.NEW2]
 
         expect:
-        data.every { !exists(it.id) }
+        entity.every { !exists(it.id) }
 
         when:
         def saved = repository.saveAll([null, Users.NEW1, null, Users.NEW2, null]).get()
 
         then:
-        saved.sort() == data.sort()
+        saved.sort() == entity.sort()
 
         and:
-        data.every { exists(it.id) }
+        entity.every { exists(it.id) }
     }
 
     def 'test that saveAll of empty returns empty'() {
         given:
-        def data = []
+        def entity = []
 
         when:
-        def saved = repository.saveAll(data).get()
+        def saved = repository.saveAll(entity).get()
 
         then:
-        saved == data
+        saved == entity
     }
 
-    def 'test that deleteAll correctly deletes all data'() {
+    def 'test that deleteAll correctly deletes all entity'() {
         given:
-        def data = [Users.SAVED1, Users.SAVED2]
+        def entity = [Users.SAVED1, Users.SAVED2]
 
         expect:
-        data.every { exists(it.id) }
+        entity.every { exists(it.id) }
 
         when:
         repository.deleteAll([Users.SAVED1.id, Users.SAVED2.id, 3L])
 
         then:
-        data.every { !exists(it.id) }
+        entity.every { !exists(it.id) }
     }
 
-    def 'test that deleteAll does not throw on null data'() {
+    def 'test that deleteAll does not throw on null entity'() {
         given:
-        def data = [Users.SAVED1, Users.SAVED2]
+        def entity = [Users.SAVED1, Users.SAVED2]
 
         expect:
-        data.every { exists(it.id) }
+        entity.every { exists(it.id) }
 
         when:
         repository.deleteAll([null, Users.SAVED1.id, null, Users.SAVED2.id, null])
 
         then:
-        data.every { !exists(it.id) }
+        entity.every { !exists(it.id) }
     }
 
     def 'test that deleteAll of empty does not throw'() {
@@ -249,7 +254,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         noExceptionThrown()
     }
 
-    def 'test that count correctly returns number of data'() {
+    def 'test that count correctly returns number of entity'() {
         when:
         def actual = repository.count().get()
 
@@ -260,18 +265,25 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
     abstract @NotNull R initializeRepository()
 
     /**
-     * Checks if a data with the given id exists in the repository.
+     * Checks if a entity with the given id exists in the repository.
      *
-     * @param id the id
+     * @param id the entity id
      * @return <code>true</code> if it does
      */
     abstract boolean exists(final @NotNull Long id)
 
     /**
-     * Adds the given data to the repository.
+     * Adds the given entity to the repository.
      *
-     * @param data the data
+     * @param entity the entity
      */
-    abstract void insert(final @NotNull User data);
+    abstract void insert(final @NotNull User entity);
+
+    /**
+     * Removes the entity with the given id from the repository.
+     *
+     * @param entity the entity id
+     */
+    abstract void remove(final @NotNull Long id);
 
 }
