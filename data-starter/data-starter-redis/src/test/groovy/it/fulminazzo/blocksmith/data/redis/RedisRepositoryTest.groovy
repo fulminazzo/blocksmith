@@ -29,9 +29,9 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
     }
 
     void cleanup() {
-        connection.close()
-        client.shutdown()
-        server.stop()
+        if (connection != null) connection.close()
+        if (client != null) client.shutdown()
+        if (server != null) server.stop()
     }
 
     @Override
