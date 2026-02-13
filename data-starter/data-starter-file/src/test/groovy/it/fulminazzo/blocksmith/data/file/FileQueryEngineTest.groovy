@@ -27,7 +27,7 @@ class FileQueryEngineTest extends Specification {
     }
 
     void cleanup() {
-        if (executor != null) executor.shutdown()
+        executor.shutdown()
     }
 
     def 'test that query throws CompletionException on IOException'() {
