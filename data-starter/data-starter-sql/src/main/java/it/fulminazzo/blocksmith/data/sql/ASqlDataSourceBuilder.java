@@ -24,7 +24,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
     protected final @NotNull HikariConfig config;
 
     protected @Nullable String database;
-    private @Nullable ExecutorService executor;
+    protected @Nullable ExecutorService executor;
 
     @Override
     public @NotNull SqlDataSource build() {
