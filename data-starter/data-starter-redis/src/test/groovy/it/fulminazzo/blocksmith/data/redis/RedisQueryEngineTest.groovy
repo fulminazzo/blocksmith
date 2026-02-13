@@ -14,13 +14,13 @@ class RedisQueryEngineTest extends Specification {
     private static final Mapper mapper = Mappers.JSON
     private static final int serverPort = 16380
 
-    private RedisServer server
-    private RedisClient client
-    private StatefulRedisConnection<String, String> connection
+    private static RedisServer server
+    private static RedisClient client
+    private static StatefulRedisConnection<String, String> connection
 
-    private RedisQueryEngine<User, Long> engine
+    private static RedisQueryEngine<User, Long> engine
 
-    void setup() {
+    void setupSpec() {
         server = new RedisServer(serverPort)
         server.start()
 
@@ -40,7 +40,7 @@ class RedisQueryEngineTest extends Specification {
         )
     }
 
-    void cleanup() {
+    void cleanupSpec() {
         if (connection != null) connection.close()
         if (client != null) client.shutdown()
         if (server != null) server.stop()
