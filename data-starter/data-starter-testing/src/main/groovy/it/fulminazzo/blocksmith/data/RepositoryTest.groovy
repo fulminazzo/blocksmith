@@ -52,14 +52,6 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         UPDATE2 || false
     }
 
-    def 'test that findAll returns all loaded data'() {
-        when:
-        def result = repository.findAll().get()
-
-        then:
-        result.sort() == [FIRST, SECOND].sort()
-    }
-
     def 'test that save correctly updates #data'() {
         when:
         def saved = repository.save(data).get()
@@ -112,12 +104,39 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         data << [FIRST, SECOND]
     }
 
+    def 'test that delete does not throw on not existing data'() {
+        when:
+        repository.delete(3L).get()
+
+        then:
+        noExceptionThrown()
+    }
+
+    def 'test that findAll returns all loaded data'() {
+        when:
+        def result = repository.findAll().get()
+
+        then:
+        result.sort() == [FIRST, SECOND].sort()
+    }
+
     def 'test that findAllById correctly returns all data'() {
         given:
         def expected = [FIRST, SECOND]
 
         when:
-        def actual = repository.findAllById(expected.collect { it.id }).get()
+        def actual = repository.findAllById([FIRST.id, SECOND.id, 3L]).get()
+
+        then:
+        actual == expected
+    }
+
+    def 'test that findAllById does not throw on null data'() {
+        given:
+        def expected = [FIRST, SECOND]
+
+        when:
+        def actual = repository.findAllById([null, FIRST.id, null, SECOND.id, null]).get()
 
         then:
         actual == expected
@@ -171,6 +190,23 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         data.every { exists(it.id) }
     }
 
+    def 'test that saveAll does not throw on null data'() {
+        given:
+        def data = [UPDATE1, UPDATE2]
+
+        expect:
+        data.every { !exists(it.id) }
+
+        when:
+        def saved = repository.saveAll([null, UPDATE1, null, UPDATE2, null]).get()
+
+        then:
+        saved.sort() == data.sort()
+
+        and:
+        data.every { exists(it.id) }
+    }
+
     def 'test that saveAll of empty returns empty'() {
         given:
         def data = []
@@ -190,7 +226,21 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         data.every { exists(it.id) }
 
         when:
-        repository.deleteAll(data.collect { it.id })
+        repository.deleteAll([FIRST.id, SECOND.id, 3L])
+
+        then:
+        data.every { !exists(it.id) }
+    }
+
+    def 'test that deleteAll does not throw on null data'() {
+        given:
+        def data = [FIRST, SECOND]
+
+        expect:
+        data.every { exists(it.id) }
+
+        when:
+        repository.deleteAll([null, FIRST.id, null, SECOND.id, null])
 
         then:
         data.every { !exists(it.id) }
