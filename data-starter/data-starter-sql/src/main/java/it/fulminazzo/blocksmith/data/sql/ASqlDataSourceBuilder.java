@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.sql;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import it.fulminazzo.blocksmith.data.RepositoryDataSourceBuilder;
 import it.fulminazzo.blocksmith.data.util.ValidationUtils;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -19,17 +20,13 @@ import java.util.concurrent.ExecutorService;
  */
 @SuppressWarnings("unchecked")
 @AllArgsConstructor
-abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
+abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> implements RepositoryDataSourceBuilder<SqlDataSource> {
     protected final @NotNull HikariConfig config;
 
     protected @Nullable String database;
     private @Nullable ExecutorService executor;
 
-    /**
-     * Creates a new SQL data source
-     *
-     * @return the SQL data source
-     */
+    @Override
     public @NotNull SqlDataSource build() {
         config.setJdbcUrl(getJdbcUrl());
         ExecutorService executor = Objects.requireNonNull(this.executor, "executor has not been specified yet");
