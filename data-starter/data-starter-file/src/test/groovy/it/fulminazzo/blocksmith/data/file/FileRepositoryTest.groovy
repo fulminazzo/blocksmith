@@ -21,11 +21,13 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
 
     private static final ExecutorService executor = Executors.newSingleThreadExecutor()
 
-    void setup() {
+    void setupSpec() {
         WORKING_DIR.deleteDir()
         WORKING_DIR.mkdirs()
         new File(WORKING_DIR, 'tmp').createNewFile()
+    }
 
+    void setup() {
         setupRepository()
     }
 
