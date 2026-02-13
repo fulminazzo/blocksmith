@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
-import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,13 +17,11 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
 /**
- * {@link DataSource} for general SQL databases.
+ * SQL datasource for handling connection and create repositories.
  * <br>
- * Provides methods to create SQL repositories.
- * <br>
- * Example usage:
+ * Examples:
  * <ul>
- *     <li>general:
+ *     <li>creation:
  *          <pre>{@code
  *          SqlDataSource dataSource = SqlDataSource.builder()
  *                 .username("username")
@@ -33,8 +30,9 @@ import java.util.concurrent.ExecutorService;
  *                 .build(); // will fail if a database type was not specified
  *          }
  *          </pre>
- *     Check {@link SqliteDataSourceBuilder} for more;</li>
- *     <li>h2:
+ *     Check {@link SqliteDataSourceBuilder} for more;
+ *     </li>
+ *     <li>H2 connection creation:
  *          <pre>{@code
  *          SqlDataSource dataSource = SqlDataSource.builder()
  *                 .username("sa")
@@ -46,7 +44,7 @@ import java.util.concurrent.ExecutorService;
  *          }
  *          </pre>
  *     Check {@link H2DataSourceBuilder} for more;</li>
- *     <li>sqlite:
+ *     <li>SQLite connection creation:
  *          <pre>{@code
  *          SqlDataSource dataSource = SqlDataSource.builder()
  *                 .database("database")
@@ -55,8 +53,9 @@ import java.util.concurrent.ExecutorService;
  *                 .build();
  *          }
  *          </pre>
- *     Check {@link SqliteDataSourceBuilder} for more;</li>
- *     <li>remote:
+ *     Check {@link SqliteDataSourceBuilder} for more;
+ *     </li>
+ *     <li>other remote SQL database connection creation:
  *          <pre>{@code
  *          SqlDataSource dataSource = SqlDataSource.builder()
  *                 .username("user")
@@ -67,7 +66,32 @@ import java.util.concurrent.ExecutorService;
  *                 .build();
  *          }
  *          </pre>
- *     Check {@link RemoteDataSourceBuilder} for more.</li>
+ *     Check {@link RemoteDataSourceBuilder} for more.
+ *     </li>
+ *     <li>creating a new repository:
+ *         <pre>{@code
+ *         SqlDataSource dataSource = ...;
+ *         Class<?> dataType = ...;
+ *         // The table in the database containing the entities.
+ *         // Supports jOOQ generation plugin (for sub-implementations).
+ *         Table<?> entitiesTable = ...;
+ *         // The column that identifies the entities in the table.
+ *         TableField<?, ?> tableIdColumn = ...;
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 dataType,
+ *                 entitiesTable,
+ *                 tableIdColumn
+ *         );
+ *         }</pre>
+ *         or, for more control:
+ *         <pre>{@code
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 EntityMapper.create(dataType),
+ *                 entitiesTable,
+ *                 tableIdColumn
+ *         );
+ *         }</pre>
+ *     </li>
  * </ul>
  */
 public final class SqlDataSource implements RepositoryDataSource {

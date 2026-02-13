@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  *                 .build();
  *         }</pre>
  *     </li>
- *     <li>creating new repository:
+ *     <li>creating a new repository:
  *         <pre>{@code
  *         RedisDataSource dataSource = ...;
  *         Class<?> dataType = ...;

@@ -23,7 +23,7 @@ import java.util.concurrent.ExecutorService;
  *         FileDataSource dataSource = FileDataSource.create(executor);
  *         }</pre>
  *     </li>
- *     <li>creating new repository:
+ *     <li>creating a new repository:
  *         <pre>{@code
  *         FileDataSource dataSource = ...;
  *         Class<?> dataType = ...;
