@@ -8,6 +8,7 @@ import io.lettuce.core.api.async.RedisAsyncCommands;
 import it.fulminazzo.blocksmith.data.QueryEngine;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,8 +29,7 @@ import java.util.stream.Collectors;
  * @param <T>  the type of the entities
  * @param <ID> the type of the id of the entities
  */
-//TODO: construction logic
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class RedisQueryEngine<T, ID> implements QueryEngine<T, ID> {
     private final @NotNull StatefulRedisConnection<String, String> connection;
     private final @NotNull EntityMapper<T, ID> entityMapper;
