@@ -14,21 +14,27 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
     private static final Mapper mapper = Mappers.JSON
     private static final int serverPort = 16379
 
-    private RedisServer server
-    private RedisClient client
-    private StatefulRedisConnection<String, String> connection
+    private static RedisServer server
+    private static RedisClient client
+    private static StatefulRedisConnection<String, String> connection
 
-    void setup() {
+    void setupSpec() {
         server = new RedisServer(serverPort)
         server.start()
 
         client = RedisClient.create("redis://localhost:$serverPort")
         connection = client.connect()
+    }
 
+    void setup() {
         setupRepository()
     }
 
     void cleanup() {
+        clearData()
+    }
+
+    void cleanupSpec() {
         if (connection != null) connection.close()
         if (client != null) client.shutdown()
         if (server != null) server.stop()
@@ -52,8 +58,13 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
     }
 
     @Override
-    void insert(final @NotNull User data) {
-        connection.sync().set(data.id.toString(), mapper.serialize(data))
+    void insert(final @NotNull User entity) {
+        connection.sync().set(entity.id.toString(), mapper.serialize(entity))
+    }
+
+    @Override
+    void remove(final @NotNull Long id) {
+        connection.sync().del(id.toString())
     }
 
 }
