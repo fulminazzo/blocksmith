@@ -2,17 +2,13 @@ package it.fulminazzo.blocksmith.data.redis;
 
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
 import io.lettuce.core.SocketOptions;
+import it.fulminazzo.blocksmith.data.RepositoryDataSourceBuilder;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.Mappers;
-import it.fulminazzo.blocksmith.data.util.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -47,19 +43,11 @@ import java.util.function.Consumer;
  *         .build();
  * }</pre>
  */
-public final class RedisDataSourceBuilder {
+public final class RedisDataSourceBuilder implements RepositoryDataSourceBuilder<RedisDataSource> {
     private final @NotNull ClientOptions.Builder clientOptions = ClientOptions.builder();
     private final @NotNull SocketOptions.Builder socketOptions = SocketOptions.builder();
 
-    private boolean encrypted;
-
-    private @Nullable String host;
-    private int port;
-
-    private int database;
-
-    private @Nullable String username;
-    private @Nullable String password;
+    private final @NotNull RedisURI.Builder redisURIbuilder;
 
     private @NotNull Mapper mapper = Mappers.JSON;
 
@@ -67,16 +55,12 @@ public final class RedisDataSourceBuilder {
      * Instantiates a new Redis data source builder.
      */
     RedisDataSourceBuilder() {
-        host("0.0.0.0").port(6379).database(0);
+        this.redisURIbuilder = RedisURI.builder(RedisURI.create("redis://0.0.0.0:6379/0"));
     }
 
-    /**
-     * Creates a new Redis data source.
-     *
-     * @return the redis data source
-     */
+    @Override
     public @NotNull RedisDataSource build() {
-        final RedisClient client = RedisClient.create(getRedisUrl());
+        final RedisClient client = RedisClient.create(redisURIbuilder.build());
         client.setOptions(clientOptions
                 .socketOptions(socketOptions.build())
                 .build()
@@ -85,101 +69,13 @@ public final class RedisDataSourceBuilder {
     }
 
     /**
-     * Gets the Redis url.
+     * Allows editing the internal redis URI using the lettuce provided builder.
      *
-     * @return the redis url
-     */
-    @NotNull String getRedisUrl() {
-        StringBuilder url = new StringBuilder("redis");
-        if (encrypted) url.append("s");
-        url.append("://");
-        if (username != null || password != null) {
-            String username = this.username == null ? "default" : this.username;
-            url.append(URLEncoder.encode(username, StandardCharsets.UTF_8)).append(":");
-            if (password != null) url.append(URLEncoder.encode(password, StandardCharsets.UTF_8));
-            url.append("@");
-        }
-        return url
-                .append(Objects.requireNonNull(host, "host has not been specified yet")).append(":")
-                .append(port)
-                .append("/")
-                .append(database)
-                .toString();
-    }
-
-    /**
-     * Enables or disables encryption.
-     * <br>
-     * Default: <code>false</code>
-     *
-     * @param encrypted <code>true</code> to enable
+     * @param editFunction the function to edit the URI
      * @return this object (for method chaining)
      */
-    public @NotNull RedisDataSourceBuilder encrypted(final boolean encrypted) {
-        this.encrypted = encrypted;
-        return this;
-    }
-
-    /**
-     * Sets the host.
-     * <br>
-     * Default: <code>0.0.0.0</code>
-     *
-     * @param host the host
-     * @return this object (for method chaining)
-     */
-    public @NotNull RedisDataSourceBuilder host(final @NotNull String host) {
-        this.host = host;
-        return this;
-    }
-
-    /**
-     * Sets the port.
-     * <br>
-     * Default: <code>6379</code>
-     *
-     * @param port the port
-     * @return this object (for method chaining)
-     */
-    public @NotNull RedisDataSourceBuilder port(final @Range(from = 1, to = 65535) int port) {
-        ValidationUtils.checkPort(port);
-        this.port = port;
-        return this;
-    }
-
-    /**
-     * Sets the database.
-     * <br>
-     * Default: <code>0</code>
-     *
-     * @param database the database
-     * @return this object (for method chaining)
-     */
-    public @NotNull RedisDataSourceBuilder database(final @Range(from = 0, to = 15) int database) {
-        ValidationUtils.checkInRange(database, "database", 0, 15);
-        this.database = database;
-        return this;
-    }
-
-    /**
-     * Sets the username.
-     *
-     * @param username the username
-     * @return this object (for method chaining)
-     */
-    public @NotNull RedisDataSourceBuilder username(final @NotNull String username) {
-        this.username = username;
-        return this;
-    }
-
-    /**
-     * Sets the password.
-     *
-     * @param password the password
-     * @return this object (for method chaining)
-     */
-    public @NotNull RedisDataSourceBuilder password(final @NotNull String password) {
-        this.password = password;
+    public @NotNull RedisDataSourceBuilder uri(final @NotNull Consumer<RedisURI.Builder> editFunction) {
+        editFunction.accept(redisURIbuilder);
         return this;
     }
 
