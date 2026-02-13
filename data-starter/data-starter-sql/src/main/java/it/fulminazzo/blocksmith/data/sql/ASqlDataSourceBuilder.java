@@ -178,7 +178,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param executor the executor
      * @return this object (for method chaining)
      */
-    public @NotNull B setExecutor(final @NotNull ExecutorService executor) {
+    public @NotNull B executor(final @NotNull ExecutorService executor) {
         this.executor = executor;
         return (B) this;
     }
