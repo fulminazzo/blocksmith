@@ -4,17 +4,12 @@ import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 abstract class RepositoryTest<R extends Repository<User, Long>> extends Specification {
-    protected static final User FIRST = new User(1, 'fulminazzo', 23)
-    protected static final User SECOND = new User(2, 'c4my', 20)
-    protected static final User UPDATE1 = new User(3, 'tiz_', 55)
-    protected static final User UPDATE2 = new User(4, 'alex', 18)
-
     protected R repository
 
     void setupRepository() {
         repository = initializeRepository()
-        insert(FIRST)
-        insert(SECOND)
+        insert(Users.SAVED1)
+        insert(Users.SAVED2)
     }
 
     def 'test that findById returns #expected'() {
@@ -26,7 +21,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         actual.get() == expected
 
         where:
-        expected << [FIRST, SECOND]
+        expected << [Users.SAVED1, Users.SAVED2]
     }
 
     def 'test that findById does not throw if not existing'() {
@@ -46,10 +41,10 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
 
         where:
         user    || expected
-        FIRST   || true
-        SECOND  || true
-        UPDATE1 || false
-        UPDATE2 || false
+        Users.SAVED1 || true
+        Users.SAVED2 || true
+        Users.NEW1 || false
+        Users.NEW2 || false
     }
 
     def 'test that save correctly updates #data'() {
@@ -68,8 +63,8 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
 
         where:
         data << [
-                new User(FIRST.id, FIRST.username + '_', FIRST.age + 1),
-                new User(SECOND.id, SECOND.username + '_', SECOND.age + 1)
+                new User(Users.SAVED1.id, Users.SAVED1.username + '_', Users.SAVED1.age + 1),
+                new User(Users.SAVED2.id, Users.SAVED2.username + '_', Users.SAVED2.age + 1)
         ]
     }
 
@@ -87,7 +82,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         exists(data.id)
 
         where:
-        data << [UPDATE1, UPDATE2]
+        data << [Users.NEW1, Users.NEW2]
     }
 
     def 'test that delete correctly deletes #data'() {
@@ -101,7 +96,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         !exists(data.id)
 
         where:
-        data << [FIRST, SECOND]
+        data << [Users.SAVED1, Users.SAVED2]
     }
 
     def 'test that delete does not throw on not existing data'() {
@@ -117,15 +112,15 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         def result = repository.findAll().get()
 
         then:
-        result.sort() == [FIRST, SECOND].sort()
+        result.sort() == [Users.SAVED1, Users.SAVED2].sort()
     }
 
     def 'test that findAllById correctly returns all data'() {
         given:
-        def expected = [FIRST, SECOND]
+        def expected = [Users.SAVED1, Users.SAVED2]
 
         when:
-        def actual = repository.findAllById([FIRST.id, SECOND.id, 3L]).get()
+        def actual = repository.findAllById([Users.SAVED1.id, Users.SAVED2.id, 3L]).get()
 
         then:
         actual == expected
@@ -133,10 +128,10 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
 
     def 'test that findAllById does not throw on null data'() {
         given:
-        def expected = [FIRST, SECOND]
+        def expected = [Users.SAVED1, Users.SAVED2]
 
         when:
-        def actual = repository.findAllById([null, FIRST.id, null, SECOND.id, null]).get()
+        def actual = repository.findAllById([null, Users.SAVED1.id, null, Users.SAVED2.id, null]).get()
 
         then:
         actual == expected
@@ -156,8 +151,8 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
     def 'test that saveAll correctly updates all data'() {
         given:
         def data = [
-                new User(FIRST.id, FIRST.username + '_', FIRST.age + 1),
-                new User(SECOND.id, SECOND.username + '_', SECOND.age + 1)
+                new User(Users.SAVED1.id, Users.SAVED1.username + '_', Users.SAVED1.age + 1),
+                new User(Users.SAVED2.id, Users.SAVED2.username + '_', Users.SAVED2.age + 1)
         ]
 
         when:
@@ -175,7 +170,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
 
     def 'test that saveAll correctly saves all data'() {
         given:
-        def data = [UPDATE1, UPDATE2]
+        def data = [Users.NEW1, Users.NEW2]
 
         expect:
         data.every { !exists(it.id) }
@@ -192,13 +187,13 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
 
     def 'test that saveAll does not throw on null data'() {
         given:
-        def data = [UPDATE1, UPDATE2]
+        def data = [Users.NEW1, Users.NEW2]
 
         expect:
         data.every { !exists(it.id) }
 
         when:
-        def saved = repository.saveAll([null, UPDATE1, null, UPDATE2, null]).get()
+        def saved = repository.saveAll([null, Users.NEW1, null, Users.NEW2, null]).get()
 
         then:
         saved.sort() == data.sort()
@@ -220,13 +215,13 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
 
     def 'test that deleteAll correctly deletes all data'() {
         given:
-        def data = [FIRST, SECOND]
+        def data = [Users.SAVED1, Users.SAVED2]
 
         expect:
         data.every { exists(it.id) }
 
         when:
-        repository.deleteAll([FIRST.id, SECOND.id, 3L])
+        repository.deleteAll([Users.SAVED1.id, Users.SAVED2.id, 3L])
 
         then:
         data.every { !exists(it.id) }
@@ -234,13 +229,13 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
 
     def 'test that deleteAll does not throw on null data'() {
         given:
-        def data = [FIRST, SECOND]
+        def data = [Users.SAVED1, Users.SAVED2]
 
         expect:
         data.every { exists(it.id) }
 
         when:
-        repository.deleteAll([null, FIRST.id, null, SECOND.id, null])
+        repository.deleteAll([null, Users.SAVED1.id, null, Users.SAVED2.id, null])
 
         then:
         data.every { !exists(it.id) }
