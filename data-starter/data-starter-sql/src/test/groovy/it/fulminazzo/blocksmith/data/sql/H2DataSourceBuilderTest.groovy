@@ -3,6 +3,8 @@ package it.fulminazzo.blocksmith.data.sql
 import com.zaxxer.hikari.HikariConfig
 import spock.lang.Specification
 
+import java.util.concurrent.Executors
+
 class H2DataSourceBuilderTest extends Specification {
 
     private HikariConfig config
@@ -15,13 +17,13 @@ class H2DataSourceBuilderTest extends Specification {
 
     def 'test that database is initialized with custom schema'() {
         given:
-        def builder = new H2DataSourceBuilder(config, 'test')
+        def builder = new H2DataSourceBuilder(config, 'test', Executors.newSingleThreadExecutor())
                 .memory()
                 .schemaName('custom')
 
         when:
-        def source = builder.build()
-        def connection = source.getConnection()
+        def dataSource = builder.build()
+        def connection = dataSource.dataSource.getConnection()
 
         then:
         connection.catalog == 'TEST'
@@ -29,18 +31,18 @@ class H2DataSourceBuilderTest extends Specification {
 
         cleanup:
         connection?.close()
-        source?.close()
+        dataSource?.close()
     }
 
     def 'test that init script works'() {
         given:
-        def builder = new H2DataSourceBuilder(config, 'test')
+        def builder = new H2DataSourceBuilder(config, 'test', Executors.newSingleThreadExecutor())
                 .memory()
                 .initScript('build/resources/test/h2_schema.sql')
 
         when:
-        def source = builder.build()
-        def connection = source.getConnection()
+        def dataSource = builder.build()
+        def connection = dataSource.dataSource.getConnection()
 
         then:
         noExceptionThrown()
@@ -57,6 +59,10 @@ class H2DataSourceBuilderTest extends Specification {
 
         and:
         !set.next()
+
+        cleanup:
+        connection?.close()
+        dataSource?.close()
     }
 
 }
