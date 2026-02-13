@@ -47,6 +47,9 @@ class FileQueryEngineTest extends Specification {
 
     def 'test that getFiles only returns data files'() {
         given:
+        WORKING_DIR.mkdirs()
+
+        and:
         def expected = (0..9).collect { "tmp${it}.${FORMAT.fileExtension}" }
                 .collect { new File(WORKING_DIR, it) }
                 .each { Files.createFile(it.toPath()) }
