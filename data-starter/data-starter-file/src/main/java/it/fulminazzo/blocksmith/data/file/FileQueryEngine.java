@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
 import it.fulminazzo.blocksmith.data.QueryEngine;
 import it.fulminazzo.blocksmith.function.FunctionException;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,8 +28,7 @@ import java.util.stream.Collectors;
  * @param <T>  the type of the entities
  * @param <ID> the type of the id of the entities
  */
-//TODO: construction logic
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class FileQueryEngine<T, ID> implements QueryEngine<T, ID> {
     private final @NotNull ConfigurationAdapter adapter;
     private final @NotNull ConfigurationFormat format;
