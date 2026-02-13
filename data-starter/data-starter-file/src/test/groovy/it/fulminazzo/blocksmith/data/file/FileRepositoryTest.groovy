@@ -8,6 +8,7 @@ import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import org.jetbrains.annotations.NotNull
 
+import java.nio.file.Files
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -18,7 +19,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
 
     private final ConfigurationAdapter adapter = ConfigurationAdapter.newAdapter(log, FORMAT)
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor()
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor()
 
     void setup() {
         WORKING_DIR.deleteDir()
@@ -29,6 +30,10 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
     }
 
     void cleanup() {
+        clearData()
+    }
+
+    void cleanupSpec() {
         executor.shutdown()
     }
 
@@ -51,8 +56,13 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
     }
 
     @Override
-    void insert(final @NotNull User data) {
-        adapter.store(WORKING_DIR, data.id.toString(), data)
+    void insert(final @NotNull User entity) {
+        adapter.store(WORKING_DIR, entity.id.toString(), entity)
+    }
+
+    @Override
+    void remove(final @NotNull Long id) {
+        Files.deleteIfExists(FORMAT.getFile(WORKING_DIR, id.toString()).toPath())
     }
 
 }
