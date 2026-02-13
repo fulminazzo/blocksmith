@@ -15,6 +15,8 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
     void clearData() {
         remove(Users.SAVED1.id)
         remove(Users.SAVED2.id)
+        remove(Users.NEW1.id)
+        remove(Users.NEW2.id)
     }
 
     def 'test that findById returns #expected'() {
