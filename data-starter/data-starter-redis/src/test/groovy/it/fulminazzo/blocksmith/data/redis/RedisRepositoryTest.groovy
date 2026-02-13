@@ -4,6 +4,7 @@ import io.lettuce.core.RedisClient
 import io.lettuce.core.api.StatefulRedisConnection
 import it.fulminazzo.blocksmith.data.RepositoryTest
 import it.fulminazzo.blocksmith.data.User
+import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.Mappers
 import org.jetbrains.annotations.NotNull
@@ -33,42 +34,15 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
         server.stop()
     }
 
-    def 'test that getValues returns #expected'() {
-        given:
-        def keys = expected.collect { it.id.toString() }
-
-        when:
-        def actual = repository.getValues(keys).get()
-
-        then:
-        actual.sort() == expected.sort()
-
-        where:
-        expected << [
-                [FIRST],
-                [SECOND],
-                [FIRST, SECOND]
-        ]
-    }
-
-    def 'test that getAllKeys returns all keys'() {
-        given:
-        def expected = [FIRST, SECOND].collect { it.id.toString() }
-
-        when:
-        def actual = repository.allKeys.get()
-
-        then:
-        actual.sort() == expected.sort()
-    }
-
     @Override
     RedisRepository<User, Long> initializeRepository() {
         return new RedisRepository<>(
-                connection,
-                User::getId,
-                User,
-                mapper
+                new RedisQueryEngine<>(
+                        connection,
+                        EntityMapper.create(User),
+                        mapper
+                ),
+                EntityMapper.create(User)
         )
     }
 
