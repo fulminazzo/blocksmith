@@ -3,12 +3,10 @@ package it.fulminazzo.blocksmith.data.redis;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 import it.fulminazzo.blocksmith.data.Repository;
+import it.fulminazzo.blocksmith.data.RepositoryDataSource;
+import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.Closeable;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * Redis data source for handling connections and create Redis repositories.
@@ -20,10 +18,10 @@ import java.util.function.Function;
  *         .username("username")
  *         .password("SuperSecurePassword")
  *         .build();
- * }</pre>
+ * }*</pre>
  * Check {@link RedisDataSourceBuilder} for more.
  */
-public final class RedisDataSource implements Closeable {
+public final class RedisDataSource implements RepositoryDataSource {
     private final @NotNull RedisClient redisClient;
     private final @NotNull StatefulRedisConnection<String, String> connection;
 
@@ -45,37 +43,34 @@ public final class RedisDataSource implements Closeable {
     /**
      * Creates a new repository.
      *
-     * @param <T>      the type of the data
-     * @param <ID>     the type of the id
-     * @param idMapper the function to get the id from a data object
-     * @param dataType the data type
+     * @param <T>        the type of the entities
+     * @param <ID>       the type of the id of the entities
+     * @param entityType the entity Java class
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull Function<T, ID> idMapper,
-            final @NotNull Class<T> dataType
+            final @NotNull Class<T> entityType
     ) {
-        return new RedisRepository<>(
-                connection,
-                idMapper,
-                dataType,
-                mapper
-        );
+        return newRepository(EntityMapper.create(entityType));
     }
 
     /**
-     * Creates a new custom repository.
+     * Creates a new repository.
      *
-     * @param <R>                the type of the repository
-     * @param <T>                the type of the data
-     * @param <ID>               the type of the id
-     * @param repositorySupplier the repository creation function
+     * @param <T>          the type of the entities
+     * @param <ID>         the type of the id of the entities
+     * @param entityMapper the entities mapper
      * @return the repository
      */
-    public <R extends RedisRepository<T, ID>, T, ID> @NotNull R newRepository(
-            final @NotNull BiFunction<StatefulRedisConnection<String, String>, Mapper, R> repositorySupplier
+    public <T, ID> @NotNull Repository<T, ID> newRepository(
+            final @NotNull EntityMapper<T, ID> entityMapper
     ) {
-        return repositorySupplier.apply(connection, mapper);
+        RedisQueryEngine<T, ID> engine = new RedisQueryEngine<>(
+                connection,
+                entityMapper,
+                mapper
+        );
+        return new RedisRepository<>(engine, entityMapper);
     }
 
     @Override
