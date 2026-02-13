@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Range;
 import org.jooq.SQLDialect;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 
 /**
  * A builder for {@link SqlDataSource} for host-port based databases.
@@ -36,12 +37,14 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
      *
      * @param config       the config
      * @param database     the database
+     * @param executor     the executor
      * @param databaseType the database type
      */
     RemoteDataSourceBuilder(final @NotNull HikariConfig config,
                             final @Nullable String database,
+                            final @Nullable ExecutorService executor,
                             final @NotNull IDatabaseType databaseType) {
-        super(config, database);
+        super(config, database, executor);
         this.databaseType = databaseType;
         host("0.0.0.0").port(databaseType.getPort());
     }

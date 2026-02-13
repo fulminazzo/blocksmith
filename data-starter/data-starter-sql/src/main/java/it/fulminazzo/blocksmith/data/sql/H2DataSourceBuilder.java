@@ -27,8 +27,7 @@ import java.util.stream.Collectors;
  *                 // defaults to database value
  *                 .schemaName("schema") // INIT=CREATE SCHEMA IF NOT EXISTS schema\;SET SCHEMA schema
  *                 .build();
- *          }
- *          </pre>
+ *          }</pre>
  *     </li>
  *     <li>in memory database:
  *          <pre>{@code
@@ -38,8 +37,7 @@ import java.util.stream.Collectors;
  *                 .memory() // mem:test
  *                 .preventMemoryLoss() // DB_CLOSE_DELAY=-1
  *                 .build();
- *          }
- *          </pre>
+ *          }</pre>
  *     </li>
  *     <li>file based database:
  *          <pre>{@code
@@ -50,8 +48,7 @@ import java.util.stream.Collectors;
  *                 .allowSimultaneousFileConnections() // AUTO_SERVER=true
  *                 .preventConnectionOnNonExistingFile() // IFEXISTS=true
  *                 .build();
- *          }
- *          </pre>
+ *          }</pre>
  *     </li>
  *     <li>server based database:
  *          <pre>{@code

@@ -22,8 +22,7 @@ import org.jooq.SQLDialect;
  *                 .maxLifeTime(1800000) // default = 30 minutes
  *                 .addDataSourceProperty("cachePrepStmts", true)
  *                 .build(); // will fail if a database type was not specified
- *          }
- *          </pre>
+ *          }</pre>
  *     </li>
  *     <li>h2:
  *          <pre>{@code
@@ -34,8 +33,7 @@ import org.jooq.SQLDialect;
  *                 .h2()
  *                 .memory()
  *                 .build();
- *          }
- *          </pre>
+ *          }</pre>
  *     Check {@link H2DataSourceBuilder} for more;</li>
  *     <li>sqlite:
  *          <pre>{@code
@@ -44,8 +42,7 @@ import org.jooq.SQLDialect;
  *                 .sqlite()
  *                 .disk("./sqlite")
  *                 .build();
- *          }
- *          </pre>
+ *          }</pre>
  *     Check {@link SqliteDataSourceBuilder} for more;</li>
  *     <li>remote:
  *          <pre>{@code
@@ -56,8 +53,7 @@ import org.jooq.SQLDialect;
  *                 .databaseType(DatabaseType.POSTGRES)
  *                 .postgres()
  *                 .build();
- *          }
- *          </pre>
+ *          }</pre>
  *     Check {@link RemoteDataSourceBuilder} for more.</li>
  * </ul>
  */
@@ -72,7 +68,7 @@ public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSou
      * Instantiates a new SQL data source builder.
      */
     SqlDataSourceBuilder() {
-        super(new HikariConfig(), null);
+        super(new HikariConfig(), null, null);
         maximumPoolSize(maximumPoolSize)
                 .minimumIdle(minimumIdle)
                 .connectionTimeout(connectionTimeout)
@@ -99,7 +95,7 @@ public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSou
      * @return this object (for method chaining)
      */
     public @NotNull RemoteDataSourceBuilder databaseType(final @NotNull IDatabaseType databaseType) {
-        return new RemoteDataSourceBuilder(config, database, databaseType);
+        return new RemoteDataSourceBuilder(config, database, executor, databaseType);
     }
 
     /**
@@ -108,7 +104,7 @@ public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSou
      * @return this object (for method chaining)
      */
     public @NotNull H2DataSourceBuilder h2() {
-        return new H2DataSourceBuilder(config, database).lowercaseNames(true);
+        return new H2DataSourceBuilder(config, database, executor).lowercaseNames(true);
     }
 
     /**
@@ -117,7 +113,7 @@ public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSou
      * @return this object (for method chaining)
      */
     public @NotNull SqliteDataSourceBuilder sqlite() {
-        return new SqliteDataSourceBuilder(config, database);
+        return new SqliteDataSourceBuilder(config, database, executor);
     }
 
 }

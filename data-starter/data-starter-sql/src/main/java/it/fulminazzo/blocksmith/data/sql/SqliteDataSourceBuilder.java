@@ -7,6 +7,7 @@ import org.jooq.SQLDialect;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 
 /**
  * A builder for {@link SqlDataSource} for SQLite databases.
@@ -41,10 +42,12 @@ public final class SqliteDataSourceBuilder extends ASqlDataSourceBuilder<SqliteD
      *
      * @param config   the config
      * @param database the database
+     * @param executor the executor
      */
     SqliteDataSourceBuilder(final @NotNull HikariConfig config,
-                            final @Nullable String database) {
-        super(config, database);
+                            final @Nullable String database,
+                            final @Nullable ExecutorService executor) {
+        super(config, database, executor);
     }
 
     @Override
