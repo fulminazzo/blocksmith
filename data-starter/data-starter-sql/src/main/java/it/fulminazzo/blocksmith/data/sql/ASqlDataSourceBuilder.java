@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Range;
 import org.jooq.SQLDialect;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 
 /**
  * A general SQL data source builder.
@@ -22,6 +23,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
     protected final @NotNull HikariConfig config;
 
     protected @Nullable String database;
+    private @Nullable ExecutorService executor;
 
     /**
      * Creates a new SQL data source
@@ -30,7 +32,8 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
      */
     public @NotNull SqlDataSource build() {
         config.setJdbcUrl(getJdbcUrl());
-        return new SqlDataSource(new HikariDataSource(config), getSQLDialect());
+        ExecutorService executor = Objects.requireNonNull(this.executor, "executor has not been specified yet");
+        return new SqlDataSource(new HikariDataSource(config), getSQLDialect(), executor);
     }
 
     /**
@@ -169,6 +172,17 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> {
     public @NotNull B addDataSourceProperty(final @NotNull String propertyName,
                                             final Object value) {
         config.addDataSourceProperty(propertyName, value);
+        return (B) this;
+    }
+
+    /**
+     * Sets the executor of the queries.
+     *
+     * @param executor the executor
+     * @return this object (for method chaining)
+     */
+    public @NotNull B setExecutor(final @NotNull ExecutorService executor) {
+        this.executor = executor;
         return (B) this;
     }
 
