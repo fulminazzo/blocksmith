@@ -3,32 +3,85 @@ package it.fulminazzo.blocksmith.data.sql
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.pool.HikariPool
+import it.fulminazzo.blocksmith.data.User
 import org.jetbrains.annotations.NotNull
 import org.jooq.SQLDialect
+import org.jooq.impl.DSL
+import org.jooq.impl.SQLDataType
 import spock.lang.Specification
 
+import javax.sql.DataSource
 import java.sql.Connection
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
+import static org.jooq.impl.DSL.constraint
 
 class SqlDataSourceTest extends Specification {
 
-    private SqlDataSource dataSource
-    private Connection connection
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor()
 
-    void setup() {
+    private static DataSource hikariDataSource
+    private static SqlDataSource dataSource
+    private static Connection connection
+
+    void setupSpec() {
         def hikariConfig = new HikariConfig()
         hikariConfig.jdbcUrl = 'jdbc:h2:mem:testdb'
         hikariConfig.username = 'sa'
         hikariConfig.password = ''
 
-        def hikariDataSource = new HikariDataSource(hikariConfig)
-        dataSource = new SqlDataSource(hikariDataSource, SQLDialect.H2)
+        hikariDataSource = new HikariDataSource(hikariConfig)
+        dataSource = new SqlDataSource(hikariDataSource, SQLDialect.H2, executor)
 
-        connection = dataSource.getConnection()
+        connection = hikariDataSource.getConnection()
     }
 
     void cleanup() {
+        DSL.using(hikariDataSource, SQLDialect.H2).dropTableIfExists('LOGINS').execute()
+    }
+
+    void cleanupSpec() {
         connection?.close()
         dataSource?.close()
+        executor?.shutdown()
+    }
+
+    def 'test datasource life cycle'() {
+        given:
+        def dataSource = SqlDataSource.builder()
+                .executor(executor)
+                .database('test')
+                .username('sa')
+                .password('')
+                .h2()
+                .memory()
+                .build()
+
+        and:
+        def dsl = DSL.using(dataSource.dataSource, SQLDialect.H2)
+        dsl.createTable('TEST')
+                .column('ID', SQLDataType.BIGINT.notNull().identity(true))
+                .constraints(constraint('PK_TEST').primaryKey('ID'))
+                .execute()
+        def table = dsl.meta().getTables('TEST')[0]
+        def field = table.field('ID')
+
+        when:
+        def repository = dataSource.newRepository(
+                User,
+                table,
+                field
+        )
+
+        then:
+        repository != null
+
+        when:
+        dataSource.close()
+
+        then:
+        noExceptionThrown()
     }
 
     def 'test executeScriptFromFile of #argument correctly updates database'() {
@@ -95,6 +148,7 @@ class SqlDataSourceTest extends Specification {
 
         when:
         def source = SqlDataSource.builder()
+                .executor(executor)
                 .database('sql_data_source')
                 .username('user')
                 .password('password')
@@ -117,6 +171,7 @@ class SqlDataSourceTest extends Specification {
     def 'test that #type returns #dialect'() {
         given:
         def builder = SqlDataSource.builder()
+                .executor(executor)
                 .database('sql_data_source')
                 .username('user')
                 .password('password')
@@ -129,10 +184,10 @@ class SqlDataSourceTest extends Specification {
         actual == dialect
 
         where:
-        type                                || dialect
-        DatabaseType.MYSQL                  || SQLDialect.MYSQL
-        DatabaseType.MARIADB                || SQLDialect.MARIADB
-        DatabaseType.POSTGRES               || SQLDialect.POSTGRES
+        type                       || dialect
+        DatabaseType.MYSQL         || SQLDialect.MYSQL
+        DatabaseType.MARIADB       || SQLDialect.MARIADB
+        DatabaseType.POSTGRES      || SQLDialect.POSTGRES
         new IDatabaseType() {
 
             @Override
@@ -146,7 +201,7 @@ class SqlDataSourceTest extends Specification {
                 return 1337
             }
 
-        }                                   || SQLDialect.DEFAULT
+        }                          || SQLDialect.DEFAULT
     }
 
     /*
@@ -156,6 +211,7 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize sqlite memory connection'() {
         when:
         def source = SqlDataSource.builder()
+                .executor(executor)
                 .database('sqlite_data_source')
                 .username('sa')
                 .password('')
@@ -177,6 +233,7 @@ class SqlDataSourceTest extends Specification {
 
         when:
         def source = SqlDataSource.builder()
+                .executor(executor)
                 .database('sqlite_data_source')
                 .username('sa')
                 .password('')
@@ -197,6 +254,7 @@ class SqlDataSourceTest extends Specification {
     def 'test that SQLDialect is SQLITE'() {
         given:
         def builder = SqlDataSource.builder()
+                .executor(executor)
                 .database('sqlite_data_source')
                 .username('sa')
                 .password('')
@@ -213,6 +271,7 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize h2 memory connection'() {
         when:
         def source = SqlDataSource.builder()
+                .executor(executor)
                 .database('h2_data_source')
                 .username('sa')
                 .password('')
@@ -234,6 +293,7 @@ class SqlDataSourceTest extends Specification {
 
         when:
         def source = SqlDataSource.builder()
+                .executor(executor)
                 .database('h2_data_source')
                 .username('sa')
                 .password('')
@@ -255,6 +315,7 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize h2 disk connection throws on non-existing'() {
         when:
         def source = SqlDataSource.builder()
+                .executor(executor)
                 .database('h2_data_source')
                 .username('sa')
                 .password('')
@@ -274,6 +335,7 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize h2 server connection'() {
         when:
         def source = SqlDataSource.builder()
+                .executor(executor)
                 .database('h2_data_source')
                 .username('sa')
                 .password('')
@@ -291,6 +353,7 @@ class SqlDataSourceTest extends Specification {
     def 'test that SQLDialect is H2'() {
         given:
         def builder = SqlDataSource.builder()
+                .executor(executor)
                 .database('h2_data_source')
                 .username('sa')
                 .password('')
@@ -307,6 +370,7 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize general SQL throws'() {
         when:
         def source = SqlDataSource.builder()
+                .executor(executor)
                 .database('sql_data_source')
                 .username('sa')
                 .password('')
@@ -322,6 +386,7 @@ class SqlDataSourceTest extends Specification {
     def 'test initialize general SQL throws'() {
         when:
         def source = SqlDataSource.builder()
+                .executor(executor)
                 .database('sql_data_source')
                 .username('sa')
                 .password('')
