@@ -55,8 +55,8 @@ class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<?
     }
 
     void cleanupSpec() {
-        executor.shutdown()
-        dataSource.close()
+        executor?.shutdown()
+        dataSource?.close()
     }
 
     @Override

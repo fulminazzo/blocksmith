@@ -28,8 +28,8 @@ class H2DataSourceBuilderTest extends Specification {
         connection.schema == 'CUSTOM'
 
         cleanup:
-        if (connection != null) connection.close()
-        if (source != null) source.close()
+        connection?.close()
+        source?.close()
     }
 
     def 'test that init script works'() {

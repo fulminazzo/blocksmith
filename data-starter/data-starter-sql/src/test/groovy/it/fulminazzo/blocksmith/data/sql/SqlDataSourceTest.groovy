@@ -108,7 +108,7 @@ class SqlDataSourceTest extends Specification {
         thrown(Exception)
 
         cleanup:
-        if (source != null) source.close()
+        source?.close()
 
         where:
         type << DatabaseType.values()
@@ -167,7 +167,7 @@ class SqlDataSourceTest extends Specification {
         noExceptionThrown()
 
         cleanup:
-        if (source != null) source.close()
+        source?.close()
     }
 
     def 'test initialize sqlite disk connection'() {
@@ -191,7 +191,7 @@ class SqlDataSourceTest extends Specification {
         expected.exists()
 
         cleanup:
-        if (source != null) source.close()
+        source?.close()
     }
 
     def 'test that SQLDialect is SQLITE'() {
@@ -225,7 +225,7 @@ class SqlDataSourceTest extends Specification {
         noExceptionThrown()
 
         cleanup:
-        if (source != null) source.close()
+        source?.close()
     }
 
     def 'test initialize h2 disk connection'() {
@@ -249,7 +249,7 @@ class SqlDataSourceTest extends Specification {
         expected.exists()
 
         cleanup:
-        if (source != null) source.close()
+        source?.close()
     }
 
     def 'test initialize h2 disk connection throws on non-existing'() {
@@ -268,7 +268,7 @@ class SqlDataSourceTest extends Specification {
         thrown(HikariPool.PoolInitializationException)
 
         cleanup:
-        if (source != null) source.close()
+        source?.close()
     }
 
     def 'test initialize h2 server connection'() {
@@ -285,7 +285,7 @@ class SqlDataSourceTest extends Specification {
         thrown(HikariPool.PoolInitializationException)
 
         cleanup:
-        if (source != null) source.close()
+        source?.close()
     }
 
     def 'test that SQLDialect is H2'() {
@@ -316,7 +316,7 @@ class SqlDataSourceTest extends Specification {
         thrown(IllegalStateException)
 
         cleanup:
-        if (source != null) source.close()
+        source?.close()
     }
 
     def 'test initialize general SQL throws'() {
@@ -331,7 +331,7 @@ class SqlDataSourceTest extends Specification {
         thrown(IllegalStateException)
 
         cleanup:
-        if (source != null) source.close()
+        source?.close()
     }
 
 }

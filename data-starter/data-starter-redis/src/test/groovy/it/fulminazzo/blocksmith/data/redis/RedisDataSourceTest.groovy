@@ -16,7 +16,7 @@ class RedisDataSourceTest extends Specification {
     }
 
     void cleanup() {
-        if (server != null) server.stop()
+        server?.stop()
     }
 
     def 'test datasource life cycle'() {
