@@ -29,11 +29,11 @@ import org.jetbrains.annotations.NotNull;
  *         <pre>{@code
  *         RedisDataSource dataSource = ...;
  *         Class<?> dataType = ...;
- *         Repository<?, ?> = dataSource.newRepository(dataType);
+ *         Repository<?, ?> repository = dataSource.newRepository(dataType);
  *         }</pre>
  *         or, for more control:
  *         <pre>{@code
- *         Repository<?, ?> = dataSource.newRepository(EntityMapper.create(dataType, "idFieldName"));
+ *         Repository<?, ?> repository = dataSource.newRepository(EntityMapper.create(dataType, "idFieldName"));
  *         }</pre>
  *     </li>
  * </ul>
