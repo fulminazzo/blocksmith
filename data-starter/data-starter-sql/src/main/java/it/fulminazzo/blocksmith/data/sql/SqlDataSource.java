@@ -2,18 +2,20 @@ package it.fulminazzo.blocksmith.data.sql;
 
 import com.zaxxer.hikari.HikariDataSource;
 import it.fulminazzo.blocksmith.data.Repository;
-import lombok.experimental.Delegate;
+import it.fulminazzo.blocksmith.data.RepositoryDataSource;
+import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import javax.sql.DataSource;
-import java.io.*;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import java.util.concurrent.Executor;
-import java.util.function.BiFunction;
+import java.util.concurrent.ExecutorService;
 
 /**
  * {@link DataSource} for general SQL databases.
@@ -68,66 +70,70 @@ import java.util.function.BiFunction;
  *     Check {@link RemoteDataSourceBuilder} for more.</li>
  * </ul>
  */
-public final class SqlDataSource implements DataSource, Closeable {
-    @Delegate
-    private final @NotNull HikariDataSource delegate;
+public final class SqlDataSource implements RepositoryDataSource {
+    private final @NotNull HikariDataSource dataSource;
     private final @NotNull DSLContext context;
+    private final @NotNull ExecutorService executor;
 
     /**
      * Instantiates a new SQL data source.
      *
-     * @param delegate the delegate that will handle the internal logic
-     * @param dialect  the SQL dialect
+     * @param dataSource the data source
+     * @param dialect    the dialect
+     * @param executor   the executor
      */
-    SqlDataSource(final @NotNull HikariDataSource delegate,
-                  final @NotNull SQLDialect dialect) {
-        this.delegate = delegate;
-        this.context = DSL.using(this, dialect);
+    SqlDataSource(final @NotNull HikariDataSource dataSource,
+                  final @NotNull SQLDialect dialect,
+                  final @NotNull ExecutorService executor) {
+        this.dataSource = dataSource;
+        this.executor = executor;
+        this.context = DSL.using(dataSource, dialect);
     }
 
     /**
      * Creates a new repository.
      *
-     * @param <R>       the type of the record in the table
-     * @param <T>       the type of the data
-     * @param <ID>      the type of the id
-     * @param dataType  the data type
-     * @param dataTable the data table
-     * @param idColumn  the column of the id
-     * @param executor  the executor (for asynchronous operations)
+     * @param <T>        the type of the entities
+     * @param <ID>       the type of the id of the entities
+     * @param <R>        the type of the entities in the table
+     * @param entityType the entity Java class
+     * @param table      the table
+     * @param idColumn   the column that represents the ID of the entities in the table
      * @return the repository
      */
-    public <R extends Record, T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull Class<T> dataType,
-            final @NotNull Table<R> dataTable,
-            final @NotNull TableField<R, ID> idColumn,
-            final @NotNull Executor executor
+    public <T, ID, R extends Record> @NotNull Repository<T, ID> newRepository(
+            final @NotNull Class<T> entityType,
+            final @NotNull Table<R> table,
+            final @NotNull TableField<R, ID> idColumn
     ) {
-        return new SqlRepository<>(
-                context,
-                dataTable,
-                idColumn,
-                dataType,
-                executor
-        );
+        return newRepository(EntityMapper.create(entityType), table, idColumn);
     }
 
     /**
-     * Creates a new custom repository.
+     * Creates a new repository.
      *
-     * @param <R>                the type of the repository
-     * @param <T>                the type of the data
-     * @param <ID>               the type of the id
-     * @param repositorySupplier the repository creation function
-     * @param executor           the executor (for asynchronous operations)
+     * @param <T>          the type of the entities
+     * @param <ID>         the type of the id of the entities
+     * @param <R>          the type of the entities in the table
+     * @param entityMapper the entities mapper
+     * @param table        the table
+     * @param idColumn     the column that represents the ID of the entities in the table
      * @return the repository
      */
-    public <R extends SqlRepository<T, ID, ?>, T, ID> @NotNull R newRepository(
-            final @NotNull BiFunction<DSLContext, Executor, R> repositorySupplier,
-            final @NotNull Executor executor
+    public <T, ID, R extends Record> @NotNull Repository<T, ID> newRepository(
+            final @NotNull EntityMapper<T, ID> entityMapper,
+            final @NotNull Table<R> table,
+            final @NotNull TableField<R, ID> idColumn
     ) {
-        return repositorySupplier.apply(context, executor);
+        SqlQueryEngine<T, ID, Table<R>> engine = new SqlQueryEngine<>(
+                context,
+                table,
+                idColumn,
+                executor
+        );
+        return new SqlRepository<>(engine, entityMapper);
     }
+
 
     /**
      * Executes the given script.
@@ -178,6 +184,12 @@ public final class SqlDataSource implements DataSource, Closeable {
         String raw = new String(data, StandardCharsets.UTF_8);
         context.parser().parse(raw).executeBatch();
         return this;
+    }
+
+    @Override
+    public void close() {
+        executor.shutdown();
+        dataSource.close();
     }
 
     /**
