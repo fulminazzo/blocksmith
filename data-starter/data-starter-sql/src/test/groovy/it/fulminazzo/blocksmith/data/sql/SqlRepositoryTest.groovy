@@ -4,12 +4,12 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import it.fulminazzo.blocksmith.data.RepositoryTest
 import it.fulminazzo.blocksmith.data.User
+import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import org.jetbrains.annotations.NotNull
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.SQLDialect
 import org.jooq.Table
-import org.jooq.impl.DSL
 import org.jooq.impl.SQLDataType
 
 import java.util.concurrent.ExecutorService
@@ -22,12 +22,12 @@ class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<?
     private static final String TABLE_NAME = 'USERS'
     private static final String ID_COLUMN = 'ID'
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor()
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor()
 
-    private HikariDataSource dataSource
-    private DSLContext dsl
+    private static HikariDataSource dataSource
+    private static DSLContext dsl
 
-    void setup() {
+    void setupSpec() {
         def config = new HikariConfig()
         config.jdbcUrl = H2_PATH
         config.username = 'sa'
@@ -35,7 +35,7 @@ class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<?
 
         dataSource = new HikariDataSource(config)
 
-        dsl = DSL.using(dataSource, SQLDialect.H2)
+        dsl = using(dataSource, SQLDialect.H2)
         dsl.createTable(TABLE_NAME)
                 .column(ID_COLUMN, SQLDataType.BIGINT.notNull().identity(true))
                 .column('USERNAME', SQLDataType.VARCHAR(16).notNull())
@@ -44,32 +44,32 @@ class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<?
                         constraint("PK_$TABLE_NAME").primaryKey(ID_COLUMN)
                 )
                 .execute()
+    }
 
+    void setup() {
         setupRepository()
     }
 
     void cleanup() {
-        executor.shutdown()
-        dataSource.close()
+        clearData()
     }
 
-    def 'test that query works'() {
-        when:
-        def actual = repository.query(dsl -> dsl.selectOne().fetchOne(0, Integer)).get()
-
-        then:
-        actual == 1
+    void cleanupSpec() {
+        executor.shutdown()
+        dataSource.close()
     }
 
     @Override
     SqlRepository<User, Long, Table<? extends Record>> initializeRepository() {
         def table = dsl.meta().getTables(TABLE_NAME)[1]
         return new SqlRepository<>(
-                dsl,
-                table,
-                table.field(ID_COLUMN, Long),
-                User,
-                executor
+                new SqlQueryEngine<User, Long, Table<? extends Record>>(
+                        dsl,
+                        table,
+                        table.field(ID_COLUMN, Long),
+                        executor
+                ),
+                EntityMapper.create(User)
         )
     }
 
@@ -82,9 +82,16 @@ class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<?
     }
 
     @Override
-    void insert(final @NotNull User data) {
+    void insert(final @NotNull User entity) {
         dsl.insertInto(table(TABLE_NAME))
-                .values(data.id, data.username, data.age)
+                .values(entity.id, entity.username, entity.age)
+                .execute()
+    }
+
+    @Override
+    void remove(final @NotNull Long id) {
+        dsl.deleteFrom(table(TABLE_NAME))
+                .where(field(ID_COLUMN).eq(id))
                 .execute()
     }
 
