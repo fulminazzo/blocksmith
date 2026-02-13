@@ -2,15 +2,12 @@ package it.fulminazzo.blocksmith.data.mongodb;
 
 import com.mongodb.MongoClientSettings;
 import com.mongodb.reactivestreams.client.MongoClient;
-import com.mongodb.reactivestreams.client.MongoCollection;
-import com.mongodb.reactivestreams.client.MongoDatabase;
 import it.fulminazzo.blocksmith.data.Repository;
+import it.fulminazzo.blocksmith.data.RepositoryDataSource;
+import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.Closeable;
-import java.util.function.Function;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -18,7 +15,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 /**
  * Mongo data source for handling connections and create Mongo repositories.
  */
-public final class MongoDataSource implements Closeable {
+public final class MongoDataSource implements RepositoryDataSource {
     private final @NotNull MongoClient client;
 
     /**
@@ -35,81 +32,41 @@ public final class MongoDataSource implements Closeable {
 
     /**
      * Creates a new repository.
-     * <br>
-     * Assumes the data has a <code>id</code> field as id.
      *
-     * @param <T>            the type of the data
-     * @param <ID>           the type of the id
-     * @param dataType       the data type
-     * @param databaseName   the name of the database
-     * @param collectionName the name of the collection
-     * @param idMapper       the function to get the id from a data object
+     * @param <T>            the type of the entities
+     * @param <ID>           the type of the id of the entities
+     * @param entityType     the entity Java class
+     * @param databaseName   the name of the collection
+     * @param collectionName the name of the database
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull Class<T> dataType,
+            final @NotNull Class<T> entityType,
             final @NotNull String databaseName,
-            final @NotNull String collectionName,
-            final @NotNull Function<T, ID> idMapper
+            final @NotNull String collectionName
     ) {
-        return newRepository(
-                dataType,
-                databaseName,
-                collectionName,
-                idMapper,
-                "id"
-        );
+        return newRepository(EntityMapper.create(entityType), databaseName, collectionName);
     }
 
     /**
      * Creates a new repository.
      *
-     * @param <T>            the type of the data
-     * @param <ID>           the type of the id
-     * @param dataType       the data type
-     * @param databaseName   the name of the database
-     * @param collectionName the name of the collection
-     * @param idMapper       the function to get the id from a data object
-     * @param idFieldName    the name of the field representing the id
+     * @param <T>            the type of the entities
+     * @param <ID>           the type of the id of the entities
+     * @param entityMapper   the entities mapper
+     * @param databaseName   the name of the collection
+     * @param collectionName the name of the database
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull Class<T> dataType,
+            final @NotNull EntityMapper<T, ID> entityMapper,
             final @NotNull String databaseName,
-            final @NotNull String collectionName,
-            final @NotNull Function<T, ID> idMapper,
-            final @NotNull String idFieldName
+            final @NotNull String collectionName
     ) {
-        MongoDatabase database = client.getDatabase(databaseName);
-        MongoCollection<T> collection = database.getCollection(collectionName, dataType);
-        return new MongoRepository<>(
-                collection,
-                idFieldName,
-                idMapper
+        MongoQueryEngine<T, ID> engine = new MongoQueryEngine<>(
+                client.getDatabase(databaseName).getCollection(collectionName, entityMapper.getType())
         );
-    }
-
-    /**
-     * Creates a new custom repository.
-     *
-     * @param <R>                the type parameter
-     * @param <T>                the type of the data
-     * @param <ID>               the type of the id
-     * @param dataType           the data type
-     * @param databaseName       the name of the database
-     * @param collectionName     the name of the collection
-     * @param repositorySupplier the repository creation function
-     * @return the repository
-     */
-    public <R extends MongoRepository<T, ID>, T, ID> @NotNull Repository<T, ID> newCustomRepository(
-            final @NotNull Class<T> dataType,
-            final @NotNull String databaseName,
-            final @NotNull String collectionName,
-            final @NotNull Function<MongoCollection<T>, R> repositorySupplier
-    ) {
-        MongoDatabase database = client.getDatabase(databaseName);
-        MongoCollection<T> collection = database.getCollection(collectionName, dataType);
-        return repositorySupplier.apply(collection);
+        return new MongoRepository<>(engine, entityMapper);
     }
 
     @Override
