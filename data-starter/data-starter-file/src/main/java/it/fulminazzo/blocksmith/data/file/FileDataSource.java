@@ -11,21 +11,21 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.File;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Implementation of {@link RepositoryDataSource} for file-based repositories.
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class FileDataSource implements RepositoryDataSource {
-    private final @NotNull Executor executor;
+    private final @NotNull ExecutorService executor;
 
     /**
      * Creates a new repository.
      *
      * @param <T>           the type of the entities
      * @param <ID>          the type of the id of the entities
-     * @param entityType     the entity Java class
+     * @param entityType    the entity Java class
      * @param dataDirectory the directory where all the data is stored
      * @param logger        the logger
      * @param format        the configuration format to use for storing
@@ -68,6 +68,17 @@ public final class FileDataSource implements RepositoryDataSource {
 
     @Override
     public void close() {
+        executor.shutdown();
+    }
+
+    /**
+     * Creates a new File datasource.
+     *
+     * @param executor the executor
+     * @return the file datasource
+     */
+    public static @NotNull FileDataSource create(final @NotNull ExecutorService executor) {
+        return new FileDataSource(executor);
     }
 
 }
