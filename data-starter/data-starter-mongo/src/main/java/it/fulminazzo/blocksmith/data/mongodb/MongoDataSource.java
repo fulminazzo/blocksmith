@@ -1,16 +1,10 @@
 package it.fulminazzo.blocksmith.data.mongodb;
 
-import com.mongodb.MongoClientSettings;
 import com.mongodb.reactivestreams.client.MongoClient;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.RepositoryDataSource;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
 import org.jetbrains.annotations.NotNull;
-
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 /**
  * Mongo data source for handling connections and create Mongo repositories.
@@ -63,10 +57,7 @@ public final class MongoDataSource implements RepositoryDataSource {
      * @param client the client
      */
     MongoDataSource(final @NotNull MongoClient client) {
-        CodecRegistry pojoCodec = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
-                fromProviders(PojoCodecProvider.builder().automatic(true).build())
-        );
-        this.client = (MongoClient) client.withCodecRegistry(pojoCodec);
+        this.client = client;
     }
 
     /**

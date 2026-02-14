@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 import org.jspecify.annotations.NonNull;
@@ -19,6 +20,9 @@ import org.jspecify.annotations.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 /**
  * A builder for {@link MongoDataSource}.
@@ -41,6 +45,7 @@ import java.util.function.Consumer;
  *         ))
  *         .applicationName("blocksmith/1.0.0")
  *         .uuidRepresentation(UuidRepresentation.JAVA_LEGACY)
+ *         // default value
  *         .codecRegistry(CodecRegistries.fromRegistries(
  *                 MongoClientSettings.getDefaultCodecRegistry(),
  *                 CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
@@ -67,8 +72,13 @@ import java.util.function.Consumer;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder<MongoDataSource> {
     private static final @NotNull ServerAddress defaultAddress = new ServerAddress("0.0.0.0");
+    private static final @NotNull CodecRegistry pojoCodecRegistry = fromRegistries(
+            MongoClientSettings.getDefaultCodecRegistry(),
+            fromProviders(PojoCodecProvider.builder().automatic(true).build())
+    );
 
-    private final @NotNull MongoClientSettings.Builder clientSettings = MongoClientSettings.builder();
+    private final @NotNull MongoClientSettings.Builder clientSettings = MongoClientSettings.builder()
+            .codecRegistry(pojoCodecRegistry);
 
     private final @NotNull List<ServerAddress> hosts = new ArrayList<>();
 
@@ -148,6 +158,8 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
 
     /**
      * Sets the credentials for the client.
+     * <br>
+     * Default: the default POJO codec registry
      *
      * @param codecRegistry the codec registry
      * @return this object (for method chaining)
