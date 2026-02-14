@@ -30,3 +30,5 @@ include("data-starter:data-starter-file")
 include("data-starter:data-starter-mongo")
 include("data-starter:data-starter-redis")
 include("data-starter:data-starter-sql")
+
+include("base:validation")
