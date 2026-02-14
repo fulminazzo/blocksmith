@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.mongodb;
 
 import com.mongodb.reactivestreams.client.MongoCollection;
 import it.fulminazzo.blocksmith.data.QueryEngine;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.reactivestreams.Publisher;
@@ -22,8 +23,7 @@ import java.util.function.Function;
  * @param <T>  the type of the entities
  * @param <ID> the type of the id of the entities
  */
-//TODO: construction logic
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MongoQueryEngine<T, ID> implements QueryEngine<T, ID> {
     private final @NotNull MongoCollection<T> collection;
 
