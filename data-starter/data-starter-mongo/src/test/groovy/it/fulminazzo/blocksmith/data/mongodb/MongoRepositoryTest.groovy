@@ -21,6 +21,7 @@ import de.flapdoodle.reverse.TransitionWalker
 import de.flapdoodle.reverse.transitions.Start
 import it.fulminazzo.blocksmith.data.RepositoryTest
 import it.fulminazzo.blocksmith.data.User
+import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.pojo.PojoCodecProvider
 import org.jetbrains.annotations.NotNull
@@ -30,11 +31,11 @@ class MongoRepositoryTest extends RepositoryTest<MongoRepository<User, Long>> {
     private static final int port = 47017
     private static final String idFieldName = '_id'
 
-    private TransitionWalker.ReachedState<RunningMongodProcess> server
-    private MongoClient client
-    private MongoCollection<User> collection
+    private static TransitionWalker.ReachedState<RunningMongodProcess> server
+    private static MongoClient client
+    private static MongoCollection<User> collection
 
-    void setup() {
+    void setupSpec() {
         server = Mongod.builder()
                 .net(Start.to(Net).initializedWith(Net.of('localhost', port, de.flapdoodle.net.Net.localhostIsIPv6())))
                 .packageOfDistribution(PackageOfCommandDistribution.builder()
@@ -69,29 +70,26 @@ class MongoRepositoryTest extends RepositoryTest<MongoRepository<User, Long>> {
         client = MongoClients.create("mongodb://localhost:$port")
         def database = client.getDatabase('test').withCodecRegistry(pojoCodec)
         collection = database.getCollection('users', User)
+    }
 
+    void setup() {
         setupRepository()
     }
 
     void cleanup() {
-        if (client != null) client.close()
-        if (server != null) server.close()
+        clearData()
     }
 
-    def 'test that query works'() {
-        when:
-        def documents = repository.query(c -> c.countDocuments()).get()
-
-        then:
-        documents == 2
+    void cleanupSpec() {
+        client?.close()
+        server?.close()
     }
 
     @Override
     MongoRepository<User, Long> initializeRepository() {
         return new MongoRepository<User, Long>(
-                collection,
-                idFieldName,
-                User::getId
+                new MongoQueryEngine<>(collection),
+                EntityMapper.create(User)
         )
     }
 
@@ -101,8 +99,13 @@ class MongoRepositoryTest extends RepositoryTest<MongoRepository<User, Long>> {
     }
 
     @Override
-    void insert(final @NotNull User data) {
-        Mono.from(collection.insertOne(data)).block()
+    void insert(final @NotNull User entity) {
+        Mono.from(collection.insertOne(entity)).block()
+    }
+
+    @Override
+    void remove(final @NotNull Long id) {
+        Mono.from(collection.deleteOne(Filters.eq(idFieldName, id))).block()
     }
 
 }
