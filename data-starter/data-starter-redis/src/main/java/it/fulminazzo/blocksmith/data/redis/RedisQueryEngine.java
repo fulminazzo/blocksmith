@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.data.redis;
 
 import io.lettuce.core.KeyValue;
-import io.lettuce.core.RedisFuture;
 import io.lettuce.core.ScanCursor;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.async.RedisAsyncCommands;
@@ -17,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -83,7 +83,7 @@ public final class RedisQueryEngine<T, ID> implements QueryEngine<T, ID> {
      * @return the query result
      */
     public <R> @NotNull CompletableFuture<R> query(
-            final @NotNull Function<RedisAsyncCommands<String, String>, RedisFuture<R>> queryFunction
+            final @NotNull Function<RedisAsyncCommands<String, String>, CompletionStage<R>> queryFunction
     ) {
         return queryFunction.apply(connection.async()).toCompletableFuture();
     }
