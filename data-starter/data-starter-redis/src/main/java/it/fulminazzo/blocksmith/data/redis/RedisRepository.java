@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.redis;
 
 import io.lettuce.core.MSetExArgs;
+import io.lettuce.core.RedisFuture;
 import io.lettuce.core.api.async.RedisServerAsyncCommands;
 import it.fulminazzo.blocksmith.data.AbstractRepository;
 import it.fulminazzo.blocksmith.data.Repository;
@@ -54,9 +55,8 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
         return queryEngine.query(async -> {
             String id = entityMapper.getId(entity).toString();
             String serEntity = queryEngine.serialize(entity);
-            if (expiry > 0) async.psetex(id, expiry, serEntity);
-            else async.set(id, serEntity);
-            return null;
+            if (expiry > 0) return async.psetex(id, expiry, serEntity);
+            else return async.set(id, serEntity);
         }).thenApply(s -> entity);
     }
 
@@ -83,9 +83,10 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
                             t -> entityMapper.getId(t).toString(),
                             queryEngine::serialize
                     ));
-            if (expiry > 0) async.msetex(serEntities, new MSetExArgs().px(Duration.ofMillis(expiry)));
-            else async.mset(serEntities);
-            return null;
+            final RedisFuture<?> future;
+            if (expiry > 0) future = async.msetex(serEntities, new MSetExArgs().px(Duration.ofMillis(expiry)));
+            else future = async.mset(serEntities);
+            return future;
         }).thenApply(s -> entities);
     }
 
