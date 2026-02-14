@@ -62,9 +62,11 @@ public final class RedisDataSource implements RepositoryDataSource {
     /**
      * Creates a new repository.
      *
-     * @param <T>        the type of the entities
-     * @param <ID>       the type of the id of the entities
-     * @param entityType the entity Java class
+     * @param <T>            the type of the entities
+     * @param <ID>           the type of the id of the entities
+     * @param entityType     the entity Java class
+     * @param databaseName   the database name (used to build the internal query engine)
+     * @param collectionName the collection name (used to build the internal query engine)
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(
@@ -78,9 +80,11 @@ public final class RedisDataSource implements RepositoryDataSource {
     /**
      * Creates a new repository.
      *
-     * @param <T>          the type of the entities
-     * @param <ID>         the type of the id of the entities
-     * @param entityMapper the entities mapper
+     * @param <T>            the type of the entities
+     * @param <ID>           the type of the id of the entities
+     * @param entityMapper   the entities mapper
+     * @param databaseName   the database name (used to build the internal query engine)
+     * @param collectionName the collection name (used to build the internal query engine)
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(
@@ -104,6 +108,8 @@ public final class RedisDataSource implements RepositoryDataSource {
      * @param <ID>              the type of the id of the entities
      * @param repositoryBuilder the repository creation function
      * @param entityMapper      the entities mapper (used to build the internal query engine)
+     * @param databaseName      the database name (used to build the internal query engine)
+     * @param collectionName    the collection name (used to build the internal query engine)
      * @return the repository
      */
     public <R extends RedisRepository<T, ID>, T, ID> @NotNull R newRepository(

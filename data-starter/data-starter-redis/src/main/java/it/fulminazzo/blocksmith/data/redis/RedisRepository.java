@@ -109,7 +109,7 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
     /**
      * Sets the expiration time when saving an entity.
      *
-     * @param expiry the expiration time
+     * @param expiry the expiration time (in milliseconds)
      */
     public void setExpiry(final @Range(from = 0, to = Long.MAX_VALUE) long expiry) {
         ValidationUtils.checkPositive(expiry, "expiry");
