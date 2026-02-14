@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
 
 /**
  * SQL data source for handling connection and create repositories.
@@ -28,7 +29,7 @@ import java.util.concurrent.ExecutorService;
  *                 .password("password")
  *                 .database("database")
  *                 .build(); // will fail if a database type was not specified
- *          }
+ *          }*
  *          </pre>
  *     Check {@link SqliteDataSourceBuilder} for more;
  *     </li>
@@ -41,7 +42,7 @@ import java.util.concurrent.ExecutorService;
  *                 .h2()
  *                 .memory()
  *                 .build();
- *          }
+ *          }*
  *          </pre>
  *     Check {@link H2DataSourceBuilder} for more;</li>
  *     <li>SQLite connection creation:
@@ -51,7 +52,7 @@ import java.util.concurrent.ExecutorService;
  *                 .sqlite()
  *                 .disk("./sqlite")
  *                 .build();
- *          }
+ *          }*
  *          </pre>
  *     Check {@link SqliteDataSourceBuilder} for more;
  *     </li>
@@ -65,7 +66,7 @@ import java.util.concurrent.ExecutorService;
  *                 .host("0.0.0.0")
  *                 .postgres()
  *                 .build();
- *          }
+ *          }*
  *          </pre>
  *     Check {@link RemoteDataSourceBuilder} for more.
  *     </li>
@@ -83,7 +84,7 @@ import java.util.concurrent.ExecutorService;
  *                 entitiesTable,
  *                 tableIdColumn
  *         );
- *         }</pre>
+ *         }*</pre>
  *         or, for more control:
  *         <pre>{@code
  *         Repository<?, ?> repository = dataSource.newRepository(
@@ -91,7 +92,7 @@ import java.util.concurrent.ExecutorService;
  *                 entitiesTable,
  *                 tableIdColumn
  *         );
- *         }</pre>
+ *         }*</pre>
  *     </li>
  * </ul>
  */
@@ -150,13 +151,37 @@ public final class SqlDataSource implements RepositoryDataSource {
             final @NotNull Table<R> table,
             final @NotNull TableField<R, ID> idColumn
     ) {
-        SqlQueryEngine<T, ID, Table<R>> engine = new SqlQueryEngine<>(
+        return newRepository(
+                e -> new SqlRepository<>(e, entityMapper),
+                table,
+                idColumn
+        );
+    }
+
+    /**
+     * Creates a new custom repository.
+     *
+     * @param <R>               the type of the repository
+     * @param <T>               the type of the entities
+     * @param <ID>              the type of the id of the entities
+     * @param <TR>              the type of the entities in the table
+     * @param repositoryBuilder the repository creation function
+     * @param table             the table (used to build the internal query engine)
+     * @param idColumn          the column that represents the ID of the entities in the table (used to build the internal query engine)
+     * @return the repository
+     */
+    public <R extends SqlRepository<T, ID, Table<TR>>, T, ID, TR extends Record> @NotNull R newRepository(
+            final @NotNull Function<SqlQueryEngine<T, ID, Table<TR>>, R> repositoryBuilder,
+            final @NotNull Table<TR> table,
+            final @NotNull TableField<TR, ID> idColumn
+    ) {
+        SqlQueryEngine<T, ID, Table<TR>> engine = new SqlQueryEngine<>(
                 context,
                 table,
                 idColumn,
                 executor
         );
-        return new SqlRepository<>(engine, entityMapper);
+        return repositoryBuilder.apply(engine);
     }
 
 

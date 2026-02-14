@@ -8,6 +8,8 @@ import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Function;
+
 /**
  * Redis data source for handling connections and create Redis repositories.
  * <br>
@@ -23,18 +25,18 @@ import org.jetbrains.annotations.NotNull;
  *                         .withSsl(true)
  *                 )
  *                 .build();
- *         }</pre>
+ *         }**</pre>
  *     </li>
  *     <li>creating a new repository:
  *         <pre>{@code
  *         RedisDataSource dataSource = ...;
  *         Class<?> dataType = ...;
  *         Repository<?, ?> repository = dataSource.newRepository(dataType);
- *         }</pre>
+ *         }**</pre>
  *         or, for more control:
  *         <pre>{@code
  *         Repository<?, ?> repository = dataSource.newRepository(EntityMapper.create(dataType, "idFieldName"));
- *         }</pre>
+ *         }**</pre>
  *     </li>
  * </ul>
  */
@@ -82,12 +84,32 @@ public final class RedisDataSource implements RepositoryDataSource {
     public <T, ID> @NotNull Repository<T, ID> newRepository(
             final @NotNull EntityMapper<T, ID> entityMapper
     ) {
+        return newRepository(
+                e -> new RedisRepository<>(e, entityMapper),
+                entityMapper
+        );
+    }
+
+    /**
+     * Creates a new custom repository.
+     *
+     * @param <R>               the type of the repository
+     * @param <T>               the type of the entities
+     * @param <ID>              the type of the id of the entities
+     * @param repositoryBuilder the repository creation function
+     * @param entityMapper      the entities mapper (used to build the internal query engine)
+     * @return the repository
+     */
+    public <R extends RedisRepository<T, ID>, T, ID> @NotNull R newRepository(
+            final @NotNull Function<RedisQueryEngine<T, ID>, R> repositoryBuilder,
+            final @NotNull EntityMapper<T, ID> entityMapper
+    ) {
         RedisQueryEngine<T, ID> engine = new RedisQueryEngine<>(
                 connection,
                 entityMapper,
                 mapper
         );
-        return new RedisRepository<>(engine, entityMapper);
+        return repositoryBuilder.apply(engine);
     }
 
     @Override

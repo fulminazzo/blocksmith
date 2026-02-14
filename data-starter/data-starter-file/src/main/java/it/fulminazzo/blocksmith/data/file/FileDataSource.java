@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
 
 /**
  * Implementation of {@link RepositoryDataSource} for file-based repositories.
@@ -21,7 +22,7 @@ import java.util.concurrent.ExecutorService;
  *         <pre>{@code
  *         ExecutorService executor = ...;
  *         FileDataSource dataSource = FileDataSource.create(executor);
- *         }</pre>
+ *         }*</pre>
  *     </li>
  *     <li>creating a new repository:
  *         <pre>{@code
@@ -36,7 +37,7 @@ import java.util.concurrent.ExecutorService;
  *                 logger,
  *                 format
  *         );
- *         }</pre>
+ *         }*</pre>
  *         or, for more control:
  *         <pre>{@code
  *         Repository<?, ?> repository = dataSource.newRepository(
@@ -45,7 +46,7 @@ import java.util.concurrent.ExecutorService;
  *                 logger,
  *                 format
  *         );
- *         }</pre>
+ *         }*</pre>
  *     </li>
  * </ul>
  */
@@ -90,13 +91,39 @@ public final class FileDataSource implements RepositoryDataSource {
             final @NotNull Logger logger,
             final @NotNull ConfigurationFormat format
     ) {
+        return newRepository(
+                e -> new FileRepository<>(e, entityMapper),
+                dataDirectory,
+                logger,
+                format
+        );
+    }
+
+    /**
+     * Creates a new custom repository.
+     *
+     * @param <R>               the type of the repository
+     * @param <T>               the type of the entities
+     * @param <ID>              the type of the id of the entities
+     * @param repositoryBuilder the repository creation function
+     * @param dataDirectory     the directory where all the data is stored (used to build the internal query engine)
+     * @param logger            the logger (used to build the internal query engine)
+     * @param format            the configuration format to use for storing (used to build the internal query engine)
+     * @return the repository
+     */
+    public <R extends FileRepository<T, ID>, T, ID> @NotNull R newRepository(
+            final @NotNull Function<FileQueryEngine<T, ID>, R> repositoryBuilder,
+            final @NotNull File dataDirectory,
+            final @NotNull Logger logger,
+            final @NotNull ConfigurationFormat format
+    ) {
         FileQueryEngine<T, ID> engine = new FileQueryEngine<>(
                 ConfigurationAdapter.newAdapter(logger, format),
                 format,
                 dataDirectory,
                 executor
         );
-        return new FileRepository<>(engine, entityMapper);
+        return repositoryBuilder.apply(engine);
     }
 
     @Override

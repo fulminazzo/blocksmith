@@ -6,6 +6,8 @@ import it.fulminazzo.blocksmith.data.RepositoryDataSource;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Function;
+
 /**
  * Mongo data source for handling connections and create Mongo repositories.
  * <br>
@@ -25,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  *                 .applicationName("blocksmith/1.0.0")
  *                 .sslSettings(ssl -> ssl.enabled(true))
  *                 .build();
- *         }</pre>
+ *         }*</pre>
  *     </li>
  *     <li>creating a new repository:
  *         <pre>{@code
@@ -36,7 +38,7 @@ import org.jetbrains.annotations.NotNull;
  *                 "database",
  *                 "data"
  *         );
- *         }</pre>
+ *         }*</pre>
  *         or, for more control:
  *         <pre>{@code
  *         Repository<?, ?> repository = dataSource.newRepository(
@@ -44,7 +46,7 @@ import org.jetbrains.annotations.NotNull;
  *                 "database",
  *                 "data"
  *         );
- *         }</pre>
+ *         }*</pre>
  *     </li>
  * </ul>
  */
@@ -93,10 +95,36 @@ public final class MongoDataSource implements RepositoryDataSource {
             final @NotNull String databaseName,
             final @NotNull String collectionName
     ) {
+        return newRepository(
+                e -> new MongoRepository<>(e, entityMapper),
+                entityMapper,
+                databaseName,
+                collectionName
+        );
+    }
+
+    /**
+     * Creates a new custom repository.
+     *
+     * @param <R>               the type parameter
+     * @param <T>               the type of the entities
+     * @param <ID>              the type of the id of the entities
+     * @param repositoryBuilder the repository creation function
+     * @param entityMapper      the entities mapper (used to build the internal query engine)
+     * @param databaseName      the name of the collection (used to build the internal query engine)
+     * @param collectionName    the name of the database (used to build the internal query engine)
+     * @return the repository
+     */
+    public <R extends MongoRepository<T, ID>, T, ID> @NotNull R newRepository(
+            final @NotNull Function<MongoQueryEngine<T, ID>, R> repositoryBuilder,
+            final @NotNull EntityMapper<T, ID> entityMapper,
+            final @NotNull String databaseName,
+            final @NotNull String collectionName
+    ) {
         MongoQueryEngine<T, ID> engine = new MongoQueryEngine<>(
                 client.getDatabase(databaseName).getCollection(collectionName, entityMapper.getType())
         );
-        return new MongoRepository<>(engine, entityMapper);
+        return repositoryBuilder.apply(engine);
     }
 
     @Override
