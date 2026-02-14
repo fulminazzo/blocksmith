@@ -108,4 +108,24 @@ public final class RedisQueryEngine<T, ID> implements QueryEngine<T, ID> {
         return mapper.deserialize(serializedData, entityMapper.getType());
     }
 
+    /**
+     * Gets the ID of an entity.
+     *
+     * @param entity the entity
+     * @return the id
+     */
+    public @NotNull String getEntityId(final @NotNull T entity) {
+        return getId(entityMapper.getId(entity));
+    }
+
+    /**
+     * Gets the textual form of the id of an entity.
+     *
+     * @param id the id
+     * @return the id
+     */
+    public @NotNull String getId(final @NotNull ID id) {
+        return id.toString();
+    }
+
 }

@@ -36,21 +36,21 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
 
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
-        return queryEngine.query(async -> async.get(id.toString()))
+        return queryEngine.query(async -> async.get(queryEngine.getId(id)))
                 .thenApply(Optional::ofNullable)
                 .thenApply(o -> o.map(queryEngine::deserialize));
     }
 
     @Override
     public @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id) {
-        return queryEngine.query(async -> async.exists(id.toString()))
+        return queryEngine.query(async -> async.exists(queryEngine.getId(id)))
                 .thenApply(l -> l > 0);
     }
 
     @Override
     public @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
         return queryEngine.query(async -> {
-            String id = entityMapper.getId(entity).toString();
+            String id = queryEngine.getEntityId(entity);
             String serEntity = queryEngine.serialize(entity);
             if (expiry > 0) return async.psetex(id, expiry, serEntity);
             else return async.set(id, serEntity);
@@ -59,7 +59,7 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
 
     @Override
     protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id) {
-        return queryEngine.query(async -> async.del(id.toString()));
+        return queryEngine.query(async -> async.del(queryEngine.getId(id)));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
 
     @Override
     protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
-        return queryEngine.getValues(ids.stream().map(Object::toString).collect(Collectors.toList()));
+        return queryEngine.getValues(ids.stream().map(queryEngine::getId).collect(Collectors.toList()));
     }
 
     @Override
@@ -77,7 +77,7 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
         return queryEngine.query(async -> {
             Map<String, String> serEntities = entities.stream()
                     .collect(Collectors.toMap(
-                            t -> entityMapper.getId(t).toString(),
+                            queryEngine::getEntityId,
                             queryEngine::serialize
                     ));
             CompletionStage<?> future = null;
@@ -97,7 +97,7 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
     @Override
     protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids) {
         return queryEngine.query(async ->
-                async.del(ids.stream().map(Object::toString).toArray(String[]::new))
+                async.del(ids.stream().map(queryEngine::getId).toArray(String[]::new))
         );
     }
 
