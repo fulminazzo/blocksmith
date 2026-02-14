@@ -25,7 +25,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
     protected final @NotNull EntityMapper<T, ID> entityMapper;
 
     @Override
-    public @NotNull CompletableFuture<Void> delete(final @NotNull ID id) {
+    public final @NotNull CompletableFuture<Void> delete(final @NotNull ID id) {
         return deleteImpl(id).thenApply(r -> null);
     }
 
@@ -39,7 +39,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
     protected abstract @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id);
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
+    public final @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
         if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         return findAllByIdImpl(ids.stream().filter(Objects::nonNull).collect(Collectors.toList()));
     }
@@ -55,7 +55,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
     protected abstract @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids);
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entities) {
+    public final @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entities) {
         if (entities.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         return saveAllImpl(entities.stream().filter(Objects::nonNull).collect(Collectors.toList()));
     }
@@ -71,7 +71,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
     protected abstract @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities);
 
     @Override
-    public @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<ID> ids) {
+    public final @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<ID> ids) {
         if (ids.isEmpty()) return CompletableFuture.completedFuture(null);
         return deleteAllImpl(ids.stream().filter(Objects::nonNull).collect(Collectors.toList()))
                 .thenApply(r -> null);
