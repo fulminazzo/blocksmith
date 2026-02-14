@@ -8,14 +8,14 @@ import spock.lang.Specification
 class RedisDataSourceTest extends Specification {
     private static final int serverPort = 16378
 
-    private RedisServer server
+    private static RedisServer server
 
-    void setup() {
+    void setupSpec() {
         server = new RedisServer(serverPort)
         server.start()
     }
 
-    void cleanup() {
+    void cleanupSpec() {
         server?.stop()
     }
 
