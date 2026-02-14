@@ -68,9 +68,11 @@ public final class RedisDataSource implements RepositoryDataSource {
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull Class<T> entityType
+            final @NotNull Class<T> entityType,
+            final @NotNull String databaseName,
+            final @NotNull String collectionName
     ) {
-        return newRepository(EntityMapper.create(entityType));
+        return newRepository(EntityMapper.create(entityType), databaseName, collectionName);
     }
 
     /**
@@ -82,11 +84,15 @@ public final class RedisDataSource implements RepositoryDataSource {
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull EntityMapper<T, ID> entityMapper
+            final @NotNull EntityMapper<T, ID> entityMapper,
+            final @NotNull String databaseName,
+            final @NotNull String collectionName
     ) {
         return newRepository(
                 e -> new RedisRepository<>(e, entityMapper),
-                entityMapper
+                entityMapper,
+                databaseName,
+                collectionName
         );
     }
 
@@ -102,12 +108,16 @@ public final class RedisDataSource implements RepositoryDataSource {
      */
     public <R extends RedisRepository<T, ID>, T, ID> @NotNull R newRepository(
             final @NotNull Function<RedisQueryEngine<T, ID>, R> repositoryBuilder,
-            final @NotNull EntityMapper<T, ID> entityMapper
+            final @NotNull EntityMapper<T, ID> entityMapper,
+            final @NotNull String databaseName,
+            final @NotNull String collectionName
     ) {
         RedisQueryEngine<T, ID> engine = new RedisQueryEngine<>(
                 connection,
                 entityMapper,
-                mapper
+                mapper,
+                databaseName,
+                collectionName
         );
         return repositoryBuilder.apply(engine);
     }

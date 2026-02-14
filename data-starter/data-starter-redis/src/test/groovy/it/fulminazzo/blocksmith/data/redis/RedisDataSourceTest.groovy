@@ -32,7 +32,11 @@ class RedisDataSourceTest extends Specification {
                 .build()
 
         when:
-        def repository = dataSource.newRepository(User)
+        def repository = dataSource.newRepository(
+                User,
+                'database',
+                'users'
+        )
 
         then:
         repository != null
