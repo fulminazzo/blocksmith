@@ -17,11 +17,11 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ValidationUtils {
     /**
-     * The Min port.
+     * The minimum allowed port.
      */
     static final int MIN_PORT = 1;
     /**
-     * The Max port.
+     * The maximum allowed port.
      */
     static final int MAX_PORT = 65535;
 
