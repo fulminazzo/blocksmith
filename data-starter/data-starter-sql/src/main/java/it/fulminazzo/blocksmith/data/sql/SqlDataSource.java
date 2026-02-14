@@ -84,7 +84,7 @@ import java.util.function.Function;
  *                 entitiesTable,
  *                 tableIdColumn
  *         );
- *         }*</pre>
+ *         }</pre>
  *         or, for more control:
  *         <pre>{@code
  *         Repository<?, ?> repository = dataSource.newRepository(
@@ -92,7 +92,7 @@ import java.util.function.Function;
  *                 entitiesTable,
  *                 tableIdColumn
  *         );
- *         }*</pre>
+ *         }</pre>
  *     </li>
  * </ul>
  */

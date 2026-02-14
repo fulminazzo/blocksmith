@@ -18,18 +18,18 @@ import java.util.function.Function;
  *         <pre>{@code
  *         ExecutorService executor = ...;
  *         MemoryDataSource dataSource = MemoryDataSource.create(executor);
- *         }*</pre>
+ *         }</pre>
  *     </li>
  *     <li>creating a new repository:
  *         <pre>{@code
  *         MemoryDataSource dataSource = ...;
  *         Class<?> dataType = ...;
  *         Repository<?, ?> repository = dataSource.newRepository(dataType);
- *         }*</pre>
+ *         }</pre>
  *         or, for more control:
  *         <pre>{@code
  *         Repository<?, ?> repository = dataSource.newRepository(EntityMapper.create(dataType, "idFieldName"));
- *         }*</pre>
+ *         }</pre>
  *     </li>
  * </ul>
  */

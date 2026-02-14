@@ -22,7 +22,7 @@ import java.util.function.Function;
  *         <pre>{@code
  *         ExecutorService executor = ...;
  *         FileDataSource dataSource = FileDataSource.create(executor);
- *         }*</pre>
+ *         }</pre>
  *     </li>
  *     <li>creating a new repository:
  *         <pre>{@code
@@ -37,7 +37,7 @@ import java.util.function.Function;
  *                 logger,
  *                 format
  *         );
- *         }*</pre>
+ *         }</pre>
  *         or, for more control:
  *         <pre>{@code
  *         Repository<?, ?> repository = dataSource.newRepository(
@@ -46,7 +46,7 @@ import java.util.function.Function;
  *                 logger,
  *                 format
  *         );
- *         }*</pre>
+ *         }</pre>
  *     </li>
  * </ul>
  */

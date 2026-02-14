@@ -27,7 +27,7 @@ import java.util.function.Function;
  *                 .applicationName("blocksmith/1.0.0")
  *                 .sslSettings(ssl -> ssl.enabled(true))
  *                 .build();
- *         }*</pre>
+ *         }</pre>
  *     </li>
  *     <li>creating a new repository:
  *         <pre>{@code
@@ -38,7 +38,7 @@ import java.util.function.Function;
  *                 "database",
  *                 "data"
  *         );
- *         }*</pre>
+ *         }</pre>
  *         or, for more control:
  *         <pre>{@code
  *         Repository<?, ?> repository = dataSource.newRepository(
@@ -46,7 +46,7 @@ import java.util.function.Function;
  *                 "database",
  *                 "data"
  *         );
- *         }*</pre>
+ *         }</pre>
  *     </li>
  * </ul>
  */
@@ -68,8 +68,8 @@ public final class MongoDataSource implements RepositoryDataSource {
      * @param <T>            the type of the entities
      * @param <ID>           the type of the id of the entities
      * @param entityType     the entity Java class
-     * @param databaseName   the name of the collection (used to build the internal query engine)
-     * @param collectionName the name of the database (used to build the internal query engine)
+     * @param databaseName   the name of the database (used to build the internal query engine)
+     * @param collectionName the name of the collection (used to build the internal query engine)
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(
@@ -86,8 +86,8 @@ public final class MongoDataSource implements RepositoryDataSource {
      * @param <T>            the type of the entities
      * @param <ID>           the type of the id of the entities
      * @param entityMapper   the entities mapper
-     * @param databaseName   the name of the collection (used to build the internal query engine)
-     * @param collectionName the name of the database (used to build the internal query engine)
+     * @param databaseName   the name of the database (used to build the internal query engine)
+     * @param collectionName the name of the collection (used to build the internal query engine)
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(
@@ -111,8 +111,8 @@ public final class MongoDataSource implements RepositoryDataSource {
      * @param <ID>              the type of the id of the entities
      * @param repositoryBuilder the repository creation function
      * @param entityMapper      the entities mapper (used to build the internal query engine)
-     * @param databaseName      the name of the collection (used to build the internal query engine)
-     * @param collectionName    the name of the database (used to build the internal query engine)
+     * @param databaseName      the name of the database (used to build the internal query engine)
+     * @param collectionName    the name of the collection (used to build the internal query engine)
      * @return the repository
      */
     public <R extends MongoRepository<T, ID>, T, ID> @NotNull R newRepository(

@@ -65,7 +65,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
  *                 .invalidHostNameAllowed(false)
  *         )
  *         .build();
- * }*</pre>
+ * }</pre>
  */
 public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder<MongoDataSource> {
     private static final @NotNull CodecRegistry pojoCodecRegistry = fromRegistries(
