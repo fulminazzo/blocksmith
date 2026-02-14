@@ -7,7 +7,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.connection.*;
 import com.mongodb.reactivestreams.client.MongoClients;
 import it.fulminazzo.blocksmith.data.RepositoryDataSourceBuilder;
-import it.fulminazzo.blocksmith.data.util.ValidationUtils;
+import it.fulminazzo.blocksmith.util.ValidationUtils;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;

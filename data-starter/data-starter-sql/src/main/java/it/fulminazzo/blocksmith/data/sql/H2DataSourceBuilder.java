@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.data.sql;
 
 import com.zaxxer.hikari.HikariConfig;
-import it.fulminazzo.blocksmith.data.util.ValidationUtils;
+import it.fulminazzo.blocksmith.util.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;

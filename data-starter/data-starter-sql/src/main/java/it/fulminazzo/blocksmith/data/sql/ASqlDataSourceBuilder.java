@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.data.sql;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import it.fulminazzo.blocksmith.data.RepositoryDataSourceBuilder;
-import it.fulminazzo.blocksmith.data.util.ValidationUtils;
+import it.fulminazzo.blocksmith.util.ValidationUtils;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
