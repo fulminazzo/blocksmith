@@ -11,7 +11,7 @@ import java.util.Base64;
 final class SerializableMapper implements Mapper {
 
     @Override
-    public @NotNull <T> String serialize(final @NotNull T data) {
+    public <T> @NotNull String serialize(final @NotNull T data) {
         try (
                 ByteArrayOutputStream output = new ByteArrayOutputStream();
                 ObjectOutputStream objectStream = new ObjectOutputStream(output)
@@ -25,7 +25,7 @@ final class SerializableMapper implements Mapper {
     }
 
     @Override
-    public @NotNull <T> T deserialize(final @NotNull String serialized,
+    public <T> @NotNull T deserialize(final @NotNull String serialized,
                                       final @NotNull Class<T> dataType) {
         byte[] raw = Base64.getDecoder().decode(serialized);
         try (

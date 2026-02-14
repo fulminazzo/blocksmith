@@ -23,7 +23,7 @@ final class DelegateConfigurationAdapter implements ConfigurationAdapter {
     @Nullable BaseConfigurationAdapter delegate;
 
     @Override
-    public @NotNull <T> T load(final @NotNull File parentDirectory,
+    public <T> @NotNull T load(final @NotNull File parentDirectory,
                                final @NotNull String fileName,
                                final @NotNull Class<T> type) throws IOException {
         return load(getFormat().getFile(parentDirectory, fileName), type);
@@ -37,7 +37,7 @@ final class DelegateConfigurationAdapter implements ConfigurationAdapter {
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull File file,
+    public <T> @NotNull T load(final @NotNull File file,
                                final @NotNull Class<T> type) throws IOException {
         return getDelegate().load(file, type);
     }

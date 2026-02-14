@@ -11,7 +11,7 @@ final class JsonMapper implements Mapper {
     private final @NotNull ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public @NotNull <T> String serialize(final @NotNull T data) {
+    public <T> @NotNull String serialize(final @NotNull T data) {
         try {
             return mapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
@@ -20,7 +20,7 @@ final class JsonMapper implements Mapper {
     }
 
     @Override
-    public @NotNull <T> T deserialize(final @NotNull String serialized,
+    public <T> @NotNull T deserialize(final @NotNull String serialized,
                                       final @NotNull Class<T> dataType) {
         try {
             return mapper.readValue(serialized, dataType);

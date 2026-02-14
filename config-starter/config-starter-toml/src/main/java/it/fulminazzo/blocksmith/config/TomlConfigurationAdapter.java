@@ -37,7 +37,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         return delegate.load(file, type);
     }
 

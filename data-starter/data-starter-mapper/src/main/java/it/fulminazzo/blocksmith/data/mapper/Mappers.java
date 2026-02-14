@@ -42,12 +42,12 @@ public final class Mappers {
         }
 
         @Override
-        public @NotNull <T> String serialize(final @NotNull T data) {
+        public <T> @NotNull String serialize(final @NotNull T data) {
             throw getException();
         }
 
         @Override
-        public @NotNull <T> T deserialize(final @NotNull String serialized,
+        public <T> @NotNull T deserialize(final @NotNull String serialized,
                                           final @NotNull Class<T> dataType) {
             throw getException();
         }

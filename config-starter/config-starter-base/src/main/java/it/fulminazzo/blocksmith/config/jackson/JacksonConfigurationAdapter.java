@@ -32,7 +32,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         return mapper.readValue(file, type);
     }
 
