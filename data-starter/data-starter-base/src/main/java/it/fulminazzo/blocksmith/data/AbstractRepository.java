@@ -40,7 +40,9 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
      *
      * @param entity the entity (already validated)
      * @return the saved entity (in case values are changed)
+     * @deprecated FOR INTERNAL USE ONLY
      */
+    @Deprecated
     protected abstract @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity);
 
     @Override
@@ -55,6 +57,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
      * @return anything (result will be ignored)
      * @deprecated FOR INTERNAL USE ONLY
      */
+    @Deprecated
     protected abstract @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id);
 
     @Override
