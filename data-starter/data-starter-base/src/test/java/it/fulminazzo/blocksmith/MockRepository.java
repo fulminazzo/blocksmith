@@ -32,7 +32,10 @@ public final class MockRepository extends AbstractRepository<Cat, String, MockQu
 
     @Override
     protected @NotNull CompletableFuture<Cat> saveImpl(final @NotNull Cat entity) {
-        return queryEngine.query(m -> m.put(entity.getName(), entity));
+        return queryEngine.query(m -> {
+            m.put(entity.getName(), entity);
+            return entity;
+        });
     }
 
     @Override
