@@ -25,18 +25,18 @@ import java.util.function.Function;
  *                         .withSsl(true)
  *                 )
  *                 .build();
- *         }**</pre>
+ *         }</pre>
  *     </li>
  *     <li>creating a new repository:
  *         <pre>{@code
  *         RedisDataSource dataSource = ...;
  *         Class<?> dataType = ...;
  *         Repository<?, ?> repository = dataSource.newRepository(dataType);
- *         }**</pre>
+ *         }</pre>
  *         or, for more control:
  *         <pre>{@code
  *         Repository<?, ?> repository = dataSource.newRepository(EntityMapper.create(dataType, "idFieldName"));
- *         }**</pre>
+ *         }</pre>
  *     </li>
  * </ul>
  */
