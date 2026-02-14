@@ -1,16 +1,69 @@
 package it.fulminazzo.blocksmith.util;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * A collection of utilities to validate data.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ValidationUtils {
+    /**
+     * The Min port.
+     */
     static final int MIN_PORT = 1;
+    /**
+     * The Max port.
+     */
     static final int MAX_PORT = 65535;
+
+    private static final @NotNull Validator validator;
+
+    static {
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
+    }
+
+    /**
+     * Uses <a href="https://beanvalidation.org/">Jakarta Validation</a> to verify
+     * the correctness of the given object.
+     *
+     * @param <T>    the type of the object
+     * @param object the object
+     * @throws ViolationException in case of failed validation
+     */
+    public static <T> void validate(final @NotNull T object) throws ViolationException {
+        Set<ConstraintViolation<T>> violations = validator.validate(object);
+        Optional<ConstraintViolation<T>> first = violations.stream().findFirst();
+        if (first.isPresent()) throw new ViolationException(first.get());
+    }
+
+    /**
+     * Uses <a href="https://beanvalidation.org/">Jakarta Validation</a> to verify
+     * the correctness of the given field.
+     *
+     * @param <T>        the type of the class
+     * @param type       the Java class that contains the field
+     * @param fieldName  the name of the field
+     * @param fieldValue the value of the field (to validate)
+     * @throws ViolationException in case of failed validation
+     */
+    public static <T> void validateField(final @NotNull Class<T> type,
+                                         final @NotNull String fieldName,
+                                         final @NotNull Object fieldValue) throws ViolationException {
+        Set<ConstraintViolation<T>> violations = validator.validateValue(type, fieldName, fieldValue);
+        Optional<ConstraintViolation<T>> first = violations.stream().findFirst();
+        if (first.isPresent()) throw new ViolationException(first.get());
+    }
 
     /**
      * Checks if the given value is positive and not <code>0</code>.
@@ -75,6 +128,22 @@ public final class ValidationUtils {
             throw new IllegalArgumentException(String.format("Invalid %s %s. Must be between %s and %s",
                     valueName, value, min, max
             ));
+    }
+
+    /**
+     * Represents an exception thrown during a failed validation.
+     */
+    public static final class ViolationException extends RuntimeException {
+
+        /**
+         * Instantiates a new Violation exception.
+         *
+         * @param constraintViolation the constraint violation that triggered the exception
+         */
+        public ViolationException(final @NotNull ConstraintViolation<?> constraintViolation) {
+            super(constraintViolation.getMessage());
+        }
+
     }
 
 }
