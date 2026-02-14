@@ -8,8 +8,6 @@ import com.mongodb.connection.*;
 import com.mongodb.reactivestreams.client.MongoClients;
 import it.fulminazzo.blocksmith.data.RepositoryDataSourceBuilder;
 import it.fulminazzo.blocksmith.data.util.ValidationUtils;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
@@ -67,9 +65,8 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
  *                 .invalidHostNameAllowed(false)
  *         )
  *         .build();
- * }</pre>
+ * }*</pre>
  */
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder<MongoDataSource> {
     private static final @NotNull ServerAddress defaultAddress = new ServerAddress("0.0.0.0");
     private static final @NotNull CodecRegistry pojoCodecRegistry = fromRegistries(
@@ -77,10 +74,18 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
             fromProviders(PojoCodecProvider.builder().automatic(true).build())
     );
 
-    private final @NotNull MongoClientSettings.Builder clientSettings = MongoClientSettings.builder()
-            .codecRegistry(pojoCodecRegistry);
+    private final @NotNull MongoClientSettings.Builder clientSettings;
 
-    private final @NotNull List<ServerAddress> hosts = new ArrayList<>();
+    private final @NotNull List<ServerAddress> hosts;
+
+    /**
+     * Instantiates a new Mongo data source builder.
+     */
+    MongoDataSourceBuilder() {
+        this.clientSettings = MongoClientSettings.builder();
+        this.hosts = new ArrayList<>();
+        codecRegistry(pojoCodecRegistry);
+    }
 
     @Override
     public @NonNull MongoDataSource build() {
