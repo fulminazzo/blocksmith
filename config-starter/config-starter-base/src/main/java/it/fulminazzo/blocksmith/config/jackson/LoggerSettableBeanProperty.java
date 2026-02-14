@@ -4,16 +4,16 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
-import jakarta.validation.*;
+import it.fulminazzo.blocksmith.util.ValidationUtils;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * A special type of {@link SettableBeanProperty} that will not throw
@@ -55,14 +55,8 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
 
     @Override
     public void set(final @NotNull Object instance, final Object value) throws IOException {
-        validateValue(instance.getClass(), value);
+        ValidationUtils.validateField(instance.getClass(), field.getName(), value);
         super.set(instance, value);
-    }
-
-    private <T> void validateValue(final @NotNull Class<T> beanType, final @Nullable Object value) {
-        Set<ConstraintViolation<T>> violations = validator.validateValue(beanType, field.getName(), value);
-        Optional<ConstraintViolation<T>> first = violations.stream().findFirst();
-        if (first.isPresent()) throw new ViolationException(first.get());
     }
 
     @Override
@@ -104,7 +98,7 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
         if (message == null) message = "unknown error";
         message = message.split("\n")[0];
         logger.warn("Invalid value for property '{}': {} (path: {})", field.getName(), message, path);
-        if (!(exception instanceof ViolationException))
+        if (!(exception instanceof ValidationUtils.ViolationException))
             logger.debug("Invalid value for property '{}': {} (path: {})", field.getName(), message, path, exception);
         return getAndLogDefaultValueUsage(instance);
     }
@@ -130,22 +124,6 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
         public DeserializationException(final @NotNull String message,
                                         final Object @NotNull ... arguments) {
             super(String.format(message, arguments));
-        }
-
-    }
-
-    /**
-     * Represents an exception thrown during a failed {@link #validateValue(Class, Object)}
-     */
-    static final class ViolationException extends RuntimeException {
-
-        /**
-         * Instantiates a new Violation exception.
-         *
-         * @param constraintViolation the constraint violation that triggered the exception
-         */
-        public ViolationException(final @NotNull ConstraintViolation<?> constraintViolation) {
-            super(constraintViolation.getMessage());
         }
 
     }
