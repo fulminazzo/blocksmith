@@ -1,12 +1,17 @@
 package it.fulminazzo.blocksmith.data.redis;
 
+import io.lettuce.core.MSetExArgs;
 import io.lettuce.core.api.async.RedisServerAsyncCommands;
 import it.fulminazzo.blocksmith.data.AbstractRepository;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
+import it.fulminazzo.blocksmith.util.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
+import java.time.Duration;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -18,6 +23,7 @@ import java.util.stream.Collectors;
  * @param <ID> the type of the id of the entities (should be unique)
  */
 public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQueryEngine<T, ID>> {
+    private long expiry;
 
     /**
      * Instantiates a new Redis repository.
@@ -45,10 +51,13 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
 
     @Override
     public @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
-        return queryEngine.query(async -> async.set(
-                entityMapper.getId(entity).toString(),
-                queryEngine.serialize(entity)
-        )).thenApply(s -> entity);
+        return queryEngine.query(async -> {
+            String id = entityMapper.getId(entity).toString();
+            String serEntity = queryEngine.serialize(entity);
+            if (expiry > 0) async.psetex(id, expiry, serEntity);
+            else async.set(id, serEntity);
+            return null;
+        }).thenApply(s -> entity);
     }
 
     @Override
@@ -68,12 +77,16 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
 
     @Override
     protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities) {
-        return queryEngine.query(async -> async.mset(entities.stream()
-                .collect(Collectors.toMap(
-                        t -> entityMapper.getId(t).toString(),
-                        queryEngine::serialize
-                )))
-        ).thenApply(s -> entities);
+        return queryEngine.query(async -> {
+            Map<String, String> serEntities = entities.stream()
+                    .collect(Collectors.toMap(
+                            t -> entityMapper.getId(t).toString(),
+                            queryEngine::serialize
+                    ));
+            if (expiry > 0) async.msetex(serEntities, new MSetExArgs().px(Duration.ofMillis(expiry)));
+            else async.mset(serEntities);
+            return null;
+        }).thenApply(s -> entities);
     }
 
     @Override
@@ -86,6 +99,16 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
     @Override
     public @NotNull CompletableFuture<Long> count() {
         return queryEngine.query(RedisServerAsyncCommands::dbsize);
+    }
+
+    /**
+     * Sets the expiration time when saving an entity.
+     *
+     * @param expiry the expiration time
+     */
+    public void setExpiry(final @Range(from = 0, to = Long.MAX_VALUE) long expiry) {
+        ValidationUtils.checkPositive(expiry, "expiry");
+        this.expiry = expiry;
     }
 
 }
