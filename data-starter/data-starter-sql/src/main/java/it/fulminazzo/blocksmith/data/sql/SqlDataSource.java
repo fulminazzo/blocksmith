@@ -122,8 +122,8 @@ public final class SqlDataSource implements RepositoryDataSource {
      * @param <ID>       the type of the id of the entities
      * @param <R>        the type of the entities in the table
      * @param entityType the entity Java class
-     * @param table      the table
-     * @param idColumn   the column that represents the ID of the entities in the table
+     * @param table      the table (used to build the internal query engine)
+     * @param idColumn   the column that represents the ID of the entities in the table (used to build the internal query engine)
      * @return the repository
      */
     public <T, ID, R extends Record> @NotNull Repository<T, ID> newRepository(
@@ -141,8 +141,8 @@ public final class SqlDataSource implements RepositoryDataSource {
      * @param <ID>         the type of the id of the entities
      * @param <R>          the type of the entities in the table
      * @param entityMapper the entities mapper
-     * @param table        the table
-     * @param idColumn     the column that represents the ID of the entities in the table
+     * @param table        the table (used to build the internal query engine)
+     * @param idColumn     the column that represents the ID of the entities in the table (used to build the internal query engine)
      * @return the repository
      */
     public <T, ID, R extends Record> @NotNull Repository<T, ID> newRepository(

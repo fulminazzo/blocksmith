@@ -66,8 +66,8 @@ public final class MongoDataSource implements RepositoryDataSource {
      * @param <T>            the type of the entities
      * @param <ID>           the type of the id of the entities
      * @param entityType     the entity Java class
-     * @param databaseName   the name of the collection
-     * @param collectionName the name of the database
+     * @param databaseName   the name of the collection (used to build the internal query engine)
+     * @param collectionName the name of the database (used to build the internal query engine)
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(
@@ -84,8 +84,8 @@ public final class MongoDataSource implements RepositoryDataSource {
      * @param <T>            the type of the entities
      * @param <ID>           the type of the id of the entities
      * @param entityMapper   the entities mapper
-     * @param databaseName   the name of the collection
-     * @param collectionName the name of the database
+     * @param databaseName   the name of the collection (used to build the internal query engine)
+     * @param collectionName the name of the database (used to build the internal query engine)
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(

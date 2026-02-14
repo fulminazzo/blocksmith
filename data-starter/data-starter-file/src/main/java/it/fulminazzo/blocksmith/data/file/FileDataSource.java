@@ -59,9 +59,9 @@ public final class FileDataSource implements RepositoryDataSource {
      * @param <T>           the type of the entities
      * @param <ID>          the type of the id of the entities
      * @param entityType    the entity Java class
-     * @param dataDirectory the directory where all the data is stored
-     * @param logger        the logger
-     * @param format        the configuration format to use for storing
+     * @param dataDirectory the directory where all the data is stored (used to build the internal query engine)
+     * @param logger        the logger (used to build the internal query engine)
+     * @param format        the configuration format to use for storing (used to build the internal query engine)
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(
@@ -79,9 +79,9 @@ public final class FileDataSource implements RepositoryDataSource {
      * @param <T>           the type of the entities
      * @param <ID>          the type of the id of the entities
      * @param entityMapper  the entity mapper
-     * @param dataDirectory the directory where all the data is stored
-     * @param logger        the logger
-     * @param format        the configuration format to use for storing
+     * @param dataDirectory the directory where all the data is stored (used to build the internal query engine)
+     * @param logger        the logger (used to build the internal query engine)
+     * @param format        the configuration format to use for storing (used to build the internal query engine)
      * @return the repository
      */
     public <T, ID> @NotNull Repository<T, ID> newRepository(
