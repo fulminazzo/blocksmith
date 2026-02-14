@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.data.util
+package it.fulminazzo.blocksmith.util
 
 import spock.lang.Specification
 
