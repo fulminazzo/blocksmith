@@ -14,8 +14,8 @@ import org.jetbrains.annotations.NotNull;
  *     <li>creation:
  *         <pre>{@code
  *         MongoDataSource datasource = MongoDataSource.builder()
- *                 // if no host has been specified, will default to "0.0.0.0:27017"
- *                 .host("127.0.0.1", 27017)
+ *                 // if no host has been specified, will default to "127.0.0.1:27017"
+ *                 .host("0.0.0.0", 27018)
  *                 .replicaSetName("rs0")
  *                 .credential(MongoCredential.createScramSha256Credential(
  *                         "username",

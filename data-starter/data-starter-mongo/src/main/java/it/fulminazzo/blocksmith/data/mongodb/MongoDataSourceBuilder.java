@@ -31,7 +31,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
  *         .srvHost("cluster.host.com")
  *         .srvMaxHosts(10)
  *         .srvServiceName("mongodb")
- *         // if no host has been specified, will default to "0.0.0.0:27017"
+ *         // if no host has been specified, will default to "127.0.0.1:27017"
  *         .host("mongodb1.host.com", 27017)
  *         .host("mongodb2.host.com", 27017)
  *         .host("mongodb3.host.com", 27017)
@@ -68,7 +68,6 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
  * }*</pre>
  */
 public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder<MongoDataSource> {
-    private static final @NotNull ServerAddress defaultAddress = new ServerAddress("0.0.0.0");
     private static final @NotNull CodecRegistry pojoCodecRegistry = fromRegistries(
             MongoClientSettings.getDefaultCodecRegistry(),
             fromProviders(PojoCodecProvider.builder().automatic(true).build())
@@ -89,7 +88,7 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
 
     @Override
     public @NonNull MongoDataSource build() {
-        if (hosts.isEmpty()) hosts.add(defaultAddress);
+        if (hosts.isEmpty()) hosts.add(new ServerAddress());
         clientSettings.applyToClusterSettings(c -> c.hosts(hosts));
         return new MongoDataSource(MongoClients.create(clientSettings.build()));
     }
@@ -127,6 +126,8 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
 
     /**
      * Adds a new host to the connection.
+     * <br>
+     * Default: {@link ServerAddress#defaultHost()}:{@link ServerAddress#defaultPort()}
      *
      * @param address the host address
      * @param port    the port

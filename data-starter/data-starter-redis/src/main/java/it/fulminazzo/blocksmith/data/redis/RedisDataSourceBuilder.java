@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * <pre>{@code
  * RedisDataSource dataSource = RedisDataSource.builder()
  *         .uri(u -> u
- *                 .withHost("127.0.0.1") // defaults to "0.0.0.0"
+ *                 .withHost("0.0.0.0") // defaults to "127.0.0.1"
  *                 .withPort(6379) // defaults to 6379
  *         )
  *         .clientOptions(c -> c
@@ -53,7 +53,7 @@ public final class RedisDataSourceBuilder implements RepositoryDataSourceBuilder
      * Instantiates a new Redis datasource builder.
      */
     RedisDataSourceBuilder() {
-        this.redisURIbuilder = RedisURI.builder(RedisURI.create("redis://0.0.0.0:6379/0"));
+        this.redisURIbuilder = RedisURI.builder(RedisURI.create("redis://127.0.0.1:6379/0"));
     }
 
     @Override

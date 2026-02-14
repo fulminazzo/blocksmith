@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
  *         <pre>{@code
  *         RedisDataSource dataSource = RedisDataSource.builder()
  *                 .uri(u -> u
- *                         .withHost("127.0.0.1") // defaults to "0.0.0.0"
+ *                         .withHost("0.0.0.0") // defaults to "127.0.0.1"
  *                         .withPort(6379) // defaults to 6379
  *                         .withPassword("SuperSecurePassword")
  *                         .withSsl(true)

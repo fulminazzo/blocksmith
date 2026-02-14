@@ -62,6 +62,7 @@ import java.util.concurrent.ExecutorService;
  *                 .password("SuperSecurePassword")
  *                 .database("database")
  *                 .databaseType(DatabaseType.POSTGRES)
+ *                 .host("0.0.0.0")
  *                 .postgres()
  *                 .build();
  *          }

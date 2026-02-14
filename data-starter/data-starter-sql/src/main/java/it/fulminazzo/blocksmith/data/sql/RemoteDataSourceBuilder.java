@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutorService;
  *        .password("password")
  *        .database("test")
  *        .databaseType(databaseType)
- *        .host("127.0.0.1") // defaults to "0.0.0.0"
+ *        .host("0.0.0.0") // defaults to "127.0.0.1"
  *        .port(1337) // defaults to the port of the database type
  *        .mysql() // optimizations for MySQL/MariaDB
  *        .postgres() // optimizations for PostgreSQL
@@ -46,7 +46,7 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
                             final @NotNull IDatabaseType databaseType) {
         super(config, database, executor);
         this.databaseType = databaseType;
-        host("0.0.0.0").port(databaseType.getPort());
+        host("127.0.0.1").port(databaseType.getPort());
     }
 
     @Override
@@ -71,7 +71,7 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
     /**
      * Sets the host to connect to.
      * <br>
-     * Default: <code>0.0.0.0</code>
+     * Default: <code>127.0.0.1</code>
      *
      * @param host the host
      * @return this object (for method chaining)
