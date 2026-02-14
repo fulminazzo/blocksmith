@@ -51,7 +51,7 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
     }
 
     @Override
-    public @NotNull CompletableFuture<T> save(final @NotNull T entity) {
+    public @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
         return queryEngine.query((dsl, table) -> saveSingle(dsl, table, entity));
     }
 

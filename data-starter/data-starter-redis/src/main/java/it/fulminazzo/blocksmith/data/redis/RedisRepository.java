@@ -44,7 +44,7 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
     }
 
     @Override
-    public @NotNull CompletableFuture<T> save(final @NotNull T entity) {
+    public @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
         return queryEngine.query(async -> async.set(
                 entityMapper.getId(entity).toString(),
                 queryEngine.serialize(entity)

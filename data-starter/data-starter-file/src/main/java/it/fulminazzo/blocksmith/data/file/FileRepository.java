@@ -49,7 +49,7 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID, FileQueryEn
     }
 
     @Override
-    public @NotNull CompletableFuture<T> save(final @NotNull T entity) {
+    public @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
         return queryEngine.query(a -> {
             saveSingle(a, entity);
             return entity;

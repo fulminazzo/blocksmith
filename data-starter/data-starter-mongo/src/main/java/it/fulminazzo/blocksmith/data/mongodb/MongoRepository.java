@@ -54,7 +54,7 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID, MongoQuery
     }
 
     @Override
-    public @NotNull CompletableFuture<T> save(final @NonNull T entity) {
+    public @NotNull CompletableFuture<T> saveImpl(final @NonNull T entity) {
         return queryEngine.query(collection ->
                 collection.replaceOne(
                         eq(getIdFieldName(), entityMapper.getId(entity)),
