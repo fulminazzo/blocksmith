@@ -14,6 +14,45 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 /**
  * Mongo data source for handling connections and create Mongo repositories.
+ * <br>
+ * Examples:
+ * <ul>
+ *     <li>creation:
+ *         <pre>{@code
+ *         MongoDataSource datasource = MongoDataSource.builder()
+ *                 // if no host has been specified, will default to "0.0.0.0:27017"
+ *                 .host("127.0.0.1", 27017)
+ *                 .replicaSetName("rs0")
+ *                 .credential(MongoCredential.createScramSha256Credential(
+ *                         "username",
+ *                         "admin",
+ *                         "SuperSecurePassword".toCharArray()
+ *                 ))
+ *                 .applicationName("blocksmith/1.0.0")
+ *                 .sslSettings(ssl -> ssl.enabled(true))
+ *                 .build();
+ *         }</pre>
+ *     </li>
+ *     <li>creating a new repository:
+ *         <pre>{@code
+ *         MongoDataSource dataSource = ...;
+ *         Class<?> dataType = ...;
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 dataType,
+ *                 "database",
+ *                 "data"
+ *         );
+ *         }</pre>
+ *         or, for more control:
+ *         <pre>{@code
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 EntityMapper.create(dataType),
+ *                 "database",
+ *                 "data"
+ *         );
+ *         }</pre>
+ *     </li>
+ * </ul>
  */
 public final class MongoDataSource implements RepositoryDataSource {
     private final @NotNull MongoClient client;
@@ -72,6 +111,15 @@ public final class MongoDataSource implements RepositoryDataSource {
     @Override
     public void close() {
         client.close();
+    }
+
+    /**
+     * Gets a new builder for this class.
+     *
+     * @return the builder
+     */
+    public static @NotNull MongoDataSourceBuilder builder() {
+        return new MongoDataSourceBuilder();
     }
 
 }
