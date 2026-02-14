@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data;
 
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
+import it.fulminazzo.blocksmith.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +24,26 @@ import java.util.stream.Collectors;
 public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> implements Repository<T, ID> {
     protected final @NotNull E queryEngine;
     protected final @NotNull EntityMapper<T, ID> entityMapper;
+
+    @Override
+    public final @NotNull CompletableFuture<T> save(final @NotNull T entity) {
+        try {
+            ValidationUtils.validate(entity);
+        } catch (ValidationUtils.ViolationException e) {
+            CompletableFuture<T> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+        return saveImpl(entity);
+    }
+
+    /**
+     * Internal implementation of {@link #save(Object)}.
+     *
+     * @param entity the entity (already validated)
+     * @return the saved entity (in case values are changed)
+     */
+    protected abstract @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity);
 
     @Override
     public final @NotNull CompletableFuture<Void> delete(final @NotNull ID id) {
