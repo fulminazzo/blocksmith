@@ -29,14 +29,16 @@ class RedisQueryEngineTest extends Specification {
 
         connection.async().mset(
                 [Users.SAVED1, Users.SAVED2].collectEntries {
-                    [(it.id.toString()): mapper.serialize(it)]
+                    [("database:users:$it.id".toString()): mapper.serialize(it)]
                 }
-        )
+        ).get()
 
         engine = new RedisQueryEngine<>(
                 connection,
                 EntityMapper.create(User),
-                mapper
+                mapper,
+                'database',
+                'users'
         )
     }
 
@@ -48,7 +50,7 @@ class RedisQueryEngineTest extends Specification {
 
     def 'test that getValues returns #expected'() {
         given:
-        def keys = expected.collect { it.id.toString() }
+        def keys = expected.collect { "database:users:$it.id".toString() }
 
         when:
         def actual = engine.getValues(keys).get()
@@ -66,7 +68,7 @@ class RedisQueryEngineTest extends Specification {
 
     def 'test that getAllKeys returns all keys'() {
         given:
-        def expected = [Users.SAVED1, Users.SAVED2].collect { it.id.toString() }
+        def expected = [Users.SAVED1, Users.SAVED2].collect { "database:users:$it.id" }
 
         when:
         def actual = engine.allKeys.get()

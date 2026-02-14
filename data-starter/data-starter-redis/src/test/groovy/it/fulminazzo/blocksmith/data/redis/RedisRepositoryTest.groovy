@@ -106,7 +106,9 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
                 new RedisQueryEngine<>(
                         connection,
                         EntityMapper.create(User),
-                        mapper
+                        mapper,
+                        'database',
+                        'users'
                 ),
                 EntityMapper.create(User)
         )
@@ -114,17 +116,17 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
 
     @Override
     boolean exists(final @NotNull Long id) {
-        return connection.sync().get(id.toString()) != null
+        return connection.sync().get("database:users:$id".toString()) != null
     }
 
     @Override
     void insert(final @NotNull User entity) {
-        connection.sync().set(entity.id.toString(), mapper.serialize(entity))
+        connection.sync().set("database:users:$entity.id".toString(), mapper.serialize(entity))
     }
 
     @Override
     void remove(final @NotNull Long id) {
-        connection.sync().del(id.toString())
+        connection.sync().del("database:users:$id".toString())
     }
 
 }
