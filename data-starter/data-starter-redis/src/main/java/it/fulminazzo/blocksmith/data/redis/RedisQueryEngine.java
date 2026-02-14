@@ -25,15 +25,26 @@ import java.util.stream.Collectors;
  * <br>
  * Uses the <a href="https://lettuce.io">lettuce</a> library under the hood
  * to leverage the speed and optimizations provided by Netty asynchronous operations.
+ * <br>
+ * Will use the specified {@link #databaseName} and {@link #collectionName} to build
+ * the namespace where the entries will be stored.
+ * <br>
+ * Given an <code>ID</code>, the key format will be:
+ * `&lt;databaseName&gt;:&lt;collectionName&gt;:&lt;ID&gt;`
  *
  * @param <T>  the type of the entities
  * @param <ID> the type of the id of the entities
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class RedisQueryEngine<T, ID> implements QueryEngine<T, ID> {
+    private static final @NotNull String separator = ":";
+
     private final @NotNull StatefulRedisConnection<String, String> connection;
     private final @NotNull EntityMapper<T, ID> entityMapper;
     private final @NotNull Mapper mapper;
+
+    private final @NotNull String databaseName;
+    private final @NotNull String collectionName;
 
     /**
      * Queries the database to get all the values of the corresponding keys.
@@ -120,12 +131,14 @@ public final class RedisQueryEngine<T, ID> implements QueryEngine<T, ID> {
 
     /**
      * Gets the textual form of the id of an entity.
+     * <br>
+     * Will append the <b>namespace</b> of the engine before returning it.
      *
      * @param id the id
      * @return the id
      */
     public @NotNull String getId(final @NotNull ID id) {
-        return id.toString();
+        return databaseName + separator + collectionName + separator + id;
     }
 
 }
