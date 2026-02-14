@@ -36,32 +36,7 @@ class MongoRepositoryTest extends RepositoryTest<MongoRepository<User, Long>> {
     private static MongoCollection<User> collection
 
     void setupSpec() {
-        server = Mongod.builder()
-                .net(Start.to(Net).initializedWith(Net.of('localhost', port, de.flapdoodle.net.Net.localhostIsIPv6())))
-                .packageOfDistribution(PackageOfCommandDistribution.builder()
-                        .commandPackageResolver(command -> {
-                            def resolver = new PlatformPackageResolver(command)
-                            return (PackageResolver) ((distribution) -> {
-                                try {
-                                    return resolver.packageFor(distribution)
-                                } catch (IllegalArgumentException e) {
-                                    if (distribution.platform().operatingSystem() == CommonOS.Linux) {
-                                        def fallbackDist = Distribution.of(
-                                                distribution.version(),
-                                                ImmutablePlatform.copyOf(distribution.platform())
-                                                        .withDistribution(LinuxDistribution.Ubuntu)
-                                                        .withVersion(UbuntuVersion.Ubuntu_22_04)
-                                        )
-                                        return resolver.packageFor(fallbackDist)
-                                    }
-                                    throw e
-                                }
-                            })
-                        })
-                        .build()
-                )
-                .build()
-                .start(Version.Main.V7_0)
+        server = TestUtils.startServer(port)
 
         def pojoCodec = CodecRegistries.fromRegistries(MongoClientSettings.defaultCodecRegistry,
                 CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
