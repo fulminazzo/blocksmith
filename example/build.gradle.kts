@@ -1,6 +1,34 @@
+//TODO: rework dependency file
+//TODO: provide better examples
 plugins {
     alias(libs.plugins.shadow)
     alias(libs.plugins.jooq)
+}
+
+tasks.compileJava {
+    dependsOn("generateJooq")
+}
+
+dependencies {
+    api(libs.embedded.redis)
+
+    api(project(":data-starter:data-starter-redis"))
+}
+
+dependencies {
+    implementation(libs.slf4j)
+    implementation(libs.bundles.log4j)
+
+    implementation(project(":config-starter:config-starter-all"))
+    implementation(project(":data-starter:data-starter-file"))
+}
+
+tasks.jar {
+    dependsOn(tasks.shadowJar)
+}
+
+tasks.shadowJar {
+    archiveClassifier = "all"
 }
 
 dependencies {
@@ -39,30 +67,4 @@ jooq {
             }
         }
     }
-}
-
-tasks.compileJava {
-    dependsOn("generateJooq")
-}
-
-dependencies {
-    api(libs.embedded.redis)
-
-    api(project(":data-starter:data-starter-redis"))
-}
-
-dependencies {
-    implementation(libs.slf4j)
-    implementation(libs.bundles.log4j)
-
-    implementation(project(":config-starter:config-starter-all"))
-    implementation(project(":data-starter:data-starter-file"))
-}
-
-tasks.jar {
-    dependsOn(tasks.shadowJar)
-}
-
-tasks.shadowJar {
-    archiveClassifier = "all"
 }
