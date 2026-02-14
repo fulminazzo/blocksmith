@@ -71,10 +71,10 @@ public final class MemoryDataSource implements RepositoryDataSource {
     }
 
     /**
-     * Creates a new Memory datasource.
+     * Creates a new Memory data source.
      *
      * @param executor the executor
-     * @return the file datasource
+     * @return the file data source
      */
     public static @NotNull MemoryDataSource create(final @NotNull ExecutorService executor) {
         return new MemoryDataSource(executor);

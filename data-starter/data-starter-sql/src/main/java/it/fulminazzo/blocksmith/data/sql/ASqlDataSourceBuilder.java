@@ -160,7 +160,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
     }
 
     /**
-     * Sets a property for the final datasource.
+     * Sets a property for the final data source.
      *
      * @param propertyName the property name
      * @param value        the value

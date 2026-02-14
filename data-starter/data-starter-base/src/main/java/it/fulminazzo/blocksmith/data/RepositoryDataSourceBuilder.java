@@ -5,14 +5,14 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a general builder for a {@link RepositoryDataSource}.
  *
- * @param <D> the type of the datasource
+ * @param <D> the type of the data source
  */
 public interface RepositoryDataSourceBuilder<D extends RepositoryDataSource> {
 
     /**
-     * Builds the datasource.
+     * Builds the data source.
      *
-     * @return the datasource
+     * @return the data source
      */
     @NotNull D build();
 

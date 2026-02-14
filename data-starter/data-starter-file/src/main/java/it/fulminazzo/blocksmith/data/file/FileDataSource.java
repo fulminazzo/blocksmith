@@ -105,10 +105,10 @@ public final class FileDataSource implements RepositoryDataSource {
     }
 
     /**
-     * Creates a new File datasource.
+     * Creates a new File data source.
      *
      * @param executor the executor
-     * @return the file datasource
+     * @return the file data source
      */
     public static @NotNull FileDataSource create(final @NotNull ExecutorService executor) {
         return new FileDataSource(executor);

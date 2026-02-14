@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  * <ul>
  *     <li>creation:
  *         <pre>{@code
- *         MongoDataSource datasource = MongoDataSource.builder()
+ *         MongoDataSource dataSource = MongoDataSource.builder()
  *                 // if no host has been specified, will default to "127.0.0.1:27017"
  *                 .host("0.0.0.0", 27018)
  *                 .replicaSetName("rs0")

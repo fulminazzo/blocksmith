@@ -27,7 +27,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
  * <br>
  * Example usage:
  * <pre>{@code
- * MongoDataSource datasource = MongoDataSource.builder()
+ * MongoDataSource dataSource = MongoDataSource.builder()
  *         .srvHost("cluster.host.com")
  *         .srvMaxHosts(10)
  *         .srvServiceName("mongodb")

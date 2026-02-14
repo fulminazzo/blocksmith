@@ -50,7 +50,7 @@ public final class RedisDataSourceBuilder implements RepositoryDataSourceBuilder
     private @NotNull Mapper mapper = Mappers.JSON;
 
     /**
-     * Instantiates a new Redis datasource builder.
+     * Instantiates a new Redis data source builder.
      */
     RedisDataSourceBuilder() {
         this.redisURIbuilder = RedisURI.builder(RedisURI.create("redis://127.0.0.1:6379/0"));

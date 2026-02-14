@@ -9,7 +9,7 @@ import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Redis datasource for handling connections and create Redis repositories.
+ * Redis data source for handling connections and create Redis repositories.
  * <br>
  * Examples:
  * <ul>
@@ -45,7 +45,7 @@ public final class RedisDataSource implements RepositoryDataSource {
     private final @NotNull Mapper mapper;
 
     /**
-     * Instantiates a new Redis datasource.
+     * Instantiates a new Redis data source.
      *
      * @param redisClient the redis client
      * @param mapper      the mapper

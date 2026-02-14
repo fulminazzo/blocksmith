@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
 /**
- * SQL datasource for handling connection and create repositories.
+ * SQL data source for handling connection and create repositories.
  * <br>
  * Examples:
  * <ul>
