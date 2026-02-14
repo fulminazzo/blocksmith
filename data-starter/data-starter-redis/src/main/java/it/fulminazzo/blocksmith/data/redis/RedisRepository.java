@@ -1,6 +1,5 @@
 package it.fulminazzo.blocksmith.data.redis;
 
-import io.lettuce.core.MSetExArgs;
 import io.lettuce.core.RedisFuture;
 import io.lettuce.core.api.async.RedisServerAsyncCommands;
 import it.fulminazzo.blocksmith.data.AbstractRepository;
@@ -10,11 +9,9 @@ import it.fulminazzo.blocksmith.util.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
-import java.time.Duration;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
 /**
@@ -83,9 +80,16 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
                             t -> entityMapper.getId(t).toString(),
                             queryEngine::serialize
                     ));
-            final RedisFuture<?> future;
-            if (expiry > 0) future = async.msetex(serEntities, new MSetExArgs().px(Duration.ofMillis(expiry)));
-            else future = async.mset(serEntities);
+            CompletionStage<?> future = null;
+            if (expiry > 0) {
+                Queue<String> queue = new LinkedList<>(serEntities.keySet());
+                do {
+                    String key = queue.poll();
+                    RedisFuture<?> tmp = async.psetex(key, expiry, serEntities.get(key));
+                    if (future == null) future = tmp;
+                    else future = future.thenCompose(r -> tmp);
+                } while (!queue.isEmpty());
+            } else future = async.mset(serEntities);
             return future;
         }).thenApply(s -> entities);
     }
