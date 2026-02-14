@@ -5,9 +5,7 @@ import it.fulminazzo.blocksmith.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -78,7 +76,19 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
     @Override
     public final @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entities) {
         if (entities.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
-        return saveAllImpl(entities.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+        List<T> actualEntities = new ArrayList<>();
+        try {
+            for (T t : entities)
+                if (t != null) {
+                    ValidationUtils.validate(t);
+                    actualEntities.add(t);
+                }
+        } catch (ValidationUtils.ViolationException e) {
+            CompletableFuture<Collection<T>> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+        return saveAllImpl(actualEntities);
     }
 
     /**
