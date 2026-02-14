@@ -1,6 +1,7 @@
 rootProject.name = "blocksmith"
 
 include("base")
+include("base:validation")
 
 
 include("example")
@@ -27,8 +28,8 @@ include("data-starter:data-starter-mapper")
 include("data-starter:data-starter-mapper:data-starter-mapper-json")
 
 include("data-starter:data-starter-file")
+include("data-starter:data-starter-memory")
 include("data-starter:data-starter-mongo")
 include("data-starter:data-starter-redis")
 include("data-starter:data-starter-sql")
 
-include("base:validation")
