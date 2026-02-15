@@ -8,7 +8,7 @@ import org.jooq.TableField;
 
 import java.util.Objects;
 
-public class SqlRepositorySettings extends RepositorySettings {
+public final class SqlRepositorySettings extends RepositorySettings {
     private @Nullable Table<?> table;
     private @Nullable TableField<?, ?> idColumn;
 
@@ -20,12 +20,12 @@ public class SqlRepositorySettings extends RepositorySettings {
         return Objects.requireNonNull(idColumn, "id column has not been specified yet");
     }
 
-    public @NotNull SqlRepositorySettings setTable(final @NotNull Table<?> table) {
+    public @NotNull SqlRepositorySettings withTable(final @NotNull Table<?> table) {
         this.table = table;
         return this;
     }
 
-    public @NotNull SqlRepositorySettings setIdColumn(final @NotNull TableField<?, ?> idColumn) {
+    public @NotNull SqlRepositorySettings withIdColumn(final @NotNull TableField<?, ?> idColumn) {
         this.idColumn = idColumn;
         return this;
     }
