@@ -1,16 +1,13 @@
 package it.fulminazzo.blocksmith.data.file;
 
 import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
-import it.fulminazzo.blocksmith.config.ConfigurationFormat;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.RepositoryDataSource;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
-import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 
@@ -22,7 +19,7 @@ import java.util.function.Function;
  *         <pre>{@code
  *         ExecutorService executor = ...;
  *         FileDataSource dataSource = FileDataSource.create(executor);
- *         }</pre>
+ *         }*</pre>
  *     </li>
  *     <li>creating a new repository:
  *         <pre>{@code
@@ -37,7 +34,7 @@ import java.util.function.Function;
  *                 logger,
  *                 format
  *         );
- *         }</pre>
+ *         }*</pre>
  *         or, for more control:
  *         <pre>{@code
  *         Repository<?, ?> repository = dataSource.newRepository(
@@ -46,56 +43,22 @@ import java.util.function.Function;
  *                 logger,
  *                 format
  *         );
- *         }</pre>
+ *         }*</pre>
  *     </li>
  * </ul>
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class FileDataSource implements RepositoryDataSource {
+public final class FileDataSource implements RepositoryDataSource<FileRepositorySettings> {
     private final @NotNull ExecutorService executor;
 
-    /**
-     * Creates a new repository.
-     *
-     * @param <T>           the type of the entities
-     * @param <ID>          the type of the id of the entities
-     * @param entityType    the entity Java class
-     * @param dataDirectory the directory where all the data is stored (used to build the internal query engine)
-     * @param logger        the logger (used to build the internal query engine)
-     * @param format        the configuration format to use for storing (used to build the internal query engine)
-     * @return the repository
-     */
-    public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull Class<T> entityType,
-            final @NotNull File dataDirectory,
-            final @NotNull Logger logger,
-            final @NotNull ConfigurationFormat format
-    ) {
-        return newRepository(EntityMapper.create(entityType), dataDirectory, logger, format);
-    }
-
-    /**
-     * Creates a new repository.
-     *
-     * @param <T>           the type of the entities
-     * @param <ID>          the type of the id of the entities
-     * @param entityMapper  the entity mapper
-     * @param dataDirectory the directory where all the data is stored (used to build the internal query engine)
-     * @param logger        the logger (used to build the internal query engine)
-     * @param format        the configuration format to use for storing (used to build the internal query engine)
-     * @return the repository
-     */
+    @Override
     public <T, ID> @NotNull Repository<T, ID> newRepository(
             final @NotNull EntityMapper<T, ID> entityMapper,
-            final @NotNull File dataDirectory,
-            final @NotNull Logger logger,
-            final @NotNull ConfigurationFormat format
+            final @NotNull FileRepositorySettings settings
     ) {
         return newRepository(
                 e -> new FileRepository<>(e, entityMapper),
-                dataDirectory,
-                logger,
-                format
+                settings
         );
     }
 
@@ -106,21 +69,17 @@ public final class FileDataSource implements RepositoryDataSource {
      * @param <T>               the type of the entities
      * @param <ID>              the type of the id of the entities
      * @param repositoryBuilder the repository creation function
-     * @param dataDirectory     the directory where all the data is stored (used to build the internal query engine)
-     * @param logger            the logger (used to build the internal query engine)
-     * @param format            the configuration format to use for storing (used to build the internal query engine)
+     * @param settings          the settings to build the repository with
      * @return the repository
      */
     public <R extends FileRepository<T, ID>, T, ID> @NotNull R newRepository(
             final @NotNull Function<FileQueryEngine<T, ID>, R> repositoryBuilder,
-            final @NotNull File dataDirectory,
-            final @NotNull Logger logger,
-            final @NotNull ConfigurationFormat format
+            final @NotNull FileRepositorySettings settings
     ) {
         FileQueryEngine<T, ID> engine = new FileQueryEngine<>(
-                ConfigurationAdapter.newAdapter(logger, format),
-                format,
-                dataDirectory,
+                ConfigurationAdapter.newAdapter(settings.getLogger(), settings.getFormat()),
+                settings.getFormat(),
+                settings.getDataDirectory(),
                 executor
         );
         return repositoryBuilder.apply(engine);
