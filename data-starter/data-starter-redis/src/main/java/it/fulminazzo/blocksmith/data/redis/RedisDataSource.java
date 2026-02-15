@@ -115,7 +115,7 @@ public final class RedisDataSource implements RepositoryDataSource<RedisReposito
                 settings.getDatabaseName(),
                 settings.getCollectionName()
         );
-        return repositoryBuilder.apply(engine);
+        return (R) repositoryBuilder.apply(engine).setExpiry(settings.getExpiryInMillis());
     }
 
     @Override
