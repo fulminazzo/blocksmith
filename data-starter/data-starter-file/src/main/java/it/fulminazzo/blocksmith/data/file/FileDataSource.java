@@ -13,37 +13,46 @@ import java.util.function.Function;
 
 /**
  * Implementation of {@link RepositoryDataSource} for file-based repositories.
+ * <br>
+ * Persists data to the file system using a configurable file format (YAML, JSON, etc).
+ * Each entity is stored in a separate file named after its ID.
+ * <br>
  * Examples:
  * <ul>
  *     <li>creation:
  *         <pre>{@code
  *         ExecutorService executor = ...;
  *         FileDataSource dataSource = FileDataSource.create(executor);
- *         }*</pre>
+ *         }</pre>
  *     </li>
- *     <li>creating a new repository:
+ *     <li>creating a standard repository:
  *         <pre>{@code
  *         FileDataSource dataSource = ...;
- *         Class<?> dataType = ...;
  *         File dataDirectory = ...;
  *         Logger logger = LoggerFactory.getLogger(FileRepository.class);
  *         ConfigurationFormat format = ConfigurationFormat.YAML;
  *         Repository<?, ?> repository = dataSource.newRepository(
- *                 dataType,
- *                 dataDirectory,
- *                 logger,
- *                 format
+ *                 EntityMapper.create(User.class),
+ *                 new FileRepositorySettings()
+ *                         .withDataDirectory(dataDirectory)
+ *                         .withLogger(logger)
+ *                         .withFormat(format)
  *         );
- *         }*</pre>
- *         or, for more control:
+ *         }</pre>
+ *     </li>
+ *     <li>creating a custom repository:
  *         <pre>{@code
+ *         FileDataSource dataSource = ...;
  *         Repository<?, ?> repository = dataSource.newRepository(
- *                 EntityMapper.create(dataType, "idFieldName"),
- *                 dataDirectory,
- *                 logger,
- *                 format
+ *                 engine -> new CustomFileRepository<>(engine),
+ *                 new FileRepositorySettings()
+ *                         .withDataDirectory(dataDirectory)
+ *                         .withLogger(logger)
+ *                         .withFormat(format)
  *         );
- *         }*</pre>
+ *         }</pre>
+ *         where CustomFileRepository extends FileRepository and adds custom behavior
+ *         such as backup on save, or encryption of sensitive fields.
  *     </li>
  * </ul>
  */

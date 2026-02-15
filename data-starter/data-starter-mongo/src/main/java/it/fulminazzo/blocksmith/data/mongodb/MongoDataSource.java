@@ -11,14 +11,23 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Function;
 
 /**
- * Mongo data source for handling connections and create Mongo repositories.
+ * MongoDB data source for handling connections and creating MongoDB repositories.
+ * <br>
+ * Manages MongoDB client connections and creates repositories for storing entities
+ * in MongoDB collections using reactive streams.
  * <br>
  * Examples:
  * <ul>
- *     <li>creation:
+ *     <li>creation (local MongoDB):
  *         <pre>{@code
  *         MongoDataSource dataSource = MongoDataSource.builder()
- *                 // if no host has been specified, will default to "127.0.0.1:27017"
+ *                 // defaults to "127.0.0.1:27017"
+ *                 .build();
+ *         }</pre>
+ *     </li>
+ *     <li>creation (remote MongoDB with authentication):
+ *         <pre>{@code
+ *         MongoDataSource dataSource = MongoDataSource.builder()
  *                 .host("0.0.0.0", 27018)
  *                 .replicaSetName("rs0")
  *                 .credential(MongoCredential.createScramSha256Credential(
@@ -29,26 +38,31 @@ import java.util.function.Function;
  *                 .applicationName("blocksmith/1.0.0")
  *                 .sslSettings(ssl -> ssl.enabled(true))
  *                 .build();
- *         }*</pre>
+ *         }</pre>
  *     </li>
- *     <li>creating a new repository:
+ *     <li>creating a standard repository:
  *         <pre>{@code
  *         MongoDataSource dataSource = ...;
- *         Class<?> dataType = ...;
  *         Repository<?, ?> repository = dataSource.newRepository(
- *                 dataType,
- *                 "database",
- *                 "data"
+ *                 EntityMapper.create(User.class),
+ *                 new MongoRepositorySettings()
+ *                         .withDatabaseName("users_db")
+ *                         .withCollectionName("users")
  *         );
- *         }*</pre>
- *         or, for more control:
+ *         }</pre>
+ *     </li>
+ *     <li>creating a custom repository:
  *         <pre>{@code
+ *         MongoDataSource dataSource = ...;
  *         Repository<?, ?> repository = dataSource.newRepository(
- *                 EntityMapper.create(dataType),
- *                 "database",
- *                 "data"
+ *                 engine -> new CustomMongoRepository<>(engine),
+ *                 new MongoRepositorySettings()
+ *                         .withDatabaseName("users_db")
+ *                         .withCollectionName("users")
  *         );
- *         }*</pre>
+ *         }</pre>
+ *         where CustomMongoRepository extends MongoRepository and adds custom behavior
+ *         such as batch operations, aggregation pipelines, or change stream monitoring.
  *     </li>
  * </ul>
  */

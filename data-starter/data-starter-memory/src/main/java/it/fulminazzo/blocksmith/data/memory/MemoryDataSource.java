@@ -12,6 +12,10 @@ import java.util.function.Function;
 
 /**
  * Implementation of {@link RepositoryDataSource} for memory-based repositories.
+ * <br>
+ * Supports optional TTL (Time To Live) for entries with lazy deletion.
+ * Entries automatically expire after a specified duration and are removed when accessed.
+ * <br>
  * Examples:
  * <ul>
  *     <li>creation:
@@ -20,16 +24,26 @@ import java.util.function.Function;
  *         MemoryDataSource dataSource = MemoryDataSource.create(executor);
  *         }</pre>
  *     </li>
- *     <li>creating a new repository:
+ *     <li>creating a standard repository:
  *         <pre>{@code
  *         MemoryDataSource dataSource = ...;
- *         Class<?> dataType = ...;
- *         Repository<?, ?> repository = dataSource.newRepository(dataType);
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 EntityMapper.create(User.class),
+ *                 new MemoryRepositorySettings()
+ *                         .withExpiryInMillis(300000) // optional
+ *         );
  *         }</pre>
- *         or, for more control:
+ *     </li>
+ *     <li>creating a custom repository:
  *         <pre>{@code
- *         Repository<?, ?> repository = dataSource.newRepository(EntityMapper.create(dataType, "idFieldName"));
+ *         MemoryDataSource dataSource = ...;
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 engine -> new CustomMemoryRepository<>(engine),
+ *                 new MemoryRepositorySettings()
+ *                         .withExpiryInMillis(300000) // optional
+ *         );
  *         }</pre>
+ *         where CustomMemoryRepository extends MemoryRepository and adds custom behavior.
  *     </li>
  * </ul>
  */
@@ -73,7 +87,7 @@ public final class MemoryDataSource implements RepositoryDataSource<MemoryReposi
      * Creates a new Memory data source.
      *
      * @param executor the executor
-     * @return the file data source
+     * @return the memory data source
      */
     public static @NotNull MemoryDataSource create(final @NotNull ExecutorService executor) {
         return new MemoryDataSource(executor);

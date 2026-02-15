@@ -11,32 +11,55 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Function;
 
 /**
- * Redis data source for handling connections and create Redis repositories.
+ * Redis data source for handling connections and creating Redis repositories.
+ * <br>
+ * Manages Redis client connections and creates repositories for storing entities
+ * in Redis using the Lettuce reactive client.
  * <br>
  * Examples:
  * <ul>
- *     <li>creation:
+ *     <li>creation (local Redis):
+ *         <pre>{@code
+ *         RedisDataSource dataSource = RedisDataSource.builder()
+ *                 // defaults to "127.0.0.1:6379"
+ *                 .build();
+ *         }</pre>
+ *     </li>
+ *     <li>creation (remote Redis with authentication):
  *         <pre>{@code
  *         RedisDataSource dataSource = RedisDataSource.builder()
  *                 .uri(u -> u
- *                         .withHost("0.0.0.0") // defaults to "127.0.0.1"
- *                         .withPort(6379) // defaults to 6379
+ *                         .withHost("0.0.0.0")
+ *                         .withPort(6379)
  *                         .withPassword("SuperSecurePassword")
  *                         .withSsl(true)
  *                 )
  *                 .build();
- *         }*</pre>
+ *         }</pre>
  *     </li>
- *     <li>creating a new repository:
+ *     <li>creating a standard repository:
  *         <pre>{@code
  *         RedisDataSource dataSource = ...;
- *         Class<?> dataType = ...;
- *         Repository<?, ?> repository = dataSource.newRepository(dataType);
- *         }*</pre>
- *         or, for more control:
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 EntityMapper.create(User.class),
+ *                 new RedisRepositorySettings()
+ *                         .withDatabaseName("users_db")
+ *                         .withCollectionName("users")
+ *         );
+ *         }</pre>
+ *     </li>
+ *     <li>creating a custom repository:
  *         <pre>{@code
- *         Repository<?, ?> repository = dataSource.newRepository(EntityMapper.create(dataType, "idFieldName"));
- *         }*</pre>
+ *         RedisDataSource dataSource = ...;
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 engine -> new CustomRedisRepository<>(engine),
+ *                 new RedisRepositorySettings()
+ *                         .withDatabaseName("users_db")
+ *                         .withCollectionName("users")
+ *         );
+ *         }</pre>
+ *         where CustomRedisRepository extends RedisRepository and adds custom behavior
+ *         such as per-value TTL-based expiration, pub/sub messaging, or cache warming strategies.
  *     </li>
  * </ul>
  */

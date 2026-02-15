@@ -18,81 +18,74 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 
 /**
- * SQL data source for handling connection and create repositories.
+ * SQL data source for handling connections and creating SQL-based repositories.
+ * <br>
+ * Supports multiple SQL databases through jOOQ: H2, SQLite, PostgreSQL, MySQL, Oracle, etc.
  * <br>
  * Examples:
  * <ul>
- *     <li>creation:
- *          <pre>{@code
- *          SqlDataSource dataSource = SqlDataSource.builder()
- *                 .username("username")
- *                 .password("password")
- *                 .database("database")
- *                 .build(); // will fail if a database type was not specified
- *          }***
- *          </pre>
- *     Check {@link SqliteDataSourceBuilder} for more;
- *     </li>
- *     <li>H2 connection creation:
- *          <pre>{@code
- *          SqlDataSource dataSource = SqlDataSource.builder()
+ *     <li>creation (H2 in-memory):
+ *         <pre>{@code
+ *         SqlDataSource dataSource = SqlDataSource.builder()
  *                 .username("sa")
  *                 .password("")
  *                 .database("DATABASE")
  *                 .h2()
  *                 .memory()
  *                 .build();
- *          }***
- *          </pre>
- *     Check {@link H2DataSourceBuilder} for more;</li>
- *     <li>SQLite connection creation:
- *          <pre>{@code
- *          SqlDataSource dataSource = SqlDataSource.builder()
+ *         }</pre>
+ *     </li>
+ *     <li>creation (SQLite on disk):
+ *         <pre>{@code
+ *         SqlDataSource dataSource = SqlDataSource.builder()
  *                 .database("database")
  *                 .sqlite()
  *                 .disk("./sqlite")
  *                 .build();
- *          }***
- *          </pre>
- *     Check {@link SqliteDataSourceBuilder} for more;
+ *         }</pre>
  *     </li>
- *     <li>other remote SQL database connection creation:
- *          <pre>{@code
- *          SqlDataSource dataSource = SqlDataSource.builder()
+ *     <li>creation (PostgreSQL):
+ *         <pre>{@code
+ *         SqlDataSource dataSource = SqlDataSource.builder()
  *                 .username("user")
  *                 .password("SuperSecurePassword")
  *                 .database("database")
- *                 .databaseType(DatabaseType.POSTGRES)
- *                 .host("0.0.0.0")
  *                 .postgres()
+ *                 .host("0.0.0.0")
  *                 .build();
- *          }***
- *          </pre>
- *     Check {@link RemoteDataSourceBuilder} for more.
+ *         }</pre>
  *     </li>
- *     <li>creating a new repository:
+ *     <li>creating a standard repository:
  *         <pre>{@code
  *         SqlDataSource dataSource = ...;
- *         Class<?> dataType = ...;
- *         // The table in the database containing the entities.
- *         // Supports jOOQ generation plugin (for sub-implementations).
- *         Table<?> entitiesTable = ...;
- *         // The column that identifies the entities in the table.
- *         TableField<?, ?> tableIdColumn = ...;
+ *
+ *         Table<?> usersTable = DSL.table("users");
+ *         TableField<?, Integer> idColumn = DSL.field("id", Integer.class);
+ *
  *         Repository<?, ?> repository = dataSource.newRepository(
- *                 dataType,
- *                 entitiesTable,
- *                 tableIdColumn
+ *                 EntityMapper.create(User.class),
+ *                 new SqlRepositorySettings()
+ *                         .withTable(usersTable)
+ *                         .withIdColumn(idColumn)
  *         );
- *         }**</pre>
- *         or, for more control:
+ *         }</pre>
+ *     </li>
+ *     <li>creating a custom repository:
  *         <pre>{@code
+ *         SqlDataSource dataSource = ...;
+ *
+ *         Table<?> usersTable = DSL.table("users");
+ *         TableField<?, Integer> idColumn = DSL.field("id", Integer.class);
+ *
  *         Repository<?, ?> repository = dataSource.newRepository(
- *                 EntityMapper.create(dataType),
- *                 entitiesTable,
- *                 tableIdColumn
+ *                 engine -> new CustomSqlRepository<>(engine),
+ *                 new SqlRepositorySettings()
+ *                         .withTable(usersTable)
+ *                         .withIdColumn(idColumn)
  *         );
- *         }**</pre>
+ *         }</pre>
+ *         where CustomSqlRepository extends SqlRepository and adds custom behavior
+ *         such as audit logging, transaction handling, or query optimization.
  *     </li>
  * </ul>
  */
