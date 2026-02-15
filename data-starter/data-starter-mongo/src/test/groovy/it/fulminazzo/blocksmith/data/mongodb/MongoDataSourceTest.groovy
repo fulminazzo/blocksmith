@@ -26,7 +26,12 @@ class MongoDataSourceTest extends Specification {
                 .build()
 
         when:
-        def repository = dataSource.newRepository(User, 'database', 'users')
+        def repository = dataSource.newRepository(
+                User,
+                new MongoRepositorySettings()
+                        .withDatabaseName('database')
+                        .withCollectionName('users')
+        )
 
         then:
         repository != null

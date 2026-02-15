@@ -20,9 +20,10 @@ class FileDataSourceTest extends Specification {
         when:
         def repository = dataSource.newRepository(
                 User,
-                new File('build/resources/test'),
-                log,
-                ConfigurationFormat.JSON
+                new FileRepositorySettings()
+                        .withDataDirectory(new File('build/resources/test'))
+                        .withLogger(log)
+                        .withFormat(ConfigurationFormat.JSON)
         )
 
         then:

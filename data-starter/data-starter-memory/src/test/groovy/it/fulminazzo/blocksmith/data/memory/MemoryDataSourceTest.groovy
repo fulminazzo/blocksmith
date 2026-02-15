@@ -16,7 +16,10 @@ class MemoryDataSourceTest extends Specification {
         def dataSource = MemoryDataSource.create(executor)
 
         when:
-        def repository = dataSource.newRepository(User)
+        def repository = dataSource.newRepository(
+                User,
+                new MemoryRepositorySettings()
+        )
 
         then:
         repository != null

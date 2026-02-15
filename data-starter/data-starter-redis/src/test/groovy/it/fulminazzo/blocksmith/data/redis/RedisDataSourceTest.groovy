@@ -34,8 +34,9 @@ class RedisDataSourceTest extends Specification {
         when:
         def repository = dataSource.newRepository(
                 User,
-                'database',
-                'users'
+                new RedisRepositorySettings()
+                        .withDatabaseName('database')
+                        .withCollectionName('users')
         )
 
         then:

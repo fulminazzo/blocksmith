@@ -6,6 +6,7 @@ import com.zaxxer.hikari.pool.HikariPool
 import it.fulminazzo.blocksmith.data.User
 import org.jetbrains.annotations.NotNull
 import org.jooq.SQLDialect
+import org.jooq.TableField
 import org.jooq.impl.DSL
 import org.jooq.impl.SQLDataType
 import spock.lang.Specification
@@ -70,8 +71,9 @@ class SqlDataSourceTest extends Specification {
         when:
         def repository = dataSource.newRepository(
                 User,
-                table,
-                field
+                new SqlRepositorySettings()
+                        .withTable(table)
+                        .withIdColumn(field as TableField<?, ?>)
         )
 
         then:
