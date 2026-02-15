@@ -29,7 +29,7 @@ import java.util.function.Function;
  *                 .password("password")
  *                 .database("database")
  *                 .build(); // will fail if a database type was not specified
- *          }*
+ *          }***
  *          </pre>
  *     Check {@link SqliteDataSourceBuilder} for more;
  *     </li>
@@ -42,7 +42,7 @@ import java.util.function.Function;
  *                 .h2()
  *                 .memory()
  *                 .build();
- *          }*
+ *          }***
  *          </pre>
  *     Check {@link H2DataSourceBuilder} for more;</li>
  *     <li>SQLite connection creation:
@@ -52,7 +52,7 @@ import java.util.function.Function;
  *                 .sqlite()
  *                 .disk("./sqlite")
  *                 .build();
- *          }*
+ *          }***
  *          </pre>
  *     Check {@link SqliteDataSourceBuilder} for more;
  *     </li>
@@ -66,7 +66,7 @@ import java.util.function.Function;
  *                 .host("0.0.0.0")
  *                 .postgres()
  *                 .build();
- *          }*
+ *          }***
  *          </pre>
  *     Check {@link RemoteDataSourceBuilder} for more.
  *     </li>
@@ -84,7 +84,7 @@ import java.util.function.Function;
  *                 entitiesTable,
  *                 tableIdColumn
  *         );
- *         }</pre>
+ *         }**</pre>
  *         or, for more control:
  *         <pre>{@code
  *         Repository<?, ?> repository = dataSource.newRepository(
@@ -92,11 +92,11 @@ import java.util.function.Function;
  *                 entitiesTable,
  *                 tableIdColumn
  *         );
- *         }</pre>
+ *         }**</pre>
  *     </li>
  * </ul>
  */
-public final class SqlDataSource implements RepositoryDataSource {
+public final class SqlDataSource implements RepositoryDataSource<SqlRepositorySettings> {
     private final @NotNull HikariDataSource dataSource;
     private final @NotNull DSLContext context;
     private final @NotNull ExecutorService executor;
@@ -116,45 +116,14 @@ public final class SqlDataSource implements RepositoryDataSource {
         this.context = DSL.using(dataSource, dialect);
     }
 
-    /**
-     * Creates a new repository.
-     *
-     * @param <T>        the type of the entities
-     * @param <ID>       the type of the id of the entities
-     * @param <R>        the type of the entities in the table
-     * @param entityType the entity Java class
-     * @param table      the table (used to build the internal query engine)
-     * @param idColumn   the column that represents the ID of the entities in the table (used to build the internal query engine)
-     * @return the repository
-     */
-    public <T, ID, R extends Record> @NotNull Repository<T, ID> newRepository(
-            final @NotNull Class<T> entityType,
-            final @NotNull Table<R> table,
-            final @NotNull TableField<R, ID> idColumn
-    ) {
-        return newRepository(EntityMapper.create(entityType), table, idColumn);
-    }
-
-    /**
-     * Creates a new repository.
-     *
-     * @param <T>          the type of the entities
-     * @param <ID>         the type of the id of the entities
-     * @param <R>          the type of the entities in the table
-     * @param entityMapper the entities mapper
-     * @param table        the table (used to build the internal query engine)
-     * @param idColumn     the column that represents the ID of the entities in the table (used to build the internal query engine)
-     * @return the repository
-     */
-    public <T, ID, R extends Record> @NotNull Repository<T, ID> newRepository(
+    @Override
+    public <T, ID> @NotNull Repository<T, ID> newRepository(
             final @NotNull EntityMapper<T, ID> entityMapper,
-            final @NotNull Table<R> table,
-            final @NotNull TableField<R, ID> idColumn
+            final @NotNull SqlRepositorySettings settings
     ) {
         return newRepository(
                 e -> new SqlRepository<>(e, entityMapper),
-                table,
-                idColumn
+                settings
         );
     }
 
@@ -166,19 +135,18 @@ public final class SqlDataSource implements RepositoryDataSource {
      * @param <ID>              the type of the id of the entities
      * @param <TR>              the type of the entities in the table
      * @param repositoryBuilder the repository creation function
-     * @param table             the table (used to build the internal query engine)
-     * @param idColumn          the column that represents the ID of the entities in the table (used to build the internal query engine)
+     * @param settings          the settings to build the repository with
      * @return the repository
      */
+    @SuppressWarnings("unchecked")
     public <R extends SqlRepository<T, ID, Table<TR>>, T, ID, TR extends Record> @NotNull R newRepository(
             final @NotNull Function<SqlQueryEngine<T, ID, Table<TR>>, R> repositoryBuilder,
-            final @NotNull Table<TR> table,
-            final @NotNull TableField<TR, ID> idColumn
+            final @NotNull SqlRepositorySettings settings
     ) {
         SqlQueryEngine<T, ID, Table<TR>> engine = new SqlQueryEngine<>(
                 context,
-                table,
-                idColumn,
+                (Table<TR>) settings.getTable(),
+                (Field<ID>) settings.getIdColumn(),
                 executor
         );
         return repositoryBuilder.apply(engine);
