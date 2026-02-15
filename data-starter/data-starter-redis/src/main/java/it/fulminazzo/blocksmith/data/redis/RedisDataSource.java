@@ -66,7 +66,7 @@ public final class RedisDataSource implements RepositoryDataSource<RedisReposito
     ) {
         return newRepository(
                 e -> new RedisRepository<>(e, entityMapper),
-                settings
+                settings.withEntityMapperIfNotSet(entityMapper)
         );
     }
 

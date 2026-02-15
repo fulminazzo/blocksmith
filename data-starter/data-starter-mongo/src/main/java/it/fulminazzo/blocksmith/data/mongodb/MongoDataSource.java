@@ -27,7 +27,7 @@ import java.util.function.Function;
  *                 .applicationName("blocksmith/1.0.0")
  *                 .sslSettings(ssl -> ssl.enabled(true))
  *                 .build();
- *         }</pre>
+ *         }*</pre>
  *     </li>
  *     <li>creating a new repository:
  *         <pre>{@code
@@ -38,7 +38,7 @@ import java.util.function.Function;
  *                 "database",
  *                 "data"
  *         );
- *         }</pre>
+ *         }*</pre>
  *         or, for more control:
  *         <pre>{@code
  *         Repository<?, ?> repository = dataSource.newRepository(
@@ -46,7 +46,7 @@ import java.util.function.Function;
  *                 "database",
  *                 "data"
  *         );
- *         }</pre>
+ *         }*</pre>
  *     </li>
  * </ul>
  */
@@ -69,7 +69,7 @@ public final class MongoDataSource implements RepositoryDataSource<MongoReposito
     ) {
         return newRepository(
                 e -> new MongoRepository<>(e, entityMapper),
-                settings
+                settings.withEntityMapperIfNotSet(entityMapper)
         );
     }
 
