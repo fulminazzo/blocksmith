@@ -22,7 +22,7 @@ public interface RepositoryDataSource<S extends RepositorySettings> extends Clos
      * @param <T>        the type of the entities
      * @param <ID>       the type of the id of the entities
      * @param entityType the entity Java class
-     * @param settings   the settings to build the repository
+     * @param settings   the settings to build the repository with
      * @return the repository
      */
     default <T, ID> @NotNull Repository<T, ID> newRepository(
@@ -38,7 +38,7 @@ public interface RepositoryDataSource<S extends RepositorySettings> extends Clos
      * @param <T>          the type of the entities
      * @param <ID>         the type of the id of the entities
      * @param entityMapper the entity mapper
-     * @param settings     the settings to build the repository
+     * @param settings     the settings to build the repository with
      * @return the repository
      */
     <T, ID> @NotNull Repository<T, ID> newRepository(
