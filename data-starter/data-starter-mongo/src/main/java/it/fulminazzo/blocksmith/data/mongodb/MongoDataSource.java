@@ -50,7 +50,7 @@ import java.util.function.Function;
  *     </li>
  * </ul>
  */
-public final class MongoDataSource implements RepositoryDataSource {
+public final class MongoDataSource implements RepositoryDataSource<MongoRepositorySettings> {
     private final @NotNull MongoClient client;
 
     /**
@@ -62,44 +62,14 @@ public final class MongoDataSource implements RepositoryDataSource {
         this.client = client;
     }
 
-    /**
-     * Creates a new repository.
-     *
-     * @param <T>            the type of the entities
-     * @param <ID>           the type of the id of the entities
-     * @param entityType     the entity Java class
-     * @param databaseName   the name of the database (used to build the internal query engine)
-     * @param collectionName the name of the collection (used to build the internal query engine)
-     * @return the repository
-     */
-    public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull Class<T> entityType,
-            final @NotNull String databaseName,
-            final @NotNull String collectionName
-    ) {
-        return newRepository(EntityMapper.create(entityType), databaseName, collectionName);
-    }
-
-    /**
-     * Creates a new repository.
-     *
-     * @param <T>            the type of the entities
-     * @param <ID>           the type of the id of the entities
-     * @param entityMapper   the entities mapper
-     * @param databaseName   the name of the database (used to build the internal query engine)
-     * @param collectionName the name of the collection (used to build the internal query engine)
-     * @return the repository
-     */
+    @Override
     public <T, ID> @NotNull Repository<T, ID> newRepository(
             final @NotNull EntityMapper<T, ID> entityMapper,
-            final @NotNull String databaseName,
-            final @NotNull String collectionName
+            final @NotNull MongoRepositorySettings settings
     ) {
         return newRepository(
                 e -> new MongoRepository<>(e, entityMapper),
-                entityMapper,
-                databaseName,
-                collectionName
+                settings
         );
     }
 
@@ -110,19 +80,17 @@ public final class MongoDataSource implements RepositoryDataSource {
      * @param <T>               the type of the entities
      * @param <ID>              the type of the id of the entities
      * @param repositoryBuilder the repository creation function
-     * @param entityMapper      the entities mapper (used to build the internal query engine)
-     * @param databaseName      the name of the database (used to build the internal query engine)
-     * @param collectionName    the name of the collection (used to build the internal query engine)
+     * @param settings          the settings to build the repository with
      * @return the repository
      */
+    @SuppressWarnings("unchecked")
     public <R extends MongoRepository<T, ID>, T, ID> @NotNull R newRepository(
             final @NotNull Function<MongoQueryEngine<T, ID>, R> repositoryBuilder,
-            final @NotNull EntityMapper<T, ID> entityMapper,
-            final @NotNull String databaseName,
-            final @NotNull String collectionName
+            final @NotNull MongoRepositorySettings settings
     ) {
         MongoQueryEngine<T, ID> engine = new MongoQueryEngine<>(
-                client.getDatabase(databaseName).getCollection(collectionName, entityMapper.getType())
+                client.getDatabase(settings.getDatabaseName())
+                        .getCollection(settings.getCollectionName(), (Class<T>) settings.getEntityType())
         );
         return repositoryBuilder.apply(engine);
     }
