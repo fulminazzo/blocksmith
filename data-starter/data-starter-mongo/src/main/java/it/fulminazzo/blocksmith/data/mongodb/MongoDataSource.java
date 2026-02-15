@@ -90,7 +90,7 @@ public final class MongoDataSource implements RepositoryDataSource<MongoReposito
     ) {
         MongoQueryEngine<T, ID> engine = new MongoQueryEngine<>(
                 client.getDatabase(settings.getDatabaseName())
-                        .getCollection(settings.getCollectionName(), (Class<T>) settings.getEntityType())
+                        .getCollection(settings.getCollectionName(), (Class<T>) settings.getEntityMapper().getType())
         );
         return repositoryBuilder.apply(engine);
     }

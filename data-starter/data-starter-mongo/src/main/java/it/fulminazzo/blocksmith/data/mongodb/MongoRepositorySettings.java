@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.mongodb;
 
 import it.fulminazzo.blocksmith.data.RepositorySettings;
+import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,7 +10,7 @@ import java.util.Objects;
 public final class MongoRepositorySettings extends RepositorySettings {
     private @Nullable String databaseName;
     private @Nullable String collectionName;
-    private @Nullable Class<?> entityType;
+    private @Nullable EntityMapper<?, ?> entityMapper;
 
     public @NotNull String getDatabaseName() {
         return Objects.requireNonNull(databaseName, "database name has not been specified yet");
@@ -19,8 +20,8 @@ public final class MongoRepositorySettings extends RepositorySettings {
         return Objects.requireNonNull(collectionName, "collection name has not been specified yet");
     }
 
-    public @NotNull Class<?> getEntityType() {
-        return Objects.requireNonNull(entityType, "entity type has not been specified yet");
+    public @NotNull EntityMapper<?, ?> getEntityMapper() {
+        return Objects.requireNonNull(entityMapper, "entity mapper has not been specified yet");
     }
 
     public @NotNull MongoRepositorySettings withDatabaseName(final @NotNull String databaseName) {
@@ -33,8 +34,8 @@ public final class MongoRepositorySettings extends RepositorySettings {
         return this;
     }
 
-    public @NotNull MongoRepositorySettings withEntityType(final @NotNull Class<?> entityType) {
-        this.entityType = entityType;
+    public @NotNull MongoRepositorySettings withEntityMapper(final @NotNull EntityMapper<?, ?> entityMapper) {
+        this.entityMapper = entityMapper;
         return this;
     }
 
