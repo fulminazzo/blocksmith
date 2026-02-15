@@ -4,10 +4,10 @@ import it.fulminazzo.blocksmith.data.QueryEngine;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
 
@@ -22,7 +22,7 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MemoryQueryEngine<T, ID> implements QueryEngine<T, ID> {
-    private final @NotNull Map<ID, T> internalMap = new ConcurrentHashMap<>();
+    private final @NotNull Map<ID, T> internalMap = new ExpirationMap<>(0);
 
     private final @NotNull Executor executor;
 
@@ -37,6 +37,15 @@ public final class MemoryQueryEngine<T, ID> implements QueryEngine<T, ID> {
             final @NotNull Function<Map<ID, T>, R> queryFunction
     ) {
         return CompletableFuture.supplyAsync(() -> queryFunction.apply(internalMap), executor);
+    }
+
+    /**
+     * Sets the expiration time when saving an entity.
+     *
+     * @param expiryInMillis the expiration time (in milliseconds)
+     */
+    public void setExpiry(final @Range(from = 0, to = Long.MAX_VALUE) long expiryInMillis) {
+        ((ExpirationMap<ID, T>) internalMap).setExpiry(expiryInMillis);
     }
 
 }
