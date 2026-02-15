@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.redis;
 
 import it.fulminazzo.blocksmith.data.RepositorySettings;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,6 +12,8 @@ public final class RedisRepositorySettings extends RepositorySettings {
     private @Nullable String databaseName;
     private @Nullable String collectionName;
     private @Nullable EntityMapper<?, ?> entityMapper;
+    @Getter
+    private long expiryInMillis;
 
     public @NotNull String getDatabaseName() {
         return Objects.requireNonNull(databaseName, "database name has not been specified yet");
@@ -31,6 +34,11 @@ public final class RedisRepositorySettings extends RepositorySettings {
 
     public @NotNull RedisRepositorySettings withCollectionName(final @NotNull String collectionName) {
         this.collectionName = collectionName;
+        return this;
+    }
+
+    public @NotNull RedisRepositorySettings withExpiryInMillis(final long expiryInMillis) {
+        this.expiryInMillis = expiryInMillis;
         return this;
     }
 
