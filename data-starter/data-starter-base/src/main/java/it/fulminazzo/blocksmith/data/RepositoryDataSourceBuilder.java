@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <D> the type of the data source
  */
-public interface RepositoryDataSourceBuilder<D extends RepositoryDataSource> {
+public interface RepositoryDataSourceBuilder<D extends RepositoryDataSource<?>> {
 
     /**
      * Builds the data source.

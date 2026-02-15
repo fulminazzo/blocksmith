@@ -4,6 +4,8 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.RepositoryDataSource;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
@@ -50,17 +52,9 @@ import java.util.function.Function;
  *     </li>
  * </ul>
  */
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MongoDataSource implements RepositoryDataSource<MongoRepositorySettings> {
     private final @NotNull MongoClient client;
-
-    /**
-     * Instantiates a new Mongo data source.
-     *
-     * @param client the client
-     */
-    MongoDataSource(final @NotNull MongoClient client) {
-        this.client = client;
-    }
 
     @Override
     public <T, ID> @NotNull Repository<T, ID> newRepository(
