@@ -43,7 +43,7 @@ public class ExpirationMap<K, V> implements Map<K, V> {
     }
 
     /**
-     * Sets the expiration time when saving an entity.
+     * Sets the expiration time when storing a key-value pair.
      *
      * @param expiryInMillis the expiration time (in milliseconds)
      */
