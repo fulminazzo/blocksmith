@@ -34,35 +34,15 @@ import java.util.function.Function;
  * </ul>
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class MemoryDataSource implements RepositoryDataSource {
+public final class MemoryDataSource implements RepositoryDataSource<MemoryRepositorySettings> {
     private final @NotNull ExecutorService executor;
 
-    /**
-     * Creates a new repository.
-     *
-     * @param <T>        the type of the entities
-     * @param <ID>       the type of the id of the entities
-     * @param entityType the entity Java class
-     * @return the repository
-     */
+    @Override
     public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull Class<T> entityType
+            final @NotNull EntityMapper<T, ID> entityMapper,
+            final @NotNull MemoryRepositorySettings settings
     ) {
-        return newRepository(EntityMapper.create(entityType));
-    }
-
-    /**
-     * Creates a new repository.
-     *
-     * @param <T>          the type of the entities
-     * @param <ID>         the type of the id of the entities
-     * @param entityMapper the entity mapper
-     * @return the repository
-     */
-    public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull EntityMapper<T, ID> entityMapper
-    ) {
-        return newRepository(e -> new MemoryRepository<>(e, entityMapper));
+        return newRepository(e -> new MemoryRepository<>(e, entityMapper), settings);
     }
 
     /**
@@ -72,12 +52,15 @@ public final class MemoryDataSource implements RepositoryDataSource {
      * @param <T>               the type of the entities
      * @param <ID>              the type of the id of the entities
      * @param repositoryBuilder the repository creation function
+     * @param settings          the settings to build the repository with
      * @return the repository
      */
     public <R extends Repository<T, ID>, T, ID> @NotNull R newRepository(
-            final @NotNull Function<MemoryQueryEngine<T, ID>, R> repositoryBuilder
+            final @NotNull Function<MemoryQueryEngine<T, ID>, R> repositoryBuilder,
+            final @NotNull MemoryRepositorySettings settings
     ) {
         MemoryQueryEngine<T, ID> engine = new MemoryQueryEngine<>(executor);
+        engine.setExpiry(settings.getExpiryInMillis());
         return repositoryBuilder.apply(engine);
     }
 
