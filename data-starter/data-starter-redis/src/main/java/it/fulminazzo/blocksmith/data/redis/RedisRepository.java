@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.data.redis;
 import io.lettuce.core.RedisFuture;
 import io.lettuce.core.api.async.RedisServerAsyncCommands;
 import it.fulminazzo.blocksmith.data.AbstractRepository;
+import it.fulminazzo.blocksmith.data.CacheRepository;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.util.ValidationUtils;
@@ -20,7 +21,8 @@ import java.util.stream.Collectors;
  * @param <T>  the type of the entities
  * @param <ID> the type of the id of the entities (should be unique)
  */
-public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQueryEngine<T, ID>> {
+public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQueryEngine<T, ID>>
+        implements CacheRepository<T, ID> {
     private long expiry;
 
     /**
@@ -106,12 +108,7 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
         return queryEngine.query(RedisServerAsyncCommands::dbsize);
     }
 
-    /**
-     * Sets the expiration time when saving an entity.
-     *
-     * @param expiry the expiration time (in milliseconds)
-     * @return this object (for method chaining)
-     */
+    @Override
     public @NotNull RedisRepository<T, ID> setExpiry(final @Range(from = 0, to = Long.MAX_VALUE) long expiry) {
         ValidationUtils.checkPositive(expiry, "expiry");
         this.expiry = expiry;

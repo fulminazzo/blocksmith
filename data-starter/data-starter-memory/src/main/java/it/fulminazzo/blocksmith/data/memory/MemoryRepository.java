@@ -1,9 +1,11 @@
 package it.fulminazzo.blocksmith.data.memory;
 
 import it.fulminazzo.blocksmith.data.AbstractRepository;
+import it.fulminazzo.blocksmith.data.CacheRepository;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.Collection;
 import java.util.Map;
@@ -18,7 +20,8 @@ import java.util.stream.Collectors;
  * @param <T>  the type of the entities
  * @param <ID> the type of the id of the entities (will be used as files names)
  */
-public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQueryEngine<T, ID>> {
+public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQueryEngine<T, ID>>
+        implements CacheRepository<T, ID> {
 
     /**
      * Instantiates a new Memory repository.
@@ -87,6 +90,12 @@ public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQue
     @Override
     public @NotNull CompletableFuture<Long> count() {
         return queryEngine.query(m -> (long) m.size());
+    }
+
+    @Override
+    public @NotNull MemoryRepository<T, ID> setExpiry(final @Range(from = 0, to = Long.MAX_VALUE) long expiry) {
+        queryEngine.setExpiry(expiry);
+        return this;
     }
 
 }
