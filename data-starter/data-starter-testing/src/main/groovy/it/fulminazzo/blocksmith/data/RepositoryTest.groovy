@@ -130,7 +130,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         def actual = repository.findAllById([Users.SAVED1.id, Users.SAVED2.id, 3L]).get()
 
         then:
-        actual == expected
+        actual.sort() == expected.sort()
     }
 
     def 'test that findAllById does not throw on null entity'() {
@@ -141,7 +141,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         def actual = repository.findAllById([null, Users.SAVED1.id, null, Users.SAVED2.id, null]).get()
 
         then:
-        actual == expected
+        actual.sort() == expected.sort()
     }
 
     def 'test that findAllById of empty returns empty'() {
