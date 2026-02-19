@@ -37,6 +37,7 @@ class RedisDataSourceTest extends Specification {
                 new RedisRepositorySettings()
                         .withDatabaseName('database')
                         .withCollectionName('users')
+                        .withExpiryInMillis(1000L)
         )
 
         then:

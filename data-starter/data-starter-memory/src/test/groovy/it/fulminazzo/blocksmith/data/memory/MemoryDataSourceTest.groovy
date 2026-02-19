@@ -19,6 +19,7 @@ class MemoryDataSourceTest extends Specification {
         def repository = dataSource.newRepository(
                 User,
                 new MemoryRepositorySettings()
+                        .withExpiryInMillis(1000L)
         )
 
         then:
