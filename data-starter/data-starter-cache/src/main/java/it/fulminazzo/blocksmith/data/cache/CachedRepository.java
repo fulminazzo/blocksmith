@@ -6,10 +6,7 @@ import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,14 +63,18 @@ public class CachedRepository<T, ID> implements Repository<T, ID> {
 
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
-        return cacheRepository.findAllById(ids).thenCompose(r -> {
-            List<ID> found = r.stream().map(entityMapper::getId).collect(Collectors.toList());
-            List<ID> missing = new ArrayList<>();
-            for (ID id : ids)
-                if (!found.contains(id)) missing.add(id);
-            return repository.findAllById(missing).thenApply(r2 ->
-                    Stream.concat(r.stream(), r2.stream()).collect(Collectors.toList())
-            );
+        return cacheRepository.findAllById(ids).thenCompose(c -> {
+            List<ID> found = c.stream().map(entityMapper::getId).collect(Collectors.toList());
+            Collection<ID> missing = ids.stream()
+                    .filter(i -> !found.contains(i))
+                    .collect(Collectors.toList());
+            if (missing.isEmpty()) return CompletableFuture.completedFuture(c);
+            else return repository.findAllById(missing).thenCompose(r -> {
+                if (r.isEmpty()) return CompletableFuture.completedFuture(c);
+                else return cacheRepository.saveAll(r).thenApply(s ->
+                        Stream.concat(c.stream(), r.stream()).collect(Collectors.toList())
+                );
+            });
         });
     }
 
