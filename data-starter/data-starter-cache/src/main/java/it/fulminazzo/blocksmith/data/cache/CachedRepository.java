@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.data.cache;
 import it.fulminazzo.blocksmith.data.CacheRepository;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,12 +18,12 @@ import java.util.stream.Stream;
  * @param <T>  the type of the entities
  * @param <ID> the type of the id of the entities (will be used as files names)
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class CachedRepository<T, ID> implements Repository<T, ID> {
-    protected final @NotNull EntityMapper<T, ID> entityMapper;
-
     protected final @NotNull CacheRepository<T, ID> cacheRepository;
     protected final @NotNull Repository<T, ID> repository;
+
+    protected final @NotNull EntityMapper<T, ID> entityMapper;
 
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {

@@ -178,9 +178,9 @@ class CachedRepositoryTest extends RepositoryTest<CachedRepository<User, Long>> 
     @Override
     CachedRepository<User, Long> initializeRepository() {
         return new CachedRepository<User, Long>(
-                entityMapper,
                 cache,
-                actual
+                actual,
+                entityMapper
         )
     }
 
