@@ -15,6 +15,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A special implementation of {@link Repository} that supports internal caching.
+ *
+ * @param <T>  the type of the entities
+ * @param <ID> the type of the id of the entities (will be used as files names)
+ */
 @RequiredArgsConstructor
 public class CachedRepository<T, ID> implements CacheRepository<T, ID> {
     protected final @NotNull EntityMapper<T, ID> entityMapper;
