@@ -81,7 +81,7 @@ public class CachedRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entities) {
         return repository.saveAll(entities).thenCompose(e ->
-                cacheRepository.saveAll(entities).thenApply(c -> e)
+                cacheRepository.saveAll(e).thenApply(c -> e)
         );
     }
 
