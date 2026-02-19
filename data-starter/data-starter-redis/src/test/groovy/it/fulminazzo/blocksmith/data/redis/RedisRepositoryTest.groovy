@@ -11,6 +11,8 @@ import it.fulminazzo.blocksmith.data.mapper.Mappers
 import org.jetbrains.annotations.NotNull
 import redis.embedded.RedisServer
 
+import java.time.Duration
+
 class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
     private static final Mapper mapper = Mappers.JSON
     private static final int serverPort = 16379
@@ -46,7 +48,7 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
         def expected = Users.NEW1
 
         and:
-        repository.expiry = 1000
+        repository.ttl(Duration.ofSeconds(1))
 
         when:
         def actual = repository.save(expected).get()
@@ -76,7 +78,7 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
         def expected = [Users.NEW1, Users.NEW2]
 
         and:
-        repository.expiry = 1000
+        repository.ttl(Duration.ofSeconds(1))
 
         when:
         def actual = repository.saveAll(expected).get()

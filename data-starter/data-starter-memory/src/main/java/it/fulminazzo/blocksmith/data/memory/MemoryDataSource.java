@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 
@@ -75,7 +76,8 @@ public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryR
             final @NotNull MemoryRepositorySettings settings
     ) {
         MemoryQueryEngine<T, ID> engine = new MemoryQueryEngine<>(executor);
-        engine.setExpiry(settings.getExpiryInMillis());
+        Duration ttl = settings.getTtl();
+        if (ttl != null) engine.setExpiry(ttl.toMillis());
         return repositoryBuilder.apply(engine);
     }
 

@@ -8,6 +8,7 @@ import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.function.Function;
 
 /**
@@ -115,7 +116,10 @@ public final class RedisDataSource implements CacheRepositoryDataSource<RedisRep
                 settings.getDatabaseName(),
                 settings.getCollectionName()
         );
-        return (R) repositoryBuilder.apply(engine).setExpiry(settings.getExpiryInMillis());
+        final R repository = repositoryBuilder.apply(engine);
+        Duration expiry = settings.getTtl();
+        if (expiry != null) repository.ttl(expiry);
+        return repository;
     }
 
     @Override

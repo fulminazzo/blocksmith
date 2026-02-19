@@ -5,8 +5,8 @@ import it.fulminazzo.blocksmith.data.CacheRepository;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -93,8 +93,8 @@ public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQue
     }
 
     @Override
-    public @NotNull MemoryRepository<T, ID> setExpiry(final @Range(from = 0, to = Long.MAX_VALUE) long expiry) {
-        queryEngine.setExpiry(expiry);
+    public @NotNull MemoryRepository<T, ID> ttl(final @NotNull Duration expiry) {
+        queryEngine.setExpiry(expiry.toMillis());
         return this;
     }
 

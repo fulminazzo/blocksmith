@@ -3,7 +3,9 @@ package it.fulminazzo.blocksmith.data;
 import it.fulminazzo.blocksmith.util.ValidationUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
+import org.jetbrains.annotations.Nullable;
+
+import java.time.Duration;
 
 /**
  * Abstract implementation of {@link RepositorySettings} for {@link CacheRepository}.
@@ -13,17 +15,17 @@ import org.jetbrains.annotations.Range;
 @SuppressWarnings("unchecked")
 public abstract class CacheRepositorySettings<S extends CacheRepositorySettings<S>> extends RepositorySettings {
     @Getter
-    private long expiryInMillis;
+    private @Nullable Duration ttl;
 
     /**
-     * With expiry in millis cache repository settings.
+     * Sets the expiration time of the stored entities.
      *
-     * @param expiryInMillis the expiry in millis
-     * @return the cache repository settings
+     * @param expiry the expiration time
+     * @return this object (for method chaining)
      */
-    public @NotNull S withExpiryInMillis(final @Range(from = 0, to = Long.MAX_VALUE) long expiryInMillis) {
-        ValidationUtils.checkPositive(expiryInMillis, "cache expire time in milliseconds");
-        this.expiryInMillis = expiryInMillis;
+    public @NotNull S withTtl(final @NotNull Duration expiry) {
+        ValidationUtils.checkPositive(expiry.toMillis(), "cache expire time");
+        this.ttl = expiry;
         return (S) this;
     }
 

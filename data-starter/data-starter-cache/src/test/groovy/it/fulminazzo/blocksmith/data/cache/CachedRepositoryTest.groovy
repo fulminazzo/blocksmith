@@ -8,6 +8,7 @@ import it.fulminazzo.blocksmith.data.memory.MemoryQueryEngine
 import it.fulminazzo.blocksmith.data.memory.MemoryRepository
 import org.jetbrains.annotations.NotNull
 
+import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -20,7 +21,7 @@ class CachedRepositoryTest extends RepositoryTest<CachedRepository<User, Long>> 
     private static final MemoryRepository<User, Long> cache = new MemoryRepository(
             new MemoryQueryEngine<>(executor),
             entityMapper
-    ).setExpiry(60_000L)
+    ).ttl(Duration.ofMinutes(1))
     private static final MemoryRepository<User, Long> actual = new MemoryRepository<User, Long>(
             new MemoryQueryEngine<User, Long>(executor),
             entityMapper

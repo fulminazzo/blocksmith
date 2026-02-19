@@ -4,6 +4,7 @@ package it.fulminazzo.blocksmith.data.memory
 import it.fulminazzo.blocksmith.data.User
 import spock.lang.Specification
 
+import java.time.Duration
 import java.util.concurrent.Executors
 
 class MemoryDataSourceTest extends Specification {
@@ -19,7 +20,7 @@ class MemoryDataSourceTest extends Specification {
         def repository = dataSource.newRepository(
                 User,
                 new MemoryRepositorySettings()
-                        .withExpiryInMillis(1000L)
+                        .withTtl(Duration.ofSeconds(1))
         )
 
         then:

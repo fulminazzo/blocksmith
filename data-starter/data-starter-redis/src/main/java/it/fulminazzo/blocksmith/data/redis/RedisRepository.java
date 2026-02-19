@@ -8,8 +8,8 @@ import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.util.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -109,9 +109,10 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
     }
 
     @Override
-    public @NotNull RedisRepository<T, ID> setExpiry(final @Range(from = 0, to = Long.MAX_VALUE) long expiry) {
-        ValidationUtils.checkPositive(expiry, "expiry");
-        this.expiry = expiry;
+    public @NotNull RedisRepository<T, ID> ttl(final @NotNull Duration expiry) {
+        long expiryInMillis = expiry.toMillis();
+        ValidationUtils.checkPositive(expiryInMillis, "expiry");
+        this.expiry = expiryInMillis;
         return this;
     }
 

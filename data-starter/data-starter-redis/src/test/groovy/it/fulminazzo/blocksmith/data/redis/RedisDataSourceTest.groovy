@@ -5,6 +5,8 @@ import it.fulminazzo.blocksmith.data.mapper.Mappers
 import redis.embedded.RedisServer
 import spock.lang.Specification
 
+import java.time.Duration
+
 class RedisDataSourceTest extends Specification {
     private static final int serverPort = 16378
 
@@ -37,7 +39,7 @@ class RedisDataSourceTest extends Specification {
                 new RedisRepositorySettings()
                         .withDatabaseName('database')
                         .withCollectionName('users')
-                        .withExpiryInMillis(1000L)
+                        .withTtl(Duration.ofSeconds(1))
         )
 
         then:
