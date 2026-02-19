@@ -16,9 +16,19 @@ import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link Repository} that stores data in memory (RAM).
+ * <br>
+ * Examples:
+ * <ul>
+ *     <li>creation of simple:
+ *         <pre>{@code
+ *         MemoryRepository<T, ID> repository = MemoryRepository.create(User.class);
+ *         }</pre>
+ *         <b>WARNING:</b> every query will be run <b>synchronously</b>.
+ *     </li>
+ * </ul>
  *
  * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities (will be used as files names)
+ * @param <ID> the type of the id of the entities
  */
 public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQueryEngine<T, ID>>
         implements CacheRepository<T, ID> {
@@ -96,6 +106,37 @@ public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQue
     public @NotNull MemoryRepository<T, ID> ttl(final @NotNull Duration expiry) {
         queryEngine.setExpiry(expiry.toMillis());
         return this;
+    }
+
+    /**
+     * Creates a new Memory repository.
+     * <br>
+     * Every query will be run <b>synchronously</b>.
+     *
+     * @param <T>        the type of the entities
+     * @param <ID>       the type of the id of the entities
+     * @param entityType the entity Java class
+     * @return the repository
+     */
+    public static <T, ID> @NotNull MemoryRepository<T, ID> create(final @NotNull Class<T> entityType) {
+        return create(EntityMapper.create(entityType));
+    }
+
+    /**
+     * Creates a new Memory repository.
+     * <br>
+     * Every query will be run <b>synchronously</b>.
+     *
+     * @param <T>          the type of the entities
+     * @param <ID>         the type of the id of the entities
+     * @param entityMapper the entity mapper
+     * @return the repository
+     */
+    public static <T, ID> @NotNull MemoryRepository<T, ID> create(final @NotNull EntityMapper<T, ID> entityMapper) {
+        return new MemoryRepository<>(
+                new MemoryQueryEngine<>(Runnable::run),
+                entityMapper
+        );
     }
 
 }
