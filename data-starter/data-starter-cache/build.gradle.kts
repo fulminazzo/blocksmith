@@ -1,3 +1,3 @@
 dependencies {
-    testImplementation(project(":data-starter:data-starter-memory"))
+    api(project(":data-starter:data-starter-memory"))
 }
