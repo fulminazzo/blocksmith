@@ -16,14 +16,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-public class CachedRepository<T, ID,
-        CR extends CacheRepository<T, ID>,
-        R extends Repository<T, ID>
-        > implements CacheRepository<T, ID> {
+public class CachedRepository<T, ID> implements CacheRepository<T, ID> {
     protected final @NotNull EntityMapper<T, ID> entityMapper;
 
-    protected final @NotNull CR cacheRepository;
-    protected final @NotNull R repository;
+    protected final @NotNull CacheRepository<T, ID> cacheRepository;
+    protected final @NotNull Repository<T, ID> repository;
 
     @Override
     public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {

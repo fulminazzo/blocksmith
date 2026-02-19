@@ -11,11 +11,7 @@ import org.jetbrains.annotations.NotNull
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class CachedRepositoryTest extends RepositoryTest<CachedRepository<
-        User, Long,
-        MemoryRepository<User, Long>,
-        MemoryRepository<User, Long>>
-        > {
+class CachedRepositoryTest extends RepositoryTest<CachedRepository<User, Long>> {
 
     private static final ExecutorService executor = Executors.newSingleThreadExecutor()
 
@@ -42,8 +38,8 @@ class CachedRepositoryTest extends RepositoryTest<CachedRepository<
     }
 
     @Override
-    CachedRepository<User, Long, MemoryRepository<User, Long>, MemoryRepository<User, Long>> initializeRepository() {
-        return new CachedRepository<User, Long, MemoryRepository<User, Long>, MemoryRepository<User, Long>>(
+    CachedRepository<User, Long> initializeRepository() {
+        return new CachedRepository<User, Long>(
                 entityMapper,
                 first,
                 second
