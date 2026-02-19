@@ -9,6 +9,69 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
+/**
+ * A builder for creating {@link CachedRepository} objects.
+ * <br>
+ * The following examples will utilize a <b>SQL</b> as main repository (with the support of the
+ * <a href="https://www.jooq.org/doc/latest/manual/code-generation/codegen-execution/codegen-gradle/">jOOQ generator plugin</a>
+ * and <b>Redis</b> as cache.
+ * <ul>
+ *     <li>creating a repository:
+ *         <pre>{@code
+ *         SqlDataSource dataSource = ...;
+ *         RedisDataSource cacheDataSource = ...;
+ *         Repository<?, ?> mainRepository = dataSource.newRepository(
+ *                 EntityMapper.create(User.class),
+ *                 new SqlRepositorySettings()
+ *                         .withTable(Tables.USERS)
+ *                         .withIdColumn(Tables.USERS.ID)
+ *         );
+ *         Repository<?, ?> repository = CachedRepository.wrap(mainRepository)
+ *                 // not necessary if using implementations of the default repositories as main repository
+ *                 .entityMapper(EntityMapper.create(User.class))
+ *                 .cacheRepository(
+ *                         cacheDataSource,
+ *                         new RedisRepositorySettings()
+ *                                 .withDatabaseName("database")
+ *                                 .withCollectionName("users")
+ *                                 .withTtl(Duration.ofMinutes(30))
+ *                 )
+ *                 .build();
+ *         }</pre>
+ *     </li>
+ *     <li>creating a hybrid repository (will look up an in-memory cache before querying for the cache):
+ *         <pre>{@code
+ *         SqlDataSource dataSource = ...;
+ *         RedisDataSource cacheDataSource = ...;
+ *         MemoryDataSource memoryDataSource = ...;
+ *         Repository<?, ?> mainRepository = dataSource.newRepository(
+ *                 EntityMapper.create(User.class),
+ *                 new SqlRepositorySettings()
+ *                         .withTable(Tables.USERS)
+ *                         .withIdColumn(Tables.USERS.ID)
+ *         );
+ *         Repository<?, ?> repository = CachedRepository.wrap(mainRepository)
+ *                 // not necessary if using implementations of the default repositories as main repository
+ *                 .entityMapper(EntityMapper.create(User.class))
+ *                 .cacheRepository(
+ *                         cacheDataSource,
+ *                         new RedisRepositorySettings()
+ *                                 .withDatabaseName("database")
+ *                                 .withCollectionName("users")
+ *                                 .withTtl(Duration.ofMinutes(30))
+ *                 )
+ *                 .hybrid(
+ *                         memoryDataSource,
+ *                         new MemoryRepositorySettings()
+ *                                 .withTtl(Duration.ofMinutes(5))
+ *                 );
+ *         }</pre>
+ *     </li>
+ * </ul>
+ *
+ * @param <T>  the type of the entities
+ * @param <ID> the type of the id of the entities
+ */
 public final class CachedRepositoryBuilder<T, ID> {
     private final @NotNull Repository<T, ID> internalRepository;
 
