@@ -92,7 +92,7 @@ public final class MongoDataSource implements RepositoryDataSource<MongoReposito
      * @return the repository
      */
     @SuppressWarnings("unchecked")
-    public <R extends MongoRepository<T, ID>, T, ID> @NotNull R newRepository(
+    public <T, ID, R extends MongoRepository<T, ID>> @NotNull R newRepository(
             final @NotNull Function<MongoQueryEngine<T, ID>, R> repositoryBuilder,
             final @NotNull MongoRepositorySettings settings
     ) {

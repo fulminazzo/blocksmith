@@ -104,7 +104,7 @@ public final class RedisDataSource implements CacheRepositoryDataSource<RedisRep
      * @return the repository
      */
     @SuppressWarnings("unchecked")
-    public <R extends RedisRepository<T, ID>, T, ID> @NotNull R newRepository(
+    public <T, ID, R extends RedisRepository<T, ID>> @NotNull R newRepository(
             final @NotNull Function<RedisQueryEngine<T, ID>, R> repositoryBuilder,
             final @NotNull RedisRepositorySettings settings
     ) {

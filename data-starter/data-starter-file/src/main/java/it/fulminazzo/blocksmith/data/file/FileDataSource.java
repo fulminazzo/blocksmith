@@ -81,7 +81,7 @@ public final class FileDataSource implements RepositoryDataSource<FileRepository
      * @param settings          the settings to build the repository with
      * @return the repository
      */
-    public <R extends FileRepository<T, ID>, T, ID> @NotNull R newRepository(
+    public <T, ID, R extends FileRepository<T, ID>> @NotNull R newRepository(
             final @NotNull Function<FileQueryEngine<T, ID>, R> repositoryBuilder,
             final @NotNull FileRepositorySettings settings
     ) {

@@ -41,7 +41,7 @@ public final class CachedDataSource<
      * @param repositoryBuilder the repository creation function
      * @return the repository
      */
-    public <R extends CachedRepository<T, ID>, T, ID> @NotNull R newRepository(
+    public <T, ID, R extends CachedRepository<T, ID>> @NotNull R newRepository(
             final @NotNull Function<CacheRepositoryDataSource<CS>, CacheRepository<T, ID>> cacheRepositoryBuilder,
             final @NotNull Function<RepositoryDataSource<S>, Repository<T, ID>> internalRepositoryBuilder,
             final @NotNull BiFunction<CacheRepository<T, ID>, Repository<T, ID>, R> repositoryBuilder
