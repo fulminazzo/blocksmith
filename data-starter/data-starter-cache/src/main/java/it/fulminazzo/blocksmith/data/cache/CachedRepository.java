@@ -42,10 +42,7 @@ public class CachedRepository<T, ID> implements CacheRepository<T, ID> {
 
     @Override
     public @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id) {
-        return cacheRepository.existsById(id).thenCompose(r -> {
-            if (r) return CompletableFuture.completedFuture(true);
-            else return repository.existsById(id);
-        });
+        return findById(id).thenApply(Optional::isPresent);
     }
 
     @Override
