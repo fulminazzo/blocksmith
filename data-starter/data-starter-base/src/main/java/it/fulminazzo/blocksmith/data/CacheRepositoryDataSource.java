@@ -12,7 +12,7 @@ public interface CacheRepositoryDataSource<S extends CacheRepositorySettings<S>>
 
     @SuppressWarnings("unchecked")
     @Override
-    default @NotNull <T, ID> CacheRepository<T, ID> newRepository(
+    default <T, ID> @NotNull CacheRepository<T, ID> newRepository(
             final @NotNull Class<T> entityType,
             final @NotNull S settings
     ) {
@@ -20,7 +20,7 @@ public interface CacheRepositoryDataSource<S extends CacheRepositorySettings<S>>
     }
 
     @Override
-    @NotNull <T, ID> CacheRepository<T, ID> newRepository(
+    <T, ID> @NotNull CacheRepository<T, ID> newRepository(
             final @NotNull EntityMapper<T, ID> entityMapper,
             final @NotNull S settings
     );

@@ -20,7 +20,7 @@ public final class CachedDataSource<
     private final @NotNull RepositoryDataSource<S> repositoryDataSource;
 
     @Override
-    public @NotNull <T, ID> Repository<T, ID> newRepository(
+    public <T, ID> @NotNull Repository<T, ID> newRepository(
             final @NotNull EntityMapper<T, ID> entityMapper,
             final @NotNull CachedRepositorySettings<CS, S> settings
     ) {

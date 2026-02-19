@@ -16,7 +16,7 @@ import java.util.stream.Stream;
  * A special implementation of {@link Repository} that supports internal caching.
  *
  * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities (will be used as files names)
+ * @param <ID> the type of the id of the entities
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class CachedRepository<T, ID> implements Repository<T, ID> {
