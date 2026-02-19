@@ -1,5 +1,3 @@
-//TODO: rework dependency file
-//TODO: provide better examples
 plugins {
     alias(libs.plugins.shadow)
     alias(libs.plugins.jooq)
@@ -10,17 +8,15 @@ tasks.compileJava {
 }
 
 dependencies {
-    api(libs.embedded.redis)
-
-    api(project(":data-starter:data-starter-redis"))
-}
-
-dependencies {
-    implementation(libs.slf4j)
     implementation(libs.bundles.log4j)
 
-    implementation(project(":config-starter:config-starter-all"))
-    implementation(project(":data-starter:data-starter-file"))
+    implementation(project(":data-starter:data-starter-sql"))
+    implementation(project(":data-starter:data-starter-redis"))
+    implementation(project(":data-starter:data-starter-cache"))
+    implementation(project(":data-starter:data-starter-memory"))
+
+    jooqGenerator(libs.h2)
+    implementation(libs.mariadb)
 }
 
 tasks.jar {
@@ -29,13 +25,6 @@ tasks.jar {
 
 tasks.shadowJar {
     archiveClassifier = "all"
-}
-
-dependencies {
-    implementation(project(":data-starter:data-starter-sql"))
-    jooqGenerator(libs.h2)
-    implementation(libs.h2)
-    implementation(libs.bundles.log4j)
 }
 
 jooq {
@@ -60,7 +49,7 @@ jooq {
                     }
 
                     target.apply {
-                        packageName = "it.fulminazzo.blocksmith.data.sql"
+                        packageName = "it.fulminazzo.blocksmith.data"
                         directory = "build/generated-sources/jooq"
                     }
                 }
