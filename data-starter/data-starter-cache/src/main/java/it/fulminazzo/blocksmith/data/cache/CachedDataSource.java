@@ -39,7 +39,7 @@ import java.util.function.Function;
  *         );
  *         }</pre>
  *     </li>
- *     <li>creation of hybrid (repositories will look up an in-memory cache before querying the cache):</li>
+ *     <li>creation of hybrid (repositories will look up an in-memory cache before querying the cache):
  *         <pre>{@code
  *         HybridCachedDataSource<?, ?> dataSource = CachedDataSource.hybrid(
  *                 MemoryDataSource.create(Executors.newSingleThreadExecutor()),
@@ -58,6 +58,7 @@ import java.util.function.Function;
  *                         .build()
  *         );
  *         }</pre>
+ *     </li>
  *     <li>creating a standard repository:
  *         <pre>{@code
  *         CachedDataSource<RedisRepositorySettings, SqlRepositorySettings> dataSource = ...;
@@ -71,6 +72,25 @@ import java.util.function.Function;
  *                         new SqlRepositorySettings()
  *                                 .withTable(Tables.USERS)
  *                                 .withIdColumn(Tables.USERS.ID)
+ *                 )
+ *         );
+ *         }</pre>
+ *     </li>
+ *     <li>creating a standard hybrid repository (will look up an in-memory cache before querying for the cache):
+ *         <pre>{@code
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 EntityMapper.create(User.class),
+ *                 CachedRepositorySettings.combine(
+ *                         new MemoryRepositorySettings().withTtl(Duration.ofMinutes(5)),
+ *                         CachedRepositorySettings.combine(
+ *                                 new RedisRepositorySettings()
+ *                                         .withDatabaseName("database")
+ *                                         .withCollectionName("users")
+ *                                         .withTtl(Duration.ofMinutes(30)),
+ *                                 new SqlRepositorySettings()
+ *                                         .withTable(Tables.USERS)
+ *                                         .withIdColumn(Tables.USERS.ID)
+ *                         )
  *                 )
  *         );
  *         }</pre>
