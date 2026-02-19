@@ -103,8 +103,8 @@ import java.util.function.Function;
  * @param <CS> the repository settings of the cache repository data source
  * @param <S>  the repository settings of the internal repository data source
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class CachedDataSource<
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public class CachedDataSource<
         CS extends CacheRepositorySettings<CS>,
         S extends RepositorySettings
         > implements RepositoryDataSource<CachedRepositorySettings<CS, S>> {
