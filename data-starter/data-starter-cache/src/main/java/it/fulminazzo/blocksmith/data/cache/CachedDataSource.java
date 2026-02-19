@@ -10,7 +10,83 @@ import java.io.IOException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-//TODO: documentation and scoping
+/**
+ * Implementation of {@link RepositoryDataSource} for cached repositories.
+ * Every query to the main repository will be passed to a cache that will be
+ * updated accordingly.
+ * <br>
+ * The following examples will utilize a <b>SQL</b> as main repository (with the support of the
+ * <a href="https://www.jooq.org/doc/latest/manual/code-generation/codegen-execution/codegen-gradle/">jOOQ generator plugin</a>
+ * and <b>Redis</b> as cache.
+ * <ul>
+ *     <li>creation:
+ *         <pre>{@code
+ *         CacheRepositoryDataSource<?> cacheRepositoryDataSource = RedisDataSource.builder()
+ *                 .uri(b -> b.withHost("0.0.0.0").withPort(6379))
+ *                 .mapper(Mappers.JSON)
+ *                 .build();
+ *         RepositoryDataSource<?> repositoryDataSource = SqlDataSource.builder()
+ *                 .database("database")
+ *                 .username("root")
+ *                 .password("super-secure-password-should-use-an-env-variable")
+ *                 .databaseType(DatabaseType.MARIADB)
+ *                 .host("0.0.0.0")
+ *                 .port(3306)
+ *                 .mysql()
+ *                 .build();
+ *         CachedDataSource<?, ?> dataSource = CachedDataSource.create(
+ *                 cacheRepositoryDataSource,
+ *                 repositoryDataSource
+ *         );
+ *         }</pre>
+ *     </li>
+ *     <li>creating a standard repository:
+ *         <pre>{@code
+ *         CachedDataSource<RedisRepositorySettings, SqlRepositorySettings> dataSource = ...;
+ *         EntityMapper<?, ?> entityMapper = EntityMapper.create(User.class);
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 entityMapper,
+ *                 CachedRepositorySettings.combine(
+ *                         new RedisRepositorySettings()
+ *                                 .withEntityMapper(entityMapper)
+ *                                 .withDatabaseName("database")
+ *                                 .withCollectionName("users")
+ *                                 .withTtl(Duration.ofMinutes(30)),
+ *                         new SqlRepositorySettings()
+ *                                 .withTable(Tables.USERS)
+ *                                 .withIdColumn(Tables.USERS.ID)
+ *                 )
+ *         );
+ *         }</pre>
+ *     </li>
+ *     <li>creating a custom repository:
+ *         <pre>{@code
+ *         CachedDataSource<RedisRepositorySettings, SqlRepositorySettings> dataSource = ...;
+ *         EntityMapper<?, ?> entityMapper = EntityMapper.create(User.class);
+ *         Repository<?, ?> repository = dataSource.newRepository(
+ *                 ds -> ((RedisDataSource) ds).newRepository(
+ *                         e -> new CustomRedisRepository(e),
+ *                         new RedisRepositorySettings()
+ *                                 .withEntityMapper(entityMapper)
+ *                                 .withDatabaseName("database")
+ *                                 .withCollectionName("users")
+ *                                 .withTtl(Duration.ofMinutes(30))
+ *                 ),
+ *                 ds -> ((SqlDataSource) ds).newRepository(
+ *                         e -> new CustomSqlRepository(e),
+ *                         new SqlRepositorySettings()
+ *                                 .withTable(Tables.USERS)
+ *                                 .withIdColumn(Tables.USERS.ID)
+ *                 ),
+ *                 (cr, r) -> new CustomCachedRepository(cr, r)
+ *         );
+ *         }</pre>
+ *     </li>
+ * </ul>
+ *
+ * @param <CS> the repository settings of the cache repository data source
+ * @param <S>  the repository settings of the internal repository data source
+ */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CachedDataSource<
         CS extends CacheRepositorySettings<CS>,
