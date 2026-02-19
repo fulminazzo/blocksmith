@@ -43,12 +43,10 @@ import java.util.function.Function;
  *     <li>creating a standard repository:
  *         <pre>{@code
  *         CachedDataSource<RedisRepositorySettings, SqlRepositorySettings> dataSource = ...;
- *         EntityMapper<?, ?> entityMapper = EntityMapper.create(User.class);
  *         Repository<?, ?> repository = dataSource.newRepository(
- *                 entityMapper,
+ *                 EntityMapper.create(User.class),
  *                 CachedRepositorySettings.combine(
  *                         new RedisRepositorySettings()
- *                                 .withEntityMapper(entityMapper)
  *                                 .withDatabaseName("database")
  *                                 .withCollectionName("users")
  *                                 .withTtl(Duration.ofMinutes(30)),
