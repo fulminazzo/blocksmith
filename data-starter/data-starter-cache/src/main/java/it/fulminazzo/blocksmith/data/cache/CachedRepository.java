@@ -5,7 +5,6 @@ import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +21,7 @@ import java.util.stream.Stream;
  * @param <ID> the type of the id of the entities (will be used as files names)
  */
 @RequiredArgsConstructor
-public class CachedRepository<T, ID> implements CacheRepository<T, ID> {
+public class CachedRepository<T, ID> implements Repository<T, ID> {
     protected final @NotNull EntityMapper<T, ID> entityMapper;
 
     protected final @NotNull CacheRepository<T, ID> cacheRepository;
@@ -96,12 +95,6 @@ public class CachedRepository<T, ID> implements CacheRepository<T, ID> {
     @Override
     public @NotNull CompletableFuture<Long> count() {
         return repository.count();
-    }
-
-    @Override
-    public @NotNull CacheRepository<T, ID> setExpiry(final @Range(from = 0, to = Long.MAX_VALUE) long expiry) {
-        cacheRepository.setExpiry(expiry);
-        return this;
     }
 
 }
