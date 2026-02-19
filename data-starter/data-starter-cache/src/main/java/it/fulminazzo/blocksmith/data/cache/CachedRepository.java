@@ -65,7 +65,7 @@ public class CachedRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
         return cacheRepository.findAllById(ids).thenCompose(c -> {
-            List<ID> found = c.stream().map(entityMapper::getId).collect(Collectors.toList());
+            Set<ID> found = c.stream().map(entityMapper::getId).collect(Collectors.toSet());
             Collection<ID> missing = ids.stream()
                     .filter(i -> !found.contains(i))
                     .collect(Collectors.toList());
