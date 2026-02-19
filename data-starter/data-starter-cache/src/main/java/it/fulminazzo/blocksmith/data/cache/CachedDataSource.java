@@ -36,19 +36,25 @@ public final class CachedDataSource<
      *
      * @param <T>                       the type of the entities
      * @param <ID>                      the type of the id of the entities
+     * @param <CR>                      the type of the cache repository
+     * @param <IR>                      the type of the internal repository
      * @param <R>                       the type of the repository
      * @param cacheRepositoryBuilder    the cache repository creation function
      * @param internalRepositoryBuilder the internal repository creation function
      * @param repositoryBuilder         the repository creation function
      * @return the repository
      */
-    public <T, ID, R extends CachedRepository<T, ID>> @NotNull R newRepository(
-            final @NotNull Function<CacheRepositoryDataSource<CS>, CacheRepository<T, ID>> cacheRepositoryBuilder,
-            final @NotNull Function<RepositoryDataSource<S>, Repository<T, ID>> internalRepositoryBuilder,
-            final @NotNull BiFunction<CacheRepository<T, ID>, Repository<T, ID>, R> repositoryBuilder
+    public <T, ID,
+            CR extends CacheRepository<T, ID>,
+            IR extends Repository<T, ID>,
+            R extends CachedRepository<T, ID>
+            > @NotNull R newRepository(
+            final @NotNull Function<CacheRepositoryDataSource<CS>, CR> cacheRepositoryBuilder,
+            final @NotNull Function<RepositoryDataSource<S>, IR> internalRepositoryBuilder,
+            final @NotNull BiFunction<CR, IR, R> repositoryBuilder
     ) {
-        CacheRepository<T, ID> cacheRepository = cacheRepositoryBuilder.apply(cacheRepositoryDataSource);
-        Repository<T, ID> repository = internalRepositoryBuilder.apply(repositoryDataSource);
+        CR cacheRepository = cacheRepositoryBuilder.apply(cacheRepositoryDataSource);
+        IR repository = internalRepositoryBuilder.apply(repositoryDataSource);
         return repositoryBuilder.apply(cacheRepository, repository);
     }
 
