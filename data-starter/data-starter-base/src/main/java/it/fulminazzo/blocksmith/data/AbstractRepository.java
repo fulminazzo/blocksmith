@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data;
 
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.util.ValidationUtils;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("DeprecatedIsStillUsed")
 public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> implements Repository<T, ID> {
     protected final @NotNull E queryEngine;
+    @Getter
     protected final @NotNull EntityMapper<T, ID> entityMapper;
 
     @Override
