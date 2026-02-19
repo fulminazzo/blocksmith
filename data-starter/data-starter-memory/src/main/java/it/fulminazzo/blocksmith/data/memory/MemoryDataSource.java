@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.memory;
 
-import it.fulminazzo.blocksmith.data.Repository;
+import it.fulminazzo.blocksmith.data.CacheRepository;
+import it.fulminazzo.blocksmith.data.CacheRepositoryDataSource;
 import it.fulminazzo.blocksmith.data.RepositoryDataSource;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import lombok.AccessLevel;
@@ -48,11 +49,11 @@ import java.util.function.Function;
  * </ul>
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class MemoryDataSource implements RepositoryDataSource<MemoryRepositorySettings> {
+public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryRepositorySettings> {
     private final @NotNull ExecutorService executor;
 
     @Override
-    public <T, ID> @NotNull Repository<T, ID> newRepository(
+    public <T, ID> @NotNull CacheRepository<T, ID> newRepository(
             final @NotNull EntityMapper<T, ID> entityMapper,
             final @NotNull MemoryRepositorySettings settings
     ) {

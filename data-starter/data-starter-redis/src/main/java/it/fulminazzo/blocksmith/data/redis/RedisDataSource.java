@@ -2,8 +2,8 @@ package it.fulminazzo.blocksmith.data.redis;
 
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
-import it.fulminazzo.blocksmith.data.Repository;
-import it.fulminazzo.blocksmith.data.RepositoryDataSource;
+import it.fulminazzo.blocksmith.data.CacheRepository;
+import it.fulminazzo.blocksmith.data.CacheRepositoryDataSource;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +63,7 @@ import java.util.function.Function;
  *     </li>
  * </ul>
  */
-public final class RedisDataSource implements RepositoryDataSource<RedisRepositorySettings> {
+public final class RedisDataSource implements CacheRepositoryDataSource<RedisRepositorySettings> {
     private final @NotNull RedisClient redisClient;
     private final @NotNull StatefulRedisConnection<String, String> connection;
 
@@ -83,7 +83,7 @@ public final class RedisDataSource implements RepositoryDataSource<RedisReposito
     }
 
     @Override
-    public <T, ID> @NotNull Repository<T, ID> newRepository(
+    public <T, ID> @NotNull CacheRepository<T, ID> newRepository(
             final @NotNull EntityMapper<T, ID> entityMapper,
             final @NotNull RedisRepositorySettings settings
     ) {
