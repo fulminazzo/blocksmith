@@ -69,7 +69,7 @@ public final class MemoryDataSource implements RepositoryDataSource<MemoryReposi
      * @param settings          the settings to build the repository with
      * @return the repository
      */
-    public <R extends Repository<T, ID>, T, ID> @NotNull R newRepository(
+    public <R extends MemoryRepository<T, ID>, T, ID> @NotNull R newRepository(
             final @NotNull Function<MemoryQueryEngine<T, ID>, R> repositoryBuilder,
             final @NotNull MemoryRepositorySettings settings
     ) {
