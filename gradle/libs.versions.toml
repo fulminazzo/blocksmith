@@ -25,6 +25,7 @@ hikaricp = "7.0.2"
 
 h2 = "2.4.240"
 sqlite = "3.51.1.0"
+mariadb = "3.5.7"
 
 lettuce = "7.4.0.RELEASE"
 embedded_redis = "0.7.3"
@@ -63,6 +64,7 @@ hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
 sqlite = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite" }
+mariadb = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "mariadb" }
 
 lettuce = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
 embedded_redis = { module = "it.ozimov:embedded-redis", version.ref = "embedded_redis" }
