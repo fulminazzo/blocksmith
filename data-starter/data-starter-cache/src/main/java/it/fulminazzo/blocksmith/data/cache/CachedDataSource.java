@@ -22,25 +22,42 @@ import java.util.function.Function;
  * <ul>
  *     <li>creation:
  *         <pre>{@code
- *         CacheRepositoryDataSource<?> cacheRepositoryDataSource = RedisDataSource.builder()
- *                 .uri(b -> b.withHost("0.0.0.0").withPort(6379))
- *                 .mapper(Mappers.JSON)
- *                 .build();
- *         RepositoryDataSource<?> repositoryDataSource = SqlDataSource.builder()
- *                 .database("database")
- *                 .username("root")
- *                 .password("super-secure-password-should-use-an-env-variable")
- *                 .databaseType(DatabaseType.MARIADB)
- *                 .host("0.0.0.0")
- *                 .port(3306)
- *                 .mysql()
- *                 .build();
  *         CachedDataSource<?, ?> dataSource = CachedDataSource.create(
- *                 cacheRepositoryDataSource,
- *                 repositoryDataSource
+ *                 RedisDataSource.builder()
+ *                         .uri(b -> b.withHost("0.0.0.0").withPort(6379))
+ *                         .mapper(Mappers.JSON)
+ *                         .build(),
+ *                 SqlDataSource.builder()
+ *                         .database("database")
+ *                         .username("root")
+ *                         .password("super-secure-password-should-use-an-env-variable")
+ *                         .databaseType(DatabaseType.MARIADB)
+ *                         .host("0.0.0.0")
+ *                         .port(3306)
+ *                         .mysql()
+ *                         .build()
  *         );
  *         }</pre>
  *     </li>
+ *     <li>creation of hybrid (repositories will look up an in-memory cache before querying the cache):</li>
+ *         <pre>{@code
+ *         HybridCachedDataSource<?, ?> dataSource = CachedDataSource.hybrid(
+ *                 MemoryDataSource.create(Executors.newSingleThreadExecutor()),
+ *                 RedisDataSource.builder()
+ *                         .uri(b -> b.withHost("0.0.0.0").withPort(6379))
+ *                         .mapper(Mappers.JSON)
+ *                         .build(),
+ *                 SqlDataSource.builder()
+ *                         .database("database")
+ *                         .username("root")
+ *                         .password("super-secure-password-should-use-an-env-variable")
+ *                         .databaseType(DatabaseType.MARIADB)
+ *                         .host("0.0.0.0")
+ *                         .port(3306)
+ *                         .mysql()
+ *                         .build()
+ *         );
+ *         }</pre>
  *     <li>creating a standard repository:
  *         <pre>{@code
  *         CachedDataSource<RedisRepositorySettings, SqlRepositorySettings> dataSource = ...;
@@ -146,7 +163,7 @@ public final class CachedDataSource<
      * The lookup logic is the following:
      * <ol>
      *     <li>a {@link it.fulminazzo.blocksmith.data.memory.MemoryRepository} is queried for the resource;</li>
-     *     <li>if not found, the {@link CachedRepositorySettings} is queried for the resource;</li>
+     *     <li>if not found, the {@link CachedRepository} is queried for the resource;</li>
      *     <li>if not found, the actual {@link Repository} is queried.</li>
      * </ol>
      * This process allows for faster lookups when querying multiple data.
