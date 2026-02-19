@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.cache;
 
 import it.fulminazzo.blocksmith.data.*;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
+import it.fulminazzo.blocksmith.data.memory.MemoryDataSource;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -139,6 +140,39 @@ public final class CachedDataSource<
     }
 
     /**
+     * Creates a new Hybrid Cached data source.
+     * <br>
+     * A Hybrid Cached data source is a special {@link CachedDataSource} that uses two caches.
+     * The lookup logic is the following:
+     * <ol>
+     *     <li>a {@link it.fulminazzo.blocksmith.data.memory.MemoryRepository} is queried for the resource;</li>
+     *     <li>if not found, the {@link CachedRepositorySettings} is queried for the resource;</li>
+     *     <li>if not found, the actual {@link Repository} is queried.</li>
+     * </ol>
+     * This process allows for faster lookups when querying multiple data.
+     *
+     * @param <CS>                 the type of the settings for the cache repository
+     * @param <S>                  the type of the settings for the actual repository
+     * @param memoryDataSource     the in-memory repositories data source
+     * @param cacheDataSource      the cache repositories data source
+     * @param repositoryDataSource the actual repositories data source
+     * @return the hybrid data source
+     */
+    public static <
+            CS extends CacheRepositorySettings<CS>,
+            S extends RepositorySettings
+            > @NotNull HybridCachedDataSource<CS, S> hybrid(
+            final @NotNull MemoryDataSource memoryDataSource,
+            final @NotNull CacheRepositoryDataSource<CS> cacheDataSource,
+            final @NotNull RepositoryDataSource<S> repositoryDataSource
+    ) {
+        return new HybridCachedDataSource<>(
+                memoryDataSource,
+                create(cacheDataSource, repositoryDataSource)
+        );
+    }
+
+    /**
      * Creates a new Cached data source.
      *
      * @param <CS>                 the type of the settings for the cache repository
@@ -151,8 +185,8 @@ public final class CachedDataSource<
             CS extends CacheRepositorySettings<CS>,
             S extends RepositorySettings
             > @NotNull CachedDataSource<CS, S> create(
-            @NotNull CacheRepositoryDataSource<CS> cacheDataSource,
-            @NotNull RepositoryDataSource<S> repositoryDataSource
+            final @NotNull CacheRepositoryDataSource<CS> cacheDataSource,
+            final @NotNull RepositoryDataSource<S> repositoryDataSource
     ) {
         return new CachedDataSource<>(cacheDataSource, repositoryDataSource);
     }
