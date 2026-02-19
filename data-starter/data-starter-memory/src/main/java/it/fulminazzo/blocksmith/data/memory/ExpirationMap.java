@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * A special implementation of {@link Map} supporting expire dates for saved data.
+ * A special implementation of {@link Map} supporting expiration dates for saved data.
  *
  * @param <K> the type of the keys
  * @param <V> the type of the values
