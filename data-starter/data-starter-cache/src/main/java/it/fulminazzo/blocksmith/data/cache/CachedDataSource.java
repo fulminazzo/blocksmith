@@ -25,7 +25,7 @@ public final class CachedDataSource<
             final @NotNull CachedRepositorySettings<CS, S> settings
     ) {
         return newRepository(
-                ds -> ds.newRepository(entityMapper, settings.getCachedRepositorySettings()),
+                ds -> ds.newRepository(entityMapper, settings.getCacheRepositorySettings()),
                 ds -> ds.newRepository(entityMapper, settings.getRepositorySettings()),
                 (cr, r) -> new CachedRepository<>(entityMapper, cr, r)
         );
