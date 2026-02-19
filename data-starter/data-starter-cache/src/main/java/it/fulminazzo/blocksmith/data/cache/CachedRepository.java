@@ -99,4 +99,18 @@ public class CachedRepository<T, ID> implements Repository<T, ID> {
         return repository.count();
     }
 
+    /**
+     * Gets a new builder for this class.
+     *
+     * @param <T>        the type of the entities
+     * @param <ID>       the type of the id of the entities
+     * @param repository the base repository that will be responsible for handling the main data
+     * @return the repository builder
+     */
+    public static <T, ID> @NotNull CachedRepositoryBuilder<T, ID> wrap(
+            final @NotNull Repository<T, ID> repository
+    ) {
+        return new CachedRepositoryBuilder<>(repository);
+    }
+
 }
