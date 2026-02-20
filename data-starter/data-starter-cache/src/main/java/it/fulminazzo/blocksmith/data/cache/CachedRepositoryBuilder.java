@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.data.cache;
 
 import it.fulminazzo.blocksmith.data.*;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
-import it.fulminazzo.blocksmith.data.memory.MemoryRepository;
 import it.fulminazzo.blocksmith.data.memory.MemoryRepositorySettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -119,18 +118,17 @@ public final class CachedRepositoryBuilder<T, ID> {
      * Builds a Cached repository with two caches.
      * The lookup logic is the following:
      * <ol>
-     *     <li>a {@link it.fulminazzo.blocksmith.data.memory.MemoryRepository} is queried for the resource;</li>
-     *     <li>if not found, the {@link CachedRepository} is queried for the resource;</li>
+     *     <li>the first {@link CacheRepository} is queried for the resource;</li>
+     *     <li>if not found, the second {@link CacheRepository} is queried for the resource;</li>
      *     <li>if not found, the actual {@link Repository} is queried.</li>
      * </ol>
-     * This process allows for faster lookups when querying multiple data.
      *
-     * @param memoryRepository the memory repository
+     * @param firstCacheRepository the first cache repository
      * @return the repository
      */
-    public @NotNull Repository<T, ID> hybrid(final @NotNull MemoryRepository<T, ID> memoryRepository) {
+    public @NotNull Repository<T, ID> hybrid(final @NotNull CacheRepository<T, ID> firstCacheRepository) {
         return new CachedRepository<>(
-                memoryRepository,
+                firstCacheRepository,
                 build(),
                 getEntityMapper()
         );
