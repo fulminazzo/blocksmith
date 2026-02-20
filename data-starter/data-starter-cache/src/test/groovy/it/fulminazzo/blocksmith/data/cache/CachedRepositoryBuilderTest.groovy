@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.data.mapper.Mappers
 import it.fulminazzo.blocksmith.data.memory.MemoryDataSource
+import it.fulminazzo.blocksmith.data.memory.MemoryRepository
 import it.fulminazzo.blocksmith.data.memory.MemoryRepositorySettings
 import it.fulminazzo.blocksmith.data.redis.RedisDataSource
 import it.fulminazzo.blocksmith.data.redis.RedisRepositorySettings
@@ -127,6 +128,37 @@ class CachedRepositoryBuilderTest extends Specification {
                         memoryDataSource,
                         new MemoryRepositorySettings().withTtl(Duration.ofMinutes(5))
                 )
+
+        then:
+        noExceptionThrown()
+
+        and:
+        repository != null
+    }
+
+    def 'test creation of hybrid specific repository'() {
+        given:
+        def mainRepository = sqlDataSource.newRepository(
+                EntityMapper.create(User.class),
+                new SqlRepositorySettings()
+                        .withTable(table)
+                        .withIdColumn(idColumn)
+        )
+
+        when:
+        def repository = CachedRepository.wrap(mainRepository)
+                .entityType(User)
+                .cacheRepository(
+                        redisDataSource,
+                        new RedisRepositorySettings()
+                                .withDatabaseName("database")
+                                .withCollectionName("users")
+                                .withTtl(Duration.ofMinutes(30))
+                )
+                .hybrid(memoryDataSource.newRepository(
+                        User,
+                        new MemoryRepositorySettings().withTtl(Duration.ofMinutes(5))
+                ))
 
         then:
         noExceptionThrown()
