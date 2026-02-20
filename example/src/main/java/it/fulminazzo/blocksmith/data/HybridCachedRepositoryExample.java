@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.data;
 import it.fulminazzo.blocksmith.data.cache.CachedDataSource;
 import it.fulminazzo.blocksmith.data.cache.CachedRepositorySettings;
 import it.fulminazzo.blocksmith.data.cache.HybridCachedDataSource;
+import it.fulminazzo.blocksmith.data.jooq.Tables;
 import it.fulminazzo.blocksmith.data.memory.MemoryDataSource;
 import it.fulminazzo.blocksmith.data.memory.MemoryRepositorySettings;
 import it.fulminazzo.blocksmith.data.redis.RedisDataSource;

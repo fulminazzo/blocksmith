@@ -49,7 +49,7 @@ jooq {
                     }
 
                     target.apply {
-                        packageName = "it.fulminazzo.blocksmith.data"
+                        packageName = "it.fulminazzo.blocksmith.data.jooq"
                         directory = "build/generated-sources/jooq"
                     }
                 }
