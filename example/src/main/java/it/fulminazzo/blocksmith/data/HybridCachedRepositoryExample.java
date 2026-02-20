@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HybridCachedRepositoryExample {
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
