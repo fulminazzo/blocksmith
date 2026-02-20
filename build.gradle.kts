@@ -84,6 +84,7 @@ tasks.testCodeCoverageReport {
         fileTree(it) {
             exclude(
                 "**/ProjectInfo**",
+                "**/data/jooq/**"
             )
         }
     }))
