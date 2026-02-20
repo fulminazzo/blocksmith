@@ -183,7 +183,7 @@ public class CachedDataSource<
      * The lookup logic is the following:
      * <ol>
      *     <li>a {@link it.fulminazzo.blocksmith.data.memory.MemoryRepository} is queried for the resource;</li>
-     *     <li>if not found, the {@link CachedRepository} is queried for the resource;</li>
+     *     <li>if not found, the {@link CacheRepository} is queried for the resource;</li>
      *     <li>if not found, the actual {@link Repository} is queried.</li>
      * </ol>
      * This process allows for faster lookups when querying multiple data.
