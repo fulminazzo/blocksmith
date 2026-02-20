@@ -17,6 +17,9 @@ dependencies {
 
     jooqGenerator(libs.h2)
     implementation(libs.mariadb)
+
+    testImplementation(libs.embedded.mariadb)
+    testImplementation(libs.embedded.redis)
 }
 
 tasks.jar {
