@@ -74,8 +74,17 @@ dependencies {
 
 tasks.testCodeCoverageReport {
     dependsOn(tasks.test)
+
     reports {
         xml.required = true
         csv.required = true
     }
+
+    classDirectories.setFrom(files(classDirectories.files.map {
+        fileTree(it) {
+            exclude(
+                "**/ProjectInfo**",
+            )
+        }
+    }))
 }
