@@ -55,23 +55,6 @@ class AbstractRepositoryTest extends Specification {
         actual == null
     }
 
-    def 'test that findAll with page #page returns #expected'() {
-        when:
-        def result = repository.findAll(page).get()
-
-        then:
-        result == expected
-
-        where:
-        page           || expected
-        Page.of(0, 0)  || []
-        Page.of(-1, 1) || []
-        Page.of(-1, 0) || []
-        Page.of(2, 1)  || []
-        Page.of(2, 0)  || []
-        Page.of(0, 3)  || [Users.SAVED1, Users.SAVED2]
-    }
-
     def 'test that findAllById ignores null ids'() {
         given:
         def expected = [

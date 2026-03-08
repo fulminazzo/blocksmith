@@ -122,20 +122,23 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         result.sort() == [Users.SAVED1, Users.SAVED2].sort()
     }
 
-    def 'test findAll with page #page returns #expected'() {
-        given:
-        def actualPage = Page.of(page, 1)
-
+    def 'test that findAll with page #page returns #expected'() {
         when:
-        def result = repository.findAll(actualPage).get()
+        def result = repository.findAll(page).get()
 
         then:
-        result == [expected]
+        result == expected
 
         where:
-        page || expected
-        0    || [Users.SAVED1]
-        1    || [Users.SAVED2]
+        page           || expected
+        Page.of(0, 0)  || []
+        Page.of(0, 1)  || [Users.SAVED1]
+        Page.of(1, 1)  || [Users.SAVED2]
+        Page.of(-1, 1) || []
+        Page.of(-1, 0) || []
+        Page.of(2, 1)  || []
+        Page.of(2, 0)  || []
+        Page.of(0, 3)  || [Users.SAVED1, Users.SAVED2]
     }
 
     def 'test that findAllById correctly returns all entity'() {
