@@ -1,4 +1,6 @@
 dependencies {
+    api(libs.validation)
+
     api(libs.jooq)
     api(libs.hikaricp)
 
