@@ -124,7 +124,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
 
     def 'test findAll with page #page returns #expected'() {
         given:
-        def actualPage = Page.of(page, 1);
+        def actualPage = Page.of(page, 1)
 
         when:
         def result = repository.findAll(actualPage).get()
