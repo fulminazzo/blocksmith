@@ -81,6 +81,7 @@ public final class SqliteDataSourceBuilder extends ASqlDataSourceBuilder<SqliteD
      */
     public @NotNull SqliteDataSourceBuilder disk(final @NotNull String directoryPath) {
         File directory = new File(directoryPath);
+        if (!directory.exists()) directory.mkdirs();
         connectionMode = new File(directory, getDatabase() + ".db").getAbsolutePath();
         return this;
     }
