@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import it.fulminazzo.blocksmith.data.sql.IDatabaseType;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 import lombok.Value;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.Range;
 import java.util.Map;
 
 @Value
+@Builder
 public class SqlDataSourceConfig implements DataSourceConfig {
 
     static {
@@ -91,6 +93,7 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     ConnectionMode connectionMode;
 
     @Value
+    @Builder
     public static class ConnectionMode {
 
         @NotNull
