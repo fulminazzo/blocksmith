@@ -160,7 +160,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      * @param name the name
      * @return this object (for method chaining)
      */
-    public @NotNull H2DataSourceBuilder schemaName(final @NotNull String name) {
+    public @NotNull H2DataSourceBuilder schemaName(final @Nullable String name) {
         schemaName = name;
         return this;
     }

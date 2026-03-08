@@ -97,9 +97,11 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param maximumPoolSize the maximum pool size
      * @return this object (for method chaining)
      */
-    public @NotNull B maximumPoolSize(final @Range(from = 1, to = Integer.MAX_VALUE) int maximumPoolSize) {
-        ValidationUtils.checkNatural(maximumPoolSize, "maximum pool size");
-        config.setMaximumPoolSize(maximumPoolSize);
+    public @NotNull B maximumPoolSize(final @Nullable @Range(from = 1, to = Integer.MAX_VALUE) Integer maximumPoolSize) {
+        if (maximumPoolSize != null) {
+            ValidationUtils.checkNatural(maximumPoolSize, "maximum pool size");
+            config.setMaximumPoolSize(maximumPoolSize);
+        }
         return (B) this;
     }
 
@@ -111,9 +113,11 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param minimumIdle the minimum idle
      * @return this object (for method chaining)
      */
-    public @NotNull B minimumIdle(final @Range(from = 0, to = Integer.MAX_VALUE) int minimumIdle) {
-        ValidationUtils.checkPositive(minimumIdle, "minimum idle");
-        config.setMinimumIdle(minimumIdle);
+    public @NotNull B minimumIdle(final @Nullable @Range(from = 0, to = Integer.MAX_VALUE) Integer minimumIdle) {
+        if (minimumIdle != null) {
+            ValidationUtils.checkPositive(minimumIdle, "minimum idle");
+            config.setMinimumIdle(minimumIdle);
+        }
         return (B) this;
     }
 
@@ -125,9 +129,11 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param connectionTimeout the connection timeout
      * @return this object (for method chaining)
      */
-    public @NotNull B connectionTimeout(final @Range(from = 1, to = Long.MAX_VALUE) long connectionTimeout) {
-        ValidationUtils.checkNatural(connectionTimeout, "connection timeout");
-        config.setConnectionTimeout(connectionTimeout);
+    public @NotNull B connectionTimeout(final @Nullable @Range(from = 1, to = Long.MAX_VALUE) Long connectionTimeout) {
+        if (connectionTimeout != null) {
+            ValidationUtils.checkNatural(connectionTimeout, "connection timeout");
+            config.setConnectionTimeout(connectionTimeout);
+        }
         return (B) this;
     }
 
@@ -139,9 +145,11 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param idleTimeout the idle timeout
      * @return this object (for method chaining)
      */
-    public @NotNull B idleTimeout(final @Range(from = 0, to = Long.MAX_VALUE) long idleTimeout) {
-        ValidationUtils.checkPositive(idleTimeout, "idle timeout");
-        config.setIdleTimeout(idleTimeout);
+    public @NotNull B idleTimeout(final @Nullable @Range(from = 0, to = Long.MAX_VALUE) Long idleTimeout) {
+        if (idleTimeout != null) {
+            ValidationUtils.checkPositive(idleTimeout, "idle timeout");
+            config.setIdleTimeout(idleTimeout);
+        }
         return (B) this;
     }
 
@@ -153,9 +161,11 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param maxLifetime the max lifetime
      * @return this object (for method chaining)
      */
-    public @NotNull B maxLifeTime(final @Range(from = 0, to = Long.MAX_VALUE) long maxLifetime) {
-        ValidationUtils.checkPositive(maxLifetime, "maximum lifetime");
-        config.setMaxLifetime(maxLifetime);
+    public @NotNull B maxLifeTime(final @Nullable @Range(from = 0, to = Long.MAX_VALUE) Long maxLifetime) {
+        if (maxLifetime != null) {
+            ValidationUtils.checkPositive(maxLifetime, "maximum lifetime");
+            config.setMaxLifetime(maxLifetime);
+        }
         return (B) this;
     }
 

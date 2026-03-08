@@ -76,7 +76,7 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
      * @param host the host
      * @return this object (for method chaining)
      */
-    public @NotNull RemoteDataSourceBuilder host(final @NotNull String host) {
+    public @NotNull RemoteDataSourceBuilder host(final @Nullable String host) {
         this.host = host;
         return this;
     }
@@ -89,9 +89,11 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
      * @param port the port
      * @return this object (for method chaining)
      */
-    public @NotNull RemoteDataSourceBuilder port(final @Range(from = 1, to = 65535) int port) {
-        ValidationUtils.checkPort(port);
-        this.port = port;
+    public @NotNull RemoteDataSourceBuilder port(final @Nullable @Range(from = 1, to = 65535) Integer port) {
+        if (port != null) {
+            ValidationUtils.checkPort(port);
+            this.port = port;
+        }
         return this;
     }
 
