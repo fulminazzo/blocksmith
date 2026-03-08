@@ -28,64 +28,77 @@ final class SqlDataSourceFactory implements DataSourceFactory {
             properties.forEach((k, v) -> builder.addDataSourceProperty(k, v));
 
         IDatabaseType type = dsConfig.getDatabaseType();
-        if (type == DatabaseType.H2) {
-            H2DataSourceBuilder builder1 = builder.h2();
-            SqlDataSourceConfig.ConnectionMode mode = Objects.requireNonNull(
-                    dsConfig.getConnectionMode(),
-                    "connection mode must be declared"
+        if (type == DatabaseType.H2) return buildH2(builder, dsConfig);
+        else if (type == DatabaseType.SQLITE) return buildSQLite(builder, dsConfig);
+        else return buildRemote(builder, dsConfig, type);
+    }
+
+    @NotNull SqlDataSource buildH2(final @NotNull SqlDataSourceBuilder dataSourceBuilder,
+                                   final @NotNull SqlDataSourceConfig config) {
+        H2DataSourceBuilder builder = dataSourceBuilder.h2();
+        SqlDataSourceConfig.ConnectionMode mode = Objects.requireNonNull(
+                config.getConnectionMode(),
+                String.format("connection mode must be declared for %s database", DatabaseType.H2)
+        );
+        SqlDataSourceConfig.ConnectionModeType modeType = mode.getType();
+        if (modeType == SqlDataSourceConfig.ConnectionModeType.MEMORY)
+            builder.memory();
+        else if (modeType == SqlDataSourceConfig.ConnectionModeType.DISK)
+            builder.disk(Objects.requireNonNull(
+                    mode.getDirectoryPath(),
+                    "connection mode directoryPath must be declared"
+            ));
+        else if (modeType == SqlDataSourceConfig.ConnectionModeType.SERVER)
+            builder.server(
+                    Objects.requireNonNull(
+                            mode.getHost(),
+                            "connection mode host must be declared"
+                    ),
+                    Objects.requireNonNull(
+                            mode.getPort(),
+                            "connection mode port must be declared"
+                    )
             );
-            SqlDataSourceConfig.ConnectionModeType modeType = mode.getType();
-            if (modeType == SqlDataSourceConfig.ConnectionModeType.MEMORY)
-                builder1.memory();
-            else if (modeType == SqlDataSourceConfig.ConnectionModeType.DISK)
-                builder1.disk(Objects.requireNonNull(
-                        mode.getDirectoryPath(),
-                        "connection mode directoryPath must be declared"
-                ));
-            else if (modeType == SqlDataSourceConfig.ConnectionModeType.SERVER)
-                builder1.server(
-                        Objects.requireNonNull(
-                                mode.getHost(),
-                                "connection mode host must be declared"
-                        ),
-                        Objects.requireNonNull(
-                                mode.getPort(),
-                                "connection mode port must be declared"
-                        )
-                );
-            builder1.schemaName(dsConfig.getSchemaName());
-            @Nullable Map<String, Object> parameters = dsConfig.getParameters();
-            if (parameters != null)
-                parameters.forEach(builder1::setParameters);
-            return builder1.build();
-        }
-        else if (type == DatabaseType.SQLITE) {
-            SqliteDataSourceBuilder builder1 = builder.sqlite();
-            SqlDataSourceConfig.ConnectionMode mode = Objects.requireNonNull(
-                    dsConfig.getConnectionMode(),
-                    "connection mode must be declared"
-            );
-            SqlDataSourceConfig.ConnectionModeType modeType = mode.getType();
-            if (modeType == SqlDataSourceConfig.ConnectionModeType.MEMORY)
-                builder1.memory();
-            else if (modeType == SqlDataSourceConfig.ConnectionModeType.DISK)
-                builder1.disk(Objects.requireNonNull(
-                        mode.getDirectoryPath(),
-                        "connection mode directoryPath must be declared"
-                ));
-            else throw new IllegalArgumentException(String.format("Unsupported connection mode '%s' for '%s'",
-                        modeType, type
-                ));
-            return builder1.build();
-        } else {
-            RemoteDataSourceBuilder builder1 = builder.databaseType(type);
-            if (type == DatabaseType.MYSQL || type == DatabaseType.MARIADB) builder1.mysql();
-            else if (type == DatabaseType.POSTGRES) builder1.postgres();
-            return builder1
-                    .host(dsConfig.getHost())
-                    .port(dsConfig.getPort())
-                    .build();
-        }
+        builder.schemaName(config.getSchemaName());
+        @Nullable Map<String, Object> parameters = config.getParameters();
+        if (parameters != null)
+            parameters.forEach(builder::setParameters);
+        return builder.build();
+    }
+
+    @NotNull SqlDataSource buildSQLite(final @NotNull SqlDataSourceBuilder dataSourceBuilder,
+                                       final @NotNull SqlDataSourceConfig config) {
+        final DatabaseType type = DatabaseType.SQLITE;
+
+        SqliteDataSourceBuilder builder = dataSourceBuilder.sqlite();
+        SqlDataSourceConfig.ConnectionMode mode = Objects.requireNonNull(
+                config.getConnectionMode(),
+                String.format("connection mode must be declared for %s database", type)
+        );
+        SqlDataSourceConfig.ConnectionModeType modeType = mode.getType();
+        if (modeType == SqlDataSourceConfig.ConnectionModeType.MEMORY)
+            builder.memory();
+        else if (modeType == SqlDataSourceConfig.ConnectionModeType.DISK)
+            builder.disk(Objects.requireNonNull(
+                    mode.getDirectoryPath(),
+                    "connection mode directoryPath must be declared"
+            ));
+        else throw new IllegalArgumentException(String.format("Unsupported connection mode '%s' for '%s'",
+                    modeType, type
+            ));
+        return builder.build();
+    }
+
+    @NotNull SqlDataSource buildRemote(final @NotNull SqlDataSourceBuilder dataSourceBuilder,
+                                       final @NotNull SqlDataSourceConfig config,
+                                       final @NotNull IDatabaseType type) {
+        RemoteDataSourceBuilder builder = dataSourceBuilder.databaseType(type);
+        if (type == DatabaseType.MYSQL || type == DatabaseType.MARIADB) builder.mysql();
+        else if (type == DatabaseType.POSTGRES) builder.postgres();
+        return builder
+                .host(config.getHost())
+                .port(config.getPort())
+                .build();
     }
 
 }

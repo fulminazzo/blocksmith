@@ -69,7 +69,7 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     String host;
 
     @Min(value = 1, message = "port number must be greater than or equal to 1")
-    @Max(value = 1, message = "port number must be lower than or equal to 65535")
+    @Max(value = 65535, message = "port number must be lower than or equal to 65535")
     @Range(from = 1, to = 65535)
     @Nullable
     Integer port;
@@ -103,7 +103,7 @@ public class SqlDataSourceConfig implements DataSourceConfig {
         String host;
 
         @Min(value = 1, message = "port number must be greater than or equal to 1")
-        @Max(value = 1, message = "port number must be lower than or equal to 65535")
+        @Max(value = 65535, message = "port number must be lower than or equal to 65535")
         @Range(from = 1, to = 65535)
         @Nullable
         Integer port;
