@@ -2,24 +2,13 @@ package it.fulminazzo.blocksmith.data.sql.config
 
 import com.zaxxer.hikari.pool.HikariPool
 import it.fulminazzo.blocksmith.data.sql.DatabaseType
-import it.fulminazzo.blocksmith.data.sql.SqlDataSource
-import it.fulminazzo.blocksmith.data.sql.SqlDataSourceBuilder
+import it.fulminazzo.blocksmith.data.sql.IDatabaseType
 import org.h2.jdbc.JdbcSQLNonTransientConnectionException
 import spock.lang.Specification
-
-import java.util.concurrent.Executors
 
 class SqlDataSourceFactoryTest extends Specification {
 
     private final SqlDataSourceFactory factory = new SqlDataSourceFactory()
-
-    private SqlDataSourceBuilder baseBuilder
-
-    void setup() {
-        baseBuilder = SqlDataSource.builder()
-                .database('test')
-                .executor(Executors.newSingleThreadExecutor())
-    }
 
     def 'test build with all parameters'() {
         given:
@@ -59,7 +48,7 @@ class SqlDataSourceFactoryTest extends Specification {
                 .build()
 
         when:
-        def dataSource = factory.buildH2(baseBuilder, config)
+        def dataSource = factory.build(config)
 
         then:
         dataSource != null
@@ -92,7 +81,7 @@ class SqlDataSourceFactoryTest extends Specification {
                 .build()
 
         when:
-        factory.buildH2(baseBuilder, config)
+        factory.build(config)
 
         then:
         def e = thrown(HikariPool.PoolInitializationException)
@@ -113,7 +102,7 @@ class SqlDataSourceFactoryTest extends Specification {
                 .build()
 
         when:
-        def dataSource = factory.buildSQLite(baseBuilder, config)
+        def dataSource = factory.build(config)
 
         then:
         dataSource != null
@@ -133,6 +122,23 @@ class SqlDataSourceFactoryTest extends Specification {
         ]
     }
 
+    def 'test buildSQLite with SERVER connection mode type'() {
+        given:
+        def config = SqlDataSourceConfig.builder()
+                .database('test')
+                .databaseType(DatabaseType.SQLITE)
+                .connectionMode(SqlDataSourceConfig.ConnectionMode.builder()
+                        .type(SqlDataSourceConfig.ConnectionModeType.SERVER)
+                        .build())
+                .build()
+
+        when:
+        factory.build(config)
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
     /*
      * REMOTE
      */
@@ -146,7 +152,7 @@ class SqlDataSourceFactoryTest extends Specification {
                 .build()
 
         when:
-        factory.buildRemote(baseBuilder, config)
+        factory.build(config)
 
         then:
         def e = thrown(HikariPool.PoolInitializationException)
@@ -156,7 +162,20 @@ class SqlDataSourceFactoryTest extends Specification {
         databaseType << [
                 DatabaseType.MYSQL,
                 DatabaseType.MARIADB,
-                DatabaseType.POSTGRESQL
+                DatabaseType.POSTGRESQL,
+                new IDatabaseType() {
+
+                    @Override
+                    String getJdbcName() {
+                        return "mysql"
+                    }
+
+                    @Override
+                    int getPort() {
+                        return 1337
+                    }
+
+                }
         ]
     }
 
