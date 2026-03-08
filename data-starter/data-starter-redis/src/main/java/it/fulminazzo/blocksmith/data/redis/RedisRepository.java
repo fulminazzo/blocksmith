@@ -4,6 +4,7 @@ import io.lettuce.core.RedisFuture;
 import io.lettuce.core.api.async.RedisServerAsyncCommands;
 import it.fulminazzo.blocksmith.data.AbstractRepository;
 import it.fulminazzo.blocksmith.data.CacheRepository;
+import it.fulminazzo.blocksmith.data.Page;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.util.ValidationUtils;
@@ -67,6 +68,16 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAll() {
         return queryEngine.getAllKeys().thenCompose(queryEngine::getValues);
+    }
+
+    @Override
+    protected @NotNull CompletableFuture<Collection<T>> findAllImpl(@NotNull Page page) {
+        return queryEngine.getAllKeys()
+                .thenApply(k -> k.stream()
+                        .skip((long) page.getNumber() * page.getSize())
+                        .limit(page.getSize())
+                        .collect(Collectors.toList()))
+                .thenCompose(queryEngine::getValues);
     }
 
     @Override

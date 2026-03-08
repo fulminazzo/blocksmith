@@ -6,6 +6,7 @@ import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.WriteModel;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import it.fulminazzo.blocksmith.data.AbstractRepository;
+import it.fulminazzo.blocksmith.data.Page;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
@@ -74,6 +75,14 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID, MongoQuery
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAll() {
         return queryEngine.queryMany(MongoCollection::find);
+    }
+
+    @Override
+    protected @NotNull CompletableFuture<Collection<T>> findAllImpl(final @NotNull Page page) {
+        return queryEngine.queryMany(c -> c.find()
+                .skip(page.getNumber() * page.getSize())
+                .limit(page.getSize())
+        );
     }
 
     @Override

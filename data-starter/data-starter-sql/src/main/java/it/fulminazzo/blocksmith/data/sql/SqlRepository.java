@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.sql;
 
 import it.fulminazzo.blocksmith.data.AbstractRepository;
+import it.fulminazzo.blocksmith.data.Page;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
@@ -68,6 +69,16 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
     public @NotNull CompletableFuture<Collection<T>> findAll() {
         return queryEngine.query((dsl, table) ->
                 dsl.selectFrom(table)
+                        .fetchInto(entityMapper.getType())
+        );
+    }
+
+    @Override
+    protected @NotNull CompletableFuture<Collection<T>> findAllImpl(final @NotNull Page page) {
+        return queryEngine.query((dsl, table) ->
+                dsl.selectFrom(table)
+                        .offset(page.getNumber() * page.getSize())
+                        .limit(page.getSize())
                         .fetchInto(entityMapper.getType())
         );
     }

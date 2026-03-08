@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith;
 
 import it.fulminazzo.blocksmith.data.AbstractRepository;
+import it.fulminazzo.blocksmith.data.Page;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,6 +47,15 @@ public final class MockRepository extends AbstractRepository<Cat, String, MockQu
     @Override
     public @NotNull CompletableFuture<Collection<Cat>> findAll() {
         return queryEngine.query(Map::values);
+    }
+
+    @Override
+    protected @NotNull CompletableFuture<Collection<Cat>> findAllImpl(final @NotNull Page page) {
+        return queryEngine.query(m -> m.values().stream()
+                .skip((long) page.getNumber() * page.getSize())
+                .limit(page.getSize())
+                .collect(Collectors.toList())
+        );
     }
 
     @Override

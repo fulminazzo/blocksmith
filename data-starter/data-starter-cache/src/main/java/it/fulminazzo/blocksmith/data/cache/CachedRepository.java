@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.cache;
 
 import it.fulminazzo.blocksmith.data.CacheRepository;
+import it.fulminazzo.blocksmith.data.Page;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import lombok.AccessLevel;
@@ -60,6 +61,11 @@ public class CachedRepository<T, ID> implements Repository<T, ID> {
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Collection<T>> findAll(final @NotNull Page page) {
+        return repository.findAll(page);
     }
 
     @Override

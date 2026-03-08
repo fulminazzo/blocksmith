@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.file;
 
 import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import it.fulminazzo.blocksmith.data.AbstractRepository;
+import it.fulminazzo.blocksmith.data.Page;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
@@ -69,6 +70,20 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID, FileQueryEn
         return queryEngine.query(a -> {
             List<T> result = new ArrayList<>();
             for (File file : queryEngine.getFiles())
+                result.add(a.load(file, entityMapper.getType()));
+            return result;
+        });
+    }
+
+    @Override
+    protected @NotNull CompletableFuture<Collection<T>> findAllImpl(final @NotNull Page page) {
+        return queryEngine.query(a -> {
+            List<T> result = new ArrayList<>();
+            List<File> files = new ArrayList<>(queryEngine.getFiles()).subList(
+                    page.getNumber() * page.getSize(),
+                    (page.getNumber() + 1) * page.getSize()
+            );
+            for (File file : files)
                 result.add(a.load(file, entityMapper.getType()));
             return result;
         });

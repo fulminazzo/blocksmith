@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.memory;
 
 import it.fulminazzo.blocksmith.data.AbstractRepository;
 import it.fulminazzo.blocksmith.data.CacheRepository;
+import it.fulminazzo.blocksmith.data.Page;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
@@ -70,6 +71,15 @@ public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQue
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAll() {
         return queryEngine.query(Map::values);
+    }
+
+    @Override
+    protected @NotNull CompletableFuture<Collection<T>> findAllImpl(final @NotNull Page page) {
+        return queryEngine.query(m -> m.values().stream()
+                .skip((long) page.getNumber() * page.getSize())
+                .limit(page.getSize())
+                .collect(Collectors.toList())
+        );
     }
 
     @Override
