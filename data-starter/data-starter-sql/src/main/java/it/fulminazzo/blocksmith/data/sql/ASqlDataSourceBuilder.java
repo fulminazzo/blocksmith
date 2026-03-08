@@ -62,7 +62,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param database database
      * @return this object (for method chaining)
      */
-    public @NotNull B database(final @Nullable String database) {
+    public @NotNull B database(final @NotNull String database) {
         this.database = database;
         return (B) this;
     }
