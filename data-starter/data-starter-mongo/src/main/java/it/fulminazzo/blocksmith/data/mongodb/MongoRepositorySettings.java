@@ -38,8 +38,7 @@ public final class MongoRepositorySettings extends RepositorySettings {
      * Sets the entity mapper.
      * <br>
      * <b>NOTE:</b> this call can be avoided when using
-     * {@link MongoDataSource#newRepository(Class, RepositorySettings)}
-     * and {@link MongoDataSource#newRepository(EntityMapper, MongoRepositorySettings)}
+     * {@link MongoDataSource#newRepository(EntityMapper, MongoRepositorySettings)}.
      *
      * @param entityMapper the entity mapper
      * @return this object (for method chaining)

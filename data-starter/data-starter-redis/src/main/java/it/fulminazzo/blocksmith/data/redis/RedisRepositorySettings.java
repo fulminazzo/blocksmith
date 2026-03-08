@@ -39,8 +39,7 @@ public final class RedisRepositorySettings extends CacheRepositorySettings<Redis
      * Sets the entity mapper.
      * <br>
      * <b>NOTE:</b> this call can be avoided when using
-     * {@link RedisDataSource#newRepository(Class, RepositorySettings)}
-     * and {@link RedisDataSource#newRepository(EntityMapper, RedisRepositorySettings)}
+     * {@link RedisDataSource#newRepository(EntityMapper, RedisRepositorySettings)}.
      *
      * @param entityMapper the entity mapper
      * @return this object (for method chaining)
