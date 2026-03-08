@@ -22,8 +22,8 @@ final class MongoDataSourceFactory implements DataSourceFactory {
         String srvHost = dsConfig.getSrvHost();
         if (srvHost != null) builder.srvHost(srvHost);
 
-        Integer maxHosts = dsConfig.getMaxHosts();
-        if (maxHosts != null) builder.srvMaxHosts(maxHosts);
+        Integer srvMaxHosts = dsConfig.getSrvMaxHosts();
+        if (srvMaxHosts != null) builder.srvMaxHosts(srvMaxHosts);
 
         String srvServiceName = dsConfig.getSrvServiceName();
         if (srvServiceName != null) builder.srvServiceName(srvServiceName);

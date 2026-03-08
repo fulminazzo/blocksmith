@@ -28,7 +28,7 @@ public class MongoDataSourceConfig implements DataSourceConfig {
     @Positive(message = "maxHosts must be greater than 0")
     @Range(from = 1, to = Integer.MAX_VALUE)
     @Nullable
-    Integer maxHosts;
+    Integer srvMaxHosts;
 
     @Nullable
     String srvServiceName;
