@@ -9,6 +9,7 @@ import lombok.Value;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Value
@@ -61,8 +62,9 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     Long maxLifeTime;
 
-    @Nullable
-    Map<String, Object> properties;
+    @org.jetbrains.annotations.NotNull
+    @Builder.Default
+    Map<String, Object> properties = new HashMap<>();
 
     /*
      * RemoteDataSource
@@ -82,14 +84,16 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     String schemaName;
 
-    @Nullable
-    Map<String, Object> parameters;
+    @Builder.Default
+    @org.jetbrains.annotations.NotNull
+    Map<String, Object> parameters = new HashMap<>();
 
     /*
      * SqliteDataSource
      */
 
     @NotNull
+    @Builder.Default
     ConnectionMode connectionMode = ConnectionMode.builder().build();
 
     @Value
@@ -97,6 +101,7 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     public static class ConnectionMode {
 
         @NotNull
+        @Builder.Default
         ConnectionModeType type = ConnectionModeType.MEMORY;
 
         @Nullable
