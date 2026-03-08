@@ -34,10 +34,12 @@ final class SqlDataSourceFactory implements DataSourceFactory {
 
     @NotNull SqlDataSource buildH2(final @NotNull SqlDataSourceBuilder dataSourceBuilder,
                                    final @NotNull SqlDataSourceConfig config) {
+        final DatabaseType type = DatabaseType.H2;
+
         H2DataSourceBuilder builder = dataSourceBuilder.h2();
         SqlDataSourceConfig.ConnectionMode mode = Objects.requireNonNull(
                 config.getConnectionMode(),
-                String.format("connection mode must be declared for %s database", DatabaseType.H2)
+                String.format("connection mode must be declared for %s database", type)
         );
         SqlDataSourceConfig.ConnectionModeType modeType = mode.getType();
         if (modeType == SqlDataSourceConfig.ConnectionModeType.MEMORY)
@@ -47,8 +49,7 @@ final class SqlDataSourceFactory implements DataSourceFactory {
                     mode.getDirectoryPath(),
                     "connection mode directoryPath must be declared"
             ));
-        else if (modeType == SqlDataSourceConfig.ConnectionModeType.SERVER)
-            builder.server(
+        else builder.server(
                     Objects.requireNonNull(
                             mode.getHost(),
                             "connection mode host must be declared"
@@ -58,6 +59,7 @@ final class SqlDataSourceFactory implements DataSourceFactory {
                             "connection mode port must be declared"
                     )
             );
+
         builder.schemaName(config.getSchemaName());
         config.getParameters().forEach(builder::setParameters);
         return builder.build();
