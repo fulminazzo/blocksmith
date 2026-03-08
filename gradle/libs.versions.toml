@@ -25,7 +25,9 @@ hikaricp = "7.0.2"
 
 h2 = "2.4.240"
 sqlite = "3.51.1.0"
+mysql = "9.6.0"
 mariadb = "3.5.7"
+postgresql = "42.2.23"
 embedded_mariadb = "3.3.1"
 
 lettuce = "7.4.0.RELEASE"
@@ -65,7 +67,9 @@ hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
 sqlite = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite" }
+mysql = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
 mariadb = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "mariadb" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 embedded_mariadb = { module = "ch.vorburger.mariaDB4j:mariaDB4j", version.ref = "embedded_mariadb" }
 
 lettuce = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
