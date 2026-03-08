@@ -13,7 +13,9 @@ import org.jetbrains.annotations.NotNull;
 public enum DatabaseType implements IDatabaseType {
     MYSQL(3306),
     MARIADB(3306),
-    POSTGRES(5432)
+    POSTGRES(5432),
+    H2(8082),
+    SQLITE(8191)
     ;
 
     @Getter
