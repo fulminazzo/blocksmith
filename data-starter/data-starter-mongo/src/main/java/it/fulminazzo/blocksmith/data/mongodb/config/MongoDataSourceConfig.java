@@ -23,8 +23,8 @@ public class MongoDataSourceConfig implements DataSourceConfig {
     @NotNull(message = "host must be declared")
     String host;
 
-    @Min(value = 1, message = "port number must be greater than or equal to 1")
-    @Max(value = 65535, message = "port number must be lower than or equal to 65535")
+    @Min(value = 1, message = "port number must be at least 1")
+    @Max(value = 65535, message = "port number must be at most 65535")
     @Range(from = 1, to = 65535)
     @Nullable
     @Builder.Default

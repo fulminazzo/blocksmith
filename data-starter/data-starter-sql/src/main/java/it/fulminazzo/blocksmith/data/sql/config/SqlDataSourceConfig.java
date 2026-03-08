@@ -42,7 +42,7 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     Integer maximumPoolSize;
 
-    @PositiveOrZero(message = "minimumIdle must be greater than or equal to 0")
+    @PositiveOrZero(message = "minimumIdle must be at least 0")
     @Range(from = 0, to = Integer.MAX_VALUE)
     @Nullable
     Integer minimumIdle;
@@ -52,12 +52,12 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     Long connectionTimeout;
 
-    @PositiveOrZero(message = "idleTimeout must be greater than or equal to 0")
+    @PositiveOrZero(message = "idleTimeout must be at least 0")
     @Range(from = 0, to = Long.MAX_VALUE)
     @Nullable
     Long idleTimeout;
 
-    @PositiveOrZero(message = "maxLifeTime must be greater than or equal to 0")
+    @PositiveOrZero(message = "maxLifeTime must be at least 0")
     @Range(from = 0, to = Long.MAX_VALUE)
     @Nullable
     Long maxLifeTime;
@@ -72,8 +72,8 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     String host;
 
-    @Min(value = 1, message = "port number must be greater than or equal to 1")
-    @Max(value = 65535, message = "port number must be lower than or equal to 65535")
+    @Min(value = 1, message = "port number must be at least 1")
+    @Max(value = 65535, message = "port number must be at most 65535")
     @Range(from = 1, to = 65535)
     @Nullable
     Integer port;
@@ -110,8 +110,8 @@ public class SqlDataSourceConfig implements DataSourceConfig {
         @Nullable
         String host;
 
-        @Min(value = 1, message = "port number must be greater than or equal to 1")
-        @Max(value = 65535, message = "port number must be lower than or equal to 65535")
+        @Min(value = 1, message = "port number must be at least 1")
+        @Max(value = 65535, message = "port number must be at most 65535")
         @Range(from = 1, to = 65535)
         @Nullable
         Integer port;
