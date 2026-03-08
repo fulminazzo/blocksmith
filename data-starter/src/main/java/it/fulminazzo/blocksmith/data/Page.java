@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 /**
  * Represents the page of a query request.
@@ -49,7 +50,8 @@ public class Page {
      * @param size   the size of the pages
      * @return the page
      */
-    public static @NotNull Page of(final int number, final int size) {
+    public static @NotNull Page of(final @Range(from = 0, to = Integer.MAX_VALUE) int number,
+                                   final @Range(from = 1, to = Integer.MAX_VALUE) int size) {
         return new Page(number, size);
     }
 
