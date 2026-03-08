@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.mongodb.config;
 
 import com.mongodb.ServerAddress;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
+import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Value;
@@ -11,6 +12,13 @@ import org.jetbrains.annotations.Range;
 @Value
 @Builder
 public class MongoDataSourceConfig implements DataSourceConfig {
+
+    static {
+        DataSourceFactories.registerFactory(
+                MongoDataSourceConfig.class,
+                new MongoDataSourceFactory()
+        );
+    }
 
     @NotNull(message = "host must be declared")
     String host;
