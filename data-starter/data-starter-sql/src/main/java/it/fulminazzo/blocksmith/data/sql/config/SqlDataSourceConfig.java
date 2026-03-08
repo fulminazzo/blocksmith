@@ -89,8 +89,8 @@ public class SqlDataSourceConfig implements DataSourceConfig {
      * SqliteDataSource
      */
 
-    @Nullable
-    ConnectionMode connectionMode;
+    @NotNull
+    ConnectionMode connectionMode = ConnectionMode.builder().build();
 
     @Value
     @Builder
