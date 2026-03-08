@@ -54,6 +54,14 @@ public interface Repository<T, ID> {
     @NotNull CompletableFuture<Collection<T>> findAll();
 
     /**
+     * Gets all the entities currently stored.
+     *
+     * @param page the page to display
+     * @return the entities
+     */
+    @NotNull CompletableFuture<Collection<T>> findAll(final @NotNull Page page);
+
+    /**
      * Gets all the entities with the associated it.
      *
      * @param ids the ids
