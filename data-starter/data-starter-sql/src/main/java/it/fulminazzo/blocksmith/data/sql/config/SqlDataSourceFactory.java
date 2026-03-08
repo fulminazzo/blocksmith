@@ -16,6 +16,7 @@ final class SqlDataSourceFactory implements DataSourceFactory {
     public @NotNull RepositoryDataSource<?> build(final @NotNull DataSourceConfig config) {
         SqlDataSourceConfig dsConfig = (SqlDataSourceConfig) config;
         SqlDataSourceBuilder builder = SqlDataSource.builder()
+                .database(dsConfig.getDatabase())
                 .username(dsConfig.getUsername())
                 .password(dsConfig.getPassword())
                 .maximumPoolSize(dsConfig.getMaximumPoolSize())
