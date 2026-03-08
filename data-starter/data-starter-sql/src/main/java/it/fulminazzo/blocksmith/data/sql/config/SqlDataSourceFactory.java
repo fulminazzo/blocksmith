@@ -22,7 +22,7 @@ final class SqlDataSourceFactory implements DataSourceFactory {
                 .minimumIdle(dsConfig.getMinimumIdle())
                 .connectionTimeout(dsConfig.getConnectionTimeout())
                 .idleTimeout(dsConfig.getIdleTimeout())
-                .maxLifeTime(dsConfig.getMaxLifetime());
+                .maxLifeTime(dsConfig.getMaxLifeTime());
         @Nullable Map<String, Object> properties = dsConfig.getProperties();
         if (properties != null)
             properties.forEach((k, v) -> builder.addDataSourceProperty(k, v));

@@ -56,10 +56,10 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     Long idleTimeout;
 
-    @PositiveOrZero(message = "maxLifetime must be greater than or equal to 0")
+    @PositiveOrZero(message = "maxLifeTime must be greater than or equal to 0")
     @Range(from = 0, to = Long.MAX_VALUE)
     @Nullable
-    Long maxLifetime;
+    Long maxLifeTime;
 
     @Nullable
     Map<String, Object> properties;
