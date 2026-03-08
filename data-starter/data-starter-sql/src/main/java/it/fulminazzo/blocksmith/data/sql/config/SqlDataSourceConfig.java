@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.sql.config;
 
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
+import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import it.fulminazzo.blocksmith.data.sql.IDatabaseType;
 import jakarta.validation.constraints.*;
 import lombok.Value;
@@ -11,6 +12,13 @@ import java.util.Map;
 
 @Value
 public class SqlDataSourceConfig implements DataSourceConfig {
+
+    static {
+        DataSourceFactories.registerFactory(
+                SqlDataSourceConfig.class,
+                new SqlDataSourceFactory()
+        );
+    }
 
     @NotNull(message = "databaseType must be declared")
     @org.jetbrains.annotations.NotNull
