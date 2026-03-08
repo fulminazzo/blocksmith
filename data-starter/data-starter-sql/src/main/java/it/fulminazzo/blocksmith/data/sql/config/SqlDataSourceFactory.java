@@ -5,9 +5,7 @@ import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactory;
 import it.fulminazzo.blocksmith.data.sql.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 
@@ -26,14 +24,12 @@ final class SqlDataSourceFactory implements DataSourceFactory {
                 .connectionTimeout(dsConfig.getConnectionTimeout())
                 .idleTimeout(dsConfig.getIdleTimeout())
                 .maxLifeTime(dsConfig.getMaxLifeTime());
-        @Nullable Map<String, Object> properties = dsConfig.getProperties();
-        if (properties != null)
-            properties.forEach((k, v) -> builder.addDataSourceProperty(k, v));
+        dsConfig.getProperties().forEach((k, v) -> builder.addDataSourceProperty(k, v));
 
         IDatabaseType type = dsConfig.getDatabaseType();
         if (type == DatabaseType.H2) return buildH2(builder, dsConfig);
         else if (type == DatabaseType.SQLITE) return buildSQLite(builder, dsConfig);
-        else return buildRemote(builder, dsConfig, type);
+        else return buildRemote(builder, dsConfig);
     }
 
     @NotNull SqlDataSource buildH2(final @NotNull SqlDataSourceBuilder dataSourceBuilder,
@@ -63,9 +59,7 @@ final class SqlDataSourceFactory implements DataSourceFactory {
                     )
             );
         builder.schemaName(config.getSchemaName());
-        @Nullable Map<String, Object> parameters = config.getParameters();
-        if (parameters != null)
-            parameters.forEach(builder::setParameters);
+        config.getParameters().forEach(builder::setParameters);
         return builder.build();
     }
 
@@ -93,8 +87,8 @@ final class SqlDataSourceFactory implements DataSourceFactory {
     }
 
     @NotNull SqlDataSource buildRemote(final @NotNull SqlDataSourceBuilder dataSourceBuilder,
-                                       final @NotNull SqlDataSourceConfig config,
-                                       final @NotNull IDatabaseType type) {
+                                       final @NotNull SqlDataSourceConfig config) {
+        final IDatabaseType type = config.getDatabaseType();
         RemoteDataSourceBuilder builder = dataSourceBuilder.databaseType(type);
         if (type == DatabaseType.MYSQL || type == DatabaseType.MARIADB) builder.mysql();
         else if (type == DatabaseType.POSTGRESQL) builder.postgres();
