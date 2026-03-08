@@ -12,9 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
@@ -53,6 +51,7 @@ public final class RedisQueryEngine<T, ID> implements QueryEngine<T, ID> {
      * @return the values
      */
     public @NotNull CompletableFuture<Collection<T>> getValues(final @NotNull Collection<String> keys) {
+        if (keys.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         return query(async ->
                 async.mget(keys.toArray(String[]::new))
         ).thenApply(l -> l.stream()
@@ -81,7 +80,10 @@ public final class RedisQueryEngine<T, ID> implements QueryEngine<T, ID> {
                 .toCompletableFuture()
                 .thenCompose(c -> {
                     keys.addAll(c.getKeys());
-                    if (c.isFinished()) return CompletableFuture.completedFuture(keys);
+                    if (c.isFinished()) return CompletableFuture.completedFuture(keys
+                            .stream()
+                            .sorted(Comparator.comparing(k -> k))
+                            .collect(Collectors.toList()));
                     else return scanAllKeys(async, keys, c);
                 });
     }

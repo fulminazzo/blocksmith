@@ -79,9 +79,12 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID, FileQueryEn
     protected @NotNull CompletableFuture<Collection<T>> findAllImpl(final @NotNull Page page) {
         return queryEngine.query(a -> {
             List<T> result = new ArrayList<>();
-            List<File> files = new ArrayList<>(queryEngine.getFiles()).subList(
-                    page.getNumber() * page.getSize(),
-                    (page.getNumber() + 1) * page.getSize()
+            int from = page.getNumber() * page.getSize();
+            int to = (page.getNumber() + 1) * page.getSize();
+            Collection<File> files = queryEngine.getFiles();
+            files = new ArrayList<>(files).subList(
+                    Math.min(files.size(), from),
+                    Math.min(files.size(), to)
             );
             for (File file : files)
                 result.add(a.load(file, entityMapper.getType()));

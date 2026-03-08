@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
@@ -66,6 +67,7 @@ public final class FileQueryEngine<T, ID> implements QueryEngine<T, ID> {
             if (files != null)
                 return Arrays.stream(files)
                         .filter(f -> f.getName().endsWith("." + format.getFileExtension()))
+                        .sorted(Comparator.comparing(File::getName))
                         .collect(Collectors.toList());
         }
         return new ArrayList<>();
