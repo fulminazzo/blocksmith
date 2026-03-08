@@ -29,7 +29,7 @@ public class RedisDataSourceConfig implements DataSourceConfig {
     @Min(value = 1, message = "port number must be greater than or equal to 1")
     @Max(value = 65535, message = "port number must be lower than or equal to 65535")
     @Range(from = 1, to = 65535)
-    @NotNull(message = "port must be declared")
+    @Nullable
     @Builder.Default
     Integer port = RedisURI.DEFAULT_REDIS_PORT;
 
