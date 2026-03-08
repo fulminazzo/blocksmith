@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.data.config;
 
 import it.fulminazzo.blocksmith.data.RepositoryDataSource;
-import it.fulminazzo.blocksmith.data.RepositorySettings;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -13,10 +12,9 @@ public interface DataSourceFactory {
     /**
      * Builds the Repository data source.
      *
-     * @param <S>    the type of the repository settings
      * @param config the config
      * @return the repository data source
      */
-    <S extends RepositorySettings> @NotNull RepositoryDataSource<S> build(final @NotNull DataSourceConfig config);
+    @NotNull RepositoryDataSource<?> build(final @NotNull DataSourceConfig config);
 
 }
