@@ -63,6 +63,22 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
     protected abstract @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id);
 
     @Override
+    public @NotNull CompletableFuture<Collection<T>> findAll(final @NotNull Page page) {
+        if (page.getNumber() < 0 || page.getSize() < 1) return CompletableFuture.completedFuture(Collections.emptyList());
+        return findAllImpl(page);
+    }
+
+    /**
+     * Internal implementation of {@link #findAll(Page)}.
+     *
+     * @param page the page
+     * @return the data
+     * @deprecated FOR INTERNAL USE ONLY, PAGE NUMBER MUST BE GREATER THAN OR EQUAL TO 0 AND PAGES SIZE MUST BE GREATER THAN 0
+     */
+    @Deprecated
+    protected abstract @NotNull CompletableFuture<Collection<T>> findAllImpl(@NotNull Page page);
+
+    @Override
     public final @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
         if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
         return findAllByIdImpl(ids.stream().filter(Objects::nonNull).collect(Collectors.toList()));
