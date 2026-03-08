@@ -11,7 +11,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         insert(Users.SAVED1)
         insert(Users.SAVED2)
     }
-    
+
     void clearData() {
         remove(Users.SAVED1.id)
         remove(Users.SAVED2.id)
@@ -47,11 +47,11 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         actual == expected
 
         where:
-        user    || expected
+        user         || expected
         Users.SAVED1 || true
         Users.SAVED2 || true
-        Users.NEW1 || false
-        Users.NEW2 || false
+        Users.NEW1   || false
+        Users.NEW2   || false
     }
 
     def 'test that save correctly updates #entity'() {
@@ -120,6 +120,22 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
 
         then:
         result.sort() == [Users.SAVED1, Users.SAVED2].sort()
+    }
+
+    def 'test findAll with page #page returns #expected'() {
+        given:
+        def actualPage = Page.of(page, 1);
+
+        when:
+        def result = repository.findAll(actualPage).get()
+
+        then:
+        result == [expected]
+
+        where:
+        page || expected
+        0    || [Users.SAVED1]
+        1    || [Users.SAVED2]
     }
 
     def 'test that findAllById correctly returns all entity'() {
@@ -264,7 +280,8 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         actual == 2L
     }
 
-    abstract @NotNull R initializeRepository()
+    abstract @NotNull
+    R initializeRepository()
 
     /**
      * Checks if a entity with the given id exists in the repository.
