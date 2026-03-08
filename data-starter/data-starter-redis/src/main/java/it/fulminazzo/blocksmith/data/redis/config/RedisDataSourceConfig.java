@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.redis.config;
 
 import io.lettuce.core.RedisURI;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
+import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,13 @@ import org.jetbrains.annotations.Range;
 @Value
 @Builder
 public class RedisDataSourceConfig implements DataSourceConfig {
+
+    static {
+        DataSourceFactories.registerFactory(
+                RedisDataSourceConfig.class,
+                new RedisDataSourceFactory()
+        );
+    }
 
     @NotNull(message = "host must be declared")
     String host;
