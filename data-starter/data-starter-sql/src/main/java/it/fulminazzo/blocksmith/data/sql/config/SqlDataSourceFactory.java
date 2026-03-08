@@ -97,7 +97,7 @@ final class SqlDataSourceFactory implements DataSourceFactory {
                                        final @NotNull IDatabaseType type) {
         RemoteDataSourceBuilder builder = dataSourceBuilder.databaseType(type);
         if (type == DatabaseType.MYSQL || type == DatabaseType.MARIADB) builder.mysql();
-        else if (type == DatabaseType.POSTGRES) builder.postgres();
+        else if (type == DatabaseType.POSTGRESQL) builder.postgres();
         return builder
                 .host(config.getHost())
                 .port(config.getPort())

@@ -189,7 +189,7 @@ class SqlDataSourceTest extends Specification {
         type                       || dialect
         DatabaseType.MYSQL         || SQLDialect.MYSQL
         DatabaseType.MARIADB       || SQLDialect.MARIADB
-        DatabaseType.POSTGRES      || SQLDialect.POSTGRES
+        DatabaseType.POSTGRESQL    || SQLDialect.POSTGRES
         new IDatabaseType() {
 
             @Override
