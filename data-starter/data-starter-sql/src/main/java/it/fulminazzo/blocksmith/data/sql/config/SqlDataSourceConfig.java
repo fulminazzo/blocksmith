@@ -3,7 +3,6 @@ package it.fulminazzo.blocksmith.data.sql.config;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.sql.IDatabaseType;
 import jakarta.validation.constraints.*;
-import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -83,16 +82,11 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     ConnectionMode connectionMode;
 
-    public static abstract class ConnectionMode {
-
-    }
-
-    @EqualsAndHashCode(callSuper = true)
     @Value
-    public static class H2ConnectionMode extends ConnectionMode {
+    public static class ConnectionMode {
 
         @NotNull
-        H2ConnectionModeType type = H2ConnectionModeType.MEMORY;
+        ConnectionModeType type = ConnectionModeType.MEMORY;
 
         @Nullable
         String directoryPath;
@@ -108,24 +102,8 @@ public class SqlDataSourceConfig implements DataSourceConfig {
 
     }
 
-    public enum H2ConnectionModeType {
+    public enum ConnectionModeType {
         MEMORY, DISK, SERVER
-    }
-
-    @EqualsAndHashCode(callSuper = true)
-    @Value
-    public static class SqliteConnectionMode extends ConnectionMode {
-
-        @NotNull
-        SqliteConnectionModeType type = SqliteConnectionModeType.MEMORY;
-
-        @Nullable
-        String directoryPath;
-
-    }
-
-    public enum SqliteConnectionModeType {
-        MEMORY, DISK
     }
 
 }
