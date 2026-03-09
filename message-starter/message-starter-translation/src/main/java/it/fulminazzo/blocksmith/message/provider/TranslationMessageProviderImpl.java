@@ -18,11 +18,21 @@ final class TranslationMessageProviderImpl implements TranslationMessageProvider
     @Override
     public @NotNull Component getMessage(final @NotNull String path,
                                          final @NotNull Locale locale) throws MessageNotFoundException {
+        final MessageProvider defaultProvider = providers.get(defaultLocale);
         MessageProvider provider = providers.get(locale);
-        if (provider == null) provider = providers.get(defaultLocale);
+        if (provider == null) provider = defaultProvider;
         if (provider == null)
             throw new IllegalArgumentException("No provider registered for locale: " + LocaleUtils.toString(locale));
-        return provider.getMessage(path, locale);
+        try {
+            return provider.getMessage(path, locale);
+        } catch (MessageNotFoundException e) {
+            if (!provider.equals(defaultProvider))
+                try {
+                    return defaultProvider.getMessage(path, locale);
+                } catch (MessageNotFoundException ignored) {
+                }
+            throw e;
+        }
     }
 
     @Override
