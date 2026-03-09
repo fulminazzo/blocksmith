@@ -10,7 +10,8 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReceiverFactories {
-    private static final @NotNull List<ReceiverFactory> factories = ServiceLoader.load(ReceiverFactory.class).stream()
+    private static final @NotNull List<ReceiverFactory> factories = ServiceLoader
+            .load(ReceiverFactory.class, ReceiverFactory.class.getClassLoader()).stream()
             .map(ServiceLoader.Provider::get)
             .collect(Collectors.toList());
 
