@@ -24,7 +24,7 @@ public final class ResourceUtils {
     /**
      * Stores the requested resource on disk.
      *
-     * @param resource the resource
+     * @param resource the resource name (should NOT have a preceding "/")
      * @param file     the file where it will be stored
      * @throws IOException in case of any errors
      */
@@ -45,7 +45,7 @@ public final class ResourceUtils {
      * <br>
      * <b>NOT RECURSIVE</b> (will NOT check for subdirectories).
      *
-     * @param directory the directory (should NOT have a leading "/")
+     * @param directory the directory name (should NOT have a preceding "/")
      * @return the resources
      * @throws IOException in case of any errors
      */
