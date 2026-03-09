@@ -4,13 +4,13 @@ import spock.lang.Specification
 
 class DataSourceTypeTest extends Specification {
 
-    def 'test that newConfig throws for type #dataSourceType'() {
+    def 'test that getConfigClass throws for type #dataSourceType'() {
         given:
         def lowercaseType = dataSourceType.name().toLowerCase()
         if (dataSourceType == DataSourceType.CACHED) lowercaseType = 'cache'
 
         when:
-        dataSourceType.newConfig()
+        dataSourceType.getConfigClass()
 
         then:
         def e = thrown(IllegalStateException)
