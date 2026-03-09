@@ -9,7 +9,7 @@ class MessageNotFoundExceptionTest extends Specification {
         def exception = new MessageNotFoundException('path', Locale.ITALY)
 
         expect:
-        exception.message == 'Could not find message with path \'path\' and locale \'it-it\''
+        exception.message == 'Could not find message with path \'path\' and locale \'it_it\''
     }
 
 }
