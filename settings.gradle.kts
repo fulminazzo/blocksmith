@@ -17,3 +17,7 @@ include("config-starter:config-starter-all")
 include("message-starter")
 
 include("message-starter:message-starter-translation")
+
+include("message-starter:message-starter-bukkit")
+include("message-starter:message-starter-bungeecord")
+include("message-starter:message-starter-velocity")
