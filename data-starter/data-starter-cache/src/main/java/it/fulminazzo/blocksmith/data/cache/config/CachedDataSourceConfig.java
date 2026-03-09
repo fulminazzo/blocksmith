@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CachedDataSourceConfig implements DataSourceConfig {
+public final class CachedDataSourceConfig implements DataSourceConfig {
 
     static {
         DataSourceFactories.registerFactory(

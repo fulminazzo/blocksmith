@@ -17,7 +17,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SqlDataSourceConfig implements DataSourceConfig {
+public final class SqlDataSourceConfig implements DataSourceConfig {
 
     static {
         DataSourceFactories.registerFactory(

@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Range;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RedisDataSourceConfig implements DataSourceConfig {
+public final class RedisDataSourceConfig implements DataSourceConfig {
 
     static {
         DataSourceFactories.registerFactory(

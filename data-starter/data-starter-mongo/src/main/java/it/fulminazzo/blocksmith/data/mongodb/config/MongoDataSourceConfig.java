@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Range;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MongoDataSourceConfig implements DataSourceConfig {
+public final class MongoDataSourceConfig implements DataSourceConfig {
 
     static {
         DataSourceFactories.registerFactory(
