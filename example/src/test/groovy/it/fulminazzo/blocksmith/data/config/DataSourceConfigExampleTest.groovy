@@ -2,8 +2,12 @@ package it.fulminazzo.blocksmith.data.config
 
 import ch.vorburger.mariadb4j.DB
 import ch.vorburger.mariadb4j.DBConfigurationBuilder
+import it.fulminazzo.blocksmith.data.sql.DatabaseType
+import it.fulminazzo.blocksmith.data.sql.SqlDataSource
 import redis.embedded.RedisServer
 import spock.lang.Specification
+
+import java.util.concurrent.Executors
 
 class DataSourceConfigExampleTest extends Specification {
     private static DB mariadb
@@ -20,6 +24,15 @@ class DataSourceConfigExampleTest extends Specification {
 
         redis = new RedisServer()
         redis.start()
+
+        def source = SqlDataSource.builder()
+                .executor(Executors.newCachedThreadPool())
+                .database('test')
+                .databaseType(DatabaseType.MARIADB)
+                .mysql()
+                .build()
+        source.executeScriptFromResource('/schema.sql')
+        source.close()
     }
 
     void cleanupSpec() {
