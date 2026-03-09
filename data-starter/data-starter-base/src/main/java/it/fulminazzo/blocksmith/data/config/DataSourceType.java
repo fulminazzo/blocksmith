@@ -23,10 +23,15 @@ public enum DataSourceType {
     public @NotNull Class<DataSourceConfig> getConfigClass() {
         String type = name().toLowerCase();
         type = Character.toUpperCase(type.charAt(0)) + type.substring(1);
+
         String lowercaseType = type.toLowerCase();
         if (this == CACHED) lowercaseType = "cache";
+
+        String packageName = lowercaseType;
+        if (this == MONGO) packageName += "db";
+
         String className = DataSourceConfig.class.getCanonicalName()
-                .replace("config.", lowercaseType + ".config." + type);
+                .replace("config.", packageName + ".config." + type);
         try {
             return (Class<DataSourceConfig>) Class.forName(className);
         } catch (ClassNotFoundException e) {
