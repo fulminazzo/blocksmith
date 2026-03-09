@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith;
 
 import it.fulminazzo.blocksmith.command.HelloCommand;
+import it.fulminazzo.blocksmith.command.ReloadCommand;
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
 import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.provider.MessageProvider;
@@ -35,6 +36,7 @@ public final class Blocksmith extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        getCommand("blocksmithreload").setExecutor(new ReloadCommand(this));
         getCommand("hello").setExecutor(new HelloCommand(this));
 
         enable();
