@@ -24,7 +24,7 @@ final class DataSourceConfigDeserializer extends StdDeserializer<DataSourceConfi
         try {
             if (rawType == null) throw new IllegalArgumentException();
             DataSourceType type = DataSourceType.valueOf(rawType.toUpperCase());
-            return type.newConfig();
+            return deserializationContext.readTreeAsValue(node, type.getConfigClass());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid datasource configuration type: " + rawType);
         }
