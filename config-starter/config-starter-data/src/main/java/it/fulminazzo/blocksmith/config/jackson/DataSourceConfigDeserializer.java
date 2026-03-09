@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceType;
 
@@ -24,6 +25,7 @@ final class DataSourceConfigDeserializer extends StdDeserializer<DataSourceConfi
         try {
             if (rawType == null) throw new IllegalArgumentException();
             DataSourceType type = DataSourceType.valueOf(rawType.toUpperCase());
+            ((ObjectNode) node).remove("type");
             return deserializationContext.readTreeAsValue(node, type.getConfigClass());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid datasource configuration type: " + rawType);
