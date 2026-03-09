@@ -12,8 +12,9 @@ import it.fulminazzo.blocksmith.data.redis.RedisDataSource;
 import it.fulminazzo.blocksmith.data.redis.RedisRepositorySettings;
 import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
 import it.fulminazzo.blocksmith.data.sql.SqlRepositorySettings;
+import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Value;
+import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
@@ -23,9 +24,9 @@ import org.jspecify.annotations.NonNull;
  * <br>
  * Then, only the interested repository, according to the Datasource, is taken.
  */
-@Value
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Builder
-public class AllRepositorySettings {
+public final class AllRepositorySettings {
 
     @NotNull MemoryRepositorySettings memory;
 
