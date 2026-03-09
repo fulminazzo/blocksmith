@@ -23,17 +23,17 @@ public class RedisDataSourceConfig implements DataSourceConfig {
         );
     }
 
-    @NotNull(message = "host must be declared")
+    @NotNull(message = "'host' must be declared")
     String host;
 
-    @Min(value = 1, message = "port number must be at least 1")
-    @Max(value = 65535, message = "port number must be at most 65535")
+    @Min(value = 1, message = "'port' number must be at least 1")
+    @Max(value = 65535, message = "'port' number must be at most 65535")
     @Range(from = 1, to = 65535)
     @Nullable
     @Builder.Default
     Integer port = RedisURI.DEFAULT_REDIS_PORT;
 
-    @PositiveOrZero(message = "database number must be at least 0")
+    @PositiveOrZero(message = "'database number' must be at least 0")
     @Nullable
     @Builder.Default
     Integer database = 0;

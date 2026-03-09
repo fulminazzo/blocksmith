@@ -23,11 +23,11 @@ public class SqlDataSourceConfig implements DataSourceConfig {
         );
     }
 
-    @NotNull(message = "databaseType must be declared")
+    @NotNull(message = "'database type' must be declared")
     @org.jetbrains.annotations.NotNull
     IDatabaseType databaseType;
 
-    @NotEmpty(message = "database name must not be empty")
+    @NotEmpty(message = "'database name' must not be empty")
     @org.jetbrains.annotations.NotNull
     String database;
 
@@ -37,27 +37,27 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     String password;
 
-    @Positive(message = "maximumPoolSize must be greater than 0")
+    @Positive(message = "'maximum pool size' must be greater than 0")
     @Range(from = 1, to = Integer.MAX_VALUE)
     @Nullable
     Integer maximumPoolSize;
 
-    @PositiveOrZero(message = "minimumIdle must be at least 0")
+    @PositiveOrZero(message = "'minimum idle' must be at least 0")
     @Range(from = 0, to = Integer.MAX_VALUE)
     @Nullable
     Integer minimumIdle;
 
-    @Positive(message = "connectionTimeout must be greater than 0")
+    @Positive(message = "'connection timeout' must be greater than 0")
     @Range(from = 1, to = Long.MAX_VALUE)
     @Nullable
     Long connectionTimeout;
 
-    @PositiveOrZero(message = "idleTimeout must be at least 0")
+    @PositiveOrZero(message = "'idle timeout' must be at least 0")
     @Range(from = 0, to = Long.MAX_VALUE)
     @Nullable
     Long idleTimeout;
 
-    @PositiveOrZero(message = "maxLifeTime must be at least 0")
+    @PositiveOrZero(message = "'max life time' must be at least 0")
     @Range(from = 0, to = Long.MAX_VALUE)
     @Nullable
     Long maxLifeTime;
@@ -72,8 +72,8 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     String host;
 
-    @Min(value = 1, message = "port number must be at least 1")
-    @Max(value = 65535, message = "port number must be at most 65535")
+    @Min(value = 1, message = "'port' number must be at least 1")
+    @Max(value = 65535, message = "'port' number must be at most 65535")
     @Range(from = 1, to = 65535)
     @Nullable
     Integer port;
@@ -110,8 +110,8 @@ public class SqlDataSourceConfig implements DataSourceConfig {
         @Nullable
         String host;
 
-        @Min(value = 1, message = "port number must be at least 1")
-        @Max(value = 65535, message = "port number must be at most 65535")
+        @Min(value = 1, message = "'port' number must be at least 1")
+        @Max(value = 65535, message = "'port' number must be at most 65535")
         @Range(from = 1, to = 65535)
         @Nullable
         Integer port;

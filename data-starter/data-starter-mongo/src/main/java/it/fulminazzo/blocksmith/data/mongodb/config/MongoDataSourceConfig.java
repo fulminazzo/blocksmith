@@ -20,11 +20,11 @@ public class MongoDataSourceConfig implements DataSourceConfig {
         );
     }
 
-    @NotNull(message = "host must be declared")
+    @NotNull(message = "'host' must be declared")
     String host;
 
-    @Min(value = 1, message = "port number must be at least 1")
-    @Max(value = 65535, message = "port number must be at most 65535")
+    @Min(value = 1, message = "'port' number must be at least 1")
+    @Max(value = 65535, message = "'port' number must be at most 65535")
     @Range(from = 1, to = 65535)
     @Nullable
     @Builder.Default
@@ -33,7 +33,7 @@ public class MongoDataSourceConfig implements DataSourceConfig {
     @Nullable
     String srvHost;
 
-    @Positive(message = "maxHosts must be greater than 0")
+    @Positive(message = "'srv max hosts' must be greater than 0")
     @Range(from = 1, to = Integer.MAX_VALUE)
     @Nullable
     Integer srvMaxHosts;
@@ -54,10 +54,10 @@ public class MongoDataSourceConfig implements DataSourceConfig {
     @Builder
     public static class MongoCredentialConfig {
 
-        @NotEmpty(message = "username must not be empty")
+        @NotEmpty(message = "'username' must not be empty")
         String username;
 
-        @NotEmpty(message = "password must not be empty")
+        @NotEmpty(message = "'password' must not be empty")
         String password;
 
         @Nullable
