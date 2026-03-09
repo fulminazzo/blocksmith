@@ -13,10 +13,7 @@ import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
 import it.fulminazzo.blocksmith.data.sql.SqlRepositorySettings;
 import it.fulminazzo.blocksmith.function.RunnableException;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -88,19 +85,6 @@ public final class HybridCachedRepositoryExample {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @FieldDefaults(level = AccessLevel.PRIVATE)
-    public static final class User {
-        Long id;
-        String name;
-        String lastname;
-        String email;
-        Integer age;
-
     }
 
 }
