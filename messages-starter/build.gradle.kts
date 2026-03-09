@@ -2,7 +2,7 @@ val projectName: String = project.name
 
 allprojects {
     dependencies {
-        api(rootProject.libs.minimessage)
+        api(rootProject.libs.bundles.adventure.text)
     }
 }
 
