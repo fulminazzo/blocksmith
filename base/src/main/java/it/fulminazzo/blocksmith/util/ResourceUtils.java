@@ -32,7 +32,7 @@ public final class ResourceUtils {
                                      final @NotNull File file) throws IOException {
         Files.createDirectories(file.toPath().getParent());
         Files.createFile(file.toPath());
-        try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("/" + resource);
+        try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
              OutputStream output = new FileOutputStream(file)) {
             if (input == null)
                 throw new IllegalArgumentException("Could not find resource: " + resource);
