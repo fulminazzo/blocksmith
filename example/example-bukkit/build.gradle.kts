@@ -21,8 +21,8 @@ tasks.processResources {
     val properties = mapOf(
         "version" to version,
         "group" to group,
-        "name" to rootProject.name,
-        "name_lower" to rootProject.name.lowercase()
+        "name" to rootProject.name.replaceFirstChar { it.uppercase() },
+        "name_lower" to rootProject.name
     )
     inputs.properties(properties)
     filteringCharset = "UTF-8"
