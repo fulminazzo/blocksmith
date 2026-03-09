@@ -63,6 +63,17 @@ public final class ComponentUtils {
         return mini.deserialize(legacyToMini(string));
     }
 
+    /**
+     * Converts the given component to a string.
+     * Uses <a href="https://docs.papermc.io/adventure/minimessage/">MiniMessage</a>.
+     *
+     * @param component the component
+     * @return the string
+     */
+    public static @NotNull String toString(final @NotNull Component component) {
+        return mini.serialize(component);
+    }
+
     private static @NotNull String legacyToMini(@NotNull String message) {
         Matcher matcher = AMPERSAND_HEX_CODE_REGEX.matcher(message);
         while (matcher.find())
