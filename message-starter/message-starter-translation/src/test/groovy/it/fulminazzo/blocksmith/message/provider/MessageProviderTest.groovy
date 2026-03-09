@@ -9,6 +9,31 @@ import spock.lang.Specification
 class MessageProviderTest extends Specification {
     private static final File baseDir = new File('build/resources/test/translation_message_provider/')
 
+    def 'test creation of TranslationMessageProvider from resources'() {
+        given:
+        def workingDir = new File(baseDir, 'resources')
+        workingDir.deleteDir()
+        workingDir.mkdirs()
+
+        when:
+        def provider = MessageProvider.translation(workingDir, 'messages', ConfigurationFormat.YAML, log)
+
+        then:
+        provider != null
+
+        when:
+        def message = provider.getMessage('general.message', Locale.US)
+
+        then:
+        message == Component.text('Hello, world!')
+
+        when:
+        message = provider.getMessage('general.message', Locale.ITALY)
+
+        then:
+        message == Component.text('Ciao, mondo!')
+    }
+
     def 'test creation of TranslationMessageProvider from disk'() {
         given:
         def workingDir = new File(baseDir, 'disk')
