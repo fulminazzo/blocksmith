@@ -22,6 +22,14 @@ public interface TranslationMessageProvider extends MessageProvider {
     @NotNull TranslationMessageProvider setDefaultLocale(final @NotNull Locale defaultLocale);
 
     /**
+     * Registers a new provider.
+     *
+     * @param locale   the locale
+     * @param provider the provider
+     */
+    void registerProvider(final @NotNull Locale locale, final @NotNull MessageProvider provider);
+
+    /**
      * Creates a new Translation message provider.
      *
      * @return the translation message provider

@@ -28,12 +28,7 @@ final class TranslationMessageProviderImpl implements TranslationMessageProvider
         return this;
     }
 
-    /**
-     * Registers a new provider.
-     *
-     * @param locale   the locale
-     * @param provider the provider
-     */
+    @Override
     public void registerProvider(final @NotNull Locale locale,
                                  final @NotNull MessageProvider provider) {
         providers.put(locale, provider);
