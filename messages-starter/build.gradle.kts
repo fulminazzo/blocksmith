@@ -11,3 +11,8 @@ subprojects {
         api(project(":$projectName"))
     }
 }
+
+dependencies {
+    api(libs.slf4j)
+    api(project(":config-starter"))
+}
