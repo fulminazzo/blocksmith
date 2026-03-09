@@ -16,8 +16,9 @@ public interface MessageProvider {
      * @param path   the path
      * @param locale the locale
      * @return the message
+     * @throws MessageNotFoundException in case the message was not found
      */
     @NotNull Component getMessage(final @NotNull String path,
-                                  final @NotNull Locale locale);
+                                  final @NotNull Locale locale) throws MessageNotFoundException;
 
 }
