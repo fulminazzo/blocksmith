@@ -36,3 +36,5 @@ include("data-starter:data-starter-redis")
 include("data-starter:data-starter-sql")
 
 include("data-starter:data-starter-cache")
+
+include("data-starter:data-starter-all")
