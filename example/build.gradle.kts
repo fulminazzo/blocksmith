@@ -13,10 +13,7 @@ dependencies {
     implementation(project(":config-starter:config-starter-yaml"))
     implementation(project(":config-starter:config-starter-data"))
 
-    implementation(project(":data-starter:data-starter-sql"))
-    implementation(project(":data-starter:data-starter-redis"))
-    implementation(project(":data-starter:data-starter-cache"))
-    implementation(project(":data-starter:data-starter-memory"))
+    implementation(project(":data-starter:data-starter-all"))
 
     jooqGenerator(libs.h2)
     implementation(libs.mariadb)
