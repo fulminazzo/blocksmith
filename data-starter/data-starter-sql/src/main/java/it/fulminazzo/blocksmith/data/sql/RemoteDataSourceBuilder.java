@@ -61,10 +61,13 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
 
     @Override
     protected @NotNull SQLDialect getSQLDialect() {
+        String databaseName = databaseType.getJdbcName().toUpperCase();
         try {
-            return SQLDialect.valueOf(databaseType.getJdbcName().toUpperCase());
+            return SQLDialect.valueOf(databaseName);
         } catch (IllegalArgumentException e) {
-            return SQLDialect.DEFAULT;
+            if (databaseName.equals(DatabaseType.POSTGRESQL.name()))
+                return SQLDialect.POSTGRES;
+            else return SQLDialect.DEFAULT;
         }
     }
 
