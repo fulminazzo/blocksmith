@@ -6,12 +6,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReceiverFactories {
     private static final @NotNull List<ReceiverFactory> factories = ServiceLoader.load(ReceiverFactory.class).stream()
             .map(ServiceLoader.Provider::get)
-            .toList();
+            .collect(Collectors.toList());
 
     public static @NotNull ReceiverFactory get(final @NotNull Class<?> receiverType) {
         return factories.stream()
