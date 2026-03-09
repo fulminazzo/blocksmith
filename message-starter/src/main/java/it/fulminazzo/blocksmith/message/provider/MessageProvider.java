@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
 import it.fulminazzo.blocksmith.message.util.LocaleUtils;
 import it.fulminazzo.blocksmith.util.MapUtils;
+import it.fulminazzo.blocksmith.util.ResourceUtils;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -64,16 +65,7 @@ public interface MessageProvider {
     static @NotNull MessageProvider resource(final @NotNull File workingDir,
                                              final @NotNull String resource) throws IOException {
         File file = new File(workingDir, resource);
-        if (!file.exists()) {
-            Files.createDirectories(file.toPath().getParent());
-            Files.createFile(file.toPath());
-            try (InputStream input = MessageProvider.class.getResourceAsStream("/" + resource);
-                 OutputStream output = new FileOutputStream(file)) {
-                if (input == null)
-                    throw new IllegalArgumentException("Could not find resource: " + resource);
-                input.transferTo(output);
-            }
-        }
+        if (!file.exists()) ResourceUtils.storeResource(resource, file);
         ConfigurationAdapter adapter = ConfigurationAdapter.newAdapter(
                 null,
                 ConfigurationFormat.fromFile(file)

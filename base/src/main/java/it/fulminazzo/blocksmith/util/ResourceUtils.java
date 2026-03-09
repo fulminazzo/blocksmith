@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -20,6 +20,25 @@ import java.util.stream.Stream;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ResourceUtils {
+
+    /**
+     * Stores the requested resource on disk.
+     *
+     * @param resource the resource
+     * @param file     the file where it will be stored
+     * @throws IOException in case of any errors
+     */
+    public static void storeResource(final @NotNull String resource,
+                                     final @NotNull File file) throws IOException {
+        Files.createDirectories(file.toPath().getParent());
+        Files.createFile(file.toPath());
+        try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("/" + resource);
+             OutputStream output = new FileOutputStream(file)) {
+            if (input == null)
+                throw new IllegalArgumentException("Could not find resource: " + resource);
+            input.transferTo(output);
+        }
+    }
 
     /**
      * Gets all the resources present in a given directory.
@@ -60,5 +79,4 @@ public final class ResourceUtils {
         }
 
     }
-
 }
