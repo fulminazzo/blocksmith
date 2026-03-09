@@ -15,4 +15,5 @@ include("config-starter:config-starter-yaml")
 include("config-starter:config-starter-all")
 
 include("messages-starter")
-include("messages-starter:messages-starter-base")
+
+include("messages-starter:messages-starter-translation")
