@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 
@@ -23,11 +24,11 @@ import java.util.concurrent.ExecutionException;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DataSourceConfigExample {
 
-    public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
+    public static void main(String[] args) throws IOException, InterruptedException, ExecutionException, URISyntaxException {
         User entity = new User(null, "Alex", "Drinkwater", "alex@fulminazzo.it", 23);
 
         ConfigurationAdapter adapter = ConfigurationAdapter.newAdapter(log, ConfigurationFormat.YAML);
-        File directory = new File("example/build/resources/main");
+        File directory = new File(DataSourceConfigExample.class.getResource("/database.yml").toURI()).getParentFile();
         DataSourceConfig config = adapter.load(
                 directory,
                 "database",
