@@ -23,8 +23,8 @@ tasks.shadowJar {
 
 tasks.processResources {
     val properties = mapOf(
-        "version" to version,
-        "group" to group,
+        "version" to rootProject.version,
+        "group" to rootProject.group,
         "name" to rootProject.name.replaceFirstChar { it.uppercase() },
         "name_lower" to rootProject.name
     )
