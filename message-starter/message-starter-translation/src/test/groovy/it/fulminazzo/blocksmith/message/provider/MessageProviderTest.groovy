@@ -1,9 +1,11 @@
 package it.fulminazzo.blocksmith.message.provider
 
+import groovy.util.logging.Slf4j
 import it.fulminazzo.blocksmith.config.ConfigurationFormat
 import net.kyori.adventure.text.Component
 import spock.lang.Specification
 
+@Slf4j
 class MessageProviderTest extends Specification {
     private static final File baseDir = new File('build/resources/test/translation_message_provider/')
 
@@ -37,7 +39,7 @@ class MessageProviderTest extends Specification {
         new File(workingDir, 'something.json').createNewFile()
 
         when:
-        def provider = MessageProvider.translation(workingDir, '', ConfigurationFormat.YAML)
+        def provider = MessageProvider.translation(workingDir, '', ConfigurationFormat.YAML, log)
 
         then:
         provider != null
