@@ -1,12 +1,29 @@
 package it.fulminazzo.blocksmith.message.receiver
 
 import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
+import org.mockito.MockedStatic
+import org.mockito.Mockito
 import spock.lang.Specification
 
 class BukkitReceiverTest extends Specification {
+
+    MockedStatic<BukkitReceiver> mockedStatic
+
+    void setup() {
+        def adventure = Mock(BukkitAudiences)
+        adventure.sender(_) >> Mock(Audience)
+
+        mockedStatic = Mockito.mockStatic(BukkitReceiver)
+        mockedStatic.when(BukkitReceiver::getAdventure).thenReturn(adventure)
+    }
+
+    void cleanup() {
+        mockedStatic.close()
+    }
 
     def 'test that #toAudience converts receiver'() {
         given:
