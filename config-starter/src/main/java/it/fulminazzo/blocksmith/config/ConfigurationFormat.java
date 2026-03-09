@@ -28,6 +28,28 @@ public enum ConfigurationFormat {
     @NotNull String fileExtension;
 
     /**
+     * Checks if the given file is of the current configuration format type.
+     *
+     * @param file the file
+     * @return <code>true</code> if it is
+     */
+    public boolean isValidFile(final @NotNull File file) {
+        return isValidFile(file.getName());
+    }
+
+    /**
+     * Checks if the given file is of the current configuration format type.
+     *
+     * @param fileName the file name
+     * @return <code>true</code> if it is
+     */
+    public boolean isValidFile(final @NotNull String fileName) {
+        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
+        if (extension.equals("yaml")) extension = "yml";
+        return extension.equals(fileExtension);
+    }
+
+    /**
      * Gets the adapter for the corresponding format.
      *
      * @param logger the logger
@@ -98,7 +120,7 @@ public enum ConfigurationFormat {
      * @return the configuration format
      */
     private static @NotNull ConfigurationFormat fromFile(final @NotNull String fileName) {
-        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
         if (extension.equals("yaml")) extension = "yml";
         for (ConfigurationFormat format : ConfigurationFormat.values())
             if (format.fileExtension.equals(extension)) return format;
