@@ -9,12 +9,11 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Provides messages based on their code (path in the associated configuration).
@@ -91,20 +90,30 @@ public interface MessageProvider {
                                                            final @NotNull ConfigurationFormat format,
                                                            final @NotNull Logger logger) throws IOException {
         File directory = new File(workingDir, resourcesDir);
-        if (!directory.isDirectory()); //TODO: resources lookup
         TranslationMessageProvider provider = TranslationMessageProvider.newProvider();
-        for (File file : Objects.requireNonNull(directory.listFiles(), "Could not read files of directory: " + directory.getAbsolutePath())) {
-            if (format.isValidFile(file)) {
-                String fileName = file.getName();
-                fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+        final Collection<String> resources;
+        if (!directory.isDirectory()) {
+            Files.createDirectories(directory.toPath());
+            resources = ResourceUtils.listResources(resourcesDir);
+        } else {
+            File[] files = Objects.requireNonNull(directory.listFiles(), "Could not read files of directory: " + directory.getAbsolutePath());
+            resources = Arrays.stream(files).map(File::getName).collect(Collectors.toList());
+        }
+        for (String resourceName : resources) {
+            if (format.isValidFile(resourceName)) {
+                File resourceFile = new File(directory, resourceName);
+                if (!resourceFile.exists())
+                    ResourceUtils.storeResource(resourcesDir + "/" + resourceName, resourceFile);
+
+                String fileName = resourceName.substring(0, resourceName.lastIndexOf('.'));
                 Locale locale = LocaleUtils.fromString(fileName);
                 if (locale.getCountry().isEmpty() || locale.getLanguage().isEmpty()) {
-                    logger.warn("Ignoring invalid translation file {}. The expected format is %language%_%country%.{}", file.getName(), format.name().toLowerCase());
+                    logger.warn("Ignoring invalid translation file {}. The expected format is %language%_%country%.{}", resourceName, format.name().toLowerCase());
                     continue;
                 }
                 provider.registerProvider(
                         locale,
-                        resource(directory, file.getName())
+                        resource(directory, resourceName)
                 );
             }
         }
