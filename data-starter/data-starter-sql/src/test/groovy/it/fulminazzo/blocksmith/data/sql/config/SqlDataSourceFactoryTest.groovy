@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.data.sql.config
 
 import com.zaxxer.hikari.pool.HikariPool
 import it.fulminazzo.blocksmith.data.sql.DatabaseType
-import it.fulminazzo.blocksmith.data.sql.IDatabaseType
 import org.h2.jdbc.JdbcSQLNonTransientConnectionException
 import spock.lang.Specification
 
@@ -162,20 +161,7 @@ class SqlDataSourceFactoryTest extends Specification {
         databaseType << [
                 DatabaseType.MYSQL,
                 DatabaseType.MARIADB,
-                DatabaseType.POSTGRESQL,
-                new IDatabaseType() {
-
-                    @Override
-                    String getJdbcName() {
-                        return "mysql"
-                    }
-
-                    @Override
-                    int getPort() {
-                        return 1337
-                    }
-
-                }
+                DatabaseType.POSTGRESQL
         ]
     }
 

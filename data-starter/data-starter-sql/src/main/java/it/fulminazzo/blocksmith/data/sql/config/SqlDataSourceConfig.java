@@ -2,7 +2,7 @@ package it.fulminazzo.blocksmith.data.sql.config;
 
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
-import it.fulminazzo.blocksmith.data.sql.IDatabaseType;
+import it.fulminazzo.blocksmith.data.sql.DatabaseType;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -28,7 +28,7 @@ public class SqlDataSourceConfig implements DataSourceConfig {
 
     @NotNull(message = "'database type' must be declared")
     @org.jetbrains.annotations.NotNull
-    IDatabaseType databaseType;
+    DatabaseType databaseType;
 
     @NotEmpty(message = "'database name' must not be empty")
     @org.jetbrains.annotations.NotNull
