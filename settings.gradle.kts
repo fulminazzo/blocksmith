@@ -3,6 +3,7 @@ rootProject.name = "blocksmith"
 include("base")
 
 include("example")
+include("example:example-bukkit")
 
 include("config-starter")
 include("config-starter:config-starter-base")
