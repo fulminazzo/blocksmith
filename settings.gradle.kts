@@ -17,6 +17,8 @@ include("config-starter:config-starter-toml")
 include("config-starter:config-starter-xml")
 include("config-starter:config-starter-yaml")
 
+include("config-starter:config-starter-data")
+
 include("config-starter:config-starter-all")
 
 

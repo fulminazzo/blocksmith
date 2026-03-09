@@ -1,0 +1,1 @@
+Special module to provide compatibility with [data-starter](../../data-starter) configurations.
