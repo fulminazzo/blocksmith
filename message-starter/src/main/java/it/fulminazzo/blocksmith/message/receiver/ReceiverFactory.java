@@ -14,7 +14,7 @@ public interface ReceiverFactory {
      * @param receiver the receiver
      * @return the blocksmith receiver
      */
-    <R> @NotNull Receiver<R> create(final @NotNull R receiver);
+    <R> @NotNull Receiver<?> create(final @NotNull R receiver);
 
     /**
      * Checks if the current factory supports the given receiver type.
