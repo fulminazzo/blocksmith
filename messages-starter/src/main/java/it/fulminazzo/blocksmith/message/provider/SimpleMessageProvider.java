@@ -50,6 +50,7 @@ final class SimpleMessageProvider implements MessageProvider {
                     .collect(Collectors.joining()) +
             "])"
     );
+    private static final @NotNull Pattern AMPERSAND_HEX_CODE_REGEX = Pattern.compile("&(#[0-9a-fA-F]{6})");
 
     private final @NotNull Map<String, String> messages;
 
@@ -65,6 +66,11 @@ final class SimpleMessageProvider implements MessageProvider {
         Matcher matcher = LEGACY_CHAT_CODES_REGEX.matcher(message);
         while (matcher.find()) 
             message = message.replace(matcher.group(), CHAT_CODES.get(matcher.group(1).toLowerCase()));
+
+        matcher = AMPERSAND_HEX_CODE_REGEX.matcher(message);
+        while (matcher.find())
+            message = message.replace(matcher.group(), String.format("<%s>", matcher.group(1)));
+
         return message;
     }
 
