@@ -1,0 +1,17 @@
+type: CACHED
+hybrid: true
+cache:
+  type: REDIS
+  host: '0.0.0.0'
+  port: 6379
+  database: 0
+  clientName: 'blocksmith'
+  ssl: false
+repository:
+  type: SQL
+  database-type: MARIADB
+  database: 'test'
+  username: 'user'
+  password: 'password'
+  host: '0.0.0.0'
+  port: 3306
