@@ -14,8 +14,10 @@ final class RedisDataSourceFactory implements DataSourceFactory {
         return RedisDataSource.builder()
                 .uri(uri -> {
                     uri.withHost(dsConfig.getHost())
-                            .withClientName(dsConfig.getClientName())
                             .withSsl(Boolean.TRUE.equals(dsConfig.getSsl()));
+
+                    String clientName = dsConfig.getClientName();
+                    if (clientName != null) uri.withClientName(clientName);
 
                     Integer port = dsConfig.getPort();
                     if (port != null) uri.withPort(port);
