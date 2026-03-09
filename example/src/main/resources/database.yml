@@ -5,7 +5,7 @@ cache:
   host: '0.0.0.0'
   port: 6379
   database: 0
-  clientName: 'blocksmith'
+  client-name: 'blocksmith'
   ssl: false
 repository:
   type: SQL
