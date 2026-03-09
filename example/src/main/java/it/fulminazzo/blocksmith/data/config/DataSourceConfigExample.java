@@ -2,20 +2,17 @@ package it.fulminazzo.blocksmith.data.config;
 
 import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
-import it.fulminazzo.blocksmith.data.Repository;
-import it.fulminazzo.blocksmith.data.RepositoryDataSource;
-import it.fulminazzo.blocksmith.data.RepositorySettings;
-import it.fulminazzo.blocksmith.data.User;
-import it.fulminazzo.blocksmith.data.cache.CachedRepositorySettings;
+import it.fulminazzo.blocksmith.data.*;
+import it.fulminazzo.blocksmith.data.file.FileRepositorySettings;
 import it.fulminazzo.blocksmith.data.jooq.Tables;
 import it.fulminazzo.blocksmith.data.memory.MemoryRepositorySettings;
+import it.fulminazzo.blocksmith.data.mongodb.MongoRepositorySettings;
 import it.fulminazzo.blocksmith.data.redis.RedisRepositorySettings;
 import it.fulminazzo.blocksmith.data.sql.SqlRepositorySettings;
 import it.fulminazzo.blocksmith.data.util.TimeUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,29 +27,36 @@ public final class DataSourceConfigExample {
         User entity = new User(null, "Alex", "Drinkwater", "alex@fulminazzo.it", 23);
 
         ConfigurationAdapter adapter = ConfigurationAdapter.newAdapter(log, ConfigurationFormat.YAML);
+        File directory = new File("example/build/resources/main");
         DataSourceConfig config = adapter.load(
-                new File("example/build/resources/main"),
+                directory,
                 "database",
                 DataSourceConfig.class
         );
         final RepositoryDataSource<RepositorySettings> dataSource = DataSourceFactories.build(config);
 
-        //TODO
-        @NotNull RepositorySettings combine = CachedRepositorySettings.combine(
-                new MemoryRepositorySettings().withTtl(Duration.ofSeconds(1L)),
-                CachedRepositorySettings.combine(
-                        new RedisRepositorySettings()
-                                .withDatabaseName("test")
-                                .withCollectionName("users")
-                                .withTtl(Duration.ofSeconds(5L)),
-                        new SqlRepositorySettings()
-                                .withTable(Tables.USERS)
-                                .withIdColumn(Tables.USERS.ID)
+        AllRepositorySettings settings = AllRepositorySettings.builder()
+                .memory(new MemoryRepositorySettings().withTtl(Duration.ofSeconds(1L)))
+                .file(new FileRepositorySettings()
+                        .withDataDirectory(directory)
+                        .withFormat(ConfigurationFormat.JSON)
+                        .withLogger(log)
                 )
-        );
+                .sql(new SqlRepositorySettings()
+                        .withTable(Tables.USERS)
+                        .withIdColumn(Tables.USERS.ID))
+                .redis(new RedisRepositorySettings()
+                        .withDatabaseName("test")
+                        .withCollectionName("users")
+                        .withTtl(Duration.ofSeconds(5L)))
+                .mongo(new MongoRepositorySettings()
+                        .withDatabaseName("test")
+                        .withCollectionName("users"))
+                .build();
+
         Repository<User, Long> repository = dataSource.newRepository(
                 User.class,
-                combine
+                settings.getRepositorySettings(dataSource)
         );
 
         long id = repository.save(entity).get().getId();
