@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.argument
 
+import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import net.kyori.adventure.text.Component
 import spock.lang.Specification
 
@@ -7,7 +8,7 @@ class PlaceholderTest extends Specification {
 
     def 'test that apply correctly applies with #placeholder and #value'() {
         given:
-        def expected = Component.text('Hello, Alex!')
+        def expected = 'Hello, Alex!'
 
         and:
         def component = Component.text('Hello, %name%!')
@@ -19,14 +20,14 @@ class PlaceholderTest extends Specification {
         def actual = p.apply(component)
 
         then:
-        actual == expected
+        ComponentUtils.toString(actual) == expected
 
         where:
         placeholder            | value
         'name'                 | 'Alex'
         Component.text('name') | 'Alex'
-        'name'                 | Component.text('Alex')
         Component.text('name') | Component.text('Alex')
+        'name'                 | Component.text('Alex')
     }
 
 }
