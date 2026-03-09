@@ -11,6 +11,10 @@ import java.util.*;
  * A collection of utilities to work with Map objects.
  */
 public final class MapUtils {
+    private static final Set<Class<?>> NON_FLATTENED_TYPES = Set.of(
+            String.class,
+            Number.class
+    );
 
     /**
      * Flattens a nested {@link Map} into a single-level map using dot-notation keys.
@@ -49,8 +53,15 @@ public final class MapUtils {
     private static void flattenMapRec(final @NotNull Map<String, Object> result,
                                       final @NotNull String key,
                                       final @Nullable Object value) {
-        if (value == null || ReflectionUtils.isPrimitiveOrWrapper(value.getClass())) result.put(key, value);
-        else if (value.getClass().isArray()) flattenArrayHelper(result, key, (Object[]) value);
+        if (value == null) {
+            result.put(key, null);
+            return;
+        }
+        Class<?> valueClass = value.getClass();
+        if (ReflectionUtils.isPrimitiveOrWrapper(valueClass) || valueClass.isEnum() ||
+                NON_FLATTENED_TYPES.stream().anyMatch(c -> c.isAssignableFrom(valueClass)))
+            result.put(key, value);
+        else if (valueClass.isArray()) flattenArrayHelper(result, key, (Object[]) value);
         else if (value instanceof Collection) flattenCollectionHelper(result, key, (Collection<?>) value);
         else if (value instanceof Map) flattenMapHelper(result, key, (Map<?, ?>) value);
         else flattenObjectHelper(result, key, value);
