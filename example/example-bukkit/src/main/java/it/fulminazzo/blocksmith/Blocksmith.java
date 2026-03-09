@@ -36,7 +36,7 @@ public final class Blocksmith extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getCommand("blocksmithreload").setExecutor(new ReloadCommand(this));
+        getCommand(getName().toLowerCase() + "reload").setExecutor(new ReloadCommand(this));
         getCommand("hello").setExecutor(new HelloCommand(this));
 
         enable();
@@ -51,7 +51,7 @@ public final class Blocksmith extends JavaPlugin {
                     logger
             ));
 
-            logger.info("{} successfully enabled", getDescription().getName());
+            logger.info("{} v{} successfully enabled", getName(), getDescription().getVersion());
         } catch (IOException e) {
             logger.error("An error occurred while loading the plugin: {}", e.getMessage());
             logger.error("Disabling plugin to avoid further errors...");
