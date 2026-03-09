@@ -51,6 +51,7 @@ final class SimpleMessageProvider implements MessageProvider {
             "])"
     );
     private static final @NotNull Pattern AMPERSAND_HEX_CODE_REGEX = Pattern.compile("&(#[0-9a-fA-F]{6})");
+    private static final @NotNull Pattern SECTIONSIGN_HEX_CODE_REGEX = Pattern.compile("§x((?:§[0-9a-fA-F]){6})");
 
     private final @NotNull Map<String, String> messages;
 
@@ -70,6 +71,13 @@ final class SimpleMessageProvider implements MessageProvider {
         matcher = AMPERSAND_HEX_CODE_REGEX.matcher(message);
         while (matcher.find())
             message = message.replace(matcher.group(), String.format("<%s>", matcher.group(1)));
+
+        matcher = SECTIONSIGN_HEX_CODE_REGEX.matcher(message);
+        while (matcher.find())
+            message = message.replace(
+                    matcher.group(),
+                    String.format("<%s>", "#" + matcher.group(1).replace("§", ""))
+            );
 
         return message;
     }
