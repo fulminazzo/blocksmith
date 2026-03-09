@@ -3,9 +3,11 @@ plugins {
 }
 
 dependencies {
-    compileOnly(libs.spigot)
+    implementation(libs.slf4j.jdk)
 
     implementation(project(":message-starter:message-starter-bukkit"))
+
+    compileOnly(libs.spigot)
 
     testImplementation(libs.spigot)
 }
