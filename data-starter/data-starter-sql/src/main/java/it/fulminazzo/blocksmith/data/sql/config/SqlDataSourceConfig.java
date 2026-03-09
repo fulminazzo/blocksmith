@@ -4,15 +4,18 @@ import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import it.fulminazzo.blocksmith.data.sql.IDatabaseType;
 import jakarta.validation.constraints.*;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Value
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class SqlDataSourceConfig implements DataSourceConfig {
 
@@ -96,7 +99,10 @@ public class SqlDataSourceConfig implements DataSourceConfig {
     @Builder.Default
     ConnectionMode connectionMode = ConnectionMode.builder().build();
 
-    @Value
+    @Data
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Builder
     public static class ConnectionMode {
 

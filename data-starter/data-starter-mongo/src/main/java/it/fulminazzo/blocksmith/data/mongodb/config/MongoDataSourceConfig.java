@@ -4,12 +4,15 @@ import com.mongodb.ServerAddress;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import jakarta.validation.constraints.*;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
-@Value
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class MongoDataSourceConfig implements DataSourceConfig {
 
@@ -50,7 +53,10 @@ public class MongoDataSourceConfig implements DataSourceConfig {
     @Nullable
     MongoCredentialConfig credentials;
 
-    @Value
+    @Data
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Builder
     public static class MongoCredentialConfig {
 
