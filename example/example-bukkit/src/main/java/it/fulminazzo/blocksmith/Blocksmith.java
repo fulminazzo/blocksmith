@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith;
 
+import it.fulminazzo.blocksmith.command.HelloCommand;
 import it.fulminazzo.blocksmith.message.Messenger;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,6 +31,8 @@ public final class Blocksmith extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        getCommand("hello").setExecutor(new HelloCommand(this));
+
         logger.info("{} successfully enabled", getDescription().getName());
     }
 
