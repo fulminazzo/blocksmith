@@ -6,6 +6,10 @@ spock_core = "2.4-groovy-4.0"
 byte_buddy = "1.18.2"
 mockito_core = "4.11.0"
 
+spigot = "1.16.5-R0.1-SNAPSHOT"
+bungeecord = "1.16-R0.2"
+velocity = "3.0.0-SNAPSHOT"
+
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jetbrains_annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains_annotations" }
@@ -13,6 +17,10 @@ jetbrains_annotations = { module = "org.jetbrains:annotations", version.ref = "j
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock_core" }
 byte_buddy = { module = "net.bytebuddy:byte-buddy", version.ref = "byte_buddy" }
 mockito_core = { module = "org.mockito:mockito-core", version.ref = "mockito_core" }
+
+spigot = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
+bungeecord = { module = "net.md-5:bungeecord-api", version.ref = "bungeecord" }
+velocity = { module = "com.velocitypowered:velocity-api", version.ref = "velocity" }
 
 [bundles]
 annotations = ["lombok", "jetbrains_annotations"]
