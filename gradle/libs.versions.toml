@@ -13,7 +13,7 @@ log4j = "2.25.3"
 
 joor = "0.9.15"
 
-minimessage = "4.26.1"
+adventure_text = "4.26.1"
 
 jackson = "2.21.0"
 night_config = "3.8.3"
@@ -35,7 +35,8 @@ log4j_slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.r
 
 joor = { module = "org.jooq:joor", version.ref = "joor" }
 
-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "minimessage" }
+minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure_text" }
+adventure_serializer_legacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure_text" }
 
 jackson_json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 jackson_yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
@@ -54,6 +55,8 @@ annotations = ["lombok", "jetbrains_annotations"]
 test_framework = ["spock_core", "mockito_core"]
 
 log4j = ["log4j_api", "log4j_core", "log4j_slf4j"]
+
+adventure_text = ["minimessage", "adventure_serializer_legacy"]
 
 toml = ["jackson_toml", "night_config_toml"]
 
