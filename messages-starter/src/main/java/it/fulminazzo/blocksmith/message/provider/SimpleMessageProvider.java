@@ -64,11 +64,7 @@ final class SimpleMessageProvider implements MessageProvider {
     }
 
     private static @NotNull String legacyToMini(@NotNull String message) {
-        Matcher matcher = LEGACY_CHAT_CODES_REGEX.matcher(message);
-        while (matcher.find()) 
-            message = message.replace(matcher.group(), CHAT_CODES.get(matcher.group(1).toLowerCase()));
-
-        matcher = AMPERSAND_HEX_CODE_REGEX.matcher(message);
+        Matcher matcher = AMPERSAND_HEX_CODE_REGEX.matcher(message);
         while (matcher.find())
             message = message.replace(matcher.group(), String.format("<%s>", matcher.group(1)));
 
@@ -78,6 +74,10 @@ final class SimpleMessageProvider implements MessageProvider {
                     matcher.group(),
                     String.format("<%s>", "#" + matcher.group(1).replace("§", ""))
             );
+
+        matcher = LEGACY_CHAT_CODES_REGEX.matcher(message);
+        while (matcher.find())
+            message = message.replace(matcher.group(), CHAT_CODES.get(matcher.group(1).toLowerCase()));
 
         return message;
     }
