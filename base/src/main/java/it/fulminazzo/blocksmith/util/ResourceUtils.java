@@ -59,15 +59,14 @@ public final class ResourceUtils {
         }
 
         final Path directoryPath;
+        FileSystem fileSystem = null;
         if (uri.getScheme().equals("jar")) {
-            FileSystem fileSystem;
             try {
                 fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
             } catch (FileAlreadyExistsException e) {
                 fileSystem = FileSystems.getFileSystem(uri);
             }
             directoryPath = fileSystem.getPath(directory);
-            fileSystem.close();
         } else directoryPath = Paths.get(uri);
 
         try (Stream<Path> stream = Files.list(directoryPath)) {
@@ -76,7 +75,8 @@ public final class ResourceUtils {
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .collect(Collectors.toList());
+        } finally {
+            if (fileSystem != null) fileSystem.close();
         }
-
     }
 }
