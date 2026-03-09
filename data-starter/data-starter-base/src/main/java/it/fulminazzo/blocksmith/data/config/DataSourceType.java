@@ -29,7 +29,7 @@ public enum DataSourceType {
         String lowercaseType = type.toLowerCase();
         if (this == CACHED) lowercaseType = "cache";
         String className = DataSourceConfig.class.getCanonicalName()
-                .replace("config", lowercaseType + ".config." + type);
+                .replace("config.", lowercaseType + ".config." + type);
         try {
             Class<DataSourceConfig> clazz = (Class<DataSourceConfig>) Class.forName(className);
             Constructor<DataSourceConfig> constructor = clazz.getDeclaredConstructor();
