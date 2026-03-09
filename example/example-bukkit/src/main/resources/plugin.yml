@@ -1,0 +1,18 @@
+name: '${name}'
+description: 'Demo plugin to show the capabilities of ${name}.'
+version: ${version}
+authors: [ 'Fulminazzo' ]
+main: ${group}.${name_lower}.${name}
+api-version: '1.13'
+
+commands:
+  hello:
+    description: 'Replies with the string "world" translated accordingly to the current configuration.'
+    usage: '/hello'
+    permission: ${name_lower}.hello
+    aliases: ['hi']
+
+permissions:
+  ${name_lower}.hello:
+    description: 'Permission to execute command /hello'
+    default: true
