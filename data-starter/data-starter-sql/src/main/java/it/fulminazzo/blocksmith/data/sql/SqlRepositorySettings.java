@@ -1,6 +1,8 @@
 package it.fulminazzo.blocksmith.data.sql;
 
 import it.fulminazzo.blocksmith.data.RepositorySettings;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.Table;
@@ -8,6 +10,8 @@ import org.jooq.TableField;
 
 import java.util.Objects;
 
+@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
+@ToString(callSuper = true, doNotUseGetters = true)
 public final class SqlRepositorySettings extends RepositorySettings {
     private @Nullable Table<?> table;
     private @Nullable TableField<?, ?> idColumn;

@@ -2,13 +2,13 @@ package it.fulminazzo.blocksmith.data.cache;
 
 import it.fulminazzo.blocksmith.data.CacheRepositorySettings;
 import it.fulminazzo.blocksmith.data.RepositorySettings;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
+@ToString(callSuper = true, doNotUseGetters = true)
 public final class CachedRepositorySettings<
         CS extends CacheRepositorySettings<CS>,
         S extends RepositorySettings

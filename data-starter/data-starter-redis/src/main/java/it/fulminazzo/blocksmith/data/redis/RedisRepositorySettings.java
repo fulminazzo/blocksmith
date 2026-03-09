@@ -1,13 +1,16 @@
 package it.fulminazzo.blocksmith.data.redis;
 
 import it.fulminazzo.blocksmith.data.CacheRepositorySettings;
-import it.fulminazzo.blocksmith.data.RepositorySettings;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
+@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
+@ToString(callSuper = true, doNotUseGetters = true)
 public final class RedisRepositorySettings extends CacheRepositorySettings<RedisRepositorySettings> {
     private @Nullable String databaseName;
     private @Nullable String collectionName;

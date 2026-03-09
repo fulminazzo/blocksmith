@@ -2,6 +2,8 @@ package it.fulminazzo.blocksmith.data.file;
 
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
 import it.fulminazzo.blocksmith.data.RepositorySettings;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -9,6 +11,8 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.util.Objects;
 
+@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
+@ToString(callSuper = true, doNotUseGetters = true)
 public final class FileRepositorySettings extends RepositorySettings {
     private @Nullable File dataDirectory;
     private @Nullable Logger logger;
