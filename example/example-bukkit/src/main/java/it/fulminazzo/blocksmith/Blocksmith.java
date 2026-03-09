@@ -44,6 +44,7 @@ public final class Blocksmith extends JavaPlugin {
 
     public void enable() {
         try {
+            logger.info("Loading translation messages.");
             messenger.setMessageProvider(MessageProvider.translation(
                     new File(getDataFolder(), "messages"),
                     "messages",
