@@ -81,4 +81,28 @@ public enum ConfigurationFormat {
         return new File(parentDir, fileName + "." + fileExtension);
     }
 
+    /**
+     * Tries to obtain the best {@link ConfigurationFormat} from the given file extension.
+     *
+     * @param file the file
+     * @return the configuration format
+     */
+    public static @NotNull ConfigurationFormat fromFile(final @NotNull File file) {
+        return fromFile(file.getName());
+    }
+
+    /**
+     * Tries to obtain the best {@link ConfigurationFormat} from the given file extension.
+     *
+     * @param fileName the file name
+     * @return the configuration format
+     */
+    private static @NotNull ConfigurationFormat fromFile(final @NotNull String fileName) {
+        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+        if (extension.equals("yaml")) extension = "yml";
+        for (ConfigurationFormat format : ConfigurationFormat.values())
+            if (format.fileExtension.equals(extension)) return format;
+        throw new IllegalArgumentException("Could not find configuration format from file: " + fileName);
+    }
+
 }
