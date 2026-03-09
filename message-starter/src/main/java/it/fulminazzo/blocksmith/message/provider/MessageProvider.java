@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.message.util.LocaleUtils;
 import it.fulminazzo.blocksmith.util.MapUtils;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -89,12 +90,14 @@ public interface MessageProvider {
      * @param workingDir   the working directory
      * @param resourcesDir the resources directory
      * @param format       the format of the translation files
+     * @param logger       the logger to display errors
      * @return the translation message provider
      * @throws IOException in case of any errors
      */
     static @NotNull TranslationMessageProvider translation(final @NotNull File workingDir,
                                                            final @NotNull String resourcesDir,
-                                                           final @NotNull ConfigurationFormat format) throws IOException {
+                                                           final @NotNull ConfigurationFormat format,
+                                                           final @NotNull Logger logger) throws IOException {
         File directory = new File(workingDir, resourcesDir);
         if (!directory.isDirectory()); //TODO: resources lookup
         TranslationMessageProvider provider = TranslationMessageProvider.newProvider();
@@ -103,6 +106,10 @@ public interface MessageProvider {
                 String fileName = file.getName();
                 fileName = fileName.substring(0, fileName.lastIndexOf('.'));
                 Locale locale = LocaleUtils.fromString(fileName);
+                if (locale.getCountry().isEmpty() || locale.getLanguage().isEmpty()) {
+                    logger.warn("Ignoring invalid translation file {}. The expected format is %language%_%country%.{}", file.getName(), format.name().toLowerCase());
+                    continue;
+                }
                 provider.registerProvider(
                         locale,
                         resource(directory, file.getName())
