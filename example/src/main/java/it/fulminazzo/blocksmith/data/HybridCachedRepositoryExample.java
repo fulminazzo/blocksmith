@@ -11,10 +11,9 @@ import it.fulminazzo.blocksmith.data.redis.RedisRepositorySettings;
 import it.fulminazzo.blocksmith.data.sql.DatabaseType;
 import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
 import it.fulminazzo.blocksmith.data.sql.SqlRepositorySettings;
-import it.fulminazzo.blocksmith.function.RunnableException;
+import it.fulminazzo.blocksmith.data.util.TimeUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -60,11 +59,11 @@ public final class HybridCachedRepositoryExample {
 
         long id = repository.save(entity).get().getId();
 
-        double memory = time(() -> repository.findById(id).get());
+        double memory = TimeUtils.time(() -> repository.findById(id).get());
         Thread.sleep(1_000);
-        double redis = time(() -> repository.findById(id).get());
+        double redis = TimeUtils.time(() -> repository.findById(id).get());
         Thread.sleep(5_000);
-        double sql = time(() -> repository.findById(id).get());
+        double sql = TimeUtils.time(() -> repository.findById(id).get());
 
         dataSource.close();
 
@@ -73,18 +72,6 @@ public final class HybridCachedRepositoryExample {
                 String.format("Redis: %s ms\n", redis) +
                 String.format("SQL: %s ms", sql)
         );
-    }
-
-    private static double time(final @NotNull RunnableException<Exception> task) {
-        try {
-            long curr = System.nanoTime();
-            task.run();
-            long time = System.nanoTime() - curr;
-            double millis = time / 1_000_000.0;
-            return Math.round(millis * 100.0) / 100.0;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }
