@@ -14,6 +14,9 @@ import org.jetbrains.annotations.NotNull;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Placeholder implements Argument {
+    private static final String PLACEHOLDER_START = "%";
+    private static final String PLACEHOLDER_END = "%";
+
     private final @NotNull String placeholder;
     private final @NotNull Component value;
 
@@ -70,7 +73,7 @@ public final class Placeholder implements Argument {
      */
     public static @NotNull Placeholder of(final @NotNull String placeholder,
                                           final @NotNull Component value) {
-        return new Placeholder("%" + placeholder + "%", value);
+        return new Placeholder(PLACEHOLDER_START + placeholder + PLACEHOLDER_END, value);
     }
 
 }
