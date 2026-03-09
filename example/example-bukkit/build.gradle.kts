@@ -14,10 +14,12 @@ dependencies {
 
 tasks.jar {
     dependsOn(tasks.shadowJar)
+    archiveBaseName = getFileBaseName()
     archiveClassifier = "original"
 }
 
 tasks.shadowJar {
+    archiveBaseName = getFileBaseName()
     archiveClassifier = ""
 }
 
@@ -25,7 +27,7 @@ tasks.processResources {
     val properties = mapOf(
         "version" to rootProject.version,
         "group" to rootProject.group,
-        "name" to rootProject.name.replaceFirstChar { it.uppercase() },
+        "name" to getProjectName(),
         "name_lower" to rootProject.name
     )
     inputs.properties(properties)
@@ -34,3 +36,7 @@ tasks.processResources {
         expand(properties)
     }
 }
+
+fun getFileBaseName(): String = "${getProjectName()}-${rootProject.version}"
+
+fun getProjectName(): String = rootProject.name.replaceFirstChar { it.uppercase() }
