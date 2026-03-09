@@ -8,7 +8,7 @@ import lombok.Value;
 import java.util.concurrent.Executors;
 
 @Value
-public final class FileDataSourceConfig implements DataSourceConfig {
+public class FileDataSourceConfig implements DataSourceConfig {
 
     static {
         DataSourceFactories.registerFactory(
