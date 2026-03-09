@@ -37,6 +37,16 @@ allprojects {
         useJUnitPlatform()
     }
 
+    tasks.compileTestJava {
+        if (project.name.endsWith("-velocity")) {
+            sourceCompatibility = JavaVersion.VERSION_17.toString()
+            targetCompatibility = JavaVersion.VERSION_17.toString()
+        } else {
+            sourceCompatibility = JavaVersion.VERSION_11.toString()
+            targetCompatibility = JavaVersion.VERSION_11.toString()
+        }
+    }
+
 }
 
 dependencies {
