@@ -11,10 +11,6 @@ import java.io.IOException;
 
 final class DataSourceConfigDeserializer extends StdDeserializer<DataSourceConfig> {
 
-    static {
-        JacksonUtils.addCustomDeserializer(new DataSourceConfigDeserializer());
-    }
-
     public DataSourceConfigDeserializer() {
         super(DataSourceConfig.class);
     }

@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joor.Reflect;
+import org.joor.ReflectException;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -34,8 +35,22 @@ import java.util.List;
 final class JacksonUtils {
     private static final @NotNull List<StdDeserializer<?>> customDeserializers = new ArrayList<>();
 
-    public static void addCustomDeserializer(final @NotNull StdDeserializer<?> deserializer) {
+    static {
+        addCustomDeserializer("DataSourceConfigDeserializer");
+    }
+
+    public static void addCustomDeserializer(final StdDeserializer<?> deserializer) {
         customDeserializers.add(deserializer);
+    }
+
+    private static void addCustomDeserializer(final @NotNull String deserializerName) {
+        try {
+            StdDeserializer<?> deserializer = Reflect.onClass(JacksonUtils.class.getPackageName() + "." + deserializerName)
+                    .create()
+                    .get();
+            addCustomDeserializer(deserializer);
+        } catch (ReflectException ignored) {
+        }
     }
 
     @SuppressWarnings("unchecked")
