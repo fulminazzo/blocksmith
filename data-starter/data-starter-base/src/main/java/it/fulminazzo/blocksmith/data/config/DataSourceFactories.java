@@ -6,12 +6,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DataSourceFactories {
-    private static final @NotNull Map<Class<? extends DataSourceConfig>, DataSourceFactory> factories = new HashMap<>();
+    private static final @NotNull Map<Class<? extends DataSourceConfig>, DataSourceFactory> factories = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unchecked")
     public static @NotNull RepositoryDataSource<RepositorySettings> build(final @NotNull DataSourceConfig dataSourceConfig) {
