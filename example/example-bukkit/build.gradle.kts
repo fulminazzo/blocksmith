@@ -5,6 +5,8 @@ plugins {
 dependencies {
     compileOnly(libs.spigot)
 
+    implementation(project(":message-starter:message-starter-bukkit"))
+
     testImplementation(libs.spigot)
 }
 
