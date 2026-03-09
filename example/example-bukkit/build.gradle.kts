@@ -6,6 +6,7 @@ dependencies {
     implementation(libs.slf4j.jdk)
 
     implementation(project(":message-starter:message-starter-bukkit"))
+    implementation(project(":message-starter:message-starter-translation"))
 
     compileOnly(libs.spigot)
 
