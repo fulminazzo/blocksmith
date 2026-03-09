@@ -26,7 +26,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
      * @param commentPropertyWriterType the type of {@link CommentPropertyWriter} responsible for writing comments
      */
     public JacksonConfigurationAdapter(final @NotNull ObjectMapper mapper,
-                                       final @NotNull Logger logger,
+                                       final @Nullable Logger logger,
                                        final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
         this.mapper = JacksonUtils.setupMapper(mapper, logger, commentPropertyWriterType);
     }

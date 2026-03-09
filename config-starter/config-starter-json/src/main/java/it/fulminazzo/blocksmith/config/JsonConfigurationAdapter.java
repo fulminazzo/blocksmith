@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 /**
@@ -21,7 +22,7 @@ final class JsonConfigurationAdapter implements BaseConfigurationAdapter {
      *
      * @param logger the logger
      */
-    public JsonConfigurationAdapter(final @NotNull Logger logger) {
+    public JsonConfigurationAdapter(final @Nullable Logger logger) {
         this.delegate = new JacksonConfigurationAdapter(
                 new ObjectMapper()
                         .enable(SerializationFeature.INDENT_OUTPUT)

@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -33,7 +34,7 @@ public enum ConfigurationFormat {
      * @return the adapter
      */
     @SuppressWarnings("unchecked")
-    @NotNull BaseConfigurationAdapter newAdapter(final @NotNull Logger logger) {
+    @NotNull BaseConfigurationAdapter newAdapter(final @Nullable Logger logger) {
         String type = name().toLowerCase();
         type = Character.toUpperCase(type.charAt(0)) + type.substring(1);
         String className = BaseConfigurationAdapter.class.getCanonicalName()

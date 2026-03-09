@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.config;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -60,7 +61,7 @@ public interface ConfigurationAdapter extends BaseConfigurationAdapter {
      * @param format the format
      * @return the configuration adapter
      */
-    static @NotNull ConfigurationAdapter newAdapter(final @NotNull Logger logger,
+    static @NotNull ConfigurationAdapter newAdapter(final @Nullable Logger logger,
                                                     final @NotNull ConfigurationFormat format) {
         return new DelegateConfigurationAdapter(logger).setFormat(format);
     }

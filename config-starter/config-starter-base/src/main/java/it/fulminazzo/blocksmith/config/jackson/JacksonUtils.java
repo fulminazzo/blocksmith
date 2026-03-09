@@ -44,7 +44,7 @@ final class JacksonUtils {
      */
     @SuppressWarnings("unchecked")
     public static <M extends ObjectMapper> M setupMapper(final @NotNull M mapper,
-                                                         final @NotNull Logger logger,
+                                                         final @Nullable Logger logger,
                                                          final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
         return (M) mapper
                 .registerModule(new SimpleModule() {
@@ -87,7 +87,7 @@ final class JacksonUtils {
 
     @RequiredArgsConstructor
     private static final class JacksonBeanDeserializerModifier extends BeanDeserializerModifier {
-        private final @NotNull Logger logger;
+        private final @Nullable Logger logger;
 
         @Override
         public BeanDeserializerBuilder updateBuilder(final DeserializationConfig config,

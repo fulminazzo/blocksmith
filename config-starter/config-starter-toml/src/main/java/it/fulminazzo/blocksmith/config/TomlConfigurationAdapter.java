@@ -10,6 +10,7 @@ import com.fasterxml.jackson.dataformat.toml.TomlMapper;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.nightconfig.ConfigUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -27,7 +28,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
      *
      * @param logger the logger
      */
-    public TomlConfigurationAdapter(final @NotNull Logger logger) {
+    public TomlConfigurationAdapter(final @Nullable Logger logger) {
         this.delegate = new JacksonConfigurationAdapter(
                 new TomlMapper()
                         .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE),

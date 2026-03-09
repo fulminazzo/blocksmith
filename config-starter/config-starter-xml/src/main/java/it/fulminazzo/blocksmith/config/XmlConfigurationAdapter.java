@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joor.Reflect;
 import org.slf4j.Logger;
 
@@ -31,7 +32,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
      *
      * @param logger the logger to warn about errors
      */
-    public XmlConfigurationAdapter(final @NotNull Logger logger) {
+    public XmlConfigurationAdapter(final @Nullable Logger logger) {
         this.delegate = new JacksonConfigurationAdapter(
                 XmlMapper.builder()
                         .enable(ToXmlGenerator.Feature.WRITE_NULLS_AS_XSI_NIL)
