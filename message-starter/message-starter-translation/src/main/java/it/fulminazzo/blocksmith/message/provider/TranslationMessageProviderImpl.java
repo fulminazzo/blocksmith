@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Implementation of {@link TranslationMessageProvider}.
+ */
 final class TranslationMessageProviderImpl implements TranslationMessageProvider {
     private final @NotNull Map<Locale, MessageProvider> providers = new HashMap<>();
     private @NotNull Locale defaultLocale = LocaleUtils.fromString("en_us");
