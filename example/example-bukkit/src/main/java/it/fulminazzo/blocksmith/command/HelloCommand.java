@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.Blocksmith;
+import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -20,7 +21,7 @@ public final class HelloCommand implements TabExecutor {
                              final @NonNull Command command,
                              final @NonNull String label,
                              final @NonNull String[] args) {
-        plugin.getMessenger().sendMessage(sender, "greeting");
+        plugin.getMessenger().sendMessage(sender, "greeting", Placeholder.of("name", sender.getName()));
         return true;
     }
 
