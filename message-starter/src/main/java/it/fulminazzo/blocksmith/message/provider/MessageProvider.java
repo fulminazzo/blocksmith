@@ -38,7 +38,7 @@ public interface MessageProvider {
      * @return the message provider
      */
     static @NotNull MessageProvider memory(@NotNull Map<String, Object> messages) {
-        messages = MapUtils.listToStrings(MapUtils.flattenMap(messages));
+        messages = MapUtils.flattenMap(MapUtils.listToStrings(messages));
         Map<String, String> stringMessages = new HashMap<>();
         messages.forEach((key, value) -> {
             if (value != null) stringMessages.put(key, value.toString());
