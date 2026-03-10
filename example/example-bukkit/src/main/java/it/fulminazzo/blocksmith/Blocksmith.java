@@ -49,6 +49,7 @@ public final class Blocksmith extends JavaPlugin implements Listener {
 
     public Blocksmith() {
         try {
+            instance = this;
             Constructor<JDK14LoggerAdapter> constructor = JDK14LoggerAdapter.class.getDeclaredConstructor(java.util.logging.Logger.class);
             constructor.setAccessible(true);
             this.logger = constructor.newInstance(getLogger());
