@@ -6,6 +6,7 @@ import org.joor.Reflect;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A collection of utilities to work with Map objects.
@@ -99,6 +100,39 @@ public final class MapUtils {
             String fieldName = field.getName();
             flattenMapRec(result, key + "." + fieldName, reflect.field(fieldName).get());
         }
+    }
+
+    /**
+     * Converts the given map internal collections to a string with new-line as separator.
+     *
+     * @param map the map
+     * @return the converted map
+     */
+    public static @NotNull Map<String, Object> listToStrings(final @NotNull Map<String, Object> map) {
+        map.forEach((k, v) -> map.put(k, listToStringsRec(v)));
+        return map;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object listToStringsRec(final @Nullable Object value) {
+        if (value == null) return null;
+        Class<?> valueClass = value.getClass();
+        if (valueClass.isArray()) {
+            Object[] array = (Object[]) value;
+            return Arrays.stream(array)
+                    .map(MapUtils::listToStringsRec)
+                    .map(o -> o == null ? "null" : o.toString())
+                    .collect(Collectors.joining("\n"));
+        } else if (value instanceof Collection)
+            return ((Collection<?>) value).stream()
+                    .map(MapUtils::listToStringsRec)
+                    .map(o -> o == null ? "null" : o.toString())
+                    .collect(Collectors.joining("\n"));
+        else if (value instanceof Map) {
+            Map<Object, Object> map = (Map<Object, Object>) value;
+            map.forEach((k, v) -> map.put(k, listToStringsRec(v)));
+            return map;
+        } else return value;
     }
 
 }
