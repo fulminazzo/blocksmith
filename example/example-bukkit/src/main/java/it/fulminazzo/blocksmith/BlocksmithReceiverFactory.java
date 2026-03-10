@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith;
 import it.fulminazzo.blocksmith.message.receiver.Receiver;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactory;
+import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -33,11 +34,12 @@ public final class BlocksmithReceiverFactory implements ReceiverFactory {
     }
 
     static final class BlocksmithReceiver implements Receiver {
-        private final @NotNull Player player;
+        @Getter
+        private final @NotNull Player internal;
         private final @NotNull Receiver defaultReceiver;
 
         public BlocksmithReceiver(final @NotNull Player player) {
-            this.player = player;
+            this.internal = player;
             this.defaultReceiver = ReceiverFactories.get(CommandSender.class).create(player);
         }
 
@@ -49,7 +51,7 @@ public final class BlocksmithReceiverFactory implements ReceiverFactory {
         @Override
         public @NotNull Locale getLocale() {
             try {
-                return Blocksmith.getInstance().getRepository().findById(player.getUniqueId())
+                return Blocksmith.getInstance().getRepository().findById(internal.getUniqueId())
                         .thenApply(u -> u.map(BlocksmithUser::getLocale)
                                 .orElseGet(defaultReceiver::getLocale)
                         )
