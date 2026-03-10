@@ -6,6 +6,7 @@ dependencies {
     implementation(libs.slf4j.jdk)
 
     implementation(project(":config-starter:config-starter-yaml"))
+    implementation(project(":config-starter:config-starter-json"))
     implementation(project(":data-starter:data-starter-file"))
     implementation(project(":message-starter:message-starter-bukkit"))
     implementation(project(":message-starter:message-starter-translation"))
