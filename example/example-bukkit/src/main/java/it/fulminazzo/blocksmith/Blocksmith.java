@@ -9,7 +9,12 @@ import it.fulminazzo.blocksmith.data.file.FileDataSource;
 import it.fulminazzo.blocksmith.data.file.FileRepositorySettings;
 import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.provider.MessageProvider;
+import it.fulminazzo.blocksmith.message.util.LocaleUtils;
 import lombok.Getter;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,9 +27,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 
-public final class Blocksmith extends JavaPlugin {
+public final class Blocksmith extends JavaPlugin implements Listener {
     private final @NotNull Logger logger;
 
     @Getter
@@ -47,6 +53,8 @@ public final class Blocksmith extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        getServer().getPluginManager().registerEvents(this, this);
+
         getCommand(getName().toLowerCase() + "reload").setExecutor(new ReloadCommand(this));
         getCommand("hello").setExecutor(new HelloCommand(this));
 
@@ -102,6 +110,22 @@ public final class Blocksmith extends JavaPlugin {
         }
 
         logger.info("{} disabled. Goodbye!", getDescription().getName());
+    }
+
+    @EventHandler
+    void on(final @NotNull PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        getRepository().findById(player.getUniqueId())
+                .thenCompose(u ->
+                        CompletableFuture.completedFuture(u.orElseGet(() -> new BlocksmithUser(
+                                player.getUniqueId(),
+                                "",
+                                LocaleUtils.fromString(player.getLocale())
+                        )))
+                ).thenCompose(u -> {
+                    u.setUsername(player.getName());
+                    return getRepository().save(u);
+                });
     }
 
     public @NotNull Repository<BlocksmithUser, UUID> getRepository() {
