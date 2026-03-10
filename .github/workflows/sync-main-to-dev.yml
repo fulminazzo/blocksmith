@@ -1,10 +1,11 @@
 # Synchronizes the master branch with dev by pushing any commits on the former.
 name: Sync master to dev
 
-on:
-  push:
-    branches:
-      - master
+#TODO: re-enable
+#on:
+#  push:
+#    branches:
+#      - master
 
 concurrency:
   group: sync-master-dev
