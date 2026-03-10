@@ -53,7 +53,7 @@ class BukkitReceiverFactoryTest extends Specification {
         receivers != null
 
         when:
-        def internalReceivers = receivers.collect { it.receiver }
+        def internalReceivers = receivers.collect { it.internal }
 
         then:
         internalReceivers.sort() == [*players, console].sort()
@@ -73,7 +73,7 @@ class BukkitReceiverFactoryTest extends Specification {
         receiver != null
 
         and:
-        receiver.receiver == sender
+        receiver.internal == sender
     }
 
     def 'test that ReceiverFactories returns correct factory for #receiverType'() {
