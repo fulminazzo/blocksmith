@@ -1,1 +1,4 @@
-"greeting": "Hola, %name%!"
+prefix: '<green><bold>Block<red><bold>smith <dark_gray>» '
+greeting:
+  - '%prefix%<yellow>Hola, <gold>%name%<yellow>!'
+  - '%prefix%<yellow>¿Cómo estás hoy?'
