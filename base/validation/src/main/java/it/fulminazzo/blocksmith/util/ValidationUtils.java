@@ -28,8 +28,14 @@ public final class ValidationUtils {
     private static final @NotNull Validator validator;
 
     static {
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            validator = factory.getValidator();
+        ClassLoader original = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(ValidationUtils.class.getClassLoader());
+            try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+                validator = factory.getValidator();
+            }
+        } finally {
+            Thread.currentThread().setContextClassLoader(original);
         }
     }
 
