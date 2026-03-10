@@ -34,7 +34,7 @@ class MessengerTest extends Specification {
 
     def 'test that broadcastTitle correctly converts and sends message to all receivers'() {
         given:
-        def expected = Component.text('Hello, world!')
+        def expected = Component.text('[Broadcast] [Title] Hello, world!')
 
         and:
         provider.getMessage('message', Locale.ITALY) >> expected
@@ -63,7 +63,7 @@ class MessengerTest extends Specification {
 
     def 'test that broadcastTitle with times correctly converts and sends message to all receivers'() {
         given:
-        def expected = Component.text('Hello, world!')
+        def expected = Component.text('[Broadcast] [Title] [Timed] Hello, world!')
 
         and:
         def times = Title.Times.times(
@@ -95,7 +95,7 @@ class MessengerTest extends Specification {
 
     def 'test that broadcastActionBar correctly converts and sends message to all receivers'() {
         given:
-        def expected = 'Hello, world!'
+        def expected = '[Broadcast] [Actionbar] Hello, world!'
 
         and:
         provider.getMessage('message', Locale.ITALY) >> Component.text(expected)
@@ -116,10 +116,10 @@ class MessengerTest extends Specification {
 
     def 'test that broadcastMessage correctly converts and sends message to all receivers'() {
         given:
-        def expected = 'Hello, world!'
+        def expected = '[Broadcast] Hello, world!'
 
         and:
-        provider.getMessage('message', Locale.ITALY) >> Component.text('Hello, %what%!')
+        provider.getMessage('message', Locale.ITALY) >> Component.text('[Broadcast] Hello, %what%!')
 
         and:
         Player.ALL_PLAYERS.each { it.locale = Locale.ITALY }
@@ -137,7 +137,7 @@ class MessengerTest extends Specification {
 
     def 'test that sendTitle correctly converts and sends message'() {
         given:
-        def expected = Component.text('Hello, world!')
+        def expected = Component.text('[Title] Hello, world!')
 
         and:
         provider.getMessage('message', Locale.ITALY) >> expected
@@ -167,7 +167,7 @@ class MessengerTest extends Specification {
 
     def 'test that sendActionBar correctly converts and sends message'() {
         given:
-        def expected = 'Hello, world!'
+        def expected = '[ActionBar] Hello, world!'
 
         and:
         provider.getMessage('message', Locale.ITALY) >> Component.text(expected)
