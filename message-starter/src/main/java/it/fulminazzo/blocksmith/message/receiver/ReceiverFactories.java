@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -44,9 +45,11 @@ public final class ReceiverFactories {
      * @return all the receivers
      */
     public static @NotNull Collection<Receiver> getAllReceivers() {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
         return factories.stream()
                 .map(ReceiverFactory::getAllReceivers)
                 .flatMap(Collection::stream)
+                .filter(r -> seen.add(r.getInternal()))
                 .collect(Collectors.toSet());
     }
 
