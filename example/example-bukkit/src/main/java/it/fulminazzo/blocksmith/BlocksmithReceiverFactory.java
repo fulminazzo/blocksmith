@@ -4,15 +4,23 @@ import it.fulminazzo.blocksmith.message.receiver.Receiver;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactory;
 import net.kyori.adventure.audience.Audience;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Collection;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public final class BlocksmithReceiverFactory implements ReceiverFactory {
+
+    @Override
+    public @NotNull Collection<Receiver> getAllReceivers() {
+        return Bukkit.getOnlinePlayers().stream().map(this::create).collect(Collectors.toList());
+    }
 
     @Override
     public @NotNull <R> Receiver create(final @NonNull R receiver) {
