@@ -27,7 +27,23 @@ public final class Messenger {
     private @Nullable MessageProvider messageProvider;
 
     /**
-     * Sends a message to the given receiver.
+     * Sends a message to the given receiver through action bar.
+     * If the message could not be found, a warning will be displayed
+     * and no error will be returned.
+     *
+     * @param <R>         the type of the receiver
+     * @param receiver    the receiver
+     * @param messageCode the message code
+     * @param arguments   the arguments to apply to the message
+     */
+    public <R> void sendActionBar(final @NotNull R receiver,
+                                  final @NotNull String messageCode,
+                                  final Argument @NotNull ... arguments) {
+        sendMessageHelper(Audience::sendActionBar, receiver, messageCode, arguments);
+    }
+
+    /**
+     * Sends a message to the given receiver through chat.
      * If the message could not be found, a warning will be displayed
      * and no error will be returned.
      *
