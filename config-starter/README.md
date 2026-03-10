@@ -20,7 +20,7 @@ is [ConfigurationAdapter](./src/main/java/it/fulminazzo/blocksmith/config/Config
 that allows creation of a new adapter to **store** and **load** **Java beans** from **files**.
 
 It is possible to change the used format by using the method
-`setFormat([ConfigurationFormat](./src/main/java/it/fulminazzo/blocksmith/config/ConfigurationFormat.java))`.
+`setFormat(ConfigurationFormat)` ([ConfigurationFormat](./src/main/java/it/fulminazzo/blocksmith/config/ConfigurationFormat.java)).
 
 ```java
 File workingDir; // working directory
@@ -30,4 +30,28 @@ adapter.store(workingDir, "data", "Hello, world!"); // extension of the file aut
 // change format language of the adapter
 adapter.setFormat(ConfigurationFormat.JSON);
 adapter.load(workingDir, "data", String.class);
+```
+
+## Comment annotation
+
+The [ConfigurationAdapter](./src/main/java/it/fulminazzo/blocksmith/config/ConfigurationAdapter.java)
+supports any type of Java POJO.
+
+If a field is annotated with [Comment](./src/main/java/it/fulminazzo/blocksmith/config/Comment.java),
+and the current data format language supports it,
+the field will be saved with the specified comment.
+
+```java
+class User {
+    
+    @Comment({
+            "The username of the user.",
+            "Should be unique!"
+    })
+    private String username;
+    
+    @Comment("The email that the user specified at the time of registration.")
+    private String email;
+    
+}
 ```
