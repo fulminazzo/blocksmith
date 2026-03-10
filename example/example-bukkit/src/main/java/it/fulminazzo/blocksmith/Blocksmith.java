@@ -3,11 +3,16 @@ package it.fulminazzo.blocksmith;
 import it.fulminazzo.blocksmith.command.HelloCommand;
 import it.fulminazzo.blocksmith.command.ReloadCommand;
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
+import it.fulminazzo.blocksmith.data.Repository;
+import it.fulminazzo.blocksmith.data.RepositoryDataSource;
+import it.fulminazzo.blocksmith.data.file.FileDataSource;
+import it.fulminazzo.blocksmith.data.file.FileRepositorySettings;
 import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.provider.MessageProvider;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.jul.JDK14LoggerAdapter;
 
@@ -15,12 +20,18 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.Executors;
 
 public final class Blocksmith extends JavaPlugin {
     private final @NotNull Logger logger;
 
     @Getter
     private final @NotNull Messenger messenger;
+
+    private @Nullable RepositoryDataSource<?> dataSource;
+    private @Nullable Repository<BlocksmithUser, UUID> repository;
 
     public Blocksmith() {
         try {
@@ -42,6 +53,7 @@ public final class Blocksmith extends JavaPlugin {
         enable();
     }
 
+    @SuppressWarnings("unchecked")
     public void enable() {
         try {
             logger.info("Loading translation messages.");
@@ -51,6 +63,16 @@ public final class Blocksmith extends JavaPlugin {
                     ConfigurationFormat.YAML,
                     logger
             ));
+
+            logger.info("Loading player data.");
+            dataSource = FileDataSource.create(Executors.newCachedThreadPool());
+            repository = ((RepositoryDataSource<FileRepositorySettings>) dataSource).newRepository(
+                    BlocksmithUser.class,
+                    new FileRepositorySettings()
+                            .withDataDirectory(new File(getDataFolder(), "users"))
+                            .withFormat(ConfigurationFormat.JSON)
+                            .withLogger(logger)
+            );
 
             logger.info("{} v{} successfully enabled", getName(), getDescription().getVersion());
         } catch (IOException e) {
@@ -62,13 +84,28 @@ public final class Blocksmith extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        disable();
+        try {
+            disable();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void disable() {
+    public void disable() throws IOException {
         messenger.setMessageProvider(null);
 
+        repository = null;
+
+        if (dataSource != null) {
+            dataSource.close();
+            dataSource = null;
+        }
+
         logger.info("{} disabled. Goodbye!", getDescription().getName());
+    }
+
+    public @NotNull Repository<BlocksmithUser, UUID> getRepository() {
+        return Objects.requireNonNull(repository, "repository has not been loaded yet");
     }
 
 }
