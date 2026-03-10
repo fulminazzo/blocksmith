@@ -22,7 +22,7 @@ class BungeeReceiverTest extends Specification {
         server.console >> Mock(CommandSender)
         server.players >> []
         plugin.proxy >> server
-        ProxyServer.instance = server
+        BungeeReceiverFactoryTest.server = server
 
         adventure = BungeeAudiences.create(plugin)
     }

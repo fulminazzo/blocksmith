@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.receiver;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
@@ -12,16 +13,17 @@ import java.util.Locale;
 @RequiredArgsConstructor
 final class BungeeReceiver implements Receiver {
     private final @NotNull BungeeAudiences adventure;
-    private final @NotNull CommandSender receiver;
+    @Getter
+    private final @NotNull CommandSender internal;
 
     @Override
     public @NotNull Audience toAudience() {
-        return adventure.sender(receiver);
+        return adventure.sender(internal);
     }
 
     @Override
     public @NotNull Locale getLocale() {
-        if (receiver instanceof ProxiedPlayer) return ((ProxiedPlayer) receiver).getLocale();
+        if (internal instanceof ProxiedPlayer) return ((ProxiedPlayer) internal).getLocale();
         else return Locale.getDefault();
     }
 

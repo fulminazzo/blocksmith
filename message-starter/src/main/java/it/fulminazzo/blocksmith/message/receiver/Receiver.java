@@ -24,4 +24,12 @@ public interface Receiver {
      */
     @NotNull Locale getLocale();
 
+    /**
+     * Gets the internal wrapped receiver.
+     *
+     * @param <R> the type of the receiver
+     * @return the receiver
+     */
+    <R> @NotNull R getInternal();
+
 }

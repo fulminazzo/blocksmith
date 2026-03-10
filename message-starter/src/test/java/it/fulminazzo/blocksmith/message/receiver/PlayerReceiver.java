@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.message.receiver;
 
 import it.fulminazzo.blocksmith.message.Player;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.MessageType;
@@ -13,7 +14,8 @@ import java.util.Locale;
 
 @RequiredArgsConstructor
 final class PlayerReceiver implements Receiver {
-    private final @NotNull Player player;
+    @Getter
+    private final @NotNull Player internal;
 
     @Override
     public @NotNull Audience toAudience() {
@@ -22,19 +24,19 @@ final class PlayerReceiver implements Receiver {
             @Override
             public <T> void sendTitlePart(final @NotNull TitlePart<T> part,
                                           final @NotNull T value) {
-                player.getLastTitle().put(part, value);
+                internal.getLastTitle().put(part, value);
             }
 
             @Override
             public void sendMessage(final @NotNull Identity source,
                                     final @NotNull Component message,
                                     final @NotNull MessageType type) {
-                player.setLastMessage(message);
+                internal.setLastMessage(message);
             }
 
             @Override
             public void sendActionBar(final @NotNull Component message) {
-                player.setLastMessage(message);
+                internal.setLastMessage(message);
             }
 
         };
@@ -42,7 +44,7 @@ final class PlayerReceiver implements Receiver {
 
     @Override
     public @NotNull Locale getLocale() {
-        return player.getLocale();
+        return internal.getLocale();
     }
 
 }

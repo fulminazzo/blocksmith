@@ -29,6 +29,11 @@ public final class UserDataReceiverFactory implements ReceiverFactory {
                 return ((UserData) receiver).getLocale();
             }
 
+            @Override
+            public @NotNull <T> T getInternal() {
+                throw new UnsupportedOperationException();
+            }
+
         };
     }
 

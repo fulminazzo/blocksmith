@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public final class PlayerReceiverFactory implements ReceiverFactory {
+public class PlayerReceiverFactory implements ReceiverFactory {
 
     @Override
     public @NotNull Collection<Receiver> getAllReceivers() {

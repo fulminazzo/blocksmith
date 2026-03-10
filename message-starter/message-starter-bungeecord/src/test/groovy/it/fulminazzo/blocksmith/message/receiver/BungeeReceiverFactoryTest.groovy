@@ -47,7 +47,7 @@ class BungeeReceiverFactoryTest extends Specification {
         receivers != null
 
         when:
-        def internalReceivers = receivers.collect { it.receiver }
+        def internalReceivers = receivers.collect { it.internal }
 
         then:
         internalReceivers.sort() == [*players, console].sort()
@@ -67,7 +67,7 @@ class BungeeReceiverFactoryTest extends Specification {
         receiver != null
 
         and:
-        receiver.receiver == sender
+        receiver.internal == sender
     }
 
     def 'test that ReceiverFactories returns correct factory for #receiverType'() {
@@ -85,7 +85,7 @@ class BungeeReceiverFactoryTest extends Specification {
         ]
     }
 
-    private void setServer(final @NotNull ProxyServer server) {
+    static void setServer(final @NotNull ProxyServer server) {
         def field = ProxyServer.getDeclaredField('instance')
         field.accessible = true
         field.set(null, server)
