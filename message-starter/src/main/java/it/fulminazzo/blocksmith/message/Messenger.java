@@ -31,6 +31,64 @@ public final class Messenger {
     private @Nullable MessageProvider messageProvider;
 
     /**
+     * Broadcasts a message to all the available receivers through titles.
+     * If the message could not be found, a warning will be displayed
+     * and no error will be returned.
+     *
+     * @param titleCode    the title message code
+     * @param subtitleCode the subtitle message code
+     * @param arguments    the arguments to apply to the message
+     */
+    public void broadcastTitle(final @Nullable String titleCode,
+                               final @Nullable String subtitleCode,
+                               final Argument @NotNull ... arguments) {
+        ReceiverFactories.getAllReceivers().forEach(r -> sendTitle(r, titleCode, subtitleCode, arguments));
+    }
+
+    /**
+     * Broadcasts a message to all the available receivers through titles.
+     * If the message could not be found, a warning will be displayed
+     * and no error will be returned.
+     *
+     * @param titleCode    the title message code
+     * @param subtitleCode the subtitle message code
+     * @param times        the timings of the title
+     * @param arguments    the arguments to apply to the message
+     */
+    public void broadcastTitle(final @Nullable String titleCode,
+                               final @Nullable String subtitleCode,
+                               final @NotNull Title.Times times,
+                               final Argument @NotNull ... arguments) {
+        ReceiverFactories.getAllReceivers().forEach(r -> sendTitle(r, titleCode, subtitleCode, times, arguments));
+    }
+
+    /**
+     * Broadcasts a message to all the available receivers through action bar.
+     * If the message could not be found, a warning will be displayed
+     * and no error will be returned.
+     *
+     * @param messageCode the message code
+     * @param arguments   the arguments to apply to the message
+     */
+    public void broadcastActionBar(final @NotNull String messageCode,
+                                   final Argument @NotNull ... arguments) {
+        ReceiverFactories.getAllReceivers().forEach(r -> sendActionBar(r, messageCode, arguments));
+    }
+
+    /**
+     * Broadcasts a message to all the available receivers through chat.
+     * If the message could not be found, a warning will be displayed
+     * and no error will be returned.
+     *
+     * @param messageCode the message code
+     * @param arguments   the arguments to apply to the message
+     */
+    public void broadcastMessage(final @NotNull String messageCode,
+                                 final Argument @NotNull ... arguments) {
+        ReceiverFactories.getAllReceivers().forEach(r -> sendMessage(r, messageCode, arguments));
+    }
+
+    /**
      * Sends a message to the given receiver through titles.
      * If the message could not be found, a warning will be displayed
      * and no error will be returned.
