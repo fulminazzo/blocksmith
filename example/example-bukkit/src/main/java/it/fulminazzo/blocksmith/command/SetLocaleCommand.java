@@ -31,7 +31,7 @@ public final class SetLocaleCommand implements TabExecutor {
             } else {
                 Player player = (Player) sender;
                 plugin.getRepository().findById(player.getUniqueId()).thenCompose(u -> {
-                    BlocksmithUser user = u.orElseThrow();
+                    BlocksmithUser user = u.orElseGet(() -> new BlocksmithUser(player.getUniqueId(), player.getName(), null));
                     user.setLocale(LocaleUtils.fromString(args[0]));
                     return plugin.getRepository().save(user);
                 }).thenAccept(u ->
