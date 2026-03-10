@@ -124,7 +124,7 @@ public final class Blocksmith extends JavaPlugin implements Listener {
                         CompletableFuture.completedFuture(u.orElseGet(() -> new BlocksmithUser(
                                 player.getUniqueId(),
                                 "",
-                                LocaleUtils.fromString(player.getLocale())
+                                null
                         )))
                 ).thenCompose(u -> {
                     u.setUsername(player.getName());

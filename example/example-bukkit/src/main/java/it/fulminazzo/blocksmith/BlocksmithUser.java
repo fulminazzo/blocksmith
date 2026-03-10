@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -17,6 +18,6 @@ public final class BlocksmithUser {
 
     @NotNull String username;
 
-    @NotNull Locale locale;
+    @Nullable Locale locale;
 
 }
