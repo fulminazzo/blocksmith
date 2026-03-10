@@ -8,12 +8,14 @@ import it.fulminazzo.blocksmith.message.receiver.Receiver;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactory;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.Locale;
+import java.util.function.BiConsumer;
 
 /**
  * Handles all the messages and translations to send to users.
@@ -37,6 +39,13 @@ public final class Messenger {
     public <R> void sendMessage(final @NotNull R receiver,
                                 final @NotNull String messageCode,
                                 final Argument @NotNull ... arguments) {
+        sendMessageHelper(Audience::sendMessage, receiver, messageCode, arguments);
+    }
+
+    private <R> void sendMessageHelper(final @NotNull BiConsumer<Audience, Component> function,
+                                       final @NotNull R receiver,
+                                       final @NotNull String messageCode,
+                                       final Argument @NotNull ... arguments) {
         try {
             ReceiverFactory factory = ReceiverFactories.get(receiver.getClass());
             Receiver rec = factory.create(receiver);
@@ -48,7 +57,7 @@ public final class Messenger {
             if (prefix == null) prefix = Component.empty();
             message = Placeholder.of("prefix", prefix).apply(message);
 
-            rec.toAudience().sendMessage(message);
+            function.accept(rec.toAudience(), message);
         } catch (MessageNotFoundException e) {
             logger.warn(e.getMessage());
         }
