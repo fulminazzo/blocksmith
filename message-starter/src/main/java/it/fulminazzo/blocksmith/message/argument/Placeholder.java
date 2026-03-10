@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a placeholder replacement.
- * A placeholder is defined as a string between two ampersand signs:
+ * A placeholder is defined as a string between two percentage signs:
  * <code>Hello, %name%!</code> -> <code>Hello, Alex!</code>
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -31,7 +31,7 @@ public final class Placeholder implements Argument {
     /**
      * Creates a new Placeholder.
      *
-     * @param placeholder the placeholder (without ampersand signs)
+     * @param placeholder the placeholder (without percentage signs)
      * @param value       the value to replace
      * @return the placeholder
      */
