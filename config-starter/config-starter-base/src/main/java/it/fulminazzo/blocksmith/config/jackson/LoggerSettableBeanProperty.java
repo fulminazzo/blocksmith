@@ -11,6 +11,7 @@ import jakarta.validation.ValidatorFactory;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
         }
     }
 
-    @NotNull Logger logger;
+    @Nullable Logger logger;
     @NotNull AnnotatedField field;
 
     /**
@@ -41,7 +42,7 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
      * @param field    the field that this property represents
      */
     public LoggerSettableBeanProperty(final @NotNull SettableBeanProperty delegate,
-                                      @NotNull Logger logger,
+                                      @Nullable Logger logger,
                                       @NotNull AnnotatedField field) {
         super(delegate);
         this.logger = logger;
@@ -83,10 +84,11 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
 
     private Object handleDeserializationException(final @NotNull Object instance,
                                                   final @NotNull DeserializationException exception) {
-        logger.warn(exception.getMessage()
-                .replace("<name>", field.getName())
-                .replace("<type>", field.getRawType().getCanonicalName())
-        );
+        if (logger != null)
+            logger.warn(exception.getMessage()
+                    .replace("<name>", field.getName())
+                    .replace("<type>", field.getRawType().getCanonicalName())
+            );
         return getAndLogDefaultValueUsage(instance);
     }
 
@@ -97,16 +99,18 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
         String message = exception.getMessage();
         if (message == null) message = "unknown error";
         message = message.split("\n")[0];
-        logger.warn("Invalid value for property '{}': {} (path: {})", field.getName(), message, path);
+        if (logger != null)
+            logger.warn("Invalid value for property '{}': {} (path: {})", field.getName(), message, path);
         if (!(exception instanceof ValidationUtils.ViolationException))
-            logger.debug("Invalid value for property '{}': {} (path: {})", field.getName(), message, path, exception);
+            if (logger != null)
+                logger.debug("Invalid value for property '{}': {} (path: {})", field.getName(), message, path, exception);
         return getAndLogDefaultValueUsage(instance);
     }
 
     private Object getAndLogDefaultValueUsage(@NotNull Object instance) {
         field.fixAccess(true);
         Object defaultValue = field.getValue(instance);
-        logger.warn("Using default value: {}", defaultValue);
+        if (logger != null) logger.warn("Using default value: {}", defaultValue);
         return defaultValue;
     }
 

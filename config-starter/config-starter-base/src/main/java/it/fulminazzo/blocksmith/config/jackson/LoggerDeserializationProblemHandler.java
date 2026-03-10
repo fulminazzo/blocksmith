@@ -22,7 +22,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 final class LoggerDeserializationProblemHandler extends DeserializationProblemHandler {
-    @NotNull Logger logger;
+    @Nullable Logger logger;
 
     @Override
     public boolean handleUnknownProperty(final @Nullable DeserializationContext context,
@@ -32,7 +32,7 @@ final class LoggerDeserializationProblemHandler extends DeserializationProblemHa
                                          final @NotNull String propertyName) throws IOException {
         // when the JSON contains a property not present in the bean
         String path = JacksonUtils.getCurrentPath(parser);
-        logger.warn("Ignoring unrecognized property '{}' (path: '{}')", propertyName, path);
+        if (logger != null) logger.warn("Ignoring unrecognized property '{}' (path: '{}')", propertyName, path);
         parser.skipChildren();
         return true;
     }
@@ -44,7 +44,7 @@ final class LoggerDeserializationProblemHandler extends DeserializationProblemHa
                                            final @Nullable String failureMsg) {
         // when the key of a Map cannot be converted to the expected type (e.g. Integer)
         String path = JacksonUtils.getCurrentPath(context.getParser());
-        logger.warn("Invalid key '{}' for map: expected {} (path: '{}')",
+        if (logger != null) logger.warn("Invalid key '{}' for map: expected {} (path: '{}')",
                 keyValue,
                 rawKeyType.getCanonicalName(),
                 path

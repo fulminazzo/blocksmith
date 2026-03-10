@@ -7,6 +7,7 @@ import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
      *
      * @param logger the logger to warn about errors
      */
-    public PropertiesConfigurationAdapter(final @NotNull Logger logger) {
+    public PropertiesConfigurationAdapter(final @Nullable Logger logger) {
         this.delegate = new JacksonConfigurationAdapter(
                 new JavaPropsMapper(),
                 logger,

@@ -5,6 +5,7 @@ include("base:validation")
 
 
 include("example")
+include("example:example-bukkit")
 
 
 include("config-starter")
@@ -38,3 +39,12 @@ include("data-starter:data-starter-sql")
 include("data-starter:data-starter-cache")
 
 include("data-starter:data-starter-all")
+
+
+include("message-starter")
+
+include("message-starter:message-starter-translation")
+
+include("message-starter:message-starter-bukkit")
+include("message-starter:message-starter-bungeecord")
+include("message-starter:message-starter-velocity")

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -29,13 +30,35 @@ public enum ConfigurationFormat {
     @NotNull String fileExtension;
 
     /**
+     * Checks if the given file is of the current configuration format type.
+     *
+     * @param file the file
+     * @return <code>true</code> if it is
+     */
+    public boolean isValidFile(final @NotNull File file) {
+        return isValidFile(file.getName());
+    }
+
+    /**
+     * Checks if the given file is of the current configuration format type.
+     *
+     * @param fileName the file name
+     * @return <code>true</code> if it is
+     */
+    public boolean isValidFile(final @NotNull String fileName) {
+        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
+        if (extension.equals("yaml")) extension = "yml";
+        return extension.equals(fileExtension);
+    }
+
+    /**
      * Gets the adapter for the corresponding format.
      *
      * @param logger the logger
      * @return the adapter
      */
     @SuppressWarnings("unchecked")
-    @NotNull BaseConfigurationAdapter newAdapter(final @NotNull Logger logger) {
+    @NotNull BaseConfigurationAdapter newAdapter(final @Nullable Logger logger) {
         String type = name().toLowerCase();
         type = Character.toUpperCase(type.charAt(0)) + type.substring(1);
         String className = BaseConfigurationAdapter.class.getCanonicalName()
@@ -80,6 +103,30 @@ public enum ConfigurationFormat {
     public @NotNull File getFile(final @NotNull File parentDir,
                                  final @NotNull String fileName) {
         return new File(parentDir, fileName + "." + fileExtension);
+    }
+
+    /**
+     * Tries to obtain the best {@link ConfigurationFormat} from the given file extension.
+     *
+     * @param file the file
+     * @return the configuration format
+     */
+    public static @NotNull ConfigurationFormat fromFile(final @NotNull File file) {
+        return fromFile(file.getName());
+    }
+
+    /**
+     * Tries to obtain the best {@link ConfigurationFormat} from the given file extension.
+     *
+     * @param fileName the file name
+     * @return the configuration format
+     */
+    private static @NotNull ConfigurationFormat fromFile(final @NotNull String fileName) {
+        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
+        if (extension.equals("yaml")) extension = "yml";
+        for (ConfigurationFormat format : ConfigurationFormat.values())
+            if (format.fileExtension.equals(extension)) return format;
+        throw new IllegalArgumentException("Could not find configuration format from file: " + fileName);
     }
 
 }

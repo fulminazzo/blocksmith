@@ -14,6 +14,26 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReflectionUtils {
+    private static final Set<Class<?>> WRAPPER_TYPES = Set.of(
+            Boolean.class,
+            Character.class,
+            Byte.class,
+            Short.class,
+            Integer.class,
+            Long.class,
+            Float.class,
+            Double.class
+    );
+
+    /**
+     * Checks if a class is a primitive or a wrapper class.
+     *
+     * @param clazz the class to check
+     * @return the <code>true</code> if it is
+     */
+    public static boolean isPrimitiveOrWrapper(final @NotNull Class<?> clazz) {
+        return clazz.isPrimitive() || WRAPPER_TYPES.contains(clazz);
+    }
 
     /**
      * Returns the field with the name in the given class (or superclasses) that is not static.

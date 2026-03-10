@@ -1,0 +1,26 @@
+name: '${name}'
+description: 'Demo plugin to show the capabilities of ${name}.'
+version: ${version}
+authors: [ 'Fulminazzo' ]
+main: ${group}.${name_lower}.${name}
+api-version: '1.13'
+
+commands:
+  ${name_lower}reload:
+    description: 'Reloads the plugin.'
+    usage: '/<command>'
+    permission: ${name_lower}.${name_lower}reload
+    aliases: ['bsreload']
+  hello:
+    description: 'Replies with the string "world" translated accordingly to the current configuration.'
+    usage: '/<command>'
+    permission: ${name_lower}.hello
+    aliases: ['hi']
+
+permissions:
+  ${name_lower}.${name_lower}reload:
+    description: 'Permission to execute command /blocksmithreload'
+    default: op
+  ${name_lower}.hello:
+    description: 'Permission to execute command /hello'
+    default: true

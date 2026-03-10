@@ -14,6 +14,7 @@ import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joor.Reflect;
 import org.slf4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
@@ -35,7 +36,7 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
      *
      * @param logger the logger to warn about errors
      */
-    public YamlConfigurationAdapter(final @NotNull Logger logger) {
+    public YamlConfigurationAdapter(final @Nullable Logger logger) {
         DumperOptions options = new DumperOptions();
         options.setProcessComments(true);
         this.delegate = new JacksonConfigurationAdapter(

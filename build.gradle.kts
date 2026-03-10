@@ -19,6 +19,14 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven {
+            name = "spigotmc-repo"
+            url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+        }
+        maven {
+            name = "papermc"
+            url = uri("https://repo.papermc.io/repository/maven-public/")
+        }
     }
 
     dependencies {
@@ -49,6 +57,16 @@ allprojects {
         buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
         buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
         buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
+    }
+
+    tasks.compileTestJava {
+        if (project.name.endsWith("-velocity")) {
+            sourceCompatibility = JavaVersion.VERSION_17.toString()
+            targetCompatibility = JavaVersion.VERSION_17.toString()
+        } else {
+            sourceCompatibility = JavaVersion.VERSION_11.toString()
+            targetCompatibility = JavaVersion.VERSION_11.toString()
+        }
     }
 
 }

@@ -18,7 +18,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 final class DelegateConfigurationAdapter implements ConfigurationAdapter {
-    final @NotNull Logger logger;
+    final @Nullable Logger logger;
     @Nullable ConfigurationFormat format;
     @Nullable BaseConfigurationAdapter delegate;
 

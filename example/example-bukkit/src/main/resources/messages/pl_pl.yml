@@ -1,0 +1,4 @@
+prefix: '<green><bold>Block<red><bold>smith <reset><dark_gray>» '
+greeting:
+  - '%prefix%<yellow>Cześć, <gold>%name%<yellow>!'
+  - '%prefix%<yellow>Jak się dzisiaj masz?'
