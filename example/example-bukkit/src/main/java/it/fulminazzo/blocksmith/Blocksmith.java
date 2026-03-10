@@ -10,6 +10,7 @@ import it.fulminazzo.blocksmith.data.file.FileDataSource;
 import it.fulminazzo.blocksmith.data.file.FileRepositorySettings;
 import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.provider.MessageProvider;
+import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,6 +42,10 @@ public final class Blocksmith extends JavaPlugin implements Listener {
 
     private @Nullable RepositoryDataSource<?> dataSource;
     private @Nullable Repository<BlocksmithUser, UUID> repository;
+
+    static {
+        ReceiverFactories.registerCustomFactory(new BlocksmithReceiverFactory());
+    }
 
     public Blocksmith() {
         try {

@@ -14,10 +14,6 @@ import java.util.concurrent.ExecutionException;
 
 public final class BlocksmithReceiverFactory implements ReceiverFactory {
 
-    static {
-        ReceiverFactories.registerCustomFactory(new BlocksmithReceiverFactory());
-    }
-
     @Override
     public @NotNull <R> Receiver create(final @NonNull R receiver) {
         return new BlocksmithReceiver((Player) receiver);
