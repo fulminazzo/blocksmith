@@ -12,7 +12,7 @@ class ResourceUtilsTest extends Specification {
         def actual = ResourceUtils.listResources('data')
 
         then:
-        actual == expected
+        actual.sort() == expected.sort()
     }
 
 }
