@@ -5,13 +5,25 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Implementation of {@link ReceiverFactory} for Velocity platform.
  */
 public final class VelocityReceiverFactory implements ReceiverFactory {
     private static @Nullable ProxyServer server;
+
+    @Override
+    public @NotNull Collection<Receiver> getAllReceivers() {
+        final ProxyServer server = getServer();
+        return Stream.concat(
+                server.getAllPlayers().stream(),
+                Stream.of(server.getConsoleCommandSource())
+        ).map(this::create).collect(Collectors.toList());
+    }
 
     @Override
     public @NotNull <R> Receiver create(final @NotNull R receiver) {
