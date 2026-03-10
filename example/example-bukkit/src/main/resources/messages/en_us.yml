@@ -2,3 +2,12 @@ prefix: '<green><bold>Block<red><bold>smith <reset><dark_gray>» '
 greeting:
   - '%prefix%<yellow>Hello, <gold>%name%<yellow>!'
   - '%prefix%<yellow>How are you today?'
+usage: '%prefix%<yellow>Usage: <gray>%usage%'
+
+success:
+  set-locale: '%prefix%<yellow>Successfully updated locale to <white>%locale%'
+
+error:
+  not-enough-arguments: '%prefix%<red>You did not specify enough arguments!'
+  console-cannot-execute: '%prefix%<red>Console cannot execute this command.'
+
