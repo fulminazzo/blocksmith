@@ -8,7 +8,12 @@ import it.fulminazzo.blocksmith.message.receiver.PlayerReceiverFactory
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.title.Title
+import net.kyori.adventure.title.TitlePart
 import spock.lang.Specification
+
+import java.time.Duration
+import java.time.temporal.ChronoUnit
 
 @Slf4j
 class MessengerTest extends Specification {
@@ -25,6 +30,36 @@ class MessengerTest extends Specification {
         provider = Mock(MessageProvider)
 
         messenger = new Messenger(log).setMessageProvider(provider)
+    }
+
+    def 'test that sendTitle correctly converts and sends message'() {
+        given:
+        def expected = Component.text('Hello, world!')
+
+        and:
+        provider.getMessage('message', Locale.ITALY) >> expected
+
+        and:
+        player.locale = Locale.ITALY
+
+        when:
+        messenger.sendTitle(player, 'message', 'message')
+
+        and:
+        def lastTitle = player.lastTitle
+
+        then:
+        lastTitle[TitlePart.TITLE] == expected
+
+        and:
+        lastTitle[TitlePart.SUBTITLE] == expected
+
+        and:
+        lastTitle[TitlePart.TIMES] == Title.Times.times(
+                Duration.of(1L, ChronoUnit.SECONDS),
+                Duration.of(2L, ChronoUnit.SECONDS),
+                Duration.of(1L, ChronoUnit.SECONDS)
+        )
     }
 
     def 'test that sendActionBar correctly converts and sends message'() {

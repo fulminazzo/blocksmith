@@ -6,6 +6,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.TitlePart;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -17,6 +18,12 @@ final class PlayerReceiver implements Receiver {
     @Override
     public @NotNull Audience toAudience() {
         return new Audience() {
+
+            @Override
+            public <T> void sendTitlePart(final @NotNull TitlePart<T> part,
+                                          final @NotNull T value) {
+                player.getLastTitle().put(part, value);
+            }
 
             @Override
             public void sendMessage(final @NotNull Identity source,
