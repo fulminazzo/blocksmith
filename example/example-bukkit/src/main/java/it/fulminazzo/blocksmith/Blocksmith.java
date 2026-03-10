@@ -29,7 +29,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
 public final class Blocksmith extends JavaPlugin implements Listener {
@@ -124,21 +123,17 @@ public final class Blocksmith extends JavaPlugin implements Listener {
     @EventHandler
     void on(final @NotNull PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        try {
-            getRepository().findById(player.getUniqueId())
-                    .thenCompose(u ->
-                            CompletableFuture.completedFuture(u.orElseGet(() -> new BlocksmithUser(
-                                    player.getUniqueId(),
-                                    "",
-                                    null
-                            )))
-                    ).thenCompose(u -> {
-                        u.setUsername(player.getName());
-                        return getRepository().save(u);
-                    }).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        getRepository().findById(player.getUniqueId())
+                .thenCompose(u ->
+                        CompletableFuture.completedFuture(u.orElseGet(() -> new BlocksmithUser(
+                                player.getUniqueId(),
+                                "",
+                                null
+                        )))
+                ).thenCompose(u -> {
+                    u.setUsername(player.getName());
+                    return getRepository().save(u);
+                });
     }
 
     public @NotNull Repository<BlocksmithUser, UUID> getRepository() {
