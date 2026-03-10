@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
@@ -17,6 +18,18 @@ public final class ReceiverFactories {
             .load(ReceiverFactory.class, ReceiverFactory.class.getClassLoader()).stream()
             .map(ServiceLoader.Provider::get)
             .collect(Collectors.toCollection(LinkedList::new));
+
+    /**
+     * Gets all receivers across all the factories.
+     *
+     * @return all the receivers
+     */
+    public static @NotNull Collection<Receiver> getAllReceivers() {
+        return factories.stream()
+                .map(ReceiverFactory::getAllReceivers)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+    }
 
     /**
      * Registers a new custom Receiver factory.
