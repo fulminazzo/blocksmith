@@ -4,9 +4,16 @@ import it.fulminazzo.blocksmith.message.UserData;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Locale;
 
 public final class UserDataReceiverFactory implements ReceiverFactory {
+
+    @Override
+    public @NotNull Collection<Receiver> getAllReceivers() {
+        return new ArrayList<>();
+    }
 
     @Override
     public @NotNull <R> Receiver create(final @NotNull R receiver) {
