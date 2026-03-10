@@ -4,8 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedList;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -13,10 +12,43 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReceiverFactories {
-    private static final @NotNull LinkedList<ReceiverFactory> factories = ServiceLoader
-            .load(ReceiverFactory.class, ReceiverFactory.class.getClassLoader()).stream()
-            .map(ServiceLoader.Provider::get)
-            .collect(Collectors.toCollection(LinkedList::new));
+    private static final @NotNull LinkedList<ReceiverFactory> factories;
+
+    static {
+        factories = new LinkedList<>();
+        factories.add(new ReceiverFactory() {
+
+            @Override
+            public @NotNull Collection<Receiver> getAllReceivers() {
+                return Collections.emptyList();
+            }
+
+            @Override
+            public @NotNull <R> Receiver create(final @NotNull R receiver) {
+                return (Receiver) receiver;
+            }
+
+            @Override
+            public boolean supports(final @NotNull Class<?> receiverType) {
+                return Receiver.class.isAssignableFrom(receiverType);
+            }
+        });
+        ServiceLoader.load(ReceiverFactory.class, ReceiverFactory.class.getClassLoader()).stream()
+                .map(ServiceLoader.Provider::get)
+                .forEach(factories::add);
+    }
+
+    /**
+     * Gets all receivers across all the factories.
+     *
+     * @return all the receivers
+     */
+    public static @NotNull Collection<Receiver> getAllReceivers() {
+        return factories.stream()
+                .map(ReceiverFactory::getAllReceivers)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+    }
 
     /**
      * Registers a new custom Receiver factory.

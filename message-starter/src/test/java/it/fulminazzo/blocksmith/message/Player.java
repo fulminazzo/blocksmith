@@ -6,12 +6,13 @@ import net.kyori.adventure.title.TitlePart;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Data
 public final class Player {
+    public static final @NotNull Collection<Player> ALL_PLAYERS = Arrays.asList(
+            new Player(), new Player(), new Player()
+    );
 
     private final @NotNull Map<TitlePart<?>, Object> lastTitle = new HashMap<>();
 

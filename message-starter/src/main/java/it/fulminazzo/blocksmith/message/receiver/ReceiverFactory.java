@@ -2,10 +2,20 @@ package it.fulminazzo.blocksmith.message.receiver;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+
 /**
  * Creates {@link Receiver} objects accordingly.
  */
 public interface ReceiverFactory {
+
+    /**
+     * Gets all the receivers of the platform.
+     * In Minecraft servers it will include all the players and the console.
+     *
+     * @return the receivers
+     */
+    @NotNull Collection<Receiver> getAllReceivers();
 
     /**
      * Creates a new Receiver from the given one.
