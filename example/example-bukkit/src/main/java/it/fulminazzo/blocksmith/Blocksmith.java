@@ -32,6 +32,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 
 public final class Blocksmith extends JavaPlugin implements Listener {
+    private static @Nullable Blocksmith instance;
+
     private final @NotNull Logger logger;
 
     @Getter
@@ -132,6 +134,10 @@ public final class Blocksmith extends JavaPlugin implements Listener {
 
     public @NotNull Repository<BlocksmithUser, UUID> getRepository() {
         return Objects.requireNonNull(repository, "repository has not been loaded yet");
+    }
+
+    public static @NotNull Blocksmith getInstance() {
+        return Objects.requireNonNull(instance, "plugin instance has not been initialized yet");
     }
 
 }
