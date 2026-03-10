@@ -16,6 +16,10 @@ commands:
     usage: '/<command>'
     permission: ${name_lower}.hello
     aliases: ['hi']
+  setlocale:
+    description: 'Updates the locale stored for the usser'
+    usage: '<red>/setlocale <dark_gray><<white>locale<dark_gray>>'
+    permission: ${name_lower}.setlocale
 
 permissions:
   ${name_lower}.${name_lower}reload:
@@ -23,4 +27,7 @@ permissions:
     default: op
   ${name_lower}.hello:
     description: 'Permission to execute command /hello'
+    default: true
+  ${name_lower}.setlocale:
+    description: 'Permission to execute command /setlocale'
     default: true
