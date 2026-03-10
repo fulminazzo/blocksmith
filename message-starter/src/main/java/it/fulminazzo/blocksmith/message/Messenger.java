@@ -10,10 +10,14 @@ import it.fulminazzo.blocksmith.message.receiver.ReceiverFactory;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.title.TitlePart;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.function.BiConsumer;
 
@@ -25,6 +29,61 @@ public final class Messenger {
     private final @NotNull Logger logger;
 
     private @Nullable MessageProvider messageProvider;
+
+    /**
+     * Sends a message to the given receiver through titles.
+     * If the message could not be found, a warning will be displayed
+     * and no error will be returned.
+     *
+     * @param <R>          the type of the receiver
+     * @param receiver     the receiver
+     * @param titleCode    the title message code
+     * @param subtitleCode the subtitle message code
+     * @param arguments    the arguments to apply to the message
+     */
+    public <R> void sendTitle(final @NotNull R receiver,
+                              final @Nullable String titleCode,
+                              final @Nullable String subtitleCode,
+                              final Argument @NotNull ... arguments) {
+        sendTitle(
+                receiver,
+                titleCode,
+                subtitleCode,
+                Title.Times.times(
+                        Duration.of(1L, ChronoUnit.SECONDS),
+                        Duration.of(2L, ChronoUnit.SECONDS),
+                        Duration.of(1L, ChronoUnit.SECONDS)
+                ),
+                arguments
+        );
+    }
+
+    /**
+     * Sends a message to the given receiver through titles.
+     * If the message could not be found, a warning will be displayed
+     * and no error will be returned.
+     *
+     * @param <R>          the type of the receiver
+     * @param receiver     the receiver
+     * @param titleCode    the title message code
+     * @param subtitleCode the subtitle message code
+     * @param times        the timings of the title
+     * @param arguments    the arguments to apply to the message
+     */
+    public <R> void sendTitle(final @NotNull R receiver,
+                              final @Nullable String titleCode,
+                              final @Nullable String subtitleCode,
+                              final @NotNull Title.Times times,
+                              final Argument @NotNull ... arguments) {
+        if (titleCode == null && subtitleCode == null) return;
+        ReceiverFactory factory = ReceiverFactories.get(receiver.getClass());
+        Receiver rec = factory.create(receiver);
+        rec.toAudience().sendTitlePart(TitlePart.TIMES, times);
+        if (subtitleCode != null)
+            sendMessageHelper((a, c) -> a.sendTitlePart(TitlePart.SUBTITLE, c), receiver, subtitleCode, arguments);
+        if (titleCode != null)
+            sendMessageHelper((a, c) -> a.sendTitlePart(TitlePart.TITLE, c), receiver, titleCode, arguments);
+    }
 
     /**
      * Sends a message to the given receiver through action bar.
