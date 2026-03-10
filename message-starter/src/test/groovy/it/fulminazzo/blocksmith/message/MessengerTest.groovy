@@ -32,6 +32,109 @@ class MessengerTest extends Specification {
         messenger = new Messenger(log).setMessageProvider(provider)
     }
 
+    def 'test that broadcastTitle correctly converts and sends message to all receivers'() {
+        given:
+        def expected = Component.text('Hello, world!')
+
+        and:
+        provider.getMessage('message', Locale.ITALY) >> expected
+
+        and:
+        Player.ALL_PLAYERS.each { it.locale = Locale.ITALY }
+
+        when:
+        messenger.broadcastTitle('message', 'message')
+
+        then:
+        for (def player : Player.ALL_PLAYERS) {
+            def lastTitle = player.lastTitle
+
+            assert lastTitle[TitlePart.TITLE] == expected
+
+            assert lastTitle[TitlePart.SUBTITLE] == expected
+
+            assert lastTitle[TitlePart.TIMES] == Title.Times.times(
+                    Duration.of(1L, ChronoUnit.SECONDS),
+                    Duration.of(2L, ChronoUnit.SECONDS),
+                    Duration.of(1L, ChronoUnit.SECONDS)
+            )
+        }
+    }
+
+    def 'test that broadcastTitle with times correctly converts and sends message to all receivers'() {
+        given:
+        def expected = Component.text('Hello, world!')
+
+        and:
+        def times = Title.Times.times(
+                Duration.of(2L, ChronoUnit.SECONDS),
+                Duration.of(4L, ChronoUnit.SECONDS),
+                Duration.of(2L, ChronoUnit.SECONDS)
+        )
+
+        and:
+        provider.getMessage('message', Locale.ITALY) >> expected
+
+        and:
+        Player.ALL_PLAYERS.each { it.locale = Locale.ITALY }
+
+        when:
+        messenger.broadcastTitle('message', 'message', times)
+
+        then:
+        for (def player : Player.ALL_PLAYERS) {
+            def lastTitle = player.lastTitle
+
+            assert lastTitle[TitlePart.TITLE] == expected
+
+            assert lastTitle[TitlePart.SUBTITLE] == expected
+
+            assert lastTitle[TitlePart.TIMES] == times
+        }
+    }
+
+    def 'test that broadcastActionBar correctly converts and sends message to all receivers'() {
+        given:
+        def expected = 'Hello, world!'
+
+        and:
+        provider.getMessage('message', Locale.ITALY) >> Component.text(expected)
+
+        and:
+        Player.ALL_PLAYERS.each { it.locale = Locale.ITALY }
+
+        when:
+        messenger.broadcastActionBar('message')
+
+        then:
+        for (def player : Player.ALL_PLAYERS) {
+            def lastMessage = player.lastMessage
+            assert lastMessage != null
+            assert ComponentUtils.toString(lastMessage) == expected
+        }
+    }
+
+    def 'test that broadcastMessage correctly converts and sends message to all receivers'() {
+        given:
+        def expected = 'Hello, world!'
+
+        and:
+        provider.getMessage('message', Locale.ITALY) >> Component.text('Hello, %what%!')
+
+        and:
+        Player.ALL_PLAYERS.each { it.locale = Locale.ITALY }
+
+        when:
+        messenger.broadcastMessage('message', Placeholder.of('what', 'world'))
+
+        then:
+        for (def player : Player.ALL_PLAYERS) {
+            def lastMessage = player.lastMessage
+            assert lastMessage != null
+            assert ComponentUtils.toString(lastMessage) == expected
+        }
+    }
+
     def 'test that sendTitle correctly converts and sends message'() {
         given:
         def expected = Component.text('Hello, world!')
@@ -67,9 +170,7 @@ class MessengerTest extends Specification {
         def expected = 'Hello, world!'
 
         and:
-        provider.getMessage('message', Locale.ITALY) >> {
-            Component.text('Hello, world!')
-        }
+        provider.getMessage('message', Locale.ITALY) >> Component.text(expected)
 
         and:
         player.locale = Locale.ITALY
@@ -88,9 +189,7 @@ class MessengerTest extends Specification {
         def expected = 'Hello, world!'
 
         and:
-        provider.getMessage('message', Locale.ITALY) >> {
-            Component.text('Hello, %what%!')
-        }
+        provider.getMessage('message', Locale.ITALY) >> Component.text('Hello, %what%!')
 
         and:
         player.locale = Locale.ITALY
