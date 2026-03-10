@@ -27,6 +27,27 @@ class MessengerTest extends Specification {
         messenger = new Messenger(log).setMessageProvider(provider)
     }
 
+    def 'test that sendActionBar correctly converts and sends message'() {
+        given:
+        def expected = 'Hello, world!'
+
+        and:
+        provider.getMessage('message', Locale.ITALY) >> {
+            Component.text('Hello, world!')
+        }
+
+        and:
+        player.locale = Locale.ITALY
+
+        when:
+        messenger.sendActionBar(player, 'message')
+
+        then:
+        def lastMessage = player.lastMessage
+        lastMessage != null
+        ComponentUtils.toString(lastMessage) == expected
+    }
+
     def 'test that sendMessage correctly converts and sends message'() {
         given:
         def expected = 'Hello, world!'

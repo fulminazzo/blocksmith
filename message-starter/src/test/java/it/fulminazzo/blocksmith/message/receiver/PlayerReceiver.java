@@ -25,6 +25,11 @@ final class PlayerReceiver implements Receiver {
                 player.setLastMessage(message);
             }
 
+            @Override
+            public void sendActionBar(final @NotNull Component message) {
+                player.setLastMessage(message);
+            }
+
         };
     }
 
