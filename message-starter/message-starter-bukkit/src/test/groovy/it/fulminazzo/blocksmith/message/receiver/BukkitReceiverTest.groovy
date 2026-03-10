@@ -5,24 +5,15 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
-import org.mockito.MockedStatic
-import org.mockito.Mockito
 import spock.lang.Specification
 
 class BukkitReceiverTest extends Specification {
 
-    MockedStatic<BukkitReceiver> mockedStatic
+    private BukkitAudiences adventure
 
     void setup() {
-        def adventure = Mock(BukkitAudiences)
+        adventure = Mock(BukkitAudiences)
         adventure.sender(_) >> Mock(Audience)
-
-        mockedStatic = Mockito.mockStatic(BukkitReceiver)
-        mockedStatic.when(BukkitReceiver::getAdventure).thenReturn(adventure)
-    }
-
-    void cleanup() {
-        mockedStatic.close()
     }
 
     def 'test that #toAudience converts receiver'() {
@@ -30,7 +21,7 @@ class BukkitReceiverTest extends Specification {
         def receiver = Mock(CommandSender)
 
         when:
-        def actual = new BukkitReceiver(receiver).toAudience()
+        def actual = new BukkitReceiver(adventure, receiver).toAudience()
 
         then:
         actual != null
@@ -41,7 +32,7 @@ class BukkitReceiverTest extends Specification {
         def receiver = Mock(CommandSender, additionalInterfaces: [Audience])
 
         when:
-        def actual = new BukkitReceiver(receiver).toAudience()
+        def actual = new BukkitReceiver(adventure, receiver).toAudience()
 
         then:
         actual == receiver
@@ -53,7 +44,7 @@ class BukkitReceiverTest extends Specification {
         receiver.locale >> Locale.ITALY.toString()
 
         when:
-        def actual = new BukkitReceiver(receiver).locale
+        def actual = new BukkitReceiver(adventure, receiver).locale
 
         then:
         actual == Locale.ITALY
@@ -64,7 +55,7 @@ class BukkitReceiverTest extends Specification {
         def receiver = Mock(ConsoleCommandSender)
 
         when:
-        def actual = new BukkitReceiver(receiver).locale
+        def actual = new BukkitReceiver(adventure, receiver).locale
 
         then:
         actual == Locale.default

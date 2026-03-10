@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.receiver
 
+import net.kyori.adventure.platform.bungeecord.BungeeAudiences
 import net.md_5.bungee.api.CommandSender
 import net.md_5.bungee.api.ProxyServer
 import net.md_5.bungee.api.connection.ProxiedPlayer
@@ -10,6 +11,8 @@ import spock.lang.Specification
 
 class BungeeReceiverTest extends Specification {
 
+    private static BungeeAudiences adventure
+
     void setupSpec() {
         def plugin = Mock(Plugin)
         def description = Mock(PluginDescription)
@@ -19,10 +22,9 @@ class BungeeReceiverTest extends Specification {
         server.console >> Mock(CommandSender)
         server.players >> []
         plugin.proxy >> server
-
         ProxyServer.instance = server
 
-        BungeeReceiver.setup(plugin)
+        adventure = BungeeAudiences.create(plugin)
     }
 
     def 'test that #toAudience converts receiver'() {
@@ -30,7 +32,7 @@ class BungeeReceiverTest extends Specification {
         def receiver = Mock(CommandSender)
 
         when:
-        def actual = new BungeeReceiver(receiver).toAudience()
+        def actual = new BungeeReceiver(adventure, receiver).toAudience()
 
         then:
         actual != null
@@ -42,7 +44,7 @@ class BungeeReceiverTest extends Specification {
         receiver.locale >> Locale.ITALY
 
         when:
-        def actual = new BungeeReceiver(receiver).locale
+        def actual = new BungeeReceiver(adventure, receiver).locale
 
         then:
         actual == Locale.ITALY
@@ -53,7 +55,7 @@ class BungeeReceiverTest extends Specification {
         def receiver = Mock(CommandSender)
 
         when:
-        def actual = new BungeeReceiver(receiver).locale
+        def actual = new BungeeReceiver(adventure, receiver).locale
 
         then:
         actual == Locale.default
