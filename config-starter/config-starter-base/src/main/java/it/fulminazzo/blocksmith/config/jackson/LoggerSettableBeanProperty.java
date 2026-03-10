@@ -5,9 +5,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import it.fulminazzo.blocksmith.util.ValidationUtils;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -23,14 +20,6 @@ import java.io.IOException;
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
-    private static final @NotNull Validator validator;
-
-    static {
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            validator = factory.getValidator();
-        }
-    }
-
     @Nullable Logger logger;
     @NotNull AnnotatedField field;
 
