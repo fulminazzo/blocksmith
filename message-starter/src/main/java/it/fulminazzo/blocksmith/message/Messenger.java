@@ -53,6 +53,23 @@ public final class Messenger {
      *
      * @param messageCode the message code
      * @param locale      the locale
+     * @return the component (if found)
+     */
+    public @Nullable Component getComponentOrNull(final @NotNull String messageCode,
+                                                  final @NotNull Locale locale) {
+        try {
+            return getMessageProvider().getMessage(messageCode, locale);
+        } catch (MessageNotFoundException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Gets a Text Adventure component from the given message code.
+     * Uses the internal {@link MessageProvider}.
+     *
+     * @param messageCode the message code
+     * @param locale      the locale
      * @return the component
      * @throws MessageNotFoundException in case the message code was invalid
      */
