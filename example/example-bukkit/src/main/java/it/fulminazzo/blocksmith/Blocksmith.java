@@ -10,7 +10,6 @@ import it.fulminazzo.blocksmith.data.file.FileDataSource;
 import it.fulminazzo.blocksmith.data.file.FileRepositorySettings;
 import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.provider.MessageProvider;
-import it.fulminazzo.blocksmith.message.util.LocaleUtils;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -96,20 +95,19 @@ public final class Blocksmith extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        try {
-            disable();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        disable();
     }
 
-    public void disable() throws IOException {
+    public void disable() {
         messenger.setMessageProvider(null);
 
         repository = null;
 
         if (dataSource != null) {
-            dataSource.close();
+            try {
+                dataSource.close();
+            } catch (IOException ignored) {
+            }
             dataSource = null;
         }
 
