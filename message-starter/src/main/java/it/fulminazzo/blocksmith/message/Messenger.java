@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message;
 
+import it.fulminazzo.blocksmith.message.argument.Argument;
 import it.fulminazzo.blocksmith.message.provider.MessageNotFoundException;
 import it.fulminazzo.blocksmith.message.provider.MessageProvider;
 import it.fulminazzo.blocksmith.message.receiver.Receiver;
@@ -30,13 +31,16 @@ public final class Messenger {
      * @param <R>         the type of the receiver
      * @param receiver    the receiver
      * @param messageCode the message code
+     * @param arguments   the arguments to apply to the message
      */
     public <R> void sendMessage(final @NotNull R receiver,
-                                final @NotNull String messageCode) {
+                                final @NotNull String messageCode,
+                                final Argument @NotNull ... arguments) {
         try {
             ReceiverFactory factory = ReceiverFactories.get(receiver.getClass());
             Receiver rec = factory.create(receiver);
             Component message = getComponent(messageCode, rec.getLocale());
+            for (Argument argument : arguments) message = argument.apply(message);
             rec.toAudience().sendMessage(message);
         } catch (MessageNotFoundException e) {
             logger.warn(e.getMessage());
