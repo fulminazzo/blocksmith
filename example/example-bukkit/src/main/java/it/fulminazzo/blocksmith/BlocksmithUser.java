@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith;
 
+import it.fulminazzo.blocksmith.data.entity.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public final class BlocksmithUser {
 
+    @Id
     @NotNull UUID uuid;
 
     @NotNull String username;
