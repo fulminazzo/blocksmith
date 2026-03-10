@@ -1,10 +1,12 @@
 package it.fulminazzo.blocksmith.message
 
 import groovy.util.logging.Slf4j
+import it.fulminazzo.blocksmith.message.argument.Placeholder
 import it.fulminazzo.blocksmith.message.provider.MessageNotFoundException
 import it.fulminazzo.blocksmith.message.provider.MessageProvider
 import it.fulminazzo.blocksmith.message.receiver.PlayerReceiverFactory
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories
+import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import net.kyori.adventure.text.Component
 import spock.lang.Specification
 
@@ -27,22 +29,23 @@ class MessengerTest extends Specification {
 
     def 'test that sendMessage correctly converts and sends message'() {
         given:
-        def expected = Component.text('Hello, world!')
+        def expected = 'Hello, world!'
 
         and:
         provider.getMessage('message', Locale.ITALY) >> {
-            expected
+            Component.text('Hello, %what%!')
         }
 
         and:
         player.locale = Locale.ITALY
 
         when:
-        messenger.sendMessage(player, 'message')
+        messenger.sendMessage(player, 'message', Placeholder.of('what', 'world'))
 
         then:
         def lastMessage = player.lastMessage
-        lastMessage == expected
+        lastMessage != null
+        ComponentUtils.toString(lastMessage) == expected
     }
 
     def 'test that sendMessage does not throw on not found'() {
