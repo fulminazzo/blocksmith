@@ -18,4 +18,12 @@ public interface TaskFactory {
      */
     @NotNull TaskBuilder schedule(final @NotNull Object owner, final @NotNull Consumer<Task> function);
 
+    /**
+     * Checks if the current factory supports the provided owner type.
+     *
+     * @param ownerType the owner type
+     * @return <code>true</code> if it does
+     */
+    boolean supportsOwner(final @NotNull Class<?> ownerType);
+
 }
