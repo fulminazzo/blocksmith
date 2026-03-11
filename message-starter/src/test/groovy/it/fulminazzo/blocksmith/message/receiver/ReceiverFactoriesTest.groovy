@@ -18,7 +18,7 @@ class ReceiverFactoriesTest extends Specification {
 
     def 'test that getAllReceivers cannot return two receivers of the same object'() {
         given:
-        def player = new Player()
+        def player = new Player('Luke')
 
         and:
         ReceiverFactories.registerCustomFactory(new PlayerReceiverFactory() {
