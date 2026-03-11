@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 final class FoliaTaskBuilder extends TaskBuilder {
 
-    FoliaTaskBuilder(final @NotNull Plugin owner, final @NotNull Consumer<Task> function) {
+    FoliaTaskBuilder(final @NotNull Object owner, final @NotNull Consumer<Task> function) {
         super(owner, function);
     }
 
