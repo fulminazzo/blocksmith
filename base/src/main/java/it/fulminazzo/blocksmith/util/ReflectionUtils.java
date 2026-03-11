@@ -26,10 +26,25 @@ public final class ReflectionUtils {
     );
 
     /**
+     * Checks if the specified class is available on runtime.
+     *
+     * @param className the class name
+     * @return <code>true</code> if it is
+     */
+    public static boolean isClassAvailable(final @NotNull String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    /**
      * Checks if a class is a primitive or a wrapper class.
      *
      * @param clazz the class to check
-     * @return the <code>true</code> if it is
+     * @return <code>true</code> if it is
      */
     public static boolean isPrimitiveOrWrapper(final @NotNull Class<?> clazz) {
         return clazz.isPrimitive() || WRAPPER_TYPES.contains(clazz);
