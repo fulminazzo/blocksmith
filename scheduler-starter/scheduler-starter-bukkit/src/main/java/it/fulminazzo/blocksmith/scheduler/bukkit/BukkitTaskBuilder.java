@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 final class BukkitTaskBuilder extends TaskBuilder {
 
-    BukkitTaskBuilder(final @NotNull Object owner, final @NotNull Consumer<Task> function) {
+    BukkitTaskBuilder(final @NotNull Plugin owner, final @NotNull Consumer<Task> function) {
         super(owner, function);
     }
 

@@ -12,7 +12,7 @@ public final class BukkitTaskFactory implements TaskFactory {
 
     @Override
     public @NotNull TaskBuilder schedule(final @NotNull Object owner, final @NotNull Consumer<Task> function) {
-        return new BukkitTaskBuilder(owner, function);
+        return new BukkitTaskBuilder((Plugin) owner, function);
     }
 
     @Override
