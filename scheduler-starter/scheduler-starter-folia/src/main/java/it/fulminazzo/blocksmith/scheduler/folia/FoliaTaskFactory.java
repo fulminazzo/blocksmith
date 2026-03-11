@@ -23,8 +23,9 @@ public final class FoliaTaskFactory implements TaskFactory {
         if (owner instanceof Pair<?, ?>) {
             Pair<?, ?> pair = (Pair<?, ?>) owner;
             Object actualOwner = pair.getSecond();
-            if (supportsOwner(actualOwner.getClass())) return new FoliaTaskBuilder(owner, function);
-            throw new IllegalArgumentException(String.format(errorMessage,
+            if (supportedTypes.stream().anyMatch(type -> type.isAssignableFrom(actualOwner.getClass())))
+                return new FoliaTaskBuilder(owner, function);
+            else throw new IllegalArgumentException(String.format(errorMessage,
                     FoliaTask.class.getSimpleName(),
                     actualOwner.getClass().getCanonicalName()
             ));
@@ -38,7 +39,7 @@ public final class FoliaTaskFactory implements TaskFactory {
     @Override
     public boolean supportsOwner(final @NotNull Class<?> ownerType) {
         if (Pair.class.isAssignableFrom(ownerType)) return true;
-        else return supportedTypes.stream().anyMatch(type -> type.isAssignableFrom(ownerType));
+        else return Plugin.class.isAssignableFrom(ownerType);
     }
 
 }
