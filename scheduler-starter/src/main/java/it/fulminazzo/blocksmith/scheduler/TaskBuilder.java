@@ -28,8 +28,8 @@ public abstract class TaskBuilder {
      *
      * @return the task
      */
-    public @NotNull Task schedule() {
-        return schedule(owner, function);
+    public @NotNull Task run() {
+        return run(owner, function);
     }
 
     /**
@@ -39,7 +39,7 @@ public abstract class TaskBuilder {
      * @param function the function to execute
      * @return the task
      */
-    protected abstract @NotNull Task schedule(final @NotNull Object owner, final @NotNull Consumer<Task> function);
+    protected abstract @NotNull Task run(final @NotNull Object owner, final @NotNull Consumer<Task> function);
 
     /**
      * Specifies how much time to wait before executing the task.

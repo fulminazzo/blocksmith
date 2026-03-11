@@ -21,7 +21,7 @@ class TaskFactoryTest extends Specification {
         runs.size() == 0
 
         when:
-        def task = factory.schedule(1L, t -> addRun()).schedule()
+        def task = factory.schedule(1L, t -> addRun()).run()
 
         then:
         task != null
@@ -42,7 +42,7 @@ class TaskFactoryTest extends Specification {
         when:
         def task = factory.schedule(1L, t -> addRun())
                 .delay(1, TimeUnit.SECONDS)
-                .schedule()
+                .run()
 
         then:
         task != null
@@ -67,7 +67,7 @@ class TaskFactoryTest extends Specification {
         })
                 .delay(1, TimeUnit.SECONDS)
                 .interval(1, TimeUnit.SECONDS)
-                .schedule()
+                .run()
 
         then:
         task != null
