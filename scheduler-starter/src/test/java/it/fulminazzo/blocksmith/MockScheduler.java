@@ -58,7 +58,10 @@ public final class MockScheduler {
 
     public boolean isCancelled(final long id) {
         Object task = tasks.get(id);
-        if (task instanceof ScheduledFuture) return ((ScheduledFuture<?>) task).isCancelled();
+        if (task instanceof ScheduledFuture) {
+            ScheduledFuture<?> future = ((ScheduledFuture<?>) task);
+            return future.isCancelled() || future.isDone();
+        }
         return task == null;
     }
 
