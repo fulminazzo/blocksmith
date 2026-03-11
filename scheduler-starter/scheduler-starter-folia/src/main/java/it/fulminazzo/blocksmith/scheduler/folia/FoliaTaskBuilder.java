@@ -1,11 +1,15 @@
 package it.fulminazzo.blocksmith.scheduler.folia;
 
 import io.papermc.paper.threadedregions.scheduler.AsyncScheduler;
+import io.papermc.paper.threadedregions.scheduler.EntityScheduler;
 import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
+import io.papermc.paper.threadedregions.scheduler.RegionScheduler;
 import it.fulminazzo.blocksmith.scheduler.Task;
 import it.fulminazzo.blocksmith.scheduler.TaskBuilder;
 import it.fulminazzo.blocksmith.structure.Pair;
+import org.bukkit.Location;
 import org.bukkit.Server;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +49,51 @@ final class FoliaTaskBuilder extends TaskBuilder {
                         TimeUnit.MILLISECONDS
                 ));
         } else {
+            if (owner instanceof Pair<?, ?>) {
+                Object actualOwner = ((Pair<?, ?>) owner).getSecond();
+                if (actualOwner instanceof Location) {
+                    Location location = (Location) actualOwner;
+                    RegionScheduler scheduler = server.getRegionScheduler();
+                    if (delay == null && interval == null)
+                        task.setInternal(scheduler.run(plugin, location, t -> function.accept(task)));
+                    else if (delay != null && interval == null)
+                        task.setInternal(scheduler.runDelayed(plugin,
+                                location,
+                                t -> function.accept(task),
+                                durationToTicks(delay)
+                        ));
+                    else
+                        task.setInternal(scheduler.runAtFixedRate(plugin,
+                                location,
+                                t -> function.accept(task),
+                                durationToTicks(delay),
+                                durationToTicks(interval)
+                        ));
+                    return task;
+                } else if (actualOwner instanceof Entity) {
+                    Entity entity = (Entity) actualOwner;
+                    EntityScheduler scheduler = entity.getScheduler();
+                    if (delay == null && interval == null)
+                        task.setInternal(scheduler.run(plugin, t -> function.accept(task), () -> {
+                        }));
+                    else if (delay != null && interval == null)
+                        task.setInternal(scheduler.runDelayed(plugin,
+                                t -> function.accept(task),
+                                () -> {
+                                },
+                                durationToTicks(delay)
+                        ));
+                    else
+                        task.setInternal(scheduler.runAtFixedRate(plugin,
+                                t -> function.accept(task),
+                                () -> {
+                                },
+                                durationToTicks(delay),
+                                durationToTicks(interval)
+                        ));
+                    return task;
+                }
+            }
             GlobalRegionScheduler scheduler = server.getGlobalRegionScheduler();
             if (delay == null && interval == null)
                 task.setInternal(scheduler.run(plugin, t -> function.accept(task)));
