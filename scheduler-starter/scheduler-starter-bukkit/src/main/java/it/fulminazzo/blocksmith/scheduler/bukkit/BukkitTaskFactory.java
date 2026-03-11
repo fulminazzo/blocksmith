@@ -22,7 +22,8 @@ public final class BukkitTaskFactory implements TaskFactory {
 
     @Override
     public boolean supportsOwner(final @NotNull Class<?> ownerType) {
-        return Plugin.class.isAssignableFrom(ownerType);
+        if (Pair.class.isAssignableFrom(ownerType)) return true;
+        else return Plugin.class.isAssignableFrom(ownerType);
     }
 
 }
