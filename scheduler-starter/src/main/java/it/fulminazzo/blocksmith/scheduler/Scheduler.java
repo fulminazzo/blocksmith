@@ -25,7 +25,11 @@ public final class Scheduler {
      * given consumer in a synchronous context.
      *
      * @param <T>      the type of the returned data
-     * @param owner    the owner of the task
+     * @param owner    the owner of the task. This usually refers to the application entry point (plugin object).
+     *                 However, in <b>Bukkit</b> platforms, if <a href="https://papermc.io/software/folia/">Folia</a>
+     *                 support is going to be a requisite, then it is suggested the usage of {@link it.fulminazzo.blocksmith.structure.Pair},
+     *                 with the plugin as first object and the interested object (plugin, location or entity) as second.
+     *                 This will create a seamless compatibility with Bukkit and Folia
      * @param function the future to complete before calling the function
      * @param then     the function to run
      * @return a future with the task responsible for executing the function
@@ -39,7 +43,11 @@ public final class Scheduler {
     /**
      * Schedules a new task.
      *
-     * @param owner    the owner of the task
+     * @param owner    the owner of the task. This usually refers to the application entry point (plugin object).
+     *                 However, in <b>Bukkit</b> platforms, if <a href="https://papermc.io/software/folia/">Folia</a>
+     *                 support is going to be a requisite, then it is suggested the usage of {@link it.fulminazzo.blocksmith.structure.Pair},
+     *                 with the plugin as first object and the interested object (plugin, location or entity) as second.
+     *                 This will create a seamless compatibility with Bukkit and Folia
      * @param function the function to run
      * @return the task builder (to specify how the task should be run)
      */
