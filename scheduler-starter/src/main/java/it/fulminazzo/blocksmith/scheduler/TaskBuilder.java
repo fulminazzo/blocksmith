@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * A builder for {@link Task}.
@@ -34,8 +35,20 @@ public abstract class TaskBuilder {
      */
     public @NotNull Task repeated(final @Range(from = 1, to = Integer.MAX_VALUE) int times) {
         AtomicInteger atomicInteger = new AtomicInteger(0);
+        return repeated(t -> atomicInteger.incrementAndGet() > times);
+    }
+
+    /**
+     * Schedules the task for execution, then executes it until a certain condition is met.
+     * <br>
+     * If {@link #delay} has not been set, this will have no effect.
+     *
+     * @param condition the condition to check
+     * @return the task
+     */
+    public @NotNull Task repeated(final @NotNull Predicate<Task> condition) {
         return run(owner, t -> {
-            if (atomicInteger.incrementAndGet() > times) t.cancel();
+            if (condition.test(t)) t.cancel();
             else function.accept(t);
         });
     }
