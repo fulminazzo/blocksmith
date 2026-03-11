@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.BlocksmithUser;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.util.LocaleUtils;
 import it.fulminazzo.blocksmith.scheduler.Scheduler;
+import it.fulminazzo.blocksmith.structure.Pair;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -32,7 +33,7 @@ public final class SetLocaleCommand implements TabExecutor {
             } else {
                 Player player = (Player) sender;
                 Scheduler.runAsyncThen(
-                        plugin,
+                        Pair.of(plugin, player),
                         plugin.getRepository().findById(player.getUniqueId()).thenCompose(u -> {
                             BlocksmithUser user = u.orElseGet(() -> new BlocksmithUser(player.getUniqueId(), player.getName(), null));
                             user.setLocale(LocaleUtils.fromString(args[0]));
