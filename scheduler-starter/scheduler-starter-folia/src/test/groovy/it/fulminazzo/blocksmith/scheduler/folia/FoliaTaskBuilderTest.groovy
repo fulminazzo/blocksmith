@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.scheduler.folia
 
+import be.seeseemelk.mockbukkit.MockBukkit
 import io.papermc.paper.threadedregions.scheduler.AsyncScheduler
 import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
@@ -10,6 +11,14 @@ import spock.lang.Specification
 import java.time.Duration
 
 class FoliaTaskBuilderTest extends Specification {
+
+    void setupSpec() {
+        MockBukkit.mock()
+    }
+
+    void cleanupSpec() {
+        MockBukkit.unmock()
+    }
 
     def 'test that run with #delay, #interval and #async calls on #expectedMethod'() {
         given:
@@ -40,7 +49,7 @@ class FoliaTaskBuilderTest extends Specification {
 
         then:
         1 * scheduler."$expectedMethod"(*_) >> { a ->
-            a[1].run()
+            a[1].accept(null)
             return internal
         }
 
