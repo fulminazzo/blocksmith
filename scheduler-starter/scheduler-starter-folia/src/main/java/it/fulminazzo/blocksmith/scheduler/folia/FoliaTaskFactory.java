@@ -17,7 +17,12 @@ public final class FoliaTaskFactory implements TaskFactory {
 
     @Override
     public boolean supportsOwner(final @NotNull Class<?> ownerType) {
-        return Plugin.class.isAssignableFrom(ownerType);
+        try {
+            Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
+            return Plugin.class.isAssignableFrom(ownerType);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
 }
