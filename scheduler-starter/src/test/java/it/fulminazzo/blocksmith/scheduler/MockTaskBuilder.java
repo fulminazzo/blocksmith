@@ -13,9 +13,9 @@ public final class MockTaskBuilder extends TaskBuilder {
 
     @Override
     protected @NotNull Task schedule(final @NotNull Object owner, final @NotNull Consumer<Task> function) {
-        MockTask task = new MockTask((Long) owner, async);
+        MockTask task = new MockTask((long) owner, async);
         MockScheduler.INSTANCE.schedule(
-                task.getOwner(),
+                (long) task.getOwner(),
                 () -> function.accept(task),
                 delay == null ? null : delay.toMillis(),
                 interval == null ? null : interval.toMillis(),
