@@ -12,7 +12,10 @@ public final class BukkitTaskFactory implements TaskFactory {
 
     @Override
     public @NotNull TaskBuilder schedule(final @NotNull Object owner, final @NotNull Consumer<Task> function) {
-        return new BukkitTaskBuilder((Plugin) owner, function);
+        if (supportsOwner(owner.getClass())) return new BukkitTaskBuilder(owner, function);
+        else throw new IllegalArgumentException(String.format("%s does not support owner type: %s",
+                BukkitTask.class.getSimpleName(), owner.getClass().getCanonicalName()
+        ));
     }
 
     @Override

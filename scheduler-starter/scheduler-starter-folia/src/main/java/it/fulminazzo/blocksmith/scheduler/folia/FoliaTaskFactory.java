@@ -12,7 +12,10 @@ public final class FoliaTaskFactory implements TaskFactory {
 
     @Override
     public @NotNull TaskBuilder schedule(final @NotNull Object owner, final @NotNull Consumer<Task> function) {
-        return new FoliaTaskBuilder((Plugin) owner, function);
+        if (supportsOwner(owner.getClass())) return new FoliaTaskBuilder(owner, function);
+        else throw new IllegalArgumentException(String.format("%s does not support owner type: %s",
+                FoliaTask.class.getSimpleName(), owner.getClass().getCanonicalName()
+        ));
     }
 
     @Override

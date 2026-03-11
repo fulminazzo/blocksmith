@@ -12,7 +12,10 @@ public final class BungeeTaskFactory implements TaskFactory {
 
     @Override
     public @NotNull TaskBuilder schedule(final @NotNull Object owner, final @NotNull Consumer<Task> function) {
-        return new BungeeTaskBuilder((Plugin) owner, function);
+        if (supportsOwner(owner.getClass())) return new BungeeTaskBuilder(owner, function);
+        else throw new IllegalArgumentException(String.format("%s does not support owner type: %s",
+                BungeeTask.class.getSimpleName(), owner.getClass().getCanonicalName()
+        ));
     }
 
     @Override
