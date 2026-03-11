@@ -27,8 +27,8 @@ class BukkitTaskBuilderTest extends Specification {
         def builder = new BukkitTaskBuilder(owner, (t) -> {
             assert t != null
         })
-                .delay(delay)
-                .interval(interval)
+        if (delay != null) builder.delay(delay)
+        if (interval != null) builder.interval(interval)
 
         and:
         if (async) builder.async()

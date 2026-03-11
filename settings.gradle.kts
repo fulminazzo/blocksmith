@@ -53,6 +53,7 @@ include("message-starter:message-starter-velocity")
 include("scheduler-starter")
 
 include("scheduler-starter:scheduler-starter-bukkit")
+include("scheduler-starter:scheduler-starter-folia")
 include("scheduler-starter:scheduler-starter-bungeecord")
 include("scheduler-starter:scheduler-starter-velocity")
 
