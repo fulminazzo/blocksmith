@@ -4,6 +4,7 @@ import io.papermc.paper.threadedregions.scheduler.AsyncScheduler;
 import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
 import it.fulminazzo.blocksmith.scheduler.Task;
 import it.fulminazzo.blocksmith.scheduler.TaskBuilder;
+import it.fulminazzo.blocksmith.structure.Pair;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,7 @@ final class FoliaTaskBuilder extends TaskBuilder {
     protected @NotNull Task run(final @NotNull Object owner,
                                 final @NotNull Consumer<Task> function) {
         FoliaTask task = new FoliaTask(async);
-        Plugin plugin = (Plugin) owner;
+        Plugin plugin = getPlugin(owner);
         Server server = plugin.getServer();
 
         if (async) {
@@ -65,6 +66,20 @@ final class FoliaTaskBuilder extends TaskBuilder {
 
     private long durationToTicks(final @Nullable Duration duration) {
         return duration == null ? 0 : duration.toMillis() / 50;
+    }
+
+    private static @NotNull Plugin getPlugin(@NotNull Object owner) {
+        final Object pluginObject;
+        if (owner instanceof Pair<?, ?>) pluginObject = ((Pair<?, ?>) owner).getFirst();
+        else pluginObject = owner;
+
+        final Plugin plugin;
+        if (pluginObject instanceof Plugin) plugin = (Plugin) pluginObject;
+        else throw new IllegalArgumentException(String.format("Invalid owner type '%s': expected %s",
+                pluginObject == null ? "null" : pluginObject.getClass().getCanonicalName(),
+                Plugin.class.getCanonicalName())
+        );
+        return plugin;
     }
 
 }
