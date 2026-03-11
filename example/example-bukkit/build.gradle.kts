@@ -28,6 +28,11 @@ tasks.jar {
 }
 
 tasks.shadowJar {
+    filesMatching("META-INF/services/**") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+    mergeServiceFiles()
+
     archiveBaseName = getFileBaseName()
     archiveClassifier = ""
 
