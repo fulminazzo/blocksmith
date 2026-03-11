@@ -2,12 +2,30 @@ package it.fulminazzo.blocksmith.scheduler;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
  * A factory to build and instantiate {@link Task} objects.
  */
 public interface TaskFactory {
+
+    /**
+     * Executes the given future asynchronously.
+     * Then, it will pass the result of the computation to the
+     * given consumer in a synchronous context.
+     *
+     * @param <T>      the type of the returned data
+     * @param owner    the owner of the task
+     * @param function the future to complete before calling the function
+     * @param then     the function to run
+     * @return a future with the task responsible for executing the function
+     */
+    default <T> @NotNull CompletableFuture<Task> runAsyncThen(final @NotNull Object owner,
+                                                              final @NotNull CompletableFuture<T> function,
+                                                              final @NotNull Consumer<T> then) {
+        return function.thenApply(r -> schedule(owner, t -> then.accept(r)).run());
+    }
 
     /**
      * Schedules a new task.

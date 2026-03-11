@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.scheduler
 
 import spock.lang.Specification
 
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 class TaskFactoryTest extends Specification {
@@ -13,7 +14,7 @@ class TaskFactoryTest extends Specification {
         runs.clear()
     }
 
-    def 'test schedule task run once'() {
+    def 'test schedule task runs once'() {
         given:
         def now = now
 
@@ -32,7 +33,7 @@ class TaskFactoryTest extends Specification {
         runs.get(0) - now <= 200
     }
 
-    def 'test schedule task run after delay'() {
+    def 'test schedule task runs after delay'() {
         given:
         def now = now
 
@@ -53,7 +54,7 @@ class TaskFactoryTest extends Specification {
         runs.get(0) - now >= 1000
     }
 
-    def 'test schedule repeating task run after delay'() {
+    def 'test schedule repeating task runs after delay'() {
         given:
         def now = now
 
@@ -92,7 +93,7 @@ class TaskFactoryTest extends Specification {
         third <= 4000
     }
 
-    def 'test schedule asynchronous task run once'() {
+    def 'test schedule asynchronous task runs once'() {
         given:
         def now = now
 
@@ -114,7 +115,7 @@ class TaskFactoryTest extends Specification {
         runs.get(0) - now <= 200
     }
 
-    def 'test schedule asynchronous task run after delay'() {
+    def 'test schedule asynchronous task runs after delay'() {
         given:
         def now = now
 
@@ -139,7 +140,7 @@ class TaskFactoryTest extends Specification {
         runs.get(0) - now >= 1000
     }
 
-    def 'test schedule asynchronous repeating task run after delay'() {
+    def 'test schedule asynchronous repeating task runs after delay'() {
         given:
         def now = now
 
@@ -180,6 +181,78 @@ class TaskFactoryTest extends Specification {
         def third = runs.get(2) - now
         third >= 3000
         third <= 4000
+    }
+
+    def 'test schedule repeating task with given amount of times runs after delay'() {
+        given:
+        def now = now
+        def times = 0
+
+        expect:
+        runs.size() == 0
+
+        when:
+        def task = factory.schedule(6L, t -> {
+            times++
+            addRun()
+        })
+                .delay(1, TimeUnit.SECONDS)
+                .interval(1, TimeUnit.SECONDS)
+                .repeated(3)
+
+        then:
+        task != null
+        task.cancelled
+
+        and:
+        runs.size() == 3
+        times == 3
+
+        and:
+        def first = runs.get(0) - now
+        first >= 1000
+        first <= 2000
+
+        and:
+        def second = runs.get(1) - now
+        second >= 2000
+        second <= 3000
+
+        and:
+        def third = runs.get(2) - now
+        third >= 3000
+        third <= 4000
+    }
+
+    def 'test that runAsyncThen works'() {
+        given:
+        def value = 0
+
+        expect:
+        runs.size() == 0
+
+        when:
+        def future = factory.runAsyncThen(
+                7L,
+                CompletableFuture.supplyAsync(() -> 1),
+                n -> {
+                    value = 1
+                    addRun()
+                }
+        )
+
+        and:
+        def task = future.get()
+
+        then:
+        task != null
+        task.cancelled
+
+        and:
+        runs.size() == 1
+
+        and:
+        value == 1
     }
 
     private void addRun() {

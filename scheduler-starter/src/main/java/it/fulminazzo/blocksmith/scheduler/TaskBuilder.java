@@ -8,7 +8,9 @@ import org.jetbrains.annotations.Range;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * A builder for {@link Task}.
@@ -22,6 +24,34 @@ public abstract class TaskBuilder {
     protected @Nullable Duration interval;
 
     protected boolean async;
+
+    /**
+     * Schedules the task for execution, then executes it for the specified times.
+     * <br>
+     * If {@link #delay} has not been set, this will have no effect.
+     *
+     * @param times how many times the task should run before stopping
+     * @return the task
+     */
+    public @NotNull Task repeated(final @Range(from = 1, to = Integer.MAX_VALUE) int times) {
+        AtomicInteger atomicInteger = new AtomicInteger(0);
+        return repeated(t -> atomicInteger.incrementAndGet() > times);
+    }
+
+    /**
+     * Schedules the task for execution, then executes it until a certain condition is met.
+     * <br>
+     * If {@link #delay} has not been set, this will have no effect.
+     *
+     * @param condition the condition to check
+     * @return the task
+     */
+    public @NotNull Task repeated(final @NotNull Predicate<Task> condition) {
+        return run(owner, t -> {
+            if (condition.test(t)) t.cancel();
+            else function.accept(t);
+        });
+    }
 
     /**
      * Schedules the task for execution.
@@ -60,6 +90,7 @@ public abstract class TaskBuilder {
      * @return this object (for method chaining)
      */
     public @NotNull TaskBuilder delay(final @NotNull Duration delay) {
+        if (delay.isNegative()) throw new IllegalArgumentException("Invalid delay: must be at least zero");
         this.delay = delay;
         return this;
     }
@@ -83,6 +114,7 @@ public abstract class TaskBuilder {
      * @return this object (for method chaining)
      */
     public @NotNull TaskBuilder interval(final @NotNull Duration interval) {
+        if (interval.isNegative()) throw new IllegalArgumentException("Invalid delay: must be at least zero");
         this.interval = interval;
         return this;
     }
