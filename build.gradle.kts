@@ -42,11 +42,6 @@ allprojects {
         testImplementation(rootProject.libs.bundles.test.framework)
     }
 
-    java {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
     tasks.test {
         useJUnitPlatform()
     }
@@ -58,6 +53,19 @@ allprojects {
         buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
         buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
         buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
+    }
+
+    tasks.compileJava {
+        if (project.name.endsWith("-folia")) {
+            sourceCompatibility = JavaVersion.VERSION_21.toString()
+            targetCompatibility = JavaVersion.VERSION_21.toString()
+        } else if (project.name.endsWith("-velocity")) {
+            sourceCompatibility = JavaVersion.VERSION_17.toString()
+            targetCompatibility = JavaVersion.VERSION_17.toString()
+        } else {
+            sourceCompatibility = JavaVersion.VERSION_11.toString()
+            targetCompatibility = JavaVersion.VERSION_11.toString()
+        }
     }
 
     tasks.compileTestJava {
