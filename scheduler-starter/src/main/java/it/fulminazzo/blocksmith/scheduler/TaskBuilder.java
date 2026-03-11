@@ -24,22 +24,22 @@ public abstract class TaskBuilder {
     protected boolean async;
 
     /**
-     * Builds the task.
+     * Schedules the task for execution.
      *
      * @return the task
      */
-    public @NotNull Task build() {
-        return build(owner, function);
+    public @NotNull Task schedule() {
+        return schedule(owner, function);
     }
 
     /**
-     * Builds the task.
+     * Schedules the task for execution.
      *
      * @param owner    the owner of the task
      * @param function the function to execute
      * @return the task
      */
-    protected abstract @NotNull Task build(final @NotNull Object owner, final @NotNull Consumer<Task> function);
+    protected abstract @NotNull Task schedule(final @NotNull Object owner, final @NotNull Consumer<Task> function);
 
     /**
      * Specifies how much time to wait before executing the task.
