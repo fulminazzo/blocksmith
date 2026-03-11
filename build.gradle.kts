@@ -38,7 +38,7 @@ allprojects {
     }
 
     tasks.compileTestJava {
-        if (project.name.endsWith("-velocity")) {
+        if (project.name.endsWith("-velocity") || project.name.endsWith("-folia")) {
             sourceCompatibility = JavaVersion.VERSION_17.toString()
             targetCompatibility = JavaVersion.VERSION_17.toString()
         } else {
