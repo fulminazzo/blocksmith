@@ -16,6 +16,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 
 @RequiredArgsConstructor
 public final class SetLocaleCommand implements TabExecutor {
@@ -40,7 +41,10 @@ public final class SetLocaleCommand implements TabExecutor {
                             return plugin.getRepository().save(user);
                         }),
                         u -> plugin.getMessenger().sendMessage(sender, "success.set-locale", Placeholder.of("locale", args[0]))
-                );
+                ).exceptionally(t -> {
+                    plugin.getLogger().log(Level.WARNING, "Error while executing task", t.getCause());
+                    return null;
+                });
             }
         } else plugin.getMessenger().sendMessage(sender, "error.console-cannot-execute");
         return true;
