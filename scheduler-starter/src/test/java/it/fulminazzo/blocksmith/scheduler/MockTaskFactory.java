@@ -11,4 +11,9 @@ public final class MockTaskFactory implements TaskFactory {
         return new MockTaskBuilder(owner, function);
     }
 
+    @Override
+    public boolean supportsOwner(final @NotNull Class<?> ownerType) {
+        return Long.class.isAssignableFrom(ownerType);
+    }
+
 }
