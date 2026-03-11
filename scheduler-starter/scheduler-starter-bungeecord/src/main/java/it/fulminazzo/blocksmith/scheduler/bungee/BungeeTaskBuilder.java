@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 final class BungeeTaskBuilder extends TaskBuilder {
 
-    BungeeTaskBuilder(final @NotNull Plugin owner, final @NotNull Consumer<Task> function) {
+    BungeeTaskBuilder(final @NotNull Object owner, final @NotNull Consumer<Task> function) {
         super(owner, function);
     }
 
