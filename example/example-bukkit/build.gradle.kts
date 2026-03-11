@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":message-starter:message-starter-translation"))
 
     implementation(project(":scheduler-starter:scheduler-starter-bukkit"))
+    implementation(project(":scheduler-starter:scheduler-starter-folia"))
 
     compileOnly(libs.spigot)
 

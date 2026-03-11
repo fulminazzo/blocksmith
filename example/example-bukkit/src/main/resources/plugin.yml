@@ -4,6 +4,7 @@ version: ${version}
 authors: [ 'Fulminazzo' ]
 main: ${group}.${name_lower}.${name}
 api-version: '1.13'
+folia-supported: true
 
 commands:
   ${name_lower}reload:
