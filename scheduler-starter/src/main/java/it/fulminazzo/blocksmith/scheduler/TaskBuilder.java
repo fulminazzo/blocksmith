@@ -60,6 +60,7 @@ public abstract class TaskBuilder {
      * @return this object (for method chaining)
      */
     public @NotNull TaskBuilder delay(final @NotNull Duration delay) {
+        if (delay.isNegative()) throw new IllegalArgumentException("Invalid delay: must be at least zero");
         this.delay = delay;
         return this;
     }
@@ -83,6 +84,7 @@ public abstract class TaskBuilder {
      * @return this object (for method chaining)
      */
     public @NotNull TaskBuilder interval(final @NotNull Duration interval) {
+        if (interval.isNegative()) throw new IllegalArgumentException("Invalid delay: must be at least zero");
         this.interval = interval;
         return this;
     }
