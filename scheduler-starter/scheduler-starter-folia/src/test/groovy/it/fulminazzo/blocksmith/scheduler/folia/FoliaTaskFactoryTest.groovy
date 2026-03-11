@@ -42,8 +42,9 @@ class FoliaTaskFactoryTest extends Specification {
             server.regionScheduler >> {
                 def scheduler = Mock(RegionScheduler)
                 scheduler.run(_ as Plugin, _ as Location, _ as Consumer) >> { a ->
-                    a[1].accept(null)
+                    a[2].accept(null)
                 }
+                return scheduler
             }
             return server
         }
@@ -58,6 +59,7 @@ class FoliaTaskFactoryTest extends Specification {
             scheduler.run(_ as Plugin, _ as Consumer, _ as Runnable) >> { a ->
                 a[1].accept(null)
             }
+            return scheduler
         }
 
         and:
