@@ -30,6 +30,16 @@ tasks.jar {
 tasks.shadowJar {
     archiveBaseName = getFileBaseName()
     archiveClassifier = ""
+
+    val base = "${rootProject.group}.${rootProject.name}.libs."
+
+    relocate("com.fasterxml.jackson", base + "jackson")
+    relocate("jakarta.validation", base + "validation")
+    relocate("net.kyori", base + "kyori")
+    relocate("org.apache.bval", base + "bval")
+    relocate("org.joor", base + "joor")
+    relocate("org.slf4j", base + "slf4j")
+    relocate("org.yaml.snakeyaml", base + "snakeyaml")
 }
 
 tasks.processResources {
