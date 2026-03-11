@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Range;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
@@ -22,6 +23,22 @@ public abstract class TaskBuilder {
     protected @Nullable Duration interval;
 
     protected boolean async;
+
+    /**
+     * Schedules the task for execution, then executes it for the specified times.
+     * <br>
+     * If {@link #delay} has not been set, this will have no effect.
+     *
+     * @param times how many times the task should run before stopping
+     * @return the task
+     */
+    public @NotNull Task repeated(final @Range(from = 1, to = Integer.MAX_VALUE) int times) {
+        AtomicInteger atomicInteger = new AtomicInteger(0);
+        return run(owner, t -> {
+            if (atomicInteger.incrementAndGet() > times) t.cancel();
+            else function.accept(t);
+        });
+    }
 
     /**
      * Schedules the task for execution.
