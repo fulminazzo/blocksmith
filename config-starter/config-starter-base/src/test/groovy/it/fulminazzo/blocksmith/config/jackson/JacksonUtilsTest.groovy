@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonStreamContext
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import spock.lang.Specification
-import spock.mock.MockMakers
 
 class JacksonUtilsTest extends Specification {
 
@@ -85,30 +84,77 @@ class JacksonUtilsTest extends Specification {
         def parser = Mock(JsonParser)
 
         and:
-        def property = Mock(JsonStreamContext, mockMaker: MockMakers.mockito)
-        property.inArray() >> false
-        property.currentName >> 'property'
+        def root = new JsonStreamContext(JsonStreamContext.TYPE_ROOT, 1) {
+
+            @Override
+            JsonStreamContext getParent() {
+                return null
+            }
+
+            @Override
+            String getCurrentName() {
+                return null
+            }
+
+        }
+
+        def container = new JsonStreamContext(JsonStreamContext.TYPE_OBJECT, 2) {
+
+            @Override
+            JsonStreamContext getParent() {
+                return root
+            }
+
+            @Override
+            String getCurrentName() {
+                return 'container'
+            }
+
+        }
+
+        def array = new JsonStreamContext(JsonStreamContext.TYPE_ARRAY, 3) {
+
+            @Override
+            JsonStreamContext getParent() {
+                return container
+            }
+
+            @Override
+            String getCurrentName() {
+                return 'array'
+            }
+
+        }
+
+        def object = new JsonStreamContext(JsonStreamContext.TYPE_OBJECT, 4) {
+
+            @Override
+            JsonStreamContext getParent() {
+                return array
+            }
+
+            @Override
+            String getCurrentName() {
+                return 'object'
+            }
+
+        }
+
+        def property = new JsonStreamContext(JsonStreamContext.TYPE_OBJECT, 5) {
+
+            @Override
+            JsonStreamContext getParent() {
+                return object
+            }
+
+            @Override
+            String getCurrentName() {
+                return 'property'
+            }
+
+        }
+
         parser.parsingContext >> property
-
-        def object = Mock(JsonStreamContext, mockMaker: MockMakers.mockito)
-        object.inArray() >> false
-        object.currentName >> 'object'
-        property.parent >> object
-
-        def array = Mock(JsonStreamContext, mockMaker: MockMakers.mockito)
-        array.inArray() >> true
-        array.currentIndex >> 3
-        object.parent >> array
-
-        def container = Mock(JsonStreamContext, mockMaker: MockMakers.mockito)
-        container.inArray() >> false
-        container.currentName >> 'container'
-        array.parent >> container
-
-        def root = Mock(JsonStreamContext, mockMaker: MockMakers.mockito)
-        root.inArray() >> false
-        root.currentName >> null
-        container.parent >> root
 
         when:
         def path = JacksonUtils.getCurrentPath(parser)
@@ -123,9 +169,19 @@ class JacksonUtilsTest extends Specification {
 
         and:
 
-        def root = Mock(JsonStreamContext, mockMaker: MockMakers.mockito)
-        root.inArray() >> false
-        root.currentName >> null
+        def root = new JsonStreamContext(JsonStreamContext.TYPE_ROOT, 0) {
+
+            @Override
+            JsonStreamContext getParent() {
+                return null
+            }
+
+            @Override
+            String getCurrentName() {
+                return null
+            }
+
+        }
         parser.parsingContext >> root
 
         when:
