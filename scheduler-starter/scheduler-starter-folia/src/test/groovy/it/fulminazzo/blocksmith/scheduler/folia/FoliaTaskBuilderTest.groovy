@@ -29,8 +29,8 @@ class FoliaTaskBuilderTest extends Specification {
         def builder = new FoliaTaskBuilder(owner, (t) -> {
             assert t != null
         })
-                .delay(delay)
-                .interval(interval)
+        if (delay != null) builder.delay(delay)
+        if (interval != null) builder.interval(interval)
 
         and:
         if (async) builder.async()
