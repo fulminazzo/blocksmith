@@ -32,6 +32,7 @@ allprojects {
     dependencies {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
+        testAnnotationProcessor(rootProject.libs.lombok)
 
         val baseProjectName = "base"
         if (project.name != baseProjectName) api(project(":$baseProjectName"))

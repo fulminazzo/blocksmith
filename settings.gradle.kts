@@ -48,3 +48,11 @@ include("message-starter:message-starter-translation")
 include("message-starter:message-starter-bukkit")
 include("message-starter:message-starter-bungeecord")
 include("message-starter:message-starter-velocity")
+
+
+include("scheduler-starter")
+
+include("scheduler-starter:scheduler-starter-bukkit")
+include("scheduler-starter:scheduler-starter-bungeecord")
+include("scheduler-starter:scheduler-starter-velocity")
+
