@@ -7,9 +7,11 @@ byte_buddy = "1.18.2"
 mockito_core = "4.11.0"
 
 spigot = "1.16.5-R0.1-SNAPSHOT"
-folia = "1.20.4-R0.1-SNAPSHOT"
+folia = "1.20.6-R0.1-SNAPSHOT"
 bungeecord = "1.16-R0.2"
 velocity = "3.0.0-SNAPSHOT"
+
+mockbukkit = "3.93.2"
 
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
@@ -23,6 +25,8 @@ spigot = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
 folia = { module = "dev.folia:folia-api", version.ref = "folia" }
 bungeecord = { module = "net.md-5:bungeecord-api", version.ref = "bungeecord" }
 velocity = { module = "com.velocitypowered:velocity-api", version.ref = "velocity" }
+
+mockbukkit = { module = "com.github.seeseemelk:MockBukkit-v1.20", version.ref = "mockbukkit" }
 
 [bundles]
 annotations = ["lombok", "jetbrains_annotations"]
