@@ -13,7 +13,9 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public final class BlocksmithReceiverFactory implements ReceiverFactory {
@@ -34,6 +36,8 @@ public final class BlocksmithReceiverFactory implements ReceiverFactory {
     }
 
     static final class BlocksmithReceiver implements Receiver {
+        private static final @NotNull Map<UUID, Locale> cache = new ConcurrentHashMap<>();
+
         @Getter
         private final @NotNull Player internal;
         private final @NotNull Receiver defaultReceiver;
@@ -50,15 +54,10 @@ public final class BlocksmithReceiverFactory implements ReceiverFactory {
 
         @Override
         public @NotNull Locale getLocale() {
-            try {
-                return Blocksmith.getInstance().getRepository().findById(internal.getUniqueId())
-                        .thenApply(u -> u.map(BlocksmithUser::getLocale)
-                                .orElseGet(defaultReceiver::getLocale)
-                        )
-                        .get();
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
+            UUID uuid = internal.getUniqueId();
+            Blocksmith.getInstance().getRepository().findById(uuid)
+                    .thenAccept(o -> o.ifPresent(u -> cache.put(uuid, u.getLocale())));
+            return cache.getOrDefault(uuid, defaultReceiver.getLocale());
         }
 
     }

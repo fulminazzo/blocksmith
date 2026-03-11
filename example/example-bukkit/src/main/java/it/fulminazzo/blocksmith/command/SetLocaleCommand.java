@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.Blocksmith;
 import it.fulminazzo.blocksmith.BlocksmithUser;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.util.LocaleUtils;
+import it.fulminazzo.blocksmith.scheduler.Scheduler;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -30,12 +31,14 @@ public final class SetLocaleCommand implements TabExecutor {
                 plugin.getMessenger().sendMessage(sender, "usage", Placeholder.of("usage", command.getUsage()));
             } else {
                 Player player = (Player) sender;
-                plugin.getRepository().findById(player.getUniqueId()).thenCompose(u -> {
-                    BlocksmithUser user = u.orElseGet(() -> new BlocksmithUser(player.getUniqueId(), player.getName(), null));
-                    user.setLocale(LocaleUtils.fromString(args[0]));
-                    return plugin.getRepository().save(user);
-                }).thenAccept(u ->
-                        plugin.getMessenger().sendMessage(sender, "success.set-locale", Placeholder.of("locale", args[0]))
+                Scheduler.runAsyncThen(
+                        plugin,
+                        plugin.getRepository().findById(player.getUniqueId()).thenCompose(u -> {
+                            BlocksmithUser user = u.orElseGet(() -> new BlocksmithUser(player.getUniqueId(), player.getName(), null));
+                            user.setLocale(LocaleUtils.fromString(args[0]));
+                            return plugin.getRepository().save(user);
+                        }),
+                        u -> plugin.getMessenger().sendMessage(sender, "success.set-locale", Placeholder.of("locale", args[0]))
                 );
             }
         } else plugin.getMessenger().sendMessage(sender, "error.console-cannot-execute");
