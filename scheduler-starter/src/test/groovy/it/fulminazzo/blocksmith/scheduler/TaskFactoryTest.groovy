@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.scheduler
 import spock.lang.Specification
 
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 class TaskFactoryTest extends Specification {
@@ -253,6 +254,46 @@ class TaskFactoryTest extends Specification {
 
         and:
         value == 1
+    }
+
+    def 'test that runAsyncThen throws wrapped exception'() {
+        given:
+        def exception = new Exception('test exception')
+
+        when:
+        factory.runAsyncThen(8L,
+                CompletableFuture.runAsync(() -> {
+                    throw exception
+                }),
+                o -> { }
+        ).get()
+
+        then:
+        def ex = thrown(ExecutionException)
+
+        and:
+        def e = ex.cause
+        e == exception
+    }
+
+    def 'test that runAsyncThen throws runtime exception'() {
+        given:
+        def exception = new RuntimeException('test exception')
+
+        when:
+        factory.runAsyncThen(8L,
+                CompletableFuture.runAsync(() -> {
+                    throw exception
+                }),
+                o -> { }
+        ).get()
+
+        then:
+        def ex = thrown(ExecutionException)
+
+        and:
+        def e = ex.cause
+        e == exception
     }
 
     private void addRun() {

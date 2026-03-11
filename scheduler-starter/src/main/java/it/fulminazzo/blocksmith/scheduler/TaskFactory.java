@@ -24,7 +24,11 @@ public interface TaskFactory {
     default <T> @NotNull CompletableFuture<Task> runAsyncThen(final @NotNull Object owner,
                                                               final @NotNull CompletableFuture<T> function,
                                                               final @NotNull Consumer<T> then) {
-        return function.thenApply(r -> schedule(owner, t -> then.accept(r)).run());
+        return function.thenApply(r -> schedule(owner, t -> then.accept(r)).run())
+                .exceptionally(t -> {
+                    if (t instanceof RuntimeException) throw (RuntimeException) t;
+                    else throw new RuntimeException(t);
+                });
     }
 
     /**
