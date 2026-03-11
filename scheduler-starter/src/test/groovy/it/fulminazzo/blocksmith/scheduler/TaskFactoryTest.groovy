@@ -21,7 +21,7 @@ class TaskFactoryTest extends Specification {
         runs.size() == 0
 
         when:
-        def task = factory.schedule(1L, t -> addRun()).run()
+        def task = factory.schedule(0L, t -> addRun()).run()
 
         then:
         task != null
@@ -61,7 +61,7 @@ class TaskFactoryTest extends Specification {
         runs.size() == 0
 
         when:
-        def task = factory.schedule(1L, t -> {
+        def task = factory.schedule(2L, t -> {
             if (runs.size() >= 3) t.cancel()
             else addRun()
         })
@@ -100,7 +100,7 @@ class TaskFactoryTest extends Specification {
         runs.size() == 0
 
         when:
-        def task = factory.schedule(1L, t -> addRun()).async().run()
+        def task = factory.schedule(3L, t -> addRun()).async().run()
 
         and:
         sleep(500L)
@@ -122,7 +122,7 @@ class TaskFactoryTest extends Specification {
         runs.size() == 0
 
         when:
-        def task = factory.schedule(1L, t -> addRun())
+        def task = factory.schedule(4L, t -> addRun())
                 .delay(1, TimeUnit.SECONDS)
                 .async()
                 .run()
@@ -147,7 +147,7 @@ class TaskFactoryTest extends Specification {
         runs.size() == 0
 
         when:
-        def task = factory.schedule(1L, t -> {
+        def task = factory.schedule(5L, t -> {
             if (runs.size() >= 3) t.cancel()
             else addRun()
         })
