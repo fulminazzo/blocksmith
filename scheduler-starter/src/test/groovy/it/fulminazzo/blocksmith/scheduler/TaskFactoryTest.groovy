@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.scheduler
 
 import spock.lang.Specification
 
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 class TaskFactoryTest extends Specification {
@@ -191,7 +192,7 @@ class TaskFactoryTest extends Specification {
         runs.size() == 0
 
         when:
-        def task = factory.schedule(2L, t -> {
+        def task = factory.schedule(6L, t -> {
             times++
             addRun()
         })
@@ -221,6 +222,37 @@ class TaskFactoryTest extends Specification {
         def third = runs.get(2) - now
         third >= 3000
         third <= 4000
+    }
+
+    def 'test that runAsyncThen works'() {
+        given:
+        def value = 0
+
+        expect:
+        runs.size() == 0
+
+        when:
+        def future = factory.runAsyncThen(
+                7L,
+                CompletableFuture.supplyAsync(() -> 1),
+                n -> {
+                    value = 1
+                    addRun()
+                }
+        )
+
+        and:
+        def task = future.get()
+
+        then:
+        task != null
+        task.cancelled
+
+        and:
+        runs.size() == 1
+
+        and:
+        value == 1
     }
 
     private void addRun() {
