@@ -11,9 +11,16 @@ import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 class ReceiverFactoriesTest extends Specification {
+    private static List<ReceiverFactories> previous
 
     void setupSpec() {
+        previous = [*ReceiverFactories.factories]
         ReceiverFactories.factories.clear()
+    }
+
+    void cleanupSpec() {
+        ReceiverFactories.factories.clear()
+        ReceiverFactories.factories.addAll(previous)
     }
 
     def 'test that getAllReceivers cannot return two receivers of the same object'() {
