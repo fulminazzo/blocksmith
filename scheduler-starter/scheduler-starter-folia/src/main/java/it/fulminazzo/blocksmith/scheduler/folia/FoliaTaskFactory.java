@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.scheduler.Task;
 import it.fulminazzo.blocksmith.scheduler.TaskBuilder;
 import it.fulminazzo.blocksmith.scheduler.TaskFactory;
 import it.fulminazzo.blocksmith.structure.Pair;
+import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
@@ -38,13 +39,10 @@ public final class FoliaTaskFactory implements TaskFactory {
 
     @Override
     public boolean supportsOwner(final @NotNull Class<?> ownerType) {
-        try {
-            Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
-            if (Pair.class.isAssignableFrom(ownerType)) return true;
-            else return Plugin.class.isAssignableFrom(ownerType);
-        } catch (ClassNotFoundException e) {
+        if (!ReflectionUtils.isClassAvailable("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler"))
             return false;
-        }
+        else if (Pair.class.isAssignableFrom(ownerType)) return true;
+        else return Plugin.class.isAssignableFrom(ownerType);
     }
 
 }

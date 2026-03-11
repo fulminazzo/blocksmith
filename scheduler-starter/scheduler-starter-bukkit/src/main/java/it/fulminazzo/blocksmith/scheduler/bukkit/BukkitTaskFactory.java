@@ -4,12 +4,19 @@ import it.fulminazzo.blocksmith.scheduler.Task;
 import it.fulminazzo.blocksmith.scheduler.TaskBuilder;
 import it.fulminazzo.blocksmith.scheduler.TaskFactory;
 import it.fulminazzo.blocksmith.structure.Pair;
+import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
 public final class BukkitTaskFactory implements TaskFactory {
+    private static final @NotNull String basePackage;
+
+    static {
+        String packageName = BukkitTaskFactory.class.getPackage().getName();
+        basePackage = packageName.substring(0, packageName.lastIndexOf('.'));
+    }
 
     @Override
     public @NotNull TaskBuilder schedule(final @NotNull Object owner, final @NotNull Consumer<Task> function) {
@@ -22,13 +29,11 @@ public final class BukkitTaskFactory implements TaskFactory {
 
     @Override
     public boolean supportsOwner(final @NotNull Class<?> ownerType) {
-        try {
-            Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
+        if (ReflectionUtils.isClassAvailable(basePackage + ".folia.FoliaTaskFactory") &&
+                ReflectionUtils.isClassAvailable("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler"))
             return false;
-        } catch (ClassNotFoundException e) {
-            if (Pair.class.isAssignableFrom(ownerType)) return true;
-            else return Plugin.class.isAssignableFrom(ownerType);
-        }
+        else if (Pair.class.isAssignableFrom(ownerType)) return true;
+        else return Plugin.class.isAssignableFrom(ownerType);
     }
 
 }
