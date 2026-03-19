@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -108,6 +109,19 @@ public final class ReflectionUtils {
             curr = curr.getSuperclass();
         }
         return fields;
+    }
+
+    /**
+     * Converts the given method to a readable format.
+     *
+     * @param method the method
+     * @return the string
+     */
+    public static @NotNull String methodToString(final @NotNull Method method) {
+        return String.format("%s(%s)",
+                method.getName(),
+                Arrays.stream(method.getParameterTypes()).map(Class::getSimpleName).collect(Collectors.joining(", "))
+        );
     }
 
 }
