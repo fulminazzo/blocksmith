@@ -83,10 +83,12 @@ public abstract class CommandNode {
      * Merges the given node data with the current one.
      *
      * @param node the node
+     * @return this node
      */
-    void merge(final @NotNull CommandNode node) {
+    public @NotNull CommandNode merge(final @NotNull CommandNode node) {
         node.getChildren().forEach(this::addChild);
         if (executionInfo == null) node.getExecutionInfo().ifPresent(this::setExecutionInfo);
+        return this;
     }
 
 }
