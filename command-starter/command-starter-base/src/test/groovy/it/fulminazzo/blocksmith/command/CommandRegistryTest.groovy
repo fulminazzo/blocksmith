@@ -30,7 +30,7 @@ class CommandRegistryTest extends Specification {
         )
         clan.commandInfo = new CommandInfo(
                 'Clan base command',
-                new PermissionInfo('blocksmith.clan', Permission.Default.ALL)
+                new PermissionInfo('blocksmith.edited.clan', Permission.Default.ALL)
         )
         expected['clan'] = clan
 
