@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 public final class ArgumentNode<T> extends CommandNode {
     private final @NotNull String name;
     private final @NotNull Class<T> type;
+    private final boolean optional;
     private @Nullable String defaultValue;
     private boolean greedy;
 
