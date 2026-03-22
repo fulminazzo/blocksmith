@@ -1,6 +1,5 @@
 package it.fulminazzo.blocksmith.command.parser;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 final class CommandTokenizer {
     private final @NotNull InputStream stream;
-    @Getter
+    private @Nullable CommandToken lastToken;
     private @Nullable String lastRead;
     private @Nullable Character buffer;
 
@@ -50,15 +49,42 @@ final class CommandTokenizer {
                 if (commandToken == null) commandToken = nextToken;
                 else if (commandToken != nextToken) {
                     buffer = (char) c;
-                    return commandToken;
+                    break;
                 }
                 lastRead = tmp;
             }
-            if (commandToken == null) return CommandToken.EOF;
-            else return commandToken;
+            if (commandToken == null) commandToken = CommandToken.EOF;
+            lastToken = commandToken;
+            return commandToken;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Gets the last read token.
+     *
+     * @return the token
+     */
+    public @NotNull CommandToken getLastToken() {
+        if (lastToken == null)
+            throw new IllegalStateException(String.format("No token has been read yet. Please use %s#next to start reading",
+                    getClass().getSimpleName()
+            ));
+        return lastToken;
+    }
+
+    /**
+     * Gets the last read input.
+     *
+     * @return the input
+     */
+    public @NotNull String getLastRead() {
+        if (lastRead == null)
+            throw new IllegalStateException(String.format("No token has been read yet. Please use %s#next to start reading",
+                    getClass().getSimpleName()
+            ));
+        return lastRead;
     }
 
 }
