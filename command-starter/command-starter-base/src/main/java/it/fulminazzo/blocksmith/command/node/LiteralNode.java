@@ -51,7 +51,10 @@ public final class LiteralNode extends CommandNode {
         if (node instanceof LiteralNode) {
             LiteralNode literalNode = (LiteralNode) node;
             aliases.addAll(literalNode.aliases);
-            if (commandInfo == null) literalNode.getCommandInfo().ifPresent(this::setCommandInfo);
+            literalNode.getCommandInfo().ifPresent(i -> {
+                if (commandInfo == null) setCommandInfo(i);
+                else commandInfo.merge(i);
+            });
         }
         return (LiteralNode) super.merge(node);
     }
