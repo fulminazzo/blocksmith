@@ -43,8 +43,9 @@ public final class CommandParser {
         List<String> aliases = new ArrayList<>();
         do {
             tokenizer.next();
+            match(CommandToken.LITERAL);
             aliases.add(tokenizer.getLastRead());
-        } while (consume(CommandToken.LITERAL) == CommandToken.PIPE);
+        } while (tokenizer.next() == CommandToken.PIPE);
         consume(CommandToken.CLOSE_PARENTHESIS);
         return new LiteralNode(aliases.toArray(new String[0]));
     }
@@ -55,6 +56,7 @@ public final class CommandParser {
      * @return the node
      */
     @NotNull CommandNode parseSimpleLiteral() {
+        match(CommandToken.LITERAL);
         String literal = tokenizer.getLastRead();
         tokenizer.next();
         return new LiteralNode(literal);
