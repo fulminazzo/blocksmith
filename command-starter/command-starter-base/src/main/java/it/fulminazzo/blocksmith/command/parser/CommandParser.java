@@ -1,8 +1,13 @@
 package it.fulminazzo.blocksmith.command.parser;
 
 import it.fulminazzo.blocksmith.command.node.CommandInfo;
+import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.ExecutionInfo;
+import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A parser to read raw commands declarations and transform them into {@link CommandNode}.
@@ -27,6 +32,32 @@ public final class CommandParser {
         this.tokenizer = new CommandTokenizer(command);
         this.commandInfo = commandInfo;
         this.executionInfo = executionInfo;
+    }
+
+    /**
+     * ALIASES_LITERAL := \( {@link CommandToken#LITERAL} ( \| {@link CommandToken#LITERAL})* \)
+     *
+     * @return the node
+     */
+    @NotNull CommandNode parseAliasesLiteral() {
+        List<String> aliases = new ArrayList<>();
+        do {
+            tokenizer.next();
+            aliases.add(tokenizer.getLastRead());
+        } while (consume(CommandToken.LITERAL) == CommandToken.PIPE);
+        consume(CommandToken.CLOSE_PARENTHESIS);
+        return new LiteralNode(aliases.toArray(new String[0]));
+    }
+
+    /**
+     * SIMPLE_LITERAL := {@link CommandToken#LITERAL}
+     *
+     * @return the node
+     */
+    @NotNull CommandNode parseSimpleLiteral() {
+        String literal = tokenizer.getLastRead();
+        tokenizer.next();
+        return new LiteralNode(literal);
     }
 
     /**
