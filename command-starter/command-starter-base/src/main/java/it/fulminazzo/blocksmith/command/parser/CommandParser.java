@@ -80,7 +80,7 @@ public final class CommandParser {
      */
     void match(final @NotNull CommandToken expected) {
         if (tokenizer.getLastToken() != expected)
-            throw CommandParseException.of("Invalid input in command '%s': expected token %s but got '%s'",
+            throw CommandParseException.of("Invalid input in command '%s': expected '%s' but got '%s'",
                     rawCommand, expected, tokenizer.getLastRead()
             );
     }

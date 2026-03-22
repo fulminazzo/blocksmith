@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.parser;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,12 +21,18 @@ enum CommandToken {
 
     PIPE("\\|"),
 
-    SPACE("( |\r|\n|\t)+"),
+    SPACE("( |\r|\n|\t)+", "space"),
 
-    LITERAL("[A-Za-z_][A-Za-z0-9_]*"),
+    LITERAL("[A-Za-z_][A-Za-z0-9_]*", "text"),
     EOF("");
 
     private final @NotNull String regex;
+    @Getter
+    private final @NotNull String token;
+
+    CommandToken(final @NotNull String regex) {
+        this(regex, regex.replace("\\", ""));
+    }
 
     /**
      * Checks if the current token matches with the given one.

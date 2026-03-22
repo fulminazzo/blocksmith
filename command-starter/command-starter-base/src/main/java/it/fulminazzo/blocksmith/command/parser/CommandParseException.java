@@ -38,6 +38,7 @@ public final class CommandParseException extends RuntimeException {
             Object arg = args[i];
             if (arg instanceof Method) args[i] = ReflectionUtils.methodToString((Method) arg);
             else if (arg instanceof Class) args[i] = ((Class<?>) arg).getSimpleName();
+            else if (arg instanceof CommandToken) args[i] = ((CommandToken) arg).getToken();
         }
         return new CommandParseException(String.format(format, args));
     }
