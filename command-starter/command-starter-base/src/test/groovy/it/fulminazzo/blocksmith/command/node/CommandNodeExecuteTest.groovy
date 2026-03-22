@@ -44,7 +44,7 @@ class CommandNodeExecuteTest extends Specification {
         } else greeting.addChild(who)
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s) -> true)
+        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
                 .addInput('say', 'hello', 'Hello')
         if (whatEnabled) context.addInput('what')
         if (whoArg != null) context.addInput(whoArg)
@@ -86,7 +86,7 @@ class CommandNodeExecuteTest extends Specification {
         def node = new LiteralNode('test')
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s) -> true)
+        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
                 .addInput('test')
 
         when:
@@ -105,7 +105,7 @@ class CommandNodeExecuteTest extends Specification {
         node.addChild(who)
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s) -> true)
+        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
                 .addInput('Hello', 'Alex', 'extra', 'input', 'should', 'be', 'ignored')
 
         expect:
@@ -126,7 +126,7 @@ class CommandNodeExecuteTest extends Specification {
         def node = new LiteralNode('test')
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s) -> true)
+        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
                 .addInput('test', 'help')
 
         when:
@@ -146,7 +146,7 @@ class CommandNodeExecuteTest extends Specification {
         node.executionInfo = new ExecutionInfo(CommandNodeExecuteTest, CommandNodeExecuteTest.getDeclaredMethod(name))
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s) -> true)
+        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
                 .addInput(name)
 
         when:
@@ -177,7 +177,7 @@ class CommandNodeExecuteTest extends Specification {
         )
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s) -> true)
+        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
                 .addInput(node.name)
 
         when:
