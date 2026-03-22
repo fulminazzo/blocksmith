@@ -254,8 +254,7 @@ public final class CommandParser {
                 else rawCommand = baseCommand + " " + rawCommand;
 
                 ExecutionInfo executionInfo = new ExecutionInfo(commandModule, method);
-                int parameterIndex = 0;
-                if (method.getParameterTypes()[0].equals(senderType)) parameterIndex++;
+                int parameterIndex = getParameterIndex(method, senderType);
 
                 CommandParser parser = new CommandParser(rawCommand, commandInfo, executionInfo, parameterIndex);
                 CommandNode node = parser.parse();
@@ -288,8 +287,7 @@ public final class CommandParser {
 
                 CommandInfo commandInfo = createCommandInfo(method);
                 ExecutionInfo executionInfo = new ExecutionInfo(commandsContainer, method);
-                int parameterIndex = 0;
-                if (method.getParameterTypes()[0].equals(senderType)) parameterIndex++;
+                int parameterIndex = getParameterIndex(method, senderType);
 
                 CommandParser parser = new CommandParser(rawCommand, commandInfo, executionInfo, parameterIndex);
                 CommandNode node = parser.parse();
@@ -353,6 +351,13 @@ public final class CommandParser {
 
         PermissionInfo permissionInfo = new PermissionInfo(permission, scope);
         return new CommandInfo(description, permissionInfo);
+    }
+
+    private static int getParameterIndex(final @NotNull Method method, final @NotNull Class<?> senderType) {
+        int parameterIndex = 0;
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        if (parameterTypes.length > 0 && parameterTypes[0].equals(senderType)) parameterIndex++;
+        return parameterIndex;
     }
 
 }
