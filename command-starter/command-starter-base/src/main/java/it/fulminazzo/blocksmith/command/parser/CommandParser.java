@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * A parser to read raw commands declarations and transform them into {@link CommandNode}.
@@ -51,7 +52,7 @@ public final class CommandParser {
         if (lastToken == CommandToken.OPEN_BRACKET)
             return parseOptionalArgument();
         else if (optionalArguments)
-            throw CommandParseException.of("Invalid input in command '%s': an optional argument has been defined, therefore all upcoming nodes must be optional arguments as well", rawCommand);
+            throw parseException("an optional argument has been defined, therefore all upcoming nodes must be optional arguments as well");
         else switch (lastToken) {
             case LOWER_THAN:
                 return parseMandatoryArgument();
@@ -96,8 +97,7 @@ public final class CommandParser {
         if (optional) optionalArguments = true;
         match(CommandToken.LITERAL);
         if (parameterIndex >= parameterTypes.length)
-            throw CommandParseException.of("Invalid input in command '%s': received argument '%s' but no matching parameter was found",
-                    rawCommand, tokenizer.getLastRead());
+            throw parseException("received argument '%s' but no matching parameter was found", tokenizer.getLastRead());
         ArgumentNode<?> node = new ArgumentNode<>(tokenizer.getLastRead(), parameterTypes[parameterIndex++], optional);
         tokenizer.next();
         return node;
@@ -151,9 +151,14 @@ public final class CommandParser {
      */
     void match(final @NotNull CommandToken expected) {
         if (tokenizer.getLastToken() != expected)
-            throw CommandParseException.of("Invalid input in command '%s': expected '%s' but got '%s'",
-                    rawCommand, expected, tokenizer.getLastRead()
-            );
+            throw parseException("expected '%s' but got '%s'", expected, tokenizer.getLastRead());
+    }
+
+    private @NotNull CommandParseException parseException(final @NotNull String message,
+                                                          final Object @NotNull ... args) {
+        return CommandParseException.of("Invalid input in command '%s': " + message,
+                Stream.concat(Stream.of(rawCommand), Stream.of(args)).toArray()
+        );
     }
 
 }
