@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 @Command("(clan|team|gang)")
-public final class ClanCommand {
+final class ClanCommand {
 
     @Command
     public void execute(
