@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
@@ -12,6 +13,11 @@ import java.util.Set;
 @ToString(callSuper = true)
 public class MockNode extends CommandNode implements Cloneable {
     @NotNull String name;
+
+    @Override
+    protected void validateInput(@NotNull CommandExecutionContext context) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public boolean matches(final @NotNull String token) {
