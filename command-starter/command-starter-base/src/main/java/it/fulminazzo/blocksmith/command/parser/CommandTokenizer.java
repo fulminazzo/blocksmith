@@ -36,9 +36,12 @@ final class CommandTokenizer {
      */
     public @NotNull CommandToken next() {
         try {
-            if (stream.available() == 0) return CommandToken.EOF;
             String tmp = "";
-            if (buffer != null) tmp = buffer.toString();
+            if (buffer != null) {
+                tmp = buffer.toString();
+                buffer = null;
+                lastRead = tmp;
+            }
             CommandToken commandToken = CommandToken.getToken(tmp);
             int c;
             while ((c = stream.read()) != -1) {
