@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.execution;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +14,7 @@ import java.util.List;
 /**
  * Represents the execution context of a command.
  */
+@ToString
 @RequiredArgsConstructor
 public final class CommandExecutionContext {
     @Getter
