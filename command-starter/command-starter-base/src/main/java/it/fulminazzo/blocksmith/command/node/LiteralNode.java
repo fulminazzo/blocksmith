@@ -45,5 +45,10 @@ public final class LiteralNode extends CommandNode {
     public Optional<CommandInfo> getCommandInfo() {
         return Optional.ofNullable(commandInfo);
     }
-    
+
+    @Override
+    public @NotNull LiteralNode merge(final @NotNull CommandNode node) {
+        return (LiteralNode) super.merge(node);
+    }
+
 }
