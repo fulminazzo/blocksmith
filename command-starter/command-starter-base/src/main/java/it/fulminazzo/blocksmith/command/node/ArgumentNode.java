@@ -40,7 +40,15 @@ public final class ArgumentNode<T> extends CommandNode {
 
     @Override
     protected void validateInput(final @NotNull CommandExecutionContext<?> context) throws CommandExecutionException {
-        context.addParsedArgument(parseArgument(context.getCurrent()));
+        StringBuilder current = new StringBuilder(context.getCurrent());
+        if (isGreedy()) {
+            context.advanceCursor();
+            while (!context.isDone()) {
+                current.append(" ").append(context.getCurrent());
+                context.advanceCursor();
+            }
+        }
+        context.addParsedArgument(parseArgument(current.toString()));
     }
 
     @Override
