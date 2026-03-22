@@ -1,7 +1,9 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,6 +12,8 @@ import java.util.*;
 /**
  * Represents the node of a command, whether it is static or dynamic.
  */
+@EqualsAndHashCode
+@ToString
 public abstract class CommandNode {
     @Getter
     private final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
