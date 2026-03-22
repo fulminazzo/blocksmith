@@ -222,6 +222,52 @@ public final class CommandParser {
     }
 
     /**
+     * Obtains all the Command nodes from the given module.
+     *
+     * @param commandModule the command module
+     * @param senderType        the type of the sender (to identify methods with sender declared)
+     * @return the nodes
+     */
+    public static @NotNull List<CommandNode> parseCommands(final @NotNull Object commandModule,
+                                                           final @NotNull Class<?> senderType) {
+        if (commandModule instanceof Class<?>) return parseAnonymousCommands((Class<?>) commandModule, senderType);
+
+        Class<?> moduleType = commandModule.getClass();
+        if (!moduleType.isAnnotationPresent(Command.class))
+            throw CommandParseException.of("Invalid command module '%s': %s annotation is required", commandModule, Command.class);
+        String baseCommand = moduleType.getAnnotation(Command.class).value().trim();
+        if (baseCommand.isEmpty())
+            throw CommandParseException.of("Invalid command module '%s': command cannot be empty", commandModule);
+
+        CommandInfo baseCommandInfo = createCommandInfo(moduleType);
+
+        List<CommandNode> commands = new ArrayList<>();
+
+        for (Method method : moduleType.getMethods())
+            if (!Modifier.isStatic(method.getModifiers()) && method.isAnnotationPresent(Command.class)) {
+                Command annotation = method.getAnnotation(Command.class);
+
+                String rawCommand = annotation.value().trim();
+
+                CommandInfo commandInfo = createCommandInfo(method);
+                if (rawCommand.isEmpty()) commandInfo.merge(baseCommandInfo);
+                else rawCommand = baseCommand + " " + rawCommand;
+
+                ExecutionInfo executionInfo = new ExecutionInfo(commandModule, method);
+                int parameterIndex = 0;
+                if (method.getParameterTypes()[0].equals(senderType)) parameterIndex++;
+
+                CommandParser parser = new CommandParser(rawCommand, commandInfo, executionInfo, parameterIndex);
+                CommandNode node = parser.parse();
+
+                commands.add(node);
+
+                commandInfo.merge(getComputedCommandInfo(node));
+            }
+        return commands;
+    }
+
+    /**
      * Obtains all the Command nodes from the given class.
      * Command nodes will be created from static functions annotated with {@link Command}.
      *
@@ -229,8 +275,8 @@ public final class CommandParser {
      * @param senderType        the type of the sender (to identify methods with sender declared)
      * @return the nodes
      */
-    public static @NotNull List<CommandNode> parseAnonymousCommands(final @NotNull Class<?> commandsContainer,
-                                                                    final @NotNull Class<?> senderType) {
+    static @NotNull List<CommandNode> parseAnonymousCommands(final @NotNull Class<?> commandsContainer,
+                                                             final @NotNull Class<?> senderType) {
         List<CommandNode> commands = new ArrayList<>();
         for (Method method : commandsContainer.getMethods())
             if (Modifier.isStatic(method.getModifiers()) && method.isAnnotationPresent(Command.class)) {
