@@ -2,6 +2,7 @@
 package it.fulminazzo.blocksmith.command.parser
 
 import it.fulminazzo.blocksmith.command.annotation.Default
+import it.fulminazzo.blocksmith.command.annotation.Greedy
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.*
 import org.jetbrains.annotations.NotNull
@@ -55,6 +56,28 @@ class CommandParserTest extends Specification {
 
         then:
         actual == expected
+    }
+
+    def 'test that parse throws for nodes after greedy argument'() {
+        given:
+        def parser = new CommandParser(
+                '<argument> something else',
+                new CommandInfo(
+                        '',
+                        new PermissionInfo('', Permission.Default.NONE)
+                ),
+                new ExecutionInfo(
+                        CommandParserTest,
+                        CommandParserTest.getDeclaredMethod('greedy', String)
+                ),
+                0
+        )
+
+        when:
+        parser.parse()
+
+        then:
+        thrown(CommandParseException)
     }
 
     def 'test that parse throws for #input'() {
@@ -209,6 +232,10 @@ class CommandParserTest extends Specification {
                                 final @NotNull Object player,
                                 final @NotNull String rank,
                                 final @Nullable @Default('Unknown') String reason) {
+    }
+
+    private static void greedy(final @NotNull @Greedy String argument) {
+
     }
 
 }
