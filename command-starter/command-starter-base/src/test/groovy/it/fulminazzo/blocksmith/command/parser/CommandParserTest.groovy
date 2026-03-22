@@ -155,7 +155,7 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         when:
-        def actual = CommandParser.parseCommands(executor, CommandSender)
+        def actual = CommandParser.parseCommands(executor, CommandSender, null)
 
         then:
         actual.sort { getCommandName(it) } == expected.sort { getCommandName(it) }
@@ -163,7 +163,7 @@ class CommandParserTest extends Specification {
 
     def 'test parseCommands throws with #type'() {
         when:
-        CommandParser.parseCommands(type.getConstructor().newInstance(), CommandSender)
+        CommandParser.parseCommands(type.getConstructor().newInstance(), CommandSender, null)
 
         then:
         thrown(CommandParseException)
@@ -217,7 +217,7 @@ class CommandParserTest extends Specification {
         def expected = [help, reload]
 
         when:
-        def actual = CommandParser.parseCommands(GeneralCommands, CommandSender)
+        def actual = CommandParser.parseCommands(GeneralCommands, CommandSender, null)
 
         then:
         actual.sort { getCommandName(it) } == expected.sort { getCommandName(it) }
@@ -225,7 +225,7 @@ class CommandParserTest extends Specification {
 
     def 'test that parseAnonymousCommands throws for not given command method'() {
         when:
-        CommandParser.parseAnonymousCommands(CommandNotGiven, CommandSender)
+        CommandParser.parseAnonymousCommands(CommandNotGiven, CommandSender, null)
 
         then:
         thrown(CommandParseException)

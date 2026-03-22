@@ -226,11 +226,14 @@ public final class CommandParser {
      *
      * @param commandModule the command module
      * @param senderType    the type of the sender (to identify methods with sender declared)
+     * @param prefix        the string to prepend to the generated commands permission, if none is given
      * @return the nodes
      */
     public static @NotNull List<CommandNode> parseCommands(final @NotNull Object commandModule,
-                                                           final @NotNull Class<?> senderType) {
-        if (commandModule instanceof Class<?>) return parseAnonymousCommands((Class<?>) commandModule, senderType);
+                                                           final @NotNull Class<?> senderType,
+                                                           final @Nullable String prefix) {
+        if (commandModule instanceof Class<?>)
+            return parseAnonymousCommands((Class<?>) commandModule, senderType, prefix);
 
         Class<?> moduleType = commandModule.getClass();
         if (!moduleType.isAnnotationPresent(Command.class))
@@ -263,7 +266,7 @@ public final class CommandParser {
 
                 commands.add(node);
 
-                commandInfo.merge(getComputedCommandInfo(node));
+                commandInfo.merge(getComputedCommandInfo(node, prefix));
             }
         return commands;
     }
@@ -274,10 +277,12 @@ public final class CommandParser {
      *
      * @param commandsContainer the commands container
      * @param senderType        the type of the sender (to identify methods with sender declared)
+     * @param prefix            the string to prepend to the generated commands permission, if none is given
      * @return the nodes
      */
     static @NotNull List<CommandNode> parseAnonymousCommands(final @NotNull Class<?> commandsContainer,
-                                                             final @NotNull Class<?> senderType) {
+                                                             final @NotNull Class<?> senderType,
+                                                             final @Nullable String prefix) {
         List<CommandNode> commands = new ArrayList<>();
         for (Method method : commandsContainer.getMethods())
             if (Modifier.isStatic(method.getModifiers()) && method.isAnnotationPresent(Command.class)) {
@@ -296,7 +301,7 @@ public final class CommandParser {
 
                 commands.add(node);
 
-                commandInfo.merge(getComputedCommandInfo(node));
+                commandInfo.merge(getComputedCommandInfo(node, prefix));
             }
         return commands;
     }
@@ -304,11 +309,14 @@ public final class CommandParser {
     /**
      * Computes a default Command info object from the given node and the corresponding command declaration.
      *
-     * @param node the node
+     * @param node   the node
+     * @param prefix the string to prepend to the generated permission
      * @return the computed command information
      */
-    static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node) {
+    static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node,
+                                                       final @Nullable String prefix) {
         StringBuilder computedPermission = new StringBuilder();
+        if (prefix != null) computedPermission.append(prefix).append(".");
         CommandNode n = node;
         while (n != null) {
             if (n instanceof LiteralNode) {
