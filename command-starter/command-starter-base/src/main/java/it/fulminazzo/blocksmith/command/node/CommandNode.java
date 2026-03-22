@@ -27,10 +27,25 @@ public abstract class CommandNode {
     /**
      * Gets the first child.
      *
-     * @return the first child (if present)
+     * @return the child (if found)
      */
     public @Nullable CommandNode getFirstChild() {
         return !children.isEmpty() ? children.iterator().next() : null;
+    }
+
+    /**
+     * Gets the first child that is a {@link ArgumentNode} and is optional.
+     *
+     * @return the child (if found)
+     */
+    public @Nullable ArgumentNode<?> getFirstOptionalArgumentNode() {
+        for (CommandNode child : children)
+            if (child instanceof ArgumentNode<?>) {
+                ArgumentNode<?> argumentNode = (ArgumentNode<?>) child;
+                if (argumentNode.isOptional())
+                    return argumentNode;
+            }
+        return null;
     }
 
     /**
@@ -101,9 +116,19 @@ public abstract class CommandNode {
      */
     public void execute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         validateInput(context);
+        handleRemainingInput(context);
+    }
+
+    private void handleRemainingInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         if (context.advanceCursor().isDone()) {
             if (isExecutable()) internalExecute(context);
-            else throw new CommandExecutionException("error.not-enough-arguments");
+            else {
+                ArgumentNode<?> optional = getFirstOptionalArgumentNode();
+                if (optional != null) {
+                    context.addParsedArgument(optional.getDefaultValue());
+                    optional.execute(context);
+                } else throw new CommandExecutionException("error.not-enough-arguments");
+            }
         } else {
             CommandNode child = getChild(context.getCurrent());
             if (child == null) {
