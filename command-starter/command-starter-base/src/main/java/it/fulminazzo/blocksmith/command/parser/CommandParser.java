@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * A parser to read raw commands declarations and transform them into {@link CommandNode}.
+ * A parser to convert a command declaration into {@link CommandNode}s.
+ * Requires the method that will execute the command, with the command information
+ * (declaration, description and permission).
  */
 public final class CommandParser {
     private final @NotNull String rawCommand;
