@@ -1,5 +1,7 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
+import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +9,8 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -21,27 +25,25 @@ public abstract class CommandNode {
     private @Nullable ExecutionInfo executionInfo;
 
     /**
-     * Checks if the node matches with the given token.
-     *
-     * @param token the token
-     * @return <code>true</code> if it does
-     */
-    public abstract boolean matches(final @NotNull String token);
-
-    /**
-     * Gets the name of this node.
-     *
-     * @return the name
-     */
-    public abstract @NotNull String getName();
-
-    /**
      * Gets the first child.
      *
      * @return the first child (if present)
      */
     public @Nullable CommandNode getFirstChild() {
         return !children.isEmpty() ? children.iterator().next() : null;
+    }
+
+    /**
+     * Attempts to fetch a child that matches the given input.
+     *
+     * @param token the token
+     * @return the child (if found)
+     */
+    public @Nullable CommandNode getChild(final @NotNull String token) {
+        for (CommandNode child : children)
+            if (child instanceof LiteralNode && child.matches(token))
+                return child;
+        return children.stream().filter(c -> c.matches(token)).findFirst().orElse(null);
     }
 
     /**
@@ -90,5 +92,61 @@ public abstract class CommandNode {
         if (executionInfo == null) node.getExecutionInfo().ifPresent(this::setExecutionInfo);
         return this;
     }
+
+    /**
+     * Walks the children to construct the best command route that matches the given input.
+     *
+     * @param context the context
+     * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
+     */
+    public void execute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        validateInput(context);
+        if (context.advanceCursor().isDone()) {
+            if (isExecutable()) internalExecute(context);
+            else throw new CommandExecutionException("error.not-enough-arguments");
+        } else {
+            CommandNode child = getChild(context.getCurrent());
+            if (child == null) {
+                if (isExecutable()) internalExecute(context);
+                else throw new CommandExecutionException("error.command-not-found");
+            } else child.execute(context);
+        }
+    }
+
+    private void internalExecute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        try {
+            ExecutionInfo executionInfo = getExecutionInfo().orElseThrow();
+            Method method = executionInfo.getMethod();
+            LinkedList<Object> arguments = context.getArguments();
+            if (arguments.size() != method.getParameterCount())
+                arguments.addFirst(context.getCommandSender());
+            method.invoke(executionInfo.getExecutor(), arguments.toArray());
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new CommandExecutionException("error.internal-error", e);
+        }
+    }
+
+    /**
+     * Validates the current input of the context.
+     *
+     * @param context the context
+     * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
+     */
+    protected abstract void validateInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException;
+
+    /**
+     * Checks if the node matches with the given token.
+     *
+     * @param token the token
+     * @return <code>true</code> if it does
+     */
+    public abstract boolean matches(final @NotNull String token);
+
+    /**
+     * Gets the name of this node.
+     *
+     * @return the name
+     */
+    public abstract @NotNull String getName();
 
 }
