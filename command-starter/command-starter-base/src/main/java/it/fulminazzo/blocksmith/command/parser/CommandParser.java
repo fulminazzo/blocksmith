@@ -250,8 +250,10 @@ public final class CommandParser {
                 String rawCommand = annotation.value().trim();
 
                 CommandInfo commandInfo = createCommandInfo(method);
-                if (rawCommand.isEmpty()) commandInfo.merge(baseCommandInfo);
-                else rawCommand = baseCommand + " " + rawCommand;
+                if (rawCommand.isEmpty()) {
+                    rawCommand = baseCommand;
+                    commandInfo.merge(baseCommandInfo);
+                } else rawCommand = baseCommand + " " + rawCommand;
 
                 ExecutionInfo executionInfo = new ExecutionInfo(commandModule, method);
                 int parameterIndex = getParameterIndex(method, senderType);
