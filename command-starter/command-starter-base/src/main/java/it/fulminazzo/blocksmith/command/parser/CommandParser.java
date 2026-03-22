@@ -1,9 +1,6 @@
 package it.fulminazzo.blocksmith.command.parser;
 
-import it.fulminazzo.blocksmith.command.node.CommandInfo;
-import it.fulminazzo.blocksmith.command.node.CommandNode;
-import it.fulminazzo.blocksmith.command.node.ExecutionInfo;
-import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import it.fulminazzo.blocksmith.command.node.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -17,21 +14,67 @@ public final class CommandParser {
     private final @NotNull CommandTokenizer tokenizer;
     private final @NotNull CommandInfo commandInfo;
     private final @NotNull ExecutionInfo executionInfo;
+    private final @NotNull Class<?>[] parameterTypes;
+    private int parameterIndex;
 
     /**
      * Instantiates a new Command parser.
      *
-     * @param command       the command
-     * @param commandInfo   the command info
-     * @param executionInfo the execution info
+     * @param command        the command
+     * @param commandInfo    the command info
+     * @param executionInfo  the execution info
+     * @param parameterIndex the starting index of the parameters (excluding the command sender)
      */
     public CommandParser(final @NotNull String command,
                          final @NotNull CommandInfo commandInfo,
-                         final @NotNull ExecutionInfo executionInfo) {
+                         final @NotNull ExecutionInfo executionInfo,
+                         final int parameterIndex) {
         this.rawCommand = command;
         this.tokenizer = new CommandTokenizer(command);
         this.commandInfo = commandInfo;
         this.executionInfo = executionInfo;
+        this.parameterTypes = executionInfo.getMethod().getParameterTypes();
+        this.parameterIndex = parameterIndex;
+    }
+
+    /**
+     * MANDATORY_ARGUMENT := &lt; GENERAL_ARGUMENT &gt;
+     *
+     * @return the node
+     */
+    @NotNull CommandNode parseMandatoryArgument() {
+        consume(CommandToken.LOWER_THAN);
+        CommandNode node = parseGeneralArgument(false);
+        consume(CommandToken.GREATER_THAN);
+        return node;
+    }
+
+    /**
+     * OPTIONAL_ARGUMENT := [ GENERAL_ARGUMENT ]
+     *
+     * @return the node
+     */
+    @NotNull CommandNode parseOptionalArgument() {
+        consume(CommandToken.OPEN_BRACKET);
+        CommandNode node = parseGeneralArgument(true);
+        consume(CommandToken.CLOSE_BRACKET);
+        return node;
+    }
+
+    /**
+     * GENERAL_ARGUMENT := {@link CommandToken#LITERAL}
+     *
+     * @param optional if <code>true</code>, the argument will be marked as optional
+     * @return the node
+     */
+    @NotNull CommandNode parseGeneralArgument(final boolean optional) {
+        match(CommandToken.LITERAL);
+        if (parameterIndex >= parameterTypes.length)
+            throw CommandParseException.of("Invalid input in command '%s': received argument '%s' but no matching parameter was found",
+                    rawCommand, tokenizer.getLastRead());
+        ArgumentNode<?> node = new ArgumentNode<>(tokenizer.getLastRead(), parameterTypes[parameterIndex++], optional);
+        tokenizer.next();
+        return node;
     }
 
     /**
