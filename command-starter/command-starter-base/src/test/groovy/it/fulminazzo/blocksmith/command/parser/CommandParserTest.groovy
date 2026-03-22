@@ -20,6 +20,10 @@ class CommandParserTest extends Specification {
         def baseAliases = ['clan', 'team', 'gang']
 
         and:
+        def clan = new LiteralNode(*baseAliases)
+        expected.add(clan)
+
+        and:
         def name = new ArgumentNode('name', String, true)
         name.defaultValue = 'self'
         name.executionInfo = new ExecutionInfo(
@@ -35,7 +39,7 @@ class CommandParserTest extends Specification {
                 )
         )
         info.addChild(name)
-        def clan = new LiteralNode(*baseAliases)
+        clan = new LiteralNode(*baseAliases)
         clan.addChild(info)
         expected.add(clan)
 
