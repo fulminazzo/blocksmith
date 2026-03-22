@@ -1,6 +1,7 @@
 //file:noinspection unused
 package it.fulminazzo.blocksmith.command.parser
 
+import it.fulminazzo.blocksmith.command.CommandSender
 import it.fulminazzo.blocksmith.command.annotation.Default
 import it.fulminazzo.blocksmith.command.annotation.Greedy
 import it.fulminazzo.blocksmith.command.annotation.Permission
@@ -10,6 +11,54 @@ import org.jetbrains.annotations.Nullable
 import spock.lang.Specification
 
 class CommandParserTest extends Specification {
+
+    def 'test parseAnonymousCommands returns all commands'() {
+        given:
+        def command = new ArgumentNode('command', String, true)
+        command.executionInfo = new ExecutionInfo(
+                GeneralCommands,
+                GeneralCommands.getMethod('help', CommandSender, String)
+        )
+
+        def help = new LiteralNode('help')
+        help.addChild(command)
+        help.commandInfo = new CommandInfo(
+                'Displays help for all the available commands',
+                new PermissionInfo(
+                        'blocksmith.help',
+                        Permission.Default.ALL
+                )
+        )
+
+        and:
+        def async = new ArgumentNode('async', String, false)
+        async.executionInfo = new ExecutionInfo(
+                GeneralCommands,
+                GeneralCommands.getMethod('reload', boolean)
+        )
+
+        def plugin = new LiteralNode('plugin')
+        plugin.addChild(async)
+        plugin.commandInfo = new CommandInfo(
+                'Description for command /reload plugin',
+                new PermissionInfo(
+                        'reload.plugin',
+                        Permission.Default.OP
+                )
+        )
+
+        def reload = new LiteralNode('reload')
+        reload.addChild(plugin)
+
+        and:
+        def expected = [help, reload]
+
+        when:
+        def actual = CommandParser.parseAnonymousCommands(GeneralCommands, CommandSender)
+
+        then:
+        actual == expected
+    }
 
     def 'test that parse works'() {
         given:
