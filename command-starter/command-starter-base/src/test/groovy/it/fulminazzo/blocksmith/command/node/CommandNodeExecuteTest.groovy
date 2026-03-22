@@ -10,8 +10,10 @@ import spock.lang.Specification
 import java.lang.reflect.Method
 
 class CommandNodeExecuteTest extends Specification {
-    private static @NotNull Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
-    private static @NotNull Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
+    private static @NotNull
+    Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
+    private static @NotNull
+    Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
 
     private static String printer
 
@@ -187,6 +189,35 @@ class CommandNodeExecuteTest extends Specification {
         thrown(IllegalArgumentException)
     }
 
+    def 'test that execute supports greedy argument'() {
+        given:
+        def node = new LiteralNode('message')
+
+        def message = new ArgumentNode('message', String, false)
+        message.greedy = true
+        message.executionInfo = new ExecutionInfo(
+                CommandNodeExecuteTest,
+                CommandNodeExecuteTest.getMethod('message', CommandSender, String)
+        )
+        node.addChild(message)
+
+        and:
+        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
+                .addInput(node.name, 'Hello,', 'Alex!')
+
+        expect:
+        printer == null
+
+        when:
+        node.execute(context)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        printer == 'Hello, Alex!'
+    }
+
     static void execute(final @NotNull CommandSender sender,
                         final @NotNull String greeting,
                         final @NotNull String who) {
@@ -196,6 +227,11 @@ class CommandNodeExecuteTest extends Specification {
     static void execute(final @NotNull String greeting,
                         final @NotNull String who) {
         printer = "$greeting, $who!"
+    }
+
+    static void message(final @NotNull CommandSender sender,
+                        final @NotNull String message) {
+        printer = message
     }
 
     static void runtimeException() {
