@@ -1,0 +1,49 @@
+package it.fulminazzo.blocksmith.command.node;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+/**
+ * A {@link CommandNode} to represent general literals.
+ */
+public final class LiteralNode extends CommandNode {
+    @Getter
+    private final @NotNull String name;
+    private final @NotNull Set<String> aliases;
+    @Setter
+    private @Nullable CommandInfo commandInfo;
+
+    /**
+     * Instantiates a new Literal node.
+     *
+     * @param literals the literals
+     */
+    public LiteralNode(final String @NotNull ... literals) {
+        if (literals.length == 0) throw new IllegalArgumentException("At least one literal must be provided");
+        this.name = literals[0].trim().toLowerCase();
+        this.aliases = new HashSet<>();
+        for (String literal : literals) this.aliases.add(literal.trim().toLowerCase());
+    }
+
+    @Override
+    public boolean matches(final @NotNull String token) {
+        return aliases.contains(token.trim().toLowerCase());
+    }
+
+    /**
+     * If this literal represents the final command (or subcommand) of a command route,
+     * its command information will be available.
+     *
+     * @return the command info, if available
+     */
+    public Optional<CommandInfo> getCommandInfo() {
+        return Optional.ofNullable(commandInfo);
+    }
+    
+}
