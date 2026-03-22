@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.command;
+package it.fulminazzo.blocksmith.command.parser;
 
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import org.jetbrains.annotations.NotNull;
