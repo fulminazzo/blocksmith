@@ -191,11 +191,10 @@ public final class CommandParser {
      * If it does, the next one is read.
      *
      * @param expected the expected token
-     * @return the next read token
      */
-    @NotNull CommandToken consume(final @NotNull CommandToken expected) {
+    void consume(final @NotNull CommandToken expected) {
         match(expected);
-        return tokenizer.next();
+        tokenizer.next();
     }
 
     /**
