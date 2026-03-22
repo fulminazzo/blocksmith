@@ -54,12 +54,15 @@ public final class CommandParser {
         CommandNode first = null;
         LiteralNode lastLiteral = null;
         CommandNode last = null;
-        while (tokenizer.next() != CommandToken.EOF) {
+        tokenizer.next();
+        while (tokenizer.getLastToken() != CommandToken.EOF) {
             CommandNode node = parseExpression();
             if (first == null) first = node;
             else last.addChild(node);
             if (node instanceof LiteralNode) lastLiteral = (LiteralNode) node;
             last = node;
+            if (tokenizer.getLastToken() != CommandToken.EOF)
+                consume(CommandToken.SPACE);
         }
         if (first == null) throw parseException("could not parse command");
         last.setExecutionInfo(executionInfo);
