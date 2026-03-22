@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Method;
 
 /**
- * An exception thrown by {@link CommandNodeBuilder} when the parsing of a command fails.
+ * An exception thrown when the parsing of a command fails.
  */
 public final class CommandParseException extends RuntimeException {
 
