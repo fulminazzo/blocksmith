@@ -58,7 +58,7 @@ public final class LiteralNode extends CommandNode {
     }
 
     @Override
-    protected void validateInput(final @NotNull CommandExecutionContext context) {
+    protected void validateInput(final @NotNull CommandExecutionContext<?> context) {
         // should already be validated
     }
 

@@ -115,7 +115,7 @@ public abstract class CommandNode {
      * @param context the context
      * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
      */
-    public void execute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+    public void execute(final @NotNull CommandExecutionContext<?> context) throws CommandExecutionException {
         validateInput(context);
         handleRemainingInput(context);
     }
@@ -126,7 +126,7 @@ public abstract class CommandNode {
      * @param context the context
      * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
      */
-    void handleRemainingInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+    void handleRemainingInput(final @NotNull CommandExecutionContext<?> context) throws CommandExecutionException {
         if (context.advanceCursor().isDone()) {
             if (isExecutable()) internalExecute(context);
             else {
@@ -145,7 +145,7 @@ public abstract class CommandNode {
         }
     }
 
-    private void internalExecute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+    private void internalExecute(final @NotNull CommandExecutionContext<?> context) throws CommandExecutionException {
         ExecutionInfo executionInfo = getExecutionInfo().orElseThrow();
         Method method = executionInfo.getMethod();
         try {
@@ -169,7 +169,7 @@ public abstract class CommandNode {
      * @param context the context
      * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
      */
-    protected abstract void validateInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException;
+    protected abstract void validateInput(final @NotNull CommandExecutionContext<?> context) throws CommandExecutionException;
 
     /**
      * Checks if the node matches with the given token.
