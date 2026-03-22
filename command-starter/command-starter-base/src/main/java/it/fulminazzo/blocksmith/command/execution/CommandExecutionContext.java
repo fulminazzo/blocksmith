@@ -1,5 +1,7 @@
 package it.fulminazzo.blocksmith.command.execution;
 
+import it.fulminazzo.blocksmith.command.annotation.Permission;
+import it.fulminazzo.blocksmith.command.node.PermissionInfo;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -22,7 +24,7 @@ import java.util.function.BiPredicate;
 public final class CommandExecutionContext<S> {
     @Getter
     private final @NotNull S commandSender;
-    private final @NotNull BiPredicate<S, String> permissionChecker;
+    private final @NotNull BiPredicate<S, PermissionInfo> permissionChecker;
     private final @NotNull List<String> input = new ArrayList<>();
     @Getter
     private final @NotNull LinkedList<Object> arguments = new LinkedList<>();
@@ -34,8 +36,9 @@ public final class CommandExecutionContext<S> {
      * @param permission the permission
      * @return <code>true</code> if it does
      */
-    public boolean hasPermission(final @NotNull String permission) {
-        return permissionChecker.test(commandSender, permission);
+    public boolean hasPermission(final @NotNull PermissionInfo permission) {
+        return permission.getPermissionDefault() == Permission.Default.ALL ||
+                permissionChecker.test(commandSender, permission);
     }
 
     /**
