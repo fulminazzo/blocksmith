@@ -316,7 +316,7 @@ public final class CommandParser {
     static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node,
                                                        final @Nullable String prefix) {
         StringBuilder computedPermission = new StringBuilder();
-        if (prefix != null) computedPermission.append(prefix).append(".");
+        if (prefix != null) computedPermission.append(prefix);
         CommandNode n = node;
         while (n != null) {
             if (n instanceof LiteralNode) {
