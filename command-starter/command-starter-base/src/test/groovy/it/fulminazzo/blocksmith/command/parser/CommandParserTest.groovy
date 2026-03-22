@@ -1,5 +1,7 @@
+//file:noinspection unused
 package it.fulminazzo.blocksmith.command.parser
 
+import it.fulminazzo.blocksmith.command.annotation.Default
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.*
 import org.jetbrains.annotations.NotNull
@@ -27,6 +29,7 @@ class CommandParserTest extends Specification {
         and:
         def reason = new ArgumentNode('reason', String, true)
         reason.executionInfo = executionInfo
+        reason.defaultValue = 'Unknown'
 
         def rank = new ArgumentNode('rank', String, false)
         rank.addChild(reason)
@@ -205,7 +208,7 @@ class CommandParserTest extends Specification {
     private static void promote(final @NotNull Object commandSender,
                                 final @NotNull Object player,
                                 final @NotNull String rank,
-                                final @Nullable String reason) {
+                                final @Nullable @Default('Unknown') String reason) {
     }
 
 }
