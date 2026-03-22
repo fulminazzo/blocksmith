@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.parser;
 
 import it.fulminazzo.blocksmith.command.annotation.Default;
+import it.fulminazzo.blocksmith.command.annotation.Greedy;
 import it.fulminazzo.blocksmith.command.node.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +25,9 @@ public final class CommandParser {
     // Signals that an optional argument has been reached;
     // therefore, all the following nodes must be optional arguments.
     private @Nullable String optionalArgument;
+    // Signals that a greedy argument has been reached;
+    // therefore, nothing else can be specified.
+    private @Nullable String greedyArgument;
 
     /**
      * Instantiates a new Command parser.
@@ -79,19 +83,23 @@ public final class CommandParser {
      * @return the node
      */
     @NotNull CommandNode parseExpression() {
+        if (greedyArgument != null)
+            throw parseException("after declaring greedy argument '%s', no subsequent node can be specified " +
+                    "(the greedy argument will inglobate all the remaining input anyway)",
+                    greedyArgument);
         CommandToken lastToken = tokenizer.getLastToken();
         if (lastToken == CommandToken.OPEN_BRACKET)
             return parseOptionalArgument();
         else if (optionalArgument != null)
             throw parseException("after declaring optional argument '%s', all subsequent nodes MUST be of the same kind (optional arguments)", optionalArgument);
         else switch (lastToken) {
-            case LOWER_THAN:
-                return parseMandatoryArgument();
-            case OPEN_PHARENTHESIS:
-                return parseAliasesLiteral();
-            default:
-                return parseSimpleLiteral();
-        }
+                case LOWER_THAN:
+                    return parseMandatoryArgument();
+                case OPEN_PHARENTHESIS:
+                    return parseAliasesLiteral();
+                default:
+                    return parseSimpleLiteral();
+            }
     }
 
     /**
@@ -134,6 +142,10 @@ public final class CommandParser {
         ArgumentNode<?> node = new ArgumentNode<>(argument, parameter.getType(), optional);
         if (parameter.isAnnotationPresent(Default.class))
             node.setDefaultValue(parameter.getAnnotation(Default.class).value());
+        if (parameter.isAnnotationPresent(Greedy.class)) {
+            node.setGreedy(true);
+            greedyArgument = argument;
+        }
         tokenizer.next();
         return node;
     }
