@@ -225,7 +225,7 @@ public final class CommandParser {
      * Obtains all the Command nodes from the given module.
      *
      * @param commandModule the command module
-     * @param senderType        the type of the sender (to identify methods with sender declared)
+     * @param senderType    the type of the sender (to identify methods with sender declared)
      * @return the nodes
      */
     public static @NotNull List<CommandNode> parseCommands(final @NotNull Object commandModule,
@@ -317,13 +317,24 @@ public final class CommandParser {
             }
             n = n.getFirstChild();
         }
+        String permission = computedPermission.toString();
         return new CommandInfo(
-                "command.description." + computedPermission,
+                getDefaultDescription(permission),
                 new PermissionInfo(
-                        computedPermission.toString(),
+                        permission,
                         Permission.Default.OP
                 )
         );
+    }
+
+    /**
+     * Gets the default description of the given command path.
+     *
+     * @param path the path
+     * @return the default description
+     */
+    public static @NotNull String getDefaultDescription(final @NotNull String path) {
+        return "command.description." + path;
     }
 
     /**
