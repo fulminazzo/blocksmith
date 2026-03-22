@@ -1,9 +1,11 @@
 package it.fulminazzo.blocksmith.command.parser;
 
+import it.fulminazzo.blocksmith.command.annotation.Default;
 import it.fulminazzo.blocksmith.command.node.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -16,7 +18,7 @@ public final class CommandParser {
     private final @NotNull CommandTokenizer tokenizer;
     private final @NotNull CommandInfo commandInfo;
     private final @NotNull ExecutionInfo executionInfo;
-    private final @NotNull Class<?>[] parameterTypes;
+    private final @NotNull Parameter[] parameters;
 
     private int parameterIndex;
     // Signals that an optional argument has been reached;
@@ -39,7 +41,7 @@ public final class CommandParser {
         this.tokenizer = new CommandTokenizer(command);
         this.commandInfo = commandInfo;
         this.executionInfo = executionInfo;
-        this.parameterTypes = executionInfo.getMethod().getParameterTypes();
+        this.parameters = executionInfo.getMethod().getParameters();
         this.parameterIndex = parameterIndex;
     }
 
@@ -123,9 +125,12 @@ public final class CommandParser {
         match(CommandToken.LITERAL);
         String argument = tokenizer.getLastRead();
         if (optional) optionalArgument = argument;
-        if (parameterIndex >= parameterTypes.length)
+        if (parameterIndex >= parameters.length)
             throw parseException("received argument '%s' but no matching parameter was found", argument);
-        ArgumentNode<?> node = new ArgumentNode<>(argument, parameterTypes[parameterIndex++], optional);
+        Parameter parameter = parameters[parameterIndex++];
+        ArgumentNode<?> node = new ArgumentNode<>(argument, parameter.getType(), optional);
+        if (parameter.isAnnotationPresent(Default.class))
+            node.setDefaultValue(parameter.getAnnotation(Default.class).value());
         tokenizer.next();
         return node;
     }
