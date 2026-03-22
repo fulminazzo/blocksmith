@@ -44,6 +44,31 @@ public final class CommandParser {
     }
 
     /**
+     * Converts the given raw command input to a node of commands.
+     *
+     * @return the node
+     */
+    public @NotNull CommandNode parse() {
+        CommandNode first = null;
+        LiteralNode lastLiteral = null;
+        CommandNode last = null;
+        while (tokenizer.next() != CommandToken.EOF) {
+            CommandNode node = parseExpression();
+            if (first == null) first = node;
+            else last.addChild(node);
+            if (node instanceof LiteralNode) lastLiteral = (LiteralNode) node;
+            last = node;
+        }
+        if (first == null) throw parseException("could not parse command");
+        last.setExecutionInfo(executionInfo);
+
+        if (lastLiteral == null) throw parseException("at least one literal must be given to identify the command");
+        else lastLiteral.setCommandInfo(commandInfo);
+
+        return first;
+    }
+
+    /**
      * EXPRESSION := OPTIONAL_ARGUMENT | MANDATORY_ARGUMENT | ALIASES_LITERAL | SIMPLE_LITERAL
      *
      * @return the node
