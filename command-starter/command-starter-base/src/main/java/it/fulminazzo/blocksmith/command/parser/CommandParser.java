@@ -249,8 +249,37 @@ public final class CommandParser {
                 CommandNode node = parser.parse();
 
                 commands.add(node);
+
+                commandInfo.merge(getComputedCommandInfo(node, rawCommand));
             }
         return commands;
+    }
+
+    /**
+     * Computes a default Command info object from the given node and the corresponding command declaration.
+     *
+     * @param node       the node
+     * @param rawCommand the raw command declaration
+     * @return the computed command information
+     */
+    static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node,
+                                                       final @NotNull String rawCommand) {
+        StringBuilder computedPermission = new StringBuilder();
+        CommandNode n = node;
+        while (n != null) {
+            if (n instanceof LiteralNode) {
+                if (computedPermission.length() > 0) computedPermission.append(".");
+                computedPermission.append(n.getName());
+            }
+            n = n.getFirstChild();
+        }
+        return new CommandInfo(
+                "Description for command /" + rawCommand,
+                new PermissionInfo(
+                        computedPermission.toString(),
+                        Permission.Default.OP
+                )
+        );
     }
 
     /**
@@ -259,11 +288,12 @@ public final class CommandParser {
      * for the {@link Permission} annotation to determine the permission information.
      *
      * @param element the element
-     * @return the command info
+     * @return the command information
      */
     static @NotNull CommandInfo createCommandInfo(final @NotNull AnnotatedElement element) {
         final String description;
-        if (element.isAnnotationPresent(Command.class)) description = element.getAnnotation(Command.class).description().trim();
+        if (element.isAnnotationPresent(Command.class))
+            description = element.getAnnotation(Command.class).description().trim();
         else description = "";
 
         final String permission;
