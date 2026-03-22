@@ -250,7 +250,7 @@ public final class CommandParser {
 
                 commands.add(node);
 
-                commandInfo.merge(getComputedCommandInfo(node, rawCommand));
+                commandInfo.merge(getComputedCommandInfo(node));
             }
         return commands;
     }
@@ -258,12 +258,10 @@ public final class CommandParser {
     /**
      * Computes a default Command info object from the given node and the corresponding command declaration.
      *
-     * @param node       the node
-     * @param rawCommand the raw command declaration
+     * @param node the node
      * @return the computed command information
      */
-    static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node,
-                                                       final @NotNull String rawCommand) {
+    static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node) {
         StringBuilder computedPermission = new StringBuilder();
         CommandNode n = node;
         while (n != null) {
@@ -274,7 +272,7 @@ public final class CommandParser {
             n = n.getFirstChild();
         }
         return new CommandInfo(
-                "Description for command /" + rawCommand,
+                "command.description." + computedPermission,
                 new PermissionInfo(
                         computedPermission.toString(),
                         Permission.Default.OP

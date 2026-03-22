@@ -40,7 +40,7 @@ class CommandParserTest extends Specification {
         def plugin = new LiteralNode('plugin')
         plugin.addChild(async)
         plugin.commandInfo = new CommandInfo(
-                'Description for command /reload plugin',
+                'command.description.reload.plugin',
                 new PermissionInfo(
                         'reload.plugin',
                         Permission.Default.OP
