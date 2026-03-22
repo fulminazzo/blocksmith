@@ -36,6 +36,15 @@ public abstract class CommandNode {
     public abstract @NotNull String getName();
 
     /**
+     * Gets the first child.
+     *
+     * @return the first child (if present)
+     */
+    public @Nullable CommandNode getFirstChild() {
+        return !children.isEmpty() ? children.iterator().next() : null;
+    }
+
+    /**
      * Adds a new child to this node.
      *
      * @param child the child
