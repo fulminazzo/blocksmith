@@ -72,7 +72,7 @@ public abstract class CommandRegistry {
             nodes.addAll(CommandParser.parseCommands(commandModule, getSenderType(), getPrefix()));
         Map<String, LiteralNode> map = new HashMap<>();
         for (CommandNode node : nodes)
-            commands.merge(node.getName(), (LiteralNode) node, LiteralNode::merge);
+            map.merge(node.getName(), (LiteralNode) node, LiteralNode::merge);
         return map;
     }
 
