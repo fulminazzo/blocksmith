@@ -22,7 +22,7 @@ enum CommandToken {
 
     SPACE("( |\r|\n|\t)+"),
 
-    LITERAL("[A-Za-z0-9_]+"),
+    LITERAL("[A-Za-z_][A-Za-z0-9_]*"),
     EOF("");
 
     private final @NotNull String regex;
