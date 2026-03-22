@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 @Setter(AccessLevel.NONE)
 public final class PermissionInfo {
     @NotNull String permission;
-    final @NotNull Permission.Default permissionDefault;
+    @NotNull Permission.Default permissionDefault;
 
     /**
      * Merges the given permission information into the current one
@@ -25,7 +25,8 @@ public final class PermissionInfo {
      */
     public void merge(final @NotNull PermissionInfo permissionInfo) {
         if (permission.isEmpty()) permission = permissionInfo.getPermission();
-
+        if (permissionDefault == Permission.Default.OP)
+            permissionDefault = permissionInfo.getPermissionDefault();
     }
 
 }
