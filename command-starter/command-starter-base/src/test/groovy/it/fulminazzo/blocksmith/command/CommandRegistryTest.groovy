@@ -89,6 +89,15 @@ class CommandRegistryTest extends Specification {
 
         then:
         registry.commands == expected
+
+        when:
+        registry.commands.clear()
+
+        and:
+        registry.register(clanExecutor).register(clanAdminExecutor)
+
+        then:
+        registry.commands == expected
     }
 
     def 'test that register does not call onRegister but stores command for later registration'() {

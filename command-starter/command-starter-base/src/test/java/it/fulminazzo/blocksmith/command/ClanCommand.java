@@ -5,7 +5,7 @@ import it.fulminazzo.blocksmith.command.annotation.Permission;
 
 @SuppressWarnings("unused")
 @Command(value = "(clan|team|gang)", description = "Clan base command")
-@Permission(value = "blocksmith.clan", permissionDefault = Permission.Default.ALL)
+@Permission(value = "blocksmith.edited.clan", permissionDefault = Permission.Default.ALL)
 final class ClanCommand {
 
     @Command
