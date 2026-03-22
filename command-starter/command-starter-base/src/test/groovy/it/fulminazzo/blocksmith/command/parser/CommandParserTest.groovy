@@ -21,6 +21,17 @@ class CommandParserTest extends Specification {
 
         and:
         def clan = new LiteralNode(*baseAliases)
+        clan.executionInfo = new ExecutionInfo(
+                executor,
+                ClanCommand.getMethod('execute', CommandSender)
+        )
+        clan.commandInfo = new CommandInfo(
+                'command.description.clan',
+                new PermissionInfo(
+                        'clan',
+                        Permission.Default.OP
+                )
+        )
         expected.add(clan)
 
         and:
