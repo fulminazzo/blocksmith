@@ -62,15 +62,6 @@ public final class CommandExecutionContext {
     }
 
     /**
-     * Gets the input size (separated by spaces).
-     *
-     * @return the input size
-     */
-    public int getSize() {
-        return input.size();
-    }
-
-    /**
      * Adds a new parsed argument to the internal pool.
      *
      * @param argument the argument
