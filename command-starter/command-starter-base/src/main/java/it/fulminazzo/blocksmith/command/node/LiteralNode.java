@@ -1,6 +1,9 @@
 package it.fulminazzo.blocksmith.command.node;
 
-import lombok.*;
+import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,11 +34,6 @@ public final class LiteralNode extends CommandNode {
         for (String literal : literals) this.aliases.add(literal.trim().toLowerCase());
     }
 
-    @Override
-    public boolean matches(final @NotNull String token) {
-        return aliases.contains(token.trim().toLowerCase());
-    }
-
     /**
      * If this literal represents the final command (or subcommand) of a command route,
      * its command information will be available.
@@ -57,6 +55,16 @@ public final class LiteralNode extends CommandNode {
             });
         }
         return (LiteralNode) super.merge(node);
+    }
+
+    @Override
+    protected void validateInput(final @NotNull CommandExecutionContext context) {
+        // should already be validated
+    }
+
+    @Override
+    public boolean matches(final @NotNull String token) {
+        return aliases.contains(token.trim().toLowerCase());
     }
 
 }
