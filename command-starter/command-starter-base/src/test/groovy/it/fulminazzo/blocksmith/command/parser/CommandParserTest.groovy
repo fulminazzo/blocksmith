@@ -1,15 +1,42 @@
 package it.fulminazzo.blocksmith.command.parser
 
+
 import it.fulminazzo.blocksmith.command.annotation.Permission
-import it.fulminazzo.blocksmith.command.node.ArgumentNode
-import it.fulminazzo.blocksmith.command.node.CommandInfo
-import it.fulminazzo.blocksmith.command.node.ExecutionInfo
-import it.fulminazzo.blocksmith.command.node.LiteralNode
-import it.fulminazzo.blocksmith.command.node.PermissionInfo
+import it.fulminazzo.blocksmith.command.node.*
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 class CommandParserTest extends Specification {
+
+    def 'test that parseExpression of #input returns #expected'() {
+        given:
+        def parser = newMockCommandParser(input)
+
+        when:
+        def node = parser.parseExpression()
+
+        then:
+        node == expected
+
+        where:
+        input                  || expected
+        '[test]'               || new ArgumentNode('test', String, true)
+        '<test>'               || new ArgumentNode('test', String, false)
+        '(first|second|third)' || new LiteralNode('first', 'second', 'third')
+        'test'                 || new LiteralNode('test')
+    }
+
+    def 'test that parseExpression throws for non-optional argument after optional argument'() {
+        given:
+        def parser = newMockCommandParser('test')
+        parser.optionalArguments = true
+
+        when:
+        parser.parseExpression()
+
+        then:
+        thrown(CommandParseException)
+    }
 
     def 'test that parseOptionalArgument works'() {
         given:
