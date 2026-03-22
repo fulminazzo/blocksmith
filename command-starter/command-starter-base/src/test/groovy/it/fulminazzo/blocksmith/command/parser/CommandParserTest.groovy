@@ -1,12 +1,75 @@
 package it.fulminazzo.blocksmith.command.parser
 
-
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.*
 import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 import spock.lang.Specification
 
 class CommandParserTest extends Specification {
+
+    def 'test that parse works'() {
+        given:
+        def input = 'clan member <player> (promote|rankup) <rank> [reason]'
+
+        and:
+        def commandInfo = new CommandInfo(
+                'Example command',
+                new PermissionInfo('clan.member.promote', Permission.Default.OP)
+        )
+
+        and:
+        def executionInfo = new ExecutionInfo(
+                CommandParserTest,
+                CommandParserTest.getDeclaredMethod('promote', Object, Object, String, String)
+        )
+
+        and:
+        def reason = new ArgumentNode('reason', String, true)
+        reason.executionInfo = executionInfo
+
+        def rank = new ArgumentNode('rank', String, false)
+        rank.addChild(reason)
+
+        def promote = new LiteralNode('promote', 'rankup')
+        promote.commandInfo = commandInfo
+        promote.addChild(rank)
+
+        def player = new ArgumentNode('player', Object, false)
+        player.addChild(promote)
+
+        def member = new LiteralNode('member')
+        member.addChild(player)
+
+        def expected = new LiteralNode('clan')
+        expected.addChild(member)
+
+        and:
+        def parser = new CommandParser(input, commandInfo, executionInfo, 1)
+
+        when:
+        def actual = parser.parse()
+
+        then:
+        actual == expected
+    }
+
+    def 'test that parse throws for #input'() {
+        given:
+        def parser = newMockCommandParser(input)
+
+        when:
+        parser.parse()
+
+        then:
+        thrown(CommandParseException)
+
+        where:
+        input << [
+                '',
+                '<<first>'
+        ]
+    }
 
     def 'test that parseExpression of #input returns #expected'() {
         given:
@@ -137,6 +200,12 @@ class CommandParserTest extends Specification {
         )
         parser.tokenizer.next()
         return parser
+    }
+
+    private static void promote(final @NotNull Object commandSender,
+                                final @NotNull Object player,
+                                final @NotNull String rank,
+                                final @Nullable String reason) {
     }
 
 }
