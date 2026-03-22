@@ -1,11 +1,16 @@
 package it.fulminazzo.blocksmith.command.parser;
 
+import it.fulminazzo.blocksmith.command.annotation.Command;
 import it.fulminazzo.blocksmith.command.annotation.Default;
 import it.fulminazzo.blocksmith.command.annotation.Greedy;
+import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +45,10 @@ public final class CommandParser {
      * @param executionInfo  the execution info
      * @param parameterIndex the starting index of the parameters (excluding the command sender)
      */
-    public CommandParser(final @NotNull String command,
-                         final @NotNull CommandInfo commandInfo,
-                         final @NotNull ExecutionInfo executionInfo,
-                         final int parameterIndex) {
+    CommandParser(final @NotNull String command,
+                  final @NotNull CommandInfo commandInfo,
+                  final @NotNull ExecutionInfo executionInfo,
+                  final int parameterIndex) {
         this.rawCommand = command;
         this.tokenizer = new CommandTokenizer(command);
         this.commandInfo = commandInfo;
@@ -214,6 +219,66 @@ public final class CommandParser {
         return CommandParseException.of("Invalid input in command '%s': " + message,
                 Stream.concat(Stream.of(rawCommand), Stream.of(args)).toArray()
         );
+    }
+
+    /**
+     * Obtains all the Command nodes from the given class.
+     * Command nodes will be created from static functions annotated with {@link Command}.
+     *
+     * @param commandsContainer the commands container
+     * @param senderType        the type of the sender (to identify methods with sender declared)
+     * @return the nodes
+     */
+    public static @NotNull List<CommandNode> parseAnonymousCommands(final @NotNull Class<?> commandsContainer,
+                                                                    final @NotNull Class<?> senderType) {
+        List<CommandNode> commands = new ArrayList<>();
+        for (Method method : commandsContainer.getMethods())
+            if (Modifier.isStatic(method.getModifiers()) && method.isAnnotationPresent(Command.class)) {
+                Command annotation = method.getAnnotation(Command.class);
+
+                String rawCommand = annotation.value().trim();
+                if (rawCommand.isEmpty())
+                    throw CommandParseException.of("Invalid command method %s: command cannot be empty", method);
+
+                CommandInfo commandInfo = createCommandInfo(method);
+                ExecutionInfo executionInfo = new ExecutionInfo(commandsContainer, method);
+                int parameterIndex = 0;
+                if (method.getParameterTypes()[0].equals(senderType)) parameterIndex++;
+
+                CommandParser parser = new CommandParser(rawCommand, commandInfo, executionInfo, parameterIndex);
+                CommandNode node = parser.parse();
+
+                commands.add(node);
+            }
+        return commands;
+    }
+
+    /**
+     * Creates a Command info object from the given element.
+     * Will check for the {@link Command} annotation to determine the description and
+     * for the {@link Permission} annotation to determine the permission information.
+     *
+     * @param element the element
+     * @return the command info
+     */
+    static @NotNull CommandInfo createCommandInfo(final @NotNull AnnotatedElement element) {
+        final String description;
+        if (element.isAnnotationPresent(Command.class)) description = element.getAnnotation(Command.class).description().trim();
+        else description = "";
+
+        final String permission;
+        final Permission.Default scope;
+        if (element.isAnnotationPresent(Permission.class)) {
+            Permission permissionAnnotation = element.getAnnotation(Permission.class);
+            permission = permissionAnnotation.value().trim();
+            scope = permissionAnnotation.permissionDefault();
+        } else {
+            permission = "";
+            scope = Permission.Default.OP;
+        }
+
+        PermissionInfo permissionInfo = new PermissionInfo(permission, scope);
+        return new CommandInfo(description, permissionInfo);
     }
 
 }
