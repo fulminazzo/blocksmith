@@ -48,6 +48,11 @@ public final class LiteralNode extends CommandNode {
 
     @Override
     public @NotNull LiteralNode merge(final @NotNull CommandNode node) {
+        if (node instanceof LiteralNode) {
+            LiteralNode literalNode = (LiteralNode) node;
+            aliases.addAll(literalNode.aliases);
+            if (commandInfo == null) literalNode.getCommandInfo().ifPresent(this::setCommandInfo);
+        }
         return (LiteralNode) super.merge(node);
     }
 
