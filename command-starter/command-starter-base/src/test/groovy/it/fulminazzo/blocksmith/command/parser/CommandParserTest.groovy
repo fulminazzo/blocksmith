@@ -12,6 +12,139 @@ import spock.lang.Specification
 
 class CommandParserTest extends Specification {
 
+    def 'test parseCommands returns all commands'() {
+        given:
+        def executor = new ClanCommand()
+        def expected = []
+        def baseAliases = ['clan', 'team', 'gang']
+
+        and:
+        def name = new ArgumentNode('name', String, true)
+        name.defaultValue = 'self'
+        name.executionInfo = new ExecutionInfo(
+                executor,
+                ClanCommand.getMethod('getClanInfo', CommandSender, String)
+        )
+        def info = new LiteralNode('info', 'information', 'state')
+        info.commandInfo = new CommandInfo(
+                'Information command',
+                new PermissionInfo(
+                        'clan.info',
+                        Permission.Default.OP
+                )
+        )
+        info.addChild(name)
+        def clan = new LiteralNode(*baseAliases)
+        clan.addChild(info)
+        expected.add(clan)
+
+        and:
+        def verbose = new ArgumentNode('verbose', boolean, false)
+        verbose.executionInfo = new ExecutionInfo(
+                executor,
+                ClanCommand.getMethod('help', CommandSender, boolean)
+        )
+        def help = new LiteralNode('help')
+        help.commandInfo = new CommandInfo(
+                'command.description.clan.help',
+                new PermissionInfo(
+                        'clan.help',
+                        Permission.Default.ALL
+                )
+        )
+        help.addChild(verbose)
+        clan = new LiteralNode(*baseAliases)
+        clan.addChild(help)
+        expected.add(clan)
+
+        and:
+        def admin = new LiteralNode('admin')
+        admin.executionInfo = new ExecutionInfo(
+                executor,
+                ClanCommand.getMethod('admin')
+        )
+        admin.commandInfo = new CommandInfo(
+                'command.description.clan.admin',
+                new PermissionInfo(
+                        'clan.admin',
+                        Permission.Default.OP
+                )
+        )
+        clan = new LiteralNode(*baseAliases)
+        clan.addChild(admin)
+        expected.add(clan)
+
+        and:
+        def target = new ArgumentNode('target', String, false)
+        target.executionInfo = new ExecutionInfo(
+                executor,
+                ClanCommand.getMethod('adminInvite', CommandSender, Object)
+        )
+        def invite = new LiteralNode('invite')
+        invite.commandInfo = new CommandInfo(
+                'command.description.clan.admin.invite',
+                new PermissionInfo(
+                        'clan.admin.invite',
+                        Permission.Default.OP
+                )
+        )
+        invite.addChild(target)
+        admin = new LiteralNode('admin')
+        admin.addChild(invite)
+        clan = new LiteralNode(*baseAliases)
+        clan.addChild(admin)
+        expected.add(clan)
+
+        and:
+        def members = new LiteralNode('members')
+        members.executionInfo = new ExecutionInfo(
+                executor,
+                ClanCommand.getMethod('adminMembers', CommandSender)
+        )
+        members.commandInfo = new CommandInfo(
+                'command.description.clan.admin.members',
+                new PermissionInfo(
+                        'clan.admin.members',
+                        Permission.Default.ALL
+                )
+        )
+        members.addChild(target)
+        admin = new LiteralNode('admin')
+        admin.addChild(members)
+        clan = new LiteralNode(*baseAliases)
+        clan.addChild(admin)
+        expected.add(clan)
+
+        and:
+        target = new ArgumentNode('target', String, false)
+        target.executionInfo = new ExecutionInfo(
+                executor,
+                ClanCommand.getMethod('adminMembersKick', CommandSender, Object)
+        )
+        def kick = new LiteralNode('kick')
+        kick.commandInfo = new CommandInfo(
+                'command.description.clan.admin.members.kick',
+                new PermissionInfo(
+                        'clan.admin.members.kick',
+                        Permission.Default.OP
+                )
+        )
+        kick.addChild(target)
+        members = new LiteralNode('members')
+        members.addChild(kick)
+        admin = new LiteralNode('admin')
+        admin.addChild(members)
+        clan = new LiteralNode(*baseAliases)
+        clan.addChild(admin)
+        expected.add(clan)
+
+        when:
+        def actual = CommandParser.parseCommands(executor, CommandSender)
+
+        then:
+        actual.sort { getCommandName(it) } == expected.sort { getCommandName(it) }
+    }
+
     def 'test parseAnonymousCommands returns all commands'() {
         given:
         def command = new ArgumentNode('command', String, true)
@@ -54,10 +187,10 @@ class CommandParserTest extends Specification {
         def expected = [help, reload]
 
         when:
-        def actual = CommandParser.parseAnonymousCommands(GeneralCommands, CommandSender)
+        def actual = CommandParser.parseCommands(GeneralCommands, CommandSender)
 
         then:
-        actual.sort { it.name } == expected.sort { it.name }
+        actual.sort { getCommandName(it) } == expected.sort { getCommandName(it) }
     }
 
     def 'test that parse works'() {
@@ -307,6 +440,16 @@ class CommandParserTest extends Specification {
 
     private static void greedy(final @NotNull @Greedy String argument) {
 
+    }
+
+    private static String getCommandName(final @NotNull CommandNode node) {
+        def name = ''
+        def n = node
+        while (n != null) {
+            if (n instanceof LiteralNode) name += n.name + '_'
+            n = n.firstChild
+        }
+        return name[0..-2]
     }
 
 }
