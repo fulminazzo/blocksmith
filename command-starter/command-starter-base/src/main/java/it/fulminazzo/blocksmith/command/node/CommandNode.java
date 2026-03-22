@@ -52,9 +52,10 @@ public abstract class CommandNode {
     }
 
     /**
-     * Gets the execution info.
+     * If this node contains execution information, it represents the end of a command route.
+     * As such, it should be executable with the parsed arguments so far.
      *
-     * @return the execution info, if available
+     * @return the execution information, if available
      */
     public Optional<ExecutionInfo> getExecutionInfo() {
         return Optional.ofNullable(executionInfo);
