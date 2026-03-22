@@ -80,6 +80,28 @@ class CommandParserTest extends Specification {
         thrown(CommandParseException)
     }
 
+    def 'test that parse throws for invalid number of arguments and parameters'() {
+        given:
+        def parser = new CommandParser(
+                'clan member <player> (promote|rankup) <rank>',
+                new CommandInfo(
+                        '',
+                        new PermissionInfo('', Permission.Default.NONE)
+                ),
+                new ExecutionInfo(
+                        CommandParserTest,
+                        CommandParserTest.getDeclaredMethod('promote', Object, Object, String, String)
+                ),
+                1
+        )
+
+        when:
+        parser.parse()
+
+        then:
+        thrown(CommandParseException)
+    }
+
     def 'test that parse throws for #input'() {
         given:
         def parser = newMockCommandParser(input)

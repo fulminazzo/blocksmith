@@ -21,6 +21,7 @@ public final class CommandParser {
     private final @NotNull ExecutionInfo executionInfo;
     private final @NotNull Parameter[] parameters;
 
+    private final int startIndex;
     private int parameterIndex;
     // Signals that an optional argument has been reached;
     // therefore, all the following nodes must be optional arguments.
@@ -46,6 +47,7 @@ public final class CommandParser {
         this.commandInfo = commandInfo;
         this.executionInfo = executionInfo;
         this.parameters = executionInfo.getMethod().getParameters();
+        this.startIndex = parameterIndex;
         this.parameterIndex = parameterIndex;
     }
 
@@ -74,6 +76,11 @@ public final class CommandParser {
         if (lastLiteral == null) throw parseException("at least one literal must be given to identify the command");
         else lastLiteral.setCommandInfo(commandInfo);
 
+        if (parameterIndex != parameters.length)
+            throw parseException("method %s declares %s argument parameters, but only %s arguments were given",
+                    executionInfo.getMethod(), parameters.length - startIndex, parameterIndex - startIndex
+            );
+
         return first;
     }
 
@@ -85,7 +92,7 @@ public final class CommandParser {
     @NotNull CommandNode parseExpression() {
         if (greedyArgument != null)
             throw parseException("after declaring greedy argument '%s', no subsequent node can be specified " +
-                    "(the greedy argument will inglobate all the remaining input anyway)",
+                            "(the greedy argument will inglobate all the remaining input anyway)",
                     greedyArgument);
         CommandToken lastToken = tokenizer.getLastToken();
         if (lastToken == CommandToken.OPEN_BRACKET)
