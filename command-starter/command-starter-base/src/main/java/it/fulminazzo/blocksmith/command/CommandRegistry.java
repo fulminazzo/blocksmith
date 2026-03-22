@@ -9,9 +9,7 @@ import it.fulminazzo.blocksmith.command.parser.CommandParser;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,14 +34,19 @@ public abstract class CommandRegistry {
         if (state == State.REGISTERED)
             throw new IllegalStateException("It is not possible to register new commands at this time. Please register all commands before committing");
         state = State.REGISTERING;
-        for (Object commandModule : commandModules) {
-            List<CommandNode> nodes = CommandParser.parseCommands(commandModule, getSenderType(), getPrefix());
-            for (CommandNode node : nodes) {
-                LiteralNode literalNode = (LiteralNode) node;
-                commands.merge(literalNode.getName(), literalNode, LiteralNode::merge);
-            }
-        }
+        for (LiteralNode node : getCommandNodes(commandModules).values())
+            commands.merge(node.getName(), node, LiteralNode::merge);
         return this;
+    }
+
+    private @NotNull Map<String, LiteralNode> getCommandNodes(final Object @NotNull ... commandModules) {
+        List<CommandNode> nodes = new ArrayList<>();
+        for (Object commandModule : commandModules)
+            nodes.addAll(CommandParser.parseCommands(commandModule, getSenderType(), getPrefix()));
+        Map<String, LiteralNode> map = new HashMap<>();
+        for (CommandNode node : nodes)
+            commands.merge(node.getName(), (LiteralNode) node, LiteralNode::merge);
+        return map;
     }
 
     /**
