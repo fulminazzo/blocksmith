@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import lombok.Data;
@@ -34,8 +35,7 @@ public final class ArgumentNode<T> extends CommandNode {
     }
 
     private @Nullable T parseArgument(final @NotNull String argument) throws CommandExecutionException {
-        //TODO: parsers
-        throw new UnsupportedOperationException();
+        return ArgumentParsers.of(type).parse(argument);
     }
 
     @Override
