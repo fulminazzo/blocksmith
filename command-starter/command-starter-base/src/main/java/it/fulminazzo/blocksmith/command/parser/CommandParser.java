@@ -15,7 +15,11 @@ public final class CommandParser {
     private final @NotNull CommandInfo commandInfo;
     private final @NotNull ExecutionInfo executionInfo;
     private final @NotNull Class<?>[] parameterTypes;
+
     private int parameterIndex;
+    // Signals that an optional argument has been reached;
+    // therefore, all the following nodes must be optional arguments.
+    private boolean optionalArguments;
 
     /**
      * Instantiates a new Command parser.
@@ -46,6 +50,8 @@ public final class CommandParser {
         CommandToken lastToken = tokenizer.getLastToken();
         if (lastToken == CommandToken.OPEN_BRACKET)
             return parseOptionalArgument();
+        else if (optionalArguments)
+            throw CommandParseException.of("Invalid input in command '%s': an optional argument has been defined, therefore all upcoming nodes must be optional arguments as well", rawCommand);
         else switch (lastToken) {
             case LOWER_THAN:
                 return parseMandatoryArgument();
@@ -87,6 +93,7 @@ public final class CommandParser {
      * @return the node
      */
     @NotNull CommandNode parseGeneralArgument(final boolean optional) {
+        if (optional) optionalArguments = true;
         match(CommandToken.LITERAL);
         if (parameterIndex >= parameterTypes.length)
             throw CommandParseException.of("Invalid input in command '%s': received argument '%s' but no matching parameter was found",
