@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,11 +11,12 @@ import java.util.Set;
 /**
  * A {@link CommandNode} to represent general literals.
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public final class LiteralNode extends CommandNode {
-    @Getter
     private final @NotNull String name;
     private final @NotNull Set<String> aliases;
-    @Setter
     private @Nullable CommandInfo commandInfo;
 
     /**
