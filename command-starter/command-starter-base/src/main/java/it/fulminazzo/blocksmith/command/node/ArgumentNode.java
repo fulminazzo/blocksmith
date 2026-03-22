@@ -15,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
  * @param <T> the type of the argument
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
+@ToString(callSuper = true, doNotUseGetters = true)
 public final class ArgumentNode<T> extends CommandNode {
     private final @NotNull String name;
     private final @NotNull Class<T> type;
