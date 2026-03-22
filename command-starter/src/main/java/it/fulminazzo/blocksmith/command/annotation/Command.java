@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface Command {
 
-    @NotNull String value();
+    @NotNull String value() default "";
 
     @NotNull String description() default "";
 
