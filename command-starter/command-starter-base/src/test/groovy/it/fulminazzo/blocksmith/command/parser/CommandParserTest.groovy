@@ -29,13 +29,14 @@ class CommandParserTest extends Specification {
     def 'test that parseExpression throws for non-optional argument after optional argument'() {
         given:
         def parser = newMockCommandParser('test')
-        parser.optionalArguments = true
+        parser.optionalArgument = 'optional'
 
         when:
         parser.parseExpression()
 
         then:
-        thrown(CommandParseException)
+        def e = thrown(CommandParseException)
+        e.message == "Invalid input in command 'test': after declaring optional argument 'optional', all subsequent nodes MUST be of the same kind (optional arguments)"
     }
 
     def 'test that parseOptionalArgument works'() {

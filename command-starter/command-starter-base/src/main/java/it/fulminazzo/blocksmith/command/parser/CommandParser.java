@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.parser;
 
 import it.fulminazzo.blocksmith.command.node.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public final class CommandParser {
     private int parameterIndex;
     // Signals that an optional argument has been reached;
     // therefore, all the following nodes must be optional arguments.
-    private boolean optionalArguments;
+    private @Nullable String optionalArgument;
 
     /**
      * Instantiates a new Command parser.
@@ -51,8 +52,8 @@ public final class CommandParser {
         CommandToken lastToken = tokenizer.getLastToken();
         if (lastToken == CommandToken.OPEN_BRACKET)
             return parseOptionalArgument();
-        else if (optionalArguments)
-            throw parseException("an optional argument has been defined, therefore all upcoming nodes must be optional arguments as well");
+        else if (optionalArgument != null)
+            throw parseException("after declaring optional argument '%s', all subsequent nodes MUST be of the same kind (optional arguments)", optionalArgument);
         else switch (lastToken) {
             case LOWER_THAN:
                 return parseMandatoryArgument();
@@ -94,11 +95,12 @@ public final class CommandParser {
      * @return the node
      */
     @NotNull CommandNode parseGeneralArgument(final boolean optional) {
-        if (optional) optionalArguments = true;
         match(CommandToken.LITERAL);
+        String argument = tokenizer.getLastRead();
+        if (optional) optionalArgument = argument;
         if (parameterIndex >= parameterTypes.length)
-            throw parseException("received argument '%s' but no matching parameter was found", tokenizer.getLastRead());
-        ArgumentNode<?> node = new ArgumentNode<>(tokenizer.getLastRead(), parameterTypes[parameterIndex++], optional);
+            throw parseException("received argument '%s' but no matching parameter was found", argument);
+        ArgumentNode<?> node = new ArgumentNode<>(argument, parameterTypes[parameterIndex++], optional);
         tokenizer.next();
         return node;
     }
