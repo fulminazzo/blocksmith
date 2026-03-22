@@ -2,6 +2,7 @@
 package it.fulminazzo.blocksmith.command.parser
 
 import it.fulminazzo.blocksmith.command.CommandSender
+import it.fulminazzo.blocksmith.command.annotation.Command
 import it.fulminazzo.blocksmith.command.annotation.Default
 import it.fulminazzo.blocksmith.command.annotation.Greedy
 import it.fulminazzo.blocksmith.command.annotation.Permission
@@ -145,6 +146,20 @@ class CommandParserTest extends Specification {
         actual.sort { getCommandName(it) } == expected.sort { getCommandName(it) }
     }
 
+    def 'test parseCommands throws with #type'() {
+        when:
+        CommandParser.parseCommands(type.getConstructor().newInstance(), CommandSender)
+
+        then:
+        thrown(CommandParseException)
+
+        where:
+        type << [
+                CommandParserTest,
+                CommandNotGiven
+        ]
+    }
+
     def 'test parseAnonymousCommands returns all commands'() {
         given:
         def command = new ArgumentNode('command', String, true)
@@ -191,6 +206,14 @@ class CommandParserTest extends Specification {
 
         then:
         actual.sort { getCommandName(it) } == expected.sort { getCommandName(it) }
+    }
+
+    def 'test that parseAnonymousCommands throws for not given command method'() {
+        when:
+        CommandParser.parseAnonymousCommands(CommandNotGiven, CommandSender)
+
+        then:
+        thrown(CommandParseException)
     }
 
     def 'test that parse works'() {
@@ -450,6 +473,16 @@ class CommandParserTest extends Specification {
             n = n.firstChild
         }
         return name[0..-2]
+    }
+
+    @Command
+    static final class CommandNotGiven {
+
+        @Command
+        static void commandNotGiven() {
+
+        }
+
     }
 
 }
