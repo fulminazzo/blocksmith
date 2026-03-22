@@ -38,15 +38,22 @@ public final class CommandParser {
     }
 
     /**
-     * MANDATORY_ARGUMENT := &lt; GENERAL_ARGUMENT &gt;
+     * EXPRESSION := OPTIONAL_ARGUMENT | MANDATORY_ARGUMENT | ALIASES_LITERAL | SIMPLE_LITERAL
      *
      * @return the node
      */
-    @NotNull CommandNode parseMandatoryArgument() {
-        consume(CommandToken.LOWER_THAN);
-        CommandNode node = parseGeneralArgument(false);
-        consume(CommandToken.GREATER_THAN);
-        return node;
+    @NotNull CommandNode parseExpression() {
+        CommandToken lastToken = tokenizer.getLastToken();
+        if (lastToken == CommandToken.OPEN_BRACKET)
+            return parseOptionalArgument();
+        else switch (lastToken) {
+            case LOWER_THAN:
+                return parseMandatoryArgument();
+            case OPEN_PHARENTHESIS:
+                return parseAliasesLiteral();
+            default:
+                return parseSimpleLiteral();
+        }
     }
 
     /**
@@ -58,6 +65,18 @@ public final class CommandParser {
         consume(CommandToken.OPEN_BRACKET);
         CommandNode node = parseGeneralArgument(true);
         consume(CommandToken.CLOSE_BRACKET);
+        return node;
+    }
+
+    /**
+     * MANDATORY_ARGUMENT := &lt; GENERAL_ARGUMENT &gt;
+     *
+     * @return the node
+     */
+    @NotNull CommandNode parseMandatoryArgument() {
+        consume(CommandToken.LOWER_THAN);
+        CommandNode node = parseGeneralArgument(false);
+        consume(CommandToken.GREATER_THAN);
         return node;
     }
 
