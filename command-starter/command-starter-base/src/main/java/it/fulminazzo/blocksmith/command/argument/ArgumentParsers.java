@@ -13,7 +13,7 @@ import java.util.Map;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ArgumentParsers {
-    private static final @NotNull Map<Class<?>, ArgumentParser<?>> PARSERS = new HashMap<>();
+    private static final @NotNull Map<Class<?>, ArgumentParser<?>> parsers = new HashMap<>();
 
     static {
         register(String.class, s -> s);
@@ -29,7 +29,7 @@ public final class ArgumentParsers {
      */
     @SuppressWarnings("unchecked")
     public static <T> @NotNull ArgumentParser<T> of(final @NotNull Class<T> type) {
-        ArgumentParser<?> parser = PARSERS.get(ReflectionUtils.toWrapper(type));
+        ArgumentParser<?> parser = parsers.get(ReflectionUtils.toWrapper(type));
         if (parser == null)
             throw new IllegalArgumentException("No parser found for type " + type.getCanonicalName());
         return (ArgumentParser<T>) parser;
@@ -44,7 +44,7 @@ public final class ArgumentParsers {
      */
     public static <T> void register(final @NotNull Class<T> type,
                                     final @NotNull ArgumentParser<T> parser) {
-        PARSERS.put(type, parser);
+        parsers.put(type, parser);
     }
 
 }
