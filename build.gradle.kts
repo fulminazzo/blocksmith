@@ -19,6 +19,7 @@ allprojects {
     dependencies {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
+        testAnnotationProcessor(rootProject.libs.lombok)
 
         testImplementation(rootProject.libs.bundles.annotations)
         testImplementation(rootProject.libs.bundles.test.framework)
