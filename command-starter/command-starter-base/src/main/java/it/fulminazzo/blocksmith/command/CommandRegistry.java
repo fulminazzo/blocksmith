@@ -21,6 +21,33 @@ public abstract class CommandRegistry {
     private @NotNull State state = State.INITIAL;
 
     /**
+     * Allows to dynamically insert new commands after a {@link #commit()} call.
+     * <br>
+     * <b>WARNING</b>: this method has not been tested in every platform.
+     * As such, it might cause some unexpected behavior.
+     *
+     * @param commandModules the command modules
+     * @return this object (for method chaining)
+     */
+    public final @NotNull CommandRegistry insert(final Object @NotNull ... commandModules) {
+        if (state != State.REGISTERED)
+            throw new IllegalStateException(String.format("This method is only available after registration. " +
+                    "Please call %s#commit() before using it", getClass().getSimpleName()));
+        Map<String, LiteralNode> nodes = getCommandNodes(commandModules);
+        for (LiteralNode node : nodes.values()) {
+            String name = node.getName();
+            if (commands.containsKey(name))
+                throw new IllegalArgumentException(String.format("Could not add command '%s' as it has already been registered", name));
+        }
+        for (String name : nodes.keySet()) {
+            LiteralNode node = nodes.get(name);
+            commands.put(name, node);
+            registerSingle(name, node);
+        }
+        return this;
+    }
+
+    /**
      * Extracts all the methods annotated with {@link it.fulminazzo.blocksmith.command.annotation.Command}
      * from the given modules and adds them to the registration pool.
      * <br>
@@ -60,13 +87,17 @@ public abstract class CommandRegistry {
         else if (state != State.REGISTERING)
             throw new IllegalStateException("No commands has been registered at this time");
         state = State.REGISTERED;
-        commands.forEach((name, node) ->
-                onRegister(name, node.getCommandInfo().orElse(new CommandInfo(
-                        CommandParser.getDefaultDescription(name),
-                        new PermissionInfo(getPrefix() + "." + name, Permission.Default.OP, true)
-                )))
-        );
+        commands.forEach(this::registerSingle);
         return this;
+    }
+
+    @SuppressWarnings("deprecation")
+    private void registerSingle(final @NotNull String commandName,
+                                final @NotNull LiteralNode commandNode) {
+        onRegister(commandName, commandNode.getCommandInfo().orElse(new CommandInfo(
+                CommandParser.getDefaultDescription(commandName),
+                new PermissionInfo(getPrefix() + "." + commandName, Permission.Default.OP, true)
+        )));
     }
 
     /**
