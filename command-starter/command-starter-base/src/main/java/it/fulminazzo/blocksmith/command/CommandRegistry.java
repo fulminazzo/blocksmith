@@ -60,7 +60,7 @@ public abstract class CommandRegistry {
         commands.forEach((name, node) ->
                 onRegister(name, node.getCommandInfo().orElse(new CommandInfo(
                         CommandParser.getDefaultDescription(name),
-                        new PermissionInfo(getPrefix() + "." + name, Permission.Default.OP)
+                        new PermissionInfo(getPrefix() + "." + name, Permission.Default.OP, true)
                 )))
         );
         return this;
@@ -71,7 +71,8 @@ public abstract class CommandRegistry {
      */
     public final void unregisterAll() {
         if (state != State.REGISTERED)
-            throw new IllegalStateException(String.format("Commands have not been registered yet. Did you forget to call %s#commit()?", getClass().getSimpleName()));
+            throw new IllegalStateException(String.format("Commands have not been registered yet. " +
+                    "Did you forget to call %s#commit()?", getClass().getSimpleName()));
         state = State.INITIAL;
         new HashSet<>(commands.keySet()).forEach(this::unregister);
     }

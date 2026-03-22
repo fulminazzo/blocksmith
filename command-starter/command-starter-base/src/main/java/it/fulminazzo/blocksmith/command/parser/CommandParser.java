@@ -329,7 +329,8 @@ public final class CommandParser {
                 getDefaultDescription(permission),
                 new PermissionInfo(
                         (prefix == null ? "" : prefix + ".") + permission,
-                        Permission.Default.OP
+                        Permission.Default.OP,
+                        true
                 )
         );
     }
