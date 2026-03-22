@@ -16,6 +16,55 @@ class CommandRegistryTest extends Specification {
     void setup() {
         registry = new MockCommandRegistry()
     }
+    
+    def 'test that insert correctly inserts commands after registration'() {
+        when:
+        registry.register(Commands).commit().insert(new ClanCommand())
+
+        then:
+        noExceptionThrown()
+
+        and:
+        registry.state == CommandRegistry.State.REGISTERED
+
+        and:
+        registry.commands['help'] != null
+
+        and:
+        def help = registry.registeredCommands['help']
+        help != null
+        help.permission.permission == 'blocksmith.help'
+
+        and:
+        registry.commands['clan'] != null
+
+        and:
+        def clan = registry.registeredCommands['clan']
+        clan != null
+        clan.permission.permission == 'blocksmith.edited.clan'
+    }
+
+    def 'test that insert throws if command is already added'() {
+        when:
+        registry.register(Commands).commit().insert(Commands)
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    def 'test that insert throws for state #state'() {
+        given:
+        registry.state = state
+
+        when:
+        registry.insert()
+
+        then:
+        thrown(IllegalStateException)
+
+        where:
+        state << [CommandRegistry.State.REGISTERING, CommandRegistry.State.INITIAL]
+    }
 
     def 'test that register correctly merges command modules'() {
         given:
