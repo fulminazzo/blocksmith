@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.parser
 
 import it.fulminazzo.blocksmith.command.annotation.Permission
+import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.CommandInfo
 import it.fulminazzo.blocksmith.command.node.ExecutionInfo
 import it.fulminazzo.blocksmith.command.node.LiteralNode
@@ -9,6 +10,42 @@ import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 class CommandParserTest extends Specification {
+
+    def 'test that parseOptionalArgument works'() {
+        given:
+        def parser = newMockCommandParser('[test]')
+
+        when:
+        def node = parser.parseOptionalArgument()
+
+        then:
+        node == new ArgumentNode('test', String, true)
+    }
+
+    def 'test that parseMandatoryArgument works'() {
+        given:
+        def parser = newMockCommandParser('<test>')
+
+        when:
+        def node = parser.parseMandatoryArgument()
+
+        then:
+        node == new ArgumentNode('test', String, false)
+    }
+
+    def 'test that parseGeneralArgument throws for non-matched argument'() {
+        given:
+        def parser = newMockCommandParser('test')
+
+        and:
+        parser.parameterIndex++
+
+        when:
+        parser.parseGeneralArgument(false)
+
+        then:
+        thrown(CommandParseException)
+    }
 
     def 'test that parseAliasesLiteral for #input returns #expected'() {
         given:
@@ -67,7 +104,8 @@ class CommandParserTest extends Specification {
                 new ExecutionInfo(
                         CommandParserTest,
                         CommandParserTest.getDeclaredMethod('newMockCommandParser', String)
-                )
+                ),
+                0
         )
         parser.tokenizer.next()
         return parser
