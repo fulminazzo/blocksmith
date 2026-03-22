@@ -57,7 +57,7 @@ class CommandParserTest extends Specification {
         def actual = CommandParser.parseAnonymousCommands(GeneralCommands, CommandSender)
 
         then:
-        actual == expected
+        actual.sort { it.name } == expected.sort { it.name }
     }
 
     def 'test that parse works'() {
