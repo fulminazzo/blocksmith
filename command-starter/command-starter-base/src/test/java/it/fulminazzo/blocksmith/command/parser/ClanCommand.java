@@ -10,6 +10,13 @@ import org.jetbrains.annotations.NotNull;
 @Command("(clan|team|gang)")
 public final class ClanCommand {
 
+    @Command
+    public void execute(
+            final @NotNull CommandSender sender
+    ) {
+        // something
+    }
+
     @Command(value = "(info|information|state) [name]", description = "Information command")
     public void getClanInfo(
             final @NotNull CommandSender sender,
