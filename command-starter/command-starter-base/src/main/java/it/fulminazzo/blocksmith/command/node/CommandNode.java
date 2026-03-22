@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
+import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -119,14 +120,20 @@ public abstract class CommandNode {
         handleRemainingInput(context);
     }
 
-    private void handleRemainingInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+    /**
+     * Handles the remaining input from the context.
+     *
+     * @param context the context
+     * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
+     */
+    void handleRemainingInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         if (context.advanceCursor().isDone()) {
             if (isExecutable()) internalExecute(context);
             else {
                 ArgumentNode<?> optional = getFirstOptionalArgumentNode();
                 if (optional != null) {
                     context.addParsedArgument(optional.getDefaultValue());
-                    optional.execute(context);
+                    optional.handleRemainingInput(context);
                 } else throw new CommandExecutionException("error.not-enough-arguments");
             }
         } else {
@@ -139,15 +146,20 @@ public abstract class CommandNode {
     }
 
     private void internalExecute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        ExecutionInfo executionInfo = getExecutionInfo().orElseThrow();
+        Method method = executionInfo.getMethod();
         try {
-            ExecutionInfo executionInfo = getExecutionInfo().orElseThrow();
-            Method method = executionInfo.getMethod();
             LinkedList<Object> arguments = context.getArguments();
             if (arguments.size() != method.getParameterCount())
                 arguments.addFirst(context.getCommandSender());
             method.invoke(executionInfo.getExecutor(), arguments.toArray());
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            throw new CommandExecutionException("error.internal-error", e);
+        } catch (InvocationTargetException e) {
+            throw new CommandExecutionException("error.internal-error", e.getCause());
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException(String.format("Method %s#%s should be declared public",
+                    method.getDeclaringClass().getCanonicalName(),
+                    ReflectionUtils.methodToString(method)
+            ));
         }
     }
 
