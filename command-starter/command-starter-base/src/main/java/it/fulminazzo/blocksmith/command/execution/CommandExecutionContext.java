@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command.execution;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,7 +75,7 @@ public final class CommandExecutionContext {
      *
      * @param argument the argument
      */
-    public void addParsedArgument(final @NotNull Object argument) {
+    public void addParsedArgument(final @Nullable Object argument) {
         arguments.add(argument);
     }
 
