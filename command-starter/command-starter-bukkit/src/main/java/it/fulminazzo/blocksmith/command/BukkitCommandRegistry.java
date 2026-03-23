@@ -3,10 +3,10 @@ package it.fulminazzo.blocksmith.command;
 import it.fulminazzo.blocksmith.command.node.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.message.Messenger;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
@@ -20,11 +20,11 @@ final class BukkitCommandRegistry extends CommandRegistry {
     private final @NotNull SimpleCommandMap commandMap;
     private final @NotNull Map<String, Command> knownCommands;
 
-    public BukkitCommandRegistry(final @NotNull Messenger messenger,
-                                 final @NotNull Logger logger,
-                                 final @NotNull String prefix) {
-        super(messenger, logger, prefix);
-        Reflect reflect = Reflect.on(Bukkit.getServer()).fields().values().stream()
+    public BukkitCommandRegistry(final @NotNull JavaPlugin plugin,
+                                 final @NotNull Messenger messenger,
+                                 final @NotNull Logger logger) {
+        super(messenger, logger, plugin.getName().toLowerCase());
+        Reflect reflect = Reflect.on(plugin.getServer()).fields().values().stream()
                 .filter(f -> f.get() instanceof SimpleCommandMap)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Could not find SimpleCommandMap"));
