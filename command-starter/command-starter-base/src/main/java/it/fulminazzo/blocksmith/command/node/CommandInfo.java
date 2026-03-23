@@ -55,8 +55,10 @@ public final class CommandInfo {
      * @param commandInfo the command info to merge from
      */
     public void merge(final @NotNull CommandInfo commandInfo) {
-        if (description.isEmpty() || isAutoComputed())
+        if (description.isEmpty() || isAutoComputed()) {
             description = commandInfo.getDescription();
+            autoComputed = commandInfo.isAutoComputed();
+        }
         permission.merge(commandInfo.getPermission());
     }
 
