@@ -28,7 +28,7 @@ class ArgumentNodeExecuteTest extends Specification {
             }
 
             @Override
-            List<String> getCompletions(final @NotNull CommandExecutionContext c) {
+            @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext c) {
                 def current = c.current
                 def completions = numbers
                         .collect { "$current$it" }
