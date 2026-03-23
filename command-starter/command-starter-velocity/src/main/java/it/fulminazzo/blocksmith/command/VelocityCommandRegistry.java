@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 final class VelocityCommandRegistry extends CommandRegistry {
     private final @NotNull CommandManager commandManager;
-    private final @NotNull Map<String, Set<String>> aliases = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, List<String>> registeredAliases = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new Velocity command registry.
@@ -41,9 +40,9 @@ final class VelocityCommandRegistry extends CommandRegistry {
 
     @Override
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
-        aliases.put(commandName, command.getAliases());
         List<String> aliases = new ArrayList<>(command.getAliases());
         aliases.remove(commandName);
+        registeredAliases.put(commandName, aliases);
         CommandMeta meta = commandManager.metaBuilder(commandName)
                 .aliases(aliases.toArray(new String[0]))
                 .build();
@@ -53,7 +52,7 @@ final class VelocityCommandRegistry extends CommandRegistry {
     @Override
     protected void onUnregister(final @NotNull String commandName) {
         commandManager.unregister(commandName);
-        Set<String> aliases = this.aliases.remove(commandName);
+        List<String> aliases = registeredAliases.remove(commandName);
         if (aliases != null) aliases.forEach(commandManager::unregister);
     }
 
