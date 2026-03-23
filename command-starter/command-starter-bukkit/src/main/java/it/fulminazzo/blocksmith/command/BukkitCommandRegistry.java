@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.BlocksmithApplication;
-import it.fulminazzo.blocksmith.command.node.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -12,10 +11,10 @@ import org.jetbrains.annotations.Nullable;
 import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 final class BukkitCommandRegistry extends CommandRegistry {
     private final @NotNull JavaPlugin plugin;
@@ -41,39 +40,14 @@ final class BukkitCommandRegistry extends CommandRegistry {
 
     @Override
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
-        CommandInfo info = command.getCommandInfo().orElseThrow();
-        List<String> aliases = new ArrayList<>(command.getAliases());
-        aliases.forEach(a -> {
+        command.getAliases().forEach(a -> {
             Command curr = knownCommands.remove(a);
             if (curr != null) previousCommands.put(a, curr);
         });
-        aliases.remove(commandName);
         commandMap.register(
                 commandName,
                 getPrefix(),
-                new Command(
-                        commandName,
-                        info.getDescription(),
-                        "", //TODO: usage
-                        aliases
-                ) {
-
-                    @Override
-                    public boolean execute(final @NonNull CommandSender sender,
-                                           final @NonNull String commandLabel,
-                                           final @NonNull String[] args) {
-                        BukkitCommandRegistry.this.execute(command, sender, commandLabel, args);
-                        return true;
-                    }
-
-                    @Override
-                    public @NonNull List<String> tabComplete(final @NonNull CommandSender sender,
-                                                             final @NonNull String alias,
-                                                             final @NonNull String[] args) throws IllegalArgumentException {
-                        return BukkitCommandRegistry.this.tabComplete(command, sender, alias, args);
-                    }
-
-                }
+                new BukkitCommand(commandName, command)
         );
     }
 
@@ -91,8 +65,7 @@ final class BukkitCommandRegistry extends CommandRegistry {
                 Command cmd = previousCommands.get(a);
                 if (cmd != null) {
                     Command current = knownCommands.get(a);
-                    if (current == null || plugin.equals(JavaPlugin.getProvidingPlugin(current.getClass())))
-                        knownCommands.put(a, cmd);
+                    if (current instanceof BukkitCommand) knownCommands.put(a, cmd);
                 }
                 knownCommands.remove(getPrefix() + ":" + a);
             });
@@ -101,6 +74,37 @@ final class BukkitCommandRegistry extends CommandRegistry {
     @Override
     protected @NotNull Class<?> getSenderType() {
         return CommandSender.class;
+    }
+
+    private final class BukkitCommand extends Command {
+        private final @NotNull LiteralNode command;
+
+        public BukkitCommand(final @NotNull String commandName, final @NotNull LiteralNode command) {
+            super(commandName,
+                    command.getCommandInfo().orElseThrow().getDescription(),
+                    "", //TODO: usage
+                    command.getAliases().stream()
+                            .filter(a -> !a.equals(commandName))
+                            .collect(Collectors.toList())
+            );
+            this.command = command;
+        }
+
+        @Override
+        public boolean execute(final @NonNull CommandSender sender,
+                               final @NonNull String commandLabel,
+                               final @NonNull String[] args) {
+            BukkitCommandRegistry.this.execute(command, sender, commandLabel, args);
+            return true;
+        }
+
+        @Override
+        public @NonNull List<String> tabComplete(final @NonNull CommandSender sender,
+                                                 final @NonNull String alias,
+                                                 final @NonNull String[] args) throws IllegalArgumentException {
+            return BukkitCommandRegistry.this.tabComplete(command, sender, alias, args);
+        }
+
     }
 
 }
