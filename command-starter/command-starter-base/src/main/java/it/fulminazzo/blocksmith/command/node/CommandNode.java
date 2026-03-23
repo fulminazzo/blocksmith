@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents the node of a command, whether it is static or dynamic.
@@ -179,6 +180,30 @@ public abstract class CommandNode implements TabCompletable {
                     method.getDeclaringClass().getCanonicalName(),
                     ReflectionUtils.methodToString(method)
             ));
+        }
+    }
+
+    /**
+     * Returns all the tab completions based on the current context of execution.
+     *
+     * @param context the context
+     * @return the completions
+     */
+    public @NotNull List<String> tabComplete(final @NotNull CommandExecutionContext context) {
+        if (context.isDone())
+            return getChildren().stream()
+                    .map(c -> c.getCompletions(context))
+                    .flatMap(Collection::stream)
+                    .distinct()
+                    .filter(c -> c.toLowerCase().startsWith(context.getLast().toLowerCase()))
+                    .collect(Collectors.toList());
+        else try {
+            validateInput(context);
+            CommandNode child = getChild(context.getCurrent());
+            if (child == null) return Collections.emptyList();
+            else return child.tabComplete(context.advanceCursor());
+        } catch (CommandExecutionException e) {
+            return Collections.emptyList();
         }
     }
 
