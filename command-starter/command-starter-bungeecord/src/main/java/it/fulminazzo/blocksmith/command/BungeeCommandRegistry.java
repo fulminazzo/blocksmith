@@ -13,12 +13,20 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Implementation of {@link CommandRegistry} for Bungeecord platforms.
+ */
 final class BungeeCommandRegistry extends CommandRegistry {
     private final @NotNull Map<String, Command> registeredCommands = new ConcurrentHashMap<>();
 
     private final @NotNull Plugin plugin;
     private final @NotNull PluginManager pluginManager;
 
+    /**
+     * Instantiates a new Bungee command registry.
+     *
+     * @param application the application
+     */
     public BungeeCommandRegistry(final @NotNull BlocksmithApplication application) {
         super(application.getMessenger(), application.getLog(), application.getName().toLowerCase());
         this.plugin = (Plugin) application;
@@ -47,9 +55,18 @@ final class BungeeCommandRegistry extends CommandRegistry {
         return CommandSender.class;
     }
 
-    private final class BungeeCommand extends Command implements TabExecutor {
+    /**
+     * Bungeecord command implementation associated with the current registry.
+     */
+    final class BungeeCommand extends Command implements TabExecutor {
         private final @NotNull LiteralNode command;
 
+        /**
+         * Instantiates a new Bungee command.
+         *
+         * @param commandName the command name
+         * @param command     the command
+         */
         public BungeeCommand(final @NotNull String commandName, final @NotNull LiteralNode command) {
             super(commandName,
                     command.getCommandInfo().orElseThrow().getPermission().getPermission(),
