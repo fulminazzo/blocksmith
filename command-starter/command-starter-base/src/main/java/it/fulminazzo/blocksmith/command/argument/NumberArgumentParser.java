@@ -25,7 +25,7 @@ final class NumberArgumentParser<N extends Number> implements ArgumentParser<N> 
     @Override
     public @Nullable N parse(final @NotNull String rawArgument) throws CommandExecutionException {
         try {
-            return  parser.apply(rawArgument);
+            return parser.apply(rawArgument);
         } catch (NumberFormatException e) {
             throw new CommandExecutionException("error.invalid-number")
                     .arguments(Placeholder.of("min", min.toString()), Placeholder.of("max", max.toString()));
