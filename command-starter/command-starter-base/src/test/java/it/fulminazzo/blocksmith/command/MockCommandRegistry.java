@@ -22,7 +22,7 @@ final class MockCommandRegistry extends CommandRegistry {
     }
 
     public MockCommandRegistry(final @NotNull Messenger messenger, final @NotNull Logger logger) {
-        super(messenger, logger);
+        super(messenger, logger, "blocksmith");
     }
 
     @SuppressWarnings("unchecked")
@@ -78,11 +78,6 @@ final class MockCommandRegistry extends CommandRegistry {
     @Override
     protected @NotNull Class<?> getSenderType() {
         return CommandSender.class;
-    }
-
-    @Override
-    protected @NotNull String getPrefix() {
-        return "blocksmith";
     }
 
 }

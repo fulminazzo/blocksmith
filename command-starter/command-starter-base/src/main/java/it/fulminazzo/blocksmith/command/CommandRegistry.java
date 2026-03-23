@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.parser.CommandParser;
 import it.fulminazzo.blocksmith.message.Messenger;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -20,6 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class CommandRegistry {
     private final @NotNull Messenger messenger;
     private final @NotNull Logger logger;
+    @Getter
+    private final @NotNull String prefix;
 
     private final @NotNull Map<String, LiteralNode> commands = new ConcurrentHashMap<>();
     private @NotNull State state = State.INITIAL;
@@ -73,7 +76,7 @@ public abstract class CommandRegistry {
     private @NotNull Map<String, LiteralNode> getCommandNodes(final Object @NotNull ... commandModules) {
         List<CommandNode> nodes = new ArrayList<>();
         for (Object commandModule : commandModules)
-            nodes.addAll(CommandParser.parseCommands(commandModule, getSenderType(), getPrefix()));
+            nodes.addAll(CommandParser.parseCommands(commandModule, getSenderType(), prefix));
         Map<String, LiteralNode> map = new HashMap<>();
         for (CommandNode node : nodes)
             map.merge(node.getName(), (LiteralNode) node, LiteralNode::merge);
@@ -206,13 +209,6 @@ public abstract class CommandRegistry {
      * @return the sender type
      */
     protected abstract @NotNull Class<?> getSenderType();
-
-    /**
-     * Gets the prefix to prepend to automatically computed permissions.
-     *
-     * @return the prefix
-     */
-    protected abstract @NotNull String getPrefix();
 
     /**
      * Identifies the state of the current registry.

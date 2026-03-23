@@ -16,10 +16,12 @@ public interface CommandRegistryFactory {
      *
      * @param messenger the messenger (to handle internal messages)
      * @param logger    the logger
+     * @param prefix    the prefix to prepend to automatically computed permissions
      * @return the command registry
      */
     @NotNull CommandRegistry newRegistry(final @NotNull Messenger messenger,
-                                         final @NotNull Logger logger);
+                                         final @NotNull Logger logger,
+                                         final @NotNull String prefix);
 
     /**
      * Looks up the available services for a valid factory.
@@ -27,13 +29,15 @@ public interface CommandRegistryFactory {
      *
      * @param messenger the messenger (to handle internal messages)
      * @param logger    the logger
+     * @param prefix    the prefix to prepend to automatically computed permissions
      * @return the command registry
      */
     static @NotNull CommandRegistry newCommandRegistry(final @NotNull Messenger messenger,
-                                                       final @NotNull Logger logger) {
+                                                       final @NotNull Logger logger,
+                                                       final @NotNull String prefix) {
         ServiceLoader<CommandRegistryFactory> loader = ServiceLoader.load(CommandRegistryFactory.class);
         CommandRegistryFactory factory = loader.findFirst().orElseThrow(() -> new IllegalStateException("No valid CommandRegistryFactory was found"));
-        return factory.newRegistry(messenger, logger);
+        return factory.newRegistry(messenger, logger, prefix);
     }
 
 }
