@@ -19,6 +19,12 @@ public final class ArgumentParsers {
     private static final @NotNull Map<Class<?>, ArgumentParser<?>> parsers = new HashMap<>();
 
     static {
+        register(Byte.class, new NumberArgumentParser<>(Byte.MIN_VALUE, Byte.MAX_VALUE, Byte::valueOf));
+        register(Short.class, new NumberArgumentParser<>(Short.MIN_VALUE, Short.MAX_VALUE, Short::valueOf));
+        register(Integer.class, new NumberArgumentParser<>(Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::valueOf));
+        register(Long.class, new NumberArgumentParser<>(Long.MIN_VALUE, Long.MAX_VALUE, Long::valueOf));
+        register(Float.class, new NumberArgumentParser<>(Float.MIN_VALUE, Float.MAX_VALUE, Float::valueOf));
+        register(Double.class, new NumberArgumentParser<>(Double.MIN_VALUE, Double.MAX_VALUE, Double::valueOf));
         register(String.class, new ArgumentParser<>() {
 
             @Override
