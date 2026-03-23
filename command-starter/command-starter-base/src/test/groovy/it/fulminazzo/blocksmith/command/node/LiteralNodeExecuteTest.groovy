@@ -55,6 +55,26 @@ class LiteralNodeExecuteTest extends Specification {
         e.message == 'error.no-permission'
     }
 
+    def 'test that getCompletions returns #expected'() {
+        given:
+        def node = new LiteralNode('first', 'second', 'third')
+        node.commandInfo = new CommandInfo('', new PermissionInfo('permission', Permission.Grant.OP))
+
+        and:
+        def context = new CommandExecutionContext(new MockCommandSenderWrapper(new CommandSender().setOp(op)))
+
+        when:
+        def actual = node.getCompletions(context)
+
+        then:
+        actual.sort() == expected.sort()
+
+        where:
+        op    || expected
+        false || []
+        true  || ['first', 'second', 'third']
+    }
+
     @SuppressWarnings('unused')
     static void mock() {
 

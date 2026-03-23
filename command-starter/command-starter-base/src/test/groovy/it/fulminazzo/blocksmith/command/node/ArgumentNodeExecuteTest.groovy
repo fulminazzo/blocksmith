@@ -10,9 +10,12 @@ import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 class ArgumentNodeExecuteTest extends Specification {
+    private static final List<String> numbers = (0..9).collect { it.toString() }
 
-    def 'test that validateInput throws for invalid input'() {
-        given:
+    private ArgumentParser<Integer> previous
+
+    void setup() {
+        previous = ArgumentParsers.parsers.get(Integer)
         ArgumentParsers.register(Integer, new ArgumentParser<Integer>() {
 
             @Override
@@ -24,9 +27,26 @@ class ArgumentNodeExecuteTest extends Specification {
                 }
             }
 
-        })
+            @Override
+            List<String> getCompletions(final @NotNull CommandExecutionContext c) {
+                def current = c.current
+                def completions = numbers
+                        .collect { "$current$it" }
+                        .findAll { it.isInteger() }
+                        .collect { it.toString() }
+                if (current.startsWith('b')) completions.add('<%name%>')
+                return completions
+            }
 
-        and:
+        })
+    }
+
+    void cleanup() {
+        ArgumentParsers.parsers.put(Integer, previous)
+    }
+
+    def 'test that validateInput throws for invalid input'() {
+        given:
         def node = new ArgumentNode('test', Integer, false)
         node.executionInfo = new ExecutionInfo(
                 ArgumentNodeExecuteTest,
@@ -46,9 +66,30 @@ class ArgumentNodeExecuteTest extends Specification {
 
         and:
         (e.cause instanceof NumberFormatException)
+    }
 
-        cleanup:
-        ArgumentParsers.parsers.remove(Integer)
+    def 'test that getCompletions returns #expected for #argument'() {
+        given:
+        def node = new ArgumentNode('test', Integer, false)
+
+        and:
+        def context = new CommandExecutionContext(new MockCommandSenderWrapper(new CommandSender()))
+        context.addInput(argument)
+
+        when:
+        def actual = node.getCompletions(context)
+
+        then:
+        actual == expected
+
+        where:
+        argument || expected
+        ''       || numbers
+        '1'      || numbers.collect { "1$it" }
+        'a'      || []
+        '1.'     || []
+        '1.3'    || []
+        'b'      || ['<test>']
     }
 
     @SuppressWarnings('unused')
