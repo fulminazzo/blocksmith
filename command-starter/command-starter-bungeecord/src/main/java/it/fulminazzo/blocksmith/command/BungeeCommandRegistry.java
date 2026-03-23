@@ -33,7 +33,7 @@ final class BungeeCommandRegistry extends CommandRegistry {
 
     @Override
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
-        BungeeCommand cmd = new BungeeCommand(command);
+        BungeeCommand cmd = new BungeeCommand(commandName, command);
         registeredCommands.put(commandName, cmd);
         pluginManager.registerCommand(plugin, cmd);
     }
@@ -51,11 +51,11 @@ final class BungeeCommandRegistry extends CommandRegistry {
     private final class BungeeCommand extends Command implements TabExecutor {
         private final @NotNull LiteralNode command;
 
-        public BungeeCommand(final @NotNull LiteralNode command) {
-            super(command.getName(),
+        public BungeeCommand(final @NotNull String commandName, final @NotNull LiteralNode command) {
+            super(commandName,
                     command.getCommandInfo().orElseThrow().getPermission().getPermission(),
                     command.getAliases().stream()
-                            .filter(a -> !a.equals(command.getName()))
+                            .filter(a -> !a.equals(commandName))
                             .toArray(String[]::new)
             );
             this.command = command;
