@@ -26,7 +26,7 @@ public interface CommandRegistryFactory {
      * @return the command registry
      */
     static @NotNull CommandRegistry newCommandRegistry(final @NotNull BlocksmithApplication application) {
-        ServiceLoader<CommandRegistryFactory> loader = ServiceLoader.load(CommandRegistryFactory.class);
+        ServiceLoader<CommandRegistryFactory> loader = ServiceLoader.load(CommandRegistryFactory.class, CommandRegistryFactory.class.getClassLoader());
         CommandRegistryFactory factory = loader.findFirst().orElseThrow(() -> new IllegalStateException("No valid CommandRegistryFactory was found"));
         return factory.newRegistry(application);
     }
