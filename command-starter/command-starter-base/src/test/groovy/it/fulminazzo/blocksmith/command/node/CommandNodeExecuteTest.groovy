@@ -14,13 +14,10 @@ import spock.lang.Specification
 import java.lang.reflect.Method
 
 class CommandNodeExecuteTest extends Specification {
-    private static final @NotNull
-    CommandSenderWrapper commandSender = new MockCommandSenderWrapper(new CommandSender())
+    private static final @NotNull CommandSenderWrapper commandSender = new MockCommandSenderWrapper(new CommandSender())
 
-    private static @NotNull
-    Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
-    private static @NotNull
-    Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
+    private static @NotNull Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
+    private static @NotNull Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
 
     private static String printer
 
