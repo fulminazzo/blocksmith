@@ -6,17 +6,22 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 final class BukkitCommandRegistry extends CommandRegistry {
+    private final @NotNull JavaPlugin plugin;
     private final @NotNull SimpleCommandMap commandMap;
     private final @NotNull Map<String, Command> knownCommands;
+    private final @NotNull Map<String, Command> previousCommands = new ConcurrentHashMap<>();
 
     public BukkitCommandRegistry(final @NotNull BlocksmithApplication application) {
         super(application.getMessenger(), application.getLog(), application.getName().toLowerCase());
@@ -24,6 +29,7 @@ final class BukkitCommandRegistry extends CommandRegistry {
                 .filter(f -> f.get() instanceof SimpleCommandMap)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Could not find SimpleCommandMap"));
+        this.plugin = (JavaPlugin) application;
         this.commandMap = reflect.get();
         this.knownCommands = reflect.field("knownCommands").get();
     }
@@ -37,7 +43,10 @@ final class BukkitCommandRegistry extends CommandRegistry {
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
         CommandInfo info = command.getCommandInfo().orElseThrow();
         List<String> aliases = new ArrayList<>(command.getAliases());
-        aliases.forEach(knownCommands::remove);
+        aliases.forEach(a -> {
+            Command curr = knownCommands.remove(a);
+            if (curr != null) previousCommands.put(a, curr);
+        });
         aliases.remove(commandName);
         commandMap.register(
                 commandName,
@@ -71,15 +80,22 @@ final class BukkitCommandRegistry extends CommandRegistry {
     @Override
     protected void onUnregister(final @NotNull String commandName) {
         Command command = knownCommands.remove(commandName);
-        if (command != null)
-            command.getAliases().forEach(knownCommands::remove);
+        clearAliases(command);
         command = knownCommands.remove(getPrefix() + ":" + commandName);
-        if (command != null) {
+        clearAliases(command);
+    }
+
+    private void clearAliases(final @Nullable Command command) {
+        if (command != null)
             command.getAliases().forEach(a -> {
-                knownCommands.remove(a);
+                Command cmd = previousCommands.get(a);
+                if (cmd != null) {
+                    Command current = knownCommands.get(a);
+                    if (current == null || plugin.equals(JavaPlugin.getProvidingPlugin(current.getClass())))
+                        knownCommands.put(a, cmd);
+                }
                 knownCommands.remove(getPrefix() + ":" + a);
             });
-        }
     }
 
     @Override
