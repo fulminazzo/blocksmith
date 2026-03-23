@@ -87,7 +87,10 @@ public final class CommandParser {
         last.setExecutionInfo(executionInfo);
 
         if (lastLiteral == null) throw parseException("at least one literal must be given to identify the command");
-        else lastLiteral.setCommandInfo(commandInfo);
+        else {
+            lastLiteral.getCommandInfo().ifPresent(commandInfo::merge);
+            lastLiteral.setCommandInfo(commandInfo);
+        }
 
         if (parameterIndex != parameters.length)
             throw parseException("method %s declares %s argument parameters, but only %s arguments were given",
