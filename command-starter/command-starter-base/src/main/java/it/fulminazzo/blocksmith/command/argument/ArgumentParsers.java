@@ -42,6 +42,26 @@ public final class ArgumentParsers {
             }
 
         });
+        register(Character.class, new ArgumentParser<>() {
+
+            @Override
+            public @NotNull Character parse(final @NotNull String rawArgument) throws CommandExecutionException {
+                if (rawArgument.length() == 1) return rawArgument.charAt(0);
+                else throw new CommandExecutionException("error.invalid-character").arguments(Placeholder.of("argument", rawArgument));
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
+                List<String> completions = new ArrayList<>();
+                if (context.getCurrent().isEmpty()) {
+                    for (char c = 'a'; c <= 'z'; c++) completions.add(String.valueOf(c));
+                    for (char c = 'A'; c <= 'Z'; c++) completions.add(String.valueOf(c));
+                    for (char c = '0'; c <= '9'; c++) completions.add(String.valueOf(c));
+                }
+                return completions;
+            }
+
+        });
         register(String.class, new ArgumentParser<>() {
 
             @Override
