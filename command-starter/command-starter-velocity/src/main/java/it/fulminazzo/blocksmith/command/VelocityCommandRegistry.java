@@ -10,12 +10,13 @@ import it.fulminazzo.blocksmith.command.node.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 final class VelocityCommandRegistry extends CommandRegistry {
     private final @NotNull CommandManager commandManager;
+    private final @NotNull Map<String, Set<String>> aliases = new ConcurrentHashMap<>();
 
     public VelocityCommandRegistry(final @NotNull BlocksmithApplication application) {
         super(application.getMessenger(), application.getLog(), application.getName().toLowerCase());
@@ -30,6 +31,7 @@ final class VelocityCommandRegistry extends CommandRegistry {
     @Override
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
         CommandInfo info = command.getCommandInfo().orElseThrow();
+        aliases.put(commandName, command.getAliases());
         List<String> aliases = new ArrayList<>(command.getAliases());
         aliases.remove(commandName);
         CommandMeta meta = commandManager.metaBuilder(commandName)
@@ -60,6 +62,8 @@ final class VelocityCommandRegistry extends CommandRegistry {
     @Override
     protected void onUnregister(final @NotNull String commandName) {
         commandManager.unregister(commandName);
+        Set<String> aliases = this.aliases.remove(commandName);
+        if (aliases != null) aliases.forEach(commandManager::unregister);
     }
 
     @Override
