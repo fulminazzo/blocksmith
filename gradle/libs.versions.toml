@@ -26,6 +26,8 @@ spigot = "1.16.5-R0.1-SNAPSHOT"
 bungeecord = "1.16-R0.2"
 velocity = "3.0.0-SNAPSHOT"
 
+mockbukkit16 = "1.5.2"
+
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jetbrains_annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains_annotations" }
@@ -60,6 +62,8 @@ validator = { module = "org.apache.bval:bval-jsr", version.ref = "validator" }
 spigot = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
 bungeecord = { module = "net.md-5:bungeecord-api", version.ref = "bungeecord" }
 velocity = { module = "com.velocitypowered:velocity-api", version.ref = "velocity" }
+
+mockbukkit16 = { module = "com.github.seeseemelk:MockBukkit-v1.16", version.ref = "mockbukkit16" }
 
 [bundles]
 annotations = ["lombok", "jetbrains_annotations"]
