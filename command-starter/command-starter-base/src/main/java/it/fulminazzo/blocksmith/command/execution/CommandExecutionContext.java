@@ -46,6 +46,15 @@ public final class CommandExecutionContext {
     }
 
     /**
+     * Gets the last argument from the input.
+     *
+     * @return the last argument
+     */
+    public @NotNull String getLast() {
+        return input.get(input.size() - 1);
+    }
+
+    /**
      * Checks if the cursor has reached the final list of arguments.
      *
      * @return <code>true</code> if it has
