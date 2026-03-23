@@ -25,3 +25,5 @@ include("message-starter:message-starter-velocity")
 
 include("command-starter")
 include("command-starter:command-starter-base")
+
+include("command-starter:command-starter-bukkit")
