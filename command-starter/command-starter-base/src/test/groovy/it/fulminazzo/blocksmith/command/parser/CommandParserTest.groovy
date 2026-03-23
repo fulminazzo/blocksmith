@@ -306,13 +306,21 @@ class CommandParserTest extends Specification {
         player.addChild(promote)
 
         def member = new LiteralNode('member')
+        member.commandInfo = new CommandInfo(
+                'command.description.clan.member',
+                new PermissionInfo('clan.member', Permission.Default.OP)
+        )
         member.addChild(player)
 
         def expected = new LiteralNode('clan')
+        expected.commandInfo = new CommandInfo(
+                'command.description.clan',
+                new PermissionInfo('clan', Permission.Default.OP)
+        )
         expected.addChild(member)
 
         and:
-        def parser = new CommandParser(input, commandInfo, executionInfo, 1)
+        def parser = new CommandParser(input, commandInfo, executionInfo, 1, null)
 
         when:
         def actual = parser.parse()
@@ -333,7 +341,8 @@ class CommandParserTest extends Specification {
                         CommandParserTest,
                         CommandParserTest.getDeclaredMethod('greedy', String)
                 ),
-                0
+                0,
+                null
         )
 
         when:
@@ -355,7 +364,8 @@ class CommandParserTest extends Specification {
                         CommandParserTest,
                         CommandParserTest.getDeclaredMethod('promote', Object, Object, String, String)
                 ),
-                1
+                1,
+                null
         )
 
         when:
@@ -386,6 +396,13 @@ class CommandParserTest extends Specification {
         given:
         def parser = newMockCommandParser(input)
 
+        and:
+        if (expected instanceof LiteralNode)
+            expected.commandInfo = new CommandInfo(
+                    'command.description.test',
+                    new PermissionInfo('test', Permission.Default.OP)
+            )
+
         when:
         def node = parser.parseExpression()
 
@@ -393,11 +410,11 @@ class CommandParserTest extends Specification {
         node == expected
 
         where:
-        input                  || expected
-        '[test]'               || new ArgumentNode('test', String, true)
-        '<test>'               || new ArgumentNode('test', String, false)
-        '(first|second|third)' || new LiteralNode('first', 'second', 'third')
-        'test'                 || new LiteralNode('test')
+        input                 || expected
+        '[test]'              || new ArgumentNode('test', String, true)
+        '<test>'              || new ArgumentNode('test', String, false)
+        '(test|second|third)' || new LiteralNode('test', 'second', 'third')
+        'test'                || new LiteralNode('test')
     }
 
     def 'test that parseExpression throws for non-optional argument after optional argument'() {
@@ -507,7 +524,8 @@ class CommandParserTest extends Specification {
                         CommandParserTest,
                         CommandParserTest.getDeclaredMethod('newMockCommandParser', String)
                 ),
-                0
+                0,
+                null
         )
         parser.tokenizer.next()
         return parser
