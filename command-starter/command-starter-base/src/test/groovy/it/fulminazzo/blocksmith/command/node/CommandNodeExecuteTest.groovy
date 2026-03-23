@@ -14,10 +14,13 @@ import spock.lang.Specification
 import java.lang.reflect.Method
 
 class CommandNodeExecuteTest extends Specification {
-    private static final @NotNull CommandSenderWrapper commandSender = new MockCommandSenderWrapper(new CommandSender())
+    private static final @NotNull
+    CommandSenderWrapper commandSender = new MockCommandSenderWrapper(new CommandSender())
 
-    private static @NotNull Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
-    private static @NotNull Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
+    private static @NotNull
+    Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
+    private static @NotNull
+    Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
 
     private static String printer
 
@@ -277,6 +280,47 @@ class CommandNodeExecuteTest extends Specification {
         method                                                                | sender                     || message
         CommandNodeExecuteTest.getMethod('consoleOnly', ConsoleCommandSender) | new Player('Alex')         || 'error.player-cannot-execute'
         CommandNodeExecuteTest.getMethod('playerOnly', Player)                | new ConsoleCommandSender() || 'error.console-cannot-execute'
+    }
+
+    def 'test that tabComplete with #arguments returns #expected'() {
+        given:
+        def node = new LiteralNode('give')
+
+        def item = new ArgumentNode('item', String, false)
+        node.addChild(item)
+
+        def player = new LiteralNode('player')
+        node.addChild(player)
+
+        def playerArg = new ArgumentNode('player', String, false)
+        player.addChild(playerArg)
+
+        item = new ArgumentNode('item', String, false)
+        playerArg.addChild(item)
+
+        and:
+        def context = new CommandExecutionContext(new MockCommandSenderWrapper(new CommandSender()))
+                .addInput(*arguments)
+
+        when:
+        def actual = node.tabComplete(context)
+
+        then:
+        actual.sort() == expected.sort()
+
+        where:
+        arguments                           || expected
+        []                                  || []
+        ['']                                || ['player', '<item>']
+        ['p']                               || ['player']
+        ['P']                               || ['player']
+        ['a']                               || []
+        ['player']                          || ['player']
+        ['playera']                         || []
+        ['player', '']                      || ['<player>']
+        ['player', 'Alex']                  || []
+        ['player', 'Alex', '']              || ['<item>']
+        ['player', 'Alex', 'diamond_sword'] || []
     }
 
     static void execute(final @NotNull CommandSender sender,
