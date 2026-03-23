@@ -16,7 +16,7 @@ public abstract class CommandSenderWrapper {
      * @return <code>true</code> if it does
      */
     public final boolean extendsType(final @NotNull Class<?> type) {
-        return getActualSender().getClass().isAssignableFrom(type);
+        return type.isAssignableFrom(getActualSender().getClass());
     }
 
     /**
