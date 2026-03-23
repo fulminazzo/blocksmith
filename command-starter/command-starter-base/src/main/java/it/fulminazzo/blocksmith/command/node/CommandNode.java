@@ -161,14 +161,11 @@ public abstract class CommandNode implements TabCompletable {
                 Class<?> parameterType = method.getParameterTypes()[0];
                 if (parameterType.equals(CommandSenderWrapper.class))
                     arguments.addFirst(sender);
-                else {
-                    Object actualSender = sender.getActualSender();
-                    if (parameterType.isAssignableFrom(actualSender.getClass())) arguments.addFirst(actualSender);
-                    else throw new CommandExecutionException(sender.isPlayer()
+                else if (sender.extendsType(parameterType)) arguments.addFirst(sender.getActualSender());
+                else throw new CommandExecutionException(sender.isPlayer()
                             ? "error.player-cannot-execute"
                             : "error.console-cannot-execute"
                     );
-                }
             }
             method.invoke(executionInfo.getExecutor(), arguments.toArray());
         } catch (InvocationTargetException e) {
@@ -199,13 +196,13 @@ public abstract class CommandNode implements TabCompletable {
                     .filter(c -> c.toLowerCase().startsWith(context.getLast().toLowerCase()))
                     .collect(Collectors.toList());
         else try {
-            validateInput(context);
-            CommandNode child = getChild(context.getCurrent());
-            if (child == null) return Collections.emptyList();
-            else return child.tabComplete(context.advanceCursor());
-        } catch (CommandExecutionException e) {
-            return Collections.emptyList();
-        }
+                validateInput(context);
+                CommandNode child = getChild(context.getCurrent());
+                if (child == null) return Collections.emptyList();
+                else return child.tabComplete(context.advanceCursor());
+            } catch (CommandExecutionException e) {
+                return Collections.emptyList();
+            }
     }
 
     /**
