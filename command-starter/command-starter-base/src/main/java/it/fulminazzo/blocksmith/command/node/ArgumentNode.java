@@ -9,6 +9,9 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Represents a dynamic argument node.
  *
@@ -36,6 +39,13 @@ public final class ArgumentNode<T> extends CommandNode {
 
     private @Nullable T parseArgument(final @NotNull String argument) throws CommandExecutionException {
         return ArgumentParsers.of(type).parse(argument);
+    }
+
+    @Override
+    public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
+        return ArgumentParsers.of(type).getCompletions(context).stream()
+                .map(c -> c.replace("%name%", getName()))
+                .collect(Collectors.toList());
     }
 
     @Override

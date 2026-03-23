@@ -58,6 +58,11 @@ public final class LiteralNode extends CommandNode {
     }
 
     @Override
+    public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
+        return hasPermission(context) ? new ArrayList<>(aliases) : Collections.emptyList();
+    }
+
+    @Override
     protected void validateInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         if (!hasPermission(context))
             throw new CommandExecutionException("error.no-permission")

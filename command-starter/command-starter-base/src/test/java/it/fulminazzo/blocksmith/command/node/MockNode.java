@@ -6,6 +6,7 @@ import lombok.ToString;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Set;
 
 @Value
@@ -13,6 +14,11 @@ import java.util.Set;
 @ToString(callSuper = true)
 public class MockNode extends CommandNode implements Cloneable {
     @NotNull String name;
+
+    @Override
+    public @NotNull List<String> getCompletions(@NotNull CommandExecutionContext context) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     protected void validateInput(@NotNull CommandExecutionContext context) {
