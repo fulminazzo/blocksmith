@@ -37,6 +37,9 @@ public final class CommandParser {
     // therefore, nothing else can be specified.
     private @Nullable String greedyArgument;
 
+    private final @Nullable String prefix;
+    private @NotNull String computedPermission = "";
+
     /**
      * Instantiates a new Command parser.
      *
@@ -44,11 +47,13 @@ public final class CommandParser {
      * @param commandInfo    the command info
      * @param executionInfo  the execution info
      * @param parameterIndex the starting index of the parameters (excluding the command sender)
+     * @param prefix         the string to prepend to the generated commands permission, if none is given
      */
     CommandParser(final @NotNull String command,
                   final @NotNull CommandInfo commandInfo,
                   final @NotNull ExecutionInfo executionInfo,
-                  final int parameterIndex) {
+                  final int parameterIndex,
+                  final @Nullable String prefix) {
         this.rawCommand = command;
         this.tokenizer = new CommandTokenizer(command);
         this.commandInfo = commandInfo;
@@ -56,6 +61,7 @@ public final class CommandParser {
         this.parameters = executionInfo.getMethod().getParameters();
         this.startIndex = parameterIndex;
         this.parameterIndex = parameterIndex;
+        this.prefix = prefix;
     }
 
     /**
@@ -164,9 +170,18 @@ public final class CommandParser {
      * @return the node
      */
     @NotNull CommandNode parseLiteral() {
+        final LiteralNode literalNode;
         if (tokenizer.getLastToken() == CommandToken.OPEN_PHARENTHESIS)
-            return parseAliasesLiteral();
-        else return parseSimpleLiteral();
+            literalNode = parseAliasesLiteral();
+        else literalNode = parseSimpleLiteral();
+        if (!computedPermission.isEmpty()) computedPermission += ".";
+        computedPermission += literalNode.getName();
+        final CommandInfo computed = computeCurrentCommandInfo();
+        literalNode.getCommandInfo().ifPresentOrElse(
+                i -> i.merge(computed),
+                () -> literalNode.setCommandInfo(computed)
+        );
+        return literalNode;
     }
 
     /**
@@ -174,7 +189,7 @@ public final class CommandParser {
      *
      * @return the node
      */
-    @NotNull CommandNode parseAliasesLiteral() {
+    @NotNull LiteralNode parseAliasesLiteral() {
         List<String> aliases = new ArrayList<>();
         do {
             tokenizer.next();
@@ -190,11 +205,24 @@ public final class CommandParser {
      *
      * @return the node
      */
-    @NotNull CommandNode parseSimpleLiteral() {
+    @NotNull LiteralNode parseSimpleLiteral() {
         match(CommandToken.LITERAL);
         String literal = tokenizer.getLastRead();
         tokenizer.next();
         return new LiteralNode(literal);
+    }
+
+    @SuppressWarnings("deprecation")
+    private @NotNull CommandInfo computeCurrentCommandInfo() {
+        return new CommandInfo(
+                getDefaultDescription(computedPermission),
+                new PermissionInfo(
+                        (prefix == null ? "" : prefix + ".") + computedPermission,
+                        Permission.Default.OP,
+                        true
+                ),
+                true
+        );
     }
 
     /**
@@ -266,7 +294,7 @@ public final class CommandParser {
                 ExecutionInfo executionInfo = new ExecutionInfo(commandModule, method);
                 int parameterIndex = getParameterIndex(method, senderType);
 
-                CommandParser parser = new CommandParser(rawCommand, commandInfo, executionInfo, parameterIndex);
+                CommandParser parser = new CommandParser(rawCommand, commandInfo, executionInfo, parameterIndex, prefix);
                 CommandNode node = parser.parse();
 
                 commands.add(node);
@@ -303,7 +331,7 @@ public final class CommandParser {
                 ExecutionInfo executionInfo = new ExecutionInfo(commandsContainer, method);
                 int parameterIndex = getParameterIndex(method, senderType);
 
-                CommandParser parser = new CommandParser(rawCommand, commandInfo, executionInfo, parameterIndex);
+                CommandParser parser = new CommandParser(rawCommand, commandInfo, executionInfo, parameterIndex, prefix);
                 CommandNode node = parser.parse();
 
                 commands.add(node);
