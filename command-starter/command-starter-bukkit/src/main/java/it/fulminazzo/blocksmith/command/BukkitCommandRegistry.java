@@ -16,12 +16,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of {@link CommandRegistry} for Bukkit platforms.
+ */
 final class BukkitCommandRegistry extends CommandRegistry {
     private final @NotNull Server server;
     private final @NotNull SimpleCommandMap commandMap;
     private final @NotNull Map<String, Command> knownCommands;
     private final @NotNull Map<String, Command> previousCommands = new ConcurrentHashMap<>();
 
+    /**
+     * Instantiates a new Bukkit command registry.
+     *
+     * @param application the application that is initializing the registry
+     */
     public BukkitCommandRegistry(final @NotNull BlocksmithApplication application) {
         super(application.getMessenger(), application.getLog(), application.getName().toLowerCase());
         this.server = (Server) application.getServer();
@@ -84,9 +92,18 @@ final class BukkitCommandRegistry extends CommandRegistry {
         }
     }
 
-    private final class BukkitCommand extends Command {
+    /**
+     * Bukkit command implementation associated with the current registry.
+     */
+    final class BukkitCommand extends Command {
         private final @NotNull LiteralNode command;
 
+        /**
+         * Instantiates a new Bukkit command.
+         *
+         * @param commandName the command name
+         * @param command     the root of the command route
+         */
         public BukkitCommand(final @NotNull String commandName, final @NotNull LiteralNode command) {
             super(commandName,
                     command.getCommandInfo().orElseThrow().getDescription(),
