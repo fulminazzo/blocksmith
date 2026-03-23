@@ -55,7 +55,16 @@ public final class CommandExecutionContext {
     }
 
     /**
-     * Checks if the cursor has reached the final list of arguments.
+     * Checks if the cursor has reached the final argument.
+     *
+     * @return <code>true</code> if it has
+     */
+    public boolean isLast() {
+        return current == input.size() - 1;
+    }
+
+    /**
+     * Checks if the cursor has reached read all the available arguments.
      *
      * @return <code>true</code> if it has
      */
