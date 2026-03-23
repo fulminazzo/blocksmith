@@ -9,9 +9,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A {@link CommandNode} to represent general literals.
@@ -61,18 +59,27 @@ public final class LiteralNode extends CommandNode {
 
     @Override
     protected void validateInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        CommandInfo commandInfo = getCommandInfo().orElse(null);
-        if (commandInfo != null) {
-            PermissionInfo permission = commandInfo.getPermission();
-            if (!context.getCommandSender().hasPermission(permission))
-                throw new CommandExecutionException("error.no-permission")
-                        .arguments(Placeholder.of("permission", permission.getPermission()));
-        }
+        if (!hasPermission(context))
+            throw new CommandExecutionException("error.no-permission")
+                    .arguments(Placeholder.of("permission", getCommandInfo().orElseThrow().getPermission().getPermission()));
     }
 
     @Override
     public boolean matches(final @NotNull String token) {
         return aliases.contains(token.trim().toLowerCase());
+    }
+
+    /**
+     * Checks if the sender of the current context has permission to execute this node.
+     *
+     * @param context the context
+     * @return <code>true</code> if they do
+     */
+    boolean hasPermission(final @NotNull CommandExecutionContext context) {
+        return getCommandInfo()
+                .map(CommandInfo::getPermission)
+                .map(p -> context.getCommandSender().hasPermission(p))
+                .orElse(true);
     }
 
 }
