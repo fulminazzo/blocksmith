@@ -1,15 +1,14 @@
 package it.fulminazzo.blocksmith.command.argument;
 
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
+import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
+import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Holds all the supported argument parsers.
@@ -25,6 +24,24 @@ public final class ArgumentParsers {
         register(Long.class, new NumberArgumentParser<>(Long.MIN_VALUE, Long.MAX_VALUE, Long::valueOf));
         register(Float.class, new NumberArgumentParser<>(Float.MIN_VALUE, Float.MAX_VALUE, Float::valueOf));
         register(Double.class, new NumberArgumentParser<>(Double.MIN_VALUE, Double.MAX_VALUE, Double::valueOf));
+        register(Boolean.class, new ArgumentParser<>() {
+            private static final String TRUE = Boolean.TRUE.toString();
+            private static final String FALSE = Boolean.FALSE.toString();
+
+            @Override
+            public @NotNull Boolean parse(final @NotNull String rawArgument) throws CommandExecutionException {
+                if (rawArgument.equalsIgnoreCase(TRUE)) return true;
+                else if (rawArgument.equalsIgnoreCase(FALSE)) return false;
+                else
+                    throw new CommandExecutionException("error.invalid-boolean").arguments(Placeholder.of("argument", rawArgument));
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
+                return Arrays.asList(TRUE, FALSE);
+            }
+
+        });
         register(String.class, new ArgumentParser<>() {
 
             @Override
