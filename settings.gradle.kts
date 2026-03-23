@@ -27,3 +27,4 @@ include("command-starter")
 include("command-starter:command-starter-base")
 
 include("command-starter:command-starter-bukkit")
+include("command-starter:command-starter-bungeecord")
