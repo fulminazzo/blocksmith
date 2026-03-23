@@ -27,10 +27,7 @@ class CommandParserTest extends Specification {
         )
         clan.commandInfo = new CommandInfo(
                 'command.description.clan',
-                new PermissionInfo(
-                        'clan',
-                        Permission.Default.OP
-                )
+                new PermissionInfo('clan', Permission.Default.OP)
         )
         expected.add(clan)
 
@@ -44,13 +41,14 @@ class CommandParserTest extends Specification {
         def info = new LiteralNode('info', 'information', 'state')
         info.commandInfo = new CommandInfo(
                 'Information command',
-                new PermissionInfo(
-                        'clan.info',
-                        Permission.Default.OP
-                )
+                new PermissionInfo('clan.info', Permission.Default.OP)
         )
         info.addChild(name)
         clan = new LiteralNode(*baseAliases)
+        clan.commandInfo = new CommandInfo(
+                'command.description.clan',
+                new PermissionInfo('clan', Permission.Default.OP)
+        )
         clan.addChild(info)
         expected.add(clan)
 
@@ -63,13 +61,14 @@ class CommandParserTest extends Specification {
         def help = new LiteralNode('help')
         help.commandInfo = new CommandInfo(
                 'command.description.clan.help',
-                new PermissionInfo(
-                        'clan.help',
-                        Permission.Default.ALL
-                )
+                new PermissionInfo('clan.help', Permission.Default.ALL)
         )
         help.addChild(verbose)
         clan = new LiteralNode(*baseAliases)
+        clan.commandInfo = new CommandInfo(
+                'command.description.clan',
+                new PermissionInfo('clan', Permission.Default.OP)
+        )
         clan.addChild(help)
         expected.add(clan)
 
@@ -81,12 +80,13 @@ class CommandParserTest extends Specification {
         )
         admin.commandInfo = new CommandInfo(
                 'command.description.clan.admin',
-                new PermissionInfo(
-                        'clan.admin',
-                        Permission.Default.OP
-                )
+                new PermissionInfo('clan.admin', Permission.Default.OP)
         )
         clan = new LiteralNode(*baseAliases)
+        clan.commandInfo = new CommandInfo(
+                'command.description.clan',
+                new PermissionInfo('clan', Permission.Default.OP)
+        )
         clan.addChild(admin)
         expected.add(clan)
 
@@ -99,15 +99,20 @@ class CommandParserTest extends Specification {
         def invite = new LiteralNode('invite')
         invite.commandInfo = new CommandInfo(
                 'command.description.clan.admin.invite',
-                new PermissionInfo(
-                        'clan.admin.invite',
-                        Permission.Default.OP
-                )
+                new PermissionInfo('clan.admin.invite', Permission.Default.OP)
         )
         invite.addChild(target)
         admin = new LiteralNode('admin')
+        admin.commandInfo = new CommandInfo(
+                'command.description.clan.admin',
+                new PermissionInfo('clan.admin', Permission.Default.OP)
+        )
         admin.addChild(invite)
         clan = new LiteralNode(*baseAliases)
+        clan.commandInfo = new CommandInfo(
+                'command.description.clan',
+                new PermissionInfo('clan', Permission.Default.OP)
+        )
         clan.addChild(admin)
         expected.add(clan)
 
@@ -119,15 +124,20 @@ class CommandParserTest extends Specification {
         )
         members.commandInfo = new CommandInfo(
                 'command.description.clan.admin.members',
-                new PermissionInfo(
-                        'clan.admin.members',
-                        Permission.Default.ALL
-                )
+                new PermissionInfo('clan.admin.members', Permission.Default.ALL)
         )
         members.addChild(target)
         admin = new LiteralNode('admin')
+        admin.commandInfo = new CommandInfo(
+                'command.description.clan.admin',
+                new PermissionInfo('clan.admin', Permission.Default.OP)
+        )
         admin.addChild(members)
         clan = new LiteralNode(*baseAliases)
+        clan.commandInfo = new CommandInfo(
+                'command.description.clan',
+                new PermissionInfo('clan', Permission.Default.OP)
+        )
         clan.addChild(admin)
         expected.add(clan)
 
@@ -140,17 +150,26 @@ class CommandParserTest extends Specification {
         def kick = new LiteralNode('kick')
         kick.commandInfo = new CommandInfo(
                 'command.description.clan.admin.members.kick',
-                new PermissionInfo(
-                        'clan.admin.members.kick',
-                        Permission.Default.OP
-                )
+                new PermissionInfo('clan.admin.members.kick', Permission.Default.OP)
         )
         kick.addChild(target)
         members = new LiteralNode('members')
+        members.commandInfo = new CommandInfo(
+                'command.description.clan.admin.members',
+                new PermissionInfo('clan.admin.members', Permission.Default.OP)
+        )
         members.addChild(kick)
         admin = new LiteralNode('admin')
+        admin.commandInfo = new CommandInfo(
+                'command.description.clan.admin',
+                new PermissionInfo('clan.admin', Permission.Default.OP)
+        )
         admin.addChild(members)
         clan = new LiteralNode(*baseAliases)
+        clan.commandInfo = new CommandInfo(
+                'command.description.clan',
+                new PermissionInfo('clan', Permission.Default.OP)
+        )
         clan.addChild(admin)
         expected.add(clan)
 
@@ -158,16 +177,25 @@ class CommandParserTest extends Specification {
         def edit = new LiteralNode('edit')
         edit.commandInfo = new CommandInfo(
                 'command.description.clan.admin.gui.edit',
-                new PermissionInfo(
-                        'clan.admin.gui.edit',
-                        Permission.Default.OP
-                )
+                new PermissionInfo('clan.admin.gui.edit', Permission.Default.OP)
         )
         def gui = new LiteralNode('gui')
+        gui.commandInfo = new CommandInfo(
+                'command.description.clan.admin.gui',
+                new PermissionInfo('clan.admin.gui', Permission.Default.OP)
+        )
         gui.addChild(edit)
         admin = new LiteralNode('admin')
-        admin.addChild(gui)
+        admin.commandInfo = new CommandInfo(
+                'command.description.clan.admin',
+                new PermissionInfo('clan.admin', Permission.Default.OP)
+        )
+        admin.addChild(members)
         clan = new LiteralNode(*baseAliases)
+        clan.commandInfo = new CommandInfo(
+                'command.description.clan',
+                new PermissionInfo('clan', Permission.Default.OP)
+        )
         clan.addChild(admin)
         expected.add(clan)
 
@@ -204,10 +232,7 @@ class CommandParserTest extends Specification {
         help.addChild(command)
         help.commandInfo = new CommandInfo(
                 'Displays help for all the available commands',
-                new PermissionInfo(
-                        'blocksmith.help',
-                        Permission.Default.ALL
-                )
+                new PermissionInfo('blocksmith.help', Permission.Default.ALL)
         )
 
         and:
@@ -221,13 +246,14 @@ class CommandParserTest extends Specification {
         plugin.addChild(async)
         plugin.commandInfo = new CommandInfo(
                 'command.description.reload.plugin',
-                new PermissionInfo(
-                        'reload.plugin',
-                        Permission.Default.OP
-                )
+                new PermissionInfo('reload.plugin', Permission.Default.OP)
         )
 
         def reload = new LiteralNode('reload')
+        reload.commandInfo = new CommandInfo(
+                'command.description.reload',
+                new PermissionInfo('reload', Permission.Default.OP)
+        )
         reload.addChild(plugin)
 
         and:
