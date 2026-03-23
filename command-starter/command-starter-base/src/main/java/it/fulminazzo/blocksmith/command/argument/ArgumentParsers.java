@@ -1,11 +1,14 @@
 package it.fulminazzo.blocksmith.command.argument;
 
+import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,7 +19,19 @@ public final class ArgumentParsers {
     private static final @NotNull Map<Class<?>, ArgumentParser<?>> parsers = new HashMap<>();
 
     static {
-        register(String.class, s -> s);
+        register(String.class, new ArgumentParser<>() {
+
+            @Override
+            public @NotNull String parse(final @NotNull String rawArgument) {
+                return rawArgument;
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
+                return Collections.singletonList("<%name%>");
+            }
+
+        });
     }
 
     /**
