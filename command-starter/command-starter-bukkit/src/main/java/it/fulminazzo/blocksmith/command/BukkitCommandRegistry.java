@@ -37,8 +37,8 @@ final class BukkitCommandRegistry extends CommandRegistry {
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
         CommandInfo info = command.getCommandInfo().orElseThrow();
         List<String> aliases = new ArrayList<>(command.getAliases());
+        aliases.forEach(knownCommands::remove);
         aliases.remove(commandName);
-        knownCommands.remove(commandName);
         commandMap.register(
                 commandName,
                 getPrefix(),
