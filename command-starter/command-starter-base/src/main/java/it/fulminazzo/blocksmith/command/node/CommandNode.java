@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
+import it.fulminazzo.blocksmith.command.TabCompletable;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
@@ -21,7 +22,7 @@ import java.util.*;
  */
 @EqualsAndHashCode
 @ToString
-public abstract class CommandNode {
+public abstract class CommandNode implements TabCompletable {
     @Getter
     private final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
     @Setter
