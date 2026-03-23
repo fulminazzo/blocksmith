@@ -162,7 +162,7 @@ public abstract class CommandRegistry {
                                                       final @NotNull String commandName,
                                                       final String @NotNull ... arguments) {
         CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
-        return command.tabComplete(context);
+        return command.tabComplete(context.advanceCursor());
     }
 
     private @NotNull CommandExecutionContext prepareExecutionContext(final @NotNull Object executor,
