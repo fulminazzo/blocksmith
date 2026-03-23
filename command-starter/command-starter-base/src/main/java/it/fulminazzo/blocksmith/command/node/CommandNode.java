@@ -153,9 +153,17 @@ public abstract class CommandNode {
             LinkedList<Object> arguments = context.getArguments();
             if (arguments.size() != method.getParameterCount()) {
                 CommandSenderWrapper sender = context.getCommandSender();
-                if (method.getParameterTypes()[0].equals(CommandSenderWrapper.class))
+                Class<?> parameterType = method.getParameterTypes()[0];
+                if (parameterType.equals(CommandSenderWrapper.class))
                     arguments.addFirst(sender);
-                else arguments.addFirst(sender.getActualSender());
+                else {
+                    Object actualSender = sender.getActualSender();
+                    if (actualSender.getClass().isAssignableFrom(parameterType)) arguments.addFirst(actualSender);
+                    else throw new CommandExecutionException(sender.isPlayer()
+                            ? "error.player-cannot-execute"
+                            : "error.console-cannot-execute"
+                    );
+                }
             }
             method.invoke(executionInfo.getExecutor(), arguments.toArray());
         } catch (InvocationTargetException e) {
