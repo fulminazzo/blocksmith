@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.BlocksmithApplication;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
@@ -9,19 +10,22 @@ import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 final class BukkitCommandRegistry extends CommandRegistry {
+    private final @NotNull Server server;
     private final @NotNull SimpleCommandMap commandMap;
     private final @NotNull Map<String, Command> knownCommands;
     private final @NotNull Map<String, Command> previousCommands = new ConcurrentHashMap<>();
 
     public BukkitCommandRegistry(final @NotNull BlocksmithApplication application) {
         super(application.getMessenger(), application.getLog(), application.getName().toLowerCase());
-        Reflect reflect = Reflect.on(application.getServer()).fields().values().stream()
+        this.server = (Server) application.getServer();
+        Reflect reflect = Reflect.on(server).fields().values().stream()
                 .filter(f -> f.get() instanceof SimpleCommandMap)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Could not find SimpleCommandMap"));
@@ -45,6 +49,7 @@ final class BukkitCommandRegistry extends CommandRegistry {
                 getPrefix(),
                 new BukkitCommand(commandName, command)
         );
+        updateCommands();
     }
 
     @Override
@@ -54,6 +59,7 @@ final class BukkitCommandRegistry extends CommandRegistry {
             removeOrRestoreCommand(command.getName());
             command.getAliases().forEach(this::removeOrRestoreCommand);
         }
+        updateCommands();
     }
 
     private void removeOrRestoreCommand(final @NotNull String alias) {
@@ -67,6 +73,15 @@ final class BukkitCommandRegistry extends CommandRegistry {
     @Override
     protected @NotNull Class<?> getSenderType() {
         return CommandSender.class;
+    }
+
+    private void updateCommands() {
+        try {
+            Method syncCommands = server.getClass().getDeclaredMethod("syncCommands");
+            syncCommands.setAccessible(true);
+            syncCommands.invoke(server);
+        } catch (Exception ignored) {
+        }
     }
 
     private final class BukkitCommand extends Command {
