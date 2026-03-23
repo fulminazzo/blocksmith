@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.message.Messenger;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -17,7 +18,11 @@ final class MockCommandRegistry extends CommandRegistry {
     private final @NotNull Map<String, CommandInfo> registeredCommands = new ConcurrentHashMap<>();
 
     public MockCommandRegistry() {
-        super(new Messenger(log), log);
+        this(new Messenger(log), log);
+    }
+
+    public MockCommandRegistry(final @NotNull Messenger messenger, final @NotNull Logger logger) {
+        super(messenger, logger);
     }
 
     @SuppressWarnings("unchecked")
