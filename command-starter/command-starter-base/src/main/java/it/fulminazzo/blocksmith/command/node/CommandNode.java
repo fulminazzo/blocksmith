@@ -190,7 +190,8 @@ public abstract class CommandNode implements TabCompletable {
      * @return the completions
      */
     public @NotNull List<String> tabComplete(final @NotNull CommandExecutionContext context) {
-        if (context.isDone())
+        if (context.isDone()) return Collections.emptyList();
+        else if (context.isLast())
             return getChildren().stream()
                     .map(c -> c.getCompletions(context))
                     .flatMap(Collection::stream)
