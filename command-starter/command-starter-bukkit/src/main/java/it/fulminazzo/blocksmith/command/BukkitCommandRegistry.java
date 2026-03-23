@@ -71,10 +71,9 @@ final class BukkitCommandRegistry extends CommandRegistry {
     }
 
     private void removeOrRestoreCommand(final @NotNull String alias) {
-        Command cmd = previousCommands.get(alias);
+        Command cmd = previousCommands.remove(alias);
         Command current = knownCommands.remove(alias);
-        if (cmd != null && current instanceof BukkitCommand)
-            knownCommands.put(alias, cmd);
+        if (cmd != null && current instanceof BukkitCommand) knownCommands.put(alias, cmd);
         knownCommands.remove(getPrefix() + ":" + alias);
     }
 
