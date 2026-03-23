@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
+import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -61,8 +62,12 @@ public final class LiteralNode extends CommandNode {
     @Override
     protected void validateInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         CommandInfo commandInfo = getCommandInfo().orElse(null);
-        if (commandInfo != null && !context.getCommandSender().hasPermission(commandInfo.getPermission()))
-            throw new CommandExecutionException("error.no-permission");
+        if (commandInfo != null) {
+            PermissionInfo permission = commandInfo.getPermission();
+            if (!context.getCommandSender().hasPermission(permission))
+                throw new CommandExecutionException("error.no-permission")
+                        .arguments(Placeholder.of("permission", permission.getPermission()));
+        }
     }
 
     @Override

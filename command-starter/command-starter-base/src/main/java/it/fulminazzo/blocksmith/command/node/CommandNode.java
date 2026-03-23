@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command.node;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
+import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -138,10 +139,12 @@ public abstract class CommandNode {
                 } else throw new CommandExecutionException("error.not-enough-arguments");
             }
         } else {
-            CommandNode child = getChild(context.getCurrent());
+            String current = context.getCurrent();
+            CommandNode child = getChild(current);
             if (child == null) {
                 if (isExecutable()) internalExecute(context);
-                else throw new CommandExecutionException("error.command-not-found");
+                else throw new CommandExecutionException("error.command-not-found")
+                        .arguments(Placeholder.of("argument", current));
             } else child.execute(context);
         }
     }
@@ -167,7 +170,9 @@ public abstract class CommandNode {
             }
             method.invoke(executionInfo.getExecutor(), arguments.toArray());
         } catch (InvocationTargetException e) {
-            throw new CommandExecutionException("error.internal-error", e.getCause());
+            Throwable cause = e.getCause();
+            throw new CommandExecutionException("error.internal-error", cause)
+                    .arguments(Placeholder.of("message", cause.getMessage()));
         } catch (IllegalAccessException e) {
             throw new IllegalArgumentException(String.format("Method %s#%s should be declared public",
                     method.getDeclaringClass().getCanonicalName(),
