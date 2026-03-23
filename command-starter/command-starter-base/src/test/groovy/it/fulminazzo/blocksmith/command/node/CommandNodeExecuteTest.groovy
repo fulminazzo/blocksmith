@@ -2,6 +2,8 @@
 package it.fulminazzo.blocksmith.command.node
 
 import it.fulminazzo.blocksmith.command.CommandSender
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper
+import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
 import org.jetbrains.annotations.NotNull
@@ -10,10 +12,10 @@ import spock.lang.Specification
 import java.lang.reflect.Method
 
 class CommandNodeExecuteTest extends Specification {
-    private static @NotNull
-    Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
-    private static @NotNull
-    Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
+    private static final @NotNull CommandSenderWrapper commandSender = new MockCommandSenderWrapper(new CommandSender())
+
+    private static @NotNull Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
+    private static @NotNull Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
 
     private static String printer
 
@@ -46,7 +48,7 @@ class CommandNodeExecuteTest extends Specification {
         } else greeting.addChild(who)
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
+        def context = new CommandExecutionContext(commandSender)
                 .addInput('say', 'hello', 'Hello')
         if (whatEnabled) context.addInput('what')
         if (whoArg != null) context.addInput(whoArg)
@@ -88,7 +90,7 @@ class CommandNodeExecuteTest extends Specification {
         def node = new LiteralNode('test')
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
+        def context = new CommandExecutionContext(commandSender)
                 .addInput('test')
 
         when:
@@ -107,7 +109,7 @@ class CommandNodeExecuteTest extends Specification {
         node.addChild(who)
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
+        def context = new CommandExecutionContext(commandSender)
                 .addInput('Hello', 'Alex', 'extra', 'input', 'should', 'be', 'ignored')
 
         expect:
@@ -128,7 +130,7 @@ class CommandNodeExecuteTest extends Specification {
         def node = new LiteralNode('test')
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
+        def context = new CommandExecutionContext(commandSender)
                 .addInput('test', 'help')
 
         when:
@@ -148,7 +150,7 @@ class CommandNodeExecuteTest extends Specification {
         node.executionInfo = new ExecutionInfo(CommandNodeExecuteTest, CommandNodeExecuteTest.getDeclaredMethod(name))
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
+        def context = new CommandExecutionContext(commandSender)
                 .addInput(name)
 
         when:
@@ -179,7 +181,7 @@ class CommandNodeExecuteTest extends Specification {
         )
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
+        def context = new CommandExecutionContext(commandSender)
                 .addInput(node.name)
 
         when:
@@ -202,7 +204,7 @@ class CommandNodeExecuteTest extends Specification {
         node.addChild(message)
 
         and:
-        def context = new CommandExecutionContext(new CommandSender(), (s, p) -> true)
+        def context = new CommandExecutionContext(commandSender)
                 .addInput(node.name, 'Hello,', 'Alex!')
 
         expect:

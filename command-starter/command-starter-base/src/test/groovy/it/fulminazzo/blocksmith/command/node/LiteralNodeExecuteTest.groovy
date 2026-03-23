@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.node
 
 import it.fulminazzo.blocksmith.command.CommandSender
+import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
@@ -18,10 +19,7 @@ class LiteralNodeExecuteTest extends Specification {
         node.commandInfo = commandInfo
 
         and:
-        def context = new CommandExecutionContext(
-                new CommandSender(),
-                (s, p) -> p.permissionDefault == Permission.Default.OP
-        )
+        def context = new CommandExecutionContext(new MockCommandSenderWrapper(new CommandSender().setOp(true)))
 
         when:
         node.execute(context)
@@ -47,10 +45,7 @@ class LiteralNodeExecuteTest extends Specification {
         node.commandInfo = new CommandInfo('', new PermissionInfo('permission', Permission.Default.NONE))
 
         and:
-        def context = new CommandExecutionContext(
-                new CommandSender(),
-                (s, p) -> p.permissionDefault == Permission.Default.OP
-        )
+        def context = new CommandExecutionContext(new MockCommandSenderWrapper(new CommandSender().setOp(true)))
 
         when:
         node.execute(context)
