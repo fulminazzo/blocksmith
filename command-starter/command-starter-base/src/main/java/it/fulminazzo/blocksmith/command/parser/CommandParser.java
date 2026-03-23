@@ -342,6 +342,7 @@ public final class CommandParser {
      * @param prefix the string to prepend to the generated permission
      * @return the computed command information
      */
+    @SuppressWarnings("deprecation")
     static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node,
                                                        final @Nullable CommandNode end,
                                                        final @Nullable String prefix) {
@@ -362,7 +363,8 @@ public final class CommandParser {
                         (prefix == null ? "" : prefix + ".") + permission,
                         Permission.Default.OP,
                         true
-                )
+                ),
+                true
         );
     }
 

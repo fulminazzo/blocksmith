@@ -96,7 +96,8 @@ public abstract class CommandRegistry {
                                 final @NotNull LiteralNode commandNode) {
         onRegister(commandName, commandNode.getCommandInfo().orElse(new CommandInfo(
                 CommandParser.getDefaultDescription(commandName),
-                new PermissionInfo(getPrefix() + "." + commandName, Permission.Default.OP, true)
+                new PermissionInfo(getPrefix() + "." + commandName, Permission.Default.OP, true),
+                true
         )));
     }
 
