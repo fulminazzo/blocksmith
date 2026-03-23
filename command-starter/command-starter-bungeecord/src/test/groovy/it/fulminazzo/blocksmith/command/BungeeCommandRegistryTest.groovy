@@ -1,0 +1,84 @@
+package it.fulminazzo.blocksmith.command
+
+import groovy.util.logging.Slf4j
+import it.fulminazzo.blocksmith.BlocksmithApplication
+import it.fulminazzo.blocksmith.command.annotation.Permission
+import it.fulminazzo.blocksmith.command.node.CommandInfo
+import it.fulminazzo.blocksmith.command.node.LiteralNode
+import it.fulminazzo.blocksmith.command.node.PermissionInfo
+import it.fulminazzo.blocksmith.message.Messenger
+import net.md_5.bungee.api.ProxyServer
+import net.md_5.bungee.api.plugin.Plugin
+import net.md_5.bungee.api.plugin.PluginManager
+import spock.lang.Specification
+
+@Slf4j
+class BungeeCommandRegistryTest extends Specification {
+
+    private BlocksmithApplication application
+
+    private BungeeCommandRegistry registry
+
+    private PluginManager pluginManager
+
+    void setup() {
+        pluginManager = Mock(PluginManager)
+
+        def proxy = Mock(ProxyServer)
+        proxy.pluginManager >> pluginManager
+
+        application = Mock(Plugin, additionalInterfaces: [BlocksmithApplication])
+        application.server >> proxy
+        application.log >> log
+        application.messenger >> new Messenger(log)
+        application.name >> 'blocksmith'
+
+        registry = new BungeeCommandRegistry(application)
+    }
+
+    def 'test that onRegister correctly registers new command and aliases'() {
+        given:
+        def node = new LiteralNode('help', '?')
+        node.commandInfo = new CommandInfo(
+                'command.description.help',
+                new PermissionInfo('help', Permission.Grant.ALL)
+        )
+
+        when:
+        registry.onRegister('help', node)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        1 * pluginManager.registerCommand(application, _ as BungeeCommandRegistry.BungeeCommand)
+
+        and:
+        def registeredCommands = registry.registeredCommands
+        def command = registeredCommands['help']
+        command != null
+
+        and:
+        command.aliases.toList() == ['?']
+    }
+
+    def 'test that onUnregister removes commands'() {
+        given:
+        def command = Mock(BungeeCommandRegistry.BungeeCommand)
+        registry.registeredCommands['help'] = command
+
+        when:
+        registry.onUnregister('help')
+
+        then:
+        noExceptionThrown()
+
+        and:
+        1 * pluginManager.unregisterCommand(command)
+
+        and:
+        def registeredCommands = registry.registeredCommands
+        registeredCommands['help'] == null
+    }
+
+}
