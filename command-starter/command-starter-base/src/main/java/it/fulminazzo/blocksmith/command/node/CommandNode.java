@@ -163,7 +163,7 @@ public abstract class CommandNode implements TabCompletable {
                     arguments.addFirst(sender);
                 else {
                     Object actualSender = sender.getActualSender();
-                    if (actualSender.getClass().isAssignableFrom(parameterType)) arguments.addFirst(actualSender);
+                    if (parameterType.isAssignableFrom(actualSender.getClass())) arguments.addFirst(actualSender);
                     else throw new CommandExecutionException(sender.isPlayer()
                             ? "error.player-cannot-execute"
                             : "error.console-cannot-execute"
