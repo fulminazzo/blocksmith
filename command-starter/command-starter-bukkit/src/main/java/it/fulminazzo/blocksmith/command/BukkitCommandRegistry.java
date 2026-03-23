@@ -70,8 +70,16 @@ final class BukkitCommandRegistry extends CommandRegistry {
 
     @Override
     protected void onUnregister(final @NotNull String commandName) {
-        knownCommands.remove(commandName);
-        knownCommands.remove(getPrefix() + ":" + commandName);
+        Command command = knownCommands.remove(commandName);
+        if (command != null)
+            command.getAliases().forEach(knownCommands::remove);
+        command = knownCommands.remove(getPrefix() + ":" + commandName);
+        if (command != null) {
+            command.getAliases().forEach(a -> {
+                knownCommands.remove(a);
+                knownCommands.remove(getPrefix() + ":" + a);
+            });
+        }
     }
 
     @Override
