@@ -23,7 +23,7 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         application.messenger >> new Messenger(log)
         application.log >> log
         application.name >> 'blocksmith'
-        application.proxy >> Mock(ProxyServer)
+        application.server >> Mock(ProxyServer)
         return application
     }
 
