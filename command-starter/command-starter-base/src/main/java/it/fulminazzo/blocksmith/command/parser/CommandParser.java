@@ -331,7 +331,7 @@ public final class CommandParser {
      */
     static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node,
                                                        final @Nullable String prefix) {
-        return getComputedCommandInfo(node, node, prefix);
+        return getComputedCommandInfo(node, null, prefix);
     }
 
     /**
@@ -343,7 +343,7 @@ public final class CommandParser {
      * @return the computed command information
      */
     static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node,
-                                                       final @NotNull CommandNode end,
+                                                       final @Nullable CommandNode end,
                                                        final @Nullable String prefix) {
         StringBuilder computedPermission = new StringBuilder();
         CommandNode n = node;
