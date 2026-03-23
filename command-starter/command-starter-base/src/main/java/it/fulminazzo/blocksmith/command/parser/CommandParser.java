@@ -298,10 +298,6 @@ public final class CommandParser {
                 CommandNode node = parser.parse();
 
                 commands.add(node);
-
-                commandInfo.merge(getComputedCommandInfo(node, prefix));
-
-                populateLiteralsCommandInfos(node, prefix);
             }
         return commands;
     }
@@ -335,70 +331,8 @@ public final class CommandParser {
                 CommandNode node = parser.parse();
 
                 commands.add(node);
-
-                commandInfo.merge(getComputedCommandInfo(node, prefix));
-
-                populateLiteralsCommandInfos(node, prefix);
             }
         return commands;
-    }
-
-    private static void populateLiteralsCommandInfos(final @NotNull CommandNode node, final @Nullable String prefix) {
-        CommandNode n = node;
-        while (n != null) {
-            if (n instanceof LiteralNode) {
-                LiteralNode literalNode = (LiteralNode) n;
-                if (literalNode.getCommandInfo().isEmpty())
-                    literalNode.setCommandInfo(getComputedCommandInfo(node, n, prefix));
-            }
-            n = n.getFirstChild();
-        }
-    }
-
-    /**
-     * Computes a default Command info object from the given node and the corresponding command declaration.
-     *
-     * @param node   the node
-     * @param prefix the string to prepend to the generated permission
-     * @return the computed command information
-     */
-    static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node,
-                                                       final @Nullable String prefix) {
-        return getComputedCommandInfo(node, null, prefix);
-    }
-
-    /**
-     * Computes a default Command info object from the given node and the corresponding command declaration.
-     *
-     * @param node   the node
-     * @param end    the node when the internal loop should stop looking for command names
-     * @param prefix the string to prepend to the generated permission
-     * @return the computed command information
-     */
-    @SuppressWarnings("deprecation")
-    static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node,
-                                                       final @Nullable CommandNode end,
-                                                       final @Nullable String prefix) {
-        StringBuilder computedPermission = new StringBuilder();
-        CommandNode n = node;
-        while (n != null) {
-            if (n instanceof LiteralNode) {
-                if (computedPermission.length() > 0) computedPermission.append(".");
-                computedPermission.append(n.getName());
-            }
-            if (n.equals(end)) break;
-            n = n.getFirstChild();
-        }
-        String permission = computedPermission.toString();
-        return new CommandInfo(
-                getDefaultDescription(permission),
-                new PermissionInfo(
-                        (prefix == null ? "" : prefix + ".") + permission,
-                        Permission.Default.OP,
-                        true
-                ),
-                true
-        );
     }
 
     /**
