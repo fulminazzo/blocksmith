@@ -1,10 +1,14 @@
 package it.fulminazzo.blocksmith.command;
 
+import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
+import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.parser.CommandParser;
+import it.fulminazzo.blocksmith.message.Messenger;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @RequiredArgsConstructor
 public abstract class CommandRegistry {
+    private final @NotNull Messenger messenger;
+    private final @NotNull Logger logger;
+
     private final @NotNull Map<String, LiteralNode> commands = new ConcurrentHashMap<>();
     private @NotNull State state = State.INITIAL;
 
@@ -112,6 +119,70 @@ public abstract class CommandRegistry {
     protected final void unregister(final @NotNull String commandName) {
         if (commands.remove(commandName) != null) onUnregister(commandName);
     }
+
+    /**
+     * Executes the given command.
+     *
+     * @param command     the root of the command route
+     * @param executor    the executor of the command
+     * @param commandName the command name
+     * @param arguments   the arguments to pass as input
+     */
+    protected final void execute(final @NotNull LiteralNode command,
+                                 final @NotNull Object executor,
+                                 final @NotNull String commandName,
+                                 final String @NotNull ... arguments) {
+        try {
+            CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
+            command.execute(context);
+        } catch (CommandExecutionException e) {
+            messenger.sendMessage(executor, e.getMessage(), e.getArguments());
+            Throwable cause = e.getCause();
+            if (cause != null)
+                logger.warn("{} while executing command /{} {}",
+                        cause.getClass().getCanonicalName(),
+                        commandName,
+                        String.join(" ", arguments),
+                        cause
+                );
+        }
+    }
+
+    /**
+     * Obtains the tab completions for the given input.
+     *
+     * @param command     the root of the command route
+     * @param executor    the executor of the command
+     * @param commandName the command name
+     * @param arguments   the arguments to pass as input
+     * @return the tab completions
+     */
+    protected final @NotNull List<String> tabComplete(final @NotNull LiteralNode command,
+                                                      final @NotNull Object executor,
+                                                      final @NotNull String commandName,
+                                                      final String @NotNull ... arguments) {
+        CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
+        return command.tabComplete(context);
+    }
+
+    private @NotNull CommandExecutionContext prepareExecutionContext(final @NotNull Object executor,
+                                                                     final @NotNull String commandName,
+                                                                     final String @NotNull ... arguments) {
+        CommandSenderWrapper wrapper;
+        if (executor instanceof CommandSenderWrapper) wrapper = (CommandSenderWrapper) executor;
+        else wrapper = wrapSender(executor);
+        return new CommandExecutionContext(wrapper)
+                .addInput(commandName)
+                .addInput(arguments);
+    }
+
+    /**
+     * Converts the command executor to a {@link CommandSenderWrapper}.
+     *
+     * @param executor the executor of the command
+     * @return the wrapped command sender
+     */
+    protected abstract @NotNull CommandSenderWrapper wrapSender(final @NotNull Object executor);
 
     /**
      * Method called upon actively registering a command.
