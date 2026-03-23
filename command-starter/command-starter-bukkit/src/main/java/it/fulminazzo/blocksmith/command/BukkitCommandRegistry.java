@@ -6,7 +6,6 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
