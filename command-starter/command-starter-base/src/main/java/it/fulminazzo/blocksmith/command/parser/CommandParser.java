@@ -92,7 +92,7 @@ public final class CommandParser {
     }
 
     /**
-     * EXPRESSION := OPTIONAL_ARGUMENT | MANDATORY_ARGUMENT | ALIASES_LITERAL | SIMPLE_LITERAL
+     * EXPRESSION := OPTIONAL_ARGUMENT | MANDATORY_ARGUMENT | LITERAL
      *
      * @return the node
      */
@@ -106,14 +106,8 @@ public final class CommandParser {
             return parseOptionalArgument();
         else if (optionalArgument != null)
             throw parseException("after declaring optional argument '%s', all subsequent nodes MUST be of the same kind (optional arguments)", optionalArgument);
-        else switch (lastToken) {
-                case LOWER_THAN:
-                    return parseMandatoryArgument();
-                case OPEN_PHARENTHESIS:
-                    return parseAliasesLiteral();
-                default:
-                    return parseSimpleLiteral();
-            }
+        else if (lastToken == CommandToken.LOWER_THAN) return parseMandatoryArgument();
+        else return parseLiteral();
     }
 
     /**
@@ -162,6 +156,17 @@ public final class CommandParser {
         }
         tokenizer.next();
         return node;
+    }
+
+    /**
+     * LITERAL := ALIASES_LITERAL | SIMPLE_LITERAL
+     *
+     * @return the node
+     */
+    @NotNull CommandNode parseLiteral() {
+        if (tokenizer.getLastToken() == CommandToken.OPEN_PHARENTHESIS)
+            return parseAliasesLiteral();
+        else return parseSimpleLiteral();
     }
 
     /**
