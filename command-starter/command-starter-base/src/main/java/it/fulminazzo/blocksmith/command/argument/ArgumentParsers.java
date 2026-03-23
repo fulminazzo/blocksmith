@@ -22,8 +22,8 @@ public final class ArgumentParsers {
         register(Short.class, new NumberArgumentParser<>(Short.MIN_VALUE, Short.MAX_VALUE, Short::valueOf));
         register(Integer.class, new NumberArgumentParser<>(Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::valueOf));
         register(Long.class, new NumberArgumentParser<>(Long.MIN_VALUE, Long.MAX_VALUE, Long::valueOf));
-        register(Float.class, new NumberArgumentParser<>(Float.MIN_VALUE, Float.MAX_VALUE, Float::valueOf));
-        register(Double.class, new NumberArgumentParser<>(Double.MIN_VALUE, Double.MAX_VALUE, Double::valueOf));
+        register(Float.class, new NumberArgumentParser<>(-Float.MAX_VALUE, Float.MAX_VALUE, Float::valueOf));
+        register(Double.class, new NumberArgumentParser<>(-Double.MAX_VALUE, Double.MAX_VALUE, Double::valueOf));
         register(Boolean.class, new ArgumentParser<>() {
             private static final String TRUE = Boolean.TRUE.toString();
             private static final String FALSE = Boolean.FALSE.toString();
