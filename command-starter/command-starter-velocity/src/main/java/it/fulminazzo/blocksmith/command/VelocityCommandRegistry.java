@@ -17,10 +17,18 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Implementation of {@link CommandRegistry} for Velocity platforms.
+ */
 final class VelocityCommandRegistry extends CommandRegistry {
     private final @NotNull CommandManager commandManager;
     private final @NotNull Map<String, Set<String>> aliases = new ConcurrentHashMap<>();
 
+    /**
+     * Instantiates a new Velocity command registry.
+     *
+     * @param application the application
+     */
     public VelocityCommandRegistry(final @NotNull BlocksmithApplication application) {
         super(application.getMessenger(), application.getLog(), application.getName().toLowerCase());
         this.commandManager = ((ProxyServer) application.getServer()).getCommandManager();
@@ -54,6 +62,9 @@ final class VelocityCommandRegistry extends CommandRegistry {
         return CommandSource.class;
     }
 
+    /**
+     * Velocity command implementation associated with the current registry.
+     */
     @RequiredArgsConstructor
     final class VelocityCommand implements SimpleCommand {
         private final @NotNull LiteralNode command;
