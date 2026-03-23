@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
@@ -150,8 +151,12 @@ public abstract class CommandNode {
         Method method = executionInfo.getMethod();
         try {
             LinkedList<Object> arguments = context.getArguments();
-            if (arguments.size() != method.getParameterCount())
-                arguments.addFirst(context.getCommandSender());
+            if (arguments.size() != method.getParameterCount()) {
+                CommandSenderWrapper sender = context.getCommandSender();
+                if (method.getParameterTypes()[0].equals(CommandSenderWrapper.class))
+                    arguments.addFirst(sender);
+                else arguments.addFirst(sender.getActualSender());
+            }
             method.invoke(executionInfo.getExecutor(), arguments.toArray());
         } catch (InvocationTargetException e) {
             throw new CommandExecutionException("error.internal-error", e.getCause());
