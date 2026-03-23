@@ -36,7 +36,7 @@ final class NumberArgumentParser<N extends Number> implements ArgumentParser<N> 
     public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
         String argument = context.getCurrent();
         List<String> completions = new ArrayList<>();
-        if (isValid(argument))
+        if (argument.isEmpty() || isValid(argument))
             for (int i = 0; i < 10; i++) {
                 String tmp = argument + i;
                 if (isValid(tmp)) completions.add(tmp);
