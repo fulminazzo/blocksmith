@@ -15,7 +15,7 @@ public class ClanAdminCommand {
     }
 
     @Command("admin members")
-    @Permission(permissionDefault = Permission.Default.ALL)
+    @Permission(grant = Permission.Grant.ALL)
     public void adminMembers(final @NotNull CommandSender sender) {
         // something
     }

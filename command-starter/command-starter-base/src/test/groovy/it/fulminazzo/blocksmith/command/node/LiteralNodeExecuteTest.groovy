@@ -30,8 +30,8 @@ class LiteralNodeExecuteTest extends Specification {
         where:
         commandInfo << [
                 null,
-                new CommandInfo('', new PermissionInfo('permission', Permission.Default.ALL)),
-                new CommandInfo('', new PermissionInfo('permission', Permission.Default.OP))
+                new CommandInfo('', new PermissionInfo('permission', Permission.Grant.ALL)),
+                new CommandInfo('', new PermissionInfo('permission', Permission.Grant.OP))
         ]
     }
 
@@ -42,7 +42,7 @@ class LiteralNodeExecuteTest extends Specification {
                 LiteralNodeExecuteTest,
                 LiteralNodeExecuteTest.getMethod('mock')
         )
-        node.commandInfo = new CommandInfo('', new PermissionInfo('permission', Permission.Default.NONE))
+        node.commandInfo = new CommandInfo('', new PermissionInfo('permission', Permission.Grant.NONE))
 
         and:
         def context = new CommandExecutionContext(new MockCommandSenderWrapper(new CommandSender().setOp(true)))

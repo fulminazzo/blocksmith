@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 public final class PermissionInfo {
 
     @NotNull String permission;
-    @NotNull Permission.Default permissionDefault;
+    @NotNull Permission.Grant grant;
 
     @Getter(AccessLevel.PRIVATE)
     @EqualsAndHashCode.Exclude
@@ -24,29 +24,29 @@ public final class PermissionInfo {
     /**
      * Instantiates a new Permission info.
      *
-     * @param permission        the permission
-     * @param permissionDefault the permission default
+     * @param permission the permission
+     * @param grant      who the permission is granted to
      */
     public PermissionInfo(final @NotNull String permission,
-                          final @NotNull Permission.Default permissionDefault) {
-        this(permission, permissionDefault, false);
+                          final @NotNull Permission.Grant grant) {
+        this(permission, grant, false);
     }
 
     /**
      * Instantiates a new Permission info.
      *
-     * @param permission        the permission
-     * @param permissionDefault the permission default
-     * @param autoComputed      if <code>true</code>, will mark the permission as automatically computed,
-     *                          meaning it was not provided by the user, but was instead retrieved from the command route
+     * @param permission   the permission
+     * @param grant        who the permission is granted to
+     * @param autoComputed if <code>true</code>, will mark the permission as automatically computed,
+     *                     meaning it was not provided by the user, but was instead retrieved from the command route
      * @deprecated FOR INTERNAL USE ONLY
      */
     @Deprecated
     public PermissionInfo(final @NotNull String permission,
-                          final @NotNull Permission.Default permissionDefault,
+                          final @NotNull Permission.Grant grant,
                           final boolean autoComputed) {
         this.permission = permission;
-        this.permissionDefault = permissionDefault;
+        this.grant = grant;
         this.autoComputed = autoComputed;
     }
 
@@ -61,8 +61,8 @@ public final class PermissionInfo {
             permission = permissionInfo.getPermission();
             autoComputed = permissionInfo.isAutoComputed();
         }
-        if (permissionDefault == Permission.Default.OP)
-            permissionDefault = permissionInfo.getPermissionDefault();
+        if (grant == Permission.Grant.OP)
+            grant = permissionInfo.getGrant();
     }
 
 }

@@ -18,7 +18,7 @@ public final class MockCommandSenderWrapper extends CommandSenderWrapper {
 
     @Override
     protected boolean hasPermissionImpl(final @NotNull PermissionInfo permissionInfo) {
-        if (permissionInfo.getPermissionDefault() == Permission.Default.OP && actualSender.isOp()) return true;
+        if (permissionInfo.getGrant() == Permission.Grant.OP && actualSender.isOp()) return true;
         return actualSender.hasPermission(permissionInfo.getPermission());
     }
 

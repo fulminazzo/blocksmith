@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.PermissionInfo;
-import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -34,13 +33,13 @@ public abstract class CommandSenderWrapper {
      * @return <code>true</code> if they do
      */
     public final boolean hasPermission(final @NotNull PermissionInfo permissionInfo) {
-        return permissionInfo.getPermissionDefault() == Permission.Default.ALL || hasPermissionImpl(permissionInfo);
+        return permissionInfo.getGrant() == Permission.Grant.ALL || hasPermissionImpl(permissionInfo);
     }
 
     /**
      * Internal implementation for {@link #hasPermission(PermissionInfo)}.
      * <br>
-     * Does NOT check if the permission is for {@link it.fulminazzo.blocksmith.command.annotation.Permission.Default#ALL}.
+     * Does NOT check if the permission is for {@link Permission.Grant#ALL}.
      *
      * @param permissionInfo the permission info
      * @return <code>true</code> if they have the permission

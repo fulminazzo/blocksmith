@@ -26,7 +26,7 @@ final class ClanCommand {
     }
 
     @Command("help <verbose>")
-    @Permission(permissionDefault = Permission.Default.ALL)
+    @Permission(grant = Permission.Grant.ALL)
     public void help(
             final @NotNull CommandSender sender,
             final boolean verbose
@@ -46,7 +46,7 @@ final class ClanCommand {
     }
 
     @Command("admin members")
-    @Permission(permissionDefault = Permission.Default.ALL)
+    @Permission(grant = Permission.Grant.ALL)
     public void adminMembers(final @NotNull CommandSender sender) {
         // something
     }

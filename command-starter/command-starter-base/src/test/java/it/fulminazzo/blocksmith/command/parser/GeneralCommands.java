@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 final class GeneralCommands {
 
     @Command(value = "help [command]", description = "Displays help for all the available commands")
-    @Permission(value = "blocksmith.help", permissionDefault = Permission.Default.ALL)
+    @Permission(value = "blocksmith.help", grant = Permission.Grant.ALL)
     public static void help(final @NotNull CommandSender sender,
                             final @Nullable String command
     ) {

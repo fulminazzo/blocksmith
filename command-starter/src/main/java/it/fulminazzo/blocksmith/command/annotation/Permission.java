@@ -15,9 +15,9 @@ public @interface Permission {
     @NotNull String value() default "";
 
     //TODO: better naming
-    @NotNull Default permissionDefault() default Default.OP;
+    @NotNull Grant grant() default Grant.OP;
 
-    enum Default {
+    enum Grant {
         ALL, OP, NONE
     }
 

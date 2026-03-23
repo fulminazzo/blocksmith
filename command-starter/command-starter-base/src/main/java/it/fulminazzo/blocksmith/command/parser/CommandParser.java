@@ -221,7 +221,7 @@ public final class CommandParser {
                 getDefaultDescription(computedPermission),
                 new PermissionInfo(
                         (prefix == null ? "" : prefix + ".") + computedPermission,
-                        Permission.Default.OP,
+                        Permission.Grant.OP,
                         true
                 ),
                 true
@@ -363,17 +363,17 @@ public final class CommandParser {
         else description = "";
 
         final String permission;
-        final Permission.Default scope;
+        final Permission.Grant grant;
         if (element.isAnnotationPresent(Permission.class)) {
             Permission permissionAnnotation = element.getAnnotation(Permission.class);
             permission = permissionAnnotation.value().trim();
-            scope = permissionAnnotation.permissionDefault();
+            grant = permissionAnnotation.grant();
         } else {
             permission = "";
-            scope = Permission.Default.OP;
+            grant = Permission.Grant.OP;
         }
 
-        PermissionInfo permissionInfo = new PermissionInfo(permission, scope);
+        PermissionInfo permissionInfo = new PermissionInfo(permission, grant);
         return new CommandInfo(description, permissionInfo);
     }
 
