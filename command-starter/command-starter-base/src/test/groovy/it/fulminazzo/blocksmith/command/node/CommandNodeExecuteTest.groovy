@@ -3,7 +3,9 @@ package it.fulminazzo.blocksmith.command.node
 
 import it.fulminazzo.blocksmith.command.CommandSender
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper
+import it.fulminazzo.blocksmith.command.ConsoleCommandSender
 import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
+import it.fulminazzo.blocksmith.command.Player
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
 import org.jetbrains.annotations.NotNull
@@ -220,6 +222,61 @@ class CommandNodeExecuteTest extends Specification {
         printer == 'Hello, Alex!'
     }
 
+    def 'test that execute of #method from #sender does not throw'() {
+        given:
+        def node = new LiteralNode('command')
+        node.executionInfo = new ExecutionInfo(
+                CommandNodeExecuteTest,
+                method
+        )
+
+        and:
+        def context = new CommandExecutionContext(new MockCommandSenderWrapper(sender))
+                .addInput('command')
+
+        expect:
+        printer == null
+
+        when:
+        node.execute(context)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        printer == "Hello from $sender.name!"
+
+        where:
+        method                                                                | sender
+        CommandNodeExecuteTest.getMethod('consoleOnly', ConsoleCommandSender) | new ConsoleCommandSender()
+        CommandNodeExecuteTest.getMethod('playerOnly', Player)                | new Player('Alex')
+    }
+
+    def 'test that execute of #method from #sender throws CommandExecutionException with #message'() {
+        given:
+        def node = new LiteralNode('command')
+        node.executionInfo = new ExecutionInfo(
+                CommandNodeExecuteTest,
+                method
+        )
+
+        and:
+        def context = new CommandExecutionContext(new MockCommandSenderWrapper(sender))
+                .addInput('command')
+
+        when:
+        node.execute(context)
+
+        then:
+        def e = thrown(CommandExecutionException)
+        e.message == message
+
+        where:
+        method                                                                | sender                     || message
+        CommandNodeExecuteTest.getMethod('consoleOnly', ConsoleCommandSender) | new Player('Alex')         || 'error.player-cannot-execute'
+        CommandNodeExecuteTest.getMethod('playerOnly', Player)                | new ConsoleCommandSender() || 'error.console-cannot-execute'
+    }
+
     static void execute(final @NotNull CommandSender sender,
                         final @NotNull String greeting,
                         final @NotNull String who) {
@@ -234,6 +291,14 @@ class CommandNodeExecuteTest extends Specification {
     static void message(final @NotNull CommandSenderWrapper sender,
                         final @NotNull String message) {
         printer = message
+    }
+
+    static void consoleOnly(final @NotNull ConsoleCommandSender sender) {
+        printer = "Hello from $sender.name!"
+    }
+
+    static void playerOnly(final @NotNull Player sender) {
+        printer = "Hello from $sender.name!"
     }
 
     static void runtimeException() {
