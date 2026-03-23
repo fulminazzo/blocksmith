@@ -28,8 +28,8 @@ class NumberArgumentParserTest extends Specification {
 
         then:
         def e = thrown(CommandExecutionException)
-        e.arguments.toList() == [Placeholder.of("min", Integer.MIN_VALUE.toString()),
-                                 Placeholder.of("max", Integer.MAX_VALUE.toString())]
+        e.arguments.toList() == [Placeholder.of("min", Integer.MIN_VALUE),
+                                 Placeholder.of("max", Integer.MAX_VALUE)]
     }
 
     def 'test that getCompletions returns #expected for argument #argument'() {

@@ -36,8 +36,8 @@ public final class Placeholder implements Argument {
      * @return the placeholder
      */
     public static @NotNull Placeholder of(final @NotNull String placeholder,
-                                          final @NotNull String value) {
-        return of(placeholder, ComponentUtils.toComponent(value));
+                                          final @NotNull Object value) {
+        return of(placeholder, ComponentUtils.toComponent(value.toString()));
     }
 
     /**
@@ -48,8 +48,8 @@ public final class Placeholder implements Argument {
      * @return the placeholder
      */
     public static @NotNull Placeholder of(final @NotNull Component placeholder,
-                                          final @NotNull String value) {
-        return of(placeholder, ComponentUtils.toComponent(value));
+                                          final @NotNull Object value) {
+        return of(placeholder, ComponentUtils.toComponent(value.toString()));
     }
 
     /**

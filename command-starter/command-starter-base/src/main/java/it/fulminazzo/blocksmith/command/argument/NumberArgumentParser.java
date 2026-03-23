@@ -28,7 +28,7 @@ final class NumberArgumentParser<N extends Number> implements ArgumentParser<N> 
             return parser.apply(rawArgument);
         } catch (NumberFormatException e) {
             throw new CommandExecutionException("error.invalid-number")
-                    .arguments(Placeholder.of("min", min.toString()), Placeholder.of("max", max.toString()));
+                    .arguments(Placeholder.of("min", min), Placeholder.of("max", max));
         }
     }
 
