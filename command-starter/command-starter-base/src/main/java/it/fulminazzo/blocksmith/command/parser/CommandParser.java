@@ -315,6 +315,20 @@ public final class CommandParser {
      */
     static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node,
                                                        final @Nullable String prefix) {
+        return getComputedCommandInfo(node, node, prefix);
+    }
+
+    /**
+     * Computes a default Command info object from the given node and the corresponding command declaration.
+     *
+     * @param node   the node
+     * @param end    the node when the internal loop should stop looking for command names
+     * @param prefix the string to prepend to the generated permission
+     * @return the computed command information
+     */
+    static @NotNull CommandInfo getComputedCommandInfo(final @NotNull CommandNode node,
+                                                       final @NotNull CommandNode end,
+                                                       final @Nullable String prefix) {
         StringBuilder computedPermission = new StringBuilder();
         CommandNode n = node;
         while (n != null) {
@@ -322,6 +336,7 @@ public final class CommandParser {
                 if (computedPermission.length() > 0) computedPermission.append(".");
                 computedPermission.append(n.getName());
             }
+            if (n.equals(end)) break;
             n = n.getFirstChild();
         }
         String permission = computedPermission.toString();
