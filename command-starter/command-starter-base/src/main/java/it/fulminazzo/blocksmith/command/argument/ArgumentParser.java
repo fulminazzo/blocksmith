@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.argument;
 
+import it.fulminazzo.blocksmith.command.TabCompletable;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <T> the type of the parsed argument
  */
-public interface ArgumentParser<T> {
+public interface ArgumentParser<T> extends TabCompletable {
 
     /**
      * Parses the given string
