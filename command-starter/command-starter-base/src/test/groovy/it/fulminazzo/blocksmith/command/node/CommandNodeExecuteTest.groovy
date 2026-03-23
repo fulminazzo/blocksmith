@@ -199,7 +199,7 @@ class CommandNodeExecuteTest extends Specification {
         message.greedy = true
         message.executionInfo = new ExecutionInfo(
                 CommandNodeExecuteTest,
-                CommandNodeExecuteTest.getMethod('message', CommandSender, String)
+                CommandNodeExecuteTest.getMethod('message', CommandSenderWrapper, String)
         )
         node.addChild(message)
 
@@ -231,7 +231,7 @@ class CommandNodeExecuteTest extends Specification {
         printer = "$greeting, $who!"
     }
 
-    static void message(final @NotNull CommandSender sender,
+    static void message(final @NotNull CommandSenderWrapper sender,
                         final @NotNull String message) {
         printer = message
     }
