@@ -154,6 +154,23 @@ class CommandParserTest extends Specification {
         clan.addChild(admin)
         expected.add(clan)
 
+        and:
+        def edit = new LiteralNode('edit')
+        edit.commandInfo = new CommandInfo(
+                'command.description.clan.admin.gui.edit',
+                new PermissionInfo(
+                        'clan.admin.gui.edit',
+                        Permission.Default.OP
+                )
+        )
+        def gui = new LiteralNode('gui')
+        gui.addChild(edit)
+        admin = new LiteralNode('admin')
+        admin.addChild(gui)
+        clan = new LiteralNode(*baseAliases)
+        clan.addChild(admin)
+        expected.add(clan)
+
         when:
         def actual = CommandParser.parseCommands(executor, CommandSender, null)
 

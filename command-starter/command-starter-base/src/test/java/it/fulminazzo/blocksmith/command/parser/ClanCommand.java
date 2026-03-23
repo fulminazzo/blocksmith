@@ -57,6 +57,11 @@ final class ClanCommand {
         // something
     }
 
+    @Command("admin gui edit")
+    public void adminGuiEdit(final @NotNull CommandSender sender) {
+        // something
+    }
+
     public static void ignore(final @NotNull CommandSender sender) {
         // something
     }
