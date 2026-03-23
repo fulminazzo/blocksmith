@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command;
 import it.fulminazzo.blocksmith.BlocksmithApplication;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
@@ -22,7 +23,7 @@ final class BungeeCommandRegistry extends CommandRegistry {
     public BungeeCommandRegistry(final @NotNull BlocksmithApplication application) {
         super(application.getMessenger(), application.getLog(), application.getName().toLowerCase());
         this.plugin = (Plugin) application;
-        this.pluginManager = plugin.getProxy().getPluginManager();
+        this.pluginManager = ((ProxyServer) application.getServer()).getPluginManager();
     }
 
     @Override

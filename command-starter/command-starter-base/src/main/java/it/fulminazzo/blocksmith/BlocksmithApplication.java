@@ -24,6 +24,13 @@ public interface BlocksmithApplication {
     @NotNull Logger getLog();
 
     /**
+     * Gets the server where the application has been started.
+     *
+     * @return the server
+     */
+    @NotNull Object getServer();
+
+    /**
      * Gets the name of this application.
      *
      * @return the name

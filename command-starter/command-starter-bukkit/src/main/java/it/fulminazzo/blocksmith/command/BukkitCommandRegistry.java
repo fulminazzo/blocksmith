@@ -21,7 +21,7 @@ final class BukkitCommandRegistry extends CommandRegistry {
 
     public BukkitCommandRegistry(final @NotNull BlocksmithApplication application) {
         super(application.getMessenger(), application.getLog(), application.getName().toLowerCase());
-        Reflect reflect = Reflect.on(((Plugin) application).getServer()).fields().values().stream()
+        Reflect reflect = Reflect.on(application.getServer()).fields().values().stream()
                 .filter(f -> f.get() instanceof SimpleCommandMap)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Could not find SimpleCommandMap"));
