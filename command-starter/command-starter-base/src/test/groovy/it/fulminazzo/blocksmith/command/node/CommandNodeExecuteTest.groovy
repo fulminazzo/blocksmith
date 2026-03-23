@@ -185,6 +185,8 @@ class CommandNodeExecuteTest extends Specification {
         and:
         def context = new CommandExecutionContext(commandSender)
                 .addInput(node.name)
+        context.addParsedArgument(1)
+        context.addParsedArgument(2)
 
         when:
         node.execute(context)
