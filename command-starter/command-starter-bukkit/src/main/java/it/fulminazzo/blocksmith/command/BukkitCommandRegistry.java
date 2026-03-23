@@ -5,9 +5,7 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
 
@@ -17,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 final class BukkitCommandRegistry extends CommandRegistry {
-    private final @NotNull JavaPlugin plugin;
     private final @NotNull SimpleCommandMap commandMap;
     private final @NotNull Map<String, Command> knownCommands;
     private final @NotNull Map<String, Command> previousCommands = new ConcurrentHashMap<>();
@@ -28,7 +25,6 @@ final class BukkitCommandRegistry extends CommandRegistry {
                 .filter(f -> f.get() instanceof SimpleCommandMap)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Could not find SimpleCommandMap"));
-        this.plugin = (JavaPlugin) application;
         this.commandMap = reflect.get();
         this.knownCommands = reflect.field("knownCommands").get();
     }
@@ -53,22 +49,19 @@ final class BukkitCommandRegistry extends CommandRegistry {
 
     @Override
     protected void onUnregister(final @NotNull String commandName) {
-        Command command = knownCommands.remove(commandName);
-        clearAliases(command);
-        command = knownCommands.remove(getPrefix() + ":" + commandName);
-        clearAliases(command);
+        Command command = knownCommands.remove(getPrefix() + ":" + commandName);
+        if (command != null) {
+            removeOrRestoreCommand(command.getName());
+            command.getAliases().forEach(this::removeOrRestoreCommand);
+        }
     }
 
-    private void clearAliases(final @Nullable Command command) {
-        if (command != null)
-            command.getAliases().forEach(a -> {
-                Command cmd = previousCommands.get(a);
-                if (cmd != null) {
-                    Command current = knownCommands.get(a);
-                    if (current instanceof BukkitCommand) knownCommands.put(a, cmd);
-                }
-                knownCommands.remove(getPrefix() + ":" + a);
-            });
+    private void removeOrRestoreCommand(final @NotNull String alias) {
+        Command cmd = previousCommands.get(alias);
+        Command current = knownCommands.remove(alias);
+        if (cmd != null && current instanceof BukkitCommand)
+            knownCommands.put(alias, cmd);
+        knownCommands.remove(getPrefix() + ":" + alias);
     }
 
     @Override
