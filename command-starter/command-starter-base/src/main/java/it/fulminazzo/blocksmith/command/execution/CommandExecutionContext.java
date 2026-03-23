@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.command.execution;
 
-import it.fulminazzo.blocksmith.command.annotation.Permission;
-import it.fulminazzo.blocksmith.command.node.PermissionInfo;
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -12,34 +11,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiPredicate;
 
 /**
  * Represents the execution context of a command.
- *
- * @param <S> the type of the sender
  */
 @ToString
 @RequiredArgsConstructor
-public final class CommandExecutionContext<S> {
+public final class CommandExecutionContext {
     @Getter
-    private final @NotNull S commandSender;
-    private final @NotNull BiPredicate<S, PermissionInfo> permissionChecker;
+    private final @NotNull CommandSenderWrapper commandSender;
     private final @NotNull List<String> input = new ArrayList<>();
     @Getter
     private final @NotNull LinkedList<Object> arguments = new LinkedList<>();
     private int current;
-
-    /**
-     * Checks if the internal sender has the permission.
-     *
-     * @param permission the permission
-     * @return <code>true</code> if it does
-     */
-    public boolean hasPermission(final @NotNull PermissionInfo permission) {
-        return permission.getPermissionDefault() == Permission.Default.ALL ||
-                permissionChecker.test(commandSender, permission);
-    }
 
     /**
      * Adds more data to the input.
@@ -47,7 +31,7 @@ public final class CommandExecutionContext<S> {
      * @param input the input
      * @return this object (for method chaining)
      */
-    public @NotNull CommandExecutionContext<S> addInput(final String @NotNull ... input) {
+    public @NotNull CommandExecutionContext addInput(final String @NotNull ... input) {
         this.input.addAll(Arrays.asList(input));
         return this;
     }
@@ -75,7 +59,7 @@ public final class CommandExecutionContext<S> {
      *
      * @return this object (for method chaining)
      */
-    public @NotNull CommandExecutionContext<S> advanceCursor() {
+    public @NotNull CommandExecutionContext advanceCursor() {
         current++;
         return this;
     }

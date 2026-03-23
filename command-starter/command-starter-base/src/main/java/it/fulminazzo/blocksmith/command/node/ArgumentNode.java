@@ -39,7 +39,7 @@ public final class ArgumentNode<T> extends CommandNode {
     }
 
     @Override
-    protected void validateInput(final @NotNull CommandExecutionContext<?> context) throws CommandExecutionException {
+    protected void validateInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         StringBuilder current = new StringBuilder(context.getCurrent());
         if (isGreedy()) {
             context.advanceCursor();
