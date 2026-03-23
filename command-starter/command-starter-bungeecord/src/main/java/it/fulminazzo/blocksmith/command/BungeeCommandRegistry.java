@@ -10,7 +10,6 @@ import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -63,12 +62,12 @@ final class BungeeCommandRegistry extends CommandRegistry {
 
         @Override
         public void execute(final CommandSender sender, final String[] args) {
-            BungeeCommandRegistry.this.execute(command, sender, args[0], Arrays.copyOfRange(args, 1, args.length));
+            BungeeCommandRegistry.this.execute(command, sender, getName(), args);
         }
 
         @Override
         public @NotNull Iterable<String> onTabComplete(final CommandSender sender, final String[] args) {
-            return BungeeCommandRegistry.this.tabComplete(command, sender, args[0], Arrays.copyOfRange(args, 1, args.length));
+            return BungeeCommandRegistry.this.tabComplete(command, sender, getName(), args);
         }
 
     }
