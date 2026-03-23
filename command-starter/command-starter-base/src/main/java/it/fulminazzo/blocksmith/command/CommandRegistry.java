@@ -1,10 +1,7 @@
 package it.fulminazzo.blocksmith.command;
 
-import it.fulminazzo.blocksmith.command.annotation.Permission;
-import it.fulminazzo.blocksmith.command.node.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
-import it.fulminazzo.blocksmith.command.node.PermissionInfo;
 import it.fulminazzo.blocksmith.command.parser.CommandParser;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -91,14 +88,9 @@ public abstract class CommandRegistry {
         return this;
     }
 
-    @SuppressWarnings("deprecation")
     private void registerSingle(final @NotNull String commandName,
                                 final @NotNull LiteralNode commandNode) {
-        onRegister(commandName, commandNode.getCommandInfo().orElse(new CommandInfo(
-                CommandParser.getDefaultDescription(commandName),
-                new PermissionInfo(getPrefix() + "." + commandName, Permission.Grant.OP, true),
-                true
-        )));
+        onRegister(commandName, commandNode);
     }
 
     /**
@@ -125,10 +117,10 @@ public abstract class CommandRegistry {
      * Method called upon actively registering a command.
      *
      * @param commandName the command name
-     * @param commandInfo the command info
+     * @param command     the root of the command route
      */
     protected abstract void onRegister(final @NotNull String commandName,
-                                       final @NotNull CommandInfo commandInfo);
+                                       final @NotNull LiteralNode command);
 
     /**
      * Method called upon unregistering a command.

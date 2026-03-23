@@ -49,8 +49,8 @@ final class MockCommandRegistry extends CommandRegistry {
 
     @Override
     protected void onRegister(final @NotNull String commandName,
-                              final @NotNull CommandInfo commandInfo) {
-        registeredCommands.put(commandName, commandInfo);
+                              final @NotNull LiteralNode command) {
+        registeredCommands.put(commandName, command.getCommandInfo().orElseThrow());
     }
 
     @Override
