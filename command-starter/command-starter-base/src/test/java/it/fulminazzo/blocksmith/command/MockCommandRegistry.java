@@ -2,16 +2,23 @@ package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.command.node.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import it.fulminazzo.blocksmith.message.Messenger;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 final class MockCommandRegistry extends CommandRegistry {
     @Getter
     private final @NotNull Map<String, CommandInfo> registeredCommands = new ConcurrentHashMap<>();
+
+    public MockCommandRegistry() {
+        super(new Messenger(log), log);
+    }
 
     @SuppressWarnings("unchecked")
     public @NotNull Map<String, LiteralNode> getCommands() {
@@ -45,6 +52,11 @@ final class MockCommandRegistry extends CommandRegistry {
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    protected @NotNull CommandSenderWrapper wrapSender(final @NotNull Object executor) {
+        return new MockCommandSenderWrapper((CommandSender) executor);
     }
 
     @Override
