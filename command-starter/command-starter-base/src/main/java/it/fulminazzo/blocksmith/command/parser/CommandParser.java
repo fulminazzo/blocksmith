@@ -267,6 +267,8 @@ public final class CommandParser {
                 commands.add(node);
 
                 commandInfo.merge(getComputedCommandInfo(node, prefix));
+
+                populateLiteralsCommandInfos(node, prefix);
             }
         return commands;
     }
@@ -302,8 +304,22 @@ public final class CommandParser {
                 commands.add(node);
 
                 commandInfo.merge(getComputedCommandInfo(node, prefix));
+
+                populateLiteralsCommandInfos(node, prefix);
             }
         return commands;
+    }
+
+    private static void populateLiteralsCommandInfos(final @NotNull CommandNode node, final @Nullable String prefix) {
+        CommandNode n = node;
+        while (n != null) {
+            if (n instanceof LiteralNode) {
+                LiteralNode literalNode = (LiteralNode) n;
+                if (literalNode.getCommandInfo().isEmpty())
+                    literalNode.setCommandInfo(getComputedCommandInfo(node, n, prefix));
+            }
+            n = n.getFirstChild();
+        }
     }
 
     /**
