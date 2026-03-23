@@ -94,7 +94,8 @@ public final class ReflectionUtils {
     }
 
     /**
-     * Returns all the fields in the given class (or superclasses) that are not static.
+     * Returns all the fields in the given class (or superclasses)
+     * that are not static.
      *
      * @param container the container of the fields
      * @return the fields
