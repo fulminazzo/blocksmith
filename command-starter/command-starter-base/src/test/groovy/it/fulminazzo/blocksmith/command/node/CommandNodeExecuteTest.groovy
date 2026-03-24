@@ -15,10 +15,13 @@ import spock.lang.Specification
 import java.lang.reflect.Method
 
 class CommandNodeExecuteTest extends Specification {
-    private static final @NotNull CommandSenderWrapper commandSender = new MockCommandSenderWrapper(new CommandSender())
+    private static final @NotNull
+    CommandSenderWrapper commandSender = new MockCommandSenderWrapper(new CommandSender())
 
-    private static @NotNull Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
-    private static @NotNull Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
+    private static @NotNull
+    Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
+    private static @NotNull
+    Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
 
     private static String printer
 
@@ -307,18 +310,18 @@ class CommandNodeExecuteTest extends Specification {
         actual.sort() == expected.sort()
 
         where:
-        arguments                           || expected
-        []                                  || []
-        ['']                                || ['player', '<item>']
-        ['p']                               || ['player']
-        ['P']                               || ['player']
-        ['a']                               || []
-        ['player']                          || ['player']
-        ['playera']                         || []
-        ['player', '']                      || ['<player>']
-        ['player', 'Alex']                  || []
-        ['player', 'Alex', '']              || ['<item>']
-        ['player', 'Alex', 'diamond_sword'] || []
+        arguments                                   || expected
+        []                                          || []
+        ['give', '']                                || ['player', '<item>']
+        ['give', 'p']                               || ['player']
+        ['give', 'P']                               || ['player']
+        ['give', 'a']                               || ['<item>']
+        ['give', 'player']                          || ['player']
+        ['give', 'playera']                         || ['<item>']
+        ['give', 'player', '']                      || ['<player>']
+        ['give', 'player', 'Alex']                  || ['<player>']
+        ['give', 'player', 'Alex', '']              || ['<item>']
+        ['give', 'player', 'Alex', 'diamond_sword'] || ['<item>']
     }
 
     static void execute(final @NotNull CommandSender sender,
