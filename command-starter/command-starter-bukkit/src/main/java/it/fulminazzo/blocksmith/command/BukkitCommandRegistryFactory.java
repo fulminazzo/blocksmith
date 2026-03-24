@@ -6,8 +6,10 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -70,6 +72,25 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
                 Server server = (Server) context.getApplication().getServer();
                 return Arrays.stream(server.getOfflinePlayers()).map(OfflinePlayer::getName).collect(Collectors.toList());
+            }
+
+        });
+        ArgumentParsers.register(World.class, new ArgumentParser<>() {
+
+            @Override
+            public @NotNull World parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+                Server server = (Server) context.getApplication().getServer();
+                String argument = context.getCurrent();
+                World world = server.getWorld(argument);
+                if (world != null) return world;
+                else throw new CommandExecutionException("error.world-not-found")
+                        .arguments(Placeholder.of("world", argument));
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
+                Server server = (Server) context.getApplication().getServer();
+                return server.getWorlds().stream().map(World::getName).collect(Collectors.toList());
             }
 
         });
