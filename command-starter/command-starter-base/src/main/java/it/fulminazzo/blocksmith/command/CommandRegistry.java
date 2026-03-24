@@ -178,7 +178,7 @@ public abstract class CommandRegistry {
         CommandSenderWrapper wrapper;
         if (executor instanceof CommandSenderWrapper) wrapper = (CommandSenderWrapper) executor;
         else wrapper = wrapSender(executor);
-        return new CommandExecutionContext(wrapper)
+        return new CommandExecutionContext(application, wrapper)
                 .addInput(commandName)
                 .addInput(arguments);
     }

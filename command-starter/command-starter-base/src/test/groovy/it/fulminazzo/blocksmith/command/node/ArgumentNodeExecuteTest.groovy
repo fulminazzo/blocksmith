@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node
 
+import it.fulminazzo.blocksmith.BlocksmithApplication
 import it.fulminazzo.blocksmith.command.CommandSender
 import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser
@@ -54,7 +55,7 @@ class ArgumentNodeExecuteTest extends Specification {
         )
 
         and:
-        def context = new CommandExecutionContext(new MockCommandSenderWrapper(new CommandSender()))
+        def context = new CommandExecutionContext(Mock(BlocksmithApplication), new MockCommandSenderWrapper(new CommandSender()))
         context.addInput('invalid')
 
         when:
@@ -73,7 +74,7 @@ class ArgumentNodeExecuteTest extends Specification {
         def node = new ArgumentNode('test', Integer, false)
 
         and:
-        def context = new CommandExecutionContext(new MockCommandSenderWrapper(new CommandSender()))
+        def context = new CommandExecutionContext(Mock(BlocksmithApplication), new MockCommandSenderWrapper(new CommandSender()))
         context.addInput(argument)
 
         when:
