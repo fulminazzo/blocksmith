@@ -1,18 +1,26 @@
 package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.BlocksmithApplication;
+import it.fulminazzo.blocksmith.command.annotation.Permission.Grant;
+import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import it.fulminazzo.blocksmith.command.node.PermissionInfo;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -21,9 +29,13 @@ import java.util.stream.Collectors;
  */
 final class BukkitCommandRegistry extends CommandRegistry {
     private final @NotNull Server server;
+
     private final @NotNull SimpleCommandMap commandMap;
     private final @NotNull Map<String, Command> knownCommands;
     private final @NotNull Map<String, Command> previousCommands = new ConcurrentHashMap<>();
+
+    private final @NotNull PluginManager pluginManager;
+    private final @NotNull Map<String, Permission> previousPermissions = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new Bukkit command registry.
@@ -33,12 +45,15 @@ final class BukkitCommandRegistry extends CommandRegistry {
     public BukkitCommandRegistry(final @NotNull BlocksmithApplication application) {
         super(application.getMessenger(), application.getLog(), application.getName().toLowerCase());
         this.server = (Server) application.getServer();
+
         Reflect reflect = Reflect.on(server).fields().values().stream()
                 .filter(f -> f.get() instanceof SimpleCommandMap)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Could not find SimpleCommandMap"));
         this.commandMap = reflect.get();
         this.knownCommands = reflect.field("knownCommands").get();
+
+        this.pluginManager = server.getPluginManager();
     }
 
     @Override
@@ -58,6 +73,48 @@ final class BukkitCommandRegistry extends CommandRegistry {
                 new BukkitCommand(commandName, command)
         );
         updateCommands();
+    }
+
+    /**
+     * Registers a new bukkit Permission for the given node.
+     *
+     * @param node the node
+     * @return the registered permission
+     */
+    @NotNull Permission registerPermission(final @NotNull LiteralNode node) {
+        PermissionInfo permissionInfo = node.getCommandInfo().orElseThrow().getPermission();
+        Set<String> childrenPermissions = getChildrenPermissions(node);
+        PermissionDefault permissionDefault = getPermissionDefault(permissionInfo.getGrant());
+        Permission permission = new Permission(
+                permissionInfo.getPermission(),
+                permissionDefault,
+                childrenPermissions.stream().collect(Collectors.toMap(p -> p, p -> true))
+        );
+        Permission previous = pluginManager.getPermission(permission.getName());
+        if (previous != null) {
+            pluginManager.removePermission(previous);
+            previousPermissions.put(permission.getName(), previous);
+        }
+        pluginManager.addPermission(permission);
+        return permission;
+    }
+
+    /**
+     * Gets the children permissions of the given node.
+     *
+     * @param node the node
+     * @return the permissions
+     */
+    @NotNull Set<String> getChildrenPermissions(final @NotNull CommandNode node) {
+        Set<String> permissions = new HashSet<>();
+        for (CommandNode child : node.getChildren()) {
+            if (child instanceof LiteralNode) {
+                Permission permission = registerPermission((LiteralNode) child);
+                permissions.add(permission.getName());
+            }
+            permissions.addAll(getChildrenPermissions(child));
+        }
+        return permissions;
     }
 
     @Override
@@ -88,6 +145,23 @@ final class BukkitCommandRegistry extends CommandRegistry {
             syncCommands.setAccessible(true);
             syncCommands.invoke(server);
         } catch (Exception ignored) {
+        }
+    }
+
+    /**
+     * Converts a {@link Grant} to a bukkit {@link PermissionDefault}.
+     *
+     * @param grant the grant
+     * @return the permission default
+     */
+    static @NotNull PermissionDefault getPermissionDefault(final @NotNull Grant grant) {
+        switch (grant) {
+            case ALL:
+                return PermissionDefault.TRUE;
+            case NONE:
+                return PermissionDefault.FALSE;
+            default:
+                return PermissionDefault.OP;
         }
     }
 
