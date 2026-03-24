@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
+import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -90,7 +91,7 @@ public class ArgumentNode<T> extends CommandNode {
     public static <T> @NotNull ArgumentNode<T> newNode(final @NotNull String name,
                                                        final @NotNull Class<T> type,
                                                        final boolean optional) {
-        if (Number.class.isAssignableFrom(type))
+        if (Number.class.isAssignableFrom(ReflectionUtils.toWrapper(type)))
             return (ArgumentNode<T>) new NumberArgumentNode<>(name, (Class<? extends Number>) type, optional);
         else return new ArgumentNode<>(name, type, optional);
     }
