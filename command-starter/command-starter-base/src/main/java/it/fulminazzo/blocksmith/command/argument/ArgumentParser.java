@@ -14,12 +14,27 @@ import org.jetbrains.annotations.Nullable;
 public interface ArgumentParser<T> extends TabCompletable {
 
     /**
-     * Parses the given string
+     * Parses the given string.
      *
      * @param context the current context of action
      * @return the object
      * @throws CommandExecutionException in case of parsing errors
      */
     @Nullable T parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException;
+
+    /**
+     * Validates the current input.
+     *
+     * @param context the context
+     * @return <code>true</code> if it is valid
+     */
+    default boolean validateCompletions(final @NotNull CommandExecutionContext context) {
+        try {
+            context.addParsedArgument(parse(context));
+            return true;
+        } catch (CommandExecutionException e) {
+            return false;
+        }
+    }
 
 }
