@@ -136,7 +136,7 @@ public abstract class CommandNode implements TabCompletable {
             else {
                 ArgumentNode<?> optional = getFirstOptionalArgumentNode();
                 if (optional != null) {
-                    context.addParsedArgument(optional.getDefaultValue());
+                    context.addParsedArgument(optional.getDefaultValue(context));
                     optional.handleRemainingInput(context);
                 } else throw new CommandExecutionException("error.not-enough-arguments");
             }
