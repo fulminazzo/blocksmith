@@ -15,10 +15,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class BukkitCommandRegistryFactory implements CommandRegistryFactory {
@@ -91,6 +88,26 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
                 Server server = (Server) context.getApplication().getServer();
                 return server.getWorlds().stream().map(World::getName).collect(Collectors.toList());
+            }
+
+        });
+        ArgumentParsers.register(Location.class, new ArgumentParser<>() {
+
+            @SuppressWarnings("DataFlowIssue")
+            @Override
+            public @NotNull Location parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+                ArgumentParser<Double> doubleParser = ArgumentParsers.of(Double.class);
+                double x = doubleParser.parse(context);
+                if (context.isLast()) throw new CommandExecutionException("error.not-enough-arguments");
+                double y = doubleParser.parse(context.advanceCursor());
+                if (context.isLast()) throw new CommandExecutionException("error.not-enough-arguments");
+                double z = doubleParser.parse(context.advanceCursor());
+                return new Location(null, x, y, z);
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
+                return Collections.singletonList("<x> <y> <z>");
             }
 
         });
