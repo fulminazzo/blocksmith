@@ -18,10 +18,7 @@ import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -83,12 +80,7 @@ final class BukkitCommandRegistry extends CommandRegistry {
     @NotNull Permission registerPermission(final @NotNull LiteralNode node) {
         PermissionInfo permissionInfo = node.getCommandInfo().orElseThrow().getPermission();
         Set<String> childrenPermissions = getChildrenPermissions(node);
-        PermissionDefault permissionDefault = getPermissionDefault(permissionInfo.getGrant());
-        Permission permission = new Permission(
-                permissionInfo.getPermission(),
-                permissionDefault,
-                childrenPermissions.stream().collect(Collectors.toMap(p -> p, p -> true))
-        );
+        Permission permission = new BukkitPermission(permissionInfo, childrenPermissions);
         Permission previous = pluginManager.getPermission(permission.getName());
         if (previous != null) {
             pluginManager.removePermission(previous);
@@ -145,6 +137,7 @@ final class BukkitCommandRegistry extends CommandRegistry {
     void unregisterPermission(final @Nullable Permission permission) {
         if (permission == null) return;
         String name = permission.getName();
+        if (!(pluginManager.getPermission(name) instanceof BukkitPermission)) return;
         pluginManager.removePermission(name);
         Permission previous = previousPermissions.remove(name);
         if (previous != null) pluginManager.addPermission(previous);
@@ -173,23 +166,6 @@ final class BukkitCommandRegistry extends CommandRegistry {
             syncCommands.setAccessible(true);
             syncCommands.invoke(server);
         } catch (Exception ignored) {
-        }
-    }
-
-    /**
-     * Converts a {@link Grant} to a bukkit {@link PermissionDefault}.
-     *
-     * @param grant the grant
-     * @return the permission default
-     */
-    static @NotNull PermissionDefault getPermissionDefault(final @NotNull Grant grant) {
-        switch (grant) {
-            case ALL:
-                return PermissionDefault.TRUE;
-            case NONE:
-                return PermissionDefault.FALSE;
-            default:
-                return PermissionDefault.OP;
         }
     }
 
@@ -229,6 +205,42 @@ final class BukkitCommandRegistry extends CommandRegistry {
                                                  final @NonNull String alias,
                                                  final @NonNull String[] args) throws IllegalArgumentException {
             return BukkitCommandRegistry.this.tabComplete(command, sender, alias, args);
+        }
+
+    }
+
+    static final class BukkitPermission extends Permission {
+
+        /**
+         * Instantiates a new Bukkit permission.
+         *
+         * @param permissionInfo the permission info
+         * @param children       the children
+         */
+        public BukkitPermission(final @NotNull PermissionInfo permissionInfo,
+                                final @NotNull Collection<String> children) {
+            super(
+                    permissionInfo.getPermission(),
+                    getPermissionDefault(permissionInfo.getGrant()),
+                    children.stream().collect(Collectors.toMap(k -> k, k -> true))
+            );
+        }
+
+        /**
+         * Converts a {@link Grant} to a bukkit {@link PermissionDefault}.
+         *
+         * @param grant the grant
+         * @return the permission default
+         */
+        static @NotNull PermissionDefault getPermissionDefault(final @NotNull Grant grant) {
+            switch (grant) {
+                case ALL:
+                    return PermissionDefault.TRUE;
+                case NONE:
+                    return PermissionDefault.FALSE;
+                default:
+                    return PermissionDefault.OP;
+            }
         }
 
     }
