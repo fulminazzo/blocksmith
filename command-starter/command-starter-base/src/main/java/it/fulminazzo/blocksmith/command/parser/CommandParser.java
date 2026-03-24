@@ -1,9 +1,6 @@
 package it.fulminazzo.blocksmith.command.parser;
 
-import it.fulminazzo.blocksmith.command.annotation.Command;
-import it.fulminazzo.blocksmith.command.annotation.Default;
-import it.fulminazzo.blocksmith.command.annotation.Greedy;
-import it.fulminazzo.blocksmith.command.annotation.Permission;
+import it.fulminazzo.blocksmith.command.annotation.*;
 import it.fulminazzo.blocksmith.command.node.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -163,6 +160,12 @@ public final class CommandParser {
             node.setGreedy(true);
             greedyArgument = argument;
         }
+        if (parameter.isAnnotationPresent(Range.class))
+            if (node instanceof NumberArgumentNode<?>) {
+                NumberArgumentNode<?> argumentNode = (NumberArgumentNode<?>) node;
+                Range range = parameter.getAnnotation(Range.class);
+                argumentNode.min(range.min()).max(range.max());
+            } else throw parseException("argument '%s' type must be %s or an implementation", argument, Number.class);
         tokenizer.next();
         return node;
     }
