@@ -46,8 +46,8 @@ final class NumberArgumentParser<N extends Number> implements ArgumentParser<N> 
 
     private boolean isValid(final @NotNull String argument) {
         try {
-            parser.apply(argument);
-            return true;
+            N parsed = parser.apply(argument);
+            return parsed.floatValue() != Float.POSITIVE_INFINITY && parsed.floatValue() != Float.NEGATIVE_INFINITY;
         } catch (NumberFormatException ignored) {
             return false;
         }
