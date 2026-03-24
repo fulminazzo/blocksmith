@@ -67,11 +67,9 @@ final class BukkitCommandRegistry extends CommandRegistry {
             Command curr = knownCommands.remove(a);
             if (curr != null) previousCommands.put(a, curr);
         });
-        commandMap.register(
-                commandName,
-                getPrefix(),
-                new BukkitCommand(commandName, command)
-        );
+        BukkitCommand cmd = new BukkitCommand(commandName, command);
+        cmd.setPermission(registerPermission(command).getName());
+        commandMap.register(commandName, getPrefix(), cmd);
         updateCommands();
     }
 
