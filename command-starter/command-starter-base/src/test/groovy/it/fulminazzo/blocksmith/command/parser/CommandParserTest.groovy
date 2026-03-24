@@ -6,11 +6,10 @@ import it.fulminazzo.blocksmith.command.annotation.Command
 import it.fulminazzo.blocksmith.command.annotation.Default
 import it.fulminazzo.blocksmith.command.annotation.Greedy
 import it.fulminazzo.blocksmith.command.annotation.Permission
+import it.fulminazzo.blocksmith.command.annotation.Range
 import it.fulminazzo.blocksmith.command.node.*
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
-import spock.lang.Specification
-
 class CommandParserTest extends Specification {
 
     def 'test parseCommands returns all commands'() {
@@ -452,6 +451,54 @@ class CommandParserTest extends Specification {
         node == new ArgumentNode('test', String, false)
     }
 
+    def 'test that parseGeneralArgument correctly parses range argument'() {
+        given:
+        def parser = new CommandParser('value',
+                new CommandInfo(
+                        '',
+                        new PermissionInfo('', Permission.Grant.ALL)
+                ),
+                new ExecutionInfo(
+                        CommandParserTest,
+                        CommandParserTest.getDeclaredMethod('validRange', int)
+                ),
+                0,
+                null
+        )
+        parser.tokenizer.next()
+
+        when:
+        def node = parser.parseGeneralArgument(false)
+
+        then:
+        (node instanceof NumberArgumentNode)
+        node.min == 0
+        node.max == 10
+    }
+
+    def 'test that parseGeneralArgument throws for invalid range argument'() {
+        given:
+        def parser = new CommandParser('value',
+                new CommandInfo(
+                        '',
+                        new PermissionInfo('', Permission.Grant.ALL)
+                ),
+                new ExecutionInfo(
+                        CommandParserTest,
+                        CommandParserTest.getDeclaredMethod('invalidRange', String)
+                ),
+                0,
+                null
+        )
+        parser.tokenizer.next()
+
+        when:
+        parser.parseGeneralArgument(false)
+
+        then:
+        thrown(CommandParseException)
+    }
+
     def 'test that parseGeneralArgument throws for non-matched argument'() {
         given:
         def parser = newMockCommandParser('test')
@@ -551,6 +598,14 @@ class CommandParserTest extends Specification {
         return name[0..-2]
     }
 
+    private static void validRange(final @NotNull @Range(min = 0, max = 10) int value) {
+
+    }
+
+    private static void invalidRange(final @NotNull @Range(min = 0, max = 10) String value) {
+
+    }
+
     @Command
     static final class CommandNotGiven {
 
@@ -562,3 +617,5 @@ class CommandParserTest extends Specification {
     }
 
 }
+
+import spock.lang.Specification
