@@ -6,13 +6,15 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
-import org.bukkit.*;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,6 +50,26 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
                     players.removeIf(p -> !senderPlayer.canSee(p));
                 }
                 return players.stream().map(Player::getName).collect(Collectors.toList());
+            }
+
+        });
+        ArgumentParsers.register(OfflinePlayer.class, new ArgumentParser<>() {
+
+            @Override
+            public @NonNull OfflinePlayer parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+                Server server = (Server) context.getApplication().getServer();
+                String argument = context.getCurrent();
+                return Arrays.stream(server.getOfflinePlayers())
+                        .filter(p -> argument.equalsIgnoreCase(p.getName()))
+                        .findFirst()
+                        .orElseThrow(() -> new CommandExecutionException("error.player-not-found")
+                                .arguments(Placeholder.of("player", argument)));
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
+                Server server = (Server) context.getApplication().getServer();
+                return Arrays.stream(server.getOfflinePlayers()).map(OfflinePlayer::getName).collect(Collectors.toList());
             }
 
         });
