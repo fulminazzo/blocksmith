@@ -111,8 +111,15 @@ class BukkitCommandRegistryTest extends Specification {
     def 'test that onUnregister removes commands and restores previous commands'() {
         given:
         def previousCommand = Mock(Command)
-        registry.previousCommands.put('?', previousCommand)
-        registry.previousCommands.put('showhelp', previousCommand)
+        registry.previousCommands['?'] = previousCommand
+        registry.previousCommands['showhelp'] = previousCommand
+
+        and:
+        def previousPermission = new org.bukkit.permissions.Permission(
+                'help',
+                PermissionDefault.TRUE
+        )
+        registry.previousPermissions['help'] = previousPermission
 
         and:
         def node = new LiteralNode('help', '?', 'showhelp', 'displayhelp')
@@ -121,6 +128,7 @@ class BukkitCommandRegistryTest extends Specification {
                 new PermissionInfo('help', Permission.Grant.ALL)
         )
         def command = new BukkitCommandRegistry.BukkitCommand(registry, 'help', node)
+        command.permission = 'help'
 
         and:
         registry.knownCommands['help'] = command
@@ -128,6 +136,15 @@ class BukkitCommandRegistryTest extends Specification {
         registry.knownCommands["${application.name}:help"] = command
         registry.knownCommands["${application.name}:?"] = command
         registry.knownCommands['showhelp'] = Mock(Command)
+
+        and:
+        def pluginManager = Bukkit.server.pluginManager
+        pluginManager.addPermission(new BukkitCommandRegistry.BukkitPermission(
+                new PermissionInfo('help', Permission.Grant.ALL),
+                ['help.plugin']
+        ))
+        def otherPermission = new org.bukkit.permissions.Permission('help.plugin')
+        pluginManager.addPermission(otherPermission)
 
         when:
         registry.onUnregister('help')
@@ -143,8 +160,20 @@ class BukkitCommandRegistryTest extends Specification {
         knownCommands["${application.name}?"] == null
 
         and:
+        def helpPermission = pluginManager.getPermission('help')
+        helpPermission == previousPermission
+
+        and:
+        def helpPluginPermission = pluginManager.getPermission('help.plugin')
+        helpPluginPermission == otherPermission
+
+        and:
         def previousCommands = registry.previousCommands
         previousCommands.isEmpty()
+
+        and:
+        def previousPermissions = registry.previousPermissions
+        previousPermissions.isEmpty()
     }
 
     def 'test that onUnregister does not throw on unknown command'() {
