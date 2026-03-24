@@ -10,6 +10,25 @@ import spock.lang.Specification
 
 class NumberArgumentNodeTest extends Specification {
 
+    def 'test that getCompletions return correct values'() {
+        given:
+        def node = new NumberArgumentNode('test', Integer, false)
+                .min(1)
+                .max(10)
+
+        and:
+        def context = new CommandExecutionContext(
+                Mock(BlocksmithApplication),
+                new MockCommandSenderWrapper(new CommandSender())
+        ).addInput('')
+
+        when:
+        def completions = node.getCompletions(context)
+
+        then:
+        completions == (1..9).collect { it.toString() }
+    }
+
     def 'test that validateExecuteInput correctly validates #argument'() {
         given:
         def node = new NumberArgumentNode('test', Integer, false)
