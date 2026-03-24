@@ -40,6 +40,16 @@ public final class CommandExecutionContext {
     }
 
     /**
+     * Merges all the remaining input into one space separated argument (for greedy arguments).
+     */
+    public void mergeRemainingInput() {
+        StringBuilder argument = new StringBuilder(getCurrent());
+        while (input.size() > current + 1)
+            argument.append(" ").append(input.remove(current + 1));
+        input.set(current, argument.toString());
+    }
+
+    /**
      * Gets the current argument from the input.
      *
      * @return the current argument
