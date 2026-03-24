@@ -1,15 +1,13 @@
 package it.fulminazzo.blocksmith.command;
 
+import it.fulminazzo.blocksmith.BlocksmithApplication;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.parser.CommandParser;
-import it.fulminazzo.blocksmith.message.Messenger;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,10 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @RequiredArgsConstructor
 public abstract class CommandRegistry {
-    private final @NotNull Messenger messenger;
-    private final @NotNull Logger logger;
-    @Getter
-    private final @NotNull String prefix;
+    private final @NotNull BlocksmithApplication application;
 
     private final @NotNull Map<String, LiteralNode> commands = new ConcurrentHashMap<>();
     private @NotNull State state = State.INITIAL;
@@ -76,7 +71,7 @@ public abstract class CommandRegistry {
     private @NotNull Map<String, LiteralNode> getCommandNodes(final Object @NotNull ... commandModules) {
         List<CommandNode> nodes = new ArrayList<>();
         for (Object commandModule : commandModules)
-            nodes.addAll(CommandParser.parseCommands(commandModule, getSenderType(), prefix));
+            nodes.addAll(CommandParser.parseCommands(commandModule, getSenderType(), getPrefix()));
         Map<String, LiteralNode> map = new HashMap<>();
         for (CommandNode node : nodes)
             map.merge(node.getName(), (LiteralNode) node, LiteralNode::merge);
@@ -115,6 +110,15 @@ public abstract class CommandRegistry {
     }
 
     /**
+     * Gets the prefix to prepend to the automatically computed permissions.
+     *
+     * @return the prefix
+     */
+    protected @NotNull String getPrefix() {
+        return application.getName();
+    }
+
+    /**
      * Unregisters the given command.
      *
      * @param commandName the command name
@@ -139,10 +143,10 @@ public abstract class CommandRegistry {
             CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
             command.execute(context);
         } catch (CommandExecutionException e) {
-            messenger.sendMessage(executor, e.getMessage(), e.getArguments());
+            application.getMessenger().sendMessage(executor, e.getMessage(), e.getArguments());
             Throwable cause = e.getCause();
             if (cause != null)
-                logger.warn("{} while executing command /{} {}",
+                application.getLog().warn("{} while executing command /{} {}",
                         cause.getClass().getCanonicalName(),
                         commandName,
                         String.join(" ", arguments),
