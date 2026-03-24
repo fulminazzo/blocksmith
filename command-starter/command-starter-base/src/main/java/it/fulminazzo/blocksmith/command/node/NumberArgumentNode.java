@@ -35,10 +35,26 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
             throw new CommandExecutionException("error.invalid-number")
                     .arguments(
                             Placeholder.of("argument", context.getCurrent()),
-                            Placeholder.of("min", min),
-                            Placeholder.of("max", max)
+                            Placeholder.of("min", cast(min)),
+                            Placeholder.of("max", cast(max))
                     );
         context.addParsedArgument(parsed);
+    }
+
+    /**
+     * Casts the given number to the current type.
+     *
+     * @param value the value to cast
+     * @return the number
+     */
+    public @NotNull N cast(final double value) {
+        final Class<N> type = getType();
+        if (type == Byte.class) return type.cast((byte) value);
+        else if (type == Short.class) return type.cast((short) value);
+        else if (type == Integer.class) return type.cast((int) value);
+        else if (type == Long.class) return type.cast((long) value);
+        else if (type == Float.class) return type.cast((float) value);
+        else return type.cast(value);
     }
 
     @Override
