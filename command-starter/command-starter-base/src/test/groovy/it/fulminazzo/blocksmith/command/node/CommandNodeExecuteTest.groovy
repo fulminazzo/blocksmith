@@ -300,8 +300,10 @@ class CommandNodeExecuteTest extends Specification {
         playerArg.addChild(item)
 
         and:
-        def context = new CommandExecutionContext(Mock(BlocksmithApplication), new MockCommandSenderWrapper(new CommandSender()))
-                .addInput(*arguments)
+        def context = new CommandExecutionContext(
+                Mock(BlocksmithApplication),
+                new MockCommandSenderWrapper(new CommandSender())
+        ).addInput(*arguments)
 
         when:
         def actual = node.tabComplete(context)
@@ -322,6 +324,39 @@ class CommandNodeExecuteTest extends Specification {
         ['give', 'player', 'Alex']                  || ['<player>']
         ['give', 'player', 'Alex', '']              || ['<item>']
         ['give', 'player', 'Alex', 'diamond_sword'] || ['<item>']
+    }
+
+    def 'test that tabComplete of greedy parameter with #arguments returns #expected'() {
+        given:
+        def node = new LiteralNode('msg')
+
+        def player = new ArgumentNode('player', String, false)
+        node.addChild(player)
+
+        def message = new ArgumentNode('message', String, false)
+        message.greedy = true
+        player.addChild(message)
+
+        and:
+        def context = new CommandExecutionContext(
+                Mock(BlocksmithApplication),
+                new MockCommandSenderWrapper(new CommandSender())
+        ).addInput(*arguments)
+
+        when:
+        def actual = node.tabComplete(context)
+
+        then:
+        actual.sort() == expected.sort()
+
+        where:
+        arguments                                                  || expected
+        ['msg', 'Alex', '']                                        || ['<message>']
+        ['msg', 'Alex', 'Hello']                                   || ['<message>']
+        ['msg', 'Alex', 'Hello,', 'world!']                        || ['<message>']
+        ['msg', 'Alex', 'Hello,', 'world!', 'Hello,']              || ['<message>']
+        ['msg', 'Alex', 'Hello,', 'world!', 'Hello,', 'Mars!']     || ['<message>']
+        ['msg', 'Alex', 'Hello,', 'world!', 'Hello,', 'Mars!', ''] || ['<message>']
     }
 
     static void execute(final @NotNull CommandSender sender,
