@@ -156,7 +156,7 @@ public final class CommandParser {
         if (parameterIndex >= parameters.length)
             throw parseException("received argument '%s' but no matching parameter was found", argument);
         Parameter parameter = parameters[parameterIndex++];
-        ArgumentNode<?> node = new ArgumentNode<>(argument, parameter.getType(), optional);
+        ArgumentNode<?> node = ArgumentNode.newNode(argument, parameter.getType(), optional);
         if (parameter.isAnnotationPresent(Default.class))
             node.setDefaultValue(parameter.getAnnotation(Default.class).value());
         if (parameter.isAnnotationPresent(Greedy.class)) {

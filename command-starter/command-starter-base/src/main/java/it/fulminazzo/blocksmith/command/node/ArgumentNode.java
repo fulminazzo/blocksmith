@@ -16,9 +16,10 @@ import java.util.stream.Collectors;
  * @param <T> the type of the argument
  */
 @Data
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
-public final class ArgumentNode<T> extends CommandNode {
+public class ArgumentNode<T> extends CommandNode {
     private final @NotNull String name;
     private final @NotNull Class<T> type;
     private final boolean optional;
@@ -64,6 +65,21 @@ public final class ArgumentNode<T> extends CommandNode {
     @Override
     public boolean matches(final @NotNull String token) {
         return true;
+    }
+
+    /**
+     * Instantiates a new Argument node.
+     *
+     * @param <T>      the type of the parameter
+     * @param name     the name
+     * @param type     the Java class of the parameter
+     * @param optional if <code>true</code> the parameter will be non-mandatory
+     * @return the argument node
+     */
+    public static <T> @NotNull ArgumentNode<T> newNode(final @NotNull String name,
+                                                       final @NotNull Class<T> type,
+                                                       final boolean optional) {
+        return new ArgumentNode<>(name, type, optional);
     }
 
 }
