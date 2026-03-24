@@ -7,6 +7,7 @@ import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
 import it.fulminazzo.blocksmith.message.argument.Placeholder
+import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 class NumberArgumentParserTest extends Specification {
@@ -17,7 +18,7 @@ class NumberArgumentParserTest extends Specification {
 
     def 'test that parse with valid argument does not throw'() {
         when:
-        parser.parse('1')
+        parser.parse(prepareContext('1'))
 
         then:
         noExceptionThrown()
@@ -25,12 +26,15 @@ class NumberArgumentParserTest extends Specification {
 
     def 'test that parse throws for invalid argument'() {
         when:
-        parser.parse('a')
+        parser.parse(prepareContext('a'))
 
         then:
         def e = thrown(CommandExecutionException)
-        e.arguments.toList() == [Placeholder.of("min", Integer.MIN_VALUE),
-                                 Placeholder.of("max", Integer.MAX_VALUE)]
+        e.arguments.toList() == [
+                Placeholder.of('argument', 'a'),
+                Placeholder.of("min", Integer.MIN_VALUE),
+                Placeholder.of("max", Integer.MAX_VALUE)
+        ]
     }
 
     def 'test that getCompletions returns #expected for argument #argument'() {
@@ -53,6 +57,12 @@ class NumberArgumentParserTest extends Specification {
         'a'                  || []
         "$Integer.MAX_VALUE" || []
         "$Integer.MIN_VALUE" || []
+    }
+
+    private CommandExecutionContext prepareContext(final @NotNull String argument) {
+        def context = Mock(CommandExecutionContext)
+        context.current >> argument
+        return context
     }
 
 }

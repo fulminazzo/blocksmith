@@ -29,7 +29,8 @@ public final class ArgumentParsers {
             private final String FALSE = Boolean.FALSE.toString();
 
             @Override
-            public @NotNull Boolean parse(final @NotNull String rawArgument) throws CommandExecutionException {
+            public @NotNull Boolean parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+                String rawArgument = context.getCurrent();
                 if (rawArgument.equalsIgnoreCase(TRUE)) return true;
                 else if (rawArgument.equalsIgnoreCase(FALSE)) return false;
                 else
@@ -45,9 +46,11 @@ public final class ArgumentParsers {
         register(Character.class, new ArgumentParser<>() {
 
             @Override
-            public @NotNull Character parse(final @NotNull String rawArgument) throws CommandExecutionException {
+            public @NotNull Character parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+                String rawArgument = context.getCurrent();
                 if (rawArgument.length() == 1) return rawArgument.charAt(0);
-                else throw new CommandExecutionException("error.invalid-character").arguments(Placeholder.of("argument", rawArgument));
+                else
+                    throw new CommandExecutionException("error.invalid-character").arguments(Placeholder.of("argument", rawArgument));
             }
 
             @Override
@@ -65,8 +68,8 @@ public final class ArgumentParsers {
         register(String.class, new ArgumentParser<>() {
 
             @Override
-            public @NotNull String parse(final @NotNull String rawArgument) {
-                return rawArgument;
+            public @NotNull String parse(final @NotNull CommandExecutionContext context) {
+                return context.getCurrent();
             }
 
             @Override

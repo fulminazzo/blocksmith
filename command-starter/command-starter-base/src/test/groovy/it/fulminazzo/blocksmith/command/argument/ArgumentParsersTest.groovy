@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.command.CommandSender
 import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
+import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 class ArgumentParsersTest extends Specification {
@@ -17,7 +18,7 @@ class ArgumentParsersTest extends Specification {
         def arg = argument instanceof Number ? new BigDecimal(argument).toPlainString() : argument.toString()
 
         when:
-        def actual = parser.parse(arg)
+        def actual = parser.parse(prepareContext(arg))
 
         then:
         actual == expected
@@ -106,7 +107,7 @@ class ArgumentParsersTest extends Specification {
         def arg = argument instanceof Number ? new BigDecimal(argument).toPlainString() : argument.toString()
 
         when:
-        parser.parse(arg)
+        parser.parse(prepareContext(arg))
 
         then:
         def e = thrown(CommandExecutionException)
@@ -279,6 +280,12 @@ class ArgumentParsersTest extends Specification {
         Character | 'ab'              || []
         // STRING
         String    | ''                || ['<%name%>']
+    }
+
+    private CommandExecutionContext prepareContext(final @NotNull String argument) {
+        def context = Mock(CommandExecutionContext)
+        context.current >> argument
+        return context
     }
 
 }

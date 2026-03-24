@@ -20,9 +20,9 @@ class ArgumentNodeExecuteTest extends Specification {
         ArgumentParsers.register(Integer, new ArgumentParser<Integer>() {
 
             @Override
-            Integer parse(final @NotNull String rawArgument) throws CommandExecutionException {
+            Integer parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
                 try {
-                    return Integer.parseInt(rawArgument)
+                    return Integer.parseInt(context.current)
                 } catch (NumberFormatException ex) {
                     throw new CommandExecutionException('error.mock-message', ex)
                 }

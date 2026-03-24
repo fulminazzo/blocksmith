@@ -23,12 +23,17 @@ final class NumberArgumentParser<N extends Number> implements ArgumentParser<N> 
     private final @NotNull Function<String, N> parser;
 
     @Override
-    public @Nullable N parse(final @NotNull String rawArgument) throws CommandExecutionException {
+    public @Nullable N parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        String rawArgument = context.getCurrent();
         try {
             return parser.apply(rawArgument);
         } catch (NumberFormatException e) {
             throw new CommandExecutionException("error.invalid-number")
-                    .arguments(Placeholder.of("min", min), Placeholder.of("max", max));
+                    .arguments(
+                            Placeholder.of("argument", rawArgument),
+                            Placeholder.of("min", min),
+                            Placeholder.of("max", max)
+                    );
         }
     }
 
