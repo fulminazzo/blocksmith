@@ -67,6 +67,19 @@ public abstract class CommandNode implements TabCompletable {
     }
 
     /**
+     * Gets all the {@link ArgumentNode} children that are greedy.
+     *
+     * @return the children
+     */
+    public @NotNull List<ArgumentNode<?>> getGreedyChildren() {
+        return children.stream()
+                .filter(c -> c instanceof ArgumentNode)
+                .map(c -> (ArgumentNode<?>) c)
+                .filter(ArgumentNode::isGreedy)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Adds a new child to this node.
      *
      * @param child the child
@@ -201,7 +214,11 @@ public abstract class CommandNode implements TabCompletable {
                 else {
                     CommandNode child = getChild(context.getCurrent());
                     if (child == null) return Collections.emptyList();
-                    else return child.tabComplete(context);
+                    else {
+                        List<ArgumentNode<?>> greedyChildren = getGreedyChildren();
+                        if (greedyChildren.contains(child)) return child.getCompletions(context);
+                        else return child.tabComplete(context);
+                    }
                 }
             } catch (CommandExecutionException e) {
                 return Collections.emptyList();
