@@ -76,10 +76,13 @@ public class ArgumentNode<T> extends CommandNode {
      * @param optional if <code>true</code> the parameter will be non-mandatory
      * @return the argument node
      */
+    @SuppressWarnings("unchecked")
     public static <T> @NotNull ArgumentNode<T> newNode(final @NotNull String name,
                                                        final @NotNull Class<T> type,
                                                        final boolean optional) {
-        return new ArgumentNode<>(name, type, optional);
+        if (Number.class.isAssignableFrom(type))
+            return (ArgumentNode<T>) new NumberArgumentNode<>(name, (Class<? extends Number>) type, optional);
+        else return new ArgumentNode<>(name, type, optional);
     }
 
 }
