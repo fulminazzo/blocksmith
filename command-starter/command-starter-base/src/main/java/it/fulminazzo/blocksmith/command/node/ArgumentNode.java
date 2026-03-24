@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
@@ -39,12 +40,12 @@ public class ArgumentNode<T> extends CommandNode {
     }
 
     private @Nullable T parseArgument(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        return ArgumentParsers.of(type).parse(context);
+        return getArgumentParser().parse(context);
     }
 
     @Override
     public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
-        return ArgumentParsers.of(type).getCompletions(context).stream()
+        return getArgumentParser().getCompletions(context).stream()
                 .map(c -> c.replace("%name%", getName()))
                 .collect(Collectors.toList());
     }
@@ -58,13 +59,22 @@ public class ArgumentNode<T> extends CommandNode {
     @Override
     protected void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         if (isGreedy()) context.mergeRemainingInput();
-        if (!ArgumentParsers.of(type).validateCompletions(context))
+        if (!getArgumentParser().validateCompletions(context))
             throw new CommandExecutionException();
     }
 
     @Override
     public boolean matches(final @NotNull String token) {
         return true;
+    }
+
+    /**
+     * Gets the best argument parser for this node.
+     *
+     * @return the argument parser
+     */
+    protected @NotNull ArgumentParser<T> getArgumentParser() {
+        return ArgumentParsers.of(type);
     }
 
     /**
