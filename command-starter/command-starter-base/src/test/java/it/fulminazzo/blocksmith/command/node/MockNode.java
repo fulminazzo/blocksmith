@@ -21,7 +21,12 @@ public class MockNode extends CommandNode implements Cloneable {
     }
 
     @Override
-    protected void validateInput(@NotNull CommandExecutionContext context) {
+    protected void validateExecuteInput(@NotNull CommandExecutionContext context) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected void validateTabCompleteInput(@NotNull CommandExecutionContext context) {
         throw new UnsupportedOperationException();
     }
 
