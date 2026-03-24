@@ -110,6 +110,23 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
                 return Collections.singletonList("<x> <y> <z>");
             }
 
+            @SuppressWarnings("DataFlowIssue")
+            @Override
+            public boolean validateCompletions(final @NotNull CommandExecutionContext context) {
+                try {
+                    ArgumentParser<Double> doubleParser = ArgumentParsers.of(Double.class);
+                    double x = doubleParser.parse(context);
+                    if (context.isLast()) return false;
+                    double y = doubleParser.parse(context.advanceCursor());
+                    if (context.isLast()) return false;
+                    double z = doubleParser.parse(context.advanceCursor());
+                    context.addParsedArgument(new Location(null, x, y, z));
+                    return !context.isLast();
+                } catch (CommandExecutionException e) {
+                    return false;
+                }
+            }
+
         });
     }
 
