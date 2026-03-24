@@ -13,6 +13,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
 
@@ -119,16 +120,45 @@ final class BukkitCommandRegistry extends CommandRegistry {
     protected void onUnregister(final @NotNull String commandName) {
         Command command = knownCommands.remove(getPrefix() + ":" + commandName);
         if (command != null) {
+            unregisterPermission(command);
             removeOrRestoreCommand(command.getName());
             command.getAliases().forEach(this::removeOrRestoreCommand);
         }
         updateCommands();
     }
 
+    /**
+     * Unregisters the given permission.
+     *
+     * @param command the command
+     */
+    void unregisterPermission(final @NotNull Command command) {
+        String permission = command.getPermission();
+        if (permission != null) unregisterPermission(pluginManager.getPermission(permission));
+    }
+
+    /**
+     * Unregisters the given permission.
+     *
+     * @param permission the permission
+     */
+    void unregisterPermission(final @Nullable Permission permission) {
+        if (permission == null) return;
+        String name = permission.getName();
+        pluginManager.removePermission(name);
+        Permission previous = previousPermissions.remove(name);
+        if (previous != null) pluginManager.addPermission(previous);
+        for (String child : permission.getChildren().keySet())
+            unregisterPermission(pluginManager.getPermission(child));
+    }
+
     private void removeOrRestoreCommand(final @NotNull String alias) {
         Command cmd = previousCommands.remove(alias);
         Command current = knownCommands.remove(alias);
-        if (cmd != null && current instanceof BukkitCommand) knownCommands.put(alias, cmd);
+        if (cmd != null) {
+            unregisterPermission(current);
+            if (current instanceof BukkitCommand) knownCommands.put(alias, cmd);
+        }
         knownCommands.remove(getPrefix() + ":" + alias);
     }
 
