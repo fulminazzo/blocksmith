@@ -1,5 +1,8 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
+import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
+import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -22,6 +25,25 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
                        final @NotNull Class<N> type,
                        final boolean optional) {
         super(name, type, optional);
+    }
+
+    @Override
+    protected void validateExecuteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        Number parsed = getArgumentParser().parse(context);
+        double value = parsed.doubleValue();
+        if (value < min || value > max)
+            throw new CommandExecutionException("error.invalid-number")
+                    .arguments(
+                            Placeholder.of("argument", context.getCurrent()),
+                            Placeholder.of("min", min),
+                            Placeholder.of("max", max)
+                    );
+        context.addParsedArgument(parsed);
+    }
+
+    @Override
+    protected void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        validateExecuteInput(context);
     }
 
     /**
