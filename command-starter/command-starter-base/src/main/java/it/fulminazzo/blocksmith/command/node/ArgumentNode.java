@@ -89,11 +89,12 @@ public class ArgumentNode<T> extends CommandNode {
      */
     @SuppressWarnings("unchecked")
     public static <T> @NotNull ArgumentNode<T> newNode(final @NotNull String name,
-                                                       final @NotNull Class<T> type,
+                                                       @NotNull Class<?> type,
                                                        final boolean optional) {
-        if (Number.class.isAssignableFrom(ReflectionUtils.toWrapper(type)))
-            return (ArgumentNode<T>) new NumberArgumentNode<>(name, (Class<? extends Number>) type, optional);
-        else return new ArgumentNode<>(name, type, optional);
+        Class<T> actualType = (Class<T>) ReflectionUtils.toWrapper(type);
+        if (Number.class.isAssignableFrom(actualType))
+            return (ArgumentNode<T>) new NumberArgumentNode<>(name, (Class<? extends Number>) actualType, optional);
+        else return new ArgumentNode<>(name, actualType, optional);
     }
 
 }
