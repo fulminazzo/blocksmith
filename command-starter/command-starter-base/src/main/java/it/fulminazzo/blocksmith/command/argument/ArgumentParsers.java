@@ -25,8 +25,8 @@ public final class ArgumentParsers {
         register(Float.class, new NumberArgumentParser<>(-Float.MAX_VALUE, Float.MAX_VALUE, Float::valueOf));
         register(Double.class, new NumberArgumentParser<>(-Double.MAX_VALUE, Double.MAX_VALUE, Double::valueOf));
         register(Boolean.class, new ArgumentParser<>() {
-            private static final String TRUE = Boolean.TRUE.toString();
-            private static final String FALSE = Boolean.FALSE.toString();
+            private final String TRUE = Boolean.TRUE.toString();
+            private final String FALSE = Boolean.FALSE.toString();
 
             @Override
             public @NotNull Boolean parse(final @NotNull String rawArgument) throws CommandExecutionException {
