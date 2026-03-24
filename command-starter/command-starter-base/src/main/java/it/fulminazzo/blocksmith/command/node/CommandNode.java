@@ -205,18 +205,18 @@ public abstract class CommandNode implements TabCompletable {
             try {
                 validateInput(context);
                 if (context.isLast() || context.advanceCursor().isLast())
-                    return getChildren().stream()
+                    return filterCompletions(context, getChildren().stream()
                             .map(c -> c.getCompletions(context))
                             .flatMap(Collection::stream)
-                            .distinct()
-                            .filter(c -> c.toLowerCase().startsWith(context.getCurrent().toLowerCase()) || c.startsWith("<"))
-                            .collect(Collectors.toList());
+                            .collect(Collectors.toList())
+                    );
                 else {
                     CommandNode child = getChild(context.getCurrent());
                     if (child == null) return Collections.emptyList();
                     else {
                         List<ArgumentNode<?>> greedyChildren = getGreedyChildren();
-                        if (greedyChildren.contains(child)) return child.getCompletions(context);
+                        if (greedyChildren.contains(child))
+                            return filterCompletions(context, child.getCompletions(context));
                         else return child.tabComplete(context);
                     }
                 }
@@ -224,6 +224,18 @@ public abstract class CommandNode implements TabCompletable {
                 return Collections.emptyList();
             }
         }
+    }
+
+    private @NotNull List<String> filterCompletions(final @NotNull CommandExecutionContext context,
+                                                    final @NotNull List<String> completions) {
+        List<String> finalCompletions = completions.stream()
+                .filter(c -> c.toLowerCase().startsWith(context.getCurrent().toLowerCase()))
+                .collect(Collectors.toList());
+        if (finalCompletions.isEmpty())
+            return completions.stream()
+                    .filter(c -> c.startsWith("<"))
+                    .collect(Collectors.toList());
+        else return finalCompletions;
     }
 
     /**
