@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command.argument;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,9 +18,10 @@ import java.util.function.Function;
  * @param <N> the type of the parameter
  */
 @RequiredArgsConstructor
-final class NumberArgumentParser<N extends Number> implements ArgumentParser<N> {
+public final class NumberArgumentParser<N extends Number> implements ArgumentParser<N> {
     private final @NotNull N min;
     private final @NotNull N max;
+    @Getter
     private final @NotNull Function<String, N> parser;
 
     @Override
