@@ -188,21 +188,25 @@ public abstract class CommandNode implements TabCompletable {
      */
     public @NotNull List<String> tabComplete(final @NotNull CommandExecutionContext context) {
         if (context.isDone()) return Collections.emptyList();
-        else if (context.isLast())
-            return getChildren().stream()
-                    .map(c -> c.getCompletions(context))
-                    .flatMap(Collection::stream)
-                    .distinct()
-                    .filter(c -> c.toLowerCase().startsWith(context.getLast().toLowerCase()))
-                    .collect(Collectors.toList());
-        else try {
+        else {
+            try {
                 validateInput(context);
-                CommandNode child = getChild(context.getCurrent());
-                if (child == null) return Collections.emptyList();
-                else return child.tabComplete(context.advanceCursor());
+                if (context.isLast() || context.advanceCursor().isLast())
+                    return getChildren().stream()
+                            .map(c -> c.getCompletions(context))
+                            .flatMap(Collection::stream)
+                            .distinct()
+                            .filter(c -> c.toLowerCase().startsWith(context.getCurrent().toLowerCase()) || c.startsWith("<"))
+                            .collect(Collectors.toList());
+                else {
+                    CommandNode child = getChild(context.getCurrent());
+                    if (child == null) return Collections.emptyList();
+                    else return child.tabComplete(context);
+                }
             } catch (CommandExecutionException e) {
                 return Collections.emptyList();
             }
+        }
     }
 
     /**
