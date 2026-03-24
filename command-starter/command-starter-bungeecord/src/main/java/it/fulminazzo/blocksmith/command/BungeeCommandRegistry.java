@@ -25,10 +25,10 @@ final class BungeeCommandRegistry extends CommandRegistry {
     /**
      * Instantiates a new Bungee command registry.
      *
-     * @param application the application
+     * @param application the application that is initializing the registry
      */
     public BungeeCommandRegistry(final @NotNull BlocksmithApplication application) {
-        super(application.getMessenger(), application.getLog(), application.getName().toLowerCase());
+        super(application);
         this.plugin = (Plugin) application;
         this.pluginManager = ((ProxyServer) application.getServer()).getPluginManager();
     }

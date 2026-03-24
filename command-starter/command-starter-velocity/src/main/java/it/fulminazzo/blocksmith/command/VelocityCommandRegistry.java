@@ -26,10 +26,10 @@ final class VelocityCommandRegistry extends CommandRegistry {
     /**
      * Instantiates a new Velocity command registry.
      *
-     * @param application the application
+     * @param application the application that is initializing the registry
      */
     public VelocityCommandRegistry(final @NotNull BlocksmithApplication application) {
-        super(application.getMessenger(), application.getLog(), application.getName().toLowerCase());
+        super(application);
         this.commandManager = ((ProxyServer) application.getServer()).getCommandManager();
     }
 

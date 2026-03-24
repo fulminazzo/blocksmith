@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
+import it.fulminazzo.blocksmith.BlocksmithApplication;
 import it.fulminazzo.blocksmith.command.node.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.message.Messenger;
@@ -22,7 +23,29 @@ final class MockCommandRegistry extends CommandRegistry {
     }
 
     public MockCommandRegistry(final @NotNull Messenger messenger, final @NotNull Logger logger) {
-        super(messenger, logger, "blocksmith");
+        super(new BlocksmithApplication() {
+
+            @Override
+            public @NotNull Messenger getMessenger() {
+                return messenger;
+            }
+
+            @Override
+            public @NotNull Logger getLog() {
+                return logger;
+            }
+
+            @Override
+            public @NotNull Object getServer() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public @NotNull String getName() {
+                return "blocksmith";
+            }
+
+        });
     }
 
     @SuppressWarnings("unchecked")

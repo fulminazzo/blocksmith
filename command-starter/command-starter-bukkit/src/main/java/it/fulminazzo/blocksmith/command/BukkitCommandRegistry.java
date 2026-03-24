@@ -41,7 +41,7 @@ final class BukkitCommandRegistry extends CommandRegistry {
      * @param application the application that is initializing the registry
      */
     public BukkitCommandRegistry(final @NotNull BlocksmithApplication application) {
-        super(application.getMessenger(), application.getLog(), application.getName().toLowerCase());
+        super(application);
         this.server = (Server) application.getServer();
 
         Reflect reflect = Reflect.on(server).fields().values().stream()
