@@ -1,9 +1,13 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.argument.NumberArgumentParser;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * Special implementation of {@link ArgumentNode} for {@link Number} arguments.
@@ -28,10 +32,18 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
     }
 
     @Override
+    public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
+        final NumberArgumentParser<N> parser = (NumberArgumentParser<N>) getArgumentParser();
+        final Function<String, N> parseFunction = parser.getParser();
+        List<String> completions = super.getCompletions(context);
+        completions.removeIf(c -> isValid(parseFunction.apply(c)));
+        return completions;
+    }
+
+    @Override
     protected void validateExecuteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        Number parsed = getArgumentParser().parse(context);
-        double value = parsed.doubleValue();
-        if (value < min || value > max)
+        N parsed = getArgumentParser().parse(context);
+        if (isValid(parsed))
             throw new CommandExecutionException("error.invalid-number")
                     .arguments(
                             Placeholder.of("argument", context.getCurrent()),
@@ -39,6 +51,22 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
                             Placeholder.of("max", cast(max))
                     );
         context.addParsedArgument(parsed);
+    }
+
+    @Override
+    protected void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        validateExecuteInput(context);
+    }
+
+    /**
+     * Checks if the given number is within bounds.
+     *
+     * @param number the number
+     * @return <code>true</code> if it is
+     */
+    public boolean isValid(final @NotNull N number) {
+        double value = number.doubleValue();
+        return value < min || value > max;
     }
 
     /**
@@ -55,11 +83,6 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
         else if (type == Long.class) return type.cast((long) value);
         else if (type == Float.class) return type.cast((float) value);
         else return type.cast(value);
-    }
-
-    @Override
-    protected void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        validateExecuteInput(context);
     }
 
     /**
