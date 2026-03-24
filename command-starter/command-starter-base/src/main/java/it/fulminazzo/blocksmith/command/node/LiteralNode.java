@@ -63,10 +63,15 @@ public final class LiteralNode extends CommandNode {
     }
 
     @Override
-    protected void validateInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+    protected void validateExecuteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         if (!hasPermission(context))
             throw new CommandExecutionException("error.no-permission")
                     .arguments(Placeholder.of("permission", getCommandInfo().orElseThrow().getPermission().getPermission()));
+    }
+
+    @Override
+    protected void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        validateExecuteInput(context);
     }
 
     @Override

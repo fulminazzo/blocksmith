@@ -49,9 +49,16 @@ public final class ArgumentNode<T> extends CommandNode {
     }
 
     @Override
-    protected void validateInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+    protected void validateExecuteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         if (isGreedy()) context.mergeRemainingInput();
         context.addParsedArgument(parseArgument(context));
+    }
+
+    @Override
+    protected void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        if (isGreedy()) context.mergeRemainingInput();
+        if (!ArgumentParsers.of(type).validateCompletions(context))
+            throw new CommandExecutionException();
     }
 
     @Override

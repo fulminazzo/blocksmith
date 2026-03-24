@@ -133,7 +133,7 @@ public abstract class CommandNode implements TabCompletable {
      * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
      */
     public void execute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        validateInput(context);
+        validateExecuteInput(context);
         handleRemainingInput(context);
     }
 
@@ -203,7 +203,7 @@ public abstract class CommandNode implements TabCompletable {
         if (context.isDone()) return Collections.emptyList();
         else {
             try {
-                validateInput(context);
+                validateTabCompleteInput(context);
                 if (context.isLast() || context.advanceCursor().isLast())
                     return filterCompletions(context, getChildren().stream()
                             .map(c -> c.getCompletions(context))
@@ -239,12 +239,20 @@ public abstract class CommandNode implements TabCompletable {
     }
 
     /**
-     * Validates the current input of the context.
+     * Validates the current input of the context during execution.
      *
      * @param context the context
      * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
      */
-    protected abstract void validateInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException;
+    protected abstract void validateExecuteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException;
+
+    /**
+     * Validates the current input of the context during tab completion.
+     *
+     * @param context the context
+     * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
+     */
+    protected abstract void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException;
 
     /**
      * Checks if the node matches with the given token.
