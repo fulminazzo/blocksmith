@@ -137,8 +137,9 @@ final class BukkitCommandRegistry extends CommandRegistry {
     void unregisterPermission(final @Nullable Permission permission) {
         if (permission == null) return;
         String name = permission.getName();
-        if (!(pluginManager.getPermission(name) instanceof BukkitPermission)) return;
-        pluginManager.removePermission(name);
+        Permission perm = pluginManager.getPermission(name);
+        if (!(perm instanceof BukkitPermission)) return;
+        pluginManager.removePermission(perm);
         Permission previous = previousPermissions.remove(name);
         if (previous != null) pluginManager.addPermission(previous);
         for (String child : permission.getChildren().keySet())
