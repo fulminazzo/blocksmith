@@ -54,6 +54,13 @@ public abstract class CommandSenderWrapper {
     public abstract boolean isPlayer();
 
     /**
+     * Gets a unique identifier for the wrapped sender.
+     *
+     * @return the id
+     */
+    public abstract @NotNull Object getId();
+
+    /**
      * Gets the actual sender instance.
      *
      * @return the actual sender
