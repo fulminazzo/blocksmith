@@ -11,7 +11,7 @@ class TimeParserTest extends Specification {
     def 'test that parse works'() {
         given:
         def parser = new TimeParser('(!%years% {year|years})[ %months% {month|months}] ' +
-                '(%days% {day|days}) this should totally be ignored[! %hours% {hours|hour}] ' +
+                '(%days% {day|days}) this should totally be ignored[! %hours% {hour|hours}] ' +
                 '(%minutes% {minute|minutes})')
 
         and:
