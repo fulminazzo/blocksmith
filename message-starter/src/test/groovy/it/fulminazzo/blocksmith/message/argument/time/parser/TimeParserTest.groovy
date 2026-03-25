@@ -54,6 +54,46 @@ class TimeParserTest extends Specification {
         full << [true, false]
     }
 
+    def 'test that parseGeneralArgument automatically determines singular and plural if not given'() {
+        given:
+        def parser = newMockTimeParser("%years%)")
+
+        and:
+        def expected = new ArgumentNode(
+                '%unit%',
+                ArgumentNode.TimeUnit.YEARS,
+                'y',
+                'y',
+                false
+        )
+
+        when:
+        def actual = parser.parseGeneralArgument(TimeToken.CLOSE_PARENTHESIS)
+
+        then:
+        actual == expected
+    }
+
+    def 'test that parseGeneralArgument throws for input #input'() {
+        given:
+        def parser = newMockTimeParser(input)
+
+        when:
+        parser.parseGeneralArgument(TimeToken.CLOSE_PARENTHESIS)
+
+        then:
+        thrown(TimeParseException)
+
+        where:
+        input << [
+                '',
+                'invalid',
+                '()',
+                '( {year|years})',
+                '(%years% {year|years} %years%)'
+        ]
+    }
+
     def 'test that parseUnitPlaceholder returns #unit'() {
         given:
         def parser = newMockTimeParser("%$unit.name%")
