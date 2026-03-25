@@ -47,7 +47,7 @@ public final class Placeholder implements Argument {
     /**
      * Creates a new Placeholder.
      *
-     * @param placeholder the placeholder (without ampersands)
+     * @param placeholder the placeholder (without percentages)
      * @param value       the value to replace
      * @return the placeholder
      */
@@ -59,7 +59,7 @@ public final class Placeholder implements Argument {
     /**
      * Creates a new Placeholder.
      *
-     * @param placeholder the placeholder (without ampersands)
+     * @param placeholder the placeholder (without percentages)
      * @param value       the value to replace
      * @return the placeholder
      */
@@ -71,7 +71,7 @@ public final class Placeholder implements Argument {
     /**
      * Creates a new Placeholder.
      *
-     * @param placeholder the placeholder (without ampersands)
+     * @param placeholder the placeholder (without percentages)
      * @param value       the value to replace
      * @return the placeholder
      */
