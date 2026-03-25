@@ -9,7 +9,7 @@ import java.util.Collections;
 /**
  * Implementation of {@link ReceiverFactory} for {@link CommandSenderWrapper} objects.
  */
-public final class WrapperReceiverFactory implements ReceiverFactory {
+public final class CommandSenderWrapperReceiverFactory implements ReceiverFactory {
 
     @Override
     public @NotNull Collection<Receiver> getAllReceivers() {
