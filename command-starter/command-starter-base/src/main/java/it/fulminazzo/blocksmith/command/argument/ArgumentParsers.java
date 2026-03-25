@@ -85,11 +85,13 @@ public final class ArgumentParsers {
      * Throws {@link IllegalArgumentException} if not found.
      *
      * @param <T>  the type of the argument
-     * @param type the java class of the argument
+     * @param type the Java class of the argument
      * @return the argument parser
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public static <T> @NotNull ArgumentParser<T> of(final @NotNull Class<T> type) {
+        if (Enum.class.isAssignableFrom(type))
+            return (ArgumentParser<T>) new EnumArgumentParser<>((Class) type);
         ArgumentParser<?> parser = parsers.get(ReflectionUtils.toWrapper(type));
         if (parser == null)
             throw new IllegalArgumentException("No parser found for type " + type.getCanonicalName());
