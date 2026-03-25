@@ -283,7 +283,36 @@ public final class CommandParser {
         Class<?> moduleType = commandModule.getClass();
         if (!moduleType.isAnnotationPresent(Command.class))
             throw CommandParseException.of("Invalid command module '%s': %s annotation is required", commandModule, Command.class);
-        String baseCommand = moduleType.getAnnotation(Command.class).value().trim();
+
+        Command baseAnnotation = moduleType.getAnnotation(Command.class);
+        String baseCommand = baseAnnotation.value().trim();
+        if (baseAnnotation.dynamic()) {
+            String methodName = "getAliases";
+            try {
+                Method aliasesMethod = moduleType.getMethod(methodName);
+                if (!Modifier.isStatic(aliasesMethod.getModifiers()) && Collection.class.isAssignableFrom(aliasesMethod.getReturnType())) {
+                    Collection<?> aliases = (Collection<?>) aliasesMethod.invoke(commandModule);
+                    baseCommand = String.format("(%s) ", aliases.stream()
+                            .filter(Objects::nonNull)
+                            .map(Object::toString)
+                            .collect(Collectors.joining("|"))
+                    ) + baseCommand;
+                    baseCommand = baseCommand.trim();
+                } else throw new NoSuchMethodException();
+            } catch (NoSuchMethodException e) {
+                throw CommandParseException.of("Invalid command module '%s': required static method '%s' with return type %s was not found",
+                        commandModule, methodName, Collection.class
+                );
+            } catch (InvocationTargetException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+                else throw new RuntimeException(cause);
+            } catch (IllegalAccessException e) {
+                throw CommandParseException.of("Invalid command module '%s': cannot access method '%s'",
+                        commandModule, methodName
+                );
+            }
+        }
         if (baseCommand.isEmpty())
             throw CommandParseException.of("Invalid command module '%s': command cannot be empty", commandModule);
 
