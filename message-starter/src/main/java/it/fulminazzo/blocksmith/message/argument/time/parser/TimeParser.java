@@ -39,15 +39,21 @@ final class TimeParser {
     }
 
     /**
-     * EXPRESSION := OPTIONAL_ARGUMENT | ALWAYS_SHOWN_ARGUMENT | {@link TimeToken#TEXT}
+     * EXPRESSION := OPTIONAL_ARGUMENT | ALWAYS_SHOWN_ARGUMENT | .
      *
      * @return the node
      */
     @NotNull TimeNode parseExpression() {
         switch (tokenizer.getLastToken()) {
-            case OPEN_BRACKET: return parseOptionalArgument();
-            case OPEN_PHARENTHESIS: return parseAlwaysShownArgument();
-            default: return new LiteralNode(tokenizer.getLastRead());
+            case OPEN_BRACKET:
+                return parseOptionalArgument();
+            case OPEN_PHARENTHESIS:
+                return parseAlwaysShownArgument();
+            default: {
+                String test = tokenizer.getLastRead();
+                tokenizer.next();
+                return new LiteralNode(test);
+            }
         }
     }
 
@@ -101,8 +107,7 @@ final class TimeParser {
                 if (unit == null) {
                     unit = parseUnitPlaceholder();
                     text.append("%unit%");
-                }
-                else throw parseException("invalid argument '%s': unit was already specified", text);
+                } else throw parseException("invalid argument '%s': unit was already specified", text);
             } else if (lastRead == TimeToken.OPEN_BRACE) {
                 singularAndPlural = parseSingularAndPlural();
                 text.append("%name%");
