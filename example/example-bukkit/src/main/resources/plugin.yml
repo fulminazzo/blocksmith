@@ -18,9 +18,13 @@ commands:
     permission: ${name_lower}.hello
     aliases: ['hi']
   setlocale:
-    description: 'Updates the locale stored for the usser'
+    description: 'Updates the locale stored for the user'
     usage: '<red>/setlocale <dark_gray><<white>locale<dark_gray>>'
     permission: ${name_lower}.setlocale
+  lastdeath:
+    description: 'Gets the time since last death of the user'
+    usage: '<red>/lastdeath'
+    permission: ${name_lower}.lastdeath
 
 permissions:
   ${name_lower}.${name_lower}reload:

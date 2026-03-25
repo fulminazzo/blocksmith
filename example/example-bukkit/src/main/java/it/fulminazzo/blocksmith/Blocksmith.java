@@ -66,6 +66,7 @@ public final class Blocksmith extends JavaPlugin implements Listener {
         getCommand(getName().toLowerCase() + "reload").setExecutor(new ReloadCommand(this));
         getCommand("hello").setExecutor(new HelloCommand(this));
         getCommand("setlocale").setExecutor(new SetLocaleCommand(this));
+        getCommand("lastdeath").setExecutor(new LastDeath(this));
 
         enable();
     }
