@@ -9,10 +9,12 @@ import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.Player
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
+import it.fulminazzo.blocksmith.message.argument.Time
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 import java.lang.reflect.Method
+import java.time.Duration
 
 class CommandNodeExecuteTest extends Specification {
     private static final @NotNull
@@ -105,6 +107,52 @@ class CommandNodeExecuteTest extends Specification {
         then:
         def e = thrown(CommandExecutionException)
         e.message == 'error.not-enough-arguments'
+    }
+
+    def 'test execute with cooldown'() {
+        given:
+        def node = new ArgumentNode('cooldown', String, false)
+        def who = new ArgumentNode('who', String, false)
+        who.executionInfo = new ExecutionInfo(CommandNodeExecuteTest, second)
+        who.cooldown = Duration.ofSeconds(1L)
+        node.addChild(who)
+
+        and:
+        def context = new CommandExecutionContext(Mock(BlocksmithApplication), commandSender)
+                .addInput('Hello', 'Alex')
+
+        expect:
+        printer == null
+
+        when:
+        node.execute(context)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        printer == 'Hello, Alex!'
+
+        when:
+        context = new CommandExecutionContext(Mock(BlocksmithApplication), commandSender)
+                .addInput('Hello', 'Alex')
+
+        and:
+        node.execute(context)
+
+        then:
+        def e = thrown(CommandExecutionException)
+        def arg = e.arguments[0]
+        (arg instanceof Time)
+
+        and:
+        arg.placeholder == 'cooldown'
+        arg.timeFormat == 'general.time-format'
+
+        and:
+        def time = arg.timeSupplier.get()
+        time < 1000L
+        time > 0
     }
 
     def 'test execute with extra arguments'() {
