@@ -21,6 +21,7 @@ enum TimeToken {
 
     PIPE("\\|"),
     PERCENTAGE("%"),
+    EXCLAMATION_MARK("!"),
 
     LITERAL("[A-Za-z_][A-Za-z0-9_]*", "text"),
     ANYTHING_ELSE("[^A-Za-z0-9_*()\\[\\]{}|%]+", ""),
