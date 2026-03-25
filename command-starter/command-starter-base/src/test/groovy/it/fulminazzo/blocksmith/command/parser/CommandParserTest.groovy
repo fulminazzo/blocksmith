@@ -213,14 +213,16 @@ class CommandParserTest extends Specification {
 
         and:
         def clan = new LiteralNode(*baseAliases)
-        clan.executionInfo = new ExecutionInfo(
-                executor,
-                ClanCommand.getMethod('execute', CommandSender)
-        )
         clan.commandInfo = new CommandInfo(
                 'command.description.clan',
                 new PermissionInfo('clan', Permission.Grant.OP)
         )
+        def value = new ArgumentNode('value', double, false)
+        value.executionInfo = new ExecutionInfo(
+                executor,
+                ClanCommand.getMethod('execute', CommandSender)
+        )
+        clan.addChild(value)
         expected.add(clan)
 
         and:
@@ -259,8 +261,10 @@ class CommandParserTest extends Specification {
 
         where:
         type << [
-                CommandParserTest,
-                CommandNotGiven
+                CommandParserTest, CommandNotGiven,
+                AliasesNotGiven,
+                AliasesNotInstance, AliasesNotCollection,
+                AliasesPrivate
         ]
     }
 
@@ -701,6 +705,7 @@ class CommandParserTest extends Specification {
 
     }
 
+    @Command(dynamic = true)
     static final class AliasesNotGiven {
 
         @Command(dynamic = true)
@@ -723,6 +728,16 @@ class CommandParserTest extends Specification {
 
     }
 
+    @Command(dynamic = true)
+    static final class AliasesNotInstance {
+
+        static List<String> getAliases() {
+            return []
+        }
+
+    }
+
+    @Command(dynamic = true)
     static final class AliasesNotCollection {
 
         @Command(dynamic = true)
@@ -734,8 +749,13 @@ class CommandParserTest extends Specification {
             return 'Hello, world!'
         }
 
+        String getAliases() {
+            return 'Hello, world!'
+        }
+
     }
 
+    @Command(dynamic = true)
     static final class AliasesPrivate {
 
         @Command(dynamic = true)
@@ -743,7 +763,11 @@ class CommandParserTest extends Specification {
 
         }
 
-        static List<String> getHelpAliases() {
+        private static List<String> getHelpAliases() {
+            return []
+        }
+
+        private List<String> getAliases() {
             return []
         }
 

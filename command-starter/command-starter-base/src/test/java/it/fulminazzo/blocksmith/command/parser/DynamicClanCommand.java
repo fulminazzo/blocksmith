@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.command.parser;
 
 import it.fulminazzo.blocksmith.command.CommandSender;
 import it.fulminazzo.blocksmith.command.annotation.Command;
-import it.fulminazzo.blocksmith.command.annotation.Default;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,9 +12,10 @@ import java.util.List;
 @Command(dynamic = true)
 final class DynamicClanCommand {
 
-    @Command
+    @Command(value = "<value>")
     public void execute(
-            final @NotNull CommandSender sender
+            final @NotNull CommandSender sender,
+            final double value
     ) {
         // something
     }
