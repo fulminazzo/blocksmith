@@ -19,13 +19,14 @@ public final class ArgumentNode extends TimeNode {
     private final @NotNull TimeUnit timeUnit;
     private final @NotNull String singular;
     private final @NotNull String plural;
+    private final boolean full;
 
     private boolean optional;
 
     @Override
     protected @NotNull String parseSingle(final long time) {
         long actualTime = timeUnit.formatTime(time);
-        if (timeUnit != TimeUnit.YEARS) {
+        if (!full && timeUnit != TimeUnit.YEARS) {
             TimeUnit next = TimeUnit.values()[timeUnit.ordinal() + 1];
             long t = next.formatTime(time);
             if (t > 0) {
