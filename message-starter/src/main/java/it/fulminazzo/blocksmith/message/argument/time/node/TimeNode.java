@@ -24,8 +24,10 @@ public abstract class TimeNode {
      * @return this object (for method chaining)
      */
     public @NotNull TimeNode addChild(final @NotNull TimeNode child) {
-        if (this.child == null) this.child = child;
-        else this.child.addChild(child);
+        TimeNode last = this;
+        while (last.getChild() != null)
+            last = last.getChild();
+        last.child = child;
         return this;
     }
 
