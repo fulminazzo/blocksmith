@@ -5,13 +5,13 @@ import it.fulminazzo.blocksmith.command.node.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -335,6 +335,37 @@ public final class CommandParser {
                 Command annotation = method.getAnnotation(Command.class);
 
                 String rawCommand = annotation.value().trim();
+
+                if (annotation.dynamic()) {
+                    String methodName = method.getName();
+                    methodName = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
+                    methodName = "get" + methodName + "Aliases";
+                    try {
+                        Method aliasesMethod = commandsContainer.getMethod(methodName);
+                        if (Modifier.isStatic(aliasesMethod.getModifiers()) && Collection.class.isAssignableFrom(aliasesMethod.getReturnType())) {
+                            Collection<?> aliases = (Collection<?>) aliasesMethod.invoke(commandsContainer);
+                            rawCommand = String.format("(%s) ", aliases.stream()
+                                    .filter(Objects::nonNull)
+                                    .map(Object::toString)
+                                    .collect(Collectors.joining("|"))
+                            ) + rawCommand;
+                            rawCommand = rawCommand.trim();
+                        } else throw new NoSuchMethodException();
+                    } catch (NoSuchMethodException e) {
+                        throw CommandParseException.of("Invalid dynamic command method %s: required static method '%s' with return type %s was not found",
+                                method, methodName, Collection.class
+                        );
+                    } catch (InvocationTargetException e) {
+                        Throwable cause = e.getCause();
+                        if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+                        else throw new RuntimeException(cause);
+                    } catch (IllegalAccessException e) {
+                        throw CommandParseException.of("Invalid dynamic command method %s: cannot access method '%s'",
+                                method, methodName
+                        );
+                    }
+                }
+
                 if (rawCommand.isEmpty())
                     throw CommandParseException.of("Invalid command method %s: command cannot be empty", method);
 
