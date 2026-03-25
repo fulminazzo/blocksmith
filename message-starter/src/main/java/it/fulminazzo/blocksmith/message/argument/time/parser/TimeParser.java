@@ -1,10 +1,14 @@
 package it.fulminazzo.blocksmith.message.argument.time.parser;
 
+import it.fulminazzo.blocksmith.message.argument.time.node.ArgumentNode;
 import it.fulminazzo.blocksmith.structure.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
 
+/**
+ * The type Time parser.
+ */
 final class TimeParser {
     private final @NotNull String timeFormat;
     private final @NotNull TimeTokenizer tokenizer;
@@ -17,6 +21,20 @@ final class TimeParser {
     TimeParser(final @NotNull String timeFormat) {
         this.timeFormat = timeFormat;
         this.tokenizer = new TimeTokenizer(timeFormat);
+    }
+
+    /**
+     * UNIT_PLACEHOLDER := % {@link ArgumentNode.TimeUnit#getName()} %
+     */
+    @NotNull ArgumentNode.TimeUnit parseUnitPlaceholder() {
+        consume(TimeToken.PERCENTAGE);
+        match(TimeToken.TEXT);
+        String rawUnit = tokenizer.getLastRead();
+        ArgumentNode.TimeUnit unit = ArgumentNode.TimeUnit.of(rawUnit);
+        if (unit == null) throw parseException("unknown time unit '%s'", rawUnit);
+        consume(TimeToken.TEXT);
+        consume(TimeToken.PERCENTAGE);
+        return unit;
     }
 
     /**
