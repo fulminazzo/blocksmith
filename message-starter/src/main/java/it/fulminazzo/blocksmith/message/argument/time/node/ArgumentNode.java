@@ -23,6 +23,17 @@ public final class ArgumentNode extends TimeNode {
 
     private boolean optional;
 
+    /**
+     * Sets the current argument as optional.
+     *
+     * @param optional if <code>true</code>, will not show when time is <code>0</code>
+     * @return this object (for method chaining)
+     */
+    public @NotNull ArgumentNode setOptional(final boolean optional) {
+        this.optional = optional;
+        return this;
+    }
+
     @Override
     protected @NotNull String parseSingle(final long time) {
         long actualTime = timeUnit.formatTime(time);
