@@ -11,21 +11,17 @@ class TimeParserTest extends Specification {
         given:
         def parser = newMockTimeParser("[${full ? '!' : ''}%years% {year|years}]")
 
-        and:
-        def expected = new ArgumentNode(
+        when:
+        def actual = parser.parseOptionalArgument()
+
+        then:
+        actual == new ArgumentNode(
                 '%unit% %name%',
                 ArgumentNode.TimeUnit.YEARS,
                 'year',
                 'years',
                 full
-        )
-        expected.optional = true
-
-        when:
-        def actual = parser.parseOptionalArgument()
-
-        then:
-        actual == expected
+        ).setOptional(true)
 
         where:
         full << [true, false]
@@ -35,20 +31,17 @@ class TimeParserTest extends Specification {
         given:
         def parser = newMockTimeParser("(${full ? '!' : ''}%years% {year|years})")
 
-        and:
-        def expected = new ArgumentNode(
+        when:
+        def actual = parser.parseAlwaysShownArgument()
+
+        then:
+        actual == new ArgumentNode(
                 '%unit% %name%',
                 ArgumentNode.TimeUnit.YEARS,
                 'year',
                 'years',
                 full
         )
-
-        when:
-        def actual = parser.parseAlwaysShownArgument()
-
-        then:
-        actual == expected
 
         where:
         full << [true, false]
