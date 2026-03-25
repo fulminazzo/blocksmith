@@ -2,7 +2,7 @@ package it.fulminazzo.blocksmith.command
 
 import be.seeseemelk.mockbukkit.MockBukkit
 import groovy.util.logging.Slf4j
-import it.fulminazzo.blocksmith.BlocksmithApplication
+import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.CommandInfo
@@ -17,14 +17,14 @@ import spock.lang.Specification
 @Slf4j
 class BukkitCommandRegistryTest extends Specification {
 
-    private BlocksmithApplication application
+    private ApplicationHandle application
 
     private BukkitCommandRegistry registry
 
     void setup() {
         MockBukkit.mock()
 
-        application = Mock(BlocksmithApplication)
+        application = Mock(ApplicationHandle)
         application.server >> Bukkit.server
         application.log >> log
         application.messenger >> new Messenger(log)

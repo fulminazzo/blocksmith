@@ -5,7 +5,7 @@ import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ProxyServer;
-import it.fulminazzo.blocksmith.BlocksmithApplication;
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +28,7 @@ final class VelocityCommandRegistry extends CommandRegistry {
      *
      * @param application the application that is initializing the registry
      */
-    public VelocityCommandRegistry(final @NotNull BlocksmithApplication application) {
+    public VelocityCommandRegistry(final @NotNull ApplicationHandle application) {
         super(application);
         this.commandManager = ((ProxyServer) application.getServer()).getCommandManager();
     }

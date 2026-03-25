@@ -4,7 +4,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
-import it.fulminazzo.blocksmith.BlocksmithApplication;
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
@@ -60,7 +60,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
     }
 
     @Override
-    public @NotNull CommandRegistry newRegistry(final @NotNull BlocksmithApplication application) {
+    public @NotNull CommandRegistry newRegistry(final @NotNull ApplicationHandle application) {
         return new VelocityCommandRegistry(application);
     }
 

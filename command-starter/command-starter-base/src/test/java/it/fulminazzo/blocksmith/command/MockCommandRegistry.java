@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
-import it.fulminazzo.blocksmith.BlocksmithApplication;
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.message.Messenger;
@@ -23,7 +23,7 @@ final class MockCommandRegistry extends CommandRegistry {
     }
 
     public MockCommandRegistry(final @NotNull Messenger messenger, final @NotNull Logger logger) {
-        super(new BlocksmithApplication() {
+        super(new ApplicationHandle() {
 
             @Override
             public @NotNull Messenger getMessenger() {

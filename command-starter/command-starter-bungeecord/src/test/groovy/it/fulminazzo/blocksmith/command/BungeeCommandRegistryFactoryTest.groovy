@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.command
 
 import groovy.util.logging.Slf4j
-import it.fulminazzo.blocksmith.BlocksmithApplication
+import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
@@ -15,7 +15,7 @@ import spock.lang.Specification
 @Slf4j
 class BungeeCommandRegistryFactoryTest extends Specification {
 
-    private BlocksmithApplication application
+    private ApplicationHandle application
 
     private CommandExecutionContext context
 
@@ -44,7 +44,7 @@ class BungeeCommandRegistryFactoryTest extends Specification {
                     .find { it.name.equalsIgnoreCase(a[0]) }
         }
 
-        application = Mock(Plugin, additionalInterfaces: [BlocksmithApplication]) as BlocksmithApplication
+        application = Mock(Plugin, additionalInterfaces: [ApplicationHandle]) as ApplicationHandle
         application.server >> server
 
         context = new CommandExecutionContext(

@@ -1,7 +1,7 @@
 //file:noinspection unused
 package it.fulminazzo.blocksmith.command.node
 
-import it.fulminazzo.blocksmith.BlocksmithApplication
+import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.CommandSender
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper
 import it.fulminazzo.blocksmith.command.ConsoleCommandSender
@@ -56,7 +56,7 @@ class CommandNodeExecuteTest extends Specification {
         } else greeting.addChild(who)
 
         and:
-        def context = new CommandExecutionContext(Mock(BlocksmithApplication), commandSender)
+        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
                 .addInput('say', 'hello', 'Hello')
         if (whatEnabled) context.addInput('what')
         if (whoArg != null) context.addInput(whoArg)
@@ -98,7 +98,7 @@ class CommandNodeExecuteTest extends Specification {
         def node = new LiteralNode('test')
 
         and:
-        def context = new CommandExecutionContext(Mock(BlocksmithApplication), commandSender)
+        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
                 .addInput('test')
 
         when:
@@ -118,7 +118,7 @@ class CommandNodeExecuteTest extends Specification {
         node.addChild(who)
 
         and:
-        def context = new CommandExecutionContext(Mock(BlocksmithApplication), commandSender)
+        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
                 .addInput('Hello', 'Alex')
 
         expect:
@@ -134,7 +134,7 @@ class CommandNodeExecuteTest extends Specification {
         printer == 'Hello, Alex!'
 
         when:
-        context = new CommandExecutionContext(Mock(BlocksmithApplication), commandSender)
+        context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
                 .addInput('Hello', 'Alex')
 
         and:
@@ -163,7 +163,7 @@ class CommandNodeExecuteTest extends Specification {
         node.addChild(who)
 
         and:
-        def context = new CommandExecutionContext(Mock(BlocksmithApplication), commandSender)
+        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
                 .addInput('Hello', 'Alex', 'extra', 'input', 'should', 'be', 'ignored')
 
         expect:
@@ -184,7 +184,7 @@ class CommandNodeExecuteTest extends Specification {
         def node = new LiteralNode('test')
 
         and:
-        def context = new CommandExecutionContext(Mock(BlocksmithApplication), commandSender)
+        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
                 .addInput('test', 'help')
 
         when:
@@ -204,7 +204,7 @@ class CommandNodeExecuteTest extends Specification {
         node.executionInfo = new ExecutionInfo(CommandNodeExecuteTest, CommandNodeExecuteTest.getDeclaredMethod(name))
 
         and:
-        def context = new CommandExecutionContext(Mock(BlocksmithApplication), commandSender)
+        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
                 .addInput(name)
 
         when:
@@ -235,7 +235,7 @@ class CommandNodeExecuteTest extends Specification {
         )
 
         and:
-        def context = new CommandExecutionContext(Mock(BlocksmithApplication), commandSender)
+        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
                 .addInput(node.name)
         context.addParsedArgument(1)
         context.addParsedArgument(2)
@@ -260,7 +260,7 @@ class CommandNodeExecuteTest extends Specification {
         node.addChild(message)
 
         and:
-        def context = new CommandExecutionContext(Mock(BlocksmithApplication), commandSender)
+        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
                 .addInput(node.name, 'Hello,', 'Alex!')
 
         expect:
@@ -285,7 +285,7 @@ class CommandNodeExecuteTest extends Specification {
         )
 
         and:
-        def context = new CommandExecutionContext(Mock(BlocksmithApplication), new MockCommandSenderWrapper(sender))
+        def context = new CommandExecutionContext(Mock(ApplicationHandle), new MockCommandSenderWrapper(sender))
                 .addInput('command')
 
         expect:
@@ -315,7 +315,7 @@ class CommandNodeExecuteTest extends Specification {
         )
 
         and:
-        def context = new CommandExecutionContext(Mock(BlocksmithApplication), new MockCommandSenderWrapper(sender))
+        def context = new CommandExecutionContext(Mock(ApplicationHandle), new MockCommandSenderWrapper(sender))
                 .addInput('command')
 
         when:
@@ -349,7 +349,7 @@ class CommandNodeExecuteTest extends Specification {
 
         and:
         def context = new CommandExecutionContext(
-                Mock(BlocksmithApplication),
+                Mock(ApplicationHandle),
                 new MockCommandSenderWrapper(new CommandSender())
         ).addInput(*arguments)
 
@@ -387,7 +387,7 @@ class CommandNodeExecuteTest extends Specification {
 
         and:
         def context = new CommandExecutionContext(
-                Mock(BlocksmithApplication),
+                Mock(ApplicationHandle),
                 new MockCommandSenderWrapper(new CommandSender())
         ).addInput(*arguments)
 

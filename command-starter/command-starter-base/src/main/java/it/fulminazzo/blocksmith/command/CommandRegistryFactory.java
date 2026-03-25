@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
-import it.fulminazzo.blocksmith.BlocksmithApplication;
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ServiceLoader;
@@ -16,7 +16,7 @@ public interface CommandRegistryFactory {
      * @param application the application that is initializing the registry
      * @return the command registry
      */
-    @NotNull CommandRegistry newRegistry(final @NotNull BlocksmithApplication application);
+    @NotNull CommandRegistry newRegistry(final @NotNull ApplicationHandle application);
 
     /**
      * Looks up the available services for a valid factory.
@@ -25,7 +25,7 @@ public interface CommandRegistryFactory {
      * @param application the application that is initializing the registry
      * @return the command registry
      */
-    static @NotNull CommandRegistry newCommandRegistry(final @NotNull BlocksmithApplication application) {
+    static @NotNull CommandRegistry newCommandRegistry(final @NotNull ApplicationHandle application) {
         ServiceLoader<CommandRegistryFactory> loader = ServiceLoader.load(CommandRegistryFactory.class, CommandRegistryFactory.class.getClassLoader());
         CommandRegistryFactory factory = loader.findFirst().orElseThrow(() -> new IllegalStateException("No valid CommandRegistryFactory was found"));
         return factory.newRegistry(application);

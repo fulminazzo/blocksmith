@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.command
 
 import groovy.util.logging.Slf4j
-import it.fulminazzo.blocksmith.BlocksmithApplication
+import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.CommandInfo
 import it.fulminazzo.blocksmith.command.node.LiteralNode
@@ -15,7 +15,7 @@ import spock.lang.Specification
 @Slf4j
 class BungeeCommandRegistryTest extends Specification {
 
-    private BlocksmithApplication application
+    private ApplicationHandle application
 
     private BungeeCommandRegistry registry
 
@@ -27,7 +27,7 @@ class BungeeCommandRegistryTest extends Specification {
         def proxy = Mock(ProxyServer)
         proxy.pluginManager >> pluginManager
 
-        application = Mock(Plugin, additionalInterfaces: [BlocksmithApplication])
+        application = Mock(Plugin, additionalInterfaces: [ApplicationHandle])
         application.server >> proxy
         application.log >> log
         application.messenger >> new Messenger(log)

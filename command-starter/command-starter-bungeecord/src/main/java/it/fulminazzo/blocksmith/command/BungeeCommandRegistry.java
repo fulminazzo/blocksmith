@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
-import it.fulminazzo.blocksmith.BlocksmithApplication;
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -27,7 +27,7 @@ final class BungeeCommandRegistry extends CommandRegistry {
      *
      * @param application the application that is initializing the registry
      */
-    public BungeeCommandRegistry(final @NotNull BlocksmithApplication application) {
+    public BungeeCommandRegistry(final @NotNull ApplicationHandle application) {
         super(application);
         this.plugin = (Plugin) application;
         this.pluginManager = ((ProxyServer) application.getServer()).getPluginManager();

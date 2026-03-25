@@ -2,7 +2,7 @@ package it.fulminazzo.blocksmith.command
 
 import be.seeseemelk.mockbukkit.MockBukkit
 import be.seeseemelk.mockbukkit.ServerMock
-import it.fulminazzo.blocksmith.BlocksmithApplication
+import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
@@ -17,7 +17,7 @@ import spock.lang.Specification
 
 class BukkitCommandRegistryFactoryTest extends Specification {
 
-    private BlocksmithApplication application
+    private ApplicationHandle application
 
     private CommandExecutionContext context
 
@@ -37,7 +37,7 @@ class BukkitCommandRegistryFactoryTest extends Specification {
     }
 
     void setup() {
-        application = Mock(Plugin, additionalInterfaces: [BlocksmithApplication]) as BlocksmithApplication
+        application = Mock(Plugin, additionalInterfaces: [ApplicationHandle]) as ApplicationHandle
         application.server >> Bukkit.server
 
         context = new CommandExecutionContext(

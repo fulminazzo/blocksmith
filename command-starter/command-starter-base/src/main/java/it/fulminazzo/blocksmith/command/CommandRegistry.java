@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
-import it.fulminazzo.blocksmith.BlocksmithApplication;
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @RequiredArgsConstructor
 public abstract class CommandRegistry {
-    private final @NotNull BlocksmithApplication application;
+    private final @NotNull ApplicationHandle application;
 
     private final @NotNull Map<String, LiteralNode> commands = new ConcurrentHashMap<>();
     private @NotNull State state = State.INITIAL;

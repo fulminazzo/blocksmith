@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
-import it.fulminazzo.blocksmith.BlocksmithApplication;
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.annotation.Permission.Grant;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
@@ -40,7 +40,7 @@ final class BukkitCommandRegistry extends CommandRegistry {
      *
      * @param application the application that is initializing the registry
      */
-    public BukkitCommandRegistry(final @NotNull BlocksmithApplication application) {
+    public BukkitCommandRegistry(final @NotNull ApplicationHandle application) {
         super(application);
         this.server = (Server) application.getServer();
 

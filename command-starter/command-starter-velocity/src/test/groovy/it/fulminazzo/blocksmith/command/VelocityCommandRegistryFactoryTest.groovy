@@ -5,7 +5,7 @@ import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.proxy.server.RegisteredServer
 import com.velocitypowered.api.proxy.server.ServerInfo
-import it.fulminazzo.blocksmith.BlocksmithApplication
+import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
@@ -13,7 +13,7 @@ import spock.lang.Specification
 
 class VelocityCommandRegistryFactoryTest extends Specification {
 
-    private BlocksmithApplication application
+    private ApplicationHandle application
 
     private CommandExecutionContext context
 
@@ -48,7 +48,7 @@ class VelocityCommandRegistryFactoryTest extends Specification {
             Optional.ofNullable(server.allServers.find { it.serverInfo.name.equalsIgnoreCase(a[0]) })
         }
 
-        application = Mock(BlocksmithApplication)
+        application = Mock(ApplicationHandle)
         application.server >> server
 
         context = new CommandExecutionContext(

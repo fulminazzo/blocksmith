@@ -5,7 +5,7 @@ import com.velocitypowered.api.command.CommandManager
 import com.velocitypowered.api.command.CommandMeta
 import com.velocitypowered.api.proxy.ProxyServer
 import groovy.util.logging.Slf4j
-import it.fulminazzo.blocksmith.BlocksmithApplication
+import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.CommandInfo
 import it.fulminazzo.blocksmith.command.node.LiteralNode
@@ -16,7 +16,7 @@ import spock.lang.Specification
 @Slf4j
 class VelocityCommandRegistryTest extends Specification {
 
-    private BlocksmithApplication application
+    private ApplicationHandle application
 
     private VelocityCommandRegistry registry
 
@@ -36,7 +36,7 @@ class VelocityCommandRegistryTest extends Specification {
         def proxy = Mock(ProxyServer)
         proxy.commandManager >> commandManager
 
-        application = Mock(BlocksmithApplication)
+        application = Mock(ApplicationHandle)
         application.server >> proxy
         application.log >> log
         application.messenger >> new Messenger(log)

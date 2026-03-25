@@ -5,9 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 /**
- * Represents a blocksmith application.
+ * Provides a handle to the underlying application's utilities and metadata.
  */
-public interface BlocksmithApplication {
+public interface ApplicationHandle {
 
     /**
      * Gets the handler for messages sending.

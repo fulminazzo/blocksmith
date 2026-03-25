@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.command.node
 
-import it.fulminazzo.blocksmith.BlocksmithApplication
+import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.CommandSender
 import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
@@ -18,7 +18,7 @@ class NumberArgumentNodeTest extends Specification {
                 .min(1)
                 .max(10)
         context = new CommandExecutionContext(
-                Mock(BlocksmithApplication),
+                Mock(ApplicationHandle),
                 new MockCommandSenderWrapper(new CommandSender())
         )
     }
