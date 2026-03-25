@@ -293,12 +293,19 @@ class CommandParserTest extends Specification {
         actual == expected
     }
 
-    def 'test that parseAnonymousCommands throws for not given command method'() {
+    def 'test that parseAnonymousCommands throws for #type'() {
         when:
-        CommandParser.parseAnonymousCommands(CommandNotGiven, CommandSender, null)
+        CommandParser.parseAnonymousCommands(type, CommandSender, null)
 
         then:
         thrown(CommandParseException)
+
+        where:
+        type << [
+                CommandNotGiven, AliasesNotGiven,
+                AliasesNotStatic, AliasesNotCollection,
+                AliasesPrivate
+        ]
     }
 
     def 'test that parse works'() {
@@ -645,6 +652,54 @@ class CommandParserTest extends Specification {
         @Command
         static void commandNotGiven() {
 
+        }
+
+    }
+
+    static final class AliasesNotGiven {
+
+        @Command(dynamic = true)
+        static void help() {
+
+        }
+
+    }
+
+    static final class AliasesNotStatic {
+
+        @Command(dynamic = true)
+        static void help() {
+
+        }
+
+        List<String> getHelpAliases() {
+            return []
+        }
+
+    }
+
+    static final class AliasesNotCollection {
+
+        @Command(dynamic = true)
+        static void help() {
+
+        }
+
+        static String getHelpAliases() {
+            return 'Hello, world!'
+        }
+
+    }
+
+    static final class AliasesPrivate {
+
+        @Command(dynamic = true)
+        static void help() {
+
+        }
+
+        static List<String> getHelpAliases() {
+            return []
         }
 
     }
