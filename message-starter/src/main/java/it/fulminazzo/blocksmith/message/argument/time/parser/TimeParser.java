@@ -31,6 +31,7 @@ final class TimeParser {
      * @return the node
      */
     public @NotNull TimeNode parse() {
+        tokenizer.next();
         TimeNode timeNode = parseExpression();
         while (tokenizer.getLastToken() != TimeToken.EOF)
             timeNode.addChild(parseExpression());
