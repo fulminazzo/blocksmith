@@ -10,17 +10,22 @@ import spock.lang.Specification
 
 class NumberArgumentNodeTest extends Specification {
 
-    def 'test that getCompletions return correct values'() {
-        given:
-        def node = new NumberArgumentNode('test', Integer, false)
+    private NumberArgumentNode node
+    private CommandExecutionContext context
+
+    void setup() {
+        node = new NumberArgumentNode('test', Integer, false)
                 .min(1)
                 .max(10)
-
-        and:
-        def context = new CommandExecutionContext(
+        context = new CommandExecutionContext(
                 Mock(BlocksmithApplication),
                 new MockCommandSenderWrapper(new CommandSender())
-        ).addInput('')
+        )
+    }
+
+    def 'test that getCompletions return correct values'() {
+        given:
+        context.addInput('')
 
         when:
         def completions = node.getCompletions(context)
@@ -31,15 +36,7 @@ class NumberArgumentNodeTest extends Specification {
 
     def 'test that validateExecuteInput correctly validates #argument'() {
         given:
-        def node = new NumberArgumentNode('test', Integer, false)
-                .min(0)
-                .max(10)
-
-        and:
-        def context = new CommandExecutionContext(
-                Mock(BlocksmithApplication),
-                new MockCommandSenderWrapper(new CommandSender())
-        ).addInput(argument)
+        context.addInput(argument)
 
         when:
         node.validateExecuteInput(context)
@@ -53,15 +50,7 @@ class NumberArgumentNodeTest extends Specification {
 
     def 'test that validateExecuteInput throws for argument #argument'() {
         given:
-        def node = new NumberArgumentNode('test', Integer, false)
-                .min(0)
-                .max(10)
-
-        and:
-        def context = new CommandExecutionContext(
-                Mock(BlocksmithApplication),
-                new MockCommandSenderWrapper(new CommandSender())
-        ).addInput(argument)
+        context.addInput(argument)
 
         when:
         node.validateExecuteInput(context)
@@ -71,25 +60,17 @@ class NumberArgumentNodeTest extends Specification {
         e.message == 'error.invalid-number'
         e.arguments.toList() == [
                 Placeholder.of('argument', argument),
-                Placeholder.of('min', 0),
+                Placeholder.of('min', 1),
                 Placeholder.of('max', 10)
         ]
 
         where:
-        argument << ['-1', '11']
+        argument << ['0', '11']
     }
 
     def 'test that validateTabCompleteInput correctly validates #argument'() {
         given:
-        def node = new NumberArgumentNode('test', Integer, false)
-                .min(0)
-                .max(10)
-
-        and:
-        def context = new CommandExecutionContext(
-                Mock(BlocksmithApplication),
-                new MockCommandSenderWrapper(new CommandSender())
-        ).addInput(argument)
+        context.addInput(argument)
 
         when:
         node.validateTabCompleteInput(context)
@@ -103,15 +84,7 @@ class NumberArgumentNodeTest extends Specification {
 
     def 'test that validateTabCompleteInput throws for argument #argument'() {
         given:
-        def node = new NumberArgumentNode('test', Integer, false)
-                .min(0)
-                .max(10)
-
-        and:
-        def context = new CommandExecutionContext(
-                Mock(BlocksmithApplication),
-                new MockCommandSenderWrapper(new CommandSender())
-        ).addInput(argument)
+        context.addInput(argument)
 
         when:
         node.validateTabCompleteInput(context)
@@ -121,12 +94,12 @@ class NumberArgumentNodeTest extends Specification {
         e.message == 'error.invalid-number'
         e.arguments.toList() == [
                 Placeholder.of('argument', argument),
-                Placeholder.of('min', 0),
+                Placeholder.of('min', 1),
                 Placeholder.of('max', 10)
         ]
 
         where:
-        argument << ['-1', '11']
+        argument << ['0', '11']
     }
 
     def 'test that cast of type #type correctly casts to #expected'() {
