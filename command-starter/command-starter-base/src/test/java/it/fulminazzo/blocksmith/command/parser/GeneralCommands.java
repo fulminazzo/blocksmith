@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.parser;
 
 import it.fulminazzo.blocksmith.command.CommandSender;
 import it.fulminazzo.blocksmith.command.annotation.Command;
+import it.fulminazzo.blocksmith.command.annotation.Cooldown;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +18,7 @@ final class GeneralCommands {
     }
 
     @Command("reload plugin <async>")
+    @Cooldown(1)
     public static void reload(boolean async) {
     }
 

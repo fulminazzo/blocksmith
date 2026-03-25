@@ -10,6 +10,10 @@ import it.fulminazzo.blocksmith.command.annotation.Range
 import it.fulminazzo.blocksmith.command.node.*
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
+import spock.lang.Specification
+
+import java.time.Duration
+
 class CommandParserTest extends Specification {
 
     def 'test parseCommands returns all commands'() {
@@ -240,6 +244,7 @@ class CommandParserTest extends Specification {
                 GeneralCommands,
                 GeneralCommands.getMethod('reload', boolean)
         )
+        async.cooldown = Duration.ofSeconds(1)
 
         def plugin = new LiteralNode('plugin')
         plugin.addChild(async)
@@ -319,7 +324,7 @@ class CommandParserTest extends Specification {
         expected.addChild(member)
 
         and:
-        def parser = new CommandParser(input, commandInfo, executionInfo, 1, null)
+        def parser = new CommandParser(input, commandInfo, null, executionInfo, 1, null)
 
         when:
         def actual = parser.parse()
@@ -336,6 +341,7 @@ class CommandParserTest extends Specification {
                         '',
                         new PermissionInfo('', Permission.Grant.NONE)
                 ),
+                null,
                 new ExecutionInfo(
                         CommandParserTest,
                         CommandParserTest.getDeclaredMethod('greedy', String)
@@ -359,6 +365,7 @@ class CommandParserTest extends Specification {
                         '',
                         new PermissionInfo('', Permission.Grant.NONE)
                 ),
+                null,
                 new ExecutionInfo(
                         CommandParserTest,
                         CommandParserTest.getDeclaredMethod('promote', Object, Object, String, String)
@@ -458,6 +465,7 @@ class CommandParserTest extends Specification {
                         '',
                         new PermissionInfo('', Permission.Grant.ALL)
                 ),
+                null,
                 new ExecutionInfo(
                         CommandParserTest,
                         CommandParserTest.getDeclaredMethod('validRange', int)
@@ -483,6 +491,7 @@ class CommandParserTest extends Specification {
                         '',
                         new PermissionInfo('', Permission.Grant.ALL)
                 ),
+                null,
                 new ExecutionInfo(
                         CommandParserTest,
                         CommandParserTest.getDeclaredMethod('invalidRange', String)
@@ -567,6 +576,7 @@ class CommandParserTest extends Specification {
                         '',
                         new PermissionInfo('', Permission.Grant.ALL)
                 ),
+                null,
                 new ExecutionInfo(
                         CommandParserTest,
                         CommandParserTest.getDeclaredMethod('newMockCommandParser', String)
@@ -617,5 +627,3 @@ class CommandParserTest extends Specification {
     }
 
 }
-
-import spock.lang.Specification
