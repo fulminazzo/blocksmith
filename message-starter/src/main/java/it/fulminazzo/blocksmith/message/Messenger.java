@@ -207,7 +207,7 @@ public final class Messenger {
     public @Nullable Component getComponentOrNull(final @NotNull String messageCode,
                                                   final @NotNull Locale locale) {
         try {
-            return getMessageProvider().getMessage(messageCode, locale);
+            return getComponent(messageCode, locale);
         } catch (MessageNotFoundException e) {
             return null;
         }
