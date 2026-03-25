@@ -1,11 +1,35 @@
 package it.fulminazzo.blocksmith.message.argument.time.parser
 
 import it.fulminazzo.blocksmith.message.argument.time.node.ArgumentNode
+import it.fulminazzo.blocksmith.message.argument.time.node.LiteralNode
 import it.fulminazzo.blocksmith.structure.Pair
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 class TimeParserTest extends Specification {
+
+    def 'test that parse works'() {
+        given:
+        def parser = new TimeParser('(!%years% {year|years})[ %months% {month|months}] ' +
+                '(%days% {day|days}) this should totally be ignored[! %hours% {hours|hour}] ' +
+                '(%minutes% {minute|minutes})')
+
+        and:
+        def expected = new ArgumentNode('%unit% %name%', ArgumentNode.TimeUnit.YEARS, 'year', 'years', true)
+                .addChild(new ArgumentNode(' %unit% %name%', ArgumentNode.TimeUnit.MONTHS, 'month', 'months', false).setOptional(true))
+                .addChild(new LiteralNode(' '))
+                .addChild(new ArgumentNode('%unit% %name%', ArgumentNode.TimeUnit.DAYS, 'day', 'days', false))
+                .addChild(new LiteralNode(' this should totally be ignored'))
+                .addChild(new ArgumentNode(' %unit% %name%', ArgumentNode.TimeUnit.HOURS, 'hour', 'hours', true).setOptional(true))
+                .addChild(new LiteralNode(' '))
+                .addChild(new ArgumentNode('%unit% %name%', ArgumentNode.TimeUnit.MINUTES, 'minute', 'minutes', false))
+
+        when:
+        def actual = parser.parse()
+
+        then:
+        actual == expected
+    }
 
     def 'test that parseOptionalArgument works'() {
         given:
