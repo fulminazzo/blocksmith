@@ -115,7 +115,7 @@ public abstract class CommandRegistry {
      * @return the prefix
      */
     protected @NotNull String getPrefix() {
-        return application.getName();
+        return application.getName().toLowerCase();
     }
 
     /**
