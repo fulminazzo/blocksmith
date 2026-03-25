@@ -7,6 +7,53 @@ import spock.lang.Specification
 
 class TimeParserTest extends Specification {
 
+    def 'test that parseOptionalArgument works'() {
+        given:
+        def parser = newMockTimeParser("[${full ? '!' : ''}%years% {year|years}]")
+
+        and:
+        def expected = new ArgumentNode(
+                '%unit% %name%',
+                ArgumentNode.TimeUnit.YEARS,
+                'year',
+                'years',
+                full
+        )
+        expected.optional = true
+
+        when:
+        def actual = parser.parseOptionalArgument()
+
+        then:
+        actual == expected
+
+        where:
+        full << [true, false]
+    }
+
+    def 'test that parseShownArgument works'() {
+        given:
+        def parser = newMockTimeParser("(${full ? '!' : ''}%years% {year|years})")
+
+        and:
+        def expected = new ArgumentNode(
+                '%unit% %name%',
+                ArgumentNode.TimeUnit.YEARS,
+                'year',
+                'years',
+                full
+        )
+
+        when:
+        def actual = parser.parseShownArgument()
+
+        then:
+        actual == expected
+
+        where:
+        full << [true, false]
+    }
+
     def 'test that parseUnitPlaceholder returns #unit'() {
         given:
         def parser = newMockTimeParser("%$unit.name%")
@@ -48,5 +95,5 @@ class TimeParserTest extends Specification {
         parser.tokenizer.next()
         return parser
     }
-    
+
 }
