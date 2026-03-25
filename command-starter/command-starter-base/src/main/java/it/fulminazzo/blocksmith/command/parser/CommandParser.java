@@ -300,7 +300,7 @@ public final class CommandParser {
                     baseCommand = baseCommand.trim();
                 } else throw new NoSuchMethodException();
             } catch (NoSuchMethodException e) {
-                throw CommandParseException.of("Invalid command module '%s': required static method '%s' with return type %s was not found",
+                throw CommandParseException.of("Invalid command module '%s': required public method '%s' with return type %s was not found",
                         commandModule, methodName, Collection.class
                 );
             } catch (InvocationTargetException e) {
@@ -381,7 +381,7 @@ public final class CommandParser {
                             rawCommand = rawCommand.trim();
                         } else throw new NoSuchMethodException();
                     } catch (NoSuchMethodException e) {
-                        throw CommandParseException.of("Invalid dynamic command method %s: required static method '%s' with return type %s was not found",
+                        throw CommandParseException.of("Invalid dynamic command method %s: required public static method '%s' with return type %s was not found",
                                 method, methodName, Collection.class
                         );
                     } catch (InvocationTargetException e) {
