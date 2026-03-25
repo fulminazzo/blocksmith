@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.cooldown.CooldownManager;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
+import it.fulminazzo.blocksmith.message.argument.Time;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -182,9 +183,11 @@ public abstract class CommandNode implements TabCompletable {
         ExecutionInfo executionInfo = getExecutionInfo().orElseThrow();
         if (cooldownManager != null) {
             Object id = context.getCommandSender().getId();
-            if (cooldownManager.isOnCooldown(id))
-                throw new CommandExecutionException("error.command-on-cooldown");
-            else cooldownManager.putOnCooldown(id);
+            if (cooldownManager.isOnCooldown(id)) {
+                long time = cooldownManager.getRemainingCooldown(id);
+                throw new CommandExecutionException("error.command-on-cooldown")
+                        .arguments(Time.of("cooldown", time));
+            } else cooldownManager.putOnCooldown(id);
         }
         Method method = executionInfo.getMethod();
         try {
