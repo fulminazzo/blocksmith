@@ -34,7 +34,11 @@ public final class CooldownManager<T> {
      * @return <code>true</code> if it is
      */
     public boolean isOnCooldown(final @NotNull T entity) {
-        return lastUsage.getOrDefault(entity, 0L) > System.currentTimeMillis();
+        Long last = lastUsage.get(entity);
+        if (last == null) return false;
+        if (last > System.currentTimeMillis()) return true;
+        lastUsage.remove(entity);
+        return false;
     }
 
 }
