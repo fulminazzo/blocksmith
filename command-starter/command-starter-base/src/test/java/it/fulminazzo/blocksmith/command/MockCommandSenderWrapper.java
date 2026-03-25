@@ -27,4 +27,9 @@ public final class MockCommandSenderWrapper extends CommandSenderWrapper {
         return actualSender instanceof Player;
     }
 
+    @Override
+    public @NotNull Object getId() {
+        return getName();
+    }
+
 }

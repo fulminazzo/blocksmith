@@ -28,4 +28,9 @@ final class BukkitCommandSenderWrapper extends CommandSenderWrapper {
         return actualSender instanceof Player;
     }
 
+    @Override
+    public @NotNull Object getId() {
+        return isPlayer() ? ((Player) actualSender).getUniqueId() : getName();
+    }
+
 }

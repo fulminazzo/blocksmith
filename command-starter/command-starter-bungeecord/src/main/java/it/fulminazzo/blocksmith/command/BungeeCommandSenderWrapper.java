@@ -27,4 +27,9 @@ final class BungeeCommandSenderWrapper extends CommandSenderWrapper {
         return actualSender instanceof ProxiedPlayer;
     }
 
+    @Override
+    public @NotNull Object getId() {
+        return isPlayer() ? ((ProxiedPlayer) actualSender).getUniqueId() : getName();
+    }
+
 }
