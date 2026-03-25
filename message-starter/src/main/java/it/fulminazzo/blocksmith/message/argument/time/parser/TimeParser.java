@@ -62,10 +62,11 @@ final class TimeParser {
         Boolean full = null;
 
         TimeToken lastRead;
-        while ((lastRead = tokenizer.next()) != closeToken && lastRead != TimeToken.EOF) {
+        while ((lastRead = tokenizer.getLastToken()) != closeToken && lastRead != TimeToken.EOF) {
             if (full == null) {
                 if (lastRead == TimeToken.EXCLAMATION_MARK) {
                     full = true;
+                    tokenizer.next();
                     continue;
                 } else full = false;
             }
@@ -78,7 +79,10 @@ final class TimeParser {
             } else if (lastRead == TimeToken.OPEN_BRACE) {
                 singularAndPlural = parseSingularAndPlural();
                 text.append("%name%");
-            } else text.append(tokenizer.getLastRead());
+            } else {
+                text.append(tokenizer.getLastRead());
+                tokenizer.next();
+            }
         }
 
         if (unit == null)
