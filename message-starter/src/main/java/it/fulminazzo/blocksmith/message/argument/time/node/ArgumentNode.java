@@ -25,6 +25,14 @@ public final class ArgumentNode extends TimeNode {
     @Override
     protected @NotNull String parseSingle(final long time) {
         long actualTime = timeUnit.formatTime(time);
+        if (timeUnit != TimeUnit.YEARS) {
+            TimeUnit next = TimeUnit.values()[timeUnit.ordinal() + 1];
+            long t = next.formatTime(time);
+            if (t > 0) {
+                t *= (long) ((double) next.timeInMillis / timeUnit.timeInMillis);
+                actualTime -= t;
+            }
+        }
         if (optional && actualTime == 0) return "";
         return text
                 .replace("%unit%", String.valueOf(actualTime))
