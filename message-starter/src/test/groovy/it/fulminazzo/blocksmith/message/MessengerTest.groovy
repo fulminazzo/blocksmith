@@ -22,12 +22,21 @@ class MessengerTest extends Specification {
     private MessageProvider provider
     private Messenger messenger
 
+    private Map<String, Component> messages = [:]
+
     void setup() {
         ReceiverFactories.factories.add(new PlayerReceiverFactory())
 
         player = new Player()
 
         provider = Mock(MessageProvider)
+        provider.getMessage(_, _) >> { a ->
+            def message = messages[a[0]]
+            if (message == null) throw new MessageNotFoundException(a[0], a[1])
+            return message
+        }
+
+        messages['prefix'] = Component.text('blocksmith | ')
 
         messenger = new Messenger(log).setMessageProvider(provider)
     }
@@ -37,7 +46,7 @@ class MessengerTest extends Specification {
         def expected = Component.text('[Broadcast] [Title] Hello, world!')
 
         and:
-        provider.getMessage('message', Locale.ITALY) >> expected
+        messages['message'] = expected
 
         and:
         Player.ALL_PLAYERS.each { it.locale = Locale.ITALY }
@@ -73,7 +82,7 @@ class MessengerTest extends Specification {
         )
 
         and:
-        provider.getMessage('message', Locale.ITALY) >> expected
+        messages['message'] = expected
 
         and:
         Player.ALL_PLAYERS.each { it.locale = Locale.ITALY }
@@ -98,7 +107,7 @@ class MessengerTest extends Specification {
         def expected = '[Broadcast] [Actionbar] Hello, world!'
 
         and:
-        provider.getMessage('message', Locale.ITALY) >> Component.text(expected)
+        messages['message'] = Component.text(expected)
 
         and:
         Player.ALL_PLAYERS.each { it.locale = Locale.ITALY }
@@ -119,7 +128,7 @@ class MessengerTest extends Specification {
         def expected = '[Broadcast] Hello, world!'
 
         and:
-        provider.getMessage('message', Locale.ITALY) >> Component.text('[Broadcast] Hello, %what%!')
+        messages['message'] = Component.text('[Broadcast] Hello, %what%!')
 
         and:
         Player.ALL_PLAYERS.each { it.locale = Locale.ITALY }
@@ -140,7 +149,7 @@ class MessengerTest extends Specification {
         def expected = Component.text('[Title] Hello, world!')
 
         and:
-        provider.getMessage('message', Locale.ITALY) >> expected
+        messages['message'] = expected
 
         and:
         player.locale = Locale.ITALY
@@ -170,7 +179,7 @@ class MessengerTest extends Specification {
         def expected = '[ActionBar] Hello, world!'
 
         and:
-        provider.getMessage('message', Locale.ITALY) >> Component.text(expected)
+        messages['message'] = Component.text(expected)
 
         and:
         player.locale = Locale.ITALY
@@ -189,7 +198,7 @@ class MessengerTest extends Specification {
         def expected = 'Hello, world!'
 
         and:
-        provider.getMessage('message', Locale.ITALY) >> Component.text('Hello, %what%!')
+        messages['message'] = Component.text('Hello, %what%!')
 
         and:
         player.locale = Locale.ITALY
@@ -204,11 +213,6 @@ class MessengerTest extends Specification {
     }
 
     def 'test that sendMessage does not throw on not found'() {
-        given:
-        provider.getMessage(_, _) >> {
-            throw new MessageNotFoundException('message', Locale.default)
-        }
-
         when:
         messenger.sendMessage(player, 'message')
 
@@ -225,7 +229,7 @@ class MessengerTest extends Specification {
         messenger.getComponent(code, locale)
 
         then:
-        1 * provider.getMessage(code, locale)
+        1 * provider.getMessage(code, locale) >> Mock(Component)
     }
 
     def 'test that getMessageProvider with no provider throws'() {

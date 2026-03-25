@@ -183,13 +183,7 @@ public final class Messenger {
             ReceiverFactory factory = ReceiverFactories.get(receiver.getClass());
             Receiver rec = factory.create(receiver);
             Locale locale = rec.getLocale();
-            Component message = getComponent(messageCode, locale);
-            for (Argument argument : arguments) message = argument.apply(message);
-
-            Component prefix = getComponentOrNull("prefix", locale);
-            if (prefix == null) prefix = Component.empty();
-            message = Placeholder.of("prefix", prefix).apply(message);
-
+            Component message = getComponent(messageCode, locale, arguments);
             function.accept(rec.toAudience(), message);
         } catch (MessageNotFoundException e) {
             logger.warn(e.getMessage());
@@ -202,12 +196,14 @@ public final class Messenger {
      *
      * @param messageCode the message code
      * @param locale      the locale
+     * @param arguments   the arguments to apply to the message
      * @return the component (if found)
      */
     public @Nullable Component getComponentOrNull(final @NotNull String messageCode,
-                                                  final @NotNull Locale locale) {
+                                                  final @NotNull Locale locale,
+                                                  final Argument @NotNull ... arguments) {
         try {
-            return getMessageProvider().getMessage(messageCode, locale);
+            return getComponent(messageCode, locale, arguments);
         } catch (MessageNotFoundException e) {
             return null;
         }
@@ -219,12 +215,25 @@ public final class Messenger {
      *
      * @param messageCode the message code
      * @param locale      the locale
+     * @param arguments   the arguments to apply to the message
      * @return the component
      * @throws MessageNotFoundException in case the message code was invalid
      */
     public @NotNull Component getComponent(final @NotNull String messageCode,
-                                           final @NotNull Locale locale) throws MessageNotFoundException {
-        return getMessageProvider().getMessage(messageCode, locale);
+                                           final @NotNull Locale locale,
+                                           final Argument @NotNull ... arguments) throws MessageNotFoundException {
+        Component message = getMessageProvider().getMessage(messageCode, locale);
+        for (Argument argument : arguments)
+            message = argument.apply(new MessageParseContext(this, locale, message));
+
+        if (!messageCode.equals("prefix")) {
+            Component prefix = getComponentOrNull("prefix", locale);
+            if (prefix == null) prefix = Component.empty();
+            message = Placeholder.of("prefix", prefix)
+                    .apply(new MessageParseContext(this, locale, message));
+        }
+
+        return message;
     }
 
     /**

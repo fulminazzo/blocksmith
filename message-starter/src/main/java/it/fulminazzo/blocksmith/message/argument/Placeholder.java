@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.argument;
 
+import it.fulminazzo.blocksmith.message.MessageParseContext;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,13 @@ public class Placeholder implements Argument {
     @NotNull Component value;
 
     @Override
-    public @NotNull Component apply(final @NotNull Component component) {
-        return component.replaceText(TextReplacementConfig.builder()
+    public @NotNull Component apply(final @NotNull MessageParseContext context) {
+        Component replacement = value;
+        String code = ComponentUtils.toString(replacement);
+        Component tmp = context.getMessenger().getComponentOrNull(code, context.getLocale());
+        return context.getMessage().replaceText(TextReplacementConfig.builder()
                 .matchLiteral(placeholder)
-                .replacement(value)
+                .replacement(tmp != null ? tmp : replacement)
                 .build());
     }
 
@@ -45,7 +49,7 @@ public class Placeholder implements Argument {
     /**
      * Creates a new Placeholder.
      *
-     * @param placeholder the placeholder (without ampersands)
+     * @param placeholder the placeholder (without percentages)
      * @param value       the value to replace
      * @return the placeholder
      */
@@ -57,7 +61,7 @@ public class Placeholder implements Argument {
     /**
      * Creates a new Placeholder.
      *
-     * @param placeholder the placeholder (without ampersands)
+     * @param placeholder the placeholder (without percentages)
      * @param value       the value to replace
      * @return the placeholder
      */
@@ -69,13 +73,23 @@ public class Placeholder implements Argument {
     /**
      * Creates a new Placeholder.
      *
-     * @param placeholder the placeholder (without ampersands)
+     * @param placeholder the placeholder (without percentages)
      * @param value       the value to replace
      * @return the placeholder
      */
     public static @NotNull Placeholder of(final @NotNull String placeholder,
                                           final @NotNull Component value) {
-        return new Placeholder(PLACEHOLDER_START + placeholder + PLACEHOLDER_END, value);
+        return new Placeholder(formatPlaceholder(placeholder), value);
+    }
+
+    /**
+     * Formats the given string with the expected placeholders format.
+     *
+     * @param placeholder the placeholder
+     * @return the format
+     */
+    public static @NotNull String formatPlaceholder(final @NotNull String placeholder) {
+        return PLACEHOLDER_START + placeholder + PLACEHOLDER_END;
     }
 
 }
