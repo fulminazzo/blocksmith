@@ -31,7 +31,7 @@ class TimeParserTest extends Specification {
         full << [true, false]
     }
 
-    def 'test that parseShownArgument works'() {
+    def 'test that parseAlwaysShownArgument works'() {
         given:
         def parser = newMockTimeParser("(${full ? '!' : ''}%years% {year|years})")
 
@@ -45,7 +45,7 @@ class TimeParserTest extends Specification {
         )
 
         when:
-        def actual = parser.parseShownArgument()
+        def actual = parser.parseAlwaysShownArgument()
 
         then:
         actual == expected

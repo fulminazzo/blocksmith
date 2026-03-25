@@ -38,11 +38,11 @@ final class TimeParser {
     }
 
     /**
-     * SHOWN_ARGUMENT := ( GENERAL_ARGUMENT )
+     * ALWAYS_SHOWN_ARGUMENT := ( GENERAL_ARGUMENT )
      *
      * @return the node
      */
-    @NotNull TimeNode parseShownArgument() {
+    @NotNull TimeNode parseAlwaysShownArgument() {
         consume(TimeToken.OPEN_PHARENTHESIS);
         ArgumentNode node = parseGeneralArgument(TimeToken.CLOSE_PARENTHESIS);
         consume(TimeToken.CLOSE_PARENTHESIS);
