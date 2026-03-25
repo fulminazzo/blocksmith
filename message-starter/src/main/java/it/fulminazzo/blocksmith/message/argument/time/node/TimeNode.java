@@ -21,10 +21,12 @@ public abstract class TimeNode {
      * Adds a new child to the children tree.
      *
      * @param child the child
+     * @return this object (for method chaining)
      */
-    public void addChild(final @NotNull TimeNode child) {
+    public @NotNull TimeNode addChild(final @NotNull TimeNode child) {
         if (this.child == null) this.child = child;
         else this.child.addChild(child);
+        return this;
     }
 
     /**
