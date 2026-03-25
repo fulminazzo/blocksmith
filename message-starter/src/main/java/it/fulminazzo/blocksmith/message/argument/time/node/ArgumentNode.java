@@ -27,7 +27,7 @@ public final class ArgumentNode extends TimeNode {
         long actualTime = timeUnit.formatTime(time);
         if (optional && actualTime == 0) return "";
         return text
-                .replace("%" + timeUnit.getName() + "%", String.valueOf(actualTime))
+                .replace("%unit%", String.valueOf(actualTime))
                 .replace("%name%", actualTime == 1 ? singular : plural);
     }
 
