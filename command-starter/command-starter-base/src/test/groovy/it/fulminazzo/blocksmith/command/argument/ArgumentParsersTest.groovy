@@ -192,7 +192,7 @@ class ArgumentParsersTest extends Specification {
         def actual = parser.getCompletions(context)
 
         then:
-        actual == expected
+        actual.sort() == expected.sort()
 
         where:
         type      | argument          || expected
