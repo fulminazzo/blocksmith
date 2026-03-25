@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.argument.time.parser;
 
+import it.fulminazzo.blocksmith.structure.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
@@ -16,6 +17,22 @@ final class TimeParser {
     TimeParser(final @NotNull String timeFormat) {
         this.timeFormat = timeFormat;
         this.tokenizer = new TimeTokenizer(timeFormat);
+    }
+
+    /**
+     * SINGULAR_AND_PLURAL := { {@link TimeToken#TEXT} \| {@link TimeToken#TEXT} }
+     *
+     * @return the parsed singular and plurals
+     */
+    @NotNull Pair<String, String> parseSingularAndPlural() {
+        consume(TimeToken.OPEN_BRACE);
+        String singular = tokenizer.getLastRead();
+        consume(TimeToken.TEXT);
+        consume(TimeToken.PIPE);
+        String plural = tokenizer.getLastRead();
+        consume(TimeToken.TEXT);
+        consume(TimeToken.CLOSE_BRACE);
+        return Pair.of(singular, plural);
     }
 
     /**
