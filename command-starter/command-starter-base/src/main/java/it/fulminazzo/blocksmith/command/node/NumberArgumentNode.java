@@ -43,7 +43,7 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
     @Override
     protected void validateExecuteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         N parsed = getArgumentParser().parse(context);
-        if (!isInvalid(parsed))
+        if (isInvalid(parsed))
             throw new CommandExecutionException("error.invalid-number")
                     .arguments(
                             Placeholder.of("argument", context.getCurrent()),
