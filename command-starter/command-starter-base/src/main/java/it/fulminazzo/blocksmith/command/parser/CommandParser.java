@@ -9,6 +9,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -22,6 +23,7 @@ public final class CommandParser {
     private final @NotNull String rawCommand;
     private final @NotNull CommandTokenizer tokenizer;
     private final @NotNull CommandInfo commandInfo;
+    private final @Nullable Duration cooldown;
     private final @NotNull ExecutionInfo executionInfo;
     private final @NotNull Parameter[] parameters;
 
@@ -42,18 +44,21 @@ public final class CommandParser {
      *
      * @param command        the command
      * @param commandInfo    the command info
+     * @param cooldown       the cooldown of the command
      * @param executionInfo  the execution info
      * @param parameterIndex the starting index of the parameters (excluding the command sender)
      * @param prefix         the string to prepend to the generated commands permission, if none is given
      */
     CommandParser(final @NotNull String command,
                   final @NotNull CommandInfo commandInfo,
+                  final @Nullable Duration cooldown,
                   final @NotNull ExecutionInfo executionInfo,
                   final int parameterIndex,
                   final @Nullable String prefix) {
         this.rawCommand = command;
         this.tokenizer = new CommandTokenizer(command);
         this.commandInfo = commandInfo;
+        this.cooldown = cooldown;
         this.executionInfo = executionInfo;
         this.parameters = executionInfo.getMethod().getParameters();
         this.startIndex = parameterIndex;
@@ -82,6 +87,7 @@ public final class CommandParser {
         }
         if (first == null) throw parseException("could not parse command");
         last.setExecutionInfo(executionInfo);
+        if (cooldown != null) last.setCooldown(cooldown);
 
         if (lastLiteral == null) throw parseException("at least one literal must be given to identify the command");
         else {
@@ -282,6 +288,7 @@ public final class CommandParser {
             throw CommandParseException.of("Invalid command module '%s': command cannot be empty", commandModule);
 
         CommandInfo baseCommandInfo = createCommandInfo(moduleType);
+        Duration baseCooldown = extractCooldown(moduleType);
 
         List<CommandNode> commands = new ArrayList<>();
 
@@ -296,11 +303,13 @@ public final class CommandParser {
                     rawCommand = baseCommand;
                     commandInfo.merge(baseCommandInfo);
                 } else rawCommand = baseCommand + " " + rawCommand;
+                Duration cooldown = extractCooldown(method);
+                if (cooldown == null) cooldown = baseCooldown;
 
                 ExecutionInfo executionInfo = new ExecutionInfo(commandModule, method);
                 int parameterIndex = getParameterIndex(method, senderType);
 
-                CommandParser parser = new CommandParser(rawCommand, commandInfo, executionInfo, parameterIndex, prefix);
+                CommandParser parser = new CommandParser(rawCommand, commandInfo, cooldown, executionInfo, parameterIndex, prefix);
                 CommandNode node = parser.parse();
 
                 commands.add(node);
@@ -330,10 +339,11 @@ public final class CommandParser {
                     throw CommandParseException.of("Invalid command method %s: command cannot be empty", method);
 
                 CommandInfo commandInfo = createCommandInfo(method);
+                Duration cooldown = extractCooldown(method);
                 ExecutionInfo executionInfo = new ExecutionInfo(commandsContainer, method);
                 int parameterIndex = getParameterIndex(method, senderType);
 
-                CommandParser parser = new CommandParser(rawCommand, commandInfo, executionInfo, parameterIndex, prefix);
+                CommandParser parser = new CommandParser(rawCommand, commandInfo, cooldown, executionInfo, parameterIndex, prefix);
                 CommandNode node = parser.parse();
 
                 commands.add(node);
@@ -385,6 +395,13 @@ public final class CommandParser {
         Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length > 0 && parameterTypes[0].equals(senderType)) parameterIndex++;
         return parameterIndex;
+    }
+
+    private static @Nullable Duration extractCooldown(final @NotNull AnnotatedElement element) {
+        if (element.isAnnotationPresent(Cooldown.class)) {
+            Cooldown cooldownAnnotation = element.getAnnotation(Cooldown.class);
+            return Duration.of(cooldownAnnotation.value(), cooldownAnnotation.unit().toChronoUnit());
+        } else return null;
     }
 
 }
