@@ -23,7 +23,7 @@ enum TimeToken {
     PERCENTAGE("%"),
 
     LITERAL("[A-Za-z_][A-Za-z0-9_]*", "text"),
-    ANYTHING(".+", ""),
+    ANYTHING_ELSE("[^A-Za-z0-9_*()\\[\\]{}|%]+", ""),
     EOF("");
 
     private final @NotNull String regex;
