@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.message.argument.time;
+package it.fulminazzo.blocksmith.message.argument.time.parser;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;

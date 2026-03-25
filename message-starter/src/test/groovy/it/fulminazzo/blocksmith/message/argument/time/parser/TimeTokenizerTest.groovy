@@ -1,8 +1,8 @@
-package it.fulminazzo.blocksmith.message.argument.time
+package it.fulminazzo.blocksmith.message.argument.time.parser
 
 import spock.lang.Specification
 
-import static it.fulminazzo.blocksmith.message.argument.time.TimeToken.*
+import static it.fulminazzo.blocksmith.message.argument.time.parser.TimeToken.*
 
 class TimeTokenizerTest extends Specification {
 
