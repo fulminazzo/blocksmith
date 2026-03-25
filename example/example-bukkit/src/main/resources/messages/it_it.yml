@@ -5,10 +5,11 @@ greeting:
 usage: '%prefix%<yellow>Utilizzo: <gray>%usage%'
 
 general:
-  time-format: '[<dark_red>%years% {anno|anni}</dark_red><dark_gray>, </dark_gray>][<red>%months% {mese|mesi}</red><dark_gray>, </dark_gray>][<gold>%weeks% {settimana|settimane}</gold><dark_gray>, </dark_gray>][<yellow>%days% {giorno|giorni}</yellow><dark_gray>, </dark_gray>][<green>%hours% {ora|ore}</green><dark_gray>, </dark_gray>][<aqua>%minute% {minuto|minuti}</aqua><dark_gray>, </dark_gray>](<blue>%seconds% {secondo|secondi}</blue>)'
+  time-format: '[<dark_red>%years% {anno|anni}<dark_gray>, ][<red>%months% {mese|mesi}<dark_gray>, ][<gold>%weeks% {settimana|settimane}<dark_gray>, ][<yellow>%days% {giorno|giorni}<dark_gray>, ][<green>%hours% {ora|ore}<dark_gray>, ][<aqua>%minute% {minuto|minuti}<dark_gray>, ](<blue>%seconds% {secondo|secondi})'
 
 success:
   set-locale: '%prefix%<yellow>Lingua impostata con successo su <white>%locale%'
+  last-death: '%prefix%<yellow>Tempo dall''ultima morte: %time%'
 
 error:
   not-enough-arguments: '%prefix%<red>Non hai specificato abbastanza argomenti!'

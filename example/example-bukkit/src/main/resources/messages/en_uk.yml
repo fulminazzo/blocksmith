@@ -5,10 +5,11 @@ greeting:
 usage: '%prefix%<yellow>Usage: <gray>%usage%'
 
 general:
-  time-format: '[<dark_red>%years% {year|years}</dark_red><dark_gray>, </dark_gray>][<red>%months% {month|months}</red><dark_gray>, </dark_gray>][<gold>%weeks% {week|weeks}</gold><dark_gray>, </dark_gray>][<yellow>%days% {day|days}</yellow><dark_gray>, </dark_gray>][<green>%hours% {hour|hours}</green><dark_gray>, </dark_gray>][<aqua>%minute% {minute|minutes}</aqua><dark_gray>, </dark_gray>](<blue>%seconds% {second|seconds}</blue>)'
+  time-format: '[<dark_red>%years% {year|years}<dark_gray>, ][<red>%months% {month|months}<dark_gray>, ][<gold>%weeks% {week|weeks}<dark_gray>, ][<yellow>%days% {day|days}<dark_gray>, ][<green>%hours% {hour|hours}<dark_gray>, ][<aqua>%minute% {minute|minutes}<dark_gray>, ](<blue>%seconds% {second|seconds})'
 
 success:
   set-locale: '%prefix%<yellow>Successfully updated locale to <white>%locale%'
+  last-death: '%prefix%<yellow>Time since last death: %time%'
 
 error:
   not-enough-arguments: '%prefix%<red>You did not specify enough arguments!'
