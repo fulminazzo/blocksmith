@@ -16,4 +16,6 @@ public @interface Command {
 
     @NotNull String description() default "";
 
+    boolean dynamic() default false;
+
 }
