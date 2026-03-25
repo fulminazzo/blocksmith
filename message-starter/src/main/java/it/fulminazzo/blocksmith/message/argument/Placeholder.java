@@ -77,7 +77,17 @@ public final class Placeholder implements Argument {
      */
     public static @NotNull Placeholder of(final @NotNull String placeholder,
                                           final @NotNull Component value) {
-        return new Placeholder(PLACEHOLDER_START + placeholder + PLACEHOLDER_END, value);
+        return new Placeholder(formatPlaceholder(placeholder), value);
+    }
+
+    /**
+     * Formats the given string with the expected placeholders format.
+     *
+     * @param placeholder the placeholder
+     * @return the format
+     */
+    public static @NotNull String formatPlaceholder(final @NotNull String placeholder) {
+        return PLACEHOLDER_START + placeholder + PLACEHOLDER_END;
     }
 
 }
