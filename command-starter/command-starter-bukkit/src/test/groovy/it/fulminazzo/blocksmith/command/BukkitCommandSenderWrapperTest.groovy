@@ -46,6 +46,7 @@ class BukkitCommandSenderWrapperTest extends Specification {
         given:
         def player = Mock(Player)
         player.name >> 'Alex'
+        player.uniqueId >> UUID.nameUUIDFromBytes(player.name.bytes)
 
         and:
         def wrapper = new BukkitCommandSenderWrapper(player)
@@ -59,6 +60,7 @@ class BukkitCommandSenderWrapperTest extends Specification {
         where:
         method     || expected
         'getName'  || 'Alex'
+        'getId'    || UUID.nameUUIDFromBytes('Alex'.bytes)
         'isPlayer' || true
     }
 
@@ -79,6 +81,7 @@ class BukkitCommandSenderWrapperTest extends Specification {
         where:
         method     || expected
         'getName'  || 'CONSOLE'
+        'getId'    || 'CONSOLE'
         'isPlayer' || false
     }
 

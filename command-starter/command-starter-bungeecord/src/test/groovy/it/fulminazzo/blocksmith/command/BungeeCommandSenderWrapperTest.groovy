@@ -44,6 +44,7 @@ class BungeeCommandSenderWrapperTest extends Specification {
         given:
         def player = Mock(ProxiedPlayer)
         player.name >> 'Alex'
+        player.uniqueId >> UUID.nameUUIDFromBytes(player.name.bytes)
 
         and:
         def wrapper = new BungeeCommandSenderWrapper(player)
@@ -57,6 +58,7 @@ class BungeeCommandSenderWrapperTest extends Specification {
         where:
         method     || expected
         'getName'  || 'Alex'
+        'getId'    || UUID.nameUUIDFromBytes('Alex'.bytes)
         'isPlayer' || true
     }
 
@@ -77,6 +79,7 @@ class BungeeCommandSenderWrapperTest extends Specification {
         where:
         method     || expected
         'getName'  || '(server)'
+        'getId'    || '(server)'
         'isPlayer' || false
     }
 

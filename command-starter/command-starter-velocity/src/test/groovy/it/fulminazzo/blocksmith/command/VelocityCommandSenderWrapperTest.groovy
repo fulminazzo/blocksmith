@@ -45,6 +45,7 @@ class VelocityCommandSenderWrapperTest extends Specification {
         given:
         def player = Mock(Player)
         player.username >> 'Alex'
+        player.uniqueId >> UUID.nameUUIDFromBytes(player.username.bytes)
 
         and:
         def wrapper = new VelocityCommandSenderWrapper(player)
@@ -58,6 +59,7 @@ class VelocityCommandSenderWrapperTest extends Specification {
         where:
         method     || expected
         'getName'  || 'Alex'
+        'getId'    || UUID.nameUUIDFromBytes('Alex'.bytes)
         'isPlayer' || true
     }
 
@@ -77,6 +79,7 @@ class VelocityCommandSenderWrapperTest extends Specification {
         where:
         method     || expected
         'getName'  || 'console'
+        'getId'    || 'console'
         'isPlayer' || false
     }
 
