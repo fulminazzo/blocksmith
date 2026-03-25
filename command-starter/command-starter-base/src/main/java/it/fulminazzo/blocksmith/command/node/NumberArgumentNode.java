@@ -36,14 +36,14 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
         final NumberArgumentParser<N> parser = (NumberArgumentParser<N>) getArgumentParser();
         final Function<String, N> parseFunction = parser.getParser();
         List<String> completions = super.getCompletions(context);
-        completions.removeIf(c -> isValid(parseFunction.apply(c)));
+        completions.removeIf(c -> isInvalid(parseFunction.apply(c)));
         return completions;
     }
 
     @Override
     protected void validateExecuteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         N parsed = getArgumentParser().parse(context);
-        if (isValid(parsed))
+        if (!isInvalid(parsed))
             throw new CommandExecutionException("error.invalid-number")
                     .arguments(
                             Placeholder.of("argument", context.getCurrent()),
@@ -64,7 +64,7 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
      * @param number the number
      * @return <code>true</code> if it is
      */
-    public boolean isValid(final @NotNull N number) {
+    public boolean isInvalid(final @NotNull N number) {
         double value = number.doubleValue();
         return value < min || value > max;
     }
