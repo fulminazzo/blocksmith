@@ -26,10 +26,22 @@ class CooldownManagerTest extends Specification {
         manager.isOnCooldown(target)
 
         when:
+        def remaining = manager.getRemainingCooldown(target)
+
+        then:
+        remaining < 1000
+
+        when:
         Thread.sleep(1000)
 
         then:
         !manager.isOnCooldown(target)
+
+        when:
+        manager.getRemainingCooldown(target)
+
+        then:
+        thrown(IllegalArgumentException)
     }
 
 }
