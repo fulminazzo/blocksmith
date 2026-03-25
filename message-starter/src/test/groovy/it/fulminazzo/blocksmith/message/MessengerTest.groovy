@@ -225,7 +225,7 @@ class MessengerTest extends Specification {
         messenger.getComponent(code, locale)
 
         then:
-        1 * provider.getMessage(code, locale)
+        1 * provider.getMessage(code, locale) >> Mock(Component)
     }
 
     def 'test that getMessageProvider with no provider throws'() {
