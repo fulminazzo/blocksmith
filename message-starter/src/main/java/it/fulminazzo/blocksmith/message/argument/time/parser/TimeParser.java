@@ -26,6 +26,18 @@ final class TimeParser {
     }
 
     /**
+     * Converts the given raw format to a tree of time nodes.
+     *
+     * @return the node
+     */
+    public @NotNull TimeNode parse() {
+        TimeNode timeNode = parseExpression();
+        while (tokenizer.getLastToken() != TimeToken.EOF)
+            timeNode.addChild(parseExpression());
+        return timeNode;
+    }
+
+    /**
      * EXPRESSION := OPTIONAL_ARGUMENT | ALWAYS_SHOWN_ARGUMENT | {@link TimeToken#TEXT}
      *
      * @return the node
