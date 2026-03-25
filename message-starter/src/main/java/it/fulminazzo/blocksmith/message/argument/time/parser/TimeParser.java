@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.message.argument.time.parser;
 
 import it.fulminazzo.blocksmith.message.argument.time.node.ArgumentNode;
+import it.fulminazzo.blocksmith.message.argument.time.node.LiteralNode;
 import it.fulminazzo.blocksmith.message.argument.time.node.TimeNode;
 import it.fulminazzo.blocksmith.structure.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +23,19 @@ final class TimeParser {
     TimeParser(final @NotNull String timeFormat) {
         this.timeFormat = timeFormat;
         this.tokenizer = new TimeTokenizer(timeFormat);
+    }
+
+    /**
+     * EXPRESSION := OPTIONAL_ARGUMENT | ALWAYS_SHOWN_ARGUMENT | {@link TimeToken#TEXT}
+     *
+     * @return the node
+     */
+    @NotNull TimeNode parseExpression() {
+        switch (tokenizer.getLastToken()) {
+            case OPEN_BRACKET: return parseOptionalArgument();
+            case OPEN_PHARENTHESIS: return parseAlwaysShownArgument();
+            default: return new LiteralNode(tokenizer.getLastRead());
+        }
     }
 
     /**
