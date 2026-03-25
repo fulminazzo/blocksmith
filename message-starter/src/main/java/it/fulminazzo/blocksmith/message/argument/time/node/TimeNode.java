@@ -18,6 +18,16 @@ public abstract class TimeNode {
     private @Nullable TimeNode child;
 
     /**
+     * Adds a new child to the children tree.
+     *
+     * @param child the child
+     */
+    public void addChild(final @NotNull TimeNode child) {
+        if (this.child == null) this.child = child;
+        else this.child.addChild(child);
+    }
+
+    /**
      * Parses the given time into this time format.
      *
      * @param time the time (in milliseconds)
