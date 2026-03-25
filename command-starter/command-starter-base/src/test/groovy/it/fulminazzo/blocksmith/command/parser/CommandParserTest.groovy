@@ -205,6 +205,51 @@ class CommandParserTest extends Specification {
         actual.sort { getCommandName(it) } == expected.sort { getCommandName(it) }
     }
 
+    def 'test parseCommands of dynamic command'() {
+        given:
+        def executor = new DynamicClanCommand()
+        def expected = []
+        def baseAliases = ['clan', 'team', 'gang']
+
+        and:
+        def clan = new LiteralNode(*baseAliases)
+        clan.executionInfo = new ExecutionInfo(
+                executor,
+                ClanCommand.getMethod('execute', CommandSender)
+        )
+        clan.commandInfo = new CommandInfo(
+                'command.description.clan',
+                new PermissionInfo('clan', Permission.Grant.OP)
+        )
+        expected.add(clan)
+
+        and:
+        def verbose = new ArgumentNode('verbose', boolean, false)
+        verbose.executionInfo = new ExecutionInfo(
+                executor,
+                ClanCommand.getMethod('help', CommandSender, boolean)
+        )
+        def help = new LiteralNode('help')
+        help.commandInfo = new CommandInfo(
+                'command.description.clan.help',
+                new PermissionInfo('clan.help', Permission.Grant.ALL)
+        )
+        help.addChild(verbose)
+        clan = new LiteralNode(*baseAliases)
+        clan.commandInfo = new CommandInfo(
+                'command.description.clan',
+                new PermissionInfo('clan', Permission.Grant.OP)
+        )
+        clan.addChild(help)
+        expected.add(clan)
+
+        when:
+        def actual = CommandParser.parseCommands(executor, CommandSender, null)
+
+        then:
+        actual.sort { getCommandName(it) } == expected.sort { getCommandName(it) }
+    }
+
     def 'test parseCommands throws with #type'() {
         when:
         CommandParser.parseCommands(type.getConstructor().newInstance(), CommandSender, null)
