@@ -40,7 +40,7 @@ public abstract class CommandNode implements TabCompletable {
      * @param cooldown the cooldown
      */
     public void setCooldown(final @NotNull Duration cooldown) {
-        cooldownManager = new  CooldownManager<>(cooldown);
+        cooldownManager = new CooldownManager<>(cooldown);
     }
 
     /**
@@ -180,6 +180,12 @@ public abstract class CommandNode implements TabCompletable {
 
     private void internalExecute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         ExecutionInfo executionInfo = getExecutionInfo().orElseThrow();
+        if (cooldownManager != null) {
+            Object id = context.getCommandSender().getId();
+            if (cooldownManager.isOnCooldown(id))
+                throw new CommandExecutionException("error.command-on-cooldown");
+            else cooldownManager.putOnCooldown(id);
+        }
         Method method = executionInfo.getMethod();
         try {
             LinkedList<Object> arguments = context.getArguments();
