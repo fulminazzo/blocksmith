@@ -23,9 +23,12 @@ public final class Placeholder implements Argument {
 
     @Override
     public @NotNull Component apply(final @NotNull MessageParseContext context) {
+        Component replacement = value;
+        String code = ComponentUtils.toString(replacement);
+        Component tmp = context.getMessenger().getComponentOrNull(code, context.getLocale());
         return context.getMessage().replaceText(TextReplacementConfig.builder()
                 .matchLiteral(placeholder)
-                .replacement(value)
+                .replacement(tmp != null ? tmp : replacement)
                 .build());
     }
 
