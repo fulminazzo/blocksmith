@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.TabCompletable;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
+import it.fulminazzo.blocksmith.cooldown.CooldownManager;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.EqualsAndHashCode;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,6 +30,18 @@ public abstract class CommandNode implements TabCompletable {
     private final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
     @Setter
     private @Nullable ExecutionInfo executionInfo;
+    private @Nullable CooldownManager<Object> cooldownManager;
+
+    /**
+     * Sets an execution cooldown for the current node.
+     * <br>
+     * <b>WARNING</b>: only works if {@link #executionInfo} is defined.
+     *
+     * @param cooldown the cooldown
+     */
+    public void setCooldown(final @NotNull Duration cooldown) {
+        cooldownManager = new  CooldownManager<>(cooldown);
+    }
 
     /**
      * Gets the first child.
