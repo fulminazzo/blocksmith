@@ -4,6 +4,9 @@ greeting:
   - '%prefix%<yellow>Come stai oggi?'
 usage: '%prefix%<yellow>Utilizzo: <gray>%usage%'
 
+general:
+  time-format: '[<dark_red>%years% {anno|anni}</dark_red><dark_gray>, </dark_gray>][<red>%months% {mese|mesi}</red><dark_gray>, </dark_gray>][<gold>%weeks% {settimana|settimane}</gold><dark_gray>, </dark_gray>][<yellow>%days% {giorno|giorni}</yellow><dark_gray>, </dark_gray>][<green>%hours% {ora|ore}</green><dark_gray>, </dark_gray>][<aqua>%minute% {minuto|minuti}</aqua><dark_gray>, </dark_gray>](<blue>%seconds% {secondo|secondi}</blue>)'
+
 success:
   set-locale: '%prefix%<yellow>Lingua impostata con successo su <white>%locale%'
 
