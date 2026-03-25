@@ -82,11 +82,13 @@ final class BukkitCommandRegistry extends CommandRegistry {
         Set<String> childrenPermissions = getChildrenPermissions(node);
         Permission permission = new BukkitPermission(permissionInfo, childrenPermissions);
         Permission previous = pluginManager.getPermission(permission.getName());
-        if (previous != null) {
-            pluginManager.removePermission(previous);
-            previousPermissions.put(permission.getName(), previous);
+        if (!(previous instanceof BukkitPermission)) {
+            if (previous != null) {
+                pluginManager.removePermission(previous);
+                previousPermissions.put(permission.getName(), previous);
+            }
+            pluginManager.addPermission(permission);
         }
-        pluginManager.addPermission(permission);
         return permission;
     }
 
