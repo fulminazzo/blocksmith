@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.stream.Stream;
 
 /**
- * The type Time parser.
+ * A parser for time formats.
  */
-final class TimeParser {
+public final class TimeParser {
     private final @NotNull String timeFormat;
     private final @NotNull TimeTokenizer tokenizer;
 
@@ -20,7 +20,7 @@ final class TimeParser {
      *
      * @param timeFormat the time format
      */
-    TimeParser(final @NotNull String timeFormat) {
+    public TimeParser(final @NotNull String timeFormat) {
         this.timeFormat = timeFormat;
         this.tokenizer = new TimeTokenizer(timeFormat);
     }
