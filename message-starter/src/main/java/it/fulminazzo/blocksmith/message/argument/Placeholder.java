@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.argument;
 
+import it.fulminazzo.blocksmith.message.MessageParseContext;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,8 @@ public final class Placeholder implements Argument {
     private final @NotNull Component value;
 
     @Override
-    public @NotNull Component apply(final @NotNull Component component) {
-        return component.replaceText(TextReplacementConfig.builder()
+    public @NotNull Component apply(final @NotNull MessageParseContext context) {
+        return context.getMessage().replaceText(TextReplacementConfig.builder()
                 .matchLiteral(placeholder)
                 .replacement(value)
                 .build());

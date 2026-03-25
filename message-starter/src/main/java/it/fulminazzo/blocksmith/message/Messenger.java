@@ -223,12 +223,14 @@ public final class Messenger {
                                            final @NotNull Locale locale,
                                            final Argument @NotNull ... arguments) throws MessageNotFoundException {
         Component message = getMessageProvider().getMessage(messageCode, locale);
-        for (Argument argument : arguments) message = argument.apply(message);
+        for (Argument argument : arguments)
+            message = argument.apply(new MessageParseContext(this, locale, message));
 
         if (!messageCode.equals("prefix")) {
             Component prefix = getComponentOrNull("prefix", locale);
             if (prefix == null) prefix = Component.empty();
-            message = Placeholder.of("prefix", prefix).apply(message);
+            message = Placeholder.of("prefix", prefix)
+                    .apply(new MessageParseContext(this, locale, message));
         }
 
         return message;
