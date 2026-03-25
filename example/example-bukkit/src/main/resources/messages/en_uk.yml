@@ -5,7 +5,7 @@ greeting:
 usage: '%prefix%<yellow>Usage: <gray>%usage%'
 
 general:
-  time-format: '[<dark_red>%years% {year|years}<dark_gray>, ][<red>%months% {month|months}<dark_gray>, ][<gold>%weeks% {week|weeks}<dark_gray>, ][<yellow>%days% {day|days}<dark_gray>, ][<green>%hours% {hour|hours}<dark_gray>, ][<aqua>%minute% {minute|minutes}<dark_gray>, ](<blue>%seconds% {second|seconds})'
+  time-format: '[<dark_red>%years% {year|years}<dark_gray>, ][<red>%months% {month|months}<dark_gray>, ][<gold>%weeks% {week|weeks}<dark_gray>, ][<yellow>%days% {day|days}<dark_gray>, ][<green>%hours% {hour|hours}<dark_gray>, ][<aqua>%minutes% {minute|minutes}<dark_gray>, ](<blue>%seconds% {second|seconds})'
 
 success:
   set-locale: '%prefix%<yellow>Successfully updated locale to <white>%locale%'
