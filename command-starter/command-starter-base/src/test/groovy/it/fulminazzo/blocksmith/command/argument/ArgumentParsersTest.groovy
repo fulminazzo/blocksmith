@@ -8,6 +8,8 @@ import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
+import java.util.concurrent.TimeUnit
+
 class ArgumentParsersTest extends Specification {
 
     def 'test that parse of parser for #type returns #expected with #argument'() {
@@ -97,6 +99,14 @@ class ArgumentParsersTest extends Specification {
         Character | 'a'               || 'a' as Character
         // STRING
         String    | 'Hello, world!'   || 'Hello, world!'
+        // ENUM
+        TimeUnit  | 'nanoseconds'     || TimeUnit.NANOSECONDS
+        TimeUnit  | 'Microseconds'    || TimeUnit.MICROSECONDS
+        TimeUnit  | 'MILLISECONDS'    || TimeUnit.MILLISECONDS
+        TimeUnit  | 'secondS'         || TimeUnit.SECONDS
+        TimeUnit  | 'MiNuTeS'         || TimeUnit.MINUTES
+        TimeUnit  | 'HOURs'           || TimeUnit.HOURS
+        TimeUnit  | 'DayS'            || TimeUnit.DAYS
     }
 
     def 'test that parse of parser for #type throws exception with #expected message with #argument'() {
@@ -163,6 +173,10 @@ class ArgumentParsersTest extends Specification {
         // CHARACTER WRAPPER
         Character | ''        || 'error.invalid-character'
         Character | 'ab'      || 'error.invalid-character'
+        // ENUM
+        TimeUnit  | 'day'     || 'error.invalid-enum'
+        TimeUnit  | 'weeks'   || 'error.invalid-enum'
+        TimeUnit  | 'months'  || 'error.invalid-enum'
     }
 
     def 'test that completions of parser for #type return #expected with #argument'() {
@@ -280,6 +294,11 @@ class ArgumentParsersTest extends Specification {
         Character | 'ab'              || []
         // STRING
         String    | ''                || ['<%name%>']
+        // ENUM
+        TimeUnit  | ''                || TimeUnit.values().collect { it.toString().toLowerCase() }
+        TimeUnit  | 'n'               || TimeUnit.values().collect { it.toString().toLowerCase() }
+        TimeUnit  | 'nanoseconds'     || TimeUnit.values().collect { it.toString().toLowerCase() }
+        TimeUnit  | 'NANOSECONDS'     || TimeUnit.values().collect { it.toString().toLowerCase() }
     }
 
     private CommandExecutionContext prepareContext(final @NotNull String argument) {
