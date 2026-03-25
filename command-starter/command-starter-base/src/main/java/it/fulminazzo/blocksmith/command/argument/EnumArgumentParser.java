@@ -38,7 +38,7 @@ final class EnumArgumentParser<E extends Enum<E>> implements ArgumentParser<E> {
         final String rawArgument = context.getCurrent();
         return values.stream()
                 .filter(v -> v.name().equalsIgnoreCase(rawArgument))
-                .findFirst().orElseThrow(() -> new CommandExecutionException("error.invalid-enum")
+                .findFirst().orElseThrow(() -> new CommandExecutionException("error.enum-not-found")
                         .arguments(
                                 Placeholder.of("argument", rawArgument),
                                 Placeholder.of("name", enumTypeName)

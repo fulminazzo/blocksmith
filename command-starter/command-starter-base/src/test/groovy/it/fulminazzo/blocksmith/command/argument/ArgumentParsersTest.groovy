@@ -174,9 +174,9 @@ class ArgumentParsersTest extends Specification {
         Character | ''        || 'error.invalid-character'
         Character | 'ab'      || 'error.invalid-character'
         // ENUM
-        TimeUnit  | 'day'     || 'error.invalid-enum'
-        TimeUnit  | 'weeks'   || 'error.invalid-enum'
-        TimeUnit  | 'months'  || 'error.invalid-enum'
+        TimeUnit  | 'day'     || 'error.enum-not-found'
+        TimeUnit  | 'weeks'   || 'error.enum-not-found'
+        TimeUnit  | 'months'  || 'error.enum-not-found'
     }
 
     def 'test that completions of parser for #type return #expected with #argument'() {
