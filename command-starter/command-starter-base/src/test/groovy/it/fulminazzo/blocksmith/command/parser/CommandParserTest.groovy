@@ -2,11 +2,7 @@
 package it.fulminazzo.blocksmith.command.parser
 
 import it.fulminazzo.blocksmith.command.CommandSender
-import it.fulminazzo.blocksmith.command.annotation.Command
-import it.fulminazzo.blocksmith.command.annotation.Default
-import it.fulminazzo.blocksmith.command.annotation.Greedy
-import it.fulminazzo.blocksmith.command.annotation.Permission
-import it.fulminazzo.blocksmith.command.annotation.Range
+import it.fulminazzo.blocksmith.command.annotation.*
 import it.fulminazzo.blocksmith.command.node.*
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
@@ -268,6 +264,33 @@ class CommandParserTest extends Specification {
 
         then:
         actual.sort { getCommandName(it) } == expected.sort { getCommandName(it) }
+    }
+
+    def 'test parseAnonymousCommands of dynamic commands'() {
+        given:
+        def help = new LiteralNode('help', '?')
+        help.commandInfo = new CommandInfo(
+                'command.description.help',
+                new PermissionInfo(
+                        'help',
+                        Permission.Grant.OP,
+                        true
+                ),
+                true
+        )
+        help.executionInfo = new ExecutionInfo(
+                DynamicGeneralCommands,
+                DynamicGeneralCommands.getMethod('help', CommandSender)
+        )
+
+        and:
+        def expected = [help]
+
+        when:
+        def actual = CommandParser.parseCommands(DynamicGeneralCommands, CommandSender, null)
+
+        then:
+        actual == expected
     }
 
     def 'test that parseAnonymousCommands throws for not given command method'() {
