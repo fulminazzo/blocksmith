@@ -1,39 +1,32 @@
 package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.ApplicationHandle;
-import it.fulminazzo.blocksmith.command.annotation.Permission.Grant;
-import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
-import it.fulminazzo.blocksmith.command.node.PermissionInfo;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
-import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link CommandRegistry} for Bukkit platforms.
  */
-class BukkitCommandRegistry extends CommandRegistry {
+final class BukkitCommandRegistry extends CommandRegistry {
     private final @NotNull Server server;
 
     private final @NotNull SimpleCommandMap commandMap;
     private final @NotNull Map<String, Command> knownCommands;
     private final @NotNull Map<String, Command> previousCommands = new ConcurrentHashMap<>();
 
-    private final @NotNull PluginManager pluginManager;
-    private final @NotNull Map<String, Permission> previousPermissions = new ConcurrentHashMap<>();
+    private final @NotNull BukkitPermissionRegistry permissionRegistry;
 
     /**
      * Instantiates a new Bukkit command registry.
@@ -51,7 +44,7 @@ class BukkitCommandRegistry extends CommandRegistry {
         this.commandMap = reflect.get();
         this.knownCommands = reflect.field("knownCommands").get();
 
-        this.pluginManager = server.getPluginManager();
+        this.permissionRegistry = new BukkitPermissionRegistry(application);
     }
 
     @Override
@@ -77,47 +70,8 @@ class BukkitCommandRegistry extends CommandRegistry {
      */
     protected void actualRegister(final @NonNull String commandName, final @NonNull LiteralNode command) {
         BukkitCommand cmd = new BukkitCommand(commandName, command);
-        cmd.setPermission(registerPermission(command).getName());
+        cmd.setPermission(permissionRegistry.registerPermission(command).getName());
         commandMap.register(commandName, getPrefix(), cmd);
-    }
-
-    /**
-     * Registers a new bukkit Permission for the given node.
-     *
-     * @param node the node
-     * @return the registered permission
-     */
-    @NotNull Permission registerPermission(final @NotNull LiteralNode node) {
-        PermissionInfo permissionInfo = node.getCommandInfo().orElseThrow().getPermission();
-        Set<String> childrenPermissions = getChildrenPermissions(node);
-        Permission permission = new BukkitPermission(permissionInfo, childrenPermissions);
-        Permission previous = pluginManager.getPermission(permission.getName());
-        if (!(previous instanceof BukkitPermission)) {
-            if (previous != null) {
-                pluginManager.removePermission(previous);
-                previousPermissions.put(permission.getName(), previous);
-            }
-            pluginManager.addPermission(permission);
-        }
-        return permission;
-    }
-
-    /**
-     * Gets the children permissions of the given node.
-     *
-     * @param node the node
-     * @return the permissions
-     */
-    @NotNull Set<String> getChildrenPermissions(final @NotNull CommandNode node) {
-        Set<String> permissions = new HashSet<>();
-        for (CommandNode child : node.getChildren()) {
-            if (child instanceof LiteralNode) {
-                Permission permission = registerPermission((LiteralNode) child);
-                permissions.add(permission.getName());
-            }
-            permissions.addAll(getChildrenPermissions(child));
-        }
-        return permissions;
     }
 
     @Override
@@ -131,31 +85,8 @@ class BukkitCommandRegistry extends CommandRegistry {
         updateCommands();
     }
 
-    /**
-     * Unregisters the given permission.
-     *
-     * @param command the command
-     */
-    void unregisterPermission(final @NotNull Command command) {
-        String permission = command.getPermission();
-        if (permission != null) unregisterPermission(pluginManager.getPermission(permission));
-    }
-
-    /**
-     * Unregisters the given permission.
-     *
-     * @param permission the permission
-     */
-    void unregisterPermission(final @Nullable Permission permission) {
-        if (permission == null) return;
-        String name = permission.getName();
-        Permission perm = pluginManager.getPermission(name);
-        if (!(perm instanceof BukkitPermission)) return;
-        pluginManager.removePermission(perm);
-        Permission previous = previousPermissions.remove(name);
-        if (previous != null) pluginManager.addPermission(previous);
-        for (String child : permission.getChildren().keySet())
-            unregisterPermission(pluginManager.getPermission(child));
+    private void unregisterPermission(final @NotNull Command command) {
+        permissionRegistry.unregisterPermission(command.getPermission());
     }
 
     private void removeOrRestoreCommand(final @NotNull String alias) {
@@ -173,10 +104,7 @@ class BukkitCommandRegistry extends CommandRegistry {
         return CommandSender.class;
     }
 
-    /**
-     * Updates the commands for the online players.
-     */
-    protected void updateCommands() {
+    private void updateCommands() {
         try {
             Method syncCommands = server.getClass().getDeclaredMethod("syncCommands");
             syncCommands.setAccessible(true);
@@ -221,45 +149,6 @@ class BukkitCommandRegistry extends CommandRegistry {
                                                  final @NonNull String alias,
                                                  final @NonNull String[] args) throws IllegalArgumentException {
             return BukkitCommandRegistry.this.tabComplete(command, sender, alias, args);
-        }
-
-    }
-
-    /**
-     * The type Bukkit permission.
-     */
-    static final class BukkitPermission extends Permission {
-
-        /**
-         * Instantiates a new Bukkit permission.
-         *
-         * @param permissionInfo the permission info
-         * @param children       the children
-         */
-        public BukkitPermission(final @NotNull PermissionInfo permissionInfo,
-                                final @NotNull Collection<String> children) {
-            super(
-                    permissionInfo.getPermission(),
-                    getPermissionDefault(permissionInfo.getGrant()),
-                    children.stream().collect(Collectors.toMap(k -> k, k -> true))
-            );
-        }
-
-        /**
-         * Converts a {@link Grant} to a bukkit {@link PermissionDefault}.
-         *
-         * @param grant the grant
-         * @return the permission default
-         */
-        static @NotNull PermissionDefault getPermissionDefault(final @NotNull Grant grant) {
-            switch (grant) {
-                case ALL:
-                    return PermissionDefault.TRUE;
-                case NONE:
-                    return PermissionDefault.FALSE;
-                default:
-                    return PermissionDefault.OP;
-            }
         }
 
     }
