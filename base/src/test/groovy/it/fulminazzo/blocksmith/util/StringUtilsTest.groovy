@@ -12,31 +12,35 @@ class StringUtilsTest extends Specification {
         actual == expected
 
         where:
-        string            | regex  | quotes     || expected
-        'a,b,c'           | ','    | []         || ['a', 'b', 'c']
-        'hello world'     | ' '    | []         || ['hello', 'world']
-        'one'             | ','    | []         || ['one']
-        ''                | ','    | []         || ['']
-        'a,,b'            | ','    | []         || ['a', '', 'b']
+        string                          | regex  | quotes     || expected
+        'a,b,c'                         | ','    | []         || ['a', 'b', 'c']
+        'hello world'                   | ' '    | []         || ['hello', 'world']
+        'one'                           | ','    | []         || ['one']
+        ''                              | ','    | []         || ['']
+        'a,,b'                          | ','    | []         || ['a', '', 'b']
 
-        'a1b2c'           | '\\d'  | []         || ['a', 'b', 'c']
-        'a1b2c3'           | '\\d'  | []         || ['a', 'b', 'c', '']
-        'one  two'        | '\\s+' | []         || ['one', 'two']
+        'a1b2c'                         | '\\d'  | []         || ['a', 'b', 'c']
+        'a1b2c3'                        | '\\d'  | []         || ['a', 'b', 'c', '']
+        'one  two'                      | '\\s+' | []         || ['one', 'two']
 
-        '"a,b",c'         | ','    | ['"']      || ['"a,b"', 'c']
-        "'a,b',c"         | ','    | ["'"]      || ["'a,b'", 'c']
-        '"a,b","c,d"'     | ','    | ['"']      || ['"a,b"', '"c,d"']
+        '"a,b",c'                       | ','    | ['"']      || ['"a,b"', 'c']
+        '"a,b",c"'                      | ','    | ['"']      || ['"a,b"', 'c"']
+        "'a,b',c"                       | ','    | ["'"]      || ["'a,b'", 'c']
+        '"a,b","c,d"'                   | ','    | ['"']      || ['"a,b"', '"c,d"']
+        '"a,b","c,d'                    | ','    | ['"']      || ['"a,b"', '"c,d']
 
-        '"a,b",\'c,d\',e' | ','    | ['"', "'"] || ['"a,b"', "'c,d'", 'e']
+        '"a,b",\'c,d\',e'               | ','    | ['"', "'"] || ['"a,b"', "'c,d'", 'e']
 
-        '"a,b,c'          | ','    | ['"']      || ['"a', 'b', 'c']
+        'first "and \"second\"" third' || ' '    | ['"']      || ['first', '"and \"second\""', 'third']
 
-        'nodivision'      | ','    | ['"']      || ['nodivision']
+        '"a,b,c'                        | ','    | ['"']      || ['"a,b,c']
 
-        'a,b,c'           | ','    | []         || ['a', 'b', 'c']
+        'nodivision'                    | ','    | ['"']      || ['nodivision']
 
-        ',a,b'            | ','    | []         || ['', 'a', 'b']
-        'a,b,'            | ','    | []         || ['a', 'b', '']
+        'a,b,c'                         | ','    | []         || ['a', 'b', 'c']
+
+        ',a,b'                          | ','    | []         || ['', 'a', 'b']
+        'a,b,'                          | ','    | []         || ['a', 'b', '']
     }
 
 }
