@@ -30,6 +30,17 @@ public class ArgumentNode<T> extends CommandNode {
     private boolean greedy;
 
     /**
+     * Sets the current node to greedy.
+     *
+     * @param greedy if <code>true</code>, will take all the remaining input
+     * @return this object (for method chaining)
+     */
+    public @NotNull ArgumentNode<T> setGreedy(final boolean greedy) {
+        this.greedy = greedy;
+        return this;
+    }
+
+    /**
      * Gets the default value (if given).
      *
      * @param context the current context of action
