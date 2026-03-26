@@ -81,14 +81,14 @@ class BukkitCommandRegistryTest extends Specification {
         and:
         def helpPermission = pluginManager.getPermission('help')
         helpPermission != previousPermission
-        (helpPermission instanceof BukkitCommandRegistry.BukkitPermission)
+        (helpPermission instanceof BukkitPermissionRegistry.BukkitPermission)
         helpPermission.name == 'help'
         helpPermission.default == PermissionDefault.TRUE
         helpPermission.children.keySet().toList() == ['help.plugin']
 
         and:
         def helpPluginPermission = pluginManager.getPermission('help.plugin')
-        (helpPluginPermission instanceof BukkitCommandRegistry.BukkitPermission)
+        (helpPluginPermission instanceof BukkitPermissionRegistry.BukkitPermission)
         helpPluginPermission.name == 'help.plugin'
         helpPluginPermission.default == PermissionDefault.OP
         helpPluginPermission.children.keySet().toList() == []
@@ -101,7 +101,7 @@ class BukkitCommandRegistryTest extends Specification {
         previousCommands['?'] == previousCommand
 
         and:
-        def previousPermissions = registry.previousPermissions
+        def previousPermissions = registry.permissionRegistry.previousPermissions
         previousPermissions.size() == 1
 
         and:
@@ -119,7 +119,7 @@ class BukkitCommandRegistryTest extends Specification {
                 'help',
                 PermissionDefault.TRUE
         )
-        registry.previousPermissions['help'] = previousPermission
+        registry.permissionRegistry.previousPermissions['help'] = previousPermission
 
         and:
         def node = new LiteralNode('help', '?', 'showhelp', 'displayhelp')
@@ -139,7 +139,7 @@ class BukkitCommandRegistryTest extends Specification {
 
         and:
         def pluginManager = Bukkit.server.pluginManager
-        pluginManager.addPermission(new BukkitCommandRegistry.BukkitPermission(
+        pluginManager.addPermission(new BukkitPermissionRegistry.BukkitPermission(
                 new PermissionInfo('help', Permission.Grant.ALL),
                 ['help.plugin']
         ))
@@ -172,7 +172,7 @@ class BukkitCommandRegistryTest extends Specification {
         previousCommands.isEmpty()
 
         and:
-        def previousPermissions = registry.previousPermissions
+        def previousPermissions = registry.permissionRegistry.previousPermissions
         previousPermissions.isEmpty()
     }
 
