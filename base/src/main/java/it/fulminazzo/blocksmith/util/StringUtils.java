@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -22,7 +23,7 @@ public final class StringUtils {
      *               Supports regular expressions
      * @return the strings
      */
-    public static @NotNull List<String> split(final @NotNull String string,
+    public static @NotNull List<String> split(final @Nullable String string,
                                               final @NotNull String regex,
                                               final String @NotNull ... quotes) {
         return split(string, regex, true, quotes);
@@ -40,10 +41,11 @@ public final class StringUtils {
      *               Supports regular expressions
      * @return the strings
      */
-    public static @NotNull List<String> split(final @NotNull String string,
+    public static @NotNull List<String> split(final @Nullable String string,
                                               final @NotNull String regex,
                                               final boolean quoted,
                                               final String @NotNull ... quotes) {
+        if (string == null) return Collections.emptyList();
         if (string.isEmpty()) return Collections.singletonList("");
         final List<String> strings = new LinkedList<>();
         final Pattern pattern = Pattern.compile(regex + "$");

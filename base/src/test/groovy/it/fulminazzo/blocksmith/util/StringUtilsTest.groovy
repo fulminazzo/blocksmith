@@ -21,6 +21,8 @@ class StringUtilsTest extends Specification {
         'one'                              | ','    | false  | []         || ['one']
         ''                                 | ','    | true   | []         || ['']
         ''                                 | ','    | false  | []         || ['']
+        null                               | ','    | true   | []         || []
+        null                               | ','    | false  | []         || []
         'a,,b'                             | ','    | true   | []         || ['a', '', 'b']
         'a,,b'                             | ','    | false  | []         || ['a', '', 'b']
 
