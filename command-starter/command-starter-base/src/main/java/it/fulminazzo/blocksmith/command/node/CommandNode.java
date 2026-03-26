@@ -111,6 +111,17 @@ public abstract class CommandNode implements TabCompletable {
     }
 
     /**
+     * Adds several children to this node.
+     *
+     * @param children the children
+     * @return this object (for method chaining)
+     */
+    public @NotNull CommandNode addChildren(final @NotNull Collection<CommandNode> children) {
+        children.forEach(this::addChild);
+        return this;
+    }
+
+    /**
      * If this node contains execution information, it represents the end of a command route.
      * As such, it should be executable with the parsed arguments so far.
      *
