@@ -2,12 +2,14 @@ package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
+import it.fulminazzo.blocksmith.cooldown.CooldownManager;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joor.Reflect;
 
 import java.util.*;
 
@@ -32,6 +34,22 @@ public final class LiteralNode extends CommandNode {
         this.name = literals[0].trim().toLowerCase();
         this.aliases = new HashSet<>();
         for (String literal : literals) this.aliases.add(literal.trim().toLowerCase());
+    }
+
+    /**
+     * Creates a clone of the current node, with the given literals.
+     *
+     * @param literals the new literals
+     * @return the clone
+     */
+    public @NotNull LiteralNode clone(final String @NotNull ... literals) {
+        LiteralNode clone = new LiteralNode(literals);
+        getChildren().forEach(clone::addChild);
+        getExecutionInfo().ifPresent(clone::setExecutionInfo);
+        getCommandInfo().ifPresent(clone::setCommandInfo);
+        CooldownManager<Object> cooldown = Reflect.on(this).get("cooldownManager");
+        if (cooldown != null) clone.setCooldown(Reflect.on(cooldown).get("cooldown"));
+        return clone;
     }
 
     /**
