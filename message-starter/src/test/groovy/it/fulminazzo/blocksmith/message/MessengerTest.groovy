@@ -27,7 +27,7 @@ class MessengerTest extends Specification {
     void setup() {
         ReceiverFactories.factories.add(new PlayerReceiverFactory())
 
-        player = new Player()
+        player = new Player('Luke')
 
         provider = Mock(MessageProvider)
         provider.getMessage(_, _) >> { a ->
@@ -56,6 +56,8 @@ class MessengerTest extends Specification {
 
         then:
         for (def player : Player.ALL_PLAYERS) {
+            println player
+
             def lastTitle = player.lastTitle
 
             assert lastTitle[TitlePart.TITLE] == expected
@@ -92,6 +94,8 @@ class MessengerTest extends Specification {
 
         then:
         for (def player : Player.ALL_PLAYERS) {
+            println player
+
             def lastTitle = player.lastTitle
 
             assert lastTitle[TitlePart.TITLE] == expected
@@ -118,6 +122,7 @@ class MessengerTest extends Specification {
         then:
         for (def player : Player.ALL_PLAYERS) {
             def lastMessage = player.lastMessage
+            println player
             assert lastMessage != null
             assert ComponentUtils.toString(lastMessage) == expected
         }
@@ -139,6 +144,7 @@ class MessengerTest extends Specification {
         then:
         for (def player : Player.ALL_PLAYERS) {
             def lastMessage = player.lastMessage
+            println player
             assert lastMessage != null
             assert ComponentUtils.toString(lastMessage) == expected
         }
