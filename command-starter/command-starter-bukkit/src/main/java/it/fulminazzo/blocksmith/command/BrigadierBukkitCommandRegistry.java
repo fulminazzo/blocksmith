@@ -75,6 +75,12 @@ final class BrigadierBukkitCommandRegistry<S> extends BrigadierCommandRegistry<S
     }
 
     @Override
+    protected void unregister(final @NotNull String commandName) {
+        LiteralNode command = Reflect.on(this).field("commands").call("remove", commandName).get();
+        if (command != null) command.getAliases().forEach(this::onUnregister);
+    }
+
+    @Override
     protected void onUnregister(final @NotNull String commandName) {
         if (!commandName.startsWith(getBukkitPrefix())) {
             Permission permission = registeredPermissions.remove(commandName);
