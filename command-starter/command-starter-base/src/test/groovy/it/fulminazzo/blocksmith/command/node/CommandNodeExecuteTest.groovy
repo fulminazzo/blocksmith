@@ -2,14 +2,12 @@
 package it.fulminazzo.blocksmith.command.node
 
 import it.fulminazzo.blocksmith.ApplicationHandle
-import it.fulminazzo.blocksmith.command.CommandSender
-import it.fulminazzo.blocksmith.command.CommandSenderWrapper
-import it.fulminazzo.blocksmith.command.ConsoleCommandSender
-import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
-import it.fulminazzo.blocksmith.command.Player
+import it.fulminazzo.blocksmith.command.*
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
 import it.fulminazzo.blocksmith.message.argument.Time
+import it.fulminazzo.blocksmith.message.util.ComponentUtils
+import jakarta.validation.constraints.Pattern
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
@@ -177,6 +175,33 @@ class CommandNodeExecuteTest extends Specification {
 
         and:
         printer == 'Hello, Alex!'
+    }
+
+    def 'test that execute throws CommandExecuteException on invalid parameter'() {
+        given:
+        def say = new LiteralNode('say', 'yell')
+
+        def greeting = new ArgumentNode('greeting', String, false)
+        say.addChild(greeting)
+
+        def who = new ArgumentNode('who', String, true)
+        who.executionInfo = new ExecutionInfo(
+                this,
+                CommandNodeExecuteTest.getMethod('checkedExecute', String, String)
+        )
+        greeting.addChild(who)
+
+        and:
+        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
+                .addInput('say', 'hello', '!@#$%^&*()_+')
+
+        when:
+        say.execute(context)
+
+        then:
+        def e = thrown(CommandExecutionException)
+        e.message == 'error.invalid-name'
+        ComponentUtils.toString(e.arguments[0].value) == '!@#$%^&*()_+'
     }
 
     def 'test that execute throws on unknown command'() {
@@ -415,6 +440,14 @@ class CommandNodeExecuteTest extends Specification {
 
     static void execute(final @NotNull String greeting,
                         final @NotNull String who) {
+        printer = "$greeting, $who!"
+    }
+
+    void checkedExecute(final @NotNull String greeting,
+                        final @NotNull @Pattern(
+                                regexp = '^[A-Za-z]+$',
+                                message = 'error.invalid-name'
+                        ) String who) {
         printer = "$greeting, $who!"
     }
 
