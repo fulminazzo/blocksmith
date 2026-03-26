@@ -27,6 +27,7 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
 
     private final @NotNull RootCommandNode<S> cachedRoot;
 
+    private final @NotNull Map<String, LiteralNode> registeredCommands = new ConcurrentHashMap<>();
     private final @NotNull Map<String, CommandNode<S>> previousBrigadierNodes = new ConcurrentHashMap<>();
 
     /**
@@ -55,6 +56,7 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
 
         LiteralCommandNode<S> brigadierNode = parser.parse(command);
         injectIntoBrigadier(commandName, brigadierNode);
+        registeredCommands.put(commandName, command);
 
         for (String alias : command.getAliases()) {
             if (alias.equals(commandName)) continue;
@@ -85,10 +87,15 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
         }
 
         removeChild(commandName);
-        CommandNode<S> previous = previousBrigadierNodes.remove(commandName);
+        LiteralNode command = registeredCommands.remove(commandName);
+        if (command != null)
+            command.getAliases().stream()
+                    .filter(a -> !a.equals(commandName))
+                    .forEach(this::unregister);
 
         super.onUnregister(commandName);
 
+        CommandNode<S> previous = previousBrigadierNodes.remove(commandName);
         if (previous != null) {
             removeChild(commandName);
             getRoot().addChild(previous);
@@ -124,7 +131,8 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
         if (liveDispatcher.isPresent()) {
             try {
                 return ((CommandDispatcher<S>) liveDispatcher.get()).getRoot();
-            } catch (ClassCastException ignored) {}
+            } catch (ClassCastException ignored) {
+            }
         }
         return cachedRoot;
     }
