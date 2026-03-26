@@ -31,7 +31,7 @@ public abstract class CommandRegistry {
      * @param commandModules the command modules
      * @return this object (for method chaining)
      */
-    public final @NotNull CommandRegistry insert(final Object @NotNull ... commandModules) {
+    public @NotNull CommandRegistry insert(final Object @NotNull ... commandModules) {
         if (state != State.REGISTERED)
             throw new IllegalStateException(String.format("This method is only available after registration. " +
                     "Please call %s#commit() before using it", getClass().getSimpleName()));
@@ -59,7 +59,7 @@ public abstract class CommandRegistry {
      * @param commandModules the command modules
      * @return this object (for method chaining)
      */
-    public final @NotNull CommandRegistry register(final Object @NotNull ... commandModules) {
+    public @NotNull CommandRegistry register(final Object @NotNull ... commandModules) {
         if (state == State.REGISTERED)
             throw new IllegalStateException("It is not possible to register new commands at this time. Please register all commands before committing");
         state = State.REGISTERING;
@@ -83,7 +83,7 @@ public abstract class CommandRegistry {
      *
      * @return this object (for method chaining)
      */
-    public final @NotNull CommandRegistry commit() {
+    public @NotNull CommandRegistry commit() {
         if (state == State.REGISTERED)
             throw new IllegalStateException("Commands have already been registered");
         else if (state != State.REGISTERING)
@@ -101,7 +101,7 @@ public abstract class CommandRegistry {
     /**
      * Unregisters all the commands.
      */
-    public final void unregisterAll() {
+    public void unregisterAll() {
         if (state != State.REGISTERED)
             throw new IllegalStateException(String.format("Commands have not been registered yet. " +
                     "Did you forget to call %s#commit()?", getClass().getSimpleName()));
@@ -123,7 +123,7 @@ public abstract class CommandRegistry {
      *
      * @param commandName the command name
      */
-    protected final void unregister(final @NotNull String commandName) {
+    protected void unregister(final @NotNull String commandName) {
         if (commands.remove(commandName) != null) onUnregister(commandName);
     }
 
