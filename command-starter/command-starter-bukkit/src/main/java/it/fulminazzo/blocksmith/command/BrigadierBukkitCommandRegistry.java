@@ -1,20 +1,30 @@
 package it.fulminazzo.blocksmith.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import com.mojang.brigadier.tree.RootCommandNode;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
-import org.jspecify.annotations.NonNull;
+
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Special implementation of {@link CommandRegistry} for Bukkit platforms with extended support for Brigadier.
+ *
+ * @param <S> the type parameter
  */
-final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
-    private final @NotNull BrigadierParser<S> parser = new BrigadierParser<>(this);
-    private final @NotNull CommandDispatcher<S> commandDispatcher;
+final class BrigadierBukkitCommandRegistry<S> extends BrigadierCommandRegistry<S> {
+    private final @NotNull Server server;
+    private final @NotNull RootCommandNode<S> root;
+
+    private final @NotNull Map<String, CommandNode<S>> previousNodes = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new Bukkit command registry.
@@ -26,20 +36,60 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
     public BrigadierBukkitCommandRegistry(final @NotNull ApplicationHandle application,
                                           final @NotNull Object commandDispatcher) {
         super(application);
-        this.commandDispatcher = (CommandDispatcher<S>) commandDispatcher;
+        server = (Server) application.getServer();
+        root = ((CommandDispatcher<S>) commandDispatcher).getRoot();
     }
 
     @Override
     protected @NotNull CommandSenderWrapper wrapSender(@NotNull Object executor) {
         if (!(executor instanceof CommandSender))
             executor = Reflect.on(executor).call("getBukkitSender").get();
-        return super.wrapSender(executor);
+        return new BukkitCommandSenderWrapper((CommandSender) executor);
     }
 
     @Override
-    protected void actualRegister(final @NonNull String commandName, final @NonNull LiteralNode command) {
-        LiteralCommandNode<S> commandNode = parser.parse(command);
-        commandDispatcher.getRoot().addChild(commandNode);
+    protected void onRegister(final @NotNull String commandName,
+                              final @NotNull LiteralNode command,
+                              final @NotNull LiteralCommandNode<S> brigadierCommand) {
+        CommandNode<S> previous = root.getChild(commandName);
+        if (previous != null) {
+            previousNodes.put(commandName, previous);
+            getChildren().remove(commandName);
+            getLiterals().remove(commandName);
+        }
+        root.addChild(brigadierCommand);
+        updateCommands();
+    }
+
+    @Override
+    protected void onUnregister(final @NotNull String commandName) {
+        getChildren().remove(commandName);
+        getLiterals().remove(commandName);
+        CommandNode<S> previous = previousNodes.remove(commandName);
+        if (previous != null) root.addChild(previous);
+        updateCommands();
+    }
+
+    @Override
+    protected @NotNull Class<?> getSenderType() {
+        return CommandSender.class;
+    }
+
+    private @NotNull Map<String, CommandNode<S>> getChildren() {
+        return Reflect.on(root).field("children").get();
+    }
+
+    private @NotNull Map<String, CommandNode<S>> getLiterals() {
+        return Reflect.on(root).field("literals").get();
+    }
+
+    private void updateCommands() {
+        try {
+            Method syncCommands = server.getClass().getDeclaredMethod("syncCommands");
+            syncCommands.setAccessible(true);
+            syncCommands.invoke(server);
+        } catch (Exception ignored) {
+        }
     }
 
 }
