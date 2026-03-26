@@ -70,7 +70,12 @@ public final class StringUtils {
                     start = start.substring(current.length());
                     String tmp = start;
                     for (; i < chars.length; i++) {
-                        tmp += chars[i];
+                        c = chars[i];
+                        if (c == '\\') {
+                            tmp += chars[++i];
+                            continue;
+                        }
+                        tmp += c;
                         if (tmp.endsWith(start)) {
                             if (!quoted) tmp = tmp.substring(start.length(), tmp.length() - start.length());
                             break;
