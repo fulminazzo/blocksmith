@@ -45,11 +45,6 @@ public final class LiteralNode extends CommandNode {
     }
 
     @Override
-    public @NotNull LiteralNode addChildren(final @NotNull Collection<CommandNode> children) {
-        return (LiteralNode) super.addChildren(children);
-    }
-
-    @Override
     public @NotNull LiteralNode merge(final @NotNull CommandNode node) {
         if (node instanceof LiteralNode) {
             LiteralNode literalNode = (LiteralNode) node;

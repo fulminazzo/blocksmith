@@ -9,7 +9,6 @@ import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,12 +53,6 @@ public class ArgumentNode<T> extends CommandNode {
 
     private @Nullable T parseArgument(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         return getArgumentParser().parse(context);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public @NotNull ArgumentNode<T> addChildren(final @NotNull Collection<CommandNode> children) {
-        return (ArgumentNode<T>) super.addChildren(children);
     }
 
     @Override
