@@ -8,6 +8,10 @@ import it.fulminazzo.blocksmith.cooldown.CooldownManager;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.argument.Time;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.executable.ExecutableValidator;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +31,14 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode
 @ToString
 public abstract class CommandNode implements TabCompletable {
+    private static final ExecutableValidator validator;
+
+    static {
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator().forExecutables();
+        }
+    }
+
     @Getter
     private final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
     @Setter
@@ -203,7 +215,10 @@ public abstract class CommandNode implements TabCompletable {
                             : "error.console-cannot-execute"
                     );
             }
-            method.invoke(executionInfo.getExecutor(), arguments.toArray());
+            Object executor = executionInfo.getExecutor();
+            Object[] parameterValues = arguments.toArray();
+            validateParameters(executor, method, parameterValues);
+            method.invoke(executor, parameterValues);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
             throw new CommandExecutionException("error.internal-error", cause)
@@ -213,6 +228,18 @@ public abstract class CommandNode implements TabCompletable {
                     method.getDeclaringClass().getCanonicalName(),
                     ReflectionUtils.methodToString(method)
             ));
+        }
+    }
+
+    private static void validateParameters(final @NotNull Object executor,
+                                           final @NotNull Method method,
+                                           final @NotNull Object[] parameterValues) throws CommandExecutionException {
+        Set<ConstraintViolation<Object>> violations = validator.validateParameters(executor, method, parameterValues);
+        Optional<ConstraintViolation<Object>> first = violations.stream().findFirst();
+        if (first.isPresent()) {
+            ConstraintViolation<Object> violation = first.get();
+            throw new CommandExecutionException(violation.getMessage())
+                    .arguments(Placeholder.of("argument", violation.getInvalidValue()));
         }
     }
 
