@@ -19,6 +19,11 @@ import java.util.Map;
 public final class ArgumentTypes {
     private static final @NotNull Map<Class<?>, ArgumentType<?>> types = new HashMap<>();
 
+    static {
+        register(Boolean.class, BoolArgumentType.bool());
+        register(String.class, StringArgumentType.string());
+    }
+
     /**
      * Attempts to get an ArgumentType from the given node.
      * Throws {@link IllegalArgumentException} if no type is found.
