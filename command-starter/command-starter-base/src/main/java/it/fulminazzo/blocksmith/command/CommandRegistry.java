@@ -135,10 +135,10 @@ public abstract class CommandRegistry {
      * @param commandName the command name
      * @param arguments   the arguments to pass as input
      */
-    protected final void execute(final @NotNull LiteralNode command,
-                                 final @NotNull Object executor,
-                                 final @NotNull String commandName,
-                                 final String @NotNull ... arguments) {
+    protected void execute(final @NotNull LiteralNode command,
+                           final @NotNull Object executor,
+                           final @NotNull String commandName,
+                           final String @NotNull ... arguments) {
         try {
             CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
             command.execute(context);
