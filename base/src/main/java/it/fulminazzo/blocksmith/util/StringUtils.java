@@ -25,6 +25,25 @@ public final class StringUtils {
     public static @NotNull List<String> split(final @NotNull String string,
                                               final @NotNull String regex,
                                               final String @NotNull ... quotes) {
+        return split(string, regex, true, quotes);
+    }
+
+    /**
+     * Divides the given string into multiple substrings, based on the provided regular expression.
+     *
+     * @param string the string
+     * @param regex  the expression to use for splitting
+     * @param quoted if <code>true</code>, the found quotes will be prepended and appended to the results (if present)
+     * @param quotes if any of these "quotes" are met during splitting,
+     *               if the expression is found before the same quote is met,
+     *               the string will not be split (useful for splitting quoted arguments).
+     *               Supports regular expressions
+     * @return the strings
+     */
+    public static @NotNull List<String> split(final @NotNull String string,
+                                              final @NotNull String regex,
+                                              final boolean quoted,
+                                              final String @NotNull ... quotes) {
         if (string.isEmpty()) return Collections.singletonList("");
         final List<String> strings = new LinkedList<>();
         final Pattern pattern = Pattern.compile(regex + "$");
@@ -49,11 +68,15 @@ public final class StringUtils {
                         }
                     }
                     start = start.substring(current.length());
-                    current += start;
+                    String tmp = start;
                     for (; i < chars.length; i++) {
-                        current += chars[i];
-                        if (current.endsWith(start)) break;
+                        tmp += chars[i];
+                        if (tmp.endsWith(start)) {
+                            if (!quoted) tmp = tmp.substring(start.length(), tmp.length() - start.length());
+                            break;
+                        }
                     }
+                    current += tmp;
                     continue main;
                 }
             }
