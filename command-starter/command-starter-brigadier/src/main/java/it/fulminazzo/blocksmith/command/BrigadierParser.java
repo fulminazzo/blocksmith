@@ -1,13 +1,96 @@
 package it.fulminazzo.blocksmith.command;
 
 import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
+import it.fulminazzo.blocksmith.command.node.CommandNode;
+import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.node.NumberArgumentNode;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A parser for converting Blocksmith commands into Brigadiers.
+ *
+ * @param <S> the type of the command sender (for Brigadier)
+ */
+@RequiredArgsConstructor
 @SuppressWarnings("unchecked")
-final class BrigadierParser {
+final class BrigadierParser<S> {
+
+    /**
+     * Converts the given Blocksmith command node to a Brigadier command node.
+     *
+     * @param node the blocksmith command node
+     * @return the brigadier command node
+     */
+    public @NotNull com.mojang.brigadier.tree.CommandNode<S> parse(final @NotNull CommandNode node) {
+        return parseChildren(LiteralArgumentBuilder.literal(node.getName()), node).build();
+    }
+
+    /**
+     * Appends all the children of the node to the given builder.
+     *
+     * @param builder the brigadier builder
+     * @param node    the blocksmith node
+     * @return the brigadier builder itself
+     */
+    @NotNull ArgumentBuilder<S, ?> parseChildren(final @NotNull ArgumentBuilder<S, ?> builder,
+                                                 final @NotNull CommandNode node) {
+        node.getChildren().forEach(n -> parseChild(builder, n));
+        return builder;
+    }
+
+    /**
+     * Appends to the given builder the node (converted to a Brigadier command node).
+     *
+     * @param builder the brigadier builder
+     * @param node    the blocksmith node
+     */
+    void parseChild(final @NotNull ArgumentBuilder<S, ?> builder,
+                    final @NotNull CommandNode node) {
+        if (node instanceof LiteralNode) parseChild(builder, (LiteralNode) node);
+        else parseChild(builder, (ArgumentNode<?>) node);
+    }
+
+    /**
+     * Appends to the given builder the literal node (converted to a Brigadier command node).
+     *
+     * @param builder the brigadier builder
+     * @param node    the blocksmith node
+     */
+    void parseChild(final @NotNull ArgumentBuilder<S, ?> builder,
+                    final @NotNull LiteralNode node) {
+        node.getAliases().forEach(a ->
+                //TODO: execute
+                builder.then(parseChildren(LiteralArgumentBuilder.literal(a), node))
+        );
+    }
+
+    /**
+     * Appends to the given builder the argument node (converted to a Brigadier command node).
+     *
+     * @param <T>     the type of the derived {@link ArgumentType}
+     * @param builder the brigadier builder
+     * @param node    the blocksmith node
+     */
+    <T> void parseChild(final @NotNull ArgumentBuilder<S, ?> builder,
+                        final @NotNull ArgumentNode<?> node) {
+        ArgumentType<T> type = getArgumentType(node);
+        final RequiredArgumentBuilder<S, T> argumentBuilder;
+        if (type != null) argumentBuilder = RequiredArgumentBuilder.argument(node.getName(), type);
+        else
+            argumentBuilder = RequiredArgumentBuilder.<S, T>argument(node.getName(), (ArgumentType<T>) StringArgumentType.string())
+                    .suggests(((c, b) -> {
+                        //TODO: parse completions
+                        return b.buildFuture();
+                    }));
+        //TODO: execute
+        builder.then(parseChildren(argumentBuilder, node));
+    }
 
     /**
      * Converts the given number node to a Brigadier argument type.
