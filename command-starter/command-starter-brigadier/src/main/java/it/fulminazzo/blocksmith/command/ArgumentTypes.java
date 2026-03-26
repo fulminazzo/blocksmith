@@ -1,8 +1,8 @@
 package it.fulminazzo.blocksmith.command;
 
-import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.arguments.*;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
+import it.fulminazzo.blocksmith.command.node.NumberArgumentNode;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -14,6 +14,7 @@ import java.util.Map;
 /**
  * Holds all the default Brigadier ArgumentTypes.
  */
+@SuppressWarnings("unchecked")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ArgumentTypes {
     private static final @NotNull Map<Class<?>, ArgumentType<?>> types = new HashMap<>();
@@ -27,17 +28,37 @@ public final class ArgumentTypes {
      * @param node the argument node
      * @return the argument type
      */
-    @SuppressWarnings({"unchecked"})
     public static <T, A> @NotNull ArgumentType<T> of(final @NotNull ArgumentNode<A> node) {
         if (node.isGreedy()) return (ArgumentType<T>) StringArgumentType.greedyString();
         Class<A> type = node.getType();
         if (Enum.class.isAssignableFrom(type))
             throw new UnsupportedOperationException();
+        else if (Number.class.isAssignableFrom(type))
+            return of((NumberArgumentNode<Number>) node);
         ArgumentType<?> argumentType = types.get(ReflectionUtils.toWrapper(type));
         if (argumentType == null)
             throw new IllegalArgumentException(String.format("No default Brigadier argument type supports the type %s. " +
                     "Please provide a custom type through %s#register", type.getCanonicalName(), ArgumentTypes.class.getSimpleName()));
         return (ArgumentType<T>) argumentType;
+    }
+
+    /**
+     * Converts the given number node to a Brigadier argument type.
+     *
+     * @param <T>  the type of the argument (must be known to the client)
+     * @param <N>  the Java type
+     * @param node the node
+     * @return the argument type
+     */
+    static <T, N extends Number> @NotNull ArgumentType<T> of(final @NotNull NumberArgumentNode<N> node) {
+        Class<N> type = node.getType();
+        if (type.equals(Double.class))
+            return (ArgumentType<T>) DoubleArgumentType.doubleArg(node.getMin(), node.getMax());
+        else if (type.equals(Float.class))
+            return (ArgumentType<T>) FloatArgumentType.floatArg((float) node.getMin(), (float) node.getMax());
+        else if (type.equals(Long.class))
+            return (ArgumentType<T>) LongArgumentType.longArg((long) node.getMin(), (long) node.getMax());
+        else return (ArgumentType<T>) IntegerArgumentType.integer((int) node.getMin(), (int) node.getMax());
     }
 
     /**
