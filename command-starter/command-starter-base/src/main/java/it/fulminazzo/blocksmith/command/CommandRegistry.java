@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.parser.CommandParser;
+import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -178,9 +179,10 @@ public abstract class CommandRegistry {
         CommandSenderWrapper wrapper;
         if (executor instanceof CommandSenderWrapper) wrapper = (CommandSenderWrapper) executor;
         else wrapper = wrapSender(executor);
+        String parsedArguments = String.join(" ", arguments);
         return new CommandExecutionContext(application, wrapper)
                 .addInput(commandName)
-                .addInput(arguments);
+                .addInput(StringUtils.split(parsedArguments, " ", false, "'", "\""));
     }
 
     /**
