@@ -8,6 +8,7 @@ import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
 
@@ -22,9 +23,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 final class BrigadierBukkitCommandRegistry<S> extends BrigadierCommandRegistry<S> {
     private final @NotNull Server server;
-    private final @NotNull RootCommandNode<S> root;
 
+    private final @NotNull RootCommandNode<S> root;
     private final @NotNull Map<String, CommandNode<S>> previousNodes = new ConcurrentHashMap<>();
+
+    private final @NotNull BukkitPermissionRegistry permissionRegistry;
+    private final @NotNull Map<String, Permission> registeredPermissions = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new Bukkit command registry.
@@ -36,8 +40,11 @@ final class BrigadierBukkitCommandRegistry<S> extends BrigadierCommandRegistry<S
     public BrigadierBukkitCommandRegistry(final @NotNull ApplicationHandle application,
                                           final @NotNull Object commandDispatcher) {
         super(application);
-        server = (Server) application.getServer();
-        root = ((CommandDispatcher<S>) commandDispatcher).getRoot();
+        this.server = (Server) application.getServer();
+
+        this.root = ((CommandDispatcher<S>) commandDispatcher).getRoot();
+
+        this.permissionRegistry = new BukkitPermissionRegistry(application);
     }
 
     @Override
@@ -58,11 +65,14 @@ final class BrigadierBukkitCommandRegistry<S> extends BrigadierCommandRegistry<S
             getLiterals().remove(commandName);
         }
         root.addChild(brigadierCommand);
+        registeredPermissions.put(commandName, permissionRegistry.registerPermission(command));
         updateCommands();
     }
 
     @Override
     protected void onUnregister(final @NotNull String commandName) {
+        Permission permission = registeredPermissions.remove(commandName);
+        if (permission != null) permissionRegistry.unregisterPermission(permission);
         getChildren().remove(commandName);
         getLiterals().remove(commandName);
         CommandNode<S> previous = previousNodes.remove(commandName);
