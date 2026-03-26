@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command;
 
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
@@ -28,6 +29,7 @@ public final class ArgumentTypes {
      */
     @SuppressWarnings({"unchecked"})
     public static <T, A> @NotNull ArgumentType<T> of(final @NotNull ArgumentNode<A> node) {
+        if (node.isGreedy()) return (ArgumentType<T>) StringArgumentType.greedyString();
         Class<A> type = node.getType();
         if (Enum.class.isAssignableFrom(type))
             throw new UnsupportedOperationException();
