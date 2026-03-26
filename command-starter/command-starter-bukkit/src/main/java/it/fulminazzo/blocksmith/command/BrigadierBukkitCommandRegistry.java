@@ -6,118 +6,131 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
-import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
-import org.bukkit.permissions.Permission;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
 
-import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Special implementation of {@link CommandRegistry} for Bukkit platforms with extended support for Brigadier.
  *
- * @param <S> the type parameter
+ * @param <S> the type of the command sender (for Brigadier)
  */
-final class BrigadierBukkitCommandRegistry<S> extends BrigadierCommandRegistry<S> {
-    private final @NotNull Server server;
+@SuppressWarnings("unchecked")
+final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
+    private final @NotNull BrigadierParser<S> parser = new BrigadierParser<>(this);
 
-    private final @NotNull RootCommandNode<S> root;
-    private final @NotNull Map<String, CommandNode<S>> previousNodes = new ConcurrentHashMap<>();
+    private final @NotNull RootCommandNode<S> cachedRoot;
 
-    private final @NotNull BukkitPermissionRegistry permissionRegistry;
-    private final @NotNull Map<String, Permission> registeredPermissions = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, CommandNode<S>> previousBrigadierNodes = new ConcurrentHashMap<>();
 
     /**
-     * Instantiates a new Bukkit command registry.
+     * Instantiates a new Brigadier bukkit command registry.
      *
-     * @param application       the application that is initializing the registry
-     * @param commandDispatcher the command dispatcher to register the commands with
+     * @param application       the application
+     * @param commandDispatcher the initial command dispatcher
      */
-    @SuppressWarnings("unchecked")
     public BrigadierBukkitCommandRegistry(final @NotNull ApplicationHandle application,
                                           final @NotNull Object commandDispatcher) {
         super(application);
-        this.server = (Server) application.getServer();
-
-        this.root = ((CommandDispatcher<S>) commandDispatcher).getRoot();
-
-        this.permissionRegistry = new BukkitPermissionRegistry(application);
+        CommandDispatcher<S> brigadierDispatcher = (CommandDispatcher<S>) commandDispatcher;
+        this.cachedRoot = brigadierDispatcher.getRoot();
     }
 
     @Override
     protected @NotNull CommandSenderWrapper wrapSender(@NotNull Object executor) {
         if (!(executor instanceof CommandSender))
             executor = Reflect.on(executor).call("getBukkitSender").get();
-        return new BukkitCommandSenderWrapper((CommandSender) executor);
+        return super.wrapSender(executor);
     }
 
     @Override
-    protected void onRegister(final @NotNull String commandName,
-                              final @NotNull LiteralNode command,
-                              final @NotNull LiteralCommandNode<S> brigadierCommand) {
-        CommandNode<S> previous = root.getChild(commandName);
-        if (previous != null) {
-            previousNodes.put(commandName, previous);
-            getChildren().remove(commandName);
-            getLiterals().remove(commandName);
+    protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
+        registerInCommandMap(commandName, command);
+
+        LiteralCommandNode<S> brigadierNode = parser.parse(command);
+        injectIntoBrigadier(commandName, brigadierNode);
+
+        for (String alias : command.getAliases()) {
+            if (alias.equals(commandName)) continue;
+            LiteralCommandNode<S> aliasNode = buildAliasNode(alias, brigadierNode);
+            injectIntoBrigadier(alias, aliasNode);
         }
-        root.addChild(brigadierCommand);
+
         if (!commandName.startsWith(getBukkitPrefix())) {
-            registeredPermissions.put(commandName, permissionRegistry.registerPermission(command));
-            String prefixedCommandName = getBukkitPrefix() + commandName;
-            onRegister(prefixedCommandName, command.clone(prefixedCommandName));
+            String prefixed = getBukkitPrefix() + commandName;
+            onRegister(prefixed, command.clone(prefixed));
         }
+
         updateCommands();
     }
 
-    @Override
-    protected void unregister(final @NotNull String commandName) {
-        LiteralNode command = Reflect.on(this).field("commands").call("remove", commandName).get();
-        if (command != null) command.getAliases().forEach(this::onUnregister);
+    private @NotNull LiteralCommandNode<S> buildAliasNode(final @NotNull String alias,
+                                                          final @NotNull LiteralCommandNode<S> target) {
+        return com.mojang.brigadier.builder.LiteralArgumentBuilder
+                .<S>literal(alias)
+                .redirect(target)
+                .build();
     }
 
     @Override
     protected void onUnregister(final @NotNull String commandName) {
         if (!commandName.startsWith(getBukkitPrefix())) {
-            Permission permission = registeredPermissions.remove(commandName);
-            if (permission != null) permissionRegistry.unregisterPermission(permission);
             onUnregister(getBukkitPrefix() + commandName);
         }
-        getChildren().remove(commandName);
-        getLiterals().remove(commandName);
-        CommandNode<S> previous = previousNodes.remove(commandName);
-        if (previous != null) root.addChild(previous);
+
+        removeChild(commandName);
+        CommandNode<S> previous = previousBrigadierNodes.remove(commandName);
+
+        super.onUnregister(commandName);
+
+        if (previous != null) {
+            removeChild(commandName);
+            getRoot().addChild(previous);
+        }
+
         updateCommands();
     }
 
-    private @NonNull String getBukkitPrefix() {
-        return getPrefix() + ":";
-    }
-
-    @Override
-    protected @NotNull Class<?> getSenderType() {
-        return CommandSender.class;
-    }
-
-    private @NotNull Map<String, CommandNode<S>> getChildren() {
-        return Reflect.on(root).field("children").get();
-    }
-
-    private @NotNull Map<String, CommandNode<S>> getLiterals() {
-        return Reflect.on(root).field("literals").get();
+    private void injectIntoBrigadier(final @NotNull String name,
+                                     final @NotNull LiteralCommandNode<S> node) {
+        RootCommandNode<S> liveRoot = getRoot();
+        CommandNode<S> previous = liveRoot.getChild(name);
+        if (previous != null) {
+            previousBrigadierNodes.put(name, previous);
+            removeChild(name);
+        }
+        liveRoot.addChild(node);
     }
 
     private void updateCommands() {
-        try {
-            Method syncCommands = server.getClass().getDeclaredMethod("syncCommands");
-            syncCommands.setAccessible(true);
-            syncCommands.invoke(server);
-        } catch (Exception ignored) {
+        for (Player player : server.getOnlinePlayers())
+            player.updateCommands();
+    }
+
+    private void removeChild(final @NonNull String name) {
+        Reflect root = Reflect.on(getRoot());
+        root.field("children").call("remove", name);
+        root.field("literals").call("remove", name);
+    }
+
+    private @NotNull RootCommandNode<S> getRoot() {
+        Optional<?> liveDispatcher = NMSUtils.getCommandDispatcher(server);
+        if (liveDispatcher.isPresent()) {
+            try {
+                return ((CommandDispatcher<S>) liveDispatcher.get()).getRoot();
+            } catch (ClassCastException ignored) {}
         }
+        return cachedRoot;
+    }
+
+    private @NotNull String getBukkitPrefix() {
+        return getPrefix() + ":";
     }
 
 }
