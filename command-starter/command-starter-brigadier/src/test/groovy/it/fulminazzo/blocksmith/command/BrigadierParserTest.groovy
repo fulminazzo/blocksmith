@@ -6,12 +6,75 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import com.mojang.brigadier.tree.ArgumentCommandNode
+import com.mojang.brigadier.tree.LiteralCommandNode
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 class BrigadierParserTest extends Specification {
+
+    def 'test parse of full node'() {
+        given:
+        def delegate = Mock(CommandRegistry)
+
+        and:
+        def expectedTargets = ['player', 'receiver', 'target']
+
+        and:
+        def root = new LiteralNode('message')
+
+        def targetNode = new LiteralNode(*expectedTargets)
+        root.addChild(targetNode)
+
+        def playerNode = ArgumentNode.newNode('player', Object, false)
+        targetNode.addChild(playerNode)
+
+        playerNode.addChild(ArgumentNode.newNode('message', String, false).setGreedy(true))
+
+        and:
+        def parser = new BrigadierParser(delegate)
+
+        when:
+        def node = parser.parse(root)
+
+        then:
+        (node instanceof LiteralCommandNode)
+        node.literal == 'message'
+
+        when:
+        def targetLiterals = node.children.sort { it.name }
+
+        then:
+        targetLiterals.size() == expectedTargets.size()
+
+        and:
+        for (def i in 0..expectedTargets.size() - 1) {
+            def target = targetLiterals[i]
+            assert (target instanceof LiteralCommandNode)
+            assert target.literal == expectedTargets[i]
+
+            def children = target.children
+            assert children.size() == 1
+
+            def player = children[0]
+            assert (player instanceof ArgumentCommandNode)
+            assert player.name == 'player'
+            assert (player.type instanceof StringArgumentType)
+            assert player.type.type == StringArgumentType.StringType.QUOTABLE_PHRASE
+            assert player.customSuggestions != null
+
+            children = player.children
+            assert children.size() == 1
+
+            def message = children[0]
+            assert (message instanceof ArgumentCommandNode)
+            assert message.name == 'message'
+            assert (message.type instanceof StringArgumentType)
+            assert message.type.type == StringArgumentType.StringType.GREEDY_PHRASE
+            assert message.customSuggestions == null
+        }
+    }
 
     def 'test parseChild of known argument type'() {
         given:
@@ -35,7 +98,7 @@ class BrigadierParserTest extends Specification {
         arguments.size() == 1
 
         and:
-        def argument = arguments.first()
+        def argument = arguments[0]
         (argument instanceof ArgumentCommandNode)
         argument.name == 'argument'
         (argument.type instanceof IntegerArgumentType)
@@ -47,7 +110,7 @@ class BrigadierParserTest extends Specification {
         children.size() == 1
 
         and:
-        def child = children.first()
+        def child = children[0]
         (child instanceof ArgumentCommandNode)
         child.name == 'value'
         (child.type instanceof BoolArgumentType)
@@ -82,7 +145,7 @@ class BrigadierParserTest extends Specification {
         arguments.size() == 1
 
         and:
-        def argument = arguments.first()
+        def argument = arguments[0]
         (argument instanceof ArgumentCommandNode)
         argument.name == 'argument'
         (argument.type instanceof StringArgumentType)
@@ -111,7 +174,7 @@ class BrigadierParserTest extends Specification {
         children.size() == 1
 
         and:
-        def child = children.first()
+        def child = children[0]
         (child instanceof ArgumentCommandNode)
         child.name == 'value'
         (child.type instanceof BoolArgumentType)
