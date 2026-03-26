@@ -61,6 +61,9 @@ class StringUtilsTest extends Specification {
         ',a,b'                             | ','    | false  | []         || ['', 'a', 'b']
         'a,b,'                             | ','    | true   | []         || ['a', 'b', '']
         'a,b,'                             | ','    | false  | []         || ['a', 'b', '']
+
+        '"a\\'                             | ','    | true   | ['"']      || ['"a']
+        '"a\\'                             | ','    | false  | ['"']      || ['"a']
     }
 
 }
