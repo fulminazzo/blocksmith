@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
-import com.mojang.brigadier.tree.CommandNode;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +41,6 @@ abstract class BrigadierCommandRegistry<S> extends CommandRegistry {
      */
     protected abstract void onRegister(final @NotNull String commandName,
                                        final @NotNull LiteralNode command,
-                                       final @NotNull CommandNode<S> brigadierCommand);
+                                       final @NotNull LiteralCommandNode<S> brigadierCommand);
 
 }
