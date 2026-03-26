@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.*;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
@@ -31,21 +32,22 @@ final class BrigadierParser<S> {
      * @param node the blocksmith command node
      * @return the brigadier command node
      */
-    public @NotNull com.mojang.brigadier.tree.CommandNode<S> parse(final @NotNull LiteralNode node) {
+    public @NotNull LiteralCommandNode<S> parse(final @NotNull LiteralNode node) {
         return parseChildren(node, LiteralArgumentBuilder.literal(node.getName()), node).build();
     }
 
     /**
      * Appends all the children of the node to the given builder.
      *
+     * @param <B>     the type of the brigadier builder
      * @param root    the blocksmith node that originated the conversion
      * @param builder the brigadier builder
      * @param node    the blocksmith node
      * @return the brigadier builder itself
      */
-    @NotNull ArgumentBuilder<S, ?> parseChildren(final @NotNull LiteralNode root,
-                                                 final @NotNull ArgumentBuilder<S, ?> builder,
-                                                 final @NotNull CommandNode node) {
+    <B extends ArgumentBuilder<S, B>> @NotNull B parseChildren(final @NotNull LiteralNode root,
+                                                               final @NotNull B builder,
+                                                               final @NotNull CommandNode node) {
         node.getChildren().forEach(n -> parseChild(root, builder, n));
         return builder;
     }
