@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 /**
  * Implementation of {@link CommandRegistry} for Bukkit platforms.
  */
-final class BukkitCommandRegistry extends CommandRegistry {
-    private final @NotNull Server server;
+class BukkitCommandRegistry extends CommandRegistry {
+    protected final @NotNull Server server;
 
     private final @NotNull SimpleCommandMap commandMap;
     private final @NotNull Map<String, Command> knownCommands;
@@ -54,6 +54,18 @@ final class BukkitCommandRegistry extends CommandRegistry {
 
     @Override
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
+        registerInCommandMap(commandName, command);
+        updateCommands();
+    }
+
+    /**
+     * Registers the command in the Bukkit command map.
+     *
+     * @param commandName the command name
+     * @param command     the command
+     */
+    protected void registerInCommandMap(final @NotNull String commandName,
+                                        final @NotNull LiteralNode command) {
         command.getAliases().forEach(a -> {
             Command curr = knownCommands.remove(a);
             if (curr != null) previousCommands.put(a, curr);
@@ -61,7 +73,6 @@ final class BukkitCommandRegistry extends CommandRegistry {
         BukkitCommand cmd = new BukkitCommand(commandName, command);
         cmd.setPermission(permissionRegistry.registerPermission(command).getName());
         commandMap.register(commandName, getPrefix(), cmd);
-        updateCommands();
     }
 
     @Override
