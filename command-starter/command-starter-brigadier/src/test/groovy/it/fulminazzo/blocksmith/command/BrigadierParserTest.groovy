@@ -1,14 +1,14 @@
-package it.fulminazzo.blocksmith.command.argument
+package it.fulminazzo.blocksmith.command
 
 import com.mojang.brigadier.arguments.*
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import spock.lang.Specification
 
-class ArgumentTypesTest extends Specification {
+class BrigadierParserTest extends Specification {
 
-    def 'test that of of #node returns #expected'() {
+    def 'test that getArgumentType of #node returns #expected'() {
         when:
-        def actual = ArgumentTypes.of(node as ArgumentNode)
+        def actual = BrigadierParser.getArgumentType(node as ArgumentNode)
 
         then:
         actual.class == expected
@@ -25,6 +25,7 @@ class ArgumentTypesTest extends Specification {
         ArgumentNode.newNode('string', String, false)                  || StringArgumentType
         ArgumentNode.newNode('number', Integer, false).setGreedy(true) || StringArgumentType
         ArgumentNode.newNode('string', String, false).setGreedy(true)  || StringArgumentType
+        ArgumentNode.newNode('object', Object, false)                  || null
     }
 
 }
