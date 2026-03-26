@@ -132,7 +132,10 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
 
     @Override
     public @NotNull CommandRegistry newRegistry(final @NotNull ApplicationHandle application) {
-        return new BukkitCommandRegistry(application);
+        return NMSUtils.getCommandDispatcher((Server) application.getServer())
+                .map(d -> new BrigadierBukkitCommandRegistry<>(application, d))
+                .map(r -> (CommandRegistry) r)
+                .orElse(new BukkitCommandRegistry(application));
     }
 
 }

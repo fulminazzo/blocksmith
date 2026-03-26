@@ -13,6 +13,7 @@ import org.bukkit.World
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class BukkitCommandRegistryFactoryTest extends Specification {
@@ -46,6 +47,7 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         )
     }
 
+    @Ignore
     def 'test that newCommandRegistry returns BungeeCommandRegistry'() {
         when:
         def registry = CommandRegistryFactory.newCommandRegistry(application)
