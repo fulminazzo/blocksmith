@@ -1,12 +1,55 @@
 package it.fulminazzo.blocksmith.command
 
 import com.mojang.brigadier.arguments.*
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import com.mojang.brigadier.tree.ArgumentCommandNode
+import com.mojang.brigadier.tree.RootCommandNode
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import spock.lang.Specification
 
 class BrigadierParserTest extends Specification {
+
+    def 'test parseChild of known argument type'() {
+        given:
+        def delegate = Mock(CommandRegistry)
+        def node = ArgumentNode.newNode('argument', int, false)
+        node.addChild(ArgumentNode.newNode('value', boolean, false))
+
+        and:
+        def builder = LiteralArgumentBuilder.literal('sentinel')
+
+        and:
+        def parser = new BrigadierParser(delegate)
+
+        when:
+        parser.parseChild(new LiteralNode('sentinel'), builder, node)
+
+        and:
+        def arguments = builder.arguments
+
+        then:
+        arguments.size() == 1
+
+        and:
+        def argument = arguments.first()
+        (argument instanceof ArgumentCommandNode)
+        argument.name == 'argument'
+        (argument.type instanceof IntegerArgumentType)
+
+        when:
+        def children = argument.children
+
+        then:
+        children.size() == 1
+
+        and:
+        def child = children.first()
+        (child instanceof ArgumentCommandNode)
+        child.name == 'value'
+        (child.type instanceof BoolArgumentType)
+    }
 
     def 'test that executes calls on delegate with root node'() {
         given:
