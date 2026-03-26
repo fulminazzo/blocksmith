@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 /**
  * Implementation of {@link CommandRegistry} for Bukkit platforms.
  */
-final class BukkitCommandRegistry extends CommandRegistry {
+class BukkitCommandRegistry extends CommandRegistry {
     private final @NotNull Server server;
 
     private final @NotNull SimpleCommandMap commandMap;
@@ -65,10 +65,20 @@ final class BukkitCommandRegistry extends CommandRegistry {
             Command curr = knownCommands.remove(a);
             if (curr != null) previousCommands.put(a, curr);
         });
+        actualRegister(commandName, command);
+        updateCommands();
+    }
+
+    /**
+     * Handles actual registration of commands.
+     *
+     * @param commandName the command name
+     * @param command     the command
+     */
+    protected void actualRegister(final @NonNull String commandName, final @NonNull LiteralNode command) {
         BukkitCommand cmd = new BukkitCommand(commandName, command);
         cmd.setPermission(registerPermission(command).getName());
         commandMap.register(commandName, getPrefix(), cmd);
-        updateCommands();
     }
 
     /**
@@ -163,7 +173,10 @@ final class BukkitCommandRegistry extends CommandRegistry {
         return CommandSender.class;
     }
 
-    private void updateCommands() {
+    /**
+     * Updates the commands for the online players.
+     */
+    protected void updateCommands() {
         try {
             Method syncCommands = server.getClass().getDeclaredMethod("syncCommands");
             syncCommands.setAccessible(true);
@@ -212,6 +225,9 @@ final class BukkitCommandRegistry extends CommandRegistry {
 
     }
 
+    /**
+     * The type Bukkit permission.
+     */
     static final class BukkitPermission extends Permission {
 
         /**
