@@ -4,6 +4,8 @@ import it.fulminazzo.blocksmith.command.argument.NumberArgumentParser;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
+import lombok.Data;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.function.Function;
  *
  * @param <N> the type of the argument
  */
+@Getter
 public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> {
     private double min = -Double.MAX_VALUE;
     private double max = Double.MAX_VALUE;
