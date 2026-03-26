@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
+import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -65,19 +66,30 @@ final class BrigadierBukkitCommandRegistry<S> extends BrigadierCommandRegistry<S
             getLiterals().remove(commandName);
         }
         root.addChild(brigadierCommand);
-        registeredPermissions.put(commandName, permissionRegistry.registerPermission(command));
+        if (!commandName.startsWith(getBukkitPrefix())) {
+            registeredPermissions.put(commandName, permissionRegistry.registerPermission(command));
+            String prefixedCommandName = getBukkitPrefix() + commandName;
+            onRegister(prefixedCommandName, new LiteralNode(prefixedCommandName).addChildren(command.getChildren()));
+        }
         updateCommands();
     }
 
     @Override
     protected void onUnregister(final @NotNull String commandName) {
-        Permission permission = registeredPermissions.remove(commandName);
-        if (permission != null) permissionRegistry.unregisterPermission(permission);
+        if (!commandName.startsWith(getBukkitPrefix())) {
+            Permission permission = registeredPermissions.remove(commandName);
+            if (permission != null) permissionRegistry.unregisterPermission(permission);
+            onUnregister(getBukkitPrefix() + commandName);
+        }
         getChildren().remove(commandName);
         getLiterals().remove(commandName);
         CommandNode<S> previous = previousNodes.remove(commandName);
         if (previous != null) root.addChild(previous);
         updateCommands();
+    }
+
+    private @NonNull String getBukkitPrefix() {
+        return getPrefix() + ":";
     }
 
     @Override
