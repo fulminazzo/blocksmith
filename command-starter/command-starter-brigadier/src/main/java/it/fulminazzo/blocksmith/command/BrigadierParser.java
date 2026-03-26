@@ -100,7 +100,19 @@ final class BrigadierParser<S> {
         else
             argumentBuilder = RequiredArgumentBuilder.<S, T>argument(node.getName(), (ArgumentType<T>) StringArgumentType.string())
                     .suggests(((c, b) -> {
-                        //TODO: parse completions
+                        S source = c.getSource();
+                        String input = c.getInput();
+                        String[] split = input.split(" ");
+                        if (input.endsWith(" ")) {
+                            split = Arrays.copyOf(split, split.length + 1);
+                            split[split.length - 1] = "";
+                        }
+                        delegate.tabComplete(
+                                root,
+                                source,
+                                split[0],
+                                Arrays.copyOfRange(split, 1, split.length)
+                        ).forEach(b::suggest);
                         return b.buildFuture();
                     }));
         builder.then(parseChildren(
