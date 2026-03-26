@@ -72,7 +72,7 @@ public final class StringUtils {
                     for (; i < chars.length; i++) {
                         c = chars[i];
                         if (c == '\\') {
-                            tmp += chars[++i];
+                            if (i < chars.length - 1) tmp += chars[++i];
                             continue;
                         }
                         tmp += c;
