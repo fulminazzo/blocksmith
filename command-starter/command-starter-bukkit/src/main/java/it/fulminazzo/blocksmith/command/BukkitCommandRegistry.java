@@ -58,20 +58,10 @@ final class BukkitCommandRegistry extends CommandRegistry {
             Command curr = knownCommands.remove(a);
             if (curr != null) previousCommands.put(a, curr);
         });
-        actualRegister(commandName, command);
-        updateCommands();
-    }
-
-    /**
-     * Handles actual registration of commands.
-     *
-     * @param commandName the command name
-     * @param command     the command
-     */
-    protected void actualRegister(final @NonNull String commandName, final @NonNull LiteralNode command) {
         BukkitCommand cmd = new BukkitCommand(commandName, command);
         cmd.setPermission(permissionRegistry.registerPermission(command).getName());
         commandMap.register(commandName, getPrefix(), cmd);
+        updateCommands();
     }
 
     @Override
