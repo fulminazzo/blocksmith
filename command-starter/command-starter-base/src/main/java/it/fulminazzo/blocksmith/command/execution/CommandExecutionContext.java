@@ -8,10 +8,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents the execution context of a command.
@@ -35,7 +32,17 @@ public final class CommandExecutionContext {
      * @return this object (for method chaining)
      */
     public @NotNull CommandExecutionContext addInput(final String @NotNull ... input) {
-        this.input.addAll(Arrays.asList(input));
+        return addInput(Arrays.asList(input));
+    }
+
+    /**
+     * Adds more data to the input.
+     *
+     * @param input the input
+     * @return this object (for method chaining)
+     */
+    public @NotNull CommandExecutionContext addInput(final @NotNull Collection<String> input) {
+        this.input.addAll(input);
         return this;
     }
 
