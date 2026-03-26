@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.command
 
-
+import com.velocitypowered.api.command.BrigadierCommand
 import com.velocitypowered.api.command.CommandManager
 import com.velocitypowered.api.command.CommandMeta
 import com.velocitypowered.api.proxy.ProxyServer
@@ -60,7 +60,7 @@ class VelocityCommandRegistryTest extends Specification {
         noExceptionThrown()
 
         and:
-        1 * commandManager.register(_ as CommandMeta, _ as VelocityCommandRegistry.VelocityCommand)
+        1 * commandManager.register(_ as CommandMeta, _ as BrigadierCommand)
 
         and:
         def registeredAliases = registry.registeredAliases
