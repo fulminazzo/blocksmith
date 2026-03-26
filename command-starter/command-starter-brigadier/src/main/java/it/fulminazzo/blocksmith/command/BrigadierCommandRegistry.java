@@ -25,10 +25,7 @@ abstract class BrigadierCommandRegistry<S> extends CommandRegistry {
 
     @Override
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
-        command.getAliases().forEach(a -> {
-            LiteralNode cmd = new LiteralNode(a).addChildren(command.getChildren());
-            onRegisterSingle(a, cmd);
-        });
+        command.getAliases().forEach(a -> onRegisterSingle(a, command.clone(a)));
     }
 
     /**

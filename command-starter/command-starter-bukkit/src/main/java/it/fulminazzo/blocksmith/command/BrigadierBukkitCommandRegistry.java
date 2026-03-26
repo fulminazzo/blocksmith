@@ -69,7 +69,7 @@ final class BrigadierBukkitCommandRegistry<S> extends BrigadierCommandRegistry<S
         if (!commandName.startsWith(getBukkitPrefix())) {
             registeredPermissions.put(commandName, permissionRegistry.registerPermission(command));
             String prefixedCommandName = getBukkitPrefix() + commandName;
-            onRegister(prefixedCommandName, new LiteralNode(prefixedCommandName).addChildren(command.getChildren()));
+            onRegister(prefixedCommandName, command.clone(prefixedCommandName));
         }
         updateCommands();
     }
