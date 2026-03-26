@@ -179,10 +179,12 @@ public abstract class CommandRegistry {
         CommandSenderWrapper wrapper;
         if (executor instanceof CommandSenderWrapper) wrapper = (CommandSenderWrapper) executor;
         else wrapper = wrapSender(executor);
-        String parsedArguments = String.join(" ", arguments);
-        return new CommandExecutionContext(application, wrapper)
-                .addInput(commandName)
-                .addInput(StringUtils.split(parsedArguments, " ", false, "'", "\""));
+        CommandExecutionContext context = new CommandExecutionContext(application, wrapper).addInput(commandName);
+        if (arguments.length > 0) {
+            String fullArguments = String.join(" ", arguments);
+            context.addInput(StringUtils.split(fullArguments, " ", false, "'", "\""));
+        }
+        return context;
     }
 
     /**
