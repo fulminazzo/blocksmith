@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
-import com.mojang.brigadier.tree.LiteralCommandNode;
+import com.mojang.brigadier.tree.CommandNode;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <S> the type of the command sender (for Brigadier)
  */
 abstract class BrigadierCommandRegistry<S> extends CommandRegistry {
+    private final @NotNull BrigadierParser<S> parser = new BrigadierParser<>(this);
 
     /**
      * Instantiates a new Brigadier command registry.
@@ -24,7 +25,11 @@ abstract class BrigadierCommandRegistry<S> extends CommandRegistry {
 
     @Override
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
-        throw new UnsupportedOperationException(); //TODO: implement
+        onRegister(
+                commandName,
+                command,
+                parser.parse(command)
+        );
     }
 
     /**
@@ -36,6 +41,6 @@ abstract class BrigadierCommandRegistry<S> extends CommandRegistry {
      */
     protected abstract void onRegister(final @NotNull String commandName,
                                        final @NotNull LiteralNode command,
-                                       final @NotNull LiteralCommandNode<S> brigadierCommand);
+                                       final @NotNull CommandNode<S> brigadierCommand);
 
 }
