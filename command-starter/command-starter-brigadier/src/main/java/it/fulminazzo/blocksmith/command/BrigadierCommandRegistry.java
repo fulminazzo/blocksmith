@@ -1,0 +1,41 @@
+package it.fulminazzo.blocksmith.command;
+
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import it.fulminazzo.blocksmith.ApplicationHandle;
+import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * A special type of {@link CommandRegistry} that uses the Mojang Brigadier system
+ * to parse and register commands.
+ *
+ * @param <S> the type of the command sender (for Brigadier)
+ */
+abstract class BrigadierCommandRegistry<S> extends CommandRegistry {
+
+    /**
+     * Instantiates a new Brigadier command registry.
+     *
+     * @param application the application
+     */
+    public BrigadierCommandRegistry(final @NotNull ApplicationHandle application) {
+        super(application);
+    }
+
+    @Override
+    protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
+        throw new UnsupportedOperationException(); //TODO: implement
+    }
+
+    /**
+     * Method called upon actively registering a command.
+     *
+     * @param commandName      the command name
+     * @param command          the root of the command route
+     * @param brigadierCommand the brigadier command obtained from the blocksmith command
+     */
+    protected abstract void onRegister(final @NotNull String commandName,
+                                       final @NotNull LiteralNode command,
+                                       final @NotNull LiteralCommandNode<S> brigadierCommand);
+
+}
