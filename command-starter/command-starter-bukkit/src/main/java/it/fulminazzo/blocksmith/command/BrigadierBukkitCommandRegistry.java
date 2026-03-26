@@ -4,7 +4,9 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -25,6 +27,13 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
                                           final @NotNull Object commandDispatcher) {
         super(application);
         this.commandDispatcher = (CommandDispatcher<S>) commandDispatcher;
+    }
+
+    @Override
+    protected @NotNull CommandSenderWrapper wrapSender(@NotNull Object executor) {
+        if (!(executor instanceof CommandSender))
+            executor = Reflect.on(executor).call("getBukkitSender").get();
+        return super.wrapSender(executor);
     }
 
     @Override
