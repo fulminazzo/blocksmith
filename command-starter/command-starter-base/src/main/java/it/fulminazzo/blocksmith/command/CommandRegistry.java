@@ -164,10 +164,10 @@ public abstract class CommandRegistry {
      * @param arguments   the arguments to pass as input
      * @return the tab completions
      */
-    protected final @NotNull List<String> tabComplete(final @NotNull LiteralNode command,
-                                                      final @NotNull Object executor,
-                                                      final @NotNull String commandName,
-                                                      final String @NotNull ... arguments) {
+    protected @NotNull List<String> tabComplete(final @NotNull LiteralNode command,
+                                                final @NotNull Object executor,
+                                                final @NotNull String commandName,
+                                                final String @NotNull ... arguments) {
         CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
         return command.tabComplete(context);
     }
