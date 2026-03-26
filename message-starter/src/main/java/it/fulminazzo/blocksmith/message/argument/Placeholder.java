@@ -8,6 +8,7 @@ import lombok.Value;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents a placeholder replacement.
@@ -42,8 +43,8 @@ public class Placeholder implements Argument {
      * @return the placeholder
      */
     public static @NotNull Placeholder of(final @NotNull String placeholder,
-                                          final @NotNull Object value) {
-        return of(placeholder, ComponentUtils.toComponent(value.toString()));
+                                          final @Nullable Object value) {
+        return of(placeholder, ComponentUtils.toComponent(value == null ? "null" : value.toString()));
     }
 
     /**
@@ -54,8 +55,8 @@ public class Placeholder implements Argument {
      * @return the placeholder
      */
     public static @NotNull Placeholder of(final @NotNull Component placeholder,
-                                          final @NotNull Object value) {
-        return of(placeholder, ComponentUtils.toComponent(value.toString()));
+                                          final @Nullable Object value) {
+        return of(placeholder, ComponentUtils.toComponent(value == null ? "null" : value.toString()));
     }
 
     /**
