@@ -1,5 +1,6 @@
 dependencies {
     api(project(":message-starter:message-starter-bukkit"))
+    api(project(":command-starter:command-starter-brigadier"))
 
     compileOnly(libs.spigot)
 
