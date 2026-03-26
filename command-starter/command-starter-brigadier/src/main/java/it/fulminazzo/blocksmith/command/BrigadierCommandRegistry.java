@@ -25,11 +25,22 @@ abstract class BrigadierCommandRegistry<S> extends CommandRegistry {
 
     @Override
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
-        onRegister(
-                commandName,
-                command,
-                parser.parse(command)
-        );
+        command.getAliases().forEach(a -> {
+            LiteralNode cmd = new LiteralNode(a).addChildren(command.getChildren());
+            onRegisterSingle(a, cmd);
+        });
+    }
+
+    /**
+     * Method called upon actively registering a command.
+     * <br>
+     * <b>WARNING</b>: will NOT register the aliases!
+     *
+     * @param commandName the command name
+     * @param command     the root of the command route
+     */
+    protected void onRegisterSingle(final @NotNull String commandName, final @NotNull LiteralNode command) {
+        onRegister(commandName, command, parser.parse(command));
     }
 
     /**
