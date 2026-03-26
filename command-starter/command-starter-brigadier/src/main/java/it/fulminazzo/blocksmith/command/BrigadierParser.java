@@ -6,10 +6,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import it.fulminazzo.blocksmith.command.node.ArgumentNode;
-import it.fulminazzo.blocksmith.command.node.CommandNode;
-import it.fulminazzo.blocksmith.command.node.LiteralNode;
-import it.fulminazzo.blocksmith.command.node.NumberArgumentNode;
+import it.fulminazzo.blocksmith.command.node.*;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -79,7 +76,13 @@ final class BrigadierParser<S> {
         node.getAliases().forEach(a ->
                 builder.then(parseChildren(
                         root,
-                        LiteralArgumentBuilder.<S>literal(a).executes(executes(root)),
+                        LiteralArgumentBuilder.<S>literal(a)
+                                .requires(s -> node.getCommandInfo()
+                                        .map(CommandInfo::getPermission)
+                                        .map(p -> delegate.wrapSender(s).hasPermission(p))
+                                        .orElse(true)
+                                )
+                                .executes(executes(root)),
                         node
                 ))
         );
