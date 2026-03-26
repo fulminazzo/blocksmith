@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.command;
+package it.fulminazzo.blocksmith.command.argument;
 
 import com.mojang.brigadier.arguments.*;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
