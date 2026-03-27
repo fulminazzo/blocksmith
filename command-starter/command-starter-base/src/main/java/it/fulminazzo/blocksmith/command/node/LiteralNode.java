@@ -118,6 +118,22 @@ public final class LiteralNode extends CommandNode {
         if (!hasPermission(context))
             throw new CommandExecutionException("error.no-permission")
                     .arguments(Placeholder.of("permission", getCommandInfo().orElseThrow().getPermission().getPermission()));
+        if (requiresConfirmation() && !context.isLast()) {
+            String argument = context.peek();
+
+            final Object id = context.getCommandSender().getId();
+            final PendingActionManager.Result result;
+            if (argument.equalsIgnoreCase("confirm"))
+                result = pendingActionManager.execute(id);
+            else if (argument.equalsIgnoreCase("cancel"))
+                result = pendingActionManager.cancel(id);
+            else result = null;
+
+            if (result == PendingActionManager.Result.NOT_FOUND)
+                throw new CommandExecutionException("error.no-pending-action");
+            else if (result == PendingActionManager.Result.EXPIRED)
+                throw new CommandExecutionException("error.pending-action-expired");
+        }
     }
 
     @Override
