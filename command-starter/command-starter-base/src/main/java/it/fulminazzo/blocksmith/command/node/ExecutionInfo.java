@@ -9,6 +9,8 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.executable.ExecutableValidator;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,9 +21,10 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * The type Execution info.
+ * Contains information about the actual execution of a command.
  */
 @Value
+@Getter(AccessLevel.NONE)
 public class ExecutionInfo {
     private static final ExecutableValidator validator;
 
@@ -32,6 +35,7 @@ public class ExecutionInfo {
     }
 
     @NotNull Object executor;
+    @Getter
     @NotNull Method method;
 
     /**
@@ -42,7 +46,6 @@ public class ExecutionInfo {
      */
     public void invoke(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         final CommandSenderWrapper sender = context.getCommandSender();
-        Method method = getMethod();
         try {
             LinkedList<Object> arguments = context.getArguments();
             if (arguments.size() != method.getParameterCount()) {
@@ -55,7 +58,6 @@ public class ExecutionInfo {
                             : "error.console-cannot-execute"
                     );
             }
-            Object executor = getExecutor();
             Object[] parameterValues = arguments.toArray();
             validateParameters(executor, method, parameterValues);
             method.invoke(executor, parameterValues);
