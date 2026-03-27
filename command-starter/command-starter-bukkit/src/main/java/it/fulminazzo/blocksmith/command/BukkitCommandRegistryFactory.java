@@ -52,26 +52,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             }
 
         });
-        ArgumentParsers.register(OfflinePlayer.class, new ArgumentParser<>() {
-
-            @Override
-            public @NonNull OfflinePlayer parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-                Server server = (Server) context.getApplication().getServer();
-                String argument = context.getCurrent();
-                return Arrays.stream(server.getOfflinePlayers())
-                        .filter(p -> argument.equalsIgnoreCase(p.getName()))
-                        .findFirst()
-                        .orElseThrow(() -> new CommandExecutionException("error.player-not-found")
-                                .arguments(Placeholder.of("player", argument)));
-            }
-
-            @Override
-            public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
-                Server server = (Server) context.getApplication().getServer();
-                return Arrays.stream(server.getOfflinePlayers()).map(OfflinePlayer::getName).collect(Collectors.toList());
-            }
-
-        });
+        ArgumentParsers.register(OfflinePlayer.class, new OfflinePlayerArgumentParser());
         ArgumentParsers.register(World.class, new ArgumentParser<>() {
 
             @Override
