@@ -126,8 +126,4 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
         return cachedRoot;
     }
 
-    private @NotNull String getBukkitPrefix() {
-        return getPrefix() + ":";
-    }
-
 }
