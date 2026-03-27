@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.action.PendingActionManager;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
@@ -21,6 +22,11 @@ public final class LiteralNode extends CommandNode {
     private final @NotNull String name;
     private final @NotNull Set<String> aliases;
     private @Nullable CommandInfo commandInfo;
+
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private final @NotNull PendingActionManager<Object> pendingActionManager = new PendingActionManager<>();
+    private boolean confirmation;
 
     /**
      * Instantiates a new Literal node.
@@ -47,7 +53,28 @@ public final class LiteralNode extends CommandNode {
         getCommandInfo().ifPresent(clone::setCommandInfo);
         clone.setCooldown(getCooldown());
         clone.setAsync(getAsyncTimeout());
+        clone.setRequiresConfirmation(requiresConfirmation());
         return clone;
+    }
+
+    /**
+     * Checks if the execution of the current node tree requires confirmation.
+     *
+     * @return <code>true</code> if it does
+     */
+    public boolean requiresConfirmation() {
+        return confirmation;
+    }
+
+    /**
+     * Enables or disables confirmation for this node.
+     *
+     * @param confirmation the confirmation
+     * @return this object (for method chaining)
+     */
+    public @NotNull LiteralNode setRequiresConfirmation(final boolean confirmation) {
+        this.confirmation = confirmation;
+        return this;
     }
 
     /**
