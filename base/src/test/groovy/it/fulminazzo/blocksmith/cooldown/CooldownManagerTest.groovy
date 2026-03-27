@@ -38,6 +38,13 @@ class CooldownManagerTest extends Specification {
         !manager.isOnCooldown(target)
 
         when:
+        manager.putOnCooldown(target)
+        manager.removeFromCooldown(target)
+
+        then:
+        !manager.isOnCooldown(target)
+
+        when:
         manager.getRemainingCooldown(target)
 
         then:
