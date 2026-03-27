@@ -23,6 +23,7 @@ public final class CommandExecutionContext {
     private final @NotNull CommandRegistry registry;
     @Getter
     private final @NotNull CommandSenderWrapper commandSender;
+    @Getter
     private final @NotNull List<String> input = new ArrayList<>();
     @Getter
     private final @NotNull LinkedList<Object> arguments = new LinkedList<>();
