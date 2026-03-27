@@ -1,4 +1,6 @@
 //file:noinspection unused
+//file:noinspection GrDeprecatedAPIUsage
+//file:noinspection GrMethodMayBeStatic
 package it.fulminazzo.blocksmith.command.parser
 
 import it.fulminazzo.blocksmith.command.CommandSender
@@ -31,7 +33,7 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         and:
-        def name = new ArgumentNode('name', String, true)
+        def name = ArgumentNode.newNode('name', String, true)
         name.defaultValue = 'self'
         name.executionInfo = new ExecutionInfo(
                 executor,
@@ -52,7 +54,7 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         and:
-        def verbose = new ArgumentNode('verbose', boolean, false)
+        def verbose = ArgumentNode.newNode('verbose', boolean, false)
         verbose.executionInfo = new ExecutionInfo(
                 executor,
                 ClanCommand.getMethod('help', CommandSender, boolean)
@@ -90,7 +92,7 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         and:
-        def target = new ArgumentNode('target', String, false)
+        def target = ArgumentNode.newNode('target', String, false)
         target.executionInfo = new ExecutionInfo(
                 executor,
                 ClanCommand.getMethod('adminInvite', CommandSender, Object)
@@ -141,7 +143,7 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         and:
-        target = new ArgumentNode('target', String, false)
+        target = ArgumentNode.newNode('target', String, false)
         target.executionInfo = new ExecutionInfo(
                 executor,
                 ClanCommand.getMethod('adminMembersKick', CommandSender, Object)
@@ -217,7 +219,7 @@ class CommandParserTest extends Specification {
                 'command.description.clan',
                 new PermissionInfo(null, 'clan', Permission.Grant.OP)
         )
-        def value = new ArgumentNode('value', double, false)
+        def value = ArgumentNode.newNode('value', double, false)
         value.executionInfo = new ExecutionInfo(
                 executor,
                 ClanCommand.getMethod('execute', CommandSender)
@@ -226,7 +228,7 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         and:
-        def verbose = new ArgumentNode('verbose', boolean, false)
+        def verbose = ArgumentNode.newNode('verbose', boolean, false)
         verbose.executionInfo = new ExecutionInfo(
                 executor,
                 ClanCommand.getMethod('help', CommandSender, boolean)
@@ -270,7 +272,7 @@ class CommandParserTest extends Specification {
 
     def 'test parseAnonymousCommands returns all commands'() {
         given:
-        def command = new ArgumentNode('command', String, true)
+        def command = ArgumentNode.newNode('command', String, true)
         command.executionInfo = new ExecutionInfo(
                 GeneralCommands,
                 GeneralCommands.getMethod('help', CommandSender, String)
@@ -284,7 +286,7 @@ class CommandParserTest extends Specification {
         )
 
         and:
-        def async = new ArgumentNode('async', String, false)
+        def async = ArgumentNode.newNode('async', String, false)
         async.executionInfo = new ExecutionInfo(
                 GeneralCommands,
                 GeneralCommands.getMethod('reload', boolean)
@@ -375,18 +377,18 @@ class CommandParserTest extends Specification {
         )
 
         and:
-        def reason = new ArgumentNode('reason', String, true)
+        def reason = ArgumentNode.newNode('reason', String, true)
         reason.executionInfo = executionInfo
         reason.defaultValue = 'Unknown'
 
-        def rank = new ArgumentNode('rank', String, false)
+        def rank = ArgumentNode.newNode('rank', String, false)
         rank.addChild(reason)
 
         def promote = new LiteralNode('promote', 'rankup')
         promote.commandInfo = commandInfo
         promote.addChild(rank)
 
-        def player = new ArgumentNode('player', Object, false)
+        def player = ArgumentNode.newNode('player', Object, false)
         player.addChild(promote)
 
         def member = new LiteralNode('member')
@@ -497,8 +499,8 @@ class CommandParserTest extends Specification {
 
         where:
         input                 || expected
-        '[test]'              || new ArgumentNode('test', String, true)
-        '<test>'              || new ArgumentNode('test', String, false)
+        '[test]'              || ArgumentNode.newNode('test', String, true)
+        '<test>'              || ArgumentNode.newNode('test', String, false)
         '(test|second|third)' || new LiteralNode('test', 'second', 'third')
         'test'                || new LiteralNode('test')
     }
@@ -524,7 +526,7 @@ class CommandParserTest extends Specification {
         def node = parser.parseOptionalArgument()
 
         then:
-        node == new ArgumentNode('test', String, true)
+        node == ArgumentNode.newNode('test', String, true)
     }
 
     def 'test that parseMandatoryArgument works'() {
@@ -535,7 +537,7 @@ class CommandParserTest extends Specification {
         def node = parser.parseMandatoryArgument()
 
         then:
-        node == new ArgumentNode('test', String, false)
+        node == ArgumentNode.newNode('test', String, false)
     }
 
     def 'test that parseGeneralArgument correctly parses range argument'() {
