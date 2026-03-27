@@ -221,6 +221,7 @@ public abstract class CommandNode implements TabCompletable {
             method.invoke(executor, parameterValues);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
+            if (cause instanceof CommandExecutionException) throw (CommandExecutionException) cause;
             throw new CommandExecutionException("error.internal-error", cause)
                     .arguments(Placeholder.of("message", cause.getMessage()));
         } catch (IllegalAccessException e) {
