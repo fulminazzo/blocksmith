@@ -77,24 +77,14 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
 
     @Override
     protected void onUnregister(final @NotNull String commandName) {
-        if (!commandName.startsWith(getBukkitPrefix())) {
-            onUnregister(getBukkitPrefix() + commandName);
-        }
-
         removeChild(commandName);
         LiteralNode command = registeredCommands.remove(commandName);
         if (command != null)
             command.getAliases().stream()
                     .filter(a -> !a.equals(commandName))
-                    .forEach(this::unregister);
+                    .forEach(this::restoreIntoBrigadier);
 
         super.onUnregister(commandName);
-
-        CommandNode<S> previous = previousBrigadierNodes.remove(commandName);
-        if (previous != null) {
-            removeChild(commandName);
-            getRoot().addChild(previous);
-        }
 
         updateCommands();
     }
@@ -110,9 +100,13 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
         liveRoot.addChild(node);
     }
 
-    private void updateCommands() {
-        for (Player player : server.getOnlinePlayers())
-            player.updateCommands();
+    private void restoreIntoBrigadier(final @NotNull String name) {
+        RootCommandNode<S> root = getRoot();
+        removeChild(name);
+        CommandNode<S> previous = previousBrigadierNodes.remove(name);
+        if (previous != null) root.addChild(previous);
+        if (!name.startsWith(getBukkitPrefix()))
+            restoreIntoBrigadier(getBukkitPrefix() + name);
     }
 
     private void removeChild(final @NonNull String name) {
