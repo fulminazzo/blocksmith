@@ -52,7 +52,9 @@ final class AsyncManager {
             }
         });
 
-        return checkTask.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
+        if (!timeout.isZero()) checkTask.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS);
+
+        return checkTask
                 .handle((v, t) -> {
                     pending.remove(id);
                     actualTask.cancel(true);
