@@ -60,7 +60,10 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
 
         for (String alias : command.getAliases()) {
             if (alias.equals(commandName)) continue;
-            LiteralCommandNode<S> aliasNode = buildAliasNode(alias, brigadierNode);
+            LiteralCommandNode<S> aliasNode = com.mojang.brigadier.builder.LiteralArgumentBuilder
+                    .<S>literal(alias)
+                    .redirect(brigadierNode)
+                    .build();
             injectIntoBrigadier(alias, aliasNode);
         }
 
@@ -70,14 +73,6 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
         }
 
         updateCommands();
-    }
-
-    private @NotNull LiteralCommandNode<S> buildAliasNode(final @NotNull String alias,
-                                                          final @NotNull LiteralCommandNode<S> target) {
-        return com.mojang.brigadier.builder.LiteralArgumentBuilder
-                .<S>literal(alias)
-                .redirect(target)
-                .build();
     }
 
     @Override
