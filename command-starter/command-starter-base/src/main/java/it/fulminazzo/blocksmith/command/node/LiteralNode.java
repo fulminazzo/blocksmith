@@ -102,7 +102,15 @@ public final class LiteralNode extends CommandNode {
 
     @Override
     public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
-        return hasPermission(context) ? new ArrayList<>(aliases) : Collections.emptyList();
+        List<String> aliases = new ArrayList<>();
+        if (hasPermission(context)) {
+            aliases.addAll(this.aliases);
+            if (requiresConfirmation()) {
+                aliases.add("confirm");
+                aliases.add("cancel");
+            }
+        }
+        return aliases;
     }
 
     @Override
