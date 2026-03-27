@@ -77,7 +77,7 @@ class BukkitCommandRegistry extends CommandRegistry {
 
     @Override
     protected void onUnregister(final @NotNull String commandName) {
-        Command command = knownCommands.remove(getPrefix() + ":" + commandName);
+        Command command = knownCommands.remove(getBukkitPrefix() + commandName);
         if (command != null) {
             unregisterPermission(command);
             removeOrRestoreCommand(command.getName());
@@ -101,12 +101,15 @@ class BukkitCommandRegistry extends CommandRegistry {
 
     private void removeOrRestoreCommand(final @NotNull String alias) {
         Command cmd = previousCommands.remove(alias);
-        Command current = knownCommands.remove(alias);
-        if (cmd != null && current instanceof BukkitCommand) {
-            unregisterPermission(current);
-            knownCommands.put(alias, cmd);
+        Command current = knownCommands.get(alias);
+        if (current instanceof BukkitCommand) {
+            knownCommands.remove(alias);
+            if (cmd != null) {
+                unregisterPermission(current);
+                knownCommands.put(alias, cmd);
+            }
         }
-        knownCommands.remove(getPrefix() + ":" + alias);
+        knownCommands.remove(getBukkitPrefix() + alias);
     }
 
     @Override
