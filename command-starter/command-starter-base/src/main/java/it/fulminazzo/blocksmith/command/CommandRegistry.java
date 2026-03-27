@@ -200,8 +200,8 @@ public abstract class CommandRegistry {
     private @NotNull CommandExecutionContext prepareExecutionContext(final @NotNull Object executor,
                                                                      final @NotNull String commandName,
                                                                      final String @NotNull ... arguments) {
-        CommandSenderWrapper wrapper;
-        if (executor instanceof CommandSenderWrapper) wrapper = (CommandSenderWrapper) executor;
+        CommandSenderWrapper<?> wrapper;
+        if (executor instanceof CommandSenderWrapper) wrapper = (CommandSenderWrapper<?>) executor;
         else wrapper = wrapSender(executor);
         CommandExecutionContext context = new CommandExecutionContext(application, this, wrapper).addInput(commandName);
         if (arguments.length > 0) {
@@ -217,7 +217,7 @@ public abstract class CommandRegistry {
      * @param executor the executor of the command
      * @return the wrapped command sender
      */
-    protected abstract @NotNull CommandSenderWrapper wrapSender(final @NotNull Object executor);
+    protected abstract @NotNull CommandSenderWrapper<?> wrapSender(final @NotNull Object executor);
 
     /**
      * Method called upon actively registering a command.

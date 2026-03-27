@@ -6,8 +6,10 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * A wrapper for a general Command sender.
+ *
+ * @param <S> the actual type of the sender
  */
-public abstract class CommandSenderWrapper {
+public abstract class CommandSenderWrapper<S> {
 
     /**
      * Checks if the actual sender extends the given Java class.
@@ -65,6 +67,6 @@ public abstract class CommandSenderWrapper {
      *
      * @return the actual sender
      */
-    public abstract @NotNull Object getActualSender();
+    public abstract @NotNull S getActualSender();
 
 }

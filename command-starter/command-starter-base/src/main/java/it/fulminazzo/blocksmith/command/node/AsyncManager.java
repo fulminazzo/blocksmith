@@ -36,7 +36,7 @@ final class AsyncManager {
      */
     public synchronized @NotNull CompletableFuture<Void> execute(final @NotNull ExecutionInfo executionInfo,
                                                                  final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        CommandSenderWrapper sender = context.getCommandSender();
+        CommandSenderWrapper<?> sender = context.getCommandSender();
         Object id = sender.getId();
         if (pending.contains(id)) throw new CommandExecutionException("error.await-pending-operation");
         else {

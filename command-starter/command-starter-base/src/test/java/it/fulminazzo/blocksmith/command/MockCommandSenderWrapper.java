@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @RequiredArgsConstructor
-public final class MockCommandSenderWrapper extends CommandSenderWrapper {
+public final class MockCommandSenderWrapper extends CommandSenderWrapper<CommandSender> {
     @Getter
     private final @NotNull CommandSender actualSender;
 

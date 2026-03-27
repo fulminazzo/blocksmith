@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-final class BukkitCommandSenderWrapper extends CommandSenderWrapper {
+final class BukkitCommandSenderWrapper extends CommandSenderWrapper<CommandSender> {
     private final @NotNull CommandSender actualSender;
 
     @Override

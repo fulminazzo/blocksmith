@@ -83,8 +83,8 @@ final class MockCommandRegistry extends CommandRegistry {
     }
 
     @Override
-    protected @NotNull CommandSenderWrapper wrapSender(final @NotNull Object executor) {
-        if (executor instanceof CommandSenderWrapper) return (CommandSenderWrapper) executor;
+    protected @NotNull CommandSenderWrapper<?> wrapSender(final @NotNull Object executor) {
+        if (executor instanceof CommandSenderWrapper) return (CommandSenderWrapper<?>) executor;
         return new MockCommandSenderWrapper((CommandSender) executor);
     }
 

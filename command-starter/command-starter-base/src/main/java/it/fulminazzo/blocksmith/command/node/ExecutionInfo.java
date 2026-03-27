@@ -45,7 +45,7 @@ public class ExecutionInfo {
      * @throws CommandExecutionException in case of any errors
      */
     public void invoke(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        final CommandSenderWrapper sender = context.getCommandSender();
+        final CommandSenderWrapper<?> sender = context.getCommandSender();
         try {
             LinkedList<Object> arguments = context.getArguments();
             if (arguments.size() != method.getParameterCount()) {

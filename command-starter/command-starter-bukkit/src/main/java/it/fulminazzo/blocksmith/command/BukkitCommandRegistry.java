@@ -48,7 +48,7 @@ class BukkitCommandRegistry extends CommandRegistry {
     }
 
     @Override
-    protected @NotNull CommandSenderWrapper wrapSender(final @NotNull Object executor) {
+    protected @NotNull CommandSenderWrapper<CommandSender> wrapSender(final @NotNull Object executor) {
         return new BukkitCommandSenderWrapper((CommandSender) executor);
     }
 

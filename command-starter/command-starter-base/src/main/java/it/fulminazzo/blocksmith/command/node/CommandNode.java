@@ -230,7 +230,7 @@ public abstract class CommandNode implements TabCompletable {
 
     private void internalExecute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         if (cooldownManager != null) {
-            CommandSenderWrapper sender = context.getCommandSender();
+            CommandSenderWrapper<?> sender = context.getCommandSender();
             PermissionInfo cooldownPermission = getCooldownBypassPermission(getPermission().orElseThrow());
             if (!sender.hasPermission(cooldownPermission)) {
                 Object id = sender.getId();

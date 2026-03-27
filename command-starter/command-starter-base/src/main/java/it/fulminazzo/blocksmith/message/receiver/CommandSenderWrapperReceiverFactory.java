@@ -18,7 +18,7 @@ public final class CommandSenderWrapperReceiverFactory implements ReceiverFactor
 
     @Override
     public @NotNull <R> Receiver create(final @NotNull R receiver) {
-        CommandSenderWrapper wrapper = (CommandSenderWrapper) receiver;
+        CommandSenderWrapper<?> wrapper = (CommandSenderWrapper<?>) receiver;
         Object internal = wrapper.getActualSender();
         return ReceiverFactories.get(internal.getClass()).create(internal);
     }

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-final class VelocityCommandSenderWrapper extends CommandSenderWrapper {
+final class VelocityCommandSenderWrapper extends CommandSenderWrapper<CommandSource> {
     private final @NotNull CommandSource actualSender;
 
     @Override
