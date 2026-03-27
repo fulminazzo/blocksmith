@@ -129,10 +129,9 @@ class CommandRegistryExecuteTest extends Specification {
         !executed
 
         and:
-        1 * logger.warn('{} while executing command /{} {}',
+        1 * logger.warn('{} while executing command /{}',
                 RuntimeException.canonicalName,
-                'valid',
-                'first second third',
+                'valid first second third',
                 _ as RuntimeException
         )
 
