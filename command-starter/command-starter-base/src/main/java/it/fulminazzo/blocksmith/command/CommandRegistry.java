@@ -20,7 +20,7 @@ public abstract class CommandRegistry {
     private final @NotNull ApplicationHandle application;
 
     private final @NotNull Map<String, LiteralNode> commands = new ConcurrentHashMap<>();
-    private @NotNull State state = State.INITIAL;
+    private volatile @NotNull State state = State.INITIAL;
 
     /**
      * Allows to dynamically insert new commands after a {@link #commit()} call.
@@ -83,7 +83,7 @@ public abstract class CommandRegistry {
      *
      * @return this object (for method chaining)
      */
-    public @NotNull CommandRegistry commit() {
+    public synchronized @NotNull CommandRegistry commit() {
         if (state == State.REGISTERED)
             throw new IllegalStateException("Commands have already been registered");
         else if (state != State.REGISTERING)
@@ -101,7 +101,7 @@ public abstract class CommandRegistry {
     /**
      * Unregisters all the commands.
      */
-    public void unregisterAll() {
+    public synchronized void unregisterAll() {
         if (state != State.REGISTERED)
             throw new IllegalStateException(String.format("Commands have not been registered yet. " +
                     "Did you forget to call %s#commit()?", getClass().getSimpleName()));
