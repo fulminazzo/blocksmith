@@ -25,19 +25,19 @@ class BungeeCommandSenderWrapperTest extends Specification {
         actual == expected
 
         where:
-        permission                                              | op    || expected
-        new PermissionInfo('permission', Permission.Grant.NONE) | true  || true
-        new PermissionInfo('permission', Permission.Grant.NONE) | false || true
-        new PermissionInfo('invalid', Permission.Grant.NONE)    | true  || false
-        new PermissionInfo('invalid', Permission.Grant.NONE)    | false || false
-        new PermissionInfo('permission', Permission.Grant.OP)   | true  || true
-        new PermissionInfo('permission', Permission.Grant.OP)   | false || true
-        new PermissionInfo('invalid', Permission.Grant.OP)      | true  || false
-        new PermissionInfo('invalid', Permission.Grant.OP)      | false || false
-        new PermissionInfo('permission', Permission.Grant.ALL)  | true  || true
-        new PermissionInfo('permission', Permission.Grant.ALL)  | false || true
-        new PermissionInfo('invalid', Permission.Grant.ALL)     | true  || true
-        new PermissionInfo('invalid', Permission.Grant.ALL)     | false || true
+        permission                                                    | op    || expected
+        new PermissionInfo(null, 'permission', Permission.Grant.NONE) | true  || true
+        new PermissionInfo(null, 'permission', Permission.Grant.NONE) | false || true
+        new PermissionInfo(null, 'invalid', Permission.Grant.NONE)    | true  || false
+        new PermissionInfo(null, 'invalid', Permission.Grant.NONE)    | false || false
+        new PermissionInfo(null, 'permission', Permission.Grant.OP)   | true  || true
+        new PermissionInfo(null, 'permission', Permission.Grant.OP)   | false || true
+        new PermissionInfo(null, 'invalid', Permission.Grant.OP)      | true  || false
+        new PermissionInfo(null, 'invalid', Permission.Grant.OP)      | false || false
+        new PermissionInfo(null, 'permission', Permission.Grant.ALL)  | true  || true
+        new PermissionInfo(null, 'permission', Permission.Grant.ALL)  | false || true
+        new PermissionInfo(null, 'invalid', Permission.Grant.ALL)     | true  || true
+        new PermissionInfo(null, 'invalid', Permission.Grant.ALL)     | false || true
     }
 
     def 'test that #method returns #expected for player'() {

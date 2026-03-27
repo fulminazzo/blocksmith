@@ -10,7 +10,6 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.PermissionInfo
 import it.fulminazzo.blocksmith.message.Messenger
 import org.bukkit.Bukkit
-import org.bukkit.command.Command
 import org.bukkit.permissions.PermissionDefault
 import spock.lang.Specification
 
@@ -50,12 +49,12 @@ class BukkitPermissionRegistryTest extends Specification {
         def node = new LiteralNode('help', '?')
         node.commandInfo = new CommandInfo(
                 'command.description.help',
-                new PermissionInfo('help', Permission.Grant.ALL)
+                new PermissionInfo(null, 'help', Permission.Grant.ALL)
         )
         def plugin = new LiteralNode('plugin')
         plugin.commandInfo = new CommandInfo(
                 'command.description.help.plugin',
-                new PermissionInfo('help.plugin', Permission.Grant.OP)
+                new PermissionInfo(null, 'help.plugin', Permission.Grant.OP)
         )
         node.addChild(plugin)
         def name = new ArgumentNode('name', String, false)
@@ -101,7 +100,7 @@ class BukkitPermissionRegistryTest extends Specification {
         and:
         def pluginManager = Bukkit.server.pluginManager
         pluginManager.addPermission(new BukkitPermissionRegistry.BukkitPermission(
-                new PermissionInfo('help', Permission.Grant.ALL),
+                new PermissionInfo(null, 'help', Permission.Grant.ALL),
                 ['help.plugin']
         ))
         def otherPermission = new org.bukkit.permissions.Permission('help.plugin')

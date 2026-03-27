@@ -31,8 +31,8 @@ class LiteralNodeExecuteTest extends Specification {
         where:
         commandInfo << [
                 null,
-                new CommandInfo('', new PermissionInfo('permission', Permission.Grant.ALL)),
-                new CommandInfo('', new PermissionInfo('permission', Permission.Grant.OP))
+                new CommandInfo('', new PermissionInfo(null, 'permission', Permission.Grant.ALL)),
+                new CommandInfo('', new PermissionInfo(null, 'permission', Permission.Grant.OP))
         ]
     }
 
@@ -43,7 +43,7 @@ class LiteralNodeExecuteTest extends Specification {
                 LiteralNodeExecuteTest,
                 LiteralNodeExecuteTest.getMethod('mock')
         )
-        node.commandInfo = new CommandInfo('', new PermissionInfo('permission', Permission.Grant.NONE))
+        node.commandInfo = new CommandInfo('', new PermissionInfo(null, 'permission', Permission.Grant.NONE))
 
         and:
         def context = new CommandExecutionContext(Mock(ApplicationHandle), new MockCommandSenderWrapper(new CommandSender().setOp(true)))
@@ -59,7 +59,7 @@ class LiteralNodeExecuteTest extends Specification {
     def 'test that getCompletions returns #expected'() {
         given:
         def node = new LiteralNode('first', 'second', 'third')
-        node.commandInfo = new CommandInfo('', new PermissionInfo('permission', Permission.Grant.OP))
+        node.commandInfo = new CommandInfo('', new PermissionInfo(null, 'permission', Permission.Grant.OP))
 
         and:
         def context = new CommandExecutionContext(Mock(ApplicationHandle), new MockCommandSenderWrapper(new CommandSender().setOp(op)))

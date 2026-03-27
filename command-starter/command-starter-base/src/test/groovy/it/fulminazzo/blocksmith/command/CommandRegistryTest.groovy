@@ -79,7 +79,7 @@ class CommandRegistryTest extends Specification {
         )
         clan.commandInfo = new CommandInfo(
                 'Clan base command',
-                new PermissionInfo('blocksmith.edited.clan', Permission.Grant.ALL)
+                new PermissionInfo(null, 'blocksmith.edited.clan', Permission.Grant.ALL)
         )
         expected['clan'] = clan
 
@@ -90,14 +90,14 @@ class CommandRegistryTest extends Specification {
         )
         admin.commandInfo = new CommandInfo(
                 'Clan admin command',
-                new PermissionInfo('blocksmith.clan.admin', Permission.Grant.OP)
+                new PermissionInfo('blocksmith', 'clan.admin', Permission.Grant.OP)
         )
         clan.addChild(admin)
 
         def invite = new LiteralNode('invite')
         invite.commandInfo = new CommandInfo(
                 'command.description.clan.admin.invite',
-                new PermissionInfo('blocksmith.clan.admin.invite', Permission.Grant.OP)
+                new PermissionInfo('blocksmith', 'clan.admin.invite', Permission.Grant.OP)
         )
         admin.addChild(invite)
 
@@ -115,14 +115,14 @@ class CommandRegistryTest extends Specification {
         )
         members.commandInfo = new CommandInfo(
                 'command.description.clan.admin.members',
-                new PermissionInfo('blocksmith.clan.admin.members', Permission.Grant.ALL)
+                new PermissionInfo('blocksmith', 'clan.admin.members', Permission.Grant.ALL)
         )
         admin.addChild(members)
 
         def kick = new LiteralNode('kick')
         kick.commandInfo = new CommandInfo(
                 'command.description.clan.admin.members.kick',
-                new PermissionInfo('blocksmith.clan.admin.members.kick', Permission.Grant.OP)
+                new PermissionInfo('blocksmith', 'clan.admin.members.kick', Permission.Grant.OP)
         )
         members.addChild(kick)
 

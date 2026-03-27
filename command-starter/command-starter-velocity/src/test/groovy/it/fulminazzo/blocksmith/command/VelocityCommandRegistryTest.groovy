@@ -50,7 +50,7 @@ class VelocityCommandRegistryTest extends Specification {
         def node = new LiteralNode('help', '?')
         node.commandInfo = new CommandInfo(
                 'command.description.help',
-                new PermissionInfo('help', Permission.Grant.ALL)
+                new PermissionInfo(null, 'help', Permission.Grant.ALL)
         )
 
         when:

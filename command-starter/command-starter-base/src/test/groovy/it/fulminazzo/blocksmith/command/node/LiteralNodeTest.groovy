@@ -56,17 +56,17 @@ class LiteralNodeTest extends Specification {
         second == expected
 
         where:
-        commandInfo                                                       | executionInfo | cooldown                                 | child
-        null                                                              |
-                null                                                                      | null                                     | null
-        new CommandInfo('', new PermissionInfo('', Permission.Grant.ALL)) |
-                null                                                                      | null                                     | null
-        new CommandInfo('', new PermissionInfo('', Permission.Grant.ALL)) |
-                new ExecutionInfo(LiteralNodeTest, LiteralNodeTest.getMethod('mock'))     | null                                     | null
-        new CommandInfo('', new PermissionInfo('', Permission.Grant.ALL)) |
-                new ExecutionInfo(LiteralNodeTest, LiteralNodeTest.getMethod('mock'))     | Duration.ofSeconds(1)                    | null
-        new CommandInfo('', new PermissionInfo('', Permission.Grant.ALL)) |
-                new ExecutionInfo(LiteralNodeTest, LiteralNodeTest.getMethod('mock'))     | Duration.ofSeconds(1)                    | new LiteralNode('child')
+        commandInfo                                                             | executionInfo | cooldown              | child
+        null                                                                    |
+                null                                                                            | null                  | null
+        new CommandInfo('', new PermissionInfo(null, '', Permission.Grant.ALL)) |
+                null                                                                            | null                  | null
+        new CommandInfo('', new PermissionInfo(null, '', Permission.Grant.ALL)) |
+                new ExecutionInfo(LiteralNodeTest, LiteralNodeTest.getMethod('mock'))           | null                  | null
+        new CommandInfo('', new PermissionInfo(null, '', Permission.Grant.ALL)) |
+                new ExecutionInfo(LiteralNodeTest, LiteralNodeTest.getMethod('mock'))           | Duration.ofSeconds(1) | null
+        new CommandInfo('', new PermissionInfo(null, '', Permission.Grant.ALL)) |
+                new ExecutionInfo(LiteralNodeTest, LiteralNodeTest.getMethod('mock'))           | Duration.ofSeconds(1) | new LiteralNode('child')
     }
 
     static void mock() {

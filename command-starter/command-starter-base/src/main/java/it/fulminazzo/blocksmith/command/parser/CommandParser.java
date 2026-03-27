@@ -229,7 +229,8 @@ public final class CommandParser {
         return new CommandInfo(
                 getDefaultDescription(computedPermission),
                 new PermissionInfo(
-                        (prefix == null ? "" : prefix + ".") + computedPermission,
+                        prefix,
+                        computedPermission,
                         Permission.Grant.OP,
                         true
                 ),
@@ -446,7 +447,7 @@ public final class CommandParser {
             grant = Permission.Grant.OP;
         }
 
-        PermissionInfo permissionInfo = new PermissionInfo(permission, grant);
+        PermissionInfo permissionInfo = new PermissionInfo(null, permission, grant);
         return new CommandInfo(description, permissionInfo);
     }
 
