@@ -222,12 +222,15 @@ public abstract class CommandNode implements TabCompletable {
         final CommandSenderWrapper sender = context.getCommandSender();
 
         if (cooldownManager != null) {
-            Object id = sender.getId();
-            if (cooldownManager.isOnCooldown(id)) {
-                long time = cooldownManager.getRemainingCooldown(id);
-                throw new CommandExecutionException("error.command-on-cooldown")
-                        .arguments(Time.of("cooldown", time));
-            } else cooldownManager.putOnCooldown(id);
+            PermissionInfo cooldownPermission = getCooldownBypassPermission(getPermission().orElseThrow());
+            if (!sender.hasPermission(cooldownPermission)) {
+                Object id = sender.getId();
+                if (cooldownManager.isOnCooldown(id)) {
+                    long time = cooldownManager.getRemainingCooldown(id);
+                    throw new CommandExecutionException("error.command-on-cooldown")
+                            .arguments(Time.of("cooldown", time));
+                } else cooldownManager.putOnCooldown(id);
+            }
         }
 
         final ExecutionInfo executionInfo = getExecutionInfo().orElseThrow();
