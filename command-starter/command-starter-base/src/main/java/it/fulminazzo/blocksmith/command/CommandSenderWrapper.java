@@ -3,11 +3,14 @@ package it.fulminazzo.blocksmith.command;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.PermissionInfo;
+import it.fulminazzo.blocksmith.scheduler.Scheduler;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Consumer;
 
 /**
  * A wrapper for a general Command sender.
@@ -25,13 +28,23 @@ public abstract class CommandSenderWrapper<S> {
     protected final @NotNull S actualSender;
 
     /**
+     * Executes the given function in a synchronous context.
+     * Useful in commands annotated with {@link it.fulminazzo.blocksmith.command.annotation.Async}.
+     * 
+     * @param function the function to execute
+     */
+    public void sync(final @NotNull Consumer<S> function) {
+        Scheduler.schedule(application, t -> function.accept(actualSender)).run();
+    }
+
+    /**
      * Checks if the actual sender extends the given Java class.
      *
      * @param type the type
      * @return <code>true</code> if it does
      */
     public final boolean extendsType(final @NotNull Class<?> type) {
-        return type.isAssignableFrom(getActualSender().getClass());
+        return type.isAssignableFrom(actualSender.getClass());
     }
 
     /**
