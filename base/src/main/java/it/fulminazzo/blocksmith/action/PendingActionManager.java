@@ -66,6 +66,16 @@ public final class PendingActionManager<T> {
     }
 
     /**
+     * Checks if the given entity has a pending action.
+     *
+     * @param entity the entity
+     * @return <code>true</code> if it does
+     */
+    public boolean isPending(final @NotNull T entity) {
+        return pendingActions.containsKey(entity);
+    }
+
+    /**
      * Represents the result of an action execution.
      */
     public enum Result {
