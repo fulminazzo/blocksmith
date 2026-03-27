@@ -154,8 +154,8 @@ final class BrigadierParser<S> {
                                            final @NotNull ArgumentBuilder<S, ?> builder,
                                            final @NotNull LiteralNode node) {
         if (node.requiresConfirmation())
-            builder.then(LiteralArgumentBuilder.<S>literal("confirm").executes(executes(root)))
-                    .then(LiteralArgumentBuilder.<S>literal("cancel").executes(executes(root)));
+            builder.then(LiteralArgumentBuilder.<S>literal(node.getConfirmWord()).executes(executes(root)))
+                    .then(LiteralArgumentBuilder.<S>literal(node.getCancelWord()).executes(executes(root)));
     }
 
     /**
