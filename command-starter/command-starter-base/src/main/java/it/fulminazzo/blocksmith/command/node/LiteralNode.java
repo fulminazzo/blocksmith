@@ -92,9 +92,7 @@ public final class LiteralNode extends CommandNode {
 
     @Override
     protected void processInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        if (!hasPermission(context))
-            throw new CommandExecutionException("error.no-permission")
-                    .arguments(Placeholder.of("permission", getCommandInfo().orElseThrow().getPermission().getPermission()));
+        checkPermission(context);
         if (requiresConfirmation() && !context.isLast()) {
             String argument = context.peek();
 
@@ -117,7 +115,13 @@ public final class LiteralNode extends CommandNode {
 
     @Override
     protected void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        processInput(context);
+        checkPermission(context);
+    }
+
+    private void checkPermission(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        if (!hasPermission(context))
+            throw new CommandExecutionException("error.no-permission")
+                    .arguments(Placeholder.of("permission", getCommandInfo().orElseThrow().getPermission().getPermission()));
     }
 
     @Override
