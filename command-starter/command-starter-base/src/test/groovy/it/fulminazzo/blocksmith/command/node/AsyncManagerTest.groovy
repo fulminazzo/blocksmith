@@ -12,6 +12,7 @@ import spock.lang.Specification
 import java.time.Duration
 
 class AsyncManagerTest extends Specification {
+    private static final WAIT_TIME = 50
 
     private static boolean executed = false
 
@@ -147,11 +148,12 @@ class AsyncManagerTest extends Specification {
     }
 
     static void execute() {
+        sleep(WAIT_TIME)
         executed = true
     }
 
     static void internalThrow() {
-        sleep(50)
+        sleep(WAIT_TIME)
         throw new CommandExecutionException('error.unknown')
     }
 
@@ -160,12 +162,12 @@ class AsyncManagerTest extends Specification {
     }
 
     static void otherException() {
-        sleep(50)
+        sleep(WAIT_TIME)
         throw new Exception('API error')
     }
 
     static void otherRuntimeException() {
-        sleep(50)
+        sleep(WAIT_TIME)
         throw new RuntimeException('API error')
     }
 
