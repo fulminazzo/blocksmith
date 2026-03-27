@@ -45,7 +45,7 @@ public final class LiteralNode extends CommandNode {
         getChildren().forEach(clone::addChild);
         getExecutionInfo().ifPresent(clone::setExecutionInfo);
         getCommandInfo().ifPresent(clone::setCommandInfo);
-        clone.setCooldown(clone.getCooldown());
+        clone.setCooldown(getCooldown());
         return clone;
     }
 
