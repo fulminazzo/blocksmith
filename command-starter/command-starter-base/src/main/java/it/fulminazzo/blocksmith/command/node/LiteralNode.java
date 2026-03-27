@@ -2,14 +2,12 @@ package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
-import it.fulminazzo.blocksmith.cooldown.CooldownManager;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joor.Reflect;
 
 import java.util.*;
 
@@ -47,8 +45,7 @@ public final class LiteralNode extends CommandNode {
         getChildren().forEach(clone::addChild);
         getExecutionInfo().ifPresent(clone::setExecutionInfo);
         getCommandInfo().ifPresent(clone::setCommandInfo);
-        CooldownManager<Object> cooldown = Reflect.on(this).get("cooldownManager");
-        if (cooldown != null) clone.setCooldown(Reflect.on(cooldown).get("cooldown"));
+        clone.setCooldown(clone.getCooldown());
         return clone;
     }
 
