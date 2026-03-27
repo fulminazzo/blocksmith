@@ -12,13 +12,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A manager to handle general cooldowns for entities.
+ * Every entity will have the same cooldown.
  *
  * @param <T> the type of the entity
  */
 @EqualsAndHashCode
 @ToString
 @RequiredArgsConstructor
-public final class CooldownManager<T> {
+public final class StaticCooldownManager<T> {
     @Getter
     private final @NotNull Duration cooldown;
 

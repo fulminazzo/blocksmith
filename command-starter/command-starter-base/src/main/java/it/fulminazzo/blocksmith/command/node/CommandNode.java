@@ -5,7 +5,7 @@ import it.fulminazzo.blocksmith.command.TabCompletable;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
-import it.fulminazzo.blocksmith.cooldown.CooldownManager;
+import it.fulminazzo.blocksmith.cooldown.StaticCooldownManager;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.argument.Time;
 import lombok.EqualsAndHashCode;
@@ -34,7 +34,7 @@ public abstract class CommandNode implements TabCompletable {
     @Setter
     private @Nullable ExecutionInfo executionInfo;
 
-    private @Nullable CooldownManager<Object> cooldownManager;
+    private @Nullable StaticCooldownManager<Object> cooldownManager;
 
     private @Nullable AsyncManager asyncManager;
 
@@ -77,7 +77,7 @@ public abstract class CommandNode implements TabCompletable {
      */
     public void setCooldown(final @Nullable Duration cooldown) {
         if (cooldown == null) cooldownManager = null;
-        else cooldownManager = new CooldownManager<>(cooldown);
+        else cooldownManager = new StaticCooldownManager<>(cooldown);
     }
 
     /**
