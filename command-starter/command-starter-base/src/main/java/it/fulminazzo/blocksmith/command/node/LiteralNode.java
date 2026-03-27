@@ -4,9 +4,7 @@ import it.fulminazzo.blocksmith.action.PendingActionManager;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,6 +21,8 @@ public final class LiteralNode extends CommandNode {
     private final @NotNull String name;
     private final @NotNull Set<String> aliases;
     private @Nullable CommandInfo commandInfo;
+
+    private @Nullable Duration confirmationTimeout;
 
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
@@ -52,14 +52,25 @@ public final class LiteralNode extends CommandNode {
         getExecutionInfo().ifPresent(clone::setExecutionInfo);
         getCommandInfo().ifPresent(clone::setCommandInfo);
         clone.setCooldown(getCooldown());
-        clone.setAsync(getAsyncTimeout());
         clone.setConfirmationTimeout(getConfirmationTimeout());
+        clone.setAsync(getAsyncTimeout());
         return clone;
     }
 
-    @Override
-    public @NotNull LiteralNode setConfirmationTimeout(final @Nullable Duration confirmation) {
-        return (LiteralNode) super.setConfirmationTimeout(confirmation);
+    /**
+     * Checks if the execution of the current node tree requires confirmation.
+     *
+     * @return <code>true</code> if it does
+     */
+    public boolean requiresConfirmation() {
+        return confirmationTimeout != null;
+    }
+
+    /**
+     * Enables or disables confirmation for this node.
+     */
+    public void setConfirmationTimeout(final @Nullable Duration confirmationTimeout) {
+        this.confirmationTimeout = confirmationTimeout;
     }
 
     /**

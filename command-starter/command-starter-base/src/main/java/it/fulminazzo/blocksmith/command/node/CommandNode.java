@@ -36,9 +36,6 @@ public abstract class CommandNode implements TabCompletable {
     @ToString.Exclude
     private @Nullable StaticCooldownManager<Object> cooldownManager;
 
-    @Getter(AccessLevel.PROTECTED)
-    private @Nullable Duration confirmationTimeout;
-
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private @Nullable AsyncManager asyncManager;
@@ -62,26 +59,6 @@ public abstract class CommandNode implements TabCompletable {
     public void setCooldown(final @Nullable Duration cooldown) {
         if (cooldown == null) cooldownManager = null;
         else cooldownManager = new StaticCooldownManager<>(cooldown);
-    }
-
-    /**
-     * Checks if the execution of the current node tree requires confirmation.
-     *
-     * @return <code>true</code> if it does
-     */
-    public boolean requiresConfirmation() {
-        return confirmationTimeout != null;
-    }
-
-    /**
-     * Enables or disables confirmation for this node.
-     *
-     * @param confirmationTimeout the confirmation timeout
-     * @return this object (for method chaining)
-     */
-    public @NotNull CommandNode setConfirmationTimeout(final @Nullable Duration confirmationTimeout) {
-        this.confirmationTimeout = confirmationTimeout;
-        return this;
     }
 
     /**
@@ -265,8 +242,9 @@ public abstract class CommandNode implements TabCompletable {
     }
 
     private void executeOrAwaitConfirmation(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        if (confirmationTimeout != null) {
-            LiteralNode literalNode = getCommandLiteral();
+        LiteralNode literalNode = getCommandLiteral();
+        if (literalNode != null && literalNode.requiresConfirmation()) {
+            Duration confirmationTimeout = literalNode.getConfirmationTimeout();
             literalNode.getPendingActionManager().register(
                     context.getCommandSender().getId(),
                     confirmationTimeout,
@@ -317,7 +295,7 @@ public abstract class CommandNode implements TabCompletable {
                             .map(c -> c.getCompletions(context))
                             .flatMap(Collection::stream)
                             .collect(Collectors.toList());
-                    if (this instanceof LiteralNode && requiresConfirmation())
+                    if (this instanceof LiteralNode && ((LiteralNode) this).requiresConfirmation())
                         completions.addAll(Arrays.asList("confirm", "cancel"));
                     return filterCompletions(context, completions);
                 } else {
