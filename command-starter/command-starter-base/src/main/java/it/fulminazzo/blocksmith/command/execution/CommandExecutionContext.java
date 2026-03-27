@@ -66,6 +66,17 @@ public final class CommandExecutionContext {
     }
 
     /**
+     * Injects a new argument into the current position of the input.
+     *
+     * @param input the argument
+     * @return this object (for method chaining)
+     */
+    public @NotNull CommandExecutionContext setCurrent(final @NotNull String input) {
+        this.input.set(current, input);
+        return this;
+    }
+
+    /**
      * Gets the last argument from the input.
      *
      * @return the last argument
