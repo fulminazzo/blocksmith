@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command.node
 
 import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.*
+import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
 import it.fulminazzo.blocksmith.message.argument.Time
@@ -15,13 +16,10 @@ import java.lang.reflect.Method
 import java.time.Duration
 
 class CommandNodeExecuteTest extends Specification {
-    private static final @NotNull
-    CommandSenderWrapper commandSender = new MockCommandSenderWrapper(new CommandSender())
+    private static final @NotNull CommandSenderWrapper commandSender = new MockCommandSenderWrapper(new CommandSender().addPermissions('blocksmith.bypass.cooldown.bypassed.greet'))
 
-    private static @NotNull
-    Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
-    private static @NotNull
-    Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
+    private static @NotNull Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
+    private static @NotNull Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
 
     private static String printer
 
@@ -109,7 +107,13 @@ class CommandNodeExecuteTest extends Specification {
 
     def 'test execute with cooldown'() {
         given:
+        def greet = new LiteralNode('greet')
+        greet.commandInfo = new CommandInfo(
+                '',
+                new PermissionInfo('blocksmith', 'greet', Permission.Grant.ALL)
+        )
         def node = new ArgumentNode('cooldown', String, false)
+        greet.addChild(node)
         def who = new ArgumentNode('who', String, false)
         who.executionInfo = new ExecutionInfo(CommandNodeExecuteTest, second)
         who.cooldown = Duration.ofSeconds(1L)
@@ -117,13 +121,13 @@ class CommandNodeExecuteTest extends Specification {
 
         and:
         def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput('Hello', 'Alex')
+                .addInput('greet', 'Hello', 'Alex')
 
         expect:
         printer == null
 
         when:
-        node.execute(context)
+        greet.execute(context)
 
         then:
         noExceptionThrown()
@@ -133,10 +137,10 @@ class CommandNodeExecuteTest extends Specification {
 
         when:
         context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput('Hello', 'Alex')
+                .addInput('greet', 'Hello', 'Alex')
 
         and:
-        node.execute(context)
+        greet.execute(context)
 
         then:
         def e = thrown(CommandExecutionException)
@@ -151,6 +155,50 @@ class CommandNodeExecuteTest extends Specification {
         def time = arg.timeSupplier.get()
         time <= 1000L
         time >= 0
+    }
+
+    def 'test execute with cooldown bypass'() {
+        given:
+        def greet = new LiteralNode('greet')
+        greet.commandInfo = new CommandInfo(
+                '',
+                new PermissionInfo('blocksmith', 'bypassed.greet', Permission.Grant.ALL)
+        )
+        def node = new ArgumentNode('cooldown', String, false)
+        greet.addChild(node)
+        def who = new ArgumentNode('who', String, false)
+        who.executionInfo = new ExecutionInfo(CommandNodeExecuteTest, second)
+        who.cooldown = Duration.ofSeconds(1L)
+        node.addChild(who)
+
+        and:
+        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
+                .addInput('greet', 'Hello', 'Alex')
+
+        expect:
+        printer == null
+
+        when:
+        greet.execute(context)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        printer == 'Hello, Alex!'
+
+        when:
+        context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
+                .addInput('greet', 'Hello', 'Alex')
+
+        and:
+        greet.execute(context)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        printer == 'Hello, Alex!'
     }
 
     def 'test execute with extra arguments'() {
