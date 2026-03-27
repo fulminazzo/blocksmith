@@ -26,7 +26,7 @@ public final class LocaleUtils {
      * @return the string
      */
     public static @NotNull String toString(final @NotNull Locale locale) {
-        return locale.toString().toLowerCase();
+        return (locale.getLanguage() + "_" + locale.getCountry()).toLowerCase();
     }
 
 }
