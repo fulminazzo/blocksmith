@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("DataFlowIssue")
 public final class BukkitCommandRegistryFactory implements CommandRegistryFactory {
 
     static {
@@ -77,14 +78,17 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
 
         });
         ArgumentParsers.register(Location.class, new ArgumentParser<>() {
+            private final @NotNull ArgumentParser<Double> xParser = new CoordinateParser(Location::getX);
+            private final @NotNull ArgumentParser<Double> yParser = new CoordinateParser(Location::getY);
+            private final @NotNull ArgumentParser<Double> zParser = new CoordinateParser(Location::getZ);
 
             @Override
             public @NotNull Location parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-                double x = new CoordinateParser(Location::getX).parse(context);
+                double x = xParser.parse(context);
                 if (context.isLast()) throw new CommandExecutionException("error.not-enough-arguments");
-                double y = new CoordinateParser(Location::getY).parse(context.advanceCursor());
+                double y = yParser.parse(context.advanceCursor());
                 if (context.isLast()) throw new CommandExecutionException("error.not-enough-arguments");
-                double z = new CoordinateParser(Location::getZ).parse(context.advanceCursor());
+                double z = zParser.parse(context.advanceCursor());
                 return new Location(null, x, y, z);
             }
 
@@ -96,11 +100,11 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             @Override
             public boolean validateCompletions(final @NotNull CommandExecutionContext context) {
                 try {
-                    double x = new CoordinateParser(Location::getX).parse(context);
+                    double x = xParser.parse(context);
                     if (context.isLast()) return false;
-                    double y = new CoordinateParser(Location::getY).parse(context.advanceCursor());
+                    double y = yParser.parse(context.advanceCursor());
                     if (context.isLast()) return false;
-                    double z = new CoordinateParser(Location::getZ).parse(context.advanceCursor());
+                    double z = zParser.parse(context.advanceCursor());
                     context.addParsedArgument(new Location(null, x, y, z));
                     return !context.isLast();
                 } catch (CommandExecutionException e) {
