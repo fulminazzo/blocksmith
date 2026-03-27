@@ -98,18 +98,23 @@ public final class LiteralNode extends CommandNode {
 
             final Object id = context.getCommandSender().getId();
             final PendingActionManager.Result result;
-            if (argument.equalsIgnoreCase("confirm"))
+            final String message;
+            if (argument.equalsIgnoreCase("confirm")) {
                 result = pendingActionManager.execute(id);
-            else if (argument.equalsIgnoreCase("cancel")) {
+                message = "";
+            } else if (argument.equalsIgnoreCase("cancel")) {
                 result = pendingActionManager.cancel(id);
-                if (result == PendingActionManager.Result.SUCCESS)
-                    throw new CommandExecutionException("success.pending-action-cancelled");
-            } else result = null;
+                message = "success.pending-action-cancelled";
+            } else {
+                result = null;
+                message = null;
+            }
 
             if (result == PendingActionManager.Result.NOT_FOUND)
                 throw new CommandExecutionException("error.no-pending-action");
             else if (result == PendingActionManager.Result.EXPIRED)
                 throw new CommandExecutionException("error.pending-action-expired");
+            else if (result != null) throw new CommandExecutionException(message);
         }
     }
 
