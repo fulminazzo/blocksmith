@@ -41,7 +41,7 @@ class CommandRegistryTest extends Specification {
         and:
         def clan = registry.registeredCommands['clan']
         clan != null
-        clan.permission.permission == 'blocksmith.edited.clan'
+        clan.permission.permission == 'custom.edited.clan'
     }
 
     def 'test that insert throws if command is already added'() {
@@ -79,7 +79,7 @@ class CommandRegistryTest extends Specification {
         )
         clan.commandInfo = new CommandInfo(
                 'Clan base command',
-                new PermissionInfo(null, 'blocksmith.edited.clan', Permission.Grant.ALL)
+                new PermissionInfo('custom', 'edited.clan', Permission.Grant.ALL)
         )
         expected['clan'] = clan
 
