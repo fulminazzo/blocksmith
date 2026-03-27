@@ -49,7 +49,7 @@ class BukkitCommandRegistry extends CommandRegistry {
 
     @Override
     protected @NotNull CommandSenderWrapper<CommandSender> wrapSender(final @NotNull Object executor) {
-        return new BukkitCommandSenderWrapper((CommandSender) executor);
+        return new BukkitCommandSenderWrapper(application, (CommandSender) executor);
     }
 
     @Override
