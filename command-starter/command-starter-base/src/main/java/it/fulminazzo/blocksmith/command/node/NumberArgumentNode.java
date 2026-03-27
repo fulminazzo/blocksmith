@@ -44,7 +44,7 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
     }
 
     @Override
-    protected void validateExecuteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+    protected void processInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         N parsed = getArgumentParser().parse(context);
         if (isInvalid(parsed))
             throw new CommandExecutionException("error.invalid-number")
@@ -58,7 +58,7 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
 
     @Override
     protected void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        validateExecuteInput(context);
+        processInput(context);
     }
 
     /**

@@ -46,7 +46,7 @@ class ArgumentNodeExecuteTest extends Specification {
         ArgumentParsers.parsers.put(Integer, previous)
     }
 
-    def 'test that validateExecuteInput throws for invalid input'() {
+    def 'test that processInput throws for invalid input'() {
         given:
         def node = new ArgumentNode('test', Integer, false)
         node.executionInfo = new ExecutionInfo(

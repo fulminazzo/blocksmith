@@ -158,7 +158,7 @@ public abstract class CommandNode implements TabCompletable {
      * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
      */
     public void execute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        validateExecuteInput(context);
+        processInput(context);
         handleRemainingInput(context);
     }
 
@@ -272,12 +272,13 @@ public abstract class CommandNode implements TabCompletable {
     }
 
     /**
-     * Validates the current input of the context during execution.
+     * Validates and processes the current input of the context during execution.
+     * After execution, if an argument was parsed, it will be available through {@link CommandExecutionContext#getArguments()}.
      *
      * @param context the context
      * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
      */
-    protected abstract void validateExecuteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException;
+    protected abstract void processInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException;
 
     /**
      * Validates the current input of the context during tab completion.

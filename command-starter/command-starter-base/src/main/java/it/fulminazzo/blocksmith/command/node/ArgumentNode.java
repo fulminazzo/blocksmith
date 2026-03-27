@@ -63,7 +63,7 @@ public class ArgumentNode<T> extends CommandNode {
     }
 
     @Override
-    protected void validateExecuteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+    protected void processInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         if (isGreedy()) context.mergeRemainingInput();
         context.addParsedArgument(parseArgument(context));
     }
