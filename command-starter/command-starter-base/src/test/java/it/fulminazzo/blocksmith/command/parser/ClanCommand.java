@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.parser;
 
 import it.fulminazzo.blocksmith.command.CommandSender;
+import it.fulminazzo.blocksmith.command.annotation.Async;
 import it.fulminazzo.blocksmith.command.annotation.Command;
 import it.fulminazzo.blocksmith.command.annotation.Default;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
@@ -18,6 +19,7 @@ final class ClanCommand {
     }
 
     @Command(value = "(info|information|state) [name]", description = "Information command")
+    @Async(1)
     public void getClanInfo(
             final @NotNull CommandSender sender,
             final @NotNull @Default("self") String clanName

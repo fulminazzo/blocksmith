@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.argument
 
 import it.fulminazzo.blocksmith.ApplicationHandle
+import it.fulminazzo.blocksmith.command.CommandRegistry
 import it.fulminazzo.blocksmith.command.CommandSender
 import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
@@ -194,7 +195,11 @@ class ArgumentParsersTest extends Specification {
         and:
         def sender = new MockCommandSenderWrapper(new CommandSender())
         def arg = argument instanceof Number ? new BigDecimal(argument).toPlainString() : argument.toString()
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), sender).addInput(arg)
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                sender
+        ).addInput(arg)
 
         when:
         def actual = parser.getCompletions(context)

@@ -58,7 +58,7 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
     }
 
     @Override
-    protected @NotNull CommandSenderWrapper wrapSender(@NotNull Object executor) {
+    protected @NotNull CommandSenderWrapper<CommandSender> wrapSender(@NotNull Object executor) {
         if (!(executor instanceof CommandSender))
             executor = Reflect.on(executor).call("getBukkitSender").get();
         return super.wrapSender(executor);

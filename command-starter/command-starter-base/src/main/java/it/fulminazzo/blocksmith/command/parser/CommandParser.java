@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.parser;
 
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.annotation.*;
 import it.fulminazzo.blocksmith.command.node.*;
 import org.jetbrains.annotations.NotNull;
@@ -95,6 +96,11 @@ public final class CommandParser {
 
         last.setExecutionInfo(executionInfo);
         if (cooldown != null) last.setCooldown(cooldown);
+        Method method = executionInfo.getMethod();
+        if (method.isAnnotationPresent(Async.class)) {
+            Async asyncAnnotation = method.getAnnotation(Async.class);
+            last.setAsync(Duration.of(asyncAnnotation.value(), asyncAnnotation.unit().toChronoUnit()));
+        }
 
         if (parameterIndex != parameters.length)
             throw parseException("method %s declares %s argument parameters, but only %s arguments were given",
@@ -461,7 +467,11 @@ public final class CommandParser {
     private static int getParameterIndex(final @NotNull Method method, final @NotNull Class<?> senderType) {
         int parameterIndex = 0;
         Class<?>[] parameterTypes = method.getParameterTypes();
-        if (parameterTypes.length > 0 && senderType.isAssignableFrom(parameterTypes[0])) parameterIndex++;
+        if (parameterTypes.length > 0) {
+            Class<?> parameterType = parameterTypes[0];
+            if (senderType.isAssignableFrom(parameterType) || CommandSenderWrapper.class.isAssignableFrom(parameterType))
+                parameterIndex++;
+        }
         return parameterIndex;
     }
 

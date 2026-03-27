@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.argument
 
 import it.fulminazzo.blocksmith.ApplicationHandle
+import it.fulminazzo.blocksmith.command.CommandRegistry
 import it.fulminazzo.blocksmith.command.CommandSender
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper
 import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
@@ -39,7 +40,11 @@ class NumberArgumentParserTest extends Specification {
 
     def 'test that getCompletions returns #expected for argument #argument'() {
         given:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), sender).addInput(argument)
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                sender
+        ).addInput(argument)
 
         when:
         def actual = parser.getCompletions(context)

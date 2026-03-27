@@ -50,7 +50,8 @@ class BukkitCommandRegistryFactoryTest extends Specification {
 
         context = new CommandExecutionContext(
                 application,
-                new BukkitCommandSenderWrapper(player)
+                new BukkitCommandRegistry(application),
+                new BukkitCommandSenderWrapper(application, player)
         )
     }
 
@@ -74,7 +75,11 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         sender.showPlayer(application, server.getPlayer(argument))
 
         and:
-        def context = new CommandExecutionContext(application, new BukkitCommandSenderWrapper(sender))
+        def context = new CommandExecutionContext(
+                application,
+                new BukkitCommandRegistry(application),
+                new BukkitCommandSenderWrapper(application, sender)
+        )
 
         when:
         def actual = parser.parse(context.addInput(argument))
@@ -98,7 +103,11 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         }
 
         and:
-        def context = new CommandExecutionContext(application, new BukkitCommandSenderWrapper(sender))
+        def context = new CommandExecutionContext(
+                application,
+                new BukkitCommandRegistry(application),
+                new BukkitCommandSenderWrapper(application, sender)
+        )
 
         when:
         parser.parse(context.addInput(argument))
@@ -127,7 +136,11 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         else sender.hidePlayer(application, target)
 
         and:
-        def context = new CommandExecutionContext(application, new BukkitCommandSenderWrapper(sender))
+        def context = new CommandExecutionContext(
+                application,
+                new BukkitCommandRegistry(application),
+                new BukkitCommandSenderWrapper(application, sender)
+        )
 
         when:
         def actual = parser.getCompletions(context.addInput(''))

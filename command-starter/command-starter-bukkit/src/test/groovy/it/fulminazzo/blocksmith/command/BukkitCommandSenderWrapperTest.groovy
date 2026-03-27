@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command
 
+import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.PermissionInfo
 import org.bukkit.command.CommandSender
@@ -18,7 +19,7 @@ class BukkitCommandSenderWrapperTest extends Specification {
         sender.op >> op
 
         and:
-        def wrapper = new BukkitCommandSenderWrapper(sender)
+        def wrapper = new BukkitCommandSenderWrapper(Mock(ApplicationHandle), sender)
 
         when:
         def actual = wrapper.hasPermission(permission)
@@ -49,7 +50,7 @@ class BukkitCommandSenderWrapperTest extends Specification {
         player.uniqueId >> UUID.nameUUIDFromBytes(player.name.bytes)
 
         and:
-        def wrapper = new BukkitCommandSenderWrapper(player)
+        def wrapper = new BukkitCommandSenderWrapper(Mock(ApplicationHandle), player)
 
         when:
         def actual = wrapper."$method"()
@@ -70,7 +71,7 @@ class BukkitCommandSenderWrapperTest extends Specification {
         sender.name >> 'CONSOLE'
 
         and:
-        def wrapper = new BukkitCommandSenderWrapper(sender)
+        def wrapper = new BukkitCommandSenderWrapper(Mock(ApplicationHandle), sender)
 
         when:
         def actual = wrapper."$method"()

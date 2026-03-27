@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.execution;
 
 import it.fulminazzo.blocksmith.ApplicationHandle;
+import it.fulminazzo.blocksmith.command.CommandRegistry;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,10 @@ public final class CommandExecutionContext {
     @Getter
     private final @NotNull ApplicationHandle application;
     @Getter
-    private final @NotNull CommandSenderWrapper commandSender;
+    private final @NotNull CommandRegistry registry;
+    @Getter
+    private final @NotNull CommandSenderWrapper<?> commandSender;
+    @Getter
     private final @NotNull List<String> input = new ArrayList<>();
     @Getter
     private final @NotNull LinkedList<Object> arguments = new LinkedList<>();

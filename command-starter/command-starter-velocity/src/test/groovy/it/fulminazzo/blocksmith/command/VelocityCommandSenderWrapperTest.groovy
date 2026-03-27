@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command
 import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.proxy.ConsoleCommandSource
 import com.velocitypowered.api.proxy.Player
+import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.PermissionInfo
 import spock.lang.Specification
@@ -17,7 +18,7 @@ class VelocityCommandSenderWrapperTest extends Specification {
         }
 
         and:
-        def wrapper = new VelocityCommandSenderWrapper(sender)
+        def wrapper = new VelocityCommandSenderWrapper(Mock(ApplicationHandle), sender)
 
         when:
         def actual = wrapper.hasPermission(permission)
@@ -48,7 +49,7 @@ class VelocityCommandSenderWrapperTest extends Specification {
         player.uniqueId >> UUID.nameUUIDFromBytes(player.username.bytes)
 
         and:
-        def wrapper = new VelocityCommandSenderWrapper(player)
+        def wrapper = new VelocityCommandSenderWrapper(Mock(ApplicationHandle), player)
 
         when:
         def actual = wrapper."$method"()
@@ -68,7 +69,7 @@ class VelocityCommandSenderWrapperTest extends Specification {
         def sender = Mock(ConsoleCommandSource)
 
         and:
-        def wrapper = new VelocityCommandSenderWrapper(sender)
+        def wrapper = new VelocityCommandSenderWrapper(Mock(ApplicationHandle), sender)
 
         when:
         def actual = wrapper."$method"()

@@ -53,7 +53,8 @@ class VelocityCommandRegistryFactoryTest extends Specification {
 
         context = new CommandExecutionContext(
                 application,
-                new VelocityCommandSenderWrapper(Mock(CommandSource))
+                new VelocityCommandRegistry(application),
+                new VelocityCommandSenderWrapper(application, Mock(CommandSource))
         )
     }
 

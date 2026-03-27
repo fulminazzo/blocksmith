@@ -21,7 +21,7 @@ class CommandNodeExecuteTest extends Specification {
     private static @NotNull Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
     private static @NotNull Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
 
-    private static String printer
+    private static volatile String printer
 
     void setup() {
         printer = null
@@ -52,8 +52,11 @@ class CommandNodeExecuteTest extends Specification {
         } else greeting.addChild(who)
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput('say', 'hello', 'Hello')
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput('say', 'hello', 'Hello')
         if (whatEnabled) context.addInput('what')
         if (whoArg != null) context.addInput(whoArg)
 
@@ -94,8 +97,11 @@ class CommandNodeExecuteTest extends Specification {
         def node = new LiteralNode('test')
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput('test')
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput('test')
 
         when:
         node.execute(context)
@@ -120,8 +126,11 @@ class CommandNodeExecuteTest extends Specification {
         node.addChild(who)
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput('greet', 'Hello', 'Alex')
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput('greet', 'Hello', 'Alex')
 
         expect:
         printer == null
@@ -136,8 +145,11 @@ class CommandNodeExecuteTest extends Specification {
         printer == 'Hello, Alex!'
 
         when:
-        context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput('greet', 'Hello', 'Alex')
+        context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput('greet', 'Hello', 'Alex')
 
         and:
         greet.execute(context)
@@ -172,8 +184,11 @@ class CommandNodeExecuteTest extends Specification {
         node.addChild(who)
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput('greet', 'Hello', 'Alex')
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput('greet', 'Hello', 'Alex')
 
         expect:
         printer == null
@@ -188,11 +203,51 @@ class CommandNodeExecuteTest extends Specification {
         printer == 'Hello, Alex!'
 
         when:
-        context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput('greet', 'Hello', 'Alex')
+        context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput('greet', 'Hello', 'Alex')
 
         and:
         greet.execute(context)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        printer == 'Hello, Alex!'
+    }
+
+    def 'test execute asynchronously'() {
+        given:
+        def greet = new LiteralNode('greet')
+        greet.commandInfo = new CommandInfo(
+                '',
+                new PermissionInfo('blocksmith', 'greet', Permission.Grant.ALL)
+        )
+        def node = new ArgumentNode('greeting', String, false)
+        greet.addChild(node)
+        def who = new ArgumentNode('who', String, false)
+        who.executionInfo = new ExecutionInfo(CommandNodeExecuteTest, second)
+        who.async = Duration.ofSeconds(1)
+        node.addChild(who)
+
+        and:
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput('greet', 'Hello', 'Alex')
+
+        expect:
+        printer == null
+
+        when:
+        greet.execute(context)
+
+        and:
+        sleep(200)
 
         then:
         noExceptionThrown()
@@ -209,8 +264,11 @@ class CommandNodeExecuteTest extends Specification {
         node.addChild(who)
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput('Hello', 'Alex', 'extra', 'input', 'should', 'be', 'ignored')
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput('Hello', 'Alex', 'extra', 'input', 'should', 'be', 'ignored')
 
         expect:
         printer == null
@@ -240,8 +298,11 @@ class CommandNodeExecuteTest extends Specification {
         greeting.addChild(who)
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput('say', 'hello', '!@#$%^&*()_+')
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput('say', 'hello', '!@#$%^&*()_+')
 
         when:
         say.execute(context)
@@ -257,8 +318,11 @@ class CommandNodeExecuteTest extends Specification {
         def node = new LiteralNode('test')
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput('test', 'help')
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput('test', 'help')
 
         when:
         node.execute(context)
@@ -277,8 +341,11 @@ class CommandNodeExecuteTest extends Specification {
         node.executionInfo = new ExecutionInfo(CommandNodeExecuteTest, CommandNodeExecuteTest.getDeclaredMethod(name))
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput(name)
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput(name)
 
         when:
         node.execute(context)
@@ -308,8 +375,11 @@ class CommandNodeExecuteTest extends Specification {
         )
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput(node.name)
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput(node.name)
         context.addParsedArgument(1)
         context.addParsedArgument(2)
 
@@ -333,8 +403,11 @@ class CommandNodeExecuteTest extends Specification {
         node.addChild(message)
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), commandSender)
-                .addInput(node.name, 'Hello,', 'Alex!')
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput(node.name, 'Hello,', 'Alex!')
 
         expect:
         printer == null
@@ -358,8 +431,11 @@ class CommandNodeExecuteTest extends Specification {
         )
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), new MockCommandSenderWrapper(sender))
-                .addInput('command')
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                new MockCommandSenderWrapper(sender)
+        ).addInput('command')
 
         expect:
         printer == null
@@ -388,8 +464,11 @@ class CommandNodeExecuteTest extends Specification {
         )
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), new MockCommandSenderWrapper(sender))
-                .addInput('command')
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                new MockCommandSenderWrapper(sender)
+        ).addInput('command')
 
         when:
         node.execute(context)
@@ -423,6 +502,7 @@ class CommandNodeExecuteTest extends Specification {
         and:
         def context = new CommandExecutionContext(
                 Mock(ApplicationHandle),
+                Mock(CommandRegistry),
                 new MockCommandSenderWrapper(new CommandSender())
         ).addInput(*arguments)
 
@@ -461,6 +541,7 @@ class CommandNodeExecuteTest extends Specification {
         and:
         def context = new CommandExecutionContext(
                 Mock(ApplicationHandle),
+                Mock(CommandRegistry),
                 new MockCommandSenderWrapper(new CommandSender())
         ).addInput(*arguments)
 

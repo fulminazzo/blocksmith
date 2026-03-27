@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.node
 
 import it.fulminazzo.blocksmith.ApplicationHandle
+import it.fulminazzo.blocksmith.command.CommandRegistry
 import it.fulminazzo.blocksmith.command.CommandSender
 import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser
@@ -29,7 +30,8 @@ class ArgumentNodeExecuteTest extends Specification {
             }
 
             @Override
-            @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext c) {
+            @NotNull
+            List<String> getCompletions(final @NotNull CommandExecutionContext c) {
                 def current = c.current
                 def completions = numbers
                         .collect { "$current$it" }
@@ -55,8 +57,11 @@ class ArgumentNodeExecuteTest extends Specification {
         )
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), new MockCommandSenderWrapper(new CommandSender()))
-        context.addInput('invalid')
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                new MockCommandSenderWrapper(new CommandSender())
+        ).addInput('invalid')
 
         when:
         node.execute(context)
@@ -74,8 +79,11 @@ class ArgumentNodeExecuteTest extends Specification {
         def node = new ArgumentNode('test', Integer, false)
 
         and:
-        def context = new CommandExecutionContext(Mock(ApplicationHandle), new MockCommandSenderWrapper(new CommandSender()))
-        context.addInput(argument)
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                new MockCommandSenderWrapper(new CommandSender())
+        ).addInput(argument)
 
         when:
         def actual = node.getCompletions(context)

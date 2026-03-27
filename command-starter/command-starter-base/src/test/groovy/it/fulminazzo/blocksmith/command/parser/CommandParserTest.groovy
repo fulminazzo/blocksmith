@@ -35,6 +35,7 @@ class CommandParserTest extends Specification {
         and:
         def name = ArgumentNode.newNode('name', String, true)
         name.defaultValue = 'self'
+        name.async = Duration.ofSeconds(1)
         name.executionInfo = new ExecutionInfo(
                 executor,
                 ClanCommand.getMethod('getClanInfo', CommandSender, String)

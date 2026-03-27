@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @RequiredArgsConstructor
 public abstract class CommandRegistry {
-    private final @NotNull ApplicationHandle application;
+    protected final @NotNull ApplicationHandle application;
 
     private final @NotNull Map<String, LiteralNode> commands = new ConcurrentHashMap<>();
     private volatile @NotNull State state = State.INITIAL;
@@ -142,28 +142,41 @@ public abstract class CommandRegistry {
                            final @NotNull Object executor,
                            final @NotNull String commandName,
                            final String @NotNull ... arguments) {
+        CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
         try {
-            CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
             command.execute(context);
         } catch (CommandExecutionException e) {
-            application.getMessenger().sendMessage(wrapSender(executor), e.getMessage(), getArguments(e, commandName, arguments));
-            Throwable cause = e.getCause();
-            if (cause != null)
-                application.getLog().warn("{} while executing command /{} {}",
-                        cause.getClass().getCanonicalName(),
-                        commandName,
-                        String.join(" ", arguments),
-                        cause
-                );
+            handleCommandExecutionException(e, context);
         }
     }
 
+    /**
+     * Handles the given command execution exception.
+     *
+     * @param exception the exception
+     * @param context   the context
+     */
+    public void handleCommandExecutionException(final @NotNull CommandExecutionException exception,
+                                                final @NotNull CommandExecutionContext context) {
+        application.getMessenger().sendMessage(
+                context.getCommandSender(),
+                exception.getMessage(),
+                getArguments(exception, context)
+        );
+        Throwable cause = exception.getCause();
+        if (cause != null)
+            application.getLog().warn("{} while executing command /{}",
+                    cause.getClass().getCanonicalName(),
+                    String.join(" ", context.getInput()),
+                    cause
+            );
+    }
+
     private static @NotNull Argument[] getArguments(final @NotNull CommandExecutionException exception,
-                                                    final @NotNull String commandName,
-                                                    final String @NotNull ... arguments) {
+                                                    final @NotNull CommandExecutionContext context) {
         Argument[] previous = exception.getArguments();
         Argument[] args = Arrays.copyOf(previous, previous.length + 1);
-        args[previous.length] = Placeholder.of("input", commandName + " " + String.join(" ", arguments));
+        args[previous.length] = Placeholder.of("input", String.join(" ", context.getInput()));
         return args;
     }
 
@@ -187,10 +200,10 @@ public abstract class CommandRegistry {
     private @NotNull CommandExecutionContext prepareExecutionContext(final @NotNull Object executor,
                                                                      final @NotNull String commandName,
                                                                      final String @NotNull ... arguments) {
-        CommandSenderWrapper wrapper;
-        if (executor instanceof CommandSenderWrapper) wrapper = (CommandSenderWrapper) executor;
+        CommandSenderWrapper<?> wrapper;
+        if (executor instanceof CommandSenderWrapper) wrapper = (CommandSenderWrapper<?>) executor;
         else wrapper = wrapSender(executor);
-        CommandExecutionContext context = new CommandExecutionContext(application, wrapper).addInput(commandName);
+        CommandExecutionContext context = new CommandExecutionContext(application, this, wrapper).addInput(commandName);
         if (arguments.length > 0) {
             String fullArguments = String.join(" ", arguments);
             context.addInput(StringUtils.split(fullArguments, " ", false, "'", "\""));
@@ -204,7 +217,7 @@ public abstract class CommandRegistry {
      * @param executor the executor of the command
      * @return the wrapped command sender
      */
-    protected abstract @NotNull CommandSenderWrapper wrapSender(final @NotNull Object executor);
+    protected abstract @NotNull CommandSenderWrapper<?> wrapSender(final @NotNull Object executor);
 
     /**
      * Method called upon actively registering a command.

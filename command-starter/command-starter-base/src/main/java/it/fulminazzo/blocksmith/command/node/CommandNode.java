@@ -8,11 +8,6 @@ import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.cooldown.CooldownManager;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.argument.Time;
-import it.fulminazzo.blocksmith.util.ReflectionUtils;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.ValidatorFactory;
-import jakarta.validation.executable.ExecutableValidator;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,8 +15,6 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,14 +25,6 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode
 @ToString
 public abstract class CommandNode implements TabCompletable {
-    private static final ExecutableValidator validator;
-
-    static {
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            validator = factory.getValidator().forExecutables();
-        }
-    }
-
     @Getter
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
@@ -50,6 +35,29 @@ public abstract class CommandNode implements TabCompletable {
     private @Nullable ExecutionInfo executionInfo;
 
     private @Nullable CooldownManager<Object> cooldownManager;
+
+    private @Nullable AsyncManager asyncManager;
+
+    /**
+     * Gets the timeout to execute the command asynchronously.
+     *
+     * @return the timeout (if given)
+     */
+    public @Nullable Duration getAsyncTimeout() {
+        return asyncManager == null ? null : asyncManager.getTimeout();
+    }
+
+    /**
+     * Sets the command to run asynchronously.
+     * <br>
+     * <b>WARNING</b>: only works if {@link #executionInfo} is defined.
+     *
+     * @param timeout the timeout
+     */
+    public void setAsync(final @Nullable Duration timeout) {
+        if (timeout == null) asyncManager = null;
+        else asyncManager = new AsyncManager(timeout);
+    }
 
     /**
      * Gets the execution cooldown for the current node.
@@ -221,9 +229,8 @@ public abstract class CommandNode implements TabCompletable {
     }
 
     private void internalExecute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        final CommandSenderWrapper sender = context.getCommandSender();
-
         if (cooldownManager != null) {
+            CommandSenderWrapper<?> sender = context.getCommandSender();
             PermissionInfo cooldownPermission = getCooldownBypassPermission(getPermission().orElseThrow());
             if (!sender.hasPermission(cooldownPermission)) {
                 Object id = sender.getId();
@@ -234,48 +241,9 @@ public abstract class CommandNode implements TabCompletable {
                 } else cooldownManager.putOnCooldown(id);
             }
         }
-
         final ExecutionInfo executionInfo = getExecutionInfo().orElseThrow();
-        Method method = executionInfo.getMethod();
-        try {
-            LinkedList<Object> arguments = context.getArguments();
-            if (arguments.size() != method.getParameterCount()) {
-                Class<?> parameterType = method.getParameterTypes()[0];
-                if (parameterType.equals(CommandSenderWrapper.class))
-                    arguments.addFirst(sender);
-                else if (sender.extendsType(parameterType)) arguments.addFirst(sender.getActualSender());
-                else throw new CommandExecutionException(sender.isPlayer()
-                            ? "error.player-cannot-execute"
-                            : "error.console-cannot-execute"
-                    );
-            }
-            Object executor = executionInfo.getExecutor();
-            Object[] parameterValues = arguments.toArray();
-            validateParameters(executor, method, parameterValues);
-            method.invoke(executor, parameterValues);
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof CommandExecutionException) throw (CommandExecutionException) cause;
-            throw new CommandExecutionException("error.internal-error", cause)
-                    .arguments(Placeholder.of("message", cause.getMessage()));
-        } catch (IllegalAccessException e) {
-            throw new IllegalArgumentException(String.format("Method %s#%s should be declared public",
-                    method.getDeclaringClass().getCanonicalName(),
-                    ReflectionUtils.methodToString(method)
-            ));
-        }
-    }
-
-    private static void validateParameters(final @NotNull Object executor,
-                                           final @NotNull Method method,
-                                           final @NotNull Object[] parameterValues) throws CommandExecutionException {
-        Set<ConstraintViolation<Object>> violations = validator.validateParameters(executor, method, parameterValues);
-        Optional<ConstraintViolation<Object>> first = violations.stream().findFirst();
-        if (first.isPresent()) {
-            ConstraintViolation<Object> violation = first.get();
-            throw new CommandExecutionException(violation.getMessage())
-                    .arguments(Placeholder.of("argument", violation.getInvalidValue()));
-        }
+        if (asyncManager != null) asyncManager.execute(executionInfo, context);
+        else executionInfo.invoke(context);
     }
 
     /**
