@@ -36,25 +36,25 @@ public final class CommandParser {
     // therefore, nothing else can be specified.
     private @Nullable String greedyArgument;
 
-    private final @Nullable String prefix;
+    private final @NotNull String permissionGroup;
     private @NotNull String computedPermission = "";
 
     /**
      * Instantiates a new Command parser.
      *
-     * @param command        the command
-     * @param commandInfo    the command info
-     * @param cooldown       the cooldown of the command
-     * @param executionInfo  the execution info
-     * @param parameterIndex the starting index of the parameters (excluding the command sender)
-     * @param prefix         the string to prepend to the generated commands permission, if none is given
+     * @param command         the command
+     * @param commandInfo     the command info
+     * @param cooldown        the cooldown of the command
+     * @param executionInfo   the execution info
+     * @param parameterIndex  the starting index of the parameters (excluding the command sender)
+     * @param permissionGroup the group to prepend to the commands permissions, if none is given
      */
     CommandParser(final @NotNull String command,
                   final @NotNull CommandInfo commandInfo,
                   final @Nullable Duration cooldown,
                   final @NotNull ExecutionInfo executionInfo,
                   final int parameterIndex,
-                  final @Nullable String prefix) {
+                  final @NotNull String permissionGroup) {
         this.rawCommand = command;
         this.tokenizer = new CommandTokenizer(command);
         this.commandInfo = commandInfo;
@@ -63,7 +63,7 @@ public final class CommandParser {
         this.parameters = executionInfo.getMethod().getParameters();
         this.startIndex = parameterIndex;
         this.parameterIndex = parameterIndex;
-        this.prefix = prefix;
+        this.permissionGroup = permissionGroup;
     }
 
     /**
@@ -229,7 +229,7 @@ public final class CommandParser {
         return new CommandInfo(
                 getDefaultDescription(computedPermission),
                 new PermissionInfo(
-                        prefix,
+                        permissionGroup,
                         computedPermission,
                         Permission.Grant.OP,
                         true
@@ -270,16 +270,16 @@ public final class CommandParser {
     /**
      * Obtains all the Command nodes from the given module.
      *
-     * @param commandModule the command module
-     * @param senderType    the type of the sender (to identify methods with sender declared)
-     * @param prefix        the string to prepend to the generated commands permission, if none is given
+     * @param commandModule   the command module
+     * @param senderType      the type of the sender (to identify methods with sender declared)
+     * @param permissionGroup the group to prepend to the commands permissions, if none is given
      * @return the nodes
      */
     public static @NotNull List<CommandNode> parseCommands(final @NotNull Object commandModule,
                                                            final @NotNull Class<?> senderType,
-                                                           final @Nullable String prefix) {
+                                                           final @NotNull String permissionGroup) {
         if (commandModule instanceof Class<?>)
-            return parseAnonymousCommands((Class<?>) commandModule, senderType, prefix);
+            return parseAnonymousCommands((Class<?>) commandModule, senderType, permissionGroup);
 
         Class<?> moduleType = commandModule.getClass();
         if (!moduleType.isAnnotationPresent(Command.class))
@@ -317,7 +317,7 @@ public final class CommandParser {
         if (baseCommand.isEmpty())
             throw CommandParseException.of("Invalid command module '%s': command cannot be empty", commandModule);
 
-        CommandInfo baseCommandInfo = createCommandInfo(moduleType);
+        CommandInfo baseCommandInfo = createCommandInfo(moduleType, permissionGroup);
         Duration baseCooldown = extractCooldown(moduleType);
 
         List<CommandNode> commands = new ArrayList<>();
@@ -328,7 +328,7 @@ public final class CommandParser {
 
                 String rawCommand = annotation.value().trim();
 
-                CommandInfo commandInfo = createCommandInfo(method);
+                CommandInfo commandInfo = createCommandInfo(method, permissionGroup);
                 if (rawCommand.isEmpty()) {
                     rawCommand = baseCommand;
                     commandInfo.merge(baseCommandInfo);
@@ -339,7 +339,7 @@ public final class CommandParser {
                 ExecutionInfo executionInfo = new ExecutionInfo(commandModule, method);
                 int parameterIndex = getParameterIndex(method, senderType);
 
-                CommandParser parser = new CommandParser(rawCommand, commandInfo, cooldown, executionInfo, parameterIndex, prefix);
+                CommandParser parser = new CommandParser(rawCommand, commandInfo, cooldown, executionInfo, parameterIndex, permissionGroup);
                 CommandNode node = parser.parse();
 
                 commands.add(node);
@@ -353,12 +353,12 @@ public final class CommandParser {
      *
      * @param commandsContainer the commands container
      * @param senderType        the type of the sender (to identify methods with sender declared)
-     * @param prefix            the string to prepend to the generated commands permission, if none is given
+     * @param permissionGroup   the group to prepend to the commands permissions, if none is given
      * @return the nodes
      */
     static @NotNull List<CommandNode> parseAnonymousCommands(final @NotNull Class<?> commandsContainer,
                                                              final @NotNull Class<?> senderType,
-                                                             final @Nullable String prefix) {
+                                                             final @NotNull String permissionGroup) {
         List<CommandNode> commands = new ArrayList<>();
         for (Method method : commandsContainer.getMethods())
             if (Modifier.isStatic(method.getModifiers()) && method.isAnnotationPresent(Command.class)) {
@@ -399,12 +399,12 @@ public final class CommandParser {
                 if (rawCommand.isEmpty())
                     throw CommandParseException.of("Invalid command method %s: command cannot be empty", method);
 
-                CommandInfo commandInfo = createCommandInfo(method);
+                CommandInfo commandInfo = createCommandInfo(method, permissionGroup);
                 Duration cooldown = extractCooldown(method);
                 ExecutionInfo executionInfo = new ExecutionInfo(commandsContainer, method);
                 int parameterIndex = getParameterIndex(method, senderType);
 
-                CommandParser parser = new CommandParser(rawCommand, commandInfo, cooldown, executionInfo, parameterIndex, prefix);
+                CommandParser parser = new CommandParser(rawCommand, commandInfo, cooldown, executionInfo, parameterIndex, permissionGroup);
                 CommandNode node = parser.parse();
 
                 commands.add(node);
@@ -427,27 +427,33 @@ public final class CommandParser {
      * Will check for the {@link Command} annotation to determine the description and
      * for the {@link Permission} annotation to determine the permission information.
      *
-     * @param element the element
+     * @param element         the element
+     * @param permissionGroup the group to prepend to the commands permissions, if none is given
      * @return the command information
      */
-    static @NotNull CommandInfo createCommandInfo(final @NotNull AnnotatedElement element) {
+    static @NotNull CommandInfo createCommandInfo(final @NotNull AnnotatedElement element,
+                                                  final @NotNull String permissionGroup) {
         final String description;
         if (element.isAnnotationPresent(Command.class))
             description = element.getAnnotation(Command.class).description().trim();
         else description = "";
 
         final String permission;
+        String group;
         final Permission.Grant grant;
         if (element.isAnnotationPresent(Permission.class)) {
             Permission permissionAnnotation = element.getAnnotation(Permission.class);
             permission = permissionAnnotation.value().trim();
+            group = permissionAnnotation.group();
+            if (group.trim().isEmpty()) group = permissionGroup;
             grant = permissionAnnotation.grant();
         } else {
             permission = "";
+            group = permissionGroup;
             grant = Permission.Grant.OP;
         }
 
-        PermissionInfo permissionInfo = new PermissionInfo(null, permission, grant);
+        PermissionInfo permissionInfo = new PermissionInfo(group, permission, grant);
         return new CommandInfo(description, permissionInfo);
     }
 
