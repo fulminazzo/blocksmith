@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.argument.Time;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,6 +19,7 @@ import java.util.concurrent.*;
 @RequiredArgsConstructor
 final class AsyncManager {
     private final @NotNull Set<Object> pending = ConcurrentHashMap.newKeySet();
+    @Getter
     private final @NotNull Duration timeout;
 
     /**
