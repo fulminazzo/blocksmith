@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
@@ -60,16 +61,9 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
 
         for (String alias : command.getAliases()) {
             if (alias.equals(commandName)) continue;
-            LiteralCommandNode<S> aliasNode = com.mojang.brigadier.builder.LiteralArgumentBuilder
-                    .<S>literal(alias)
+            injectIntoBrigadier(alias, LiteralArgumentBuilder.<S>literal(alias)
                     .redirect(brigadierNode)
-                    .build();
-            injectIntoBrigadier(alias, aliasNode);
-        }
-
-        if (!commandName.startsWith(getBukkitPrefix())) {
-            String prefixed = getBukkitPrefix() + commandName;
-            onRegister(prefixed, command.clone(prefixed));
+                    .build());
         }
 
         updateCommands();
@@ -98,8 +92,12 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
             removeChild(name);
         }
         root.addChild(node);
-        if (!name.startsWith(getBukkitPrefix()))
-            injectIntoBrigadier(getBukkitPrefix() + name, node);
+        if (!name.startsWith(getBukkitPrefix())) {
+            String alias = getBukkitPrefix() + name;
+            injectIntoBrigadier(alias, LiteralArgumentBuilder.<S>literal(alias)
+                    .redirect(node)
+                    .build());
+        }
     }
 
     private void restoreIntoBrigadier(final @NotNull String name) {
