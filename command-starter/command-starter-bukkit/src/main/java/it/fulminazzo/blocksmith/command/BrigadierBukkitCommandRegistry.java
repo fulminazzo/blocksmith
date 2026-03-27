@@ -53,7 +53,7 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
 
     @Override
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
-        registerInCommandMap(commandName, command);
+        if (NMSUtils.getServerVersion() < 19) super.registerInCommandMap(commandName, command);
 
         LiteralCommandNode<S> brigadierNode = parser.parse(command);
         injectIntoBrigadier(commandName, brigadierNode);
@@ -78,7 +78,7 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
                     .filter(a -> !a.equals(commandName))
                     .forEach(this::restoreIntoBrigadier);
 
-        super.onUnregister(commandName);
+        if (NMSUtils.getServerVersion() < 19) super.onUnregister(commandName);
 
         updateCommands();
     }
