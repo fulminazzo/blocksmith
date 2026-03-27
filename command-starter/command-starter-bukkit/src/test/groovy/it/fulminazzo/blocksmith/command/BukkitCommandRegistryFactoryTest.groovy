@@ -44,9 +44,13 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         application = Mock(Plugin, additionalInterfaces: [ApplicationHandle]) as ApplicationHandle
         application.server >> Bukkit.server
 
+        def player = Mock(Player)
+        player.location >> new Location(null, 1, 0, 6)
+        player.canSee(_) >> true
+
         context = new CommandExecutionContext(
                 application,
-                new BukkitCommandSenderWrapper(Mock(CommandSender))
+                new BukkitCommandSenderWrapper(player)
         )
     }
 
@@ -162,6 +166,7 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         World         | 'world_nether' || { a -> a.server.getWorld('world_nether') }
         // LOCATION
         Location      | '1 2 3'        || { a -> new Location(null, 1, 2, 3) }
+        Location      | '~ ~2 ~-3'     || { a -> new Location(null, 1, 2, 3) }
     }
 
     def 'test that parse of parser for #type throws exception with #expected message with #argument'() {
@@ -195,6 +200,7 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         Location      | '1'             || 'error.not-enough-arguments'
         Location      | '1 2'           || 'error.not-enough-arguments'
         Location      | '1 2 a'         || 'error.invalid-number'
+        Location      | '~ ~2 a'        || 'error.invalid-number'
         Location      | 'a'             || 'error.invalid-number'
     }
 
@@ -240,6 +246,7 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         Location      | '1'             || ['<x> <y> <z>']
         Location      | '1 2'           || ['<x> <y> <z>']
         Location      | '1 2 3'         || ['<x> <y> <z>']
+        Location      | '~ ~2 ~-3'      || ['<x> <y> <z>']
         Location      | 'a'             || ['<x> <y> <z>']
     }
 
