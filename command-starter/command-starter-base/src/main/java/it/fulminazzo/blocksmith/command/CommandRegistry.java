@@ -105,8 +105,8 @@ public abstract class CommandRegistry {
         if (state != State.REGISTERED)
             throw new IllegalStateException(String.format("Commands have not been registered yet. " +
                     "Did you forget to call %s#commit()?", getClass().getSimpleName()));
-        state = State.INITIAL;
         new HashSet<>(commands.keySet()).forEach(this::unregister);
+        state = State.INITIAL;
     }
 
     /**
