@@ -38,12 +38,19 @@ final class VelocityCommandRegistry extends BrigadierCommandRegistry<CommandSour
     }
 
     @Override
+    protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
+        List<String> aliases = new ArrayList<>(command.getAliases());
+        aliases.remove(commandName);
+        registeredAliases.put(commandName, aliases);
+        super.onRegister(commandName, command);
+    }
+
+    @Override
     protected void onRegister(final @NotNull String commandName,
                               final @NotNull LiteralNode command,
                               final @NotNull LiteralCommandNode<CommandSource> brigadierCommand) {
         List<String> aliases = new ArrayList<>(command.getAliases());
         aliases.remove(commandName);
-        registeredAliases.put(commandName, aliases);
         CommandMeta meta = commandManager.metaBuilder(commandName)
                 .aliases(aliases.toArray(new String[0]))
                 .build();
