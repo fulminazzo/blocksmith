@@ -296,8 +296,6 @@ public abstract class CommandNode implements TabCompletable {
                             .map(c -> c.getCompletions(context))
                             .flatMap(Collection::stream)
                             .collect(Collectors.toList());
-                    if (this instanceof LiteralNode && ((LiteralNode) this).requiresConfirmation())
-                        completions.addAll(Arrays.asList("confirm", "cancel"));
                     return filterCompletions(context, completions);
                 } else {
                     CommandNode child = getChild(context.getCurrent());
@@ -315,7 +313,14 @@ public abstract class CommandNode implements TabCompletable {
         }
     }
 
-    private @NotNull List<String> filterCompletions(final @NotNull CommandExecutionContext context,
+    /**
+     * Removes any completion not starting with &lt; and not matching the last input.
+     *
+     * @param context     the context
+     * @param completions the completions
+     * @return the completions
+     */
+    @NotNull List<String> filterCompletions(final @NotNull CommandExecutionContext context,
                                                     final @NotNull List<String> completions) {
         List<String> finalCompletions = completions.stream()
                 .filter(c -> c.toLowerCase().startsWith(context.getCurrent().toLowerCase()))

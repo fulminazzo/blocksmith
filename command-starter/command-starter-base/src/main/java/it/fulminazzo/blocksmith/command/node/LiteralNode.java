@@ -130,6 +130,14 @@ public final class LiteralNode extends CommandNode {
     }
 
     @Override
+    public @NotNull List<String> tabComplete(@NotNull CommandExecutionContext context) {
+        List<String> completions = new ArrayList<>(super.tabComplete(context));
+        if (context.isLast() || context.advanceCursor().isLast())
+            completions.addAll(Arrays.asList("confirm", "cancel"));
+        return filterCompletions(context, completions);
+    }
+
+    @Override
     protected void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         checkPermission(context);
     }
