@@ -44,6 +44,7 @@ public abstract class CommandNode implements TabCompletable {
     private final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
     @Setter
     private @Nullable ExecutionInfo executionInfo;
+
     private @Nullable CooldownManager<Object> cooldownManager;
 
     /**
@@ -203,20 +204,22 @@ public abstract class CommandNode implements TabCompletable {
     }
 
     private void internalExecute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        ExecutionInfo executionInfo = getExecutionInfo().orElseThrow();
+        final CommandSenderWrapper sender = context.getCommandSender();
+
         if (cooldownManager != null) {
-            Object id = context.getCommandSender().getId();
+            Object id = sender.getId();
             if (cooldownManager.isOnCooldown(id)) {
                 long time = cooldownManager.getRemainingCooldown(id);
                 throw new CommandExecutionException("error.command-on-cooldown")
                         .arguments(Time.of("cooldown", time));
             } else cooldownManager.putOnCooldown(id);
         }
+
+        final ExecutionInfo executionInfo = getExecutionInfo().orElseThrow();
         Method method = executionInfo.getMethod();
         try {
             LinkedList<Object> arguments = context.getArguments();
             if (arguments.size() != method.getParameterCount()) {
-                CommandSenderWrapper sender = context.getCommandSender();
                 Class<?> parameterType = method.getParameterTypes()[0];
                 if (parameterType.equals(CommandSenderWrapper.class))
                     arguments.addFirst(sender);
