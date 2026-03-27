@@ -1,6 +1,7 @@
 //file:noinspection unused
 package it.fulminazzo.blocksmith.command
 
+import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.ExecutionInfo
 import it.fulminazzo.blocksmith.command.node.LiteralNode
@@ -58,11 +59,6 @@ class CommandRegistryExecuteTest extends Specification {
     def 'test that execute with not enough arguments does not throw'() {
         given:
         def node = new LiteralNode('valid')
-        def argument = new ArgumentNode('arg', String, false)
-        argument.executionInfo = new ExecutionInfo(
-                CommandRegistryExecuteTest,
-                CommandRegistryExecuteTest.getMethod('arg1', String)
-        )
 
         when:
         registry.execute(node, executor, 'valid')
@@ -85,6 +81,30 @@ class CommandRegistryExecuteTest extends Specification {
                 new MockCommandSenderWrapper(new ConsoleCommandSender()),
                 new MockCommandSenderWrapper(new Player('Alex'))
         ]
+    }
+
+    def 'test that execute with CommandExecutionException does not throw'() {
+        given:
+        def node = new LiteralNode('valid')
+        node.executionInfo = new ExecutionInfo(
+                CommandRegistryExecuteTest,
+                CommandRegistryExecuteTest.getMethod('mockError')
+        )
+
+        and:
+        def executor = new CommandSender()
+
+        when:
+        registry.execute(node, executor, 'valid')
+
+        then:
+        noExceptionThrown()
+
+        and:
+        !executed
+
+        and:
+        1 * messenger.sendMessage(executor, 'error.mock-error')
     }
 
     def 'test that internal exception is properly logged'() {
@@ -157,6 +177,10 @@ class CommandRegistryExecuteTest extends Specification {
 
     static void invalid() {
         throw new RuntimeException('Test runtime exception')
+    }
+
+    static void mockError() {
+        throw new CommandExecutionException('error.mock-error')
     }
 
 }
