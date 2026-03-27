@@ -17,4 +17,8 @@ public @interface Confirm {
 
     @NotNull TimeUnit unit() default TimeUnit.SECONDS;
 
+    @NotNull String confirmWord() default "confirm";
+
+    @NotNull String cancelWord() default "cancel";
+
 }
