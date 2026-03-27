@@ -91,13 +91,15 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
 
     private void injectIntoBrigadier(final @NotNull String name,
                                      final @NotNull LiteralCommandNode<S> node) {
-        RootCommandNode<S> liveRoot = getRoot();
-        CommandNode<S> previous = liveRoot.getChild(name);
+        RootCommandNode<S> root = getRoot();
+        CommandNode<S> previous = root.getChild(name);
         if (previous != null) {
             previousBrigadierNodes.put(name, previous);
             removeChild(name);
         }
-        liveRoot.addChild(node);
+        root.addChild(node);
+        if (!name.startsWith(getBukkitPrefix()))
+            injectIntoBrigadier(getBukkitPrefix() + name, node);
     }
 
     private void restoreIntoBrigadier(final @NotNull String name) {
