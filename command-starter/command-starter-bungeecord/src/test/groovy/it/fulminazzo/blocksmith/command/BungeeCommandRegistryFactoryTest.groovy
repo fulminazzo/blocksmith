@@ -50,7 +50,7 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         context = new CommandExecutionContext(
                 application,
                 new BungeeCommandRegistry(application),
-                new BungeeCommandSenderWrapper(Mock(CommandSender))
+                new BungeeCommandSenderWrapper(application, Mock(CommandSender))
         )
     }
 

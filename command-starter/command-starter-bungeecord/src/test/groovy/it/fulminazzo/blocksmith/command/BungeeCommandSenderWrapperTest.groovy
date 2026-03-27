@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command
 
+import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.PermissionInfo
 import net.md_5.bungee.api.CommandSender
@@ -16,7 +17,7 @@ class BungeeCommandSenderWrapperTest extends Specification {
         }
 
         and:
-        def wrapper = new BungeeCommandSenderWrapper(sender)
+        def wrapper = new BungeeCommandSenderWrapper(Mock(ApplicationHandle), sender)
 
         when:
         def actual = wrapper.hasPermission(permission)
@@ -47,7 +48,7 @@ class BungeeCommandSenderWrapperTest extends Specification {
         player.uniqueId >> UUID.nameUUIDFromBytes(player.name.bytes)
 
         and:
-        def wrapper = new BungeeCommandSenderWrapper(player)
+        def wrapper = new BungeeCommandSenderWrapper(Mock(ApplicationHandle), player)
 
         when:
         def actual = wrapper."$method"()
@@ -68,7 +69,7 @@ class BungeeCommandSenderWrapperTest extends Specification {
         sender.name >> '(server)'
 
         and:
-        def wrapper = new BungeeCommandSenderWrapper(sender)
+        def wrapper = new BungeeCommandSenderWrapper(Mock(ApplicationHandle), sender)
 
         when:
         def actual = wrapper."$method"()

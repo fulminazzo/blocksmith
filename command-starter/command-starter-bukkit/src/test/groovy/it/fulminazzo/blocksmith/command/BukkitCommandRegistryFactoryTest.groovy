@@ -47,7 +47,7 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         context = new CommandExecutionContext(
                 application,
                 new BukkitCommandRegistry(application),
-                new BukkitCommandSenderWrapper(Mock(CommandSender))
+                new BukkitCommandSenderWrapper(application, Mock(CommandSender))
         )
     }
 
@@ -74,7 +74,7 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         def context = new CommandExecutionContext(
                 application,
                 new BukkitCommandRegistry(application),
-                new BukkitCommandSenderWrapper(sender)
+                new BukkitCommandSenderWrapper(application, sender)
         )
 
         when:
@@ -102,7 +102,7 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         def context = new CommandExecutionContext(
                 application,
                 new BukkitCommandRegistry(application),
-                new BukkitCommandSenderWrapper(sender)
+                new BukkitCommandSenderWrapper(application, sender)
         )
 
         when:
@@ -135,7 +135,7 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         def context = new CommandExecutionContext(
                 application,
                 new BukkitCommandRegistry(application),
-                new BukkitCommandSenderWrapper(sender)
+                new BukkitCommandSenderWrapper(application, sender)
         )
 
         when:
