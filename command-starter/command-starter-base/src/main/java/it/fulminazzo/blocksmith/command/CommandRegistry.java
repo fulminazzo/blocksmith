@@ -205,7 +205,7 @@ public abstract class CommandRegistry {
         CommandSenderWrapper wrapper;
         if (executor instanceof CommandSenderWrapper) wrapper = (CommandSenderWrapper) executor;
         else wrapper = wrapSender(executor);
-        CommandExecutionContext context = new CommandExecutionContext(application, wrapper).addInput(commandName);
+        CommandExecutionContext context = new CommandExecutionContext(application, this, wrapper).addInput(commandName);
         if (arguments.length > 0) {
             String fullArguments = String.join(" ", arguments);
             context.addInput(StringUtils.split(fullArguments, " ", false, "'", "\""));
