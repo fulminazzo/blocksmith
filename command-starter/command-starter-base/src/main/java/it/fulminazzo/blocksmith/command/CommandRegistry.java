@@ -146,7 +146,7 @@ public abstract class CommandRegistry {
             CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
             command.execute(context);
         } catch (CommandExecutionException e) {
-            application.getMessenger().sendMessage(executor, e.getMessage(), getArguments(e, commandName, arguments));
+            application.getMessenger().sendMessage(wrapSender(executor), e.getMessage(), getArguments(e, commandName, arguments));
             Throwable cause = e.getCause();
             if (cause != null)
                 application.getLog().warn("{} while executing command /{} {}",
