@@ -7,6 +7,7 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
@@ -17,10 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class BukkitCommandRegistryFactory implements CommandRegistryFactory {
@@ -79,15 +78,13 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
         });
         ArgumentParsers.register(Location.class, new ArgumentParser<>() {
 
-            @SuppressWarnings("DataFlowIssue")
             @Override
             public @NotNull Location parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-                ArgumentParser<Double> doubleParser = ArgumentParsers.of(Double.class);
-                double x = doubleParser.parse(context);
+                double x = new CoordinateParser(Location::getX).parse(context);
                 if (context.isLast()) throw new CommandExecutionException("error.not-enough-arguments");
-                double y = doubleParser.parse(context.advanceCursor());
+                double y = new CoordinateParser(Location::getY).parse(context.advanceCursor());
                 if (context.isLast()) throw new CommandExecutionException("error.not-enough-arguments");
-                double z = doubleParser.parse(context.advanceCursor());
+                double z = new CoordinateParser(Location::getZ).parse(context.advanceCursor());
                 return new Location(null, x, y, z);
             }
 
@@ -96,16 +93,14 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
                 return Collections.singletonList("<x> <y> <z>");
             }
 
-            @SuppressWarnings("DataFlowIssue")
             @Override
             public boolean validateCompletions(final @NotNull CommandExecutionContext context) {
                 try {
-                    ArgumentParser<Double> doubleParser = ArgumentParsers.of(Double.class);
-                    double x = doubleParser.parse(context);
+                    double x = new CoordinateParser(Location::getX).parse(context);
                     if (context.isLast()) return false;
-                    double y = doubleParser.parse(context.advanceCursor());
+                    double y = new CoordinateParser(Location::getY).parse(context.advanceCursor());
                     if (context.isLast()) return false;
-                    double z = doubleParser.parse(context.advanceCursor());
+                    double z = new CoordinateParser(Location::getZ).parse(context.advanceCursor());
                     context.addParsedArgument(new Location(null, x, y, z));
                     return !context.isLast();
                 } catch (CommandExecutionException e) {
@@ -141,6 +136,32 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
         } catch (ClassNotFoundException e) {
             return Class.forName(String.format("net.minecraft.server.%s.ArgumentPosition", NMSUtils.getNMSVersion()));
         }
+    }
+
+    @RequiredArgsConstructor
+    private static final class CoordinateParser implements ArgumentParser<Double> {
+        private static final @NotNull String currentIdentifier = "~";
+
+        private final @NotNull Function<Location, Double> coordinateGetter;
+        private final @NotNull ArgumentParser<Double> delegate = ArgumentParsers.of(Double.class);
+
+        @Override
+        public @NotNull Double parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+            if (context.getCurrent().equals(currentIdentifier)) {
+                Object sender = context.getCommandSender().getActualSender();
+                if (sender instanceof Player) return coordinateGetter.apply(((Player) sender).getLocation());
+            }
+            return Objects.requireNonNull(delegate.parse(context));
+        }
+
+        @Override
+        public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
+            List<String> completions = new ArrayList<>();
+            completions.add(currentIdentifier);
+            completions.addAll(delegate.getCompletions(context));
+            return completions;
+        }
+
     }
 
 }
