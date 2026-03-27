@@ -36,6 +36,29 @@ public abstract class CommandNode implements TabCompletable {
 
     private @Nullable CooldownManager<Object> cooldownManager;
 
+    private @Nullable AsyncManager asyncManager;
+
+    /**
+     * Gets the timeout to execute the command asynchronously.
+     *
+     * @return the timeout (if given)
+     */
+    public @Nullable Duration getAsyncTimeout() {
+        return asyncManager == null ? null : asyncManager.getTimeout();
+    }
+
+    /**
+     * Sets the command to run asynchronously.
+     * <br>
+     * <b>WARNING</b>: only works if {@link #executionInfo} is defined.
+     *
+     * @param timeout the timeout
+     */
+    public void setAsync(final @Nullable Duration timeout) {
+        if (timeout == null) asyncManager = null;
+        else asyncManager = new AsyncManager(timeout);
+    }
+
     /**
      * Gets the execution cooldown for the current node.
      *
@@ -218,8 +241,9 @@ public abstract class CommandNode implements TabCompletable {
                 } else cooldownManager.putOnCooldown(id);
             }
         }
-
-        getExecutionInfo().orElseThrow().invoke(context);
+        final ExecutionInfo executionInfo = getExecutionInfo().orElseThrow();
+        if (asyncManager != null) asyncManager.execute(executionInfo, context);
+        else executionInfo.invoke(context);
     }
 
     /**

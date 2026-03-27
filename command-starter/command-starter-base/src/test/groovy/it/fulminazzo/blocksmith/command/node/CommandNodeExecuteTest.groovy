@@ -21,7 +21,7 @@ class CommandNodeExecuteTest extends Specification {
     private static @NotNull Method first = CommandNodeExecuteTest.getDeclaredMethod('execute', CommandSender, String, String)
     private static @NotNull Method second = CommandNodeExecuteTest.getDeclaredMethod('execute', String, String)
 
-    private static String printer
+    private static volatile String printer
 
     void setup() {
         printer = null
@@ -211,6 +211,43 @@ class CommandNodeExecuteTest extends Specification {
 
         and:
         greet.execute(context)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        printer == 'Hello, Alex!'
+    }
+
+    def 'test execute asynchronously'() {
+        given:
+        def greet = new LiteralNode('greet')
+        greet.commandInfo = new CommandInfo(
+                '',
+                new PermissionInfo('blocksmith', 'greet', Permission.Grant.ALL)
+        )
+        def node = new ArgumentNode('greeting', String, false)
+        greet.addChild(node)
+        def who = new ArgumentNode('who', String, false)
+        who.executionInfo = new ExecutionInfo(CommandNodeExecuteTest, second)
+        who.async = Duration.ofSeconds(1)
+        node.addChild(who)
+
+        and:
+        def context = new CommandExecutionContext(
+                Mock(ApplicationHandle),
+                Mock(CommandRegistry),
+                commandSender
+        ).addInput('greet', 'Hello', 'Alex')
+
+        expect:
+        printer == null
+
+        when:
+        greet.execute(context)
+
+        and:
+        sleep(200)
 
         then:
         noExceptionThrown()
