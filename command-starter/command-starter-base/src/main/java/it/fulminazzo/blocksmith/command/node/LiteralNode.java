@@ -83,6 +83,19 @@ public final class LiteralNode extends CommandNode {
         return Optional.ofNullable(commandInfo);
     }
 
+    /**
+     * Checks if the sender of the current context has permission to execute this node.
+     *
+     * @param context the context
+     * @return <code>true</code> if they do
+     */
+    boolean hasPermission(final @NotNull CommandExecutionContext context) {
+        return getCommandInfo()
+                .map(CommandInfo::getPermission)
+                .map(p -> context.getCommandSender().hasPermission(p))
+                .orElse(true);
+    }
+
     @Override
     public @NotNull LiteralNode merge(final @NotNull CommandNode node) {
         if (node instanceof LiteralNode) {
@@ -151,19 +164,6 @@ public final class LiteralNode extends CommandNode {
     @Override
     public boolean matches(final @NotNull String token) {
         return aliases.contains(token.trim().toLowerCase());
-    }
-
-    /**
-     * Checks if the sender of the current context has permission to execute this node.
-     *
-     * @param context the context
-     * @return <code>true</code> if they do
-     */
-    boolean hasPermission(final @NotNull CommandExecutionContext context) {
-        return getCommandInfo()
-                .map(CommandInfo::getPermission)
-                .map(p -> context.getCommandSender().hasPermission(p))
-                .orElse(true);
     }
 
 }
