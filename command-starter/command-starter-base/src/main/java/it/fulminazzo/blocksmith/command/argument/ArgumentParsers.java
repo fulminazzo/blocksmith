@@ -3,12 +3,14 @@ package it.fulminazzo.blocksmith.command.argument;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
+import it.fulminazzo.blocksmith.message.util.LocaleUtils;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Holds all the supported argument parsers.
@@ -75,6 +77,31 @@ public final class ArgumentParsers {
             @Override
             public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
                 return Collections.singletonList("<%name%>");
+            }
+
+        });
+        register(Locale.class, new ArgumentParser<>() {
+
+            @Override
+            public @NotNull Locale parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+                String argument = context.getCurrent();
+                Locale locale = LocaleUtils.fromString(argument);
+                if (isValid(locale)) return locale;
+                else throw new CommandExecutionException("error.invalid-locale")
+                        .arguments(Placeholder.of("argument", argument));
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
+                return Arrays.stream(Locale.getAvailableLocales())
+                        .filter(this::isValid)
+                        .map(LocaleUtils::toString)
+                        .distinct()
+                        .collect(Collectors.toList());
+            }
+
+            private boolean isValid(final @NotNull Locale locale) {
+                return !locale.getLanguage().isEmpty() && !locale.getCountry().isEmpty();
             }
 
         });
