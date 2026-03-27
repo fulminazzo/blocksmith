@@ -1,16 +1,32 @@
 package it.fulminazzo.blocksmith.command;
 
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.PermissionInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+/**
+ * A Command sender wrapper for Bungeecord.
+ */
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 final class BungeeCommandSenderWrapper extends CommandSenderWrapper<CommandSender> {
-    private final @NotNull CommandSender actualSender;
+
+    /**
+     * Instantiates a new Bungee command sender wrapper.
+     *
+     * @param application  the application
+     * @param actualSender the actual sender
+     */
+    public BungeeCommandSenderWrapper(final @NotNull ApplicationHandle application,
+                                      final @NonNull CommandSender actualSender) {
+        super(application, actualSender);
+    }
 
     @Override
     public @NotNull String getName() {

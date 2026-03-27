@@ -1,16 +1,31 @@
 package it.fulminazzo.blocksmith.command;
 
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.PermissionInfo;
 import lombok.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+/**
+ * A Command sender wrapper for Bukkit.
+ */
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 final class BukkitCommandSenderWrapper extends CommandSenderWrapper<CommandSender> {
-    private final @NotNull CommandSender actualSender;
+
+    /**
+     * Instantiates a new Bukkit command sender wrapper.
+     *
+     * @param application  the application
+     * @param actualSender the actual sender
+     */
+    public BukkitCommandSenderWrapper(final @NotNull ApplicationHandle application,
+                                      final @NonNull CommandSender actualSender) {
+        super(application, actualSender);
+    }
 
     @Override
     public @NotNull String getName() {

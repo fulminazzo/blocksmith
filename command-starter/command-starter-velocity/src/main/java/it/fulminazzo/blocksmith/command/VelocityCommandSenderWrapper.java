@@ -2,15 +2,31 @@ package it.fulminazzo.blocksmith.command;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.PermissionInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+/**
+ * A Command sender wrapper for Velocity.
+ */
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 final class VelocityCommandSenderWrapper extends CommandSenderWrapper<CommandSource> {
-    private final @NotNull CommandSource actualSender;
+
+    /**
+     * Instantiates a new Velocity command sender wrapper.
+     *
+     * @param application  the application
+     * @param actualSender the actual sender
+     */
+    public VelocityCommandSenderWrapper(final @NotNull ApplicationHandle application,
+                                        final @NonNull CommandSource actualSender) {
+        super(application, actualSender);
+    }
 
     @Override
     public @NotNull String getName() {

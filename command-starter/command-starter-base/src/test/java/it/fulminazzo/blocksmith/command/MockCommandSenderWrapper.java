@@ -1,17 +1,29 @@
 package it.fulminazzo.blocksmith.command;
 
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.PermissionInfo;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
-@ToString
-@EqualsAndHashCode(callSuper = false)
-@Data
-@RequiredArgsConstructor
+/**
+ * A Command sender wrapper for testing purposes.
+ */
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public final class MockCommandSenderWrapper extends CommandSenderWrapper<CommandSender> {
-    @Getter
-    private final @NotNull CommandSender actualSender;
+
+    /**
+     * Instantiates a new Mock command sender wrapper.
+     *
+     * @param application  the application
+     * @param actualSender the actual sender
+     */
+    public MockCommandSenderWrapper(final @NotNull ApplicationHandle application,
+                                    final @NonNull CommandSender actualSender) {
+        super(application, actualSender);
+    }
 
     @Override
     public @NotNull String getName() {

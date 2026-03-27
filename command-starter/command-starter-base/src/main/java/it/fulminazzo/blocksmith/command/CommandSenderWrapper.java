@@ -1,7 +1,12 @@
 package it.fulminazzo.blocksmith.command;
 
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.PermissionInfo;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -9,7 +14,15 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <S> the actual type of the sender
  */
+@RequiredArgsConstructor
+@EqualsAndHashCode
+@ToString
 public abstract class CommandSenderWrapper<S> {
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private final @NotNull ApplicationHandle application;
+    @Getter
+    protected final @NotNull S actualSender;
 
     /**
      * Checks if the actual sender extends the given Java class.
@@ -61,12 +74,5 @@ public abstract class CommandSenderWrapper<S> {
      * @return the id
      */
     public abstract @NotNull Object getId();
-
-    /**
-     * Gets the actual sender instance.
-     *
-     * @return the actual sender
-     */
-    public abstract @NotNull S getActualSender();
 
 }
