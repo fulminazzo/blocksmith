@@ -115,6 +115,11 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
         root.field("literals").call("remove", name);
     }
 
+    private void updateCommands() {
+        for (Player player : server.getOnlinePlayers())
+            player.updateCommands();
+    }
+
     private @NotNull RootCommandNode<S> getRoot() {
         Optional<?> liveDispatcher = NMSUtils.getCommandDispatcher(server);
         if (liveDispatcher.isPresent()) {
