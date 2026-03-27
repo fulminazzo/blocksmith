@@ -50,8 +50,7 @@ public class ExecutionInfo {
             LinkedList<Object> arguments = context.getArguments();
             if (arguments.size() != method.getParameterCount()) {
                 Class<?> parameterType = method.getParameterTypes()[0];
-                if (parameterType.equals(CommandSenderWrapper.class))
-                    arguments.addFirst(sender);
+                if (CommandSenderWrapper.class.isAssignableFrom(parameterType)) arguments.addFirst(sender);
                 else if (sender.extendsType(parameterType)) arguments.addFirst(sender.getActualSender());
                 else throw new CommandExecutionException(sender.isPlayer()
                             ? "error.player-cannot-execute"
