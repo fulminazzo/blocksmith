@@ -158,11 +158,11 @@ final class BrigadierParser<S> {
     static <T, A> @Nullable ArgumentType<T> getArgumentType(final @NotNull ArgumentNode<A> node) {
         if (node.isGreedy()) return (ArgumentType<T>) StringArgumentType.greedyString();
         Class<A> type = node.getType();
-        if (Number.class.isAssignableFrom(type))
-            return getArgumentType((NumberArgumentNode<Number>) node);
-        else if (type.equals(Boolean.class)) return (ArgumentType<T>) BoolArgumentType.bool();
-        else if (type.equals(String.class)) return (ArgumentType<T>) StringArgumentType.string();
-        else return null;
+        return (ArgumentType<T>) ArgumentTypes.get(type).orElseGet(() -> {
+            if (Number.class.isAssignableFrom(type))
+                return getArgumentType((NumberArgumentNode<Number>) node);
+            else return null;
+        });
     }
 
     /**
