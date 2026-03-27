@@ -307,13 +307,16 @@ public abstract class CommandNode implements TabCompletable {
         else {
             try {
                 validateTabCompleteInput(context);
-                if (context.isLast() || context.advanceCursor().isLast())
-                    return filterCompletions(context, getChildren().stream()
+                if (context.isLast() || context.advanceCursor().isLast()) {
+                    List<String> completions = filterCompletions(context, getChildren().stream()
                             .map(c -> c.getCompletions(context))
                             .flatMap(Collection::stream)
                             .collect(Collectors.toList())
                     );
-                else {
+                    if (this instanceof LiteralNode && requiresConfirmation())
+                        completions.addAll(Arrays.asList("confirm", "cancel"));
+                    return completions;
+                } else {
                     CommandNode child = getChild(context.getCurrent());
                     if (child == null) return Collections.emptyList();
                     else {
