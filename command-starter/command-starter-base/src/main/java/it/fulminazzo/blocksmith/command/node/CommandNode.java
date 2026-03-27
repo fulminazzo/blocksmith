@@ -36,28 +36,9 @@ public abstract class CommandNode implements TabCompletable {
 
     private @Nullable StaticCooldownManager<Object> cooldownManager;
 
+    private boolean confirmation;
+
     private @Nullable AsyncManager asyncManager;
-
-    /**
-     * Gets the timeout to execute the command asynchronously.
-     *
-     * @return the timeout (if given)
-     */
-    public @Nullable Duration getAsyncTimeout() {
-        return asyncManager == null ? null : asyncManager.getTimeout();
-    }
-
-    /**
-     * Sets the command to run asynchronously.
-     * <br>
-     * <b>WARNING</b>: only works if {@link #executionInfo} is defined.
-     *
-     * @param timeout the timeout
-     */
-    public void setAsync(final @Nullable Duration timeout) {
-        if (timeout == null) asyncManager = null;
-        else asyncManager = new AsyncManager(timeout);
-    }
 
     /**
      * Gets the execution cooldown for the current node.
@@ -78,6 +59,47 @@ public abstract class CommandNode implements TabCompletable {
     public void setCooldown(final @Nullable Duration cooldown) {
         if (cooldown == null) cooldownManager = null;
         else cooldownManager = new StaticCooldownManager<>(cooldown);
+    }
+
+    /**
+     * Checks if the execution of the current node tree requires confirmation.
+     *
+     * @return <code>true</code> if it does
+     */
+    public boolean requiresConfirmation() {
+        return confirmation;
+    }
+
+    /**
+     * Enables or disables confirmation for this node.
+     *
+     * @param confirmation the confirmation
+     * @return this object (for method chaining)
+     */
+    public @NotNull CommandNode setRequiresConfirmation(final boolean confirmation) {
+        this.confirmation = confirmation;
+        return this;
+    }
+
+    /**
+     * Gets the timeout to execute the command asynchronously.
+     *
+     * @return the timeout (if given)
+     */
+    public @Nullable Duration getAsyncTimeout() {
+        return asyncManager == null ? null : asyncManager.getTimeout();
+    }
+
+    /**
+     * Sets the command to run asynchronously.
+     * <br>
+     * <b>WARNING</b>: only works if {@link #executionInfo} is defined.
+     *
+     * @param timeout the timeout
+     */
+    public void setAsync(final @Nullable Duration timeout) {
+        if (timeout == null) asyncManager = null;
+        else asyncManager = new AsyncManager(timeout);
     }
 
     /**

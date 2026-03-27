@@ -26,7 +26,6 @@ public final class LiteralNode extends CommandNode {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private final @NotNull PendingActionManager<Object> pendingActionManager = new PendingActionManager<>();
-    private boolean confirmation;
 
     /**
      * Instantiates a new Literal node.
@@ -57,24 +56,9 @@ public final class LiteralNode extends CommandNode {
         return clone;
     }
 
-    /**
-     * Checks if the execution of the current node tree requires confirmation.
-     *
-     * @return <code>true</code> if it does
-     */
-    public boolean requiresConfirmation() {
-        return confirmation;
-    }
-
-    /**
-     * Enables or disables confirmation for this node.
-     *
-     * @param confirmation the confirmation
-     * @return this object (for method chaining)
-     */
+    @Override
     public @NotNull LiteralNode setRequiresConfirmation(final boolean confirmation) {
-        this.confirmation = confirmation;
-        return this;
+        return (LiteralNode) super.setRequiresConfirmation(confirmation);
     }
 
     /**
@@ -83,7 +67,7 @@ public final class LiteralNode extends CommandNode {
      *
      * @return the command info, if available
      */
-    public Optional<CommandInfo> getCommandInfo() {
+    public @NotNull Optional<CommandInfo> getCommandInfo() {
         return Optional.ofNullable(commandInfo);
     }
 
