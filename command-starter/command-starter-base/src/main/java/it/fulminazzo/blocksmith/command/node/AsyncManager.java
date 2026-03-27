@@ -5,8 +5,10 @@ import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.argument.Time;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -16,6 +18,8 @@ import java.util.concurrent.*;
 /**
  * A manager for handling asynchronous executions in {@link CommandNode}.
  */
+@EqualsAndHashCode
+@ToString
 @RequiredArgsConstructor
 final class AsyncManager {
     private final @NotNull Set<Object> pending = ConcurrentHashMap.newKeySet();
