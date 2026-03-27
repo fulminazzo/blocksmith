@@ -1,18 +1,21 @@
 package it.fulminazzo.blocksmith.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
 
+import java.lang.reflect.Constructor;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,6 +27,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @SuppressWarnings("unchecked")
 final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
+
+    static {
+        ArgumentTypes.register(Location.class, getPositionArgumentType());
+    }
+
     /**
      * After and including this version, it is not necessary to register the commands in the command map anymore.
      */
@@ -134,6 +142,28 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
             }
         }
         return cachedRoot;
+    }
+
+    private static @NotNull ArgumentType<?> getPositionArgumentType() {
+        try {
+            Class<?> positionArgumentType = getPositionArgumentTypeClass();
+            Constructor<?> constructor = positionArgumentType.getDeclaredConstructor();
+            return (ArgumentType<?>) constructor.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Could not create Position %s", ArgumentType.class.getSimpleName()), e);
+        }
+    }
+
+    private static @NonNull Class<?> getPositionArgumentTypeClass() throws ClassNotFoundException {
+        try {
+            return Class.forName("net.minecraft.commands.arguments.coordinates.BlockPosArgument");
+        } catch (ClassNotFoundException e) {
+            try {
+                return Class.forName("net.minecraft.commands.arguments.coordinates.ArgumentPosition");
+            } catch (ClassNotFoundException ex) {
+                return Class.forName(String.format("net.minecraft.server.%s.ArgumentPosition", NMSUtils.getNMSVersion()));
+            }
+        }
     }
 
 }

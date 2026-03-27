@@ -1,6 +1,5 @@
 package it.fulminazzo.blocksmith.command;
 
-import com.mojang.brigadier.arguments.ArgumentType;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
@@ -17,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
-import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -113,7 +111,6 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             }
 
         });
-        ArgumentTypes.register(Location.class, getPositionArgumentType());
     }
 
     @Override
@@ -122,28 +119,6 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
                 .map(d -> new BrigadierBukkitCommandRegistry<>(application, d))
                 .map(r -> (CommandRegistry) r)
                 .orElse(new BukkitCommandRegistry(application));
-    }
-
-    private static @NotNull ArgumentType<?> getPositionArgumentType() {
-        try {
-            Class<?> positionArgumentType = getPositionArgumentTypeClass();
-            Constructor<?> constructor = positionArgumentType.getDeclaredConstructor();
-            return (ArgumentType<?>) constructor.newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(String.format("Could not create Position %s", ArgumentType.class.getSimpleName()), e);
-        }
-    }
-
-    private static @NonNull Class<?> getPositionArgumentTypeClass() throws ClassNotFoundException {
-        try {
-            return Class.forName("net.minecraft.commands.arguments.coordinates.BlockPosArgument");
-        } catch (ClassNotFoundException e) {
-            try {
-                return Class.forName("net.minecraft.commands.arguments.coordinates.ArgumentPosition");
-            } catch (ClassNotFoundException ex) {
-                return Class.forName(String.format("net.minecraft.server.%s.ArgumentPosition", NMSUtils.getNMSVersion()));
-            }
-        }
     }
 
     @RequiredArgsConstructor
