@@ -27,15 +27,20 @@ public abstract class CommandNode implements TabCompletable {
     @ToString.Exclude
     private @Nullable CommandNode parent;
     @Getter
+    @ToString.Exclude
     private final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
     @Setter
     private @Nullable ExecutionInfo executionInfo;
 
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private @Nullable StaticCooldownManager<Object> cooldownManager;
 
     @Getter(AccessLevel.PROTECTED)
     private @Nullable Duration confirmationTimeout;
 
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private @Nullable AsyncManager asyncManager;
 
     /**
