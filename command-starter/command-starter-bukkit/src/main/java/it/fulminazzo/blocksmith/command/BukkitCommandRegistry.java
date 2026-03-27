@@ -86,6 +86,15 @@ class BukkitCommandRegistry extends CommandRegistry {
         updateCommands();
     }
 
+    /**
+     * Alias for {@link #getPrefix()} + ":".
+     *
+     * @return the prefix
+     */
+    @NonNull String getBukkitPrefix() {
+        return getPrefix() + ":";
+    }
+
     private void unregisterPermission(final @NotNull Command command) {
         permissionRegistry.unregisterPermission(command.getPermission());
     }
