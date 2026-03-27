@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.TabCompletable;
+import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.cooldown.CooldownManager;
@@ -330,5 +331,19 @@ public abstract class CommandNode implements TabCompletable {
      * @return the name
      */
     public abstract @NotNull String getName();
+
+    /**
+     * Gets the associated permission to bypass the cooldown.
+     *
+     * @param permission the permission
+     * @return the cooldown bypass permission
+     */
+    public static @NotNull PermissionInfo getCooldownBypassPermission(final @NotNull PermissionInfo permission) {
+        return new PermissionInfo(
+                permission.getPrefix(),
+                "bypass.cooldown." + permission.getActualPermission(),
+                Permission.Grant.NONE // leave the actual check to platforms
+        );
+    }
 
 }
