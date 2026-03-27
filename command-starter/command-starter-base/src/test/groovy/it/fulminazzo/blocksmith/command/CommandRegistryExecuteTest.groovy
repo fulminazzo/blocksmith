@@ -2,10 +2,10 @@
 package it.fulminazzo.blocksmith.command
 
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
-import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.ExecutionInfo
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.message.Messenger
+import it.fulminazzo.blocksmith.message.argument.Argument
 import org.slf4j.Logger
 import spock.lang.Specification
 
@@ -70,7 +70,7 @@ class CommandRegistryExecuteTest extends Specification {
         !executed
 
         and:
-        1 * messenger.sendMessage(executor, 'error.not-enough-arguments')
+        1 * messenger.sendMessage(executor, 'error.not-enough-arguments', _ as Argument[])
 
         where:
         executor << [
@@ -104,7 +104,7 @@ class CommandRegistryExecuteTest extends Specification {
         !executed
 
         and:
-        1 * messenger.sendMessage(executor, 'error.mock-error')
+        1 * messenger.sendMessage(executor, 'error.mock-error', _ as Argument[])
     }
 
     def 'test that internal exception is properly logged'() {
