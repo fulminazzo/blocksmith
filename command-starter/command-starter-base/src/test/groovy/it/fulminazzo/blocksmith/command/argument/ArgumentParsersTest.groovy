@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.command.CommandSender
 import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
+import it.fulminazzo.blocksmith.message.util.LocaleUtils
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
@@ -107,6 +108,9 @@ class ArgumentParsersTest extends Specification {
         TimeUnit  | 'MiNuTeS'         || TimeUnit.MINUTES
         TimeUnit  | 'HOURs'           || TimeUnit.HOURS
         TimeUnit  | 'DayS'            || TimeUnit.DAYS
+        // LOCALE
+        Locale    | 'en_us'           || Locale.US
+        Locale    | 'it_it'           || Locale.ITALY
     }
 
     def 'test that parse of parser for #type throws exception with #expected message with #argument'() {
@@ -124,59 +128,63 @@ class ArgumentParsersTest extends Specification {
         e.message == expected
 
         where:
-        type      | argument  || expected
+        type      | argument       || expected
         // BYTE
-        byte      | ''        || 'error.invalid-number'
-        byte      | 'a'       || 'error.invalid-number'
+        byte      | ''             || 'error.invalid-number'
+        byte      | 'a'            || 'error.invalid-number'
         // BYTE WRAPPER
-        Byte      | ''        || 'error.invalid-number'
-        Byte      | 'a'       || 'error.invalid-number'
+        Byte      | ''             || 'error.invalid-number'
+        Byte      | 'a'            || 'error.invalid-number'
         // SHORT
-        short     | ''        || 'error.invalid-number'
-        short     | 'a'       || 'error.invalid-number'
+        short     | ''             || 'error.invalid-number'
+        short     | 'a'            || 'error.invalid-number'
         // SHORT WRAPPER
-        Short     | ''        || 'error.invalid-number'
-        Short     | 'a'       || 'error.invalid-number'
+        Short     | ''             || 'error.invalid-number'
+        Short     | 'a'            || 'error.invalid-number'
         // INTEGER
-        int       | ''        || 'error.invalid-number'
-        int       | 'a'       || 'error.invalid-number'
+        int       | ''             || 'error.invalid-number'
+        int       | 'a'            || 'error.invalid-number'
         // INTEGER WRAPPER
-        Integer   | ''        || 'error.invalid-number'
-        Integer   | 'a'       || 'error.invalid-number'
+        Integer   | ''             || 'error.invalid-number'
+        Integer   | 'a'            || 'error.invalid-number'
         // LONG
-        long      | ''        || 'error.invalid-number'
-        long      | 'a'       || 'error.invalid-number'
+        long      | ''             || 'error.invalid-number'
+        long      | 'a'            || 'error.invalid-number'
         // LONG WRAPPER
-        Long      | ''        || 'error.invalid-number'
-        Long      | 'a'       || 'error.invalid-number'
+        Long      | ''             || 'error.invalid-number'
+        Long      | 'a'            || 'error.invalid-number'
         // FLOAT
-        float     | ''        || 'error.invalid-number'
-        float     | 'a'       || 'error.invalid-number'
+        float     | ''             || 'error.invalid-number'
+        float     | 'a'            || 'error.invalid-number'
         // FLOAT WRAPPER
-        Float     | ''        || 'error.invalid-number'
-        Float     | 'a'       || 'error.invalid-number'
+        Float     | ''             || 'error.invalid-number'
+        Float     | 'a'            || 'error.invalid-number'
         // DOUBLE
-        double    | ''        || 'error.invalid-number'
-        double    | 'a'       || 'error.invalid-number'
+        double    | ''             || 'error.invalid-number'
+        double    | 'a'            || 'error.invalid-number'
         // DOUBLE WRAPPER
-        Double    | ''        || 'error.invalid-number'
-        Double    | 'a'       || 'error.invalid-number'
+        Double    | ''             || 'error.invalid-number'
+        Double    | 'a'            || 'error.invalid-number'
         // BOOLEAN
-        boolean   | ''        || 'error.invalid-boolean'
-        boolean   | 'invalid' || 'error.invalid-boolean'
+        boolean   | ''             || 'error.invalid-boolean'
+        boolean   | 'invalid'      || 'error.invalid-boolean'
         // BOOLEAN WRAPPER
-        Boolean   | ''        || 'error.invalid-boolean'
-        Boolean   | 'invalid' || 'error.invalid-boolean'
+        Boolean   | ''             || 'error.invalid-boolean'
+        Boolean   | 'invalid'      || 'error.invalid-boolean'
         // CHARACTER
-        char      | ''        || 'error.invalid-character'
-        char      | 'ab'      || 'error.invalid-character'
+        char      | ''             || 'error.invalid-character'
+        char      | 'ab'           || 'error.invalid-character'
         // CHARACTER WRAPPER
-        Character | ''        || 'error.invalid-character'
-        Character | 'ab'      || 'error.invalid-character'
+        Character | ''             || 'error.invalid-character'
+        Character | 'ab'           || 'error.invalid-character'
         // ENUM
-        TimeUnit  | 'day'     || 'error.enum-not-found'
-        TimeUnit  | 'weeks'   || 'error.enum-not-found'
-        TimeUnit  | 'months'  || 'error.enum-not-found'
+        TimeUnit  | 'day'          || 'error.enum-not-found'
+        TimeUnit  | 'weeks'        || 'error.enum-not-found'
+        TimeUnit  | 'months'       || 'error.enum-not-found'
+        // LOCALE
+        Locale    | ''             || 'error.invalid-locale'
+        Locale    | 'it'           || 'error.invalid-locale'
+        Locale    | 'non_existent' || 'error.invalid-locale'
     }
 
     def 'test that completions of parser for #type return #expected with #argument'() {
@@ -299,6 +307,15 @@ class ArgumentParsersTest extends Specification {
         TimeUnit  | 'n'               || TimeUnit.values().collect { it.toString().toLowerCase() }
         TimeUnit  | 'nanoseconds'     || TimeUnit.values().collect { it.toString().toLowerCase() }
         TimeUnit  | 'NANOSECONDS'     || TimeUnit.values().collect { it.toString().toLowerCase() }
+        // LOCALE
+        Locale    | ''                || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
+                .collect { LocaleUtils.toString(it) }.unique()
+        Locale    | 'it'              || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
+                .collect { LocaleUtils.toString(it) }.unique()
+        Locale    | 'it_it'           || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
+                .collect { LocaleUtils.toString(it) }.unique()
+        Locale    | 'non_existent'    || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
+                .collect { LocaleUtils.toString(it) }.unique()
     }
 
     private CommandExecutionContext prepareContext(final @NotNull String argument) {
