@@ -29,6 +29,8 @@ public class CooldownManager<T> {
      * @param cooldown the cooldown
      */
     public void putOnCooldown(final @NotNull T entity, final @NotNull Duration cooldown) {
+        if (cooldown.isNegative() || cooldown.isZero())
+            throw new IllegalArgumentException("Cooldown must be positive");
         lastUsage.put(entity, System.currentTimeMillis() + cooldown.toMillis());
     }
 
