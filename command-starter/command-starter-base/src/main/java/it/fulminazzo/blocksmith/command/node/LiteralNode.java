@@ -46,6 +46,7 @@ public final class LiteralNode extends CommandNode {
         getExecutionInfo().ifPresent(clone::setExecutionInfo);
         getCommandInfo().ifPresent(clone::setCommandInfo);
         clone.setCooldown(getCooldown());
+        clone.setAsync(getAsyncTimeout());
         return clone;
     }
 
