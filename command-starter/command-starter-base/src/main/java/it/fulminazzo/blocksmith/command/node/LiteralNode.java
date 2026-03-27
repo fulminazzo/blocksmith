@@ -177,10 +177,13 @@ public final class LiteralNode extends CommandNode {
     }
 
     @Override
-    public @NotNull List<String> tabComplete(@NotNull CommandExecutionContext context) {
+    public @NotNull List<String> tabComplete(final @NotNull CommandExecutionContext context) {
         List<String> completions = new ArrayList<>(super.tabComplete(context));
-        if (context.isLast() || context.advanceCursor().isLast())
-            completions.addAll(Arrays.asList(getConfirmWord(), getCancelWord()));
+        if (context.isLast() || context.advanceCursor().isLast()) {
+            Object id = context.getCommandSender().getId();
+            if (pendingActionManager.isPending(id))
+                completions.addAll(Arrays.asList(getConfirmWord(), getCancelWord()));
+        }
         return filterCompletions(context, completions);
     }
 
