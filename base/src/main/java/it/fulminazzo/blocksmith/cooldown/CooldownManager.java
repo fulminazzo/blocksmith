@@ -36,6 +36,15 @@ public final class CooldownManager<T> {
     }
 
     /**
+     * Removes the given entity from the cooldown.
+     *
+     * @param entity the entity
+     */
+    public void removeFromCooldown(final @NotNull T entity) {
+        lastUsage.remove(entity);
+    }
+
+    /**
      * Checks if the given entity is on cooldown.
      *
      * @param entity the entity
