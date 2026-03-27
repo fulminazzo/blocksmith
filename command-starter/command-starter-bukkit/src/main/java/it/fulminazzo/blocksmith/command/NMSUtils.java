@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
 import org.joor.Reflect;
@@ -8,12 +9,16 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A collection of utilities to work with NMS.
  */
 final class NMSUtils {
-    private static final String COMMAND_DISPATCHER_CLASS = "com.mojang.brigadier.CommandDispatcher";
+    private static final @NotNull String COMMAND_DISPATCHER_CLASS = "com.mojang.brigadier.CommandDispatcher";
+
+    private static final @NotNull Pattern serverVersionRegex = Pattern.compile("[0-9]+\\.([0-9]+)(?:\\.([0-9]+))?-R[0-9]+\\.[0-9]+-SNAPSHOT");
 
     /**
      * Gets the Brigadier command dispatcher from the given server.
@@ -64,6 +69,23 @@ final class NMSUtils {
             type = type.getSuperclass();
         }
         return Optional.empty();
+    }
+
+    /**
+     * Returns the current server version in a double format.
+     * If the server version is "1.X.Y", the number returned is "X.Y".
+     *
+     * @return the version
+     */
+    public static double getServerVersion() {
+        String version = Bukkit.getBukkitVersion();
+        Matcher matcher = serverVersionRegex.matcher(version);
+        if (matcher.matches()) {
+            String first = matcher.group(1);
+            String second = matcher.group(2);
+            if (second == null) second = "0";
+            return Double.parseDouble(first + "." + second);
+        } else throw new IllegalStateException("Could not find numeric version from server version: " + version);
     }
 
 }
