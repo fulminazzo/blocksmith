@@ -2,10 +2,12 @@ package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.PermissionInfo;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
+@ToString
+@EqualsAndHashCode(callSuper = false)
+@Data
 @RequiredArgsConstructor
 public final class MockCommandSenderWrapper extends CommandSenderWrapper {
     @Getter

@@ -70,7 +70,11 @@ class CommandRegistryExecuteTest extends Specification {
         !executed
 
         and:
-        1 * messenger.sendMessage(executor, 'error.not-enough-arguments', _ as Argument[])
+        1 * messenger.sendMessage(
+                executor instanceof CommandSenderWrapper ? executor : new MockCommandSenderWrapper(executor),
+                'error.not-enough-arguments',
+                _ as Argument[]
+        )
 
         where:
         executor << [
@@ -104,7 +108,7 @@ class CommandRegistryExecuteTest extends Specification {
         !executed
 
         and:
-        1 * messenger.sendMessage(executor, 'error.mock-error', _ as Argument[])
+        1 * messenger.sendMessage(new MockCommandSenderWrapper(executor), 'error.mock-error', _ as Argument[])
     }
 
     def 'test that internal exception is properly logged'() {
