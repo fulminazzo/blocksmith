@@ -16,9 +16,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.*;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public final class BukkitCommandRegistryFactory implements CommandRegistryFactory {
@@ -112,6 +114,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             }
 
         });
+        ArgumentTypes.register(Location.class, getPositionArgumentType());
     }
 
     @Override
@@ -122,16 +125,11 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
                 .orElse(new BukkitCommandRegistry(application));
     }
 
-    private static @NotNull Object getPositionArgumentType() {
+    private static @NotNull ArgumentType<?> getPositionArgumentType() {
         try {
             Class<?> positionArgumentType = getPositionArgumentTypeClass();
-            Method method = Arrays.stream(positionArgumentType.getMethods())
-                    .filter(m -> !Modifier.isStatic(m.getModifiers()))
-                    .filter(m -> m.getParameterCount() == 0)
-                    .filter(m -> m.getReturnType().equals(positionArgumentType))
-                    .findFirst()
-                    .orElseThrow(() -> new NoSuchMethodException("Could not find method to initialize: " + positionArgumentType));
-            return method.invoke(positionArgumentType);
+            Constructor<?> constructor = positionArgumentType.getDeclaredConstructor();
+            return (ArgumentType<?>) constructor.newInstance();
         } catch (Exception e) {
             throw new RuntimeException(String.format("Could not create Position %s", ArgumentType.class.getSimpleName()), e);
         }
