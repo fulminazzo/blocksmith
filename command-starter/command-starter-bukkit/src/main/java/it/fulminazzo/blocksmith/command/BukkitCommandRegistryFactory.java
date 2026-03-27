@@ -167,8 +167,15 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
         @Override
         public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
             List<String> completions = new ArrayList<>();
-            completions.add(currentIdentifier);
             completions.addAll(delegate.getCompletions(context));
+            completions.add(currentIdentifier);
+            String argument = context.getCurrent();
+            if (argument.startsWith(currentIdentifier)) {
+                argument = argument.substring(currentIdentifier.length());
+                completions.addAll(delegate.getCompletions(context.setCurrent(argument)).stream()
+                        .map(d -> currentIdentifier + d)
+                        .collect(Collectors.toList()));
+            }
             return completions;
         }
 
