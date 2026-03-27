@@ -461,7 +461,7 @@ public final class CommandParser {
     private static int getParameterIndex(final @NotNull Method method, final @NotNull Class<?> senderType) {
         int parameterIndex = 0;
         Class<?>[] parameterTypes = method.getParameterTypes();
-        if (parameterTypes.length > 0 && parameterTypes[0].equals(senderType)) parameterIndex++;
+        if (parameterTypes.length > 0 && senderType.isAssignableFrom(parameterTypes[0])) parameterIndex++;
         return parameterIndex;
     }
 
