@@ -22,6 +22,8 @@ import java.util.concurrent.*;
 @ToString
 @RequiredArgsConstructor
 final class AsyncManager {
+    private static final @NotNull ExecutorService executorService = Executors.newCachedThreadPool();
+
     private final @NotNull Set<Object> pending = ConcurrentHashMap.newKeySet();
     @Getter
     private final @NotNull Duration timeout;
@@ -41,15 +43,21 @@ final class AsyncManager {
         if (pending.contains(id)) throw new CommandExecutionException("error.await-pending-operation");
         else {
             pending.add(id);
-            return CompletableFuture.runAsync(() -> {
-                        try {
-                            executionInfo.invoke(context);
-                        } catch (CommandExecutionException e) {
-                            throw new CompletionException(e);
-                        }
-                    }).orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
+
+            CompletableFuture<Void> checkTask = new CompletableFuture<>();
+            Future<?> actualTask = executorService.submit(() -> {
+                try {
+                    executionInfo.invoke(context);
+                    checkTask.complete(null);
+                } catch (CommandExecutionException e) {
+                    checkTask.completeExceptionally(e);
+                }
+            });
+
+            return checkTask.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
                     .handle((v, t) -> {
                         pending.remove(id);
+                        actualTask.cancel(true);
                         if (t instanceof CompletionException) t = t.getCause();
                         else if (t instanceof TimeoutException)
                             t = new CommandExecutionException("error.operation-timeout")
