@@ -158,9 +158,11 @@ public abstract class CommandRegistry {
      */
     public void handleCommandExecutionException(final @NotNull CommandExecutionException exception,
                                                 final @NotNull CommandExecutionContext context) {
+        String message = exception.getMessage();
+        if (message.isEmpty()) return;
         application.getMessenger().sendMessage(
                 context.getCommandSender(),
-                exception.getMessage(),
+                message,
                 getArguments(exception, context)
         );
         Throwable cause = exception.getCause();
