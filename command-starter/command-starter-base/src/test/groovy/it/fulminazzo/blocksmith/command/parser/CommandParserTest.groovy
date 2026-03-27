@@ -44,6 +44,7 @@ class CommandParserTest extends Specification {
                 'Information command',
                 new PermissionInfo(null, 'clan.info', Permission.Grant.OP)
         )
+        info.async = Duration.ofSeconds(1)
         info.addChild(name)
         clan = new LiteralNode(*baseAliases)
         clan.commandInfo = new CommandInfo(
