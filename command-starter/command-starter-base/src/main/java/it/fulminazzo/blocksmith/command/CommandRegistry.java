@@ -146,16 +146,31 @@ public abstract class CommandRegistry {
             CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
             command.execute(context);
         } catch (CommandExecutionException e) {
-            application.getMessenger().sendMessage(wrapSender(executor), e.getMessage(), getArguments(e, commandName, arguments));
-            Throwable cause = e.getCause();
-            if (cause != null)
-                application.getLog().warn("{} while executing command /{} {}",
-                        cause.getClass().getCanonicalName(),
-                        commandName,
-                        String.join(" ", arguments),
-                        cause
-                );
+            handleCommandExecutionException(e, executor, commandName, arguments);
         }
+    }
+
+    /**
+     * Handles the given command execution exception.
+     *
+     * @param exception   the exception
+     * @param executor    the executor of the command
+     * @param commandName the command name
+     * @param arguments   the arguments to pass as input
+     */
+    public void handleCommandExecutionException(final @NotNull CommandExecutionException exception,
+                                                final @NotNull Object executor,
+                                                final @NotNull String commandName,
+                                                final String @NotNull ... arguments) {
+        application.getMessenger().sendMessage(wrapSender(executor), exception.getMessage(), getArguments(exception, commandName, arguments));
+        Throwable cause = exception.getCause();
+        if (cause != null)
+            application.getLog().warn("{} while executing command /{} {}",
+                    cause.getClass().getCanonicalName(),
+                    commandName,
+                    String.join(" ", arguments),
+                    cause
+            );
     }
 
     private static @NotNull Argument[] getArguments(final @NotNull CommandExecutionException exception,
