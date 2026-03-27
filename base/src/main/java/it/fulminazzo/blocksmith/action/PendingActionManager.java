@@ -49,6 +49,23 @@ public final class PendingActionManager<T> {
     }
 
     /**
+     * Cancels the pending action for the given entity.
+     *
+     * @param entity the entity
+     * @return {@link Result#SUCCESS} if the action was successfully removed,
+     * {@link Result#EXPIRED} if the action was executed too late,
+     * {@link Result#NOT_FOUND} if the entity has no pending action
+     */
+    public @NotNull Result cancel(final @NotNull T entity) {
+        PendingAction action = pendingActions.remove(entity);
+        if (action == null) return Result.NOT_FOUND;
+        if (cooldownManager.isOnCooldown(entity)) {
+            cooldownManager.removeFromCooldown(entity);
+            return Result.SUCCESS;
+        } else return Result.EXPIRED;
+    }
+
+    /**
      * Represents the result of an action execution.
      */
     public enum Result {
