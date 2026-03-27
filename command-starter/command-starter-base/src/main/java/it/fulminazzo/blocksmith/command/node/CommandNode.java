@@ -8,10 +8,7 @@ import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.cooldown.StaticCooldownManager;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.argument.Time;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +33,8 @@ public abstract class CommandNode implements TabCompletable {
 
     private @Nullable StaticCooldownManager<Object> cooldownManager;
 
-    private boolean confirmation;
+    @Getter(AccessLevel.PROTECTED)
+    private @Nullable Duration confirmationTimeout;
 
     private @Nullable AsyncManager asyncManager;
 
@@ -67,17 +65,17 @@ public abstract class CommandNode implements TabCompletable {
      * @return <code>true</code> if it does
      */
     public boolean requiresConfirmation() {
-        return confirmation;
+        return confirmationTimeout != null;
     }
 
     /**
      * Enables or disables confirmation for this node.
      *
-     * @param confirmation the confirmation
+     * @param confirmationTimeout the confirmation timeout
      * @return this object (for method chaining)
      */
-    public @NotNull CommandNode setRequiresConfirmation(final boolean confirmation) {
-        this.confirmation = confirmation;
+    public @NotNull CommandNode setConfirmationTimeout(final @Nullable Duration confirmationTimeout) {
+        this.confirmationTimeout = confirmationTimeout;
         return this;
     }
 
@@ -242,7 +240,7 @@ public abstract class CommandNode implements TabCompletable {
      */
     void handleRemainingInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         if (context.advanceCursor().isDone()) {
-            if (isExecutable()) internalExecute(context);
+            if (isExecutable()) executeOrAwaitConfirmation(context);
             else {
                 ArgumentNode<?> optional = getFirstOptionalArgumentNode();
                 if (optional != null) {
@@ -254,11 +252,30 @@ public abstract class CommandNode implements TabCompletable {
             String current = context.getCurrent();
             CommandNode child = getChild(current);
             if (child == null) {
-                if (isExecutable()) internalExecute(context);
+                if (isExecutable()) executeOrAwaitConfirmation(context);
                 else throw new CommandExecutionException("error.command-not-found")
                         .arguments(Placeholder.of("argument", current));
             } else child.execute(context);
         }
+    }
+
+    private void executeOrAwaitConfirmation(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        if (confirmationTimeout != null) {
+            LiteralNode literalNode = getCommandLiteral();
+            literalNode.getPendingActionManager().register(
+                    context.getCommandSender().getId(),
+                    confirmationTimeout,
+                    () -> {
+                        try {
+                            internalExecute(context);
+                        } catch (CommandExecutionException e) {
+                            context.getRegistry().handleCommandExecutionException(e, context);
+                        }
+                    }
+            );
+            throw new CommandExecutionException("general.await-confirmation")
+                    .arguments(Time.of("time", confirmationTimeout.toMillis()));
+        } else internalExecute(context);
     }
 
     private void internalExecute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {

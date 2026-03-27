@@ -10,6 +10,7 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -52,13 +53,13 @@ public final class LiteralNode extends CommandNode {
         getCommandInfo().ifPresent(clone::setCommandInfo);
         clone.setCooldown(getCooldown());
         clone.setAsync(getAsyncTimeout());
-        clone.setRequiresConfirmation(requiresConfirmation());
+        clone.setConfirmationTimeout(getConfirmationTimeout());
         return clone;
     }
 
     @Override
-    public @NotNull LiteralNode setRequiresConfirmation(final boolean confirmation) {
-        return (LiteralNode) super.setRequiresConfirmation(confirmation);
+    public @NotNull LiteralNode setConfirmationTimeout(final @Nullable Duration confirmation) {
+        return (LiteralNode) super.setConfirmationTimeout(confirmation);
     }
 
     /**
