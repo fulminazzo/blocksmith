@@ -31,7 +31,7 @@ final class BrigadierParser<S> {
      */
     public @NotNull LiteralCommandNode<S> parse(final @NotNull LiteralNode node) {
         LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder.literal(node.getName());
-        checkRequiresConfirmation(builder, node);
+        checkRequiresConfirmation(node, builder, node);
         return parseChildren(node, builder, node).build();
     }
 
@@ -88,7 +88,7 @@ final class BrigadierParser<S> {
                         node
                 ))
         );
-        checkRequiresConfirmation(builder, node);
+        checkRequiresConfirmation(root, builder, node);
     }
 
     /**
@@ -150,11 +150,12 @@ final class BrigadierParser<S> {
         };
     }
 
-    private void checkRequiresConfirmation(final @NotNull ArgumentBuilder<S, ?> builder,
+    private void checkRequiresConfirmation(final @NotNull LiteralNode root,
+                                           final @NotNull ArgumentBuilder<S, ?> builder,
                                            final @NotNull LiteralNode node) {
         if (node.requiresConfirmation())
-            builder.then(LiteralArgumentBuilder.literal("confirm"))
-                    .then(LiteralArgumentBuilder.literal("cancel"));
+            builder.then(LiteralArgumentBuilder.<S>literal("confirm").executes(executes(root)))
+                    .then(LiteralArgumentBuilder.<S>literal("cancel").executes(executes(root)));
     }
 
     /**
