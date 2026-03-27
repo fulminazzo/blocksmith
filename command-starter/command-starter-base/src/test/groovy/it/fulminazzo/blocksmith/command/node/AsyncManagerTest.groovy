@@ -14,7 +14,7 @@ import java.time.Duration
 class AsyncManagerTest extends Specification {
     private static final WAIT_TIME = 50
 
-    private static boolean executed = false
+    private static volatile boolean executed = false
 
     private AsyncManager manager
 
@@ -87,6 +87,9 @@ class AsyncManagerTest extends Specification {
         when:
         future.join()
 
+        and:
+        sleep(100)
+
         then:
         noExceptionThrown()
 
@@ -100,6 +103,9 @@ class AsyncManagerTest extends Specification {
 
         and:
         !contains()
+
+        and:
+        !executed
 
         where:
         method                  || expected
@@ -148,26 +154,27 @@ class AsyncManagerTest extends Specification {
     }
 
     static void execute() {
-        sleep(WAIT_TIME)
+        Thread.sleep(WAIT_TIME)
         executed = true
     }
 
     static void internalThrow() {
-        sleep(WAIT_TIME)
+        Thread.sleep(WAIT_TIME)
         throw new CommandExecutionException('error.unknown')
     }
 
     static void slow() {
-        sleep(10_000)
+        Thread.sleep(1050)
+        executed = true
     }
 
     static void otherException() {
-        sleep(WAIT_TIME)
+        Thread.sleep(WAIT_TIME)
         throw new Exception('API error')
     }
 
     static void otherRuntimeException() {
-        sleep(WAIT_TIME)
+        Thread.sleep(WAIT_TIME)
         throw new RuntimeException('API error')
     }
 
