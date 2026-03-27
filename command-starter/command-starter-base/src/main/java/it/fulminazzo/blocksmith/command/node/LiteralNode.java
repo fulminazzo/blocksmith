@@ -81,8 +81,12 @@ public final class LiteralNode extends CommandNode {
      * @return the confirmation timeout
      */
     public @NotNull Duration getConfirmationTimeout() {
-        Confirm annotation = Objects.requireNonNull(this.confirmAnnotation, "Confirmation annotation not set");
+        Confirm annotation = getNonNullConfirmationAnnotation();
         return Duration.of(annotation.timeout(), annotation.unit().toChronoUnit());
+    }
+
+    private @NotNull Confirm getNonNullConfirmationAnnotation() {
+        return Objects.requireNonNull(this.confirmAnnotation, "Confirmation annotation not set");
     }
 
     /**
@@ -93,6 +97,24 @@ public final class LiteralNode extends CommandNode {
      */
     public @NotNull Optional<CommandInfo> getCommandInfo() {
         return Optional.ofNullable(commandInfo);
+    }
+
+    /**
+     * Gets the word required for confirmation.
+     *
+     * @return the word
+     */
+    public @NotNull String getConfirmWord() {
+        return getNonNullConfirmationAnnotation().confirmWord();
+    }
+
+    /**
+     * Gets the cancellation word.
+     *
+     * @return the word
+     */
+    public @NotNull String getCancelWord() {
+        return getNonNullConfirmationAnnotation().cancelWord();
     }
 
     /**
@@ -135,10 +157,10 @@ public final class LiteralNode extends CommandNode {
             final Object id = context.getCommandSender().getId();
             final PendingActionManager.Result result;
             final String message;
-            if (argument.equalsIgnoreCase("confirm")) {
+            if (argument.equalsIgnoreCase(getConfirmWord())) {
                 result = pendingActionManager.execute(id);
                 message = "";
-            } else if (argument.equalsIgnoreCase("cancel")) {
+            } else if (argument.equalsIgnoreCase(getCancelWord())) {
                 result = pendingActionManager.cancel(id);
                 message = "success.pending-action-cancelled";
             } else {
@@ -158,7 +180,7 @@ public final class LiteralNode extends CommandNode {
     public @NotNull List<String> tabComplete(@NotNull CommandExecutionContext context) {
         List<String> completions = new ArrayList<>(super.tabComplete(context));
         if (context.isLast() || context.advanceCursor().isLast())
-            completions.addAll(Arrays.asList("confirm", "cancel"));
+            completions.addAll(Arrays.asList(getConfirmWord(), getCancelWord()));
         return filterCompletions(context, completions);
     }
 
