@@ -151,9 +151,15 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
 
         @Override
         public @NotNull Double parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-            if (context.getCurrent().equals(currentIdentifier)) {
+            String argument = context.getCurrent();
+            if (argument.startsWith(currentIdentifier)) {
                 Object sender = context.getCommandSender().getActualSender();
-                if (sender instanceof Player) return coordinateGetter.apply(((Player) sender).getLocation());
+                if (sender instanceof Player) {
+                    argument = argument.substring(currentIdentifier.length());
+                    double base = coordinateGetter.apply(((Player) sender).getLocation());
+                    if (!argument.isEmpty()) base += delegate.parse(context.setCurrent(argument));
+                    return base;
+                }
             }
             return Objects.requireNonNull(delegate.parse(context));
         }
