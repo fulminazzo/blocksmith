@@ -41,6 +41,8 @@ public abstract class CommandNode implements TabCompletable {
     }
 
     @Getter
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private @Nullable CommandNode parent;
     @Getter
     private final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
