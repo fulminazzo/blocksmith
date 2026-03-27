@@ -41,6 +41,8 @@ public abstract class CommandNode implements TabCompletable {
     }
 
     @Getter
+    private @Nullable CommandNode parent;
+    @Getter
     private final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
     @Setter
     private @Nullable ExecutionInfo executionInfo;
@@ -128,9 +130,11 @@ public abstract class CommandNode implements TabCompletable {
         for (CommandNode c : children)
             if (child.getClass().equals(c.getClass()) && c.getName().equals(child.getName())) {
                 c.merge(child);
+                c.parent = this;
                 return c;
             }
         children.add(child);
+        child.parent = this;
         return child;
     }
 
