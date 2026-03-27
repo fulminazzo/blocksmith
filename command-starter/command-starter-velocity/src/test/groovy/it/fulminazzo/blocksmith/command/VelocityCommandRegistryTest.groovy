@@ -60,7 +60,7 @@ class VelocityCommandRegistryTest extends Specification {
         noExceptionThrown()
 
         and:
-        1 * commandManager.register(_ as CommandMeta, _ as BrigadierCommand)
+        2 * commandManager.register(_ as CommandMeta, _ as BrigadierCommand)
 
         and:
         def registeredAliases = registry.registeredAliases
