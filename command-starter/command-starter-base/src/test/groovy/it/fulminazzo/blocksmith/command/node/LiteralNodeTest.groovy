@@ -1,6 +1,10 @@
+//file:noinspection unused
 package it.fulminazzo.blocksmith.command.node
 
+import it.fulminazzo.blocksmith.command.annotation.Permission
 import spock.lang.Specification
+
+import java.time.Duration
 
 class LiteralNodeTest extends Specification {
 
@@ -28,6 +32,45 @@ class LiteralNodeTest extends Specification {
 
         then:
         thrown(IllegalArgumentException)
+    }
+
+    def 'test that clone correctly clones node'() {
+        given:
+        def first = new LiteralNode('first')
+        first.commandInfo = commandInfo
+        first.executionInfo = executionInfo
+        first.cooldown = cooldown
+        if (child != null) first.addChild(child)
+
+        and:
+        def expected = new LiteralNode('second')
+        expected.commandInfo = commandInfo
+        expected.executionInfo = executionInfo
+        expected.cooldown = cooldown
+        if (child != null) expected.addChild(child)
+
+        when:
+        def second = first.clone('second')
+
+        then:
+        second == expected
+
+        where:
+        commandInfo                                                       | executionInfo | cooldown                                 | child
+        null                                                              |
+                null                                                                      | null                                     | null
+        new CommandInfo('', new PermissionInfo('', Permission.Grant.ALL)) |
+                null                                                                      | null                                     | null
+        new CommandInfo('', new PermissionInfo('', Permission.Grant.ALL)) |
+                new ExecutionInfo(LiteralNodeTest, LiteralNodeTest.getMethod('mock'))     | null                                     | null
+        new CommandInfo('', new PermissionInfo('', Permission.Grant.ALL)) |
+                new ExecutionInfo(LiteralNodeTest, LiteralNodeTest.getMethod('mock'))     | Duration.ofSeconds(1)                    | null
+        new CommandInfo('', new PermissionInfo('', Permission.Grant.ALL)) |
+                new ExecutionInfo(LiteralNodeTest, LiteralNodeTest.getMethod('mock'))     | Duration.ofSeconds(1)                    | new LiteralNode('child')
+    }
+
+    static void mock() {
+
     }
 
 }
