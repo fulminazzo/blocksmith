@@ -99,8 +99,7 @@ public final class CommandParser {
         Method method = executionInfo.getMethod();
         if (method.isAnnotationPresent(Confirm.class)) {
             Confirm confirmAnnotation = method.getAnnotation(Confirm.class);
-            Duration confirmationTimeout = Duration.of(confirmAnnotation.timeout(), confirmAnnotation.unit().toChronoUnit());
-            lastLiteral.setConfirmationTimeout(confirmationTimeout);
+            lastLiteral.setConfirmationInfo(confirmAnnotation);
         }
         if (method.isAnnotationPresent(Async.class)) {
             Async asyncAnnotation = method.getAnnotation(Async.class);

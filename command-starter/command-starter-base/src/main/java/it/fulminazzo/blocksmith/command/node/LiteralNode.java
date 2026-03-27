@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.action.PendingActionManager;
+import it.fulminazzo.blocksmith.command.annotation.Confirm;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
@@ -22,7 +23,8 @@ public final class LiteralNode extends CommandNode {
     private final @NotNull Set<String> aliases;
     private @Nullable CommandInfo commandInfo;
 
-    private @Nullable Duration confirmationTimeout;
+    @Getter(AccessLevel.NONE)
+    private @Nullable Confirm confirmAnnotation;
 
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
@@ -52,7 +54,7 @@ public final class LiteralNode extends CommandNode {
         getExecutionInfo().ifPresent(clone::setExecutionInfo);
         getCommandInfo().ifPresent(clone::setCommandInfo);
         clone.setCooldown(getCooldown());
-        clone.setConfirmationTimeout(getConfirmationTimeout());
+        clone.setConfirmationInfo(confirmAnnotation);
         clone.setAsync(getAsyncTimeout());
         return clone;
     }
@@ -63,14 +65,24 @@ public final class LiteralNode extends CommandNode {
      * @return <code>true</code> if it does
      */
     public boolean requiresConfirmation() {
-        return confirmationTimeout != null;
+        return confirmAnnotation != null;
     }
 
     /**
      * Enables or disables confirmation for this node.
      */
-    public void setConfirmationTimeout(final @Nullable Duration confirmationTimeout) {
-        this.confirmationTimeout = confirmationTimeout;
+    public void setConfirmationInfo(final @Nullable Confirm confirmAnnotation) {
+        this.confirmAnnotation = confirmAnnotation;
+    }
+
+    /**
+     * Gets the confirmation timeout (if set).
+     *
+     * @return the confirmation timeout
+     */
+    public @NotNull Duration getConfirmationTimeout() {
+        Confirm annotation = Objects.requireNonNull(this.confirmAnnotation, "Confirmation annotation not set");
+        return Duration.of(annotation.timeout(), annotation.unit().toChronoUnit());
     }
 
     /**
