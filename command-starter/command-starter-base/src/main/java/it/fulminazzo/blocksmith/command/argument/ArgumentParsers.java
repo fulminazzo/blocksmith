@@ -81,6 +81,7 @@ public final class ArgumentParsers {
 
         });
         register(Locale.class, new ArgumentParser<>() {
+            private final @NotNull List<String> availableLocales = new ArrayList<>();
 
             @Override
             public @NotNull Locale parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
@@ -93,11 +94,13 @@ public final class ArgumentParsers {
 
             @Override
             public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
-                return Arrays.stream(Locale.getAvailableLocales())
-                        .filter(this::isValid)
-                        .map(LocaleUtils::toString)
-                        .distinct()
-                        .collect(Collectors.toList());
+                if (availableLocales.isEmpty())
+                    availableLocales.addAll(Arrays.stream(Locale.getAvailableLocales())
+                            .filter(this::isValid)
+                            .map(LocaleUtils::toString)
+                            .distinct()
+                            .collect(Collectors.toList()));
+                return availableLocales;
             }
 
             private boolean isValid(final @NotNull Locale locale) {
