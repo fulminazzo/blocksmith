@@ -14,7 +14,12 @@ public @interface Permission {
 
     @NotNull String value() default "";
 
-    //TODO: better naming
+    //TODO: better documentation
+    // Identifies all the permissions of the same group, for example
+    // "blocksmith.command.reload" and "blocksmith.command.reload.async"
+    // are in the group "blocksmith".
+    @NotNull String group() default "";
+
     @NotNull Grant grant() default Grant.OP;
 
     enum Grant {
