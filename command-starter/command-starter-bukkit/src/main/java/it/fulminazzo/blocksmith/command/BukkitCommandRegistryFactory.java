@@ -134,7 +134,11 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
         try {
             return Class.forName("net.minecraft.commands.arguments.coordinates.BlockPosArgument");
         } catch (ClassNotFoundException e) {
-            return Class.forName(String.format("net.minecraft.server.%s.ArgumentPosition", NMSUtils.getNMSVersion()));
+            try {
+                return Class.forName("net.minecraft.commands.arguments.coordinates.ArgumentPosition");
+            } catch (ClassNotFoundException ex) {
+                return Class.forName(String.format("net.minecraft.server.%s.ArgumentPosition", NMSUtils.getNMSVersion()));
+            }
         }
     }
 
