@@ -88,4 +88,21 @@ final class NMSUtils {
         } else throw new IllegalStateException("Could not find numeric version from server version: " + version);
     }
 
+    /**
+     * Gets the NMS version of the current version.
+     * <br>
+     * <b>WARNING</b>: not supported in versions higher than 1.20.
+     *
+     * @return the version
+     */
+    public static @NotNull String getNMSVersion() {
+        Class<? extends Server> serverClass = Bukkit.getServer().getClass();
+        String version = serverClass.getPackage().getName();
+        version = version.substring(version.lastIndexOf('.') + 1);
+        if (version.equals("craftbukkit"))
+            throw new IllegalStateException("Could not find the NMS version from the current server class: " + serverClass.getSimpleName() + ". " +
+                    "Are you on a version higher than 1.20?");
+        return version;
+    }
+
 }
