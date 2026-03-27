@@ -6,6 +6,8 @@ import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.parser.CommandParser;
+import it.fulminazzo.blocksmith.message.argument.Argument;
+import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -144,7 +146,7 @@ public abstract class CommandRegistry {
             CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
             command.execute(context);
         } catch (CommandExecutionException e) {
-            application.getMessenger().sendMessage(executor, e.getMessage(), e.getArguments());
+            application.getMessenger().sendMessage(executor, e.getMessage(), getArguments(e, commandName, arguments));
             Throwable cause = e.getCause();
             if (cause != null)
                 application.getLog().warn("{} while executing command /{} {}",
@@ -154,6 +156,15 @@ public abstract class CommandRegistry {
                         cause
                 );
         }
+    }
+
+    private static @NotNull Argument[] getArguments(final @NotNull CommandExecutionException exception,
+                                                    final @NotNull String commandName,
+                                                    final String @NotNull ... arguments) {
+        Argument[] previous = exception.getArguments();
+        Argument[] args = Arrays.copyOf(previous, previous.length + 1);
+        args[previous.length] = Placeholder.of("input", commandName + " " + String.join(" ", arguments));
+        return args;
     }
 
     /**
