@@ -110,9 +110,11 @@ public final class LiteralNode extends CommandNode {
             final PendingActionManager.Result result;
             if (argument.equalsIgnoreCase("confirm"))
                 result = pendingActionManager.execute(id);
-            else if (argument.equalsIgnoreCase("cancel"))
+            else if (argument.equalsIgnoreCase("cancel")) {
                 result = pendingActionManager.cancel(id);
-            else result = null;
+                if (result == PendingActionManager.Result.SUCCESS)
+                    throw new CommandExecutionException("general.pending-action-cancelled");
+            } else result = null;
 
             if (result == PendingActionManager.Result.NOT_FOUND)
                 throw new CommandExecutionException("error.no-pending-action");
