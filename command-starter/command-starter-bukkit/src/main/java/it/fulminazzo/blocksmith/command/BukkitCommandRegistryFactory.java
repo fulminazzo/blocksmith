@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
+import com.mojang.brigadier.arguments.ArgumentType;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
@@ -15,6 +16,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -117,6 +120,29 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
                 .map(d -> new BrigadierBukkitCommandRegistry<>(application, d))
                 .map(r -> (CommandRegistry) r)
                 .orElse(new BukkitCommandRegistry(application));
+    }
+
+    private static @NotNull Object getPositionArgumentType() {
+        try {
+            Class<?> positionArgumentType = getPositionArgumentTypeClass();
+            Method method = Arrays.stream(positionArgumentType.getMethods())
+                    .filter(m -> !Modifier.isStatic(m.getModifiers()))
+                    .filter(m -> m.getParameterCount() == 0)
+                    .filter(m -> m.getReturnType().equals(positionArgumentType))
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchMethodException("Could not find method to initialize: " + positionArgumentType));
+            return method.invoke(positionArgumentType);
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Could not create Position %s", ArgumentType.class.getSimpleName()), e);
+        }
+    }
+
+    private static @NonNull Class<?> getPositionArgumentTypeClass() throws ClassNotFoundException {
+        try {
+            return Class.forName("net.minecraft.commands.arguments.coordinates.BlockPosArgument");
+        } catch (ClassNotFoundException e) {
+            return Class.forName(String.format("net.minecraft.server.%s.ArgumentPosition", NMSUtils.getNMSVersion()));
+        }
     }
 
 }
