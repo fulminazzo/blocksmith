@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
+import it.fulminazzo.blocksmith.scheduler.Scheduler;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -39,9 +40,13 @@ final class OfflinePlayerArgumentParser implements ArgumentParser<OfflinePlayer>
     private @NotNull Set<String> getNames(final @NotNull ApplicationHandle application) {
         Server server = (Server) application.getServer();
         if (names.isEmpty()) {
-            Arrays.stream(server.getOfflinePlayers())
-                    .map(OfflinePlayer::getName)
-                    .forEach(names::add);
+            names.add("<player>");
+            Scheduler.schedule(application, t -> {
+                Arrays.stream(server.getOfflinePlayers())
+                        .map(OfflinePlayer::getName)
+                        .forEach(names::add);
+                names.remove("<player>");
+            }).async().run();
         }
         server.getOnlinePlayers().stream()
                 .map(Player::getName)
