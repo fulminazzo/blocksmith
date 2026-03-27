@@ -34,14 +34,24 @@ public abstract class CommandNode implements TabCompletable {
     private @Nullable CooldownManager<Object> cooldownManager;
 
     /**
+     * Gets the execution cooldown for the current node.
+     *
+     * @return the cooldown
+     */
+    protected @Nullable Duration getCooldown() {
+        return cooldownManager == null ? null : cooldownManager.getCooldown();
+    }
+
+    /**
      * Sets an execution cooldown for the current node.
      * <br>
      * <b>WARNING</b>: only works if {@link #executionInfo} is defined.
      *
      * @param cooldown the cooldown
      */
-    public void setCooldown(final @NotNull Duration cooldown) {
-        cooldownManager = new CooldownManager<>(cooldown);
+    public void setCooldown(final @Nullable Duration cooldown) {
+        if (cooldown == null) cooldownManager = null;
+        else cooldownManager = new CooldownManager<>(cooldown);
     }
 
     /**
