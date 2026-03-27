@@ -79,6 +79,7 @@ public abstract class CommandNode implements TabCompletable {
      */
     public void setAsync(final @Nullable Duration timeout) {
         if (timeout == null) asyncManager = null;
+        else if (timeout.isNegative()) throw new IllegalArgumentException("timeout must be positive or zero");
         else asyncManager = new AsyncManager(timeout);
     }
 
