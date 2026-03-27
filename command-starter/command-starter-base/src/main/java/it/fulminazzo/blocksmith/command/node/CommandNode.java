@@ -139,12 +139,23 @@ public abstract class CommandNode implements TabCompletable {
     }
 
     /**
+     * Gets the permission to execute this node.
+     *
+     * @return the permission, if available
+     */
+    public @NotNull Optional<PermissionInfo> getPermission() {
+        if (this instanceof LiteralNode) return ((LiteralNode) this).getCommandInfo().map(CommandInfo::getPermission);
+        else if (parent == null) return Optional.empty();
+        else return parent.getPermission();
+    }
+
+    /**
      * If this node contains execution information, it represents the end of a command route.
      * As such, it should be executable with the parsed arguments so far.
      *
      * @return the execution information, if available
      */
-    public Optional<ExecutionInfo> getExecutionInfo() {
+    public @NotNull Optional<ExecutionInfo> getExecutionInfo() {
         return Optional.ofNullable(executionInfo);
     }
 
