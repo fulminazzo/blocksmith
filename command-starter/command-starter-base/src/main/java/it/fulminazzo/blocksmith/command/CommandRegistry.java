@@ -21,7 +21,7 @@ public abstract class CommandRegistry {
     private final @NotNull ApplicationHandle application;
 
     private final @NotNull Map<String, LiteralNode> commands = new ConcurrentHashMap<>();
-    private @NotNull State state = State.INITIAL;
+    private volatile @NotNull State state = State.INITIAL;
 
     /**
      * Allows to dynamically insert new commands after a {@link #commit()} call.
@@ -32,7 +32,7 @@ public abstract class CommandRegistry {
      * @param commandModules the command modules
      * @return this object (for method chaining)
      */
-    public final @NotNull CommandRegistry insert(final Object @NotNull ... commandModules) {
+    public @NotNull CommandRegistry insert(final Object @NotNull ... commandModules) {
         if (state != State.REGISTERED)
             throw new IllegalStateException(String.format("This method is only available after registration. " +
                     "Please call %s#commit() before using it", getClass().getSimpleName()));
@@ -60,7 +60,7 @@ public abstract class CommandRegistry {
      * @param commandModules the command modules
      * @return this object (for method chaining)
      */
-    public final @NotNull CommandRegistry register(final Object @NotNull ... commandModules) {
+    public @NotNull CommandRegistry register(final Object @NotNull ... commandModules) {
         if (state == State.REGISTERED)
             throw new IllegalStateException("It is not possible to register new commands at this time. Please register all commands before committing");
         state = State.REGISTERING;
@@ -84,7 +84,7 @@ public abstract class CommandRegistry {
      *
      * @return this object (for method chaining)
      */
-    public final @NotNull CommandRegistry commit() {
+    public synchronized @NotNull CommandRegistry commit() {
         if (state == State.REGISTERED)
             throw new IllegalStateException("Commands have already been registered");
         else if (state != State.REGISTERING)
@@ -102,12 +102,12 @@ public abstract class CommandRegistry {
     /**
      * Unregisters all the commands.
      */
-    public final void unregisterAll() {
+    public synchronized void unregisterAll() {
         if (state != State.REGISTERED)
             throw new IllegalStateException(String.format("Commands have not been registered yet. " +
                     "Did you forget to call %s#commit()?", getClass().getSimpleName()));
-        state = State.INITIAL;
         new HashSet<>(commands.keySet()).forEach(this::unregister);
+        state = State.INITIAL;
     }
 
     /**
@@ -124,7 +124,7 @@ public abstract class CommandRegistry {
      *
      * @param commandName the command name
      */
-    protected final void unregister(final @NotNull String commandName) {
+    protected void unregister(final @NotNull String commandName) {
         if (commands.remove(commandName) != null) onUnregister(commandName);
     }
 
@@ -136,10 +136,10 @@ public abstract class CommandRegistry {
      * @param commandName the command name
      * @param arguments   the arguments to pass as input
      */
-    protected final void execute(final @NotNull LiteralNode command,
-                                 final @NotNull Object executor,
-                                 final @NotNull String commandName,
-                                 final String @NotNull ... arguments) {
+    protected void execute(final @NotNull LiteralNode command,
+                           final @NotNull Object executor,
+                           final @NotNull String commandName,
+                           final String @NotNull ... arguments) {
         try {
             CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
             command.execute(context);
@@ -165,10 +165,10 @@ public abstract class CommandRegistry {
      * @param arguments   the arguments to pass as input
      * @return the tab completions
      */
-    protected final @NotNull List<String> tabComplete(final @NotNull LiteralNode command,
-                                                      final @NotNull Object executor,
-                                                      final @NotNull String commandName,
-                                                      final String @NotNull ... arguments) {
+    protected @NotNull List<String> tabComplete(final @NotNull LiteralNode command,
+                                                final @NotNull Object executor,
+                                                final @NotNull String commandName,
+                                                final String @NotNull ... arguments) {
         CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
         return command.tabComplete(context);
     }

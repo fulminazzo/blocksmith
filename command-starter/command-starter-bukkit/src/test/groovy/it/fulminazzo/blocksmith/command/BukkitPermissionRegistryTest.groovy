@@ -15,11 +15,11 @@ import org.bukkit.permissions.PermissionDefault
 import spock.lang.Specification
 
 @Slf4j
-class BukkitCommandRegistryTest extends Specification {
+class BukkitPermissionRegistryTest extends Specification {
 
     private ApplicationHandle application
 
-    private BukkitCommandRegistry registry
+    private BukkitPermissionRegistry registry
 
     void setup() {
         MockBukkit.mock()
@@ -30,19 +30,15 @@ class BukkitCommandRegistryTest extends Specification {
         application.messenger >> new Messenger(log)
         application.name >> 'blocksmith'
 
-        registry = new BukkitCommandRegistry(application)
+        registry = new BukkitPermissionRegistry(application)
     }
 
     void cleanup() {
         MockBukkit.unmock()
     }
 
-    def 'test that onRegister correctly registers new command and aliases'() {
+    def 'test that onRegister correctly registers new command permission'() {
         given:
-        def previousCommand = Mock(Command)
-        registry.knownCommands.put('?', previousCommand)
-
-        and:
         def pluginManager = Bukkit.server.pluginManager
         def previousPermission = new org.bukkit.permissions.Permission(
                 'help',
@@ -66,17 +62,10 @@ class BukkitCommandRegistryTest extends Specification {
         plugin.addChild(name)
 
         when:
-        registry.onRegister('help', node)
+        registry.registerPermission(node)
 
         then:
         noExceptionThrown()
-
-        and:
-        def knownCommands = registry.knownCommands
-        (knownCommands['help'] instanceof BukkitCommandRegistry.BukkitCommand)
-        (knownCommands['?'] instanceof BukkitCommandRegistry.BukkitCommand)
-        (knownCommands["${application.name}:help"] instanceof BukkitCommandRegistry.BukkitCommand)
-        (knownCommands["${application.name}:?"] instanceof BukkitCommandRegistry.BukkitCommand)
 
         and:
         def helpPermission = pluginManager.getPermission('help')
@@ -94,48 +83,20 @@ class BukkitCommandRegistryTest extends Specification {
         helpPluginPermission.children.keySet().toList() == []
 
         and:
-        def previousCommands = registry.previousCommands
-        previousCommands.size() == 1
-
-        and:
-        previousCommands['?'] == previousCommand
-
-        and:
-        def previousPermissions = registry.permissionRegistry.previousPermissions
+        def previousPermissions = registry.previousPermissions
         previousPermissions.size() == 1
 
         and:
         previousPermissions['help'] == previousPermission
     }
 
-    def 'test that onUnregister removes commands and restores previous commands'() {
+    def 'test that onUnregister removes command permissions and restores previous permissions'() {
         given:
-        def previousCommand = Mock(Command)
-        registry.previousCommands['?'] = previousCommand
-        registry.previousCommands['showhelp'] = previousCommand
-
-        and:
         def previousPermission = new org.bukkit.permissions.Permission(
                 'help',
                 PermissionDefault.TRUE
         )
-        registry.permissionRegistry.previousPermissions['help'] = previousPermission
-
-        and:
-        def node = new LiteralNode('help', '?', 'showhelp', 'displayhelp')
-        node.commandInfo = new CommandInfo(
-                'command.description.help',
-                new PermissionInfo('help', Permission.Grant.ALL)
-        )
-        def command = new BukkitCommandRegistry.BukkitCommand(registry, 'help', node)
-        command.permission = 'help'
-
-        and:
-        registry.knownCommands['help'] = command
-        registry.knownCommands['?'] = command
-        registry.knownCommands["${application.name}:help"] = command
-        registry.knownCommands["${application.name}:?"] = command
-        registry.knownCommands['showhelp'] = Mock(Command)
+        registry.previousPermissions['help'] = previousPermission
 
         and:
         def pluginManager = Bukkit.server.pluginManager
@@ -147,17 +108,10 @@ class BukkitCommandRegistryTest extends Specification {
         pluginManager.addPermission(otherPermission)
 
         when:
-        registry.onUnregister('help')
+        registry.unregisterPermission('help')
 
         then:
         noExceptionThrown()
-
-        and:
-        def knownCommands = registry.knownCommands
-        knownCommands['help'] == null
-        knownCommands['?'] == previousCommand
-        knownCommands["${application.name}help"] == null
-        knownCommands["${application.name}?"] == null
 
         and:
         def helpPermission = pluginManager.getPermission('help')
@@ -168,20 +122,8 @@ class BukkitCommandRegistryTest extends Specification {
         helpPluginPermission == otherPermission
 
         and:
-        def previousCommands = registry.previousCommands
-        previousCommands.isEmpty()
-
-        and:
-        def previousPermissions = registry.permissionRegistry.previousPermissions
+        def previousPermissions = registry.previousPermissions
         previousPermissions.isEmpty()
-    }
-
-    def 'test that onUnregister does not throw on unknown command'() {
-        when:
-        registry.onUnregister('unknown')
-
-        then:
-        noExceptionThrown()
     }
 
 }

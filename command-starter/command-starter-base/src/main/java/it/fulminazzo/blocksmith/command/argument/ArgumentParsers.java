@@ -94,7 +94,8 @@ public final class ArgumentParsers {
             return (ArgumentParser<T>) new EnumArgumentParser<>((Class) type);
         ArgumentParser<?> parser = parsers.get(ReflectionUtils.toWrapper(type));
         if (parser == null)
-            throw new IllegalArgumentException("No parser found for type " + type.getCanonicalName());
+            throw new IllegalArgumentException(String.format("No default Argument parser supports the type %s. " +
+                    "Please provide a custom parser through %s#register", type.getCanonicalName(), ArgumentParsers.class.getSimpleName()));
         return (ArgumentParser<T>) parser;
     }
 

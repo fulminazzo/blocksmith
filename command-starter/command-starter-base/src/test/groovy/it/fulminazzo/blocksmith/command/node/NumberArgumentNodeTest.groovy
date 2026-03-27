@@ -34,12 +34,12 @@ class NumberArgumentNodeTest extends Specification {
         completions == (1..9).collect { it.toString() }
     }
 
-    def 'test that validateExecuteInput correctly validates #argument'() {
+    def 'test that processInput correctly validates #argument'() {
         given:
         context.addInput(argument)
 
         when:
-        node.validateExecuteInput(context)
+        node.processInput(context)
 
         then:
         noExceptionThrown()
@@ -48,12 +48,12 @@ class NumberArgumentNodeTest extends Specification {
         argument << (1..10).collect { it.toString() }
     }
 
-    def 'test that validateExecuteInput throws for argument #argument'() {
+    def 'test that processInput throws for argument #argument'() {
         given:
         context.addInput(argument)
 
         when:
-        node.validateExecuteInput(context)
+        node.processInput(context)
 
         then:
         def e = thrown(CommandExecutionException)

@@ -35,6 +35,21 @@ public final class LiteralNode extends CommandNode {
     }
 
     /**
+     * Creates a clone of the current node, with the given literals.
+     *
+     * @param literals the new literals
+     * @return the clone
+     */
+    public @NotNull LiteralNode clone(final String @NotNull ... literals) {
+        LiteralNode clone = new LiteralNode(literals);
+        getChildren().forEach(clone::addChild);
+        getExecutionInfo().ifPresent(clone::setExecutionInfo);
+        getCommandInfo().ifPresent(clone::setCommandInfo);
+        clone.setCooldown(getCooldown());
+        return clone;
+    }
+
+    /**
      * If this literal represents the final command (or subcommand) of a command route,
      * its command information will be available.
      *
@@ -63,7 +78,7 @@ public final class LiteralNode extends CommandNode {
     }
 
     @Override
-    protected void validateExecuteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+    protected void processInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         if (!hasPermission(context))
             throw new CommandExecutionException("error.no-permission")
                     .arguments(Placeholder.of("permission", getCommandInfo().orElseThrow().getPermission().getPermission()));
@@ -71,7 +86,7 @@ public final class LiteralNode extends CommandNode {
 
     @Override
     protected void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-        validateExecuteInput(context);
+        processInput(context);
     }
 
     @Override

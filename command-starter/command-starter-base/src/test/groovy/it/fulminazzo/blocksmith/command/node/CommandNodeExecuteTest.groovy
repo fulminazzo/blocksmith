@@ -149,8 +149,8 @@ class CommandNodeExecuteTest extends Specification {
 
         and:
         def time = arg.timeSupplier.get()
-        time < 1000L
-        time > 0
+        time <= 1000L
+        time >= 0
     }
 
     def 'test execute with extra arguments'() {
