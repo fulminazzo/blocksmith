@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.cooldown;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @RequiredArgsConstructor
 public final class CooldownManager<T> {
+    @Getter
     private final @NotNull Duration cooldown;
 
     private final @NotNull Map<T, Long> lastUsage = new ConcurrentHashMap<>();
