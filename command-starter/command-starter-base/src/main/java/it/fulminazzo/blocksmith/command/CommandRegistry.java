@@ -142,43 +142,41 @@ public abstract class CommandRegistry {
                            final @NotNull Object executor,
                            final @NotNull String commandName,
                            final String @NotNull ... arguments) {
+        CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
         try {
-            CommandExecutionContext context = prepareExecutionContext(executor, commandName, arguments);
             command.execute(context);
         } catch (CommandExecutionException e) {
-            handleCommandExecutionException(e, executor, commandName, arguments);
+            handleCommandExecutionException(e, context);
         }
     }
 
     /**
      * Handles the given command execution exception.
      *
-     * @param exception   the exception
-     * @param executor    the executor of the command
-     * @param commandName the command name
-     * @param arguments   the arguments to pass as input
+     * @param exception the exception
+     * @param context   the context
      */
     public void handleCommandExecutionException(final @NotNull CommandExecutionException exception,
-                                                final @NotNull Object executor,
-                                                final @NotNull String commandName,
-                                                final String @NotNull ... arguments) {
-        application.getMessenger().sendMessage(wrapSender(executor), exception.getMessage(), getArguments(exception, commandName, arguments));
+                                                final @NotNull CommandExecutionContext context) {
+        application.getMessenger().sendMessage(
+                context.getCommandSender(),
+                exception.getMessage(),
+                getArguments(exception, context)
+        );
         Throwable cause = exception.getCause();
         if (cause != null)
-            application.getLog().warn("{} while executing command /{} {}",
+            application.getLog().warn("{} while executing command /{}",
                     cause.getClass().getCanonicalName(),
-                    commandName,
-                    String.join(" ", arguments),
+                    String.join(" ", context.getInput()),
                     cause
             );
     }
 
     private static @NotNull Argument[] getArguments(final @NotNull CommandExecutionException exception,
-                                                    final @NotNull String commandName,
-                                                    final String @NotNull ... arguments) {
+                                                    final @NotNull CommandExecutionContext context) {
         Argument[] previous = exception.getArguments();
         Argument[] args = Arrays.copyOf(previous, previous.length + 1);
-        args[previous.length] = Placeholder.of("input", commandName + " " + String.join(" ", arguments));
+        args[previous.length] = Placeholder.of("input", String.join(" ", context.getInput()));
         return args;
     }
 
