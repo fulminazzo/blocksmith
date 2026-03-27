@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @RequiredArgsConstructor
 public abstract class CommandRegistry {
-    private final @NotNull ApplicationHandle application;
+    protected final @NotNull ApplicationHandle application;
 
     private final @NotNull Map<String, LiteralNode> commands = new ConcurrentHashMap<>();
     private volatile @NotNull State state = State.INITIAL;
