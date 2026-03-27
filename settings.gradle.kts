@@ -23,6 +23,13 @@ include("message-starter:message-starter-bukkit")
 include("message-starter:message-starter-bungeecord")
 include("message-starter:message-starter-velocity")
 
+include("scheduler-starter")
+
+include("scheduler-starter:scheduler-starter-bukkit")
+include("scheduler-starter:scheduler-starter-folia")
+include("scheduler-starter:scheduler-starter-bungeecord")
+include("scheduler-starter:scheduler-starter-velocity")
+
 include("command-starter")
 include("command-starter:command-starter-base")
 include("command-starter:command-starter-brigadier")
