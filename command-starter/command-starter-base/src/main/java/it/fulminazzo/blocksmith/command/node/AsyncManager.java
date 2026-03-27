@@ -22,8 +22,7 @@ import java.util.concurrent.*;
 @ToString
 @RequiredArgsConstructor
 final class AsyncManager {
-    private static final @NotNull ExecutorService executorService = Executors.newCachedThreadPool();
-
+    private final @NotNull ExecutorService executorService = Executors.newCachedThreadPool();
     private final @NotNull Set<Object> pending = ConcurrentHashMap.newKeySet();
     @Getter
     private final @NotNull Duration timeout;
