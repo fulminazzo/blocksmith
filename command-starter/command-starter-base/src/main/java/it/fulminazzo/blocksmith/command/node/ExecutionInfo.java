@@ -67,7 +67,7 @@ public class ExecutionInfo {
             throw new CommandExecutionException("error.internal-error", cause)
                     .arguments(Placeholder.of("message", cause.getMessage()));
         } catch (IllegalAccessException e) {
-            throw new IllegalArgumentException(String.format("Method %s#%s should be declared public",
+            throw new IllegalArgumentException(String.format("Method %s#%s must be declared public",
                     method.getDeclaringClass().getCanonicalName(),
                     ReflectionUtils.methodToString(method)
             ));
