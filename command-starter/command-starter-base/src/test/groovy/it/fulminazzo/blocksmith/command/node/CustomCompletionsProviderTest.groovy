@@ -5,6 +5,7 @@ import groovy.transform.EqualsAndHashCode
 import spock.lang.Specification
 
 import java.lang.reflect.Method
+import java.util.concurrent.CompletionException
 
 @EqualsAndHashCode
 class CustomCompletionsProviderTest extends Specification {
@@ -12,6 +13,63 @@ class CustomCompletionsProviderTest extends Specification {
     private static Method validStatic = CustomCompletionsProviderTest.getMethod('validStatic')
     private static Method invalidReturnType = CustomCompletionsProviderTest.getMethod('invalidReturnType')
     private static Method invalidReturnTypeStatic = CustomCompletionsProviderTest.getMethod('invalidReturnTypeStatic')
+
+    def 'test that getCompletions works'() {
+        given:
+        def provider = new CustomCompletionsProvider(this, valid)
+
+        when:
+        def actual = provider.completions
+
+        then:
+        actual == ['first', 'null', 'third']
+    }
+
+    def 'test that getCompletions throws Exception'() {
+        given:
+        def provider = new CustomCompletionsProvider(
+                this,
+                CustomCompletionsProviderTest.getMethod('exception')
+        )
+
+        when:
+        provider.completions
+
+        then:
+        def e = thrown(CompletionException)
+        def cause = e.cause
+        (cause.class == Exception)
+        cause.message == 'Test exception'
+    }
+
+    def 'test that getCompletions throws Runtime exception'() {
+        given:
+        def provider = new CustomCompletionsProvider(
+                this,
+                CustomCompletionsProviderTest.getMethod('runtimeException')
+        )
+
+        when:
+        provider.completions
+
+        then:
+        def e = thrown(RuntimeException)
+        e.message == 'Test runtime exception'
+    }
+
+    def 'test that getCompletions throws Illegal argument exception on private method'() {
+        given:
+        def provider = new CustomCompletionsProvider(
+                this,
+                CustomCompletionsProviderTest.getDeclaredMethod('privateMethod')
+        )
+
+        when:
+        provider.completions
+
+        then:
+        thrown(IllegalArgumentException)
+    }
 
     def 'test that of function with #methodDeclaration returns #expectedRequester, #expectedMethod'() {
         when:
@@ -60,6 +118,18 @@ class CustomCompletionsProviderTest extends Specification {
     }
 
     List<String> valid() {
+        return ['first', null, 'third']
+    }
+
+    List<?> exception() {
+        throw new Exception('Test exception')
+    }
+
+    List<?> runtimeException() {
+        throw new RuntimeException('Test runtime exception')
+    }
+
+    private List<String> privateMethod() {
         return []
     }
 
