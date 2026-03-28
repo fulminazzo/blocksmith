@@ -16,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Set;
@@ -50,8 +52,16 @@ public class ExecutionInfo {
             LinkedList<Object> arguments = context.getArguments();
             if (arguments.size() != method.getParameterCount()) {
                 Class<?> parameterType = method.getParameterTypes()[0];
-                if (CommandSenderWrapper.class.isAssignableFrom(parameterType)) arguments.addFirst(sender);
-                else if (sender.extendsType(parameterType)) arguments.addFirst(sender.getActualSender());
+                if (CommandSenderWrapper.class.isAssignableFrom(parameterType)) {
+                    ParameterizedType paramType = (ParameterizedType) method.getGenericParameterTypes()[0];
+                    Type actualSenderType = paramType.getActualTypeArguments()[0];
+                    if (actualSenderType instanceof Class<?> && !sender.extendsType((Class<?>) actualSenderType))
+                        throw new CommandExecutionException(sender.isPlayer()
+                                ? "error.player-cannot-execute"
+                                : "error.console-cannot-execute"
+                        );
+                    arguments.addFirst(sender);
+                } else if (sender.extendsType(parameterType)) arguments.addFirst(sender.getActualSender());
                 else throw new CommandExecutionException(sender.isPlayer()
                             ? "error.player-cannot-execute"
                             : "error.console-cannot-execute"
