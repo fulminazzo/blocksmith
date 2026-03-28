@@ -14,10 +14,7 @@ import lombok.Getter;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Set;
@@ -86,6 +83,7 @@ public class ExecutionInfo {
     private static void validateParameters(final @NotNull Object executor,
                                            final @NotNull Method method,
                                            final @NotNull Object[] parameterValues) throws CommandExecutionException {
+        if (Modifier.isStatic(method.getModifiers())) return; //TODO: not good.
         Set<ConstraintViolation<Object>> violations = validator.validateParameters(executor, method, parameterValues);
         Optional<ConstraintViolation<Object>> first = violations.stream().findFirst();
         if (first.isPresent()) {
