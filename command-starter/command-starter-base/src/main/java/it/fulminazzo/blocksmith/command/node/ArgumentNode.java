@@ -29,6 +29,8 @@ public class ArgumentNode<T> extends CommandNode {
     private @Nullable String defaultValue;
     private boolean greedy;
 
+    private @Nullable CustomCompletionsProvider customCompletionsProvider;
+
     /**
      * Sets the current node to greedy.
      *
@@ -57,7 +59,8 @@ public class ArgumentNode<T> extends CommandNode {
 
     @Override
     public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
-        return getArgumentParser().getCompletions(context).stream()
+        if (customCompletionsProvider != null) return customCompletionsProvider.getCompletions();
+        else return getArgumentParser().getCompletions(context).stream()
                 .map(c -> c.replace("%name%", getName()))
                 .collect(Collectors.toList());
     }
