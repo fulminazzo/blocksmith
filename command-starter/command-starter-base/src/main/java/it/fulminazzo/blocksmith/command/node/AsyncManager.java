@@ -36,41 +36,41 @@ final class AsyncManager {
      * @return the future with the asynchronous execution
      * @throws CommandExecutionException in case of any error
      */
-    public synchronized @NotNull CompletableFuture<Void> execute(final @NotNull ExecutionInfo executionInfo,
-                                                                 final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+    public @NotNull CompletableFuture<Void> execute(final @NotNull ExecutionInfo executionInfo,
+                                                    final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         CommandSenderWrapper<?> sender = context.getCommandSender();
         Object id = sender.getId();
         if (pending.contains(id)) throw new CommandExecutionException("error.await-pending-operation");
-        else {
-            pending.add(id);
+        else pending.add(id);
 
-            CompletableFuture<Void> checkTask = new CompletableFuture<>();
-            Future<?> actualTask = executorService.submit(() -> {
-                try {
-                    executionInfo.invoke(context);
-                    checkTask.complete(null);
-                } catch (CommandExecutionException e) {
-                    checkTask.completeExceptionally(e);
-                }
-            });
+        CompletableFuture<Void> checkTask = new CompletableFuture<>();
+        Future<?> actualTask = executorService.submit(() -> {
+            try {
+                executionInfo.invoke(context);
+                checkTask.complete(null);
+            } catch (CommandExecutionException e) {
+                checkTask.completeExceptionally(e);
+            }
+        });
 
-            return checkTask.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
-                    .handle((v, t) -> {
-                        pending.remove(id);
-                        actualTask.cancel(true);
-                        if (t instanceof CompletionException) t = t.getCause();
-                        else if (t instanceof TimeoutException)
-                            t = new CommandExecutionException("error.operation-timeout")
-                                    .arguments(Time.of(timeout.toMillis()));
-                        if (t != null) {
-                            if (!(t instanceof CommandExecutionException))
-                                t = new CommandExecutionException("error.internal-error", t)
-                                        .arguments(Placeholder.of("message", t.getMessage()));
-                            context.getRegistry().handleCommandExecutionException((CommandExecutionException) t, context);
-                        }
-                        return v;
-                    });
-        }
+        if (!timeout.isZero()) checkTask.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS);
+
+        return checkTask
+                .handle((v, t) -> {
+                    pending.remove(id);
+                    actualTask.cancel(true);
+                    if (t instanceof CompletionException) t = t.getCause();
+                    else if (t instanceof TimeoutException)
+                        t = new CommandExecutionException("error.operation-timeout")
+                                .arguments(Time.of(timeout.toMillis()));
+                    if (t != null) {
+                        if (!(t instanceof CommandExecutionException))
+                            t = new CommandExecutionException("error.internal-error", t)
+                                    .arguments(Placeholder.of("message", t.getMessage()));
+                        context.getRegistry().handleCommandExecutionException((CommandExecutionException) t, context);
+                    }
+                    return v;
+                });
     }
 
 }

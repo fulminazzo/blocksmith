@@ -14,8 +14,7 @@ import lombok.Getter;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Set;
@@ -48,9 +47,16 @@ public class ExecutionInfo {
             LinkedList<Object> arguments = context.getArguments();
             if (arguments.size() != method.getParameterCount()) {
                 Class<?> parameterType = method.getParameterTypes()[0];
-                if (parameterType.equals(CommandSenderWrapper.class))
+                if (CommandSenderWrapper.class.isAssignableFrom(parameterType)) {
+                    ParameterizedType paramType = (ParameterizedType) method.getGenericParameterTypes()[0];
+                    Type actualSenderType = paramType.getActualTypeArguments()[0];
+                    if (actualSenderType instanceof Class<?> && !sender.extendsType((Class<?>) actualSenderType))
+                        throw new CommandExecutionException(sender.isPlayer()
+                                ? "error.player-cannot-execute"
+                                : "error.console-cannot-execute"
+                        );
                     arguments.addFirst(sender);
-                else if (sender.extendsType(parameterType)) arguments.addFirst(sender.getActualSender());
+                } else if (sender.extendsType(parameterType)) arguments.addFirst(sender.getActualSender());
                 else throw new CommandExecutionException(sender.isPlayer()
                             ? "error.player-cannot-execute"
                             : "error.console-cannot-execute"
@@ -75,6 +81,7 @@ public class ExecutionInfo {
     private static void validateParameters(final @NotNull Object executor,
                                            final @NotNull Method method,
                                            final @NotNull Object[] parameterValues) throws CommandExecutionException {
+        if (Modifier.isStatic(method.getModifiers())) return; //TODO: not good.
         Set<ConstraintViolation<Object>> violations = validator.validateParameters(executor, method, parameterValues);
         Optional<ConstraintViolation<Object>> first = violations.stream().findFirst();
         if (first.isPresent()) {

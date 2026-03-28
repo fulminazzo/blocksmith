@@ -5,13 +5,10 @@ import it.fulminazzo.blocksmith.command.TabCompletable;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
-import it.fulminazzo.blocksmith.cooldown.CooldownManager;
+import it.fulminazzo.blocksmith.cooldown.StaticCooldownManager;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.argument.Time;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,34 +27,18 @@ public abstract class CommandNode implements TabCompletable {
     @ToString.Exclude
     private @Nullable CommandNode parent;
     @Getter
+    @ToString.Exclude
     private final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
     @Setter
     private @Nullable ExecutionInfo executionInfo;
 
-    private @Nullable CooldownManager<Object> cooldownManager;
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private @Nullable StaticCooldownManager<Object> cooldownManager;
 
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private @Nullable AsyncManager asyncManager;
-
-    /**
-     * Gets the timeout to execute the command asynchronously.
-     *
-     * @return the timeout (if given)
-     */
-    public @Nullable Duration getAsyncTimeout() {
-        return asyncManager == null ? null : asyncManager.getTimeout();
-    }
-
-    /**
-     * Sets the command to run asynchronously.
-     * <br>
-     * <b>WARNING</b>: only works if {@link #executionInfo} is defined.
-     *
-     * @param timeout the timeout
-     */
-    public void setAsync(final @Nullable Duration timeout) {
-        if (timeout == null) asyncManager = null;
-        else asyncManager = new AsyncManager(timeout);
-    }
 
     /**
      * Gets the execution cooldown for the current node.
@@ -77,7 +58,40 @@ public abstract class CommandNode implements TabCompletable {
      */
     public void setCooldown(final @Nullable Duration cooldown) {
         if (cooldown == null) cooldownManager = null;
-        else cooldownManager = new CooldownManager<>(cooldown);
+        else cooldownManager = new StaticCooldownManager<>(cooldown);
+    }
+
+    /**
+     * Gets the timeout to execute the command asynchronously.
+     *
+     * @return the timeout (if given)
+     */
+    public @Nullable Duration getAsyncTimeout() {
+        return asyncManager == null ? null : asyncManager.getTimeout();
+    }
+
+    /**
+     * Sets the command to run asynchronously.
+     * <br>
+     * <b>WARNING</b>: only works if {@link #executionInfo} is defined.
+     *
+     * @param timeout the timeout
+     */
+    public void setAsync(final @Nullable Duration timeout) {
+        if (timeout == null) asyncManager = null;
+        else if (timeout.isNegative()) throw new IllegalArgumentException("timeout must be positive or zero");
+        else asyncManager = new AsyncManager(timeout);
+    }
+
+    /**
+     * Gets the first literal node (starting from this node) that represents the actual subcommand.
+     *
+     * @return the node (if found)
+     */
+    public @Nullable LiteralNode getCommandLiteral() {
+        if (this instanceof LiteralNode) return (LiteralNode) this;
+        else if (parent == null) return null;
+        else return parent.getCommandLiteral();
     }
 
     /**
@@ -209,7 +223,7 @@ public abstract class CommandNode implements TabCompletable {
      */
     void handleRemainingInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
         if (context.advanceCursor().isDone()) {
-            if (isExecutable()) internalExecute(context);
+            if (isExecutable()) executeOrAwaitConfirmation(context);
             else {
                 ArgumentNode<?> optional = getFirstOptionalArgumentNode();
                 if (optional != null) {
@@ -221,11 +235,31 @@ public abstract class CommandNode implements TabCompletable {
             String current = context.getCurrent();
             CommandNode child = getChild(current);
             if (child == null) {
-                if (isExecutable()) internalExecute(context);
+                if (isExecutable()) executeOrAwaitConfirmation(context);
                 else throw new CommandExecutionException("error.command-not-found")
                         .arguments(Placeholder.of("argument", current));
             } else child.execute(context);
         }
+    }
+
+    private void executeOrAwaitConfirmation(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        LiteralNode literalNode = getCommandLiteral();
+        if (literalNode != null && literalNode.requiresConfirmation()) {
+            Duration confirmationTimeout = literalNode.getConfirmationTimeout();
+            literalNode.getPendingActionManager().register(
+                    context.getCommandSender().getId(),
+                    confirmationTimeout,
+                    () -> {
+                        try {
+                            internalExecute(context);
+                        } catch (CommandExecutionException e) {
+                            context.getRegistry().handleCommandExecutionException(e, context);
+                        }
+                    }
+            );
+            throw new CommandExecutionException("general.await-confirmation")
+                    .arguments(Time.of("time", confirmationTimeout.toMillis()));
+        } else internalExecute(context);
     }
 
     private void internalExecute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
@@ -257,13 +291,13 @@ public abstract class CommandNode implements TabCompletable {
         else {
             try {
                 validateTabCompleteInput(context);
-                if (context.isLast() || context.advanceCursor().isLast())
-                    return filterCompletions(context, getChildren().stream()
+                if (context.isLast() || context.advanceCursor().isLast()) {
+                    List<String> completions = getChildren().stream()
                             .map(c -> c.getCompletions(context))
                             .flatMap(Collection::stream)
-                            .collect(Collectors.toList())
-                    );
-                else {
+                            .collect(Collectors.toList());
+                    return filterCompletions(context, completions);
+                } else {
                     CommandNode child = getChild(context.getCurrent());
                     if (child == null) return Collections.emptyList();
                     else {
@@ -279,7 +313,14 @@ public abstract class CommandNode implements TabCompletable {
         }
     }
 
-    private @NotNull List<String> filterCompletions(final @NotNull CommandExecutionContext context,
+    /**
+     * Removes any completion not starting with &lt; and not matching the last input.
+     *
+     * @param context     the context
+     * @param completions the completions
+     * @return the completions
+     */
+    @NotNull List<String> filterCompletions(final @NotNull CommandExecutionContext context,
                                                     final @NotNull List<String> completions) {
         List<String> finalCompletions = completions.stream()
                 .filter(c -> c.toLowerCase().startsWith(context.getCurrent().toLowerCase()))

@@ -61,6 +61,15 @@ public final class CommandExecutionContext {
     }
 
     /**
+     * Gets the next argument from the input (without advancing the cursor).
+     *
+     * @return the next argument
+     */
+    public @NotNull String peek() {
+        return input.get(current + 1);
+    }
+
+    /**
      * Gets the current argument from the input.
      *
      * @return the current argument
@@ -78,15 +87,6 @@ public final class CommandExecutionContext {
     public @NotNull CommandExecutionContext setCurrent(final @NotNull String input) {
         this.input.set(current, input);
         return this;
-    }
-
-    /**
-     * Gets the last argument from the input.
-     *
-     * @return the last argument
-     */
-    public @NotNull String getLast() {
-        return input.get(input.size() - 1);
     }
 
     /**

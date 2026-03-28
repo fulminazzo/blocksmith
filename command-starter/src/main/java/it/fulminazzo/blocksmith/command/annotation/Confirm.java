@@ -11,10 +11,14 @@ import java.util.concurrent.TimeUnit;
 //TODO: pending documentation
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface Async {
+public @interface Confirm {
 
-    long value() default 0;
+    long timeout() default 10;
 
     @NotNull TimeUnit unit() default TimeUnit.SECONDS;
+
+    @NotNull String confirmWord() default "confirm";
+
+    @NotNull String cancelWord() default "cancel";
 
 }

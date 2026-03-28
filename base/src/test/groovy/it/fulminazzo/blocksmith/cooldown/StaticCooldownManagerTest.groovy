@@ -4,11 +4,11 @@ import spock.lang.Specification
 
 import java.time.Duration
 
-class CooldownManagerTest extends Specification {
+class StaticCooldownManagerTest extends Specification {
 
     def 'test that cooldown system works'() {
         given:
-        def manager = new CooldownManager(Duration.ofSeconds(1))
+        def manager = new StaticCooldownManager(Duration.ofSeconds(1))
 
         and:
         def target = new Object()
