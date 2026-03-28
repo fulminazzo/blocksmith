@@ -157,6 +157,7 @@ final class BrigadierParser<S> {
      */
     static <T, A> @Nullable ArgumentType<T> getArgumentType(final @NotNull ArgumentNode<A> node) {
         if (node.isGreedy()) return (ArgumentType<T>) StringArgumentType.greedyString();
+        else if (node.getCustomCompletionsProvider() != null) return null;
         Class<A> type = node.getType();
         return (ArgumentType<T>) ArgumentTypes.get(type).orElseGet(() -> {
             if (Number.class.isAssignableFrom(type))
