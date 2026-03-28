@@ -24,7 +24,6 @@ import java.util.Set;
  * Contains information about the actual execution of a command.
  */
 @Value
-@Getter(AccessLevel.NONE)
 public class ExecutionInfo {
     private static final ExecutableValidator validator;
 
@@ -35,7 +34,6 @@ public class ExecutionInfo {
     }
 
     @NotNull Object executor;
-    @Getter
     @NotNull Method method;
 
     /**
