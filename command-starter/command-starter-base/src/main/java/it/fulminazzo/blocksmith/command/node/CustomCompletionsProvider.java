@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletionException;
@@ -40,6 +41,56 @@ public class CustomCompletionsProvider {
                     method.getDeclaringClass().getCanonicalName(),
                     ReflectionUtils.methodToString(method)
             ));
+        }
+    }
+
+    /**
+     * Creates a new custom completions provider from the given method declaration.
+     * If the method declaration is relative (no dots), the method will be searched in the
+     * requester class. If the method declaration is absolute (contains dots), the method will
+     * be searched in the specified class (and must be static).
+     *
+     * @param requester         the requester (can be a class or an instance)
+     * @param methodDeclaration the method declaration (e.g. "getCompletions")
+     * @return the custom completions provider
+     */
+    public static @NotNull CustomCompletionsProvider of(@NotNull Object requester,
+                                                        @NotNull String methodDeclaration) {
+        if (methodDeclaration.contains(".")) {
+            int index = methodDeclaration.lastIndexOf('.');
+            String className = methodDeclaration.substring(0, index);
+            methodDeclaration = methodDeclaration.substring(index + 1);
+            try {
+                requester = Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                throw new IllegalArgumentException(String.format("Could not find class '%s'", className));
+            }
+        }
+        final Method method;
+        Class<?> type = null;
+        try {
+            if (requester instanceof Class) {
+                type = (Class<?>) requester;
+                method = type.getMethod(methodDeclaration);
+                if (!Modifier.isStatic(method.getModifiers()))
+                    throw new IllegalArgumentException(String.format("Invalid method '%s' in type '%s': " +
+                            "completions functions with class executor must be static", methodDeclaration, type.getCanonicalName())
+                    );
+            } else {
+                type = requester.getClass();
+                method = type.getMethod(methodDeclaration);
+                if (Modifier.isStatic(method.getModifiers()))
+                    requester = type;
+            }
+            if (Collection.class.isAssignableFrom(method.getReturnType())) {
+                return new CustomCompletionsProvider(requester, method);
+            } else
+                throw new IllegalArgumentException(String.format("Invalid method '%s' in type '%s': must return an instance of %s",
+                        method.getName(), type.getCanonicalName(), Collection.class.getCanonicalName())
+                );
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(String.format("Could not find method '%s' in class '%s'",
+                    methodDeclaration, type.getCanonicalName()));
         }
     }
 
