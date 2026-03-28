@@ -1,6 +1,5 @@
 package it.fulminazzo.blocksmith.command.node;
 
-import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +25,7 @@ public class CustomCompletionsProvider {
      *
      * @return the completions
      */
-    public @NotNull List<String> getCompletions() throws CommandExecutionException {
+    public @NotNull List<String> getCompletions() {
         try {
             Collection<?> completions = (Collection<?>) method.invoke(executor);
             return completions.stream()
