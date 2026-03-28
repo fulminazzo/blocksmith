@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
+import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.util.ReflectionUtils;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
@@ -54,6 +55,15 @@ public class ArgumentNode<T> extends CommandNode {
     }
 
     private @Nullable T parseArgument(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
+        if (customCompletionsProvider != null) {
+            String argument = context.getCurrent();
+            List<String> completions = customCompletionsProvider.getCompletions();
+            if (completions.stream()
+                    .noneMatch(c -> c.equalsIgnoreCase(argument)))
+                throw new CommandExecutionException("error.invalid-argument")
+                        .arguments(Placeholder.of("argument", argument),
+                                Placeholder.of("expected", String.join(", ", completions)));
+        }
         return getArgumentParser().parse(context);
     }
 
