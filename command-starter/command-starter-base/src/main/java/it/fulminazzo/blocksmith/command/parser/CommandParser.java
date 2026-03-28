@@ -179,6 +179,11 @@ public final class CommandParser {
                 Range range = parameter.getAnnotation(Range.class);
                 argumentNode.min(range.min()).max(range.max());
             } else throw parseException("argument '%s' type must be %s or an implementation", argument, Number.class);
+        if (parameter.isAnnotationPresent(Tab.class)) {
+            Tab tab = parameter.getAnnotation(Tab.class);
+            CustomCompletionsProvider provider = CustomCompletionsProvider.of(executionInfo.getExecutor(), tab.value());
+            node.setCustomCompletionsProvider(provider);
+        }
         tokenizer.next();
         return node;
     }
