@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.reflect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -56,6 +57,33 @@ public final class ReflectException extends RuntimeException {
         if (object == null) objectDeclaration = "null";
         else objectDeclaration = object + " (type: " + object.getClass().getCanonicalName() + ")";
         return new ReflectException("Cannot cast object '%s' to type '%s'", objectDeclaration, type);
+    }
+
+    /**
+     * Cannot find constructor reflect exception.
+     *
+     * @param type           the type
+     * @param parameterTypes the parameter types
+     * @return the reflect exception
+     */
+    static @NotNull ReflectException cannotFindConstructor(final @NotNull Type type,
+                                                           final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return new ReflectException("Could not find constructor with types (%s) in type '%s'",
+                Arrays.stream(parameterTypes)
+                        .map(p -> p == null ? "?" : ReflectUtils.toString(p))
+                        .collect(Collectors.joining(", ")),
+                type
+        );
+    }
+
+    /**
+     * Cannot find constructor reflect exception.
+     *
+     * @param type the type
+     * @return the reflect exception
+     */
+    static @NotNull ReflectException cannotFindConstructor(final @NotNull Type type) {
+        return new ReflectException("Could not find constructor from the given predicate in type '%s'", type);
     }
 
     /**
@@ -124,6 +152,14 @@ public final class ReflectException extends RuntimeException {
                         ReflectUtils.toString(method.getReturnType()),
                         method.getName(),
                         Arrays.stream(method.getParameterTypes())
+                                .map(ReflectUtils::toString)
+                                .collect(Collectors.joining(", "))
+                );
+            } else if (object instanceof Constructor<?>) {
+                Constructor<?> constructor = (Constructor<?>) object;
+                args[i] = String.format("%s(%s)",
+                        constructor.getDeclaringClass().getCanonicalName(),
+                        Arrays.stream(constructor.getParameterTypes())
                                 .map(ReflectUtils::toString)
                                 .collect(Collectors.joining(", "))
                 );

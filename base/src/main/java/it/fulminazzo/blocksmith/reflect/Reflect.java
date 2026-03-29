@@ -151,6 +151,93 @@ public class Reflect {
     }
 
     /*
+     * CONSTRUCTORS
+     */
+
+    /**
+     * Initializes a new instance of the internal type.
+     *
+     * @param parameters the parameters
+     * @return the initialized object
+     * @throws ReflectException if no method was found or an error occurs while getting the value
+     */
+    public @NotNull Reflect init(final @Nullable Object @NotNull ... parameters) {
+        Class<?>[] parameterTypes = getClasses(parameters);
+        Constructor<?> constructor = getConstructor(parameterTypes);
+        return init(constructor, parameters);
+    }
+
+    /**
+     * Initializes a new instance of the internal type.
+     *
+     * @param constructor the constructor
+     * @param parameters the parameters
+     * @return the initialized object
+     * @throws ReflectException if an error occurs while getting the value
+     */
+    public @NotNull Reflect init(final @NotNull Constructor<?> constructor,
+                                 final @Nullable Object @NotNull ... parameters) {
+        try {
+            constructor.setAccessible(true);
+            return new Reflect(
+                    constructor.getDeclaringClass(),
+                    constructor.newInstance(parameters)
+            );
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+            else if (cause instanceof Error) throw (Error) cause;
+            else throw new ReflectException(e, "Could not get instance from %s", constructor);
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new ReflectException(e, "Could not get instance from %s", constructor);
+        }
+    }
+
+    /**
+     * Gets the constructor with the given parameter types.
+     * 
+     * @param parameterTypes the parameter types
+     * @return the constructor
+     * @throws ReflectException if no constructor was found
+     */
+    public @NotNull Constructor<?> getConstructor(final @Nullable Class<?> @NotNull... parameterTypes) {
+        return ReflectUtils.findExecutable(
+                getConstructors(),
+                parameterTypes
+        ).orElseThrow(() -> ReflectException.cannotFindConstructor(type, parameterTypes));
+    }
+
+    /**
+     * Gets the first constructor that matches the predicate.
+     * 
+     * @param predicate the predicate
+     * @return the constructor
+     * @throws ReflectException if no constructor was found
+     */
+    public @NotNull Constructor<?> getConstructor(final @NotNull Predicate<Constructor<?>> predicate) {
+        return getConstructors(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindConstructor(type));
+    }
+
+    /**
+     * Gets all the constructors that match the predicate.
+     * 
+     * @param predicate the predicate
+     * @return the constructors
+     */
+    public @NotNull List<Constructor<?>> getConstructors(final @NotNull Predicate<Constructor<?>> predicate) {
+        return getConstructors().stream().filter(predicate).collect(Collectors.toList());
+    }
+
+    /**
+     * Gets all the constructors.
+     * 
+     * @return the constructors
+     */
+    public @NotNull List<Constructor<?>> getConstructors() {
+        return Arrays.asList(getObjectClass().getDeclaredConstructors());
+    }
+
+    /*
      * FIELDS
      */
 
@@ -196,7 +283,7 @@ public class Reflect {
      *
      * @param name the name of the field
      * @return the value of the field
-     * @throws ReflectException if no field is found or an error occurs while getting the value
+     * @throws ReflectException if no field was found or an error occurs while getting the value
      */
     public @NotNull Reflect getInstance(final @NotNull String name) {
         return get(getInstanceField(name));
@@ -207,7 +294,7 @@ public class Reflect {
      *
      * @param name the name of the field
      * @return the value of the field
-     * @throws ReflectException if no field is found or an error occurs while getting the value
+     * @throws ReflectException if no field was found or an error occurs while getting the value
      */
     public @NotNull Reflect getStatic(final @NotNull String name) {
         return get(getStaticField(name));
@@ -218,7 +305,7 @@ public class Reflect {
      *
      * @param name the name of the field
      * @return the value of the field
-     * @throws ReflectException if no field is found or an error occurs while getting the value
+     * @throws ReflectException if no field was found or an error occurs while getting the value
      */
     public @NotNull Reflect get(final @NotNull String name) {
         return get(getField(name));
@@ -229,7 +316,7 @@ public class Reflect {
      *
      * @param predicate the predicate
      * @return the value of the field
-     * @throws ReflectException if no field is found or an error occurs while getting the value
+     * @throws ReflectException if no field was found or an error occurs while getting the value
      */
     public @NotNull Reflect get(final @NotNull Predicate<Field> predicate) {
         Field field = getField(predicate);
@@ -257,7 +344,7 @@ public class Reflect {
      *
      * @param name the name of the field
      * @return the field
-     * @throws ReflectException if no field is found
+     * @throws ReflectException if no field was found
      */
     public @NotNull Field getInstanceField(final @NotNull String name) {
         try {
@@ -272,7 +359,7 @@ public class Reflect {
      *
      * @param name the name of the field
      * @return the field
-     * @throws ReflectException if no field is found
+     * @throws ReflectException if no field was found
      */
     public @NotNull Field getStaticField(final @NotNull String name) {
         try {
@@ -287,7 +374,7 @@ public class Reflect {
      *
      * @param name the name of the field
      * @return the field
-     * @throws ReflectException if no field is found
+     * @throws ReflectException if no field was found
      */
     public @NotNull Field getField(final @NotNull String name) {
         try {
@@ -302,7 +389,7 @@ public class Reflect {
      *
      * @param predicate the predicate
      * @return the field
-     * @throws ReflectException if no field is found
+     * @throws ReflectException if no field was found
      */
     public @NotNull Field getField(final @NotNull Predicate<Field> predicate) {
         return getFields(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindField(type));
@@ -360,7 +447,7 @@ public class Reflect {
      *
      * @param parameters the parameters
      * @return the returned value
-     * @throws ReflectException if no method is found or an error occurs while getting the value
+     * @throws ReflectException if no method was found or an error occurs while getting the value
      */
     public @NotNull Reflect invoke(final @Nullable Object @NotNull ... parameters) {
         return invoke((String) null, parameters);
@@ -372,7 +459,7 @@ public class Reflect {
      * @param name       the name (if <code>null</code> any method found will be accepted)
      * @param parameters the parameters
      * @return the returned value
-     * @throws ReflectException if no method is found or an error occurs while getting the value
+     * @throws ReflectException if no method was found or an error occurs while getting the value
      */
     public @NotNull Reflect invoke(final @Nullable String name,
                                    final @Nullable Object @NotNull ... parameters) {
@@ -386,14 +473,12 @@ public class Reflect {
      * @param name       the name (if <code>null</code> any method found will be accepted)
      * @param parameters the parameters
      * @return the returned value
-     * @throws ReflectException if no method is found or an error occurs while getting the value
+     * @throws ReflectException if no method was found or an error occurs while getting the value
      */
     public @NotNull Reflect invoke(final @Nullable Class<?> returnType,
                                    final @Nullable String name,
                                    final @Nullable Object @NotNull ... parameters) {
-        Class<?>[] parameterTypes = Arrays.stream(parameters)
-                .map(p -> p == null ? null : p.getClass())
-                .toArray(Class<?>[]::new);
+        Class<?>[] parameterTypes = getClasses(parameters);
         Method method = getMethod(returnType, name, parameterTypes);
         return invoke(method, parameters);
     }
@@ -404,7 +489,7 @@ public class Reflect {
      * @param method     the method
      * @param parameters the parameters
      * @return the returned value
-     * @throws ReflectException if no method is found or an error occurs while getting the value
+     * @throws ReflectException if an error occurs while getting the value
      */
     private @NotNull Reflect invoke(final @NotNull Method method,
                                     final @Nullable Object @NotNull ... parameters) {
@@ -436,7 +521,7 @@ public class Reflect {
      *
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
      * @return the method
-     * @throws ReflectException if no method is found
+     * @throws ReflectException if no method was found
      */
     public @NotNull Method getInstanceMethod(final @Nullable Class<?> @NotNull ... parameterTypes) {
         return getInstanceMethod(null, parameterTypes);
@@ -447,7 +532,7 @@ public class Reflect {
      *
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
      * @return the static method
-     * @throws ReflectException if no method is found
+     * @throws ReflectException if no method was found
      */
     public @NotNull Method getStaticMethod(final @Nullable Class<?> @NotNull ... parameterTypes) {
         return getStaticMethod(null, parameterTypes);
@@ -458,7 +543,7 @@ public class Reflect {
      *
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
      * @return the method
-     * @throws ReflectException if no method is found
+     * @throws ReflectException if no method was found
      */
     public @NotNull Method getMethod(final @Nullable Class<?> @NotNull ... parameterTypes) {
         return getMethod(null, parameterTypes);
@@ -470,7 +555,7 @@ public class Reflect {
      * @param name           the name (if <code>null</code> any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
      * @return the method
-     * @throws ReflectException if no method is found
+     * @throws ReflectException if no method was found
      */
     public @NotNull Method getInstanceMethod(final @Nullable String name,
                                              final @Nullable Class<?> @NotNull ... parameterTypes) {
@@ -483,7 +568,7 @@ public class Reflect {
      * @param name           the name (if <code>null</code> any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
      * @return the static method
-     * @throws ReflectException if no method is found
+     * @throws ReflectException if no method was found
      */
     public @NotNull Method getStaticMethod(final @Nullable String name,
                                            final @Nullable Class<?> @NotNull ... parameterTypes) {
@@ -496,7 +581,7 @@ public class Reflect {
      * @param name           the name (if <code>null</code> any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
      * @return the method
-     * @throws ReflectException if no method is found
+     * @throws ReflectException if no method was found
      */
     public @NotNull Method getMethod(final @Nullable String name,
                                      final @Nullable Class<?> @NotNull ... parameterTypes) {
@@ -510,7 +595,7 @@ public class Reflect {
      * @param name           the name (if <code>null</code> any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
      * @return the method
-     * @throws ReflectException if no method is found
+     * @throws ReflectException if no method was found
      */
     public @NotNull Method getInstanceMethod(final @Nullable Class<?> returnType,
                                              final @Nullable String name,
@@ -525,7 +610,7 @@ public class Reflect {
      * @param name           the name (if <code>null</code> any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
      * @return the static method
-     * @throws ReflectException if no method is found
+     * @throws ReflectException if no method was found
      */
     public @NotNull Method getStaticMethod(final @Nullable Class<?> returnType,
                                            final @Nullable String name,
@@ -540,7 +625,7 @@ public class Reflect {
      * @param name           the name (if <code>null</code> any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
      * @return the method
-     * @throws ReflectException if no method is found
+     * @throws ReflectException if no method was found
      */
     public @NotNull Method getMethod(final @Nullable Class<?> returnType,
                                      final @Nullable String name,
@@ -567,7 +652,7 @@ public class Reflect {
      *
      * @param predicate the predicate
      * @return the method
-     * @throws ReflectException if no method is found
+     * @throws ReflectException if no method was found
      */
     public @NotNull Method getMethod(final @NotNull Predicate<Method> predicate) {
         return getMethods(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindMethod(type));
@@ -637,6 +722,12 @@ public class Reflect {
         if (object == null) objectDeclaration = "null";
         else objectDeclaration = String.format("%s (type: %s)", object, ReflectUtils.toString(object.getClass()));
         return String.format("%s(type=%s, object=%s)", getObjectClass().getCanonicalName(), ReflectUtils.toString(type), objectDeclaration);
+    }
+
+    private static Class<?> @NotNull [] getClasses(final @Nullable Object @NotNull ... parameters) {
+        return Arrays.stream(parameters)
+                .map(p -> p == null ? null : p.getClass())
+                .toArray(Class<?>[]::new);
     }
 
     /*
