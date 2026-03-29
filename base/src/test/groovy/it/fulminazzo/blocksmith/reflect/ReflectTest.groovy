@@ -494,17 +494,6 @@ class ReflectTest extends Specification {
         thrown(ReflectException)
     }
 
-    def 'test invoke instance method on class'() {
-        given:
-        def reflect = new Reflect(Person, Person)
-
-        when:
-        reflect.invoke('getName')
-
-        then:
-        thrown(ReflectException)
-    }
-
     def 'test that invoke with #exception throws #expected'() {
         given:
         def method = Mock(Method)
@@ -526,7 +515,6 @@ class ReflectTest extends Specification {
         new InvocationTargetException(new RuntimeException('Test runtime exception')) || RuntimeException
         new InvocationTargetException(new Error('Test error'))                        || Error
         new InvocationTargetException(new Exception('Test exception'))                || ReflectException
-        new IllegalArgumentException('Test illegal argument exception')               || IllegalArgumentException
     }
 
     def 'test that invoke throws ReflectException on IllegalAccessException'() {

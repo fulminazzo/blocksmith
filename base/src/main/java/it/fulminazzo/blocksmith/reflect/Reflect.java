@@ -563,10 +563,6 @@ public class Reflect {
             else throw new ReflectException(e, "Could not invoke method %s on %s", method, object);
         } catch (IllegalAccessException e) {
             throw new ReflectException(e, "Could not invoke method %s on %s", method, object);
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().equals("object is not an instance of declaring class"))
-                throw new ReflectException(e, "Could not invoke method %s on %s. Is it a static method?", method, object);
-            else throw e;
         }
     }
 
