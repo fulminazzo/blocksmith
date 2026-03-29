@@ -14,6 +14,26 @@ import static it.fulminazzo.blocksmith.reflect.Reflect.toWrapper;
 final class ReflectUtils {
 
     /**
+     * Checks if the given class extends the type.
+     *
+     * @param clazz the class
+     * @param type  the type
+     * @return <code>true</code> if it does
+     */
+    static boolean extendsType(final @NotNull Class<?> clazz, final @NotNull Type type) {
+        Class<?> current = clazz;
+        if (typeMatches(current, type)) return true;
+        while (current != null) {
+            Type genericSuper = current.getGenericSuperclass();
+            if (genericSuper != null && typeMatches(genericSuper, type)) return true;
+            for (Type interfaceType : current.getGenericInterfaces())
+                if (extendsType(toClass(interfaceType), type)) return true;
+            current = current.getSuperclass();
+        }
+        return false;
+    }
+
+    /**
      * Compares the two given types to verify if they match or not at runtime.
      *
      * @param source the source type. This comparison assumes that "source" represents
@@ -24,9 +44,9 @@ final class ReflectUtils {
      * @return <code>true</code> if they match
      */
     static boolean typeMatches(final @NotNull Type source, final @NotNull Type target) {
-        final Class<?> sourceClass = toClass(source);
+        final Class<?> sourceClass = toWrapper(toClass(source));
         if (target instanceof Class<?>)
-            return toWrapper(((Class<?>) target)).isAssignableFrom(toWrapper(sourceClass));
+            return toWrapper(((Class<?>) target)).isAssignableFrom(sourceClass);
         else if (target instanceof ParameterizedType) {
             ParameterizedType targetParameterizedType = (ParameterizedType) target;
             if (!(source instanceof ParameterizedType)) return typeMatches(source, targetParameterizedType.getRawType());
