@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Value
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Reflect {
-    private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER = Map.of(
+    private static final @NotNull Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER = Map.of(
             byte.class, Byte.class,
             short.class, Short.class,
             int.class, Integer.class,
@@ -28,6 +28,8 @@ public class Reflect {
             char.class, Character.class,
             boolean.class, Boolean.class
     );
+    private static final @NotNull Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITIVE = PRIMITIVE_TO_WRAPPER.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
     @NotNull Class<?> type;
     @Getter(AccessLevel.NONE)
@@ -109,10 +111,7 @@ public class Reflect {
      */
     public @NotNull Reflect toPrimitive() {
         if (isWrapper()) {
-            Class<?> newType = PRIMITIVE_TO_WRAPPER.entrySet().stream()
-                    .filter(e -> e.getValue().equals(type))
-                    .map(Map.Entry::getKey)
-                    .findFirst().orElseThrow(); // should never happen
+            Class<?> newType = WRAPPER_TO_PRIMITIVE.get(type);
             final Object newObject;
             if (object instanceof Class<?>) newObject = type;
             else newObject = newType.cast(object);
