@@ -181,7 +181,7 @@ public class Reflect {
             constructor.setAccessible(true);
             return new Reflect(
                     constructor.getDeclaringClass(),
-                    constructor.newInstance(parameters)
+                    constructor.newInstance(ReflectUtils.regroup(constructor.getParameters(), parameters))
             );
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
