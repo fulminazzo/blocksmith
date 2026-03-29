@@ -740,9 +740,9 @@ public class Reflect {
      * @param object the object
      * @return the reflect
      */
-    public static @NotNull Reflect of(final Object object) {
-        if (object instanceof Type) return of((Type) object);
-        else if (object instanceof String) return of((String) object);
+    public static @NotNull Reflect on(final Object object) {
+        if (object instanceof Type) return on((Type) object);
+        else if (object instanceof String) return on((String) object);
         else return new Reflect(object.getClass(), object);
     }
 
@@ -752,7 +752,7 @@ public class Reflect {
      * @param type the type
      * @return the reflect
      */
-    public static @NotNull Reflect of(final @NotNull Type type) {
+    public static @NotNull Reflect on(final @NotNull Type type) {
         return new Reflect(type, type);
     }
 
@@ -763,9 +763,9 @@ public class Reflect {
      * @return the reflect
      * @throws ReflectException if it could not find the class
      */
-    public static @NotNull Reflect of(final @NotNull String className) {
+    public static @NotNull Reflect on(final @NotNull String className) {
         try {
-            return of(Class.forName(className));
+            return on(Class.forName(className));
         } catch (ClassNotFoundException e) {
             throw ReflectException.classNotFound(className);
         }
@@ -779,9 +779,9 @@ public class Reflect {
      * @return the reflect
      * @throws ReflectException if it could not find the class
      */
-    public static @NotNull Reflect of(final @NotNull String className, final @NotNull ClassLoader classLoader) {
+    public static @NotNull Reflect on(final @NotNull String className, final @NotNull ClassLoader classLoader) {
         try {
-            return of(classLoader.loadClass(className));
+            return on(classLoader.loadClass(className));
         } catch (ClassNotFoundException e) {
             throw ReflectException.classNotFound(className);
         }
