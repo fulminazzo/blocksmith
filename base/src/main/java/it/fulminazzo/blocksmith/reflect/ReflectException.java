@@ -2,6 +2,8 @@ package it.fulminazzo.blocksmith.reflect;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Type;
+
 /**
  * An exception thrown by {@link Reflect} on errors.
  */
@@ -45,11 +47,11 @@ public final class ReflectException extends RuntimeException {
      * @param type   the type
      * @return the reflect exception
      */
-    static @NotNull ReflectException cannotCast(final Object object, final Class<?> type) {
+    static @NotNull ReflectException cannotCast(final Object object, final Type type) {
         final String objectDeclaration;
         if (object == null) objectDeclaration = "null";
         else objectDeclaration = object + " (type: " + object.getClass().getCanonicalName() + ")";
-        return new ReflectException("Cannot cast object '%s' to class '%s'", objectDeclaration, type);
+        return new ReflectException("Cannot cast object '%s' to type '%s'", objectDeclaration, type);
     }
 
     /**
@@ -59,9 +61,9 @@ public final class ReflectException extends RuntimeException {
      * @param fieldName the field name
      * @return the reflect exception
      */
-    static @NotNull ReflectException cannotFindField(final @NotNull Class<?> type,
+    static @NotNull ReflectException cannotFindField(final @NotNull Type type,
                                                      final @NotNull String fieldName) {
-        return new ReflectException("Could not find field '%s' in class '%s'", fieldName, type);
+        return new ReflectException("Could not find field '%s' in type '%s'", fieldName, type);
     }
 
     /**
@@ -70,15 +72,15 @@ public final class ReflectException extends RuntimeException {
      * @param type the type
      * @return the reflect exception
      */
-    static @NotNull ReflectException cannotFindField(final @NotNull Class<?> type) {
-        return new ReflectException("Could not find field with the given predicate in class '%s'", type);
+    static @NotNull ReflectException cannotFindField(final @NotNull Type type) {
+        return new ReflectException("Could not find field with the given predicate in type '%s'", type);
     }
 
     private static @NotNull String formatMessage(final @NotNull String format,
                                                  final Object @NotNull ... args) {
         for (int i = 0; i < args.length; i++) {
             Object object = args[i];
-            if (object instanceof Class<?>) args[i] = ((Class<?>) object).getCanonicalName();
+            if (object instanceof Type) args[i] = ReflectUtils.toString((Type) object);
         }
         return String.format(format, args);
     }
