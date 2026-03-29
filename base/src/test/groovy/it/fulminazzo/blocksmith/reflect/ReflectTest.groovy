@@ -431,6 +431,26 @@ class ReflectTest extends Specification {
         thrown(ReflectException)
     }
 
+    def 'test invoke of var args method'() {
+        given:
+        def reflect = new Reflect(String, String)
+
+        when:
+        def actual = reflect.invoke(method, *args)
+
+        then:
+        actual.get() == 'Hello, world!'
+
+        where:
+        method   | args
+        'format' | ['Hello, world!']
+        'format' | ['%s, world!', 'Hello']
+        'format' | ['%s, %s!', 'Hello', 'world']
+        'format' | ['%s, %s!', ['Hello', 'world'].toArray()]
+        'join'   | [', ', 'Hello, world!']
+        'join'   | [', ', 'Hello', 'world!']
+    }
+
     def 'test that cast of #type to #object returns #expected'() {
         when:
         def actual = Reflect.cast(type, object)
