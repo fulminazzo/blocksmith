@@ -525,6 +525,35 @@ class ReflectTest extends Specification {
         'join'   | [', ', 'Hello', 'world!']
     }
 
+    def 'test that on of #arguments returns #expected'() {
+        when:
+        def actual = Reflect.on(*arguments)
+
+        then:
+        actual == expected
+
+        where:
+        arguments                                  || expected
+        [new Person('Camilla', 21)]                || new Reflect(Person, new Person('Camilla', 21))
+        [Person]                                   || new Reflect(Person, Person)
+        [Person.canonicalName]                     || new Reflect(Person, Person)
+        [Person.canonicalName, Person.classLoader] || new Reflect(Person, Person)
+    }
+
+    def 'test that on of #arguments throws #expected on class not found'() {
+        when:
+        Reflect.on(*arguments)
+
+        then:
+        def e = thrown(ReflectException)
+        e.message == expected.message
+
+        where:
+        arguments                            || expected
+        ['not.Existing']                     || ReflectException.classNotFound('not.Existing')
+        ['not.Existing', Person.classLoader] || ReflectException.classNotFound('not.Existing')
+    }
+
     def 'test that cast of #type to #object returns #expected'() {
         when:
         def actual = Reflect.cast(type, object)
