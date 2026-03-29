@@ -39,28 +39,44 @@ class ReflectTest extends Specification {
         type      | object                  || expected
         // byte
         byte      | 1 as byte               || new Reflect(Byte, 1 as Byte)
+        byte      | byte                    || new Reflect(Byte, Byte)
         Byte      | 1 as Byte               || new Reflect(Byte, 1 as Byte)
+        Byte      | Byte                    || new Reflect(Byte, Byte)
         // char
         char      | 'a' as char             || new Reflect(Character, 'a' as Character)
+        char      | char                    || new Reflect(Character, Character)
         Character | 'a' as Character        || new Reflect(Character, 'a' as Character)
+        Character | Character               || new Reflect(Character, Character)
         // short
         short     | 1 as short              || new Reflect(Short, 1 as Short)
+        short     | short                   || new Reflect(Short, Short)
         Short     | 1 as Short              || new Reflect(Short, 1 as Short)
+        Short     | Short                   || new Reflect(Short, Short)
         // int
         int       | 1 as int                || new Reflect(Integer, 1 as Integer)
+        int       | int                     || new Reflect(Integer, Integer)
         Integer   | 1 as Integer            || new Reflect(Integer, 1 as Integer)
+        Integer   | Integer                 || new Reflect(Integer, Integer)
         // long
         long      | 1 as long               || new Reflect(Long, 1 as Long)
+        long      | long                    || new Reflect(Long, Long)
         Long      | 1 as Long               || new Reflect(Long, 1 as Long)
+        Long      | Long                    || new Reflect(Long, Long)
         // float
         float     | 1 as float              || new Reflect(Float, 1 as Float)
+        float     | float                   || new Reflect(Float, Float)
         Float     | 1 as Float              || new Reflect(Float, 1 as Float)
+        Float     | Float                   || new Reflect(Float, Float)
         // double
         double    | 1 as double             || new Reflect(Double, 1 as Double)
+        double    | double                  || new Reflect(Double, Double)
         Double    | 1 as Double             || new Reflect(Double, 1 as Double)
+        Double    | Double                  || new Reflect(Double, Double)
         // boolean
         boolean   | true as boolean         || new Reflect(Boolean, true as Boolean)
+        boolean   | boolean                 || new Reflect(Boolean, Boolean)
         Boolean   | Boolean.TRUE as Boolean || new Reflect(Boolean, true as Boolean)
+        Boolean   | Boolean                 || new Reflect(Boolean, Boolean)
         // String
         String    | 'Hello, world!'         || new Reflect(String, 'Hello, world!')
     }
@@ -79,28 +95,44 @@ class ReflectTest extends Specification {
         type      | object                  || expected
         // byte
         byte      | 1 as byte               || new Reflect(byte, 1 as byte)
+        byte      | byte                    || new Reflect(byte, byte)
         Byte      | 1 as Byte               || new Reflect(byte, 1 as byte)
+        Byte      | Byte                    || new Reflect(byte, byte)
         // char
         char      | 'a' as char             || new Reflect(char, 'a' as char)
+        char      | char                    || new Reflect(char, char)
         Character | 'a' as Character        || new Reflect(char, 'a' as char)
+        Character | Character               || new Reflect(char, char)
         // short
         short     | 1 as short              || new Reflect(short, 1 as short)
+        short     | short                   || new Reflect(short, short)
         Short     | 1 as Short              || new Reflect(short, 1 as short)
+        Short     | Short                   || new Reflect(short, short)
         // int
         int       | 1 as int                || new Reflect(int, 1 as int)
+        int       | int                     || new Reflect(int, int)
         Integer   | 1 as Integer            || new Reflect(int, 1 as int)
+        Integer   | Integer                 || new Reflect(int, int)
         // long
         long      | 1 as long               || new Reflect(long, 1 as long)
+        long      | long                    || new Reflect(long, long)
         Long      | 1 as Long               || new Reflect(long, 1 as long)
+        Long      | Long                    || new Reflect(long, long)
         // float
         float     | 1 as float              || new Reflect(float, 1 as float)
+        float     | float                   || new Reflect(float, float)
         Float     | 1 as Float              || new Reflect(float, 1 as float)
+        Float     | Float                   || new Reflect(float, float)
         // double
         double    | 1 as double             || new Reflect(double, 1 as double)
+        double    | double                  || new Reflect(double, double)
         Double    | 1 as Double             || new Reflect(double, 1 as double)
+        Double    | Double                  || new Reflect(double, double)
         // boolean
         boolean   | true as boolean         || new Reflect(boolean, true as boolean)
+        boolean   | boolean                 || new Reflect(boolean, boolean)
         Boolean   | Boolean.TRUE as Boolean || new Reflect(boolean, true as boolean)
+        Boolean   | Boolean                 || new Reflect(boolean, boolean)
         // String
         String    | 'Hello, world!'         || new Reflect(String, 'Hello, world!')
     }
