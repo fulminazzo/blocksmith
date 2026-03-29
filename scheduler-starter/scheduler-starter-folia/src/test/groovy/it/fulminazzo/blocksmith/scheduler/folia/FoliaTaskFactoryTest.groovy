@@ -56,7 +56,7 @@ class FoliaTaskFactoryTest extends Specification {
         def entity = Mock(Entity)
         entity.scheduler >> {
             def scheduler = Mock(EntityScheduler)
-            scheduler.run(_ as Plugin, _ as Consumer, _ as Runnable) >> { a ->
+            scheduler.run(_ as Plugin, _ as Consumer, _) >> { a ->
                 a[1].accept(null)
             }
             return scheduler
