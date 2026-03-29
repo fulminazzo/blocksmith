@@ -108,13 +108,15 @@ public class Reflect {
     }
 
     /**
-     * Checks if this class extends the given type.
+     * Checks if the class currently stored extends the given type.
+     * <br>
+     * <b>WARNING</b>: will not check for generic types correctness
      *
      * @param type the type to check
      * @return <code>true</code> if it does
      */
-    public boolean extendsType(final @NotNull Class<?> type) {
-        return toWrapper(type).isAssignableFrom(toWrapper(getObjectClass())); //TODO: check other types
+    public boolean extendsType(final @NotNull Type type) {
+        return ReflectUtils.extendsType(getObjectClass(), type);
     }
 
     /**
