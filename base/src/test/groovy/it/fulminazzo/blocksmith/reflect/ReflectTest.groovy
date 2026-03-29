@@ -44,6 +44,38 @@ class ReflectTest extends Specification {
         reflect = new Reflect(Person, new Person(nameValue, ageValue))
     }
 
+    def 'test that isBaseType returns #expected for #type'() {
+        given:
+        def reflect = new Reflect(type, type)
+
+        when:
+        def actual = reflect.baseType
+
+        then:
+        actual == expected
+
+        where:
+        type      || expected
+        byte      || true
+        Byte      || true
+        char      || true
+        Character || true
+        short     || true
+        Short     || true
+        int       || true
+        Integer   || true
+        long      || true
+        Long      || true
+        float     || true
+        Float     || true
+        double    || true
+        Double    || true
+        boolean   || true
+        Boolean   || true
+        String    || true
+        Object    || false
+    }
+
     def 'test that #type extendsType #superType returns #expected'() {
         given:
         def reflect = new Reflect(type, type)
