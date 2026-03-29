@@ -395,7 +395,7 @@ public class Reflect {
                 .map(p -> p == null ? null : p.getClass())
                 .toArray(Class<?>[]::new);
         Method method = getMethod(returnType, name, parameterTypes);
-        return invoke(name, parameters, method);
+        return invoke(method, parameters);
     }
 
     /**
