@@ -13,6 +13,43 @@ class ReflectUtilsTest extends Specification {
     private static final Type lowerBoundsWildcardType = Mock.getDeclaredMethod('wildcardSuper').genericReturnType.actualTypeArguments[0]
     private static final Type typeVariable = lowerBoundsWildcardType.lowerBounds[0].actualTypeArguments[0]
 
+    def 'test that typeMatches with #type1 and #type2 returns #expected'() {
+        when:
+        def actual = ReflectUtils.typeMatches(type1, type2)
+
+        then:
+        actual == expected
+
+        where:
+        type1                                                              | type2                   || expected
+        // Class
+        Mock                                                               | Mock                    || true
+        Mock                                                               | List                    || false
+        List                                                               | Mock                    || false
+        // ParameterizedType
+        listParameterizedType                                              | listParameterizedType   || true
+        listParameterizedType                                              | List                    || true
+        List                                                               | listParameterizedType   || true
+        Mock.getDeclaredMethod('otherParameterizedType').genericReturnType | listParameterizedType   || false
+        Mock.getDeclaredMethod('dualParameterizedType').genericReturnType  | listParameterizedType   || false
+        // TypeVariable
+        Integer                                                            | typeVariable            || true
+        Number                                                             | typeVariable            || false
+        Comparable                                                         | typeVariable            || false
+        Mock                                                               | typeVariable            || false
+        // GenericArrayType
+        Set[]                                                              | genericArrayType        || true
+        Collection[]                                                       | genericArrayType        || false
+        Set                                                                | genericArrayType        || false
+        // WildcardType
+        Object                                                             | noBoundsWildcardType    || true
+        Object                                                             | lowerBoundsWildcardType || true
+        Collection                                                         | lowerBoundsWildcardType || true
+        Object                                                             | upperBoundsWildcardType || false
+        List                                                               | upperBoundsWildcardType || true
+        listParameterizedType                                              | upperBoundsWildcardType || true
+    }
+
     def 'test that toClass of #type returns #expected'() {
         when:
         def actual = ReflectUtils.toClass(type)
@@ -54,6 +91,14 @@ class ReflectUtilsTest extends Specification {
     static class Mock<T extends Number & Comparable> {
 
         static List<String> parameterizedType() {
+            throw new UnsupportedOperationException()
+        }
+
+        static List<Object> otherParameterizedType() {
+            throw new UnsupportedOperationException()
+        }
+
+        static Map<String, List> dualParameterizedType() {
             throw new UnsupportedOperationException()
         }
 
