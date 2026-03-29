@@ -13,6 +13,28 @@ class ReflectUtilsTest extends Specification {
     private static final Type lowerBoundsWildcardType = Mock.getDeclaredMethod('wildcardSuper').genericReturnType.actualTypeArguments[0]
     private static final Type typeVariable = lowerBoundsWildcardType.lowerBounds[0].actualTypeArguments[0]
 
+    def 'test that extendsType with #clazz, #type returns #expected'() {
+        when:
+        def actual = ReflectUtils.extendsType(clazz, type)
+
+        then:
+        actual == expected
+
+        where:
+        clazz       | type         || expected
+        HashMap     | HashMap      || true
+        HashMap     | AbstractMap  || true
+        HashMap     | Map          || true
+        HashMap     | AbstractList || false
+        HashMap     | List         || false
+        HashMap     | Collection   || false
+        Person      | NamedEntity  || true
+        NamedEntity | Person       || false
+        HashMap     | Object       || true
+        Object      | HashMap      || false
+        Object      | Object       || true
+    }
+
     def 'test that typeMatches with #type1 and #type2 returns #expected'() {
         when:
         def actual = ReflectUtils.typeMatches(type1, type2)
