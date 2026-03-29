@@ -240,8 +240,13 @@ final class ReflectUtils {
     static <E extends Executable> @NotNull Optional<E> findExecutable(final @NotNull Collection<E> executables,
                                                                       final @Nullable Class<?> @NotNull [] parameterTypes) {
         return executables.stream()
-                .filter(e -> parameterMatches(e.getParameters(), parameterTypes))
-                .min(Comparator.comparing(Executable::isVarArgs));
+                .map(e -> {
+                    OptionalInt score = parameterMatches(e.getParameters(), parameterTypes);
+                    return score.isPresent() ? Map.entry(e, score.getAsInt()) : null;
+                })
+                .filter(Objects::nonNull)
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey);
     }
 
     /**
@@ -278,7 +283,7 @@ final class ReflectUtils {
             if (score.isEmpty()) return score;
             total += score.getAsInt();
         }
-        if (given.length == parameters.length) return OptionalInt.empty();
+        if (given.length != parameters.length) return OptionalInt.empty();
         else return OptionalInt.of(total);
     }
 
