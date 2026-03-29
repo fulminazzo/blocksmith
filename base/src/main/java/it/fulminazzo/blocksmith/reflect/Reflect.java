@@ -170,7 +170,7 @@ public class Reflect {
      * @throws ReflectException if no field is found or an error occurs while getting the value
      */
     public @NotNull Reflect getInstanceFieldObject(final @NotNull String name) {
-        return getFieldObject(f -> !Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
+        return getFieldObject(getInstanceField(name));
     }
 
     /**
@@ -181,7 +181,7 @@ public class Reflect {
      * @throws ReflectException if no field is found or an error occurs while getting the value
      */
     public @NotNull Reflect getStaticFieldObject(final @NotNull String name) {
-        return getFieldObject(f -> Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
+        return getFieldObject(getStaticField(name));
     }
 
     /**
@@ -192,7 +192,7 @@ public class Reflect {
      * @throws ReflectException if no field is found or an error occurs while getting the value
      */
     public @NotNull Reflect getFieldObject(final @NotNull String name) {
-        return getFieldObject(f -> f.getName().equals(name));
+        return getFieldObject(getField(name));
     }
 
     /**
@@ -214,7 +214,7 @@ public class Reflect {
      * @return the value of the field
      * @throws ReflectException if an error occurs while getting the value
      */
-    public @NotNull Reflect getFieldObject(Field field) {
+    public @NotNull Reflect getFieldObject(final @NotNull Field field) {
         try {
             field.setAccessible(true);
             return new Reflect(field.getType(), field.get(object));
@@ -231,7 +231,11 @@ public class Reflect {
      * @throws ReflectException if no field is found
      */
     public @NotNull Field getInstanceField(final @NotNull String name) {
-        return getField(f -> !Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
+        try {
+            return getField(f -> !Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
+        } catch (ReflectException e) {
+            throw ReflectException.cannotFindField(type, name);
+        }
     }
 
     /**
@@ -242,7 +246,11 @@ public class Reflect {
      * @throws ReflectException if no field is found
      */
     public @NotNull Field getStaticField(final @NotNull String name) {
-        return getField(f -> Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
+        try {
+            return getField(f -> Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
+        } catch (ReflectException e) {
+            throw ReflectException.cannotFindField(type, name);
+        }
     }
 
     /**
