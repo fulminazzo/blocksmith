@@ -141,7 +141,7 @@ public class Reflect {
 
     /**
      * Gets the value of the field with the given name.
-     * 
+     *
      * @param name the name of the field
      * @return the value of the field
      * @throws ReflectException if no field is found or an error occurs while getting the value
@@ -267,6 +267,63 @@ public class Reflect {
             type = type.getSuperclass();
         }
         return fields;
+    }
+
+    /*
+     * INITIALIZERS
+     */
+
+    /**
+     * Instantiates a new Reflect object.
+     *
+     * @param object the object
+     * @return the reflect
+     */
+    public static @NotNull Reflect of(final @NotNull Object object) {
+        if (object instanceof Class) return of((Class<?>) object);
+        else if (object instanceof String) return of((String) object);
+        else return new Reflect(object.getClass(), object);
+    }
+
+    /**
+     * Instantiates a new Reflect object.
+     *
+     * @param type the type
+     * @return the reflect
+     */
+    public static @NotNull Reflect of(final @NotNull Class<?> type) {
+        return new Reflect(type, type);
+    }
+
+    /**
+     * Instantiates a new Reflect object.
+     *
+     * @param className the class name
+     * @return the reflect
+     * @throws ReflectException if it could not find the class
+     */
+    public static @NotNull Reflect of(final @NotNull String className) {
+        try {
+            return of(Class.forName(className));
+        } catch (ClassNotFoundException e) {
+            throw ReflectException.classNotFound(className);
+        }
+    }
+
+    /**
+     * Instantiates a new Reflect object.
+     *
+     * @param className   the class name
+     * @param classLoader the class loader to load the class from
+     * @return the reflect
+      @throws ReflectException if it could not find the class
+     */
+    public static @NotNull Reflect of(final @NotNull String className, final @NotNull ClassLoader classLoader) {
+        try {
+            return of(classLoader.loadClass(className));
+        } catch (ClassNotFoundException e) {
+            throw ReflectException.classNotFound(className);
+        }
     }
 
 }

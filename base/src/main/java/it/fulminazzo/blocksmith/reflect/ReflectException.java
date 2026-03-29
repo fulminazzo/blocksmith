@@ -10,7 +10,7 @@ public final class ReflectException extends RuntimeException {
     private ReflectException(final @NotNull String format, final Object @NotNull ... args) {
         super(String.format(format, args));
     }
-    
+
     /**
      * Instantiates a new Reflect exception.
      *
@@ -20,6 +20,16 @@ public final class ReflectException extends RuntimeException {
      */
     ReflectException(final @NotNull Throwable cause, final @NotNull String format, final Object @NotNull ... args) {
         super(String.format(format, args), cause);
+    }
+
+    /**
+     * Class not found reflect exception.
+     *
+     * @param className the class name
+     * @return the reflect exception
+     */
+    static @NotNull ReflectException classNotFound(final @NotNull String className) {
+        return new ReflectException("Could not find class '%s'", className);
     }
 
     /**
@@ -43,5 +53,5 @@ public final class ReflectException extends RuntimeException {
     static @NotNull ReflectException cannotFindField(final @NotNull Class<?> type) {
         return new ReflectException("Could not find field with the given predicate in class '%s'", type.getCanonicalName());
     }
-    
+
 }
