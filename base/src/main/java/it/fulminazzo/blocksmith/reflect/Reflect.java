@@ -511,9 +511,7 @@ public class Reflect {
     public @NotNull Method getInstanceMethod(final @Nullable Class<?> returnType,
                                              final @Nullable String name,
                                              final @Nullable Class<?> @NotNull ... parameterTypes) {
-        Method method = getMethod(returnType, name, parameterTypes);
-        if (!Modifier.isStatic(method.getModifiers())) return method;
-        else throw ReflectException.cannotFindMethod(type, returnType, name, parameterTypes);
+        return getMethodHelper(m -> !Modifier.isStatic(m.getModifiers()), returnType, name, parameterTypes);
     }
 
     /**
@@ -528,9 +526,7 @@ public class Reflect {
     public @NotNull Method getStaticMethod(final @Nullable Class<?> returnType,
                                            final @Nullable String name,
                                            final @Nullable Class<?> @NotNull ... parameterTypes) {
-        Method method = getMethod(returnType, name, parameterTypes);
-        if (Modifier.isStatic(method.getModifiers())) return method;
-        else throw ReflectException.cannotFindMethod(type, returnType, name, parameterTypes);
+        return getMethodHelper(m -> Modifier.isStatic(m.getModifiers()), returnType, name, parameterTypes);
     }
 
     /**
@@ -545,10 +541,18 @@ public class Reflect {
     public @NotNull Method getMethod(final @Nullable Class<?> returnType,
                                      final @Nullable String name,
                                      final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return getMethodHelper(m -> true, returnType, name, parameterTypes);
+    }
+
+    private @NotNull Method getMethodHelper(final @NotNull Predicate<Method> validator,
+                                            final @Nullable Class<?> returnType,
+                                            final @Nullable String name,
+                                            final @Nullable Class<?> @NotNull ... parameterTypes) {
         return ReflectUtils.findExecutable(
                 getMethods(m ->
                         (name == null || m.getName().equalsIgnoreCase(name)) &&
-                                (returnType == null || ReflectUtils.extendsType(m.getReturnType(), returnType))
+                                (returnType == null || ReflectUtils.extendsType(m.getReturnType(), returnType)) &&
+                                validator.test(m)
                 ),
                 parameterTypes
         ).orElseThrow(() -> ReflectException.cannotFindMethod(type, returnType, name, parameterTypes));
