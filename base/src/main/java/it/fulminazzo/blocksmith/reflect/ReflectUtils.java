@@ -249,28 +249,37 @@ final class ReflectUtils {
      *
      * @param parameters the parameters
      * @param given      the parameter types
-     * @return <code>true</code> if they match
+     * @return the parameters compatibility, computed as the difference between the given and the requested
      */
-    static boolean parameterMatches(final @NotNull Parameter @NotNull [] parameters,
-                                    final @Nullable Class<?> @NotNull [] given) {
+    static OptionalInt parameterMatches(final @NotNull Parameter @NotNull [] parameters,
+                                        final @Nullable Class<?> @NotNull [] given) {
+        int total = 0;
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
             Type type = parameter.getParameterizedType();
-            if (i >= given.length) return parameter.isVarArgs();
-            Class<?> current = given[i];
             if (parameter.isVarArgs()) {
                 Type componentType = type instanceof Class<?>
                         ? ((Class<?>) type).getComponentType()
                         : ((GenericArrayType) type).getGenericComponentType();
+                total -= 1;
                 for (int j = i; j < given.length; j++) {
-                    current = given[j];
-                    if (current != null && !typeMatches(current, componentType)) return false;
+                    Class<?> current = given[j];
+                    if (current == null) continue;
+                    OptionalInt score = scoreTypeMatching(current, componentType);
+                    if (score.isEmpty()) return score;
+                    total += score.getAsInt();
                 }
-                return true;
+                return OptionalInt.of(total);
             }
-            if (current != null && !typeMatches(current, type)) return false;
+            if (i >= given.length) return OptionalInt.empty();
+            Class<?> current = given[i];
+            if (current == null) continue;
+            OptionalInt score = scoreTypeMatching(current, type);
+            if (score.isEmpty()) return score;
+            total += score.getAsInt();
         }
-        return given.length == parameters.length;
+        if (given.length == parameters.length) return OptionalInt.empty();
+        else return OptionalInt.of(total);
     }
 
 }
