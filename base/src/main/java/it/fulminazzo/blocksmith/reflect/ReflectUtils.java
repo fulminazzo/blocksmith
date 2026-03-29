@@ -12,6 +12,30 @@ import java.util.stream.Collectors;
 final class ReflectUtils {
 
     /**
+     * Converts the given type to a {@link Class}.
+     *
+     * @param type the type
+     * @return the class
+     */
+    public static @NotNull Class<?> toClass(final @NotNull Type type) {
+        if (type instanceof Class<?>) return (Class<?>) type;
+        else if (type instanceof ParameterizedType) return toClass(((ParameterizedType) type).getRawType());
+        else if (type instanceof TypeVariable<?>) {
+            TypeVariable<?> typeVariable = (TypeVariable<?>) type;
+            Type[] bounds = typeVariable.getBounds();
+            return bounds.length > 0 ? toClass(bounds[0]) : Object.class;
+        } else if (type instanceof GenericArrayType) {
+            Class<?> componentType = toClass(((GenericArrayType) type).getGenericComponentType());
+            return Array.newInstance(componentType, 0).getClass();
+        } else if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            Type[] lowerBounds = wildcardType.getLowerBounds();
+            if (lowerBounds.length > 0) return toClass(lowerBounds[0]);
+            else return toClass(wildcardType.getUpperBounds()[0]);
+        } else throw new IllegalArgumentException("Unsupported type: " + type);
+    }
+
+    /**
      * Prints out the type in a human-readable format.
      *
      * @param type the Java type
