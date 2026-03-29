@@ -9,12 +9,14 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
  * A wrapper for Java objects to work with reflections.
  */
+@SuppressWarnings("unchecked")
 @Value
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Reflect {
@@ -30,6 +32,24 @@ public class Reflect {
     );
     private static final @NotNull Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITIVE = PRIMITIVE_TO_WRAPPER.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+    private static final @NotNull Map<Class<?>, Function<Number, Object>> NUMBERS_CONVERTER = new HashMap<>();
+
+    static {
+        NUMBERS_CONVERTER.put(byte.class, Number::byteValue);
+        NUMBERS_CONVERTER.put(Byte.class, Number::byteValue);
+        NUMBERS_CONVERTER.put(char.class, n -> (char) n.intValue());
+        NUMBERS_CONVERTER.put(Character.class, n -> (char) n.intValue());
+        NUMBERS_CONVERTER.put(short.class, Number::shortValue);
+        NUMBERS_CONVERTER.put(Short.class, Number::shortValue);
+        NUMBERS_CONVERTER.put(int.class, Number::intValue);
+        NUMBERS_CONVERTER.put(Integer.class, Number::intValue);
+        NUMBERS_CONVERTER.put(long.class, Number::longValue);
+        NUMBERS_CONVERTER.put(Long.class, Number::longValue);
+        NUMBERS_CONVERTER.put(float.class, Number::floatValue);
+        NUMBERS_CONVERTER.put(Float.class, Number::floatValue);
+        NUMBERS_CONVERTER.put(double.class, Number::doubleValue);
+        NUMBERS_CONVERTER.put(Double.class, Number::doubleValue);
+    }
 
     @NotNull Class<?> type;
     @Getter(AccessLevel.NONE)
@@ -41,7 +61,6 @@ public class Reflect {
      * @param <T> the type of the object
      * @return the object
      */
-    @SuppressWarnings("unchecked")
     public <T> T get() {
         return (T) object;
     }
@@ -378,6 +397,10 @@ public class Reflect {
         }
     }
 
+    /*
+     * UTILITIES
+     */
+
     /**
      * Converts a primitive type to its corresponding wrapper type.
      *
@@ -386,6 +409,33 @@ public class Reflect {
      */
     public static @NotNull Class<?> toWrapper(final @NotNull Class<?> type) {
         return PRIMITIVE_TO_WRAPPER.getOrDefault(type, type);
+    }
+
+    /**
+     * Casts the Java type to the given object.
+     * Useful for dynamic casting of wrapper and primitive types.
+     *
+     * @param <T>    the type of the class to cast
+     * @param type   the class
+     * @param object the object to cast
+     * @return the cast object
+     * @throws ReflectException if the cast fails
+     */
+    public static <T> T cast(final @NotNull Class<T> type, final Object object) {
+        if (object instanceof Number) {
+            Function<Number, Object> converter = NUMBERS_CONVERTER.get(type);
+            if (converter != null) return (T) converter.apply((Number) object);
+        } else if (object instanceof Character) {
+            Function<Number, Object> converter = NUMBERS_CONVERTER.get(type);
+            if (converter != null) return (T) converter.apply((int) (Character) object);
+        }
+        if (object instanceof Boolean && type.equals(boolean.class)) return (T) object;
+        try {
+            if (type.isPrimitive() && object == null) throw new ClassCastException();
+            return type.cast(object);
+        } catch (ClassCastException e) {
+            throw ReflectException.cannotCast(object, type);
+        }
     }
 
 }

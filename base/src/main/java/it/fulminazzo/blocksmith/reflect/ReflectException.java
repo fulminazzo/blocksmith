@@ -39,6 +39,20 @@ public final class ReflectException extends RuntimeException {
     }
 
     /**
+     * Cannot cast reflect exception.
+     *
+     * @param object the object
+     * @param type   the type
+     * @return the reflect exception
+     */
+    static @NotNull ReflectException cannotCast(final Object object, final Class<?> type) {
+        final String objectDeclaration;
+        if (object == null) objectDeclaration = "null";
+        else objectDeclaration = object + " (type: " + object.getClass().getCanonicalName() + ")";
+        return new ReflectException("Cannot cast object '%s' to class '%s'", objectDeclaration, type);
+    }
+
+    /**
      * Cannot find field reflect exception.
      *
      * @param type      the type
