@@ -333,7 +333,7 @@ public class Reflect {
     public @NotNull Reflect get(final @NotNull Field field) {
         try {
             field.setAccessible(true);
-            return new Reflect(field.getType(), field.get(object));
+            return new Reflect(field.getGenericType(), field.get(object));
         } catch (IllegalAccessException e) {
             throw new ReflectException(e, "Could not get value of field '%s' from %s", field.getName(), object);
         }
@@ -496,7 +496,7 @@ public class Reflect {
         try {
             method.setAccessible(true);
             return new Reflect(
-                    method.getReturnType(),
+                    method.getGenericReturnType(),
                     method.invoke(
                             object,
                             ReflectUtils.regroup(method.getParameters(), parameters)
