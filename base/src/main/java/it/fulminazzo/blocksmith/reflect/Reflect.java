@@ -5,8 +5,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -350,6 +352,191 @@ public class Reflect {
             type = type.getSuperclass();
         }
         return fields;
+    }
+
+    /*
+     * METHODS
+     */
+
+    /**
+     * Gets the instance method with the given parameter types (method must not be static).
+     *
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the method
+     * @throws ReflectException if no method is found
+     */
+    public @NotNull Method getInstanceMethod(final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return getInstanceMethod(null, parameterTypes);
+    }
+
+    /**
+     * Gets the static method with the given parameter types.
+     *
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the static method
+     * @throws ReflectException if no method is found
+     */
+    public @NotNull Method getStaticMethod(final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return getStaticMethod(null, parameterTypes);
+    }
+
+    /**
+     * Gets the method with the given parameter types.
+     *
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the method
+     * @throws ReflectException if no method is found
+     */
+    public @NotNull Method getMethod(final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return getMethod(null, parameterTypes);
+    }
+
+    /**
+     * Gets the instance method with the given name and parameter types (method must not be static).
+     *
+     * @param name           the name (if <code>null</code> any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the method
+     * @throws ReflectException if no method is found
+     */
+    public @NotNull Method getInstanceMethod(final @Nullable String name,
+                                             final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return getInstanceMethod(null, name, parameterTypes);
+    }
+
+    /**
+     * Gets the static method with the given name and parameter types.
+     *
+     * @param name           the name (if <code>null</code> any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the static method
+     * @throws ReflectException if no method is found
+     */
+    public @NotNull Method getStaticMethod(final @Nullable String name,
+                                           final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return getStaticMethod(null, name, parameterTypes);
+    }
+
+    /**
+     * Gets the method with the given name and parameter types.
+     *
+     * @param name           the name (if <code>null</code> any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the method
+     * @throws ReflectException if no method is found
+     */
+    public @NotNull Method getMethod(final @Nullable String name,
+                                     final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return getMethod(null, name, parameterTypes);
+    }
+
+    /**
+     * Gets the instance method with the given name, return type and parameter types (method must not be static).
+     *
+     * @param returnType     the return type (if <code>null</code> any method found will be accepted)
+     * @param name           the name (if <code>null</code> any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the method
+     * @throws ReflectException if no method is found
+     */
+    public @NotNull Method getInstanceMethod(final @Nullable Class<?> returnType,
+                                             final @Nullable String name,
+                                             final @Nullable Class<?> @NotNull ... parameterTypes) {
+        Method method = getMethod(returnType, name, parameterTypes);
+        if (!Modifier.isStatic(method.getModifiers())) return method;
+        else throw ReflectException.cannotFindMethod(type, returnType, name, parameterTypes);
+    }
+
+    /**
+     * Gets the static method with the given name, return type and parameter types.
+     *
+     * @param returnType     the return type (if <code>null</code> any method found will be accepted)
+     * @param name           the name (if <code>null</code> any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the static method
+     * @throws ReflectException if no method is found
+     */
+    public @NotNull Method getStaticMethod(final @Nullable Class<?> returnType,
+                                           final @Nullable String name,
+                                           final @Nullable Class<?> @NotNull ... parameterTypes) {
+        Method method = getMethod(returnType, name, parameterTypes);
+        if (Modifier.isStatic(method.getModifiers())) return method;
+        else throw ReflectException.cannotFindMethod(type, returnType, name, parameterTypes);
+    }
+
+    /**
+     * Gets the method with the given name, return type and parameter types.
+     *
+     * @param returnType     the return type (if <code>null</code> any method found will be accepted)
+     * @param name           the name (if <code>null</code> any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the method
+     * @throws ReflectException if no method is found
+     */
+    public @NotNull Method getMethod(final @Nullable Class<?> returnType,
+                                     final @Nullable String name,
+                                     final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return ReflectUtils.findExecutable(
+                getMethods(m ->
+                        (name == null || m.getName().equalsIgnoreCase(name)) &&
+                                (returnType == null || ReflectUtils.extendsType(m.getReturnType(), returnType))
+                ),
+                parameterTypes
+        ).orElseThrow(() -> ReflectException.cannotFindMethod(type, returnType, name, parameterTypes));
+    }
+
+    /**
+     * Gets the first method that matches the predicate.
+     *
+     * @param predicate the predicate
+     * @return the method
+     * @throws ReflectException if no method is found
+     */
+    public @NotNull Method getMethod(final @NotNull Predicate<Method> predicate) {
+        return getMethods(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindMethod(type));
+    }
+
+    /**
+     * Gets all the instance methods (methods not declared as static).
+     *
+     * @return the methods
+     */
+    public @NotNull List<Method> getInstanceMethods() {
+        return getMethods(m -> !Modifier.isStatic(m.getModifiers()));
+    }
+
+    /**
+     * Gets all the static methods.
+     *
+     * @return the static methods
+     */
+    public @NotNull List<Method> getStaticMethods() {
+        return getMethods(m -> Modifier.isStatic(m.getModifiers()));
+    }
+
+    /**
+     * Gets all the methods that match the predicate.
+     *
+     * @param predicate the predicate
+     * @return the methods
+     */
+    public @NotNull List<Method> getMethods(final @NotNull Predicate<Method> predicate) {
+        return getMethods().stream().filter(predicate).collect(Collectors.toList());
+    }
+
+    /**
+     * Gets all the methods.
+     *
+     * @return the methods
+     */
+    public @NotNull List<Method> getMethods() {
+        List<Method> methods = new ArrayList<>();
+        Class<?> type = getObjectClass();
+        while (type != null) {
+            methods.addAll(Arrays.asList(type.getDeclaredMethods()));
+            type = type.getSuperclass();
+        }
+        return methods;
     }
 
     @Override

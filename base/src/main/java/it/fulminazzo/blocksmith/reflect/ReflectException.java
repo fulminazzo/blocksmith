@@ -1,8 +1,11 @@
 package it.fulminazzo.blocksmith.reflect;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * An exception thrown by {@link Reflect} on errors.
@@ -73,7 +76,40 @@ public final class ReflectException extends RuntimeException {
      * @return the reflect exception
      */
     static @NotNull ReflectException cannotFindField(final @NotNull Type type) {
-        return new ReflectException("Could not find field with the given predicate in type '%s'", type);
+        return new ReflectException("Could not find field from the given predicate in type '%s'", type);
+    }
+
+    /**
+     * Cannot find method reflect exception.
+     *
+     * @param type           the type
+     * @param returnType     the return type
+     * @param methodName     the method name
+     * @param parameterTypes the parameter types
+     * @return the reflect exception
+     */
+    static @NotNull ReflectException cannotFindMethod(final @NotNull Type type,
+                                                      final @Nullable Type returnType,
+                                                      final @Nullable String methodName,
+                                                      final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return new ReflectException("Could not find method %s %s(%s) in type '%s'",
+                returnType == null ? "?" : ReflectUtils.toString(returnType),
+                methodName == null ? "?" : methodName,
+                Arrays.stream(parameterTypes)
+                        .map(p -> p == null ? "?" : ReflectUtils.toString(p))
+                        .collect(Collectors.joining(", ")),
+                type
+        );
+    }
+
+    /**
+     * Cannot find method reflect exception.
+     *
+     * @param type the type
+     * @return the reflect exception
+     */
+    static @NotNull ReflectException cannotFindMethod(final @NotNull Type type) {
+        return new ReflectException("Could not find method from the given predicate in type '%s'", type);
     }
 
     private static @NotNull String formatMessage(final @NotNull String format,
