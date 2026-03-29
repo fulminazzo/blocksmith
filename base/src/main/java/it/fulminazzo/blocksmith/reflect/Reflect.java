@@ -53,7 +53,7 @@ public class Reflect {
 
     @NotNull Class<?> type;
     @Getter(AccessLevel.NONE)
-    @NotNull Object object;
+    Object object;
 
     /**
      * Gets the internal wrapped object.
@@ -358,7 +358,7 @@ public class Reflect {
      * @param object the object
      * @return the reflect
      */
-    public static @NotNull Reflect of(final @NotNull Object object) {
+    public static @NotNull Reflect of(final Object object) {
         if (object instanceof Class) return of((Class<?>) object);
         else if (object instanceof String) return of((String) object);
         else return new Reflect(object.getClass(), object);
