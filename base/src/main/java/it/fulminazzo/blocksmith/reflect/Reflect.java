@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -51,7 +52,7 @@ public class Reflect {
         NUMBERS_CONVERTER.put(Double.class, Number::doubleValue);
     }
 
-    @NotNull Class<?> type;
+    @NotNull Type type;
     @Getter(AccessLevel.NONE)
     Object object;
 
@@ -65,8 +66,17 @@ public class Reflect {
         return (T) object;
     }
 
+    /**
+     * Gets the internal wrapped object Java class.
+     *
+     * @return the class
+     */
+    public @NotNull Class<?> getObjectType() {
+        return (Class<?>) type; //TODO: check other types
+    }
+
     /*
-     * CLASS
+     * TYPE
      */
 
     /**
@@ -75,7 +85,7 @@ public class Reflect {
      * @return <code>true</code> if it is
      */
     public boolean isPrimitive() {
-        return type.isPrimitive();
+        return PRIMITIVE_TO_WRAPPER.containsKey(getObjectType());
     }
 
     /**
@@ -84,7 +94,7 @@ public class Reflect {
      * @return <code>true</code> if it is
      */
     public boolean isWrapper() {
-        return PRIMITIVE_TO_WRAPPER.containsValue(type);
+        return PRIMITIVE_TO_WRAPPER.containsValue(getObjectType());
     }
 
     /**
@@ -94,7 +104,7 @@ public class Reflect {
      * @return <code>true</code> if it is
      */
     public boolean isBaseType() {
-        return isPrimitive() || isWrapper() || type.equals(String.class);
+        return isPrimitive() || isWrapper() || getObjectType().equals(String.class);
     }
 
     /**
@@ -104,7 +114,7 @@ public class Reflect {
      * @return <code>true</code> if it does
      */
     public boolean extendsType(final @NotNull Class<?> type) {
-        return toWrapper(type).isAssignableFrom(toWrapper(this.type));
+        return toWrapper(type).isAssignableFrom(toWrapper(getObjectType())); //TODO: check other types
     }
 
     /**
@@ -114,7 +124,7 @@ public class Reflect {
      */
     public @NotNull Reflect toWrapper() {
         if (isPrimitive()) {
-            Class<?> newType = PRIMITIVE_TO_WRAPPER.get(type);
+            Class<?> newType = PRIMITIVE_TO_WRAPPER.get(getObjectType());
             final Object newObject;
             if (object instanceof Class<?>) newObject = newType;
             else newObject = cast(newType, object);
@@ -130,7 +140,7 @@ public class Reflect {
      */
     public @NotNull Reflect toPrimitive() {
         if (isWrapper()) {
-            Class<?> newType = WRAPPER_TO_PRIMITIVE.get(type);
+            Class<?> newType = WRAPPER_TO_PRIMITIVE.get(getObjectType());
             final Object newObject;
             if (object instanceof Class<?>) newObject = newType;
             else newObject = cast(newType, object);
@@ -332,7 +342,7 @@ public class Reflect {
      */
     public @NotNull List<Field> getFields() {
         List<Field> fields = new ArrayList<>();
-        Class<?> type = this.type;
+        Class<?> type = getObjectType();
         while (type != null) {
             fields.addAll(Arrays.asList(type.getDeclaredFields()));
             type = type.getSuperclass();
@@ -345,7 +355,7 @@ public class Reflect {
         String objectDeclaration;
         if (object == null) objectDeclaration = "null";
         else objectDeclaration = String.format("%s (type: %s)", object, object.getClass().getCanonicalName());
-        return String.format("%s(type=%s, object=%s)", getClass().getCanonicalName(), type.getCanonicalName(), objectDeclaration);
+        return String.format("%s(type=%s, object=%s)", getClass().getCanonicalName(), ReflectUtils.toString(type), objectDeclaration);
     }
 
     /*
@@ -359,7 +369,7 @@ public class Reflect {
      * @return the reflect
      */
     public static @NotNull Reflect of(final Object object) {
-        if (object instanceof Class) return of((Class<?>) object);
+        if (object instanceof Type) return of((Type) object);
         else if (object instanceof String) return of((String) object);
         else return new Reflect(object.getClass(), object);
     }
@@ -370,7 +380,7 @@ public class Reflect {
      * @param type the type
      * @return the reflect
      */
-    public static @NotNull Reflect of(final @NotNull Class<?> type) {
+    public static @NotNull Reflect of(final @NotNull Type type) {
         return new Reflect(type, type);
     }
 
