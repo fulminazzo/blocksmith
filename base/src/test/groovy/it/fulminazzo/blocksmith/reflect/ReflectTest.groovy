@@ -237,6 +237,15 @@ class ReflectTest extends Specification {
         'getFieldsObject'         | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                                 || [DEFAULT_AGE.get(null), ageValue].collect { new Reflect(it.class, it) }
         'getFieldsObject'         | [((Predicate<Field>) (f) -> true)]                                                       || [DEFAULT_AGE.get(null), ageValue, DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
         'getFieldsObject'         | []                                                                                       || [DEFAULT_AGE.get(null), ageValue, DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
+        // set
+        'setInstance'             | [name.name, nameValue]                                                                   || new Reflect(Person, new Person(nameValue, ageValue))
+        'setInstance'             | [age.name, ageValue]                                                                     || new Reflect(Person, new Person(nameValue, ageValue))
+        'setStatic'               | [DEFAULT_NAME.name, NamedEntity.DEFAULT_NAME]                                            || new Reflect(Person, new Person(nameValue, ageValue))
+        'setStatic'               | [DEFAULT_AGE.name, Person.DEFAULT_AGE]                                                   || new Reflect(Person, new Person(nameValue, ageValue))
+        'set'                     | [DEFAULT_NAME.name, NamedEntity.DEFAULT_NAME]                                            || new Reflect(Person, new Person(nameValue, ageValue))
+        'set'                     | [DEFAULT_AGE.name, Person.DEFAULT_AGE]                                                   || new Reflect(Person, new Person(nameValue, ageValue))
+        'set'                     | [name.name, nameValue]                                                                   || new Reflect(Person, new Person(nameValue, ageValue))
+        'set'                     | [age.name, ageValue]                                                                     || new Reflect(Person, new Person(nameValue, ageValue))
         // get
         'getInstance'             | [name.name]                                                                              || new Reflect(name.type, nameValue)
         'getInstance'             | [age.name]                                                                               || new Reflect(age.type, ageValue)

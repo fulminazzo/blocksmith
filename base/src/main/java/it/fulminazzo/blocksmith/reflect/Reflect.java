@@ -279,6 +279,60 @@ public class Reflect {
     }
 
     /**
+     * Sets a new value to the instance field with the given name (field must not be static).
+     *
+     * @param name  the name of the field
+     * @param value the value of the field
+     * @return this object (for method chaining)
+     * @throws ReflectException if no field was found or an error occurs while setting the value
+     */
+    public @NotNull Reflect setInstance(final @NotNull String name, final Object value) {
+        return set(getInstanceField(name), value);
+    }
+
+    /**
+     * Sets a new value to the static field with the given name.
+     *
+     * @param name  the name of the field
+     * @param value the value of the field
+     * @return this object (for method chaining)
+     * @throws ReflectException if no field was found or an error occurs while setting the value
+     */
+    public @NotNull Reflect setStatic(final @NotNull String name, final Object value) {
+        return set(getStaticField(name), value);
+    }
+
+    /**
+     * Sets a new value to the field with the given name.
+     *
+     * @param name  the name of the field
+     * @param value the value of the field
+     * @return this object (for method chaining)
+     * @throws ReflectException if no field was found or an error occurs while setting the value
+     */
+    public @NotNull Reflect set(final @NotNull String name, final Object value) {
+        return set(getField(name), value);
+    }
+
+    /**
+     * Sets a new value to the given field.
+     *
+     * @param field the field
+     * @param value the value of the field
+     * @return this object (for method chaining)
+     * @throws ReflectException if an error occurs while setting the value
+     */
+    public @NotNull Reflect set(final @NotNull Field field, final Object value) {
+        try {
+            field.setAccessible(true);
+            field.set(object, value);
+            return this;
+        } catch (IllegalAccessException e) {
+            throw new ReflectException(e, "Could not set value of field '%s' from %s", field.getName(), object);
+        }
+    }
+
+    /**
      * Gets the value of the instance field with the given name (field must not be static).
      *
      * @param name the name of the field
