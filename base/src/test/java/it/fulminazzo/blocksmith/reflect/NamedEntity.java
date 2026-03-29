@@ -1,12 +1,16 @@
 package it.fulminazzo.blocksmith.reflect;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 @Data
 public abstract class NamedEntity {
-    static final String DEFAULT_NAME = "John";
+    @Getter
+    @Setter
+    static String DEFAULT_NAME = "John";
 
-    @NotNull String name;
+    private @NotNull String name;
 
 }
