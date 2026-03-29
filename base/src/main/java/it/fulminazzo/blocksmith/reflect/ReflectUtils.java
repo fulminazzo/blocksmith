@@ -213,18 +213,21 @@ final class ReflectUtils {
                                                 final @Nullable Object @NotNull [] parameterValues) {
         List<Object> flattened = new ArrayList<>();
         for (int i = 0; i < parameters.length; i++) {
-            int remaining = parameterValues.length - i;
-            if (remaining == 1) {
-                Type type = parameters[i].getParameterizedType();
-                Object value = parameterValues[i];
-                if (value != null && typeMatches(value.getClass(), type)) {
-                    flattened.add(value);
-                    break;
+            Parameter parameter = parameters[i];
+            if (parameter.isVarArgs()) {
+                List<Object> remaining = new ArrayList<>(Arrays.asList(parameterValues).subList(i, parameterValues.length));
+                Class<?> type = parameter.getType();
+                if (remaining.size() == 1) {
+                    Object last = remaining.get(0);
+                    if (last != null && extendsType(last.getClass(), type)) {
+                        flattened.add(last);
+                        continue;
+                    }
                 }
+                flattened.add(remaining.toArray((Object[]) Array.newInstance(type.getComponentType(), remaining.size())));
+                continue;
             }
-            Object[] array = new Object[remaining];
-            System.arraycopy(parameterValues, i, array, 0, remaining);
-            flattened.add(array);
+            flattened.add(parameterValues[i]);
         }
         return flattened.toArray();
     }
