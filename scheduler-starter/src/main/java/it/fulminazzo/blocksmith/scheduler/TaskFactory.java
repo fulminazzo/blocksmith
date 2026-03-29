@@ -26,8 +26,10 @@ public interface TaskFactory {
                                                               final @NotNull Consumer<T> then) {
         return function.thenApply(r -> schedule(owner, t -> then.accept(r)).run())
                 .exceptionally(t -> {
-                    if (t instanceof RuntimeException) throw (RuntimeException) t;
-                    else throw new RuntimeException(t);
+                    Throwable cause = t.getCause();
+                    if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+                    else if (cause instanceof Error) throw (Error) cause;
+                    else throw new RuntimeException(cause);
                 });
     }
 
