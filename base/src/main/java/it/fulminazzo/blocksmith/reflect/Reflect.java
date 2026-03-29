@@ -340,6 +340,14 @@ public class Reflect {
         return fields;
     }
 
+    @Override
+    public @NotNull String toString() {
+        String objectDeclaration;
+        if (object == null) objectDeclaration = "null";
+        else objectDeclaration = String.format("%s (type: %s)", object, object.getClass().getCanonicalName());
+        return String.format("%s(type=%s, object=%s)", getClass().getCanonicalName(), type.getCanonicalName(), objectDeclaration);
+    }
+
     /*
      * INITIALIZERS
      */
