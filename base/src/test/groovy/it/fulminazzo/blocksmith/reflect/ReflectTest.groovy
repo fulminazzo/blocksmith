@@ -25,6 +25,86 @@ class ReflectTest extends Specification {
         reflect = new Reflect(Person, new Person(nameValue, ageValue))
     }
 
+    def 'test that cast toWrapper of #type to #object returns #expected'() {
+        given:
+        def reflect = new Reflect(type, object)
+
+        when:
+        def actual = reflect.toWrapper()
+
+        then:
+        actual == expected
+
+        where:
+        type      | object                  || expected
+        // byte
+        byte      | 1 as byte               || new Reflect(Byte, 1)
+        Byte      | 1 as Byte               || new Reflect(Byte, 1)
+        // char
+        char      | 'a' as char             || new Reflect(Character, 'a')
+        Character | 'a' as Character        || new Reflect(Character, 'a')
+        // short
+        short     | 1 as short              || new Reflect(Short, 1)
+        Short     | 1 as Short              || new Reflect(Short, 1)
+        // int
+        int       | 1 as int                || new Reflect(Integer, 1)
+        Integer   | 1 as Integer            || new Reflect(Integer, 1)
+        // long
+        long      | 1 as long               || new Reflect(Long, 1)
+        Long      | 1 as Long               || new Reflect(Long, 1)
+        // float
+        float     | 1 as float              || new Reflect(Float, 1)
+        Float     | 1 as Float              || new Reflect(Float, 1)
+        // double
+        double    | 1 as double             || new Reflect(Double, 1)
+        Double    | 1 as Double             || new Reflect(Double, 1)
+        // boolean
+        boolean   | true as boolean         || new Reflect(Boolean, true)
+        Boolean   | Boolean.TRUE as Boolean || new Reflect(Boolean, true)
+        // String
+        String    | 'Hello, world!'         || 'Hello, world!'
+    }
+
+    def 'test that cast toPrimitive of #type to #object returns #expected'() {
+        given:
+        def reflect = new Reflect(type, object)
+
+        when:
+        def actual = reflect.toPrimitive()
+
+        then:
+        actual == expected
+
+        where:
+        type      | object                  || expected
+        // byte
+        byte      | 1 as byte               || new Reflect(byte, 1)
+        Byte      | 1 as Byte               || new Reflect(byte, 1)
+        // char
+        char      | 'a' as char             || new Reflect(char, 'a')
+        Character | 'a' as Character        || new Reflect(char, 'a')
+        // short
+        short     | 1 as short              || new Reflect(short, 1)
+        Short     | 1 as Short              || new Reflect(short, 1)
+        // int
+        int       | 1 as int                || new Reflect(int, 1)
+        Integer   | 1 as Integer            || new Reflect(int, 1)
+        // long
+        long      | 1 as long               || new Reflect(long, 1)
+        Long      | 1 as Long               || new Reflect(long, 1)
+        // float
+        float     | 1 as float              || new Reflect(float, 1)
+        Float     | 1 as Float              || new Reflect(float, 1)
+        // double
+        double    | 1 as double             || new Reflect(double, 1)
+        Double    | 1 as Double             || new Reflect(double, 1)
+        // boolean
+        boolean   | true as boolean         || new Reflect(boolean, true)
+        Boolean   | Boolean.TRUE as Boolean || new Reflect(boolean, true)
+        // String
+        String    | 'Hello, world!'         || 'Hello, world!'
+    }
+
     def 'test that #method with #arguments returns #expected'() {
         when:
         def actual = reflect."$method"(*arguments)
