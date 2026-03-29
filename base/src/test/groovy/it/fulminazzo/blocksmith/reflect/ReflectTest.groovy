@@ -38,31 +38,31 @@ class ReflectTest extends Specification {
         where:
         type      | object                  || expected
         // byte
-        byte      | 1 as byte               || new Reflect(Byte, 1)
-        Byte      | 1 as Byte               || new Reflect(Byte, 1)
+        byte      | 1 as byte               || new Reflect(Byte, 1 as Byte)
+        Byte      | 1 as Byte               || new Reflect(Byte, 1 as Byte)
         // char
-        char      | 'a' as char             || new Reflect(Character, 'a')
-        Character | 'a' as Character        || new Reflect(Character, 'a')
+        char      | 'a' as char             || new Reflect(Character, 'a' as Character)
+        Character | 'a' as Character        || new Reflect(Character, 'a' as Character)
         // short
-        short     | 1 as short              || new Reflect(Short, 1)
-        Short     | 1 as Short              || new Reflect(Short, 1)
+        short     | 1 as short              || new Reflect(Short, 1 as Short)
+        Short     | 1 as Short              || new Reflect(Short, 1 as Short)
         // int
-        int       | 1 as int                || new Reflect(Integer, 1)
-        Integer   | 1 as Integer            || new Reflect(Integer, 1)
+        int       | 1 as int                || new Reflect(Integer, 1 as Integer)
+        Integer   | 1 as Integer            || new Reflect(Integer, 1 as Integer)
         // long
-        long      | 1 as long               || new Reflect(Long, 1)
-        Long      | 1 as Long               || new Reflect(Long, 1)
+        long      | 1 as long               || new Reflect(Long, 1 as Long)
+        Long      | 1 as Long               || new Reflect(Long, 1 as Long)
         // float
-        float     | 1 as float              || new Reflect(Float, 1)
-        Float     | 1 as Float              || new Reflect(Float, 1)
+        float     | 1 as float              || new Reflect(Float, 1 as Float)
+        Float     | 1 as Float              || new Reflect(Float, 1 as Float)
         // double
-        double    | 1 as double             || new Reflect(Double, 1)
-        Double    | 1 as Double             || new Reflect(Double, 1)
+        double    | 1 as double             || new Reflect(Double, 1 as Double)
+        Double    | 1 as Double             || new Reflect(Double, 1 as Double)
         // boolean
-        boolean   | true as boolean         || new Reflect(Boolean, true)
-        Boolean   | Boolean.TRUE as Boolean || new Reflect(Boolean, true)
+        boolean   | true as boolean         || new Reflect(Boolean, true as Boolean)
+        Boolean   | Boolean.TRUE as Boolean || new Reflect(Boolean, true as Boolean)
         // String
-        String    | 'Hello, world!'         || 'Hello, world!'
+        String    | 'Hello, world!'         || new Reflect(String, 'Hello, world!')
     }
 
     def 'test that cast toPrimitive of #type to #object returns #expected'() {
@@ -78,31 +78,31 @@ class ReflectTest extends Specification {
         where:
         type      | object                  || expected
         // byte
-        byte      | 1 as byte               || new Reflect(byte, 1)
-        Byte      | 1 as Byte               || new Reflect(byte, 1)
+        byte      | 1 as byte               || new Reflect(byte, 1 as byte)
+        Byte      | 1 as Byte               || new Reflect(byte, 1 as byte)
         // char
-        char      | 'a' as char             || new Reflect(char, 'a')
-        Character | 'a' as Character        || new Reflect(char, 'a')
+        char      | 'a' as char             || new Reflect(char, 'a' as char)
+        Character | 'a' as Character        || new Reflect(char, 'a' as char)
         // short
-        short     | 1 as short              || new Reflect(short, 1)
-        Short     | 1 as Short              || new Reflect(short, 1)
+        short     | 1 as short              || new Reflect(short, 1 as short)
+        Short     | 1 as Short              || new Reflect(short, 1 as short)
         // int
-        int       | 1 as int                || new Reflect(int, 1)
-        Integer   | 1 as Integer            || new Reflect(int, 1)
+        int       | 1 as int                || new Reflect(int, 1 as int)
+        Integer   | 1 as Integer            || new Reflect(int, 1 as int)
         // long
-        long      | 1 as long               || new Reflect(long, 1)
-        Long      | 1 as Long               || new Reflect(long, 1)
+        long      | 1 as long               || new Reflect(long, 1 as long)
+        Long      | 1 as Long               || new Reflect(long, 1 as long)
         // float
-        float     | 1 as float              || new Reflect(float, 1)
-        Float     | 1 as Float              || new Reflect(float, 1)
+        float     | 1 as float              || new Reflect(float, 1 as float)
+        Float     | 1 as Float              || new Reflect(float, 1 as float)
         // double
-        double    | 1 as double             || new Reflect(double, 1)
-        Double    | 1 as Double             || new Reflect(double, 1)
+        double    | 1 as double             || new Reflect(double, 1 as double)
+        Double    | 1 as Double             || new Reflect(double, 1 as double)
         // boolean
-        boolean   | true as boolean         || new Reflect(boolean, true)
-        Boolean   | Boolean.TRUE as Boolean || new Reflect(boolean, true)
+        boolean   | true as boolean         || new Reflect(boolean, true as boolean)
+        Boolean   | Boolean.TRUE as Boolean || new Reflect(boolean, true as boolean)
         // String
-        String    | 'Hello, world!'         || 'Hello, world!'
+        String    | 'Hello, world!'         || new Reflect(String, 'Hello, world!')
     }
 
     def 'test that #method with #arguments returns #expected'() {
