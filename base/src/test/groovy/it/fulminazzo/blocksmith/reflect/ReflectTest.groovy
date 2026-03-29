@@ -174,18 +174,18 @@ class ReflectTest extends Specification {
         'getFieldsObject'         | [((Predicate<Field>) (f) -> f.declaringClass == Person)]      || [DEFAULT_AGE.get(null), ageValue].collect { new Reflect(it.class, it) }
         'getFieldsObject'         | [((Predicate<Field>) (f) -> true)]                            || [DEFAULT_AGE.get(null), ageValue, DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
         'getFieldsObject'         | []                                                            || [DEFAULT_AGE.get(null), ageValue, DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
-        // getFieldObject
-        'getInstanceFieldObject'  | [name.name]                                                   || new Reflect(name.type, nameValue)
-        'getInstanceFieldObject'  | [age.name]                                                    || new Reflect(age.type, ageValue)
-        'getStaticFieldObject'    | [DEFAULT_NAME.name]                                           || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
-        'getStaticFieldObject'    | [DEFAULT_AGE.name]                                            || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
-        'getFieldObject'          | [DEFAULT_NAME.name]                                           || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
-        'getFieldObject'          | [DEFAULT_AGE.name]                                            || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
-        'getFieldObject'          | [name.name]                                                   || new Reflect(name.type, nameValue)
-        'getFieldObject'          | [age.name]                                                    || new Reflect(age.type, ageValue)
-        'getFieldObject'          | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)] || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
-        'getFieldObject'          | [((Predicate<Field>) (f) -> f.declaringClass == Person)]      || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
-        'getFieldObject'          | [((Predicate<Field>) (f) -> true)]                            || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        // get
+        'getInstance'             | [name.name]                                                   || new Reflect(name.type, nameValue)
+        'getInstance'             | [age.name]                                                    || new Reflect(age.type, ageValue)
+        'getStatic'               | [DEFAULT_NAME.name]                                           || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'getStatic'               | [DEFAULT_AGE.name]                                            || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'get'                     | [DEFAULT_NAME.name]                                           || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'get'                     | [DEFAULT_AGE.name]                                            || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'get'                     | [name.name]                                                   || new Reflect(name.type, nameValue)
+        'get'                     | [age.name]                                                    || new Reflect(age.type, ageValue)
+        'get'                     | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)] || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'get'                     | [((Predicate<Field>) (f) -> f.declaringClass == Person)]      || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'get'                     | [((Predicate<Field>) (f) -> true)]                            || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
         // getField
         'getInstanceField'        | [name.name]                                                   || name
         'getInstanceField'        | [age.name]                                                    || age
@@ -217,32 +217,32 @@ class ReflectTest extends Specification {
         e.message == expected.message
 
         where:
-        method                   | arguments                                                || expected
-        // getFieldObject
-        'getInstanceFieldObject' | [DEFAULT_NAME.name]                                      || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
-        'getInstanceFieldObject' | [DEFAULT_AGE.name]                                       || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
-        'getInstanceFieldObject' | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
-        'getStaticFieldObject'   | [name.name]                                              || ReflectException.cannotFindField(Person, name.name)
-        'getStaticFieldObject'   | [age.name]                                               || ReflectException.cannotFindField(Person, age.name)
-        'getStaticFieldObject'   | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
-        'getFieldObject'         | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
-        'getFieldObject'         | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
-        'getFieldObject'         | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
-        'getFieldObject'         | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
-        'getFieldObject'         | [((Predicate<Field>) (f) -> f.declaringClass == String)] || ReflectException.cannotFindField(Person)
+        method             | arguments                                                || expected
+        // get
+        'getInstance'      | [DEFAULT_NAME.name]                                      || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
+        'getInstance'      | [DEFAULT_AGE.name]                                       || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
+        'getInstance'      | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
+        'getStatic'        | [name.name]                                              || ReflectException.cannotFindField(Person, name.name)
+        'getStatic'        | [age.name]                                               || ReflectException.cannotFindField(Person, age.name)
+        'getStatic'        | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
+        'get'              | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
+        'get'              | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
+        'get'              | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
+        'get'              | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
+        'get'              | [((Predicate<Field>) (f) -> f.declaringClass == String)] || ReflectException.cannotFindField(Person)
         // getField
-        'getInstanceField'       | [DEFAULT_NAME.name]                                      || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
-        'getInstanceField'       | [DEFAULT_AGE.name]                                       || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
-        'getInstanceField'       | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
-        'getStaticField'         | [name.name]                                              || ReflectException.cannotFindField(Person, name.name)
-        'getStaticField'         | [age.name]                                               || ReflectException.cannotFindField(Person, age.name)
-        'getStaticField'         | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
-        'getField'               | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
-        'getField'               | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
-        'getField'               | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
-        'getField'               | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
-        'getField'               | [((Predicate<Field>) (f) -> f.declaringClass == String)] || ReflectException.cannotFindField(Person)
-        'getField'               | [((Predicate<Field>) (f) -> false)]                      || ReflectException.cannotFindField(Person)
+        'getInstanceField' | [DEFAULT_NAME.name]                                      || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
+        'getInstanceField' | [DEFAULT_AGE.name]                                       || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
+        'getInstanceField' | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
+        'getStaticField'   | [name.name]                                              || ReflectException.cannotFindField(Person, name.name)
+        'getStaticField'   | [age.name]                                               || ReflectException.cannotFindField(Person, age.name)
+        'getStaticField'   | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
+        'getField'         | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
+        'getField'         | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
+        'getField'         | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
+        'getField'         | ['notExisting']                                          || ReflectException.cannotFindField(Person, 'notExisting')
+        'getField'         | [((Predicate<Field>) (f) -> f.declaringClass == String)] || ReflectException.cannotFindField(Person)
+        'getField'         | [((Predicate<Field>) (f) -> false)]                      || ReflectException.cannotFindField(Person)
     }
 
     def 'test that getField object throws ReflectException on IllegalAccessException'() {
@@ -253,7 +253,7 @@ class ReflectTest extends Specification {
         }
 
         when:
-        reflect.getFieldObject(field)
+        reflect.get(field)
 
         then:
         thrown(ReflectException)

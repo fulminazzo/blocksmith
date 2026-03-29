@@ -188,7 +188,7 @@ public class Reflect {
      * @return the values of the fields
      */
     public @NotNull List<Reflect> getFieldsObject(final @NotNull Predicate<Field> predicate) {
-        return getFields(predicate).stream().map(this::getFieldObject).collect(Collectors.toList());
+        return getFields(predicate).stream().map(this::get).collect(Collectors.toList());
     }
 
     /**
@@ -198,8 +198,8 @@ public class Reflect {
      * @return the value of the field
      * @throws ReflectException if no field is found or an error occurs while getting the value
      */
-    public @NotNull Reflect getInstanceFieldObject(final @NotNull String name) {
-        return getFieldObject(getInstanceField(name));
+    public @NotNull Reflect getInstance(final @NotNull String name) {
+        return get(getInstanceField(name));
     }
 
     /**
@@ -209,8 +209,8 @@ public class Reflect {
      * @return the value of the field
      * @throws ReflectException if no field is found or an error occurs while getting the value
      */
-    public @NotNull Reflect getStaticFieldObject(final @NotNull String name) {
-        return getFieldObject(getStaticField(name));
+    public @NotNull Reflect getStatic(final @NotNull String name) {
+        return get(getStaticField(name));
     }
 
     /**
@@ -220,8 +220,8 @@ public class Reflect {
      * @return the value of the field
      * @throws ReflectException if no field is found or an error occurs while getting the value
      */
-    public @NotNull Reflect getFieldObject(final @NotNull String name) {
-        return getFieldObject(getField(name));
+    public @NotNull Reflect get(final @NotNull String name) {
+        return get(getField(name));
     }
 
     /**
@@ -231,9 +231,9 @@ public class Reflect {
      * @return the value of the field
      * @throws ReflectException if no field is found or an error occurs while getting the value
      */
-    public @NotNull Reflect getFieldObject(final @NotNull Predicate<Field> predicate) {
+    public @NotNull Reflect get(final @NotNull Predicate<Field> predicate) {
         Field field = getField(predicate);
-        return getFieldObject(field);
+        return get(field);
     }
 
     /**
@@ -243,7 +243,7 @@ public class Reflect {
      * @return the value of the field
      * @throws ReflectException if an error occurs while getting the value
      */
-    public @NotNull Reflect getFieldObject(final @NotNull Field field) {
+    public @NotNull Reflect get(final @NotNull Field field) {
         try {
             field.setAccessible(true);
             return new Reflect(field.getType(), field.get(object));
@@ -362,8 +362,8 @@ public class Reflect {
      * @return the returned value
      * @throws ReflectException if no method is found or an error occurs while getting the value
      */
-    public @NotNull Reflect invokeMethod(final @Nullable Object @NotNull ... parameters) {
-        return invokeMethod((String) null, parameters);
+    public @NotNull Reflect invoke(final @Nullable Object @NotNull ... parameters) {
+        return invoke((String) null, parameters);
     }
 
     /**
@@ -374,9 +374,9 @@ public class Reflect {
      * @return the returned value
      * @throws ReflectException if no method is found or an error occurs while getting the value
      */
-    public @NotNull Reflect invokeMethod(final @Nullable String name,
+    public @NotNull Reflect invoke(final @Nullable String name,
                                          final @Nullable Object @NotNull ... parameters) {
-        return invokeMethod(null, name, parameters);
+        return invoke(null, name, parameters);
     }
 
     /**
@@ -388,14 +388,14 @@ public class Reflect {
      * @return the returned value
      * @throws ReflectException if no method is found or an error occurs while getting the value
      */
-    public @NotNull Reflect invokeMethod(final @Nullable Class<?> returnType,
+    public @NotNull Reflect invoke(final @Nullable Class<?> returnType,
                                          final @Nullable String name,
                                          final @Nullable Object @NotNull ... parameters) {
         Class<?>[] parameterTypes = Arrays.stream(parameters)
                 .map(p -> p == null ? null : p.getClass())
                 .toArray(Class<?>[]::new);
         Method method = getMethod(returnType, name, parameterTypes);
-        return invokeMethod(name, parameters, method);
+        return invoke(name, parameters, method);
     }
 
     /**
@@ -406,7 +406,7 @@ public class Reflect {
      * @return the returned value
      * @throws ReflectException if no method is found or an error occurs while getting the value
      */
-    private @NotNull Reflect invokeMethod(final @NotNull Method method,
+    private @NotNull Reflect invoke(final @NotNull Method method,
                                           final @Nullable Object @NotNull ... parameters) {
         try {
             method.setAccessible(true);
@@ -612,8 +612,8 @@ public class Reflect {
     public @NotNull String toString() {
         String objectDeclaration;
         if (object == null) objectDeclaration = "null";
-        else objectDeclaration = String.format("%s (type: %s)", object, object.getClass().getCanonicalName());
-        return String.format("%s(type=%s, object=%s)", getClass().getCanonicalName(), ReflectUtils.toString(type), objectDeclaration);
+        else objectDeclaration = String.format("%s (type: %s)", object, ReflectUtils.toString(object.getClass()));
+        return String.format("%s(type=%s, object=%s)", getObjectClass().getCanonicalName(), ReflectUtils.toString(type), objectDeclaration);
     }
 
     /*
