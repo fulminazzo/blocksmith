@@ -117,7 +117,7 @@ public class Reflect {
             Class<?> newType = PRIMITIVE_TO_WRAPPER.get(type);
             final Object newObject;
             if (object instanceof Class<?>) newObject = type;
-            else newObject = newType.cast(object);
+            else newObject = cast(newType, object);
             return new Reflect(newType, newObject);
         }
         return this;
@@ -133,7 +133,7 @@ public class Reflect {
             Class<?> newType = WRAPPER_TO_PRIMITIVE.get(type);
             final Object newObject;
             if (object instanceof Class<?>) newObject = type;
-            else newObject = newType.cast(object);
+            else newObject = cast(newType, object);
             return new Reflect(newType, newObject);
         }
         return this;
