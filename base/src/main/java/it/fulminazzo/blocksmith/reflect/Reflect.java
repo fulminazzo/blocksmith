@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.reflect;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +30,19 @@ public class Reflect {
     );
 
     @NotNull Class<?> type;
+    @Getter(AccessLevel.NONE)
     @NotNull Object object;
+
+    /**
+     * Gets the internal wrapped object.
+     *
+     * @param <T> the type of the object
+     * @return the object
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T get() {
+        return (T) object;
+    }
 
     /*
      * CLASS
