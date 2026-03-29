@@ -15,7 +15,8 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Scheduler {
-    private static final @NotNull Collection<TaskFactory> factories = ServiceLoader.load(TaskFactory.class).stream()
+    private static final @NotNull Collection<TaskFactory> factories = ServiceLoader.load(TaskFactory.class, Scheduler.class.getClassLoader())
+            .stream()
             .map(ServiceLoader.Provider::get)
             .collect(Collectors.toSet());
 
