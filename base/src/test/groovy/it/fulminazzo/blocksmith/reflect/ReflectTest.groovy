@@ -39,6 +39,10 @@ class ReflectTest extends Specification {
         type        | superType   || expected
         Person      | NamedEntity || true
         NamedEntity | Person      || false
+        int         | Integer     || true
+        int         | Number      || true
+        Integer     | int         || true
+        Number      | int         || false
     }
 
     def 'test that cast toWrapper of #type to #object returns #expected'() {

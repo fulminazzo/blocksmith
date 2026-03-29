@@ -104,7 +104,7 @@ public class Reflect {
      * @return <code>true</code> if it does
      */
     public boolean extendsType(final @NotNull Class<?> type) {
-        return type.isAssignableFrom(this.type);
+        return toWrapper(type).isAssignableFrom(toWrapper(this.type));
     }
 
     /**
