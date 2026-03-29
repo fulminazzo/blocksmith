@@ -10,6 +10,24 @@ class BukkitTaskTest extends Specification {
         internal = Mock(org.bukkit.scheduler.BukkitTask)
     }
 
+    def 'test that async returns correct value'() {
+        given:
+        def task = new BukkitTask()
+        task.internal = internal
+
+        and:
+        internal.sync >> !expected
+
+        when:
+        def actual = task.async
+
+        then:
+        actual == expected
+
+        where:
+        expected << [true, false]
+    }
+
     def 'test #method calls #internalMethod on internal'() {
         given:
         def task = new BukkitTask()
