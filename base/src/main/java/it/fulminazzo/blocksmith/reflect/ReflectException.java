@@ -6,20 +6,26 @@ import org.jetbrains.annotations.NotNull;
  * An exception thrown by {@link Reflect} on errors.
  */
 public final class ReflectException extends RuntimeException {
-    
-    private ReflectException(final @NotNull String format, final Object @NotNull ... args) {
-        super(String.format(format, args));
+
+    /**
+     * Instantiates a new Reflect exception.
+     *
+     * @param format the format of the message
+     * @param args   the arguments to format
+     */
+    ReflectException(final @NotNull String format, final Object @NotNull ... args) {
+        super(formatMessage(format, args));
     }
 
     /**
      * Instantiates a new Reflect exception.
      *
      * @param cause  the cause that generated the exception
-     * @param format the format
-     * @param args   the args
+     * @param format the format of the message
+     * @param args   the arguments to format
      */
     ReflectException(final @NotNull Throwable cause, final @NotNull String format, final Object @NotNull ... args) {
-        super(String.format(format, args), cause);
+        super(formatMessage(format, args), cause);
     }
 
     /**
@@ -41,7 +47,7 @@ public final class ReflectException extends RuntimeException {
      */
     static @NotNull ReflectException cannotFindField(final @NotNull Class<?> type,
                                                      final @NotNull String fieldName) {
-        return new ReflectException("Could not find field '%s' in class '%s'", fieldName, type.getCanonicalName());
+        return new ReflectException("Could not find field '%s' in class '%s'", fieldName, type);
     }
 
     /**
@@ -51,7 +57,16 @@ public final class ReflectException extends RuntimeException {
      * @return the reflect exception
      */
     static @NotNull ReflectException cannotFindField(final @NotNull Class<?> type) {
-        return new ReflectException("Could not find field with the given predicate in class '%s'", type.getCanonicalName());
+        return new ReflectException("Could not find field with the given predicate in class '%s'", type);
+    }
+
+    private static @NotNull String formatMessage(final @NotNull String format,
+                                                 final Object @NotNull ... args) {
+        for (int i = 0; i < args.length; i++) {
+            Object object = args[i];
+            if (object instanceof Class<?>) args[i] = ((Class<?>) object).getCanonicalName();
+        }
+        return String.format(format, args);
     }
 
 }
