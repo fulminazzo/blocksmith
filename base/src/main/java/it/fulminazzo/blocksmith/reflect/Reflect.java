@@ -7,10 +7,7 @@ import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -357,6 +354,78 @@ public class Reflect {
     /*
      * METHODS
      */
+
+    /**
+     * Invokes the method with the given parameters.
+     *
+     * @param parameters the parameters
+     * @return the returned value
+     * @throws ReflectException if no method is found or an error occurs while getting the value
+     */
+    public @NotNull Reflect invokeMethod(final @Nullable Object @NotNull ... parameters) {
+        return invokeMethod((String) null, parameters);
+    }
+
+    /**
+     * Invokes the method with the given name and parameters.
+     *
+     * @param name       the name (if <code>null</code> any method found will be accepted)
+     * @param parameters the parameters
+     * @return the returned value
+     * @throws ReflectException if no method is found or an error occurs while getting the value
+     */
+    public @NotNull Reflect invokeMethod(final @Nullable String name,
+                                         final @Nullable Object @NotNull ... parameters) {
+        return invokeMethod(null, name, parameters);
+    }
+
+    /**
+     * Invokes the method with the given name, return type and parameters.
+     *
+     * @param returnType the return type (if <code>null</code> any method found will be accepted)
+     * @param name       the name (if <code>null</code> any method found will be accepted)
+     * @param parameters the parameters
+     * @return the returned value
+     * @throws ReflectException if no method is found or an error occurs while getting the value
+     */
+    public @NotNull Reflect invokeMethod(final @Nullable Class<?> returnType,
+                                         final @Nullable String name,
+                                         final @Nullable Object @NotNull ... parameters) {
+        Class<?>[] parameterTypes = Arrays.stream(parameters)
+                .map(p -> p == null ? null : p.getClass())
+                .toArray(Class<?>[]::new);
+        Method method = getMethod(returnType, name, parameterTypes);
+        return invokeMethod(name, parameters, method);
+    }
+
+    /**
+     * Invokes the given method.
+     *
+     * @param method     the method
+     * @param parameters the parameters
+     * @return the returned value
+     * @throws ReflectException if no method is found or an error occurs while getting the value
+     */
+    private @NotNull Reflect invokeMethod(final @NotNull Method method,
+                                          final @Nullable Object @NotNull ... parameters) {
+        try {
+            method.setAccessible(true);
+            return new Reflect(
+                    method.getReturnType(),
+                    method.invoke(
+                            object,
+                            ReflectUtils.regroup(method.getParameters(), parameters)
+                    )
+            );
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+            else if (cause instanceof Error) throw (Error) cause;
+            else throw new ReflectException(e, "Could not invoke method %s on %s", method, object);
+        } catch (IllegalAccessException e) {
+            throw new ReflectException(e, "Could not invoke method %s on %s", method, object);
+        }
+    }
 
     /**
      * Gets the instance method with the given parameter types (method must not be static).
