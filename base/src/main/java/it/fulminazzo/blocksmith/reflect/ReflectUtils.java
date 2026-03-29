@@ -4,9 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static it.fulminazzo.blocksmith.reflect.Reflect.toWrapper;
@@ -39,10 +37,7 @@ final class ReflectUtils {
     /**
      * Compares the two given types to verify if they match or not at runtime.
      *
-     * @param source the source type. This comparison assumes that "source" represents
-     *               a concrete type referred to an object.
-     *               Because of this, the {@link WildcardType}, {@link TypeVariable}
-     *               and {@link GenericArrayType} should never be encountered.
+     * @param source the source type. This comparison assumes that "source" represents               a concrete type referred to an object.               Because of this, the {@link WildcardType}, {@link TypeVariable}               and {@link GenericArrayType} should never be encountered.
      * @param target the target type
      * @return <code>true</code> if they match
      */
@@ -176,6 +171,21 @@ final class ReflectUtils {
             flattened.add(array);
         }
         return flattened.toArray();
+    }
+
+    /**
+     * Finds the executable that best matches with the given parameter types.
+     *
+     * @param <E>            the type of the executable
+     * @param executables    the collection to find the executable from
+     * @param parameterTypes the parameter types
+     * @return the executable (if found)
+     */
+    static <E extends Executable> @NotNull Optional<E> findExecutable(final @NotNull Collection<E> executables,
+                                                                      final @Nullable Class<?> @NotNull [] parameterTypes) {
+        return executables.stream()
+                .filter(e -> parameterMatches(e.getParameters(), parameterTypes))
+                .min(Comparator.comparing(Executable::isVarArgs));
     }
 
     /**
