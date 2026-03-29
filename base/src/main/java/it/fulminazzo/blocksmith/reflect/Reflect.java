@@ -246,8 +246,8 @@ public class Reflect {
      *
      * @return the values of the fields
      */
-    public @NotNull List<Reflect> getInstanceFieldsObject() {
-        return getFieldsObject(f -> !Modifier.isStatic(f.getModifiers()));
+    public @NotNull List<Reflect> getInstanceFieldValues() {
+        return getFieldValues(f -> !Modifier.isStatic(f.getModifiers()));
     }
 
     /**
@@ -255,8 +255,8 @@ public class Reflect {
      *
      * @return the values of the fields
      */
-    public @NotNull List<Reflect> getStaticFieldsObject() {
-        return getFieldsObject(f -> Modifier.isStatic(f.getModifiers()));
+    public @NotNull List<Reflect> getStaticFieldValues() {
+        return getFieldValues(f -> Modifier.isStatic(f.getModifiers()));
     }
 
     /**
@@ -264,8 +264,8 @@ public class Reflect {
      *
      * @return the values of the fields
      */
-    public @NotNull List<Reflect> getFieldsObject() {
-        return getFieldsObject(f -> true);
+    public @NotNull List<Reflect> getFieldValues() {
+        return getFieldValues(f -> true);
     }
 
     /**
@@ -274,7 +274,7 @@ public class Reflect {
      * @param predicate the predicate
      * @return the values of the fields
      */
-    public @NotNull List<Reflect> getFieldsObject(final @NotNull Predicate<Field> predicate) {
+    public @NotNull List<Reflect> getFieldValues(final @NotNull Predicate<Field> predicate) {
         return getFields(predicate).stream().map(this::get).collect(Collectors.toList());
     }
 
@@ -306,7 +306,7 @@ public class Reflect {
      * Sets a new value to the first field that matches the predicate.
      *
      * @param predicate the predicate
-     * @param value the value of the field
+     * @param value     the value of the field
      * @return this object (for method chaining)
      * @throws ReflectException if no field was found or an error occurs while setting the value
      */
