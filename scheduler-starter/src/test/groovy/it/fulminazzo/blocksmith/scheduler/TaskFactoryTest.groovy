@@ -273,17 +273,15 @@ class TaskFactoryTest extends Specification {
 
         and:
         def e = ex.cause
-        e == exception
+        (e instanceof RuntimeException)
+        e.cause == exception
     }
 
-    def 'test that runAsyncThen throws runtime exception'() {
-        given:
-        def exception = new RuntimeException('test exception')
-
+    def 'test that runAsyncThen re-throws #throwable'() {
         when:
         factory.runAsyncThen(8L,
                 CompletableFuture.runAsync(() -> {
-                    throw exception
+                    throw throwable
                 }),
                 o -> { }
         ).get()
@@ -293,7 +291,13 @@ class TaskFactoryTest extends Specification {
 
         and:
         def e = ex.cause
-        e == exception
+        e == throwable
+
+        where:
+        throwable << [
+                new RuntimeException('Test runtime exception'),
+                new Error('Test error')
+        ]
     }
 
     private void addRun() {

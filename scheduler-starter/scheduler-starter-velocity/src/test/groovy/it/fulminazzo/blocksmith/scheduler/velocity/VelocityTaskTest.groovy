@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.scheduler.velocity
 
 import com.velocitypowered.api.scheduler.ScheduledTask
+import com.velocitypowered.api.scheduler.TaskStatus
 import spock.lang.Specification
 
 class VelocityTaskTest extends Specification {
@@ -25,6 +26,25 @@ class VelocityTaskTest extends Specification {
 
         expect:
         task.async
+    }
+
+    def 'test that isCancelled returns #expected for #status'() {
+        given:
+        def task = new VelocityTask(this)
+        task.internal = internal
+        internal.status() >> status
+
+        when:
+        def actual = task.cancelled
+
+        then:
+        actual == expected
+
+        where:
+        status               || expected
+        TaskStatus.CANCELLED || true
+        TaskStatus.FINISHED  || false
+        TaskStatus.SCHEDULED || false
     }
 
     def 'test #method calls #internalMethod on internal'() {

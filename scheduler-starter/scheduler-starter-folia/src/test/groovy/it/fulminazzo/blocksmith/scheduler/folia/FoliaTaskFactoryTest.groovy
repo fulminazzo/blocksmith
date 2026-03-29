@@ -111,10 +111,13 @@ class FoliaTaskFactoryTest extends Specification {
 
     def 'test that schedule with invalid object throws'() {
         when:
-        new FoliaTaskFactory().schedule('Hello, world!', t -> { })
+        new FoliaTaskFactory().schedule(owner, t -> { })
 
         then:
         thrown(IllegalArgumentException)
+
+        where:
+        owner << ['Hello, world', Pair.of(null, 'Hello, world')]
     }
 
 }
