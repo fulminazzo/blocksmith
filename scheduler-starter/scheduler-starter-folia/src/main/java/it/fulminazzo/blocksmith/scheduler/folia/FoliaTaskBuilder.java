@@ -74,20 +74,17 @@ final class FoliaTaskBuilder extends TaskBuilder {
                     Entity entity = (Entity) actualOwner;
                     EntityScheduler scheduler = entity.getScheduler();
                     if (delay == null && interval == null)
-                        task.setInternal(scheduler.run(plugin, t -> function.accept(task), () -> {
-                        }));
+                        task.setInternal(scheduler.run(plugin, t -> function.accept(task), null));
                     else if (delay != null && interval == null)
                         task.setInternal(scheduler.runDelayed(plugin,
                                 t -> function.accept(task),
-                                () -> {
-                                },
+                                null,
                                 durationToTicks(delay)
                         ));
                     else
                         task.setInternal(scheduler.runAtFixedRate(plugin,
                                 t -> function.accept(task),
-                                () -> {
-                                },
+                                null,
                                 durationToTicks(delay),
                                 durationToTicks(interval)
                         ));
