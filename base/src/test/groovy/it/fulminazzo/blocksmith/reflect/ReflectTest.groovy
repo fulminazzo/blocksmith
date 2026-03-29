@@ -133,7 +133,7 @@ class ReflectTest extends Specification {
 
         then:
         actual == expected
-        actual.class == expected.class
+        expected == null || actual.class == expected.class
 
         where:
         type      | object                  || expected
@@ -153,50 +153,52 @@ class ReflectTest extends Specification {
         byte      | 'a' as char             || 97 as byte
         byte      | 'a' as Character        || 97 as byte
         // Byte
-        Byte      | 1 as byte               || 1 as byte
-        Byte      | 1 as Byte               || 1 as byte
-        Byte      | 1 as short              || 1 as byte
-        Byte      | 1 as Short              || 1 as byte
-        Byte      | 1 as int                || 1 as byte
-        Byte      | 1 as Integer            || 1 as byte
-        Byte      | 1 as long               || 1 as byte
-        Byte      | 1 as Long               || 1 as byte
-        Byte      | 1 as float              || 1 as byte
-        Byte      | 1 as Float              || 1 as byte
-        Byte      | 1 as double             || 1 as byte
-        Byte      | 1 as Double             || 1 as byte
-        Byte      | 'a' as char             || 97 as byte
-        Byte      | 'a' as Character        || 97 as byte
+        Byte      | 1 as byte               || 1 as Byte
+        Byte      | 1 as Byte               || 1 as Byte
+        Byte      | 1 as short              || 1 as Byte
+        Byte      | 1 as Short              || 1 as Byte
+        Byte      | 1 as int                || 1 as Byte
+        Byte      | 1 as Integer            || 1 as Byte
+        Byte      | 1 as long               || 1 as Byte
+        Byte      | 1 as Long               || 1 as Byte
+        Byte      | 1 as float              || 1 as Byte
+        Byte      | 1 as Float              || 1 as Byte
+        Byte      | 1 as double             || 1 as Byte
+        Byte      | 1 as Double             || 1 as Byte
+        Byte      | 'a' as char             || 97 as Byte
+        Byte      | 'a' as Character        || 97 as Byte
+        Byte      | null                    || null
         // char
-        char      | 1 as byte               || (char) 1
-        char      | 1 as Byte               || (char) 1
-        char      | 1 as short              || (char) 1
-        char      | 1 as Short              || (char) 1
-        char      | 1 as int                || (char) 1
-        char      | 1 as Integer            || (char) 1
-        char      | 1 as long               || (char) 1
-        char      | 1 as Long               || (char) 1
-        char      | 1 as float              || (char) 1
-        char      | 1 as Float              || (char) 1
-        char      | 1 as double             || (char) 1
-        char      | 1 as Double             || (char) 1
+        char      | 1 as byte               || 1 as char
+        char      | 1 as Byte               || 1 as char
+        char      | 1 as short              || 1 as char
+        char      | 1 as Short              || 1 as char
+        char      | 1 as int                || 1 as char
+        char      | 1 as Integer            || 1 as char
+        char      | 1 as long               || 1 as char
+        char      | 1 as Long               || 1 as char
+        char      | 1 as float              || 1 as char
+        char      | 1 as Float              || 1 as char
+        char      | 1 as double             || 1 as char
+        char      | 1 as Double             || 1 as char
         char      | 'a' as char             || 'a' as char
         char      | 'a' as Character        || 'a' as char
         // Character
-        Character | 1 as byte               || (char) 1
-        Character | 1 as Byte               || (char) 1
-        Character | 1 as short              || (char) 1
-        Character | 1 as Short              || (char) 1
-        Character | 1 as int                || (char) 1
-        Character | 1 as Integer            || (char) 1
-        Character | 1 as long               || (char) 1
-        Character | 1 as Long               || (char) 1
-        Character | 1 as float              || (char) 1
-        Character | 1 as Float              || (char) 1
-        Character | 1 as double             || (char) 1
-        Character | 1 as Double             || (char) 1
-        Character | 'a' as char             || 'a' as char
-        Character | 'a' as Character        || 'a' as char
+        Character | 1 as byte               || 1 as Character
+        Character | 1 as Byte               || 1 as Character
+        Character | 1 as short              || 1 as Character
+        Character | 1 as Short              || 1 as Character
+        Character | 1 as int                || 1 as Character
+        Character | 1 as Integer            || 1 as Character
+        Character | 1 as long               || 1 as Character
+        Character | 1 as Long               || 1 as Character
+        Character | 1 as float              || 1 as Character
+        Character | 1 as Float              || 1 as Character
+        Character | 1 as double             || 1 as Character
+        Character | 1 as Double             || 1 as Character
+        Character | 'a' as char             || 'a' as Character
+        Character | 'a' as Character        || 'a' as Character
+        Character | null                    || null
         // short
         short     | 1 as byte               || 1 as short
         short     | 1 as Byte               || 1 as short
@@ -213,20 +215,21 @@ class ReflectTest extends Specification {
         short     | 'a' as char             || 97 as short
         short     | 'a' as Character        || 97 as short
         // Short
-        Short     | 1 as byte               || 1 as short
-        Short     | 1 as Byte               || 1 as short
-        Short     | 1 as short              || 1 as short
-        Short     | 1 as Short              || 1 as short
-        Short     | 1 as int                || 1 as short
-        Short     | 1 as Integer            || 1 as short
-        Short     | 1 as long               || 1 as short
-        Short     | 1 as Long               || 1 as short
-        Short     | 1 as float              || 1 as short
-        Short     | 1 as Float              || 1 as short
-        Short     | 1 as double             || 1 as short
-        Short     | 1 as Double             || 1 as short
-        Short     | 'a' as char             || 97 as short
-        Short     | 'a' as Character        || 97 as short
+        Short     | 1 as byte               || 1 as Short
+        Short     | 1 as Byte               || 1 as Short
+        Short     | 1 as short              || 1 as Short
+        Short     | 1 as Short              || 1 as Short
+        Short     | 1 as int                || 1 as Short
+        Short     | 1 as Integer            || 1 as Short
+        Short     | 1 as long               || 1 as Short
+        Short     | 1 as Long               || 1 as Short
+        Short     | 1 as float              || 1 as Short
+        Short     | 1 as Float              || 1 as Short
+        Short     | 1 as double             || 1 as Short
+        Short     | 1 as Double             || 1 as Short
+        Short     | 'a' as char             || 97 as Short
+        Short     | 'a' as Character        || 97 as Short
+        Short     | null                    || null
         // int
         int       | 1 as byte               || 1 as int
         int       | 1 as Byte               || 1 as int
@@ -243,20 +246,21 @@ class ReflectTest extends Specification {
         int       | 'a' as char             || 97 as int
         int       | 'a' as Character        || 97 as int
         // Integer
-        Integer   | 1 as byte               || 1 as int
-        Integer   | 1 as Byte               || 1 as int
-        Integer   | 1 as short              || 1 as int
-        Integer   | 1 as Short              || 1 as int
-        Integer   | 1 as int                || 1 as int
-        Integer   | 1 as Integer            || 1 as int
-        Integer   | 1 as long               || 1 as int
-        Integer   | 1 as Long               || 1 as int
-        Integer   | 1 as float              || 1 as int
-        Integer   | 1 as Float              || 1 as int
-        Integer   | 1 as double             || 1 as int
-        Integer   | 1 as Double             || 1 as int
-        Integer   | 'a' as char             || 97 as int
-        Integer   | 'a' as Character        || 97 as int
+        Integer   | 1 as byte               || 1 as Integer
+        Integer   | 1 as Byte               || 1 as Integer
+        Integer   | 1 as short              || 1 as Integer
+        Integer   | 1 as Short              || 1 as Integer
+        Integer   | 1 as int                || 1 as Integer
+        Integer   | 1 as Integer            || 1 as Integer
+        Integer   | 1 as long               || 1 as Integer
+        Integer   | 1 as Long               || 1 as Integer
+        Integer   | 1 as float              || 1 as Integer
+        Integer   | 1 as Float              || 1 as Integer
+        Integer   | 1 as double             || 1 as Integer
+        Integer   | 1 as Double             || 1 as Integer
+        Integer   | 'a' as char             || 97 as Integer
+        Integer   | 'a' as Character        || 97 as Integer
+        Integer   | null                    || null
         // long
         long      | 1 as byte               || 1 as long
         long      | 1 as Byte               || 1 as long
@@ -273,20 +277,21 @@ class ReflectTest extends Specification {
         long      | 'a' as char             || 97 as long
         long      | 'a' as Character        || 97 as long
         // Long
-        Long      | 1 as byte               || 1 as long
-        Long      | 1 as Byte               || 1 as long
-        Long      | 1 as short              || 1 as long
-        Long      | 1 as Short              || 1 as long
-        Long      | 1 as int                || 1 as long
-        Long      | 1 as Integer            || 1 as long
-        Long      | 1 as long               || 1 as long
-        Long      | 1 as Long               || 1 as long
-        Long      | 1 as float              || 1 as long
-        Long      | 1 as Float              || 1 as long
-        Long      | 1 as double             || 1 as long
-        Long      | 1 as Double             || 1 as long
-        Long      | 'a' as char             || 97 as long
-        Long      | 'a' as Character        || 97 as long
+        Long      | 1 as byte               || 1 as Long
+        Long      | 1 as Byte               || 1 as Long
+        Long      | 1 as short              || 1 as Long
+        Long      | 1 as Short              || 1 as Long
+        Long      | 1 as int                || 1 as Long
+        Long      | 1 as Integer            || 1 as Long
+        Long      | 1 as long               || 1 as Long
+        Long      | 1 as Long               || 1 as Long
+        Long      | 1 as float              || 1 as Long
+        Long      | 1 as Float              || 1 as Long
+        Long      | 1 as double             || 1 as Long
+        Long      | 1 as Double             || 1 as Long
+        Long      | 'a' as char             || 97 as Long
+        Long      | 'a' as Character        || 97 as Long
+        Long      | null                    || null
         // float
         float     | 1 as byte               || 1 as float
         float     | 1 as Byte               || 1 as float
@@ -303,20 +308,21 @@ class ReflectTest extends Specification {
         float     | 'a' as char             || 97 as float
         float     | 'a' as Character        || 97 as float
         // Float
-        Float     | 1 as byte               || 1 as float
-        Float     | 1 as Byte               || 1 as float
-        Float     | 1 as short              || 1 as float
-        Float     | 1 as Short              || 1 as float
-        Float     | 1 as int                || 1 as float
-        Float     | 1 as Integer            || 1 as float
-        Float     | 1 as long               || 1 as float
-        Float     | 1 as Long               || 1 as float
-        Float     | 1 as float              || 1 as float
-        Float     | 1 as Float              || 1 as float
-        Float     | 1 as double             || 1 as float
-        Float     | 1 as Double             || 1 as float
-        Float     | 'a' as char             || 97 as float
-        Float     | 'a' as Character        || 97 as float
+        Float     | 1 as byte               || 1 as Float
+        Float     | 1 as Byte               || 1 as Float
+        Float     | 1 as short              || 1 as Float
+        Float     | 1 as Short              || 1 as Float
+        Float     | 1 as int                || 1 as Float
+        Float     | 1 as Integer            || 1 as Float
+        Float     | 1 as long               || 1 as Float
+        Float     | 1 as Long               || 1 as Float
+        Float     | 1 as float              || 1 as Float
+        Float     | 1 as Float              || 1 as Float
+        Float     | 1 as double             || 1 as Float
+        Float     | 1 as Double             || 1 as Float
+        Float     | 'a' as char             || 97 as Float
+        Float     | 'a' as Character        || 97 as Float
+        Float     | null                    || null
         // double
         double    | 1 as byte               || 1 as double
         double    | 1 as Byte               || 1 as double
@@ -333,20 +339,21 @@ class ReflectTest extends Specification {
         double    | 'a' as char             || 97 as double
         double    | 'a' as Character        || 97 as double
         // Double
-        Double    | 1 as byte               || 1 as double
-        Double    | 1 as Byte               || 1 as double
-        Double    | 1 as short              || 1 as double
-        Double    | 1 as Short              || 1 as double
-        Double    | 1 as int                || 1 as double
-        Double    | 1 as Integer            || 1 as double
-        Double    | 1 as long               || 1 as double
-        Double    | 1 as Long               || 1 as double
-        Double    | 1 as float              || 1 as double
-        Double    | 1 as Float              || 1 as double
-        Double    | 1 as double             || 1 as double
-        Double    | 1 as Double             || 1 as double
-        Double    | 'a' as char             || 97 as double
-        Double    | 'a' as Character        || 97 as double
+        Double    | 1 as byte               || 1 as Double
+        Double    | 1 as Byte               || 1 as Double
+        Double    | 1 as short              || 1 as Double
+        Double    | 1 as Short              || 1 as Double
+        Double    | 1 as int                || 1 as Double
+        Double    | 1 as Integer            || 1 as Double
+        Double    | 1 as long               || 1 as Double
+        Double    | 1 as Long               || 1 as Double
+        Double    | 1 as float              || 1 as Double
+        Double    | 1 as Float              || 1 as Double
+        Double    | 1 as double             || 1 as Double
+        Double    | 1 as Double             || 1 as Double
+        Double    | 'a' as char             || 97 as Double
+        Double    | 'a' as Character        || 97 as Double
+        Double    | null                    || null
         // boolean
         boolean   | true as boolean         || true as boolean
         boolean   | Boolean.TRUE as Boolean || true as Boolean
@@ -355,6 +362,30 @@ class ReflectTest extends Specification {
         Boolean   | Boolean.TRUE as Boolean || true as Boolean
         // String
         String    | 'Hello, world!'         || 'Hello, world!'
+    }
+
+    def 'test that cast cannot cast null to primitive #type'() {
+        when:
+        Reflect.cast(type, null)
+
+        then:
+        thrown(ReflectException)
+
+        where:
+        type << [byte, char, short, int, long, float, double, boolean]
+    }
+
+    def 'test that invalid cast throws'() {
+        given:
+        def object = 'Hello, world!'
+        def type = Integer
+
+        when:
+        Reflect.cast(type, object)
+
+        then:
+        def e = thrown(ReflectException)
+        e.message == ReflectException.cannotCast(object, type).message
     }
 
 }
