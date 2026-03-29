@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.reflect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -117,6 +118,16 @@ public final class ReflectException extends RuntimeException {
         for (int i = 0; i < args.length; i++) {
             Object object = args[i];
             if (object instanceof Type) args[i] = ReflectUtils.toString((Type) object);
+            else if (object instanceof Method) {
+                Method method = (Method) object;
+                args[i] = String.format("%s %s(%s)",
+                        ReflectUtils.toString(method.getReturnType()),
+                        method.getName(),
+                        Arrays.stream(method.getParameterTypes())
+                                .map(ReflectUtils::toString)
+                                .collect(Collectors.joining(", "))
+                );
+            }
         }
         return String.format(format, args);
     }
