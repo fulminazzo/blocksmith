@@ -545,8 +545,8 @@ public class Reflect {
      * @return the returned value
      * @throws ReflectException if an error occurs while getting the value
      */
-    private @NotNull Reflect invoke(final @NotNull Method method,
-                                    final @Nullable Object @NotNull ... parameters) {
+    public @NotNull Reflect invoke(final @NotNull Method method,
+                                   final @Nullable Object @NotNull ... parameters) {
         try {
             method.setAccessible(true);
             return new Reflect(
