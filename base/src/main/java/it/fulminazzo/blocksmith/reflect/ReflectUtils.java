@@ -4,7 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static it.fulminazzo.blocksmith.reflect.Reflect.toWrapper;
@@ -147,6 +149,33 @@ final class ReflectUtils {
 
             return string;
         } else throw new IllegalArgumentException("Unsupported type: " + type);
+    }
+
+    /**
+     * Regroups the given values to create an array that matches the expected parameter types.
+     *
+     * @param parameters      the parameters
+     * @param parameterValues the parameter values
+     * @return the array
+     */
+    static @Nullable Object @NotNull [] regroup(final @NotNull Parameter @NotNull [] parameters,
+                                                final @Nullable Object @NotNull [] parameterValues) {
+        List<Object> flattened = new ArrayList<>();
+        for (int i = 0; i < parameters.length; i++) {
+            int remaining = parameterValues.length - i;
+            if (remaining == 1) {
+                Type type = parameters[i].getParameterizedType();
+                Object value = parameterValues[i];
+                if (value != null && typeMatches(value.getClass(), type)) {
+                    flattened.add(value);
+                    break;
+                }
+            }
+            Object[] array = new Object[remaining];
+            System.arraycopy(parameterValues, i, array, 0, remaining);
+            flattened.add(array);
+        }
+        return flattened.toArray();
     }
 
     /**
