@@ -37,7 +37,10 @@ final class ReflectUtils {
     /**
      * Compares the two given types to verify if they match or not at runtime.
      *
-     * @param source the source type. This comparison assumes that "source" represents               a concrete type referred to an object.               Because of this, the {@link WildcardType}, {@link TypeVariable}               and {@link GenericArrayType} should never be encountered.
+     * @param source the source type. This comparison assumes that "source" represents
+     *               a concrete type referred to an object.
+     *               Because of this, the {@link WildcardType}, {@link TypeVariable}
+     *               and {@link GenericArrayType} should never be encountered.
      * @param target the target type
      * @return <code>true</code> if they match
      */
