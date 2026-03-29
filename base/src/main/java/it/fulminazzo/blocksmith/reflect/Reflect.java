@@ -93,7 +93,7 @@ public class Reflect {
      * @return <code>true</code> if it is
      */
     public boolean isWrapper() {
-        return PRIMITIVE_TO_WRAPPER.containsValue(getObjectClass());
+        return WRAPPER_TO_PRIMITIVE.containsKey(getObjectClass());
     }
 
     /**
