@@ -1,8 +1,10 @@
 package it.fulminazzo.blocksmith.reflect
 
+
 import spock.lang.Specification
 
 import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.util.function.Predicate
 
 class ReflectTest extends Specification {
@@ -10,6 +12,19 @@ class ReflectTest extends Specification {
     private static final Field DEFAULT_AGE = Person.getDeclaredField('DEFAULT_AGE')
     private static final Field name = NamedEntity.getDeclaredField('name')
     private static final Field age = Person.getDeclaredField('age')
+
+    private static final Method getDEFAULT_NAME = NamedEntity.getDeclaredMethod('getDEFAULT_NAME')
+    private static final Method getDEFAULT_AGE = Person.getDeclaredMethod('getDEFAULT_AGE')
+    private static final Method getName = NamedEntity.getDeclaredMethod('getName')
+    private static final Method getAge = Person.getDeclaredMethod('getAge')
+
+    private static final Method setDEFAULT_NAME = NamedEntity.getDeclaredMethod('setDEFAULT_NAME', String)
+    private static final Method setDEFAULT_AGE = Person.getDeclaredMethod('setDEFAULT_AGE', Integer)
+    private static final Method setName = NamedEntity.getDeclaredMethod('setName', String)
+    private static final Method setAge = Person.getDeclaredMethod('setAge', Integer)
+
+    private static final Method personCanEqual = Person.getDeclaredMethod('canEqual', Object)
+    private static final Method namedEntityCanEqual = NamedEntity.getDeclaredMethod('canEqual', Object)
 
     private static final String nameValue = 'Alex'
     private static final int ageValue = 23
@@ -165,47 +180,144 @@ class ReflectTest extends Specification {
         actual == expected
 
         where:
-        method                    | arguments                                                     || expected
+        method                    | arguments                                                                                  || expected
         // getFieldsObject
-        'getInstanceFieldsObject' | []                                                            || [ageValue, nameValue].collect { new Reflect(it.class, it) }
-        'getStaticFieldsObject'   | []                                                            || [DEFAULT_AGE.get(null), DEFAULT_NAME.get(null)].collect { new Reflect(it.class, it) }
-        'getFieldsObject'         | [((Predicate<Field>) (f) -> false)]                           || [].collect { new Reflect(it.class, it) }
-        'getFieldsObject'         | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)] || [DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
-        'getFieldsObject'         | [((Predicate<Field>) (f) -> f.declaringClass == Person)]      || [DEFAULT_AGE.get(null), ageValue].collect { new Reflect(it.class, it) }
-        'getFieldsObject'         | [((Predicate<Field>) (f) -> true)]                            || [DEFAULT_AGE.get(null), ageValue, DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
-        'getFieldsObject'         | []                                                            || [DEFAULT_AGE.get(null), ageValue, DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
+        'getInstanceFieldsObject' | []                                                                                         || [ageValue, nameValue].collect { new Reflect(it.class, it) }
+        'getStaticFieldsObject'   | []                                                                                         || [DEFAULT_AGE.get(null), DEFAULT_NAME.get(null)].collect { new Reflect(it.class, it) }
+        'getFieldsObject'         | [((Predicate<Field>) (f) -> false)]                                                        || [].collect { new Reflect(it.class, it) }
+        'getFieldsObject'         | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                              || [DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
+        'getFieldsObject'         | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                                   || [DEFAULT_AGE.get(null), ageValue].collect { new Reflect(it.class, it) }
+        'getFieldsObject'         | [((Predicate<Field>) (f) -> true)]                                                         || [DEFAULT_AGE.get(null), ageValue, DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
+        'getFieldsObject'         | []                                                                                         || [DEFAULT_AGE.get(null), ageValue, DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
         // get
-        'getInstance'             | [name.name]                                                   || new Reflect(name.type, nameValue)
-        'getInstance'             | [age.name]                                                    || new Reflect(age.type, ageValue)
-        'getStatic'               | [DEFAULT_NAME.name]                                           || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
-        'getStatic'               | [DEFAULT_AGE.name]                                            || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
-        'get'                     | [DEFAULT_NAME.name]                                           || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
-        'get'                     | [DEFAULT_AGE.name]                                            || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
-        'get'                     | [name.name]                                                   || new Reflect(name.type, nameValue)
-        'get'                     | [age.name]                                                    || new Reflect(age.type, ageValue)
-        'get'                     | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)] || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
-        'get'                     | [((Predicate<Field>) (f) -> f.declaringClass == Person)]      || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
-        'get'                     | [((Predicate<Field>) (f) -> true)]                            || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'getInstance'             | [name.name]                                                                                || new Reflect(name.type, nameValue)
+        'getInstance'             | [age.name]                                                                                 || new Reflect(age.type, ageValue)
+        'getStatic'               | [DEFAULT_NAME.name]                                                                        || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'getStatic'               | [DEFAULT_AGE.name]                                                                         || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'get'                     | [DEFAULT_NAME.name]                                                                        || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'get'                     | [DEFAULT_AGE.name]                                                                         || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'get'                     | [name.name]                                                                                || new Reflect(name.type, nameValue)
+        'get'                     | [age.name]                                                                                 || new Reflect(age.type, ageValue)
+        'get'                     | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                              || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'get'                     | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                                   || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'get'                     | [((Predicate<Field>) (f) -> true)]                                                         || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
         // getField
-        'getInstanceField'        | [name.name]                                                   || name
-        'getInstanceField'        | [age.name]                                                    || age
-        'getStaticField'          | [DEFAULT_NAME.name]                                           || DEFAULT_NAME
-        'getStaticField'          | [DEFAULT_AGE.name]                                            || DEFAULT_AGE
-        'getField'                | [DEFAULT_NAME.name]                                           || DEFAULT_NAME
-        'getField'                | [DEFAULT_AGE.name]                                            || DEFAULT_AGE
-        'getField'                | [name.name]                                                   || name
-        'getField'                | [age.name]                                                    || age
-        'getField'                | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)] || DEFAULT_NAME
-        'getField'                | [((Predicate<Field>) (f) -> f.declaringClass == Person)]      || DEFAULT_AGE
-        'getField'                | [((Predicate<Field>) (f) -> true)]                            || DEFAULT_AGE
+        'getInstanceField'        | [name.name]                                                                                || name
+        'getInstanceField'        | [age.name]                                                                                 || age
+        'getStaticField'          | [DEFAULT_NAME.name]                                                                        || DEFAULT_NAME
+        'getStaticField'          | [DEFAULT_AGE.name]                                                                         || DEFAULT_AGE
+        'getField'                | [DEFAULT_NAME.name]                                                                        || DEFAULT_NAME
+        'getField'                | [DEFAULT_AGE.name]                                                                         || DEFAULT_AGE
+        'getField'                | [name.name]                                                                                || name
+        'getField'                | [age.name]                                                                                 || age
+        'getField'                | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                              || DEFAULT_NAME
+        'getField'                | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                                   || DEFAULT_AGE
+        'getField'                | [((Predicate<Field>) (f) -> true)]                                                         || DEFAULT_AGE
         // getFields
-        'getInstanceFields'       | []                                                            || [age, name]
-        'getStaticFields'         | []                                                            || [DEFAULT_AGE, DEFAULT_NAME]
-        'getFields'               | [((Predicate<Field>) (f) -> false)]                           || []
-        'getFields'               | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)] || [DEFAULT_NAME, name]
-        'getFields'               | [((Predicate<Field>) (f) -> f.declaringClass == Person)]      || [DEFAULT_AGE, age]
-        'getFields'               | [((Predicate<Field>) (f) -> true)]                            || [DEFAULT_AGE, age, DEFAULT_NAME, name]
-        'getFields'               | []                                                            || [DEFAULT_AGE, age, DEFAULT_NAME, name]
+        'getInstanceFields'       | []                                                                                         || [age, name]
+        'getStaticFields'         | []                                                                                         || [DEFAULT_AGE, DEFAULT_NAME]
+        'getFields'               | [((Predicate<Field>) (f) -> false)]                                                        || []
+        'getFields'               | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                              || [DEFAULT_NAME, name]
+        'getFields'               | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                                   || [DEFAULT_AGE, age]
+        'getFields'               | [((Predicate<Field>) (f) -> true)]                                                         || [DEFAULT_AGE, age, DEFAULT_NAME, name]
+        'getFields'               | []                                                                                         || [DEFAULT_AGE, age, DEFAULT_NAME, name]
+        // invoke
+        'invoke'                  | [getDEFAULT_NAME.name, new Object[0]]                                                      || new Reflect(NamedEntity.DEFAULT_NAME.class, NamedEntity.DEFAULT_NAME)
+        'invoke'                  | [getDEFAULT_NAME.name]                                                                     || new Reflect(NamedEntity.DEFAULT_NAME.class, NamedEntity.DEFAULT_NAME)
+        'invoke'                  | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name, new Object[0]]                          || new Reflect(NamedEntity.DEFAULT_NAME.class, NamedEntity.DEFAULT_NAME)
+        'invoke'                  | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name]                                         || new Reflect(NamedEntity.DEFAULT_NAME.class, NamedEntity.DEFAULT_NAME)
+        'invoke'                  | [setDEFAULT_NAME.name, new Object[]{NamedEntity.DEFAULT_NAME}]                             || new Reflect(void, null)
+        'invoke'                  | [setDEFAULT_NAME.returnType, setDEFAULT_NAME.name, new Object[]{NamedEntity.DEFAULT_NAME}] || new Reflect(void, null)
+        'invoke'                  | [getName.name, new Object[0]]                                                              || new Reflect(nameValue.class, nameValue)
+        'invoke'                  | [getName.name]                                                                             || new Reflect(nameValue.class, nameValue)
+        'invoke'                  | [getName.returnType, getName.name, new Object[0]]                                          || new Reflect(nameValue.class, nameValue)
+        'invoke'                  | [getName.returnType, getName.name]                                                         || new Reflect(nameValue.class, nameValue)
+        'invoke'                  | [new Object[]{nameValue}]                                                                  || new Reflect(void, null)
+        'invoke'                  | [setName.name, new Object[]{nameValue}]                                                    || new Reflect(void, null)
+        'invoke'                  | [setName.returnType, setName.name, new Object[]{nameValue}]                                || new Reflect(void, null)
+        'invoke'                  | [getDEFAULT_AGE.name, new Object[0]]                                                       || new Reflect(Person.DEFAULT_AGE.class, Person.DEFAULT_AGE)
+        'invoke'                  | [getDEFAULT_AGE.name]                                                                      || new Reflect(Person.DEFAULT_AGE.class, Person.DEFAULT_AGE)
+        'invoke'                  | [getDEFAULT_AGE.returnType, getDEFAULT_AGE.name, new Object[0]]                            || new Reflect(Person.DEFAULT_AGE.class, Person.DEFAULT_AGE)
+        'invoke'                  | [getDEFAULT_AGE.returnType, getDEFAULT_AGE.name]                                           || new Reflect(Person.DEFAULT_AGE.class, Person.DEFAULT_AGE)
+        'invoke'                  | [setDEFAULT_AGE.name, new Object[]{Person.DEFAULT_AGE}]                                    || new Reflect(void, null)
+        'invoke'                  | [setDEFAULT_AGE.returnType, setDEFAULT_AGE.name, new Object[]{Person.DEFAULT_AGE}]         || new Reflect(void, null)
+        'invoke'                  | [getAge.name, new Object[0]]                                                               || new Reflect(ageValue.class, ageValue)
+        'invoke'                  | [getAge.name]                                                                              || new Reflect(ageValue.class, ageValue)
+        'invoke'                  | [getAge.returnType, getAge.name, new Object[0]]                                            || new Reflect(ageValue.class, ageValue)
+        'invoke'                  | [getAge.returnType, getAge.name]                                                           || new Reflect(ageValue.class, ageValue)
+        'invoke'                  | [new Object[]{ageValue}]                                                                   || new Reflect(void, null)
+        'invoke'                  | [setAge.name, new Object[]{ageValue}]                                                      || new Reflect(void, null)
+        'invoke'                  | [setAge.returnType, setAge.name, new Object[]{ageValue}]                                   || new Reflect(void, null)
+        'invoke'                  | []                                                                                         || new Reflect(ageValue.class, ageValue)
+        // getMethod
+        'getInstanceMethod'       | [getName.name, getName.parameterTypes]                                                     || getName
+        'getInstanceMethod'       | [getName.name]                                                                             || getName
+        'getInstanceMethod'       | [getName.returnType, getName.name, getName.parameterTypes]                                 || getName
+        'getInstanceMethod'       | [getName.returnType, getName.name]                                                         || getName
+        'getInstanceMethod'       | [setName.parameterTypes]                                                                   || setName
+        'getInstanceMethod'       | [setName.name, setName.parameterTypes]                                                     || setName
+        'getInstanceMethod'       | [setName.returnType, setName.name, setName.parameterTypes]                                 || setName
+        'getInstanceMethod'       | [getAge.name, getAge.parameterTypes]                                                       || getAge
+        'getInstanceMethod'       | [getAge.name]                                                                              || getAge
+        'getInstanceMethod'       | [getAge.returnType, getAge.name, getAge.parameterTypes]                                    || getAge
+        'getInstanceMethod'       | [getAge.returnType, getAge.name]                                                           || getAge
+        'getInstanceMethod'       | [setAge.parameterTypes]                                                                    || setAge
+        'getInstanceMethod'       | [setAge.name, setAge.parameterTypes]                                                       || setAge
+        'getInstanceMethod'       | [setAge.returnType, setAge.name, setAge.parameterTypes]                                    || setAge
+        'getInstanceMethod'       | []                                                                                         || getAge
+        'getStaticMethod'         | [getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes]                                     || getDEFAULT_NAME
+        'getStaticMethod'         | [getDEFAULT_NAME.name]                                                                     || getDEFAULT_NAME
+        'getStaticMethod'         | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes]         || getDEFAULT_NAME
+        'getStaticMethod'         | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name]                                         || getDEFAULT_NAME
+        'getStaticMethod'         | [setDEFAULT_NAME.parameterTypes]                                                           || setDEFAULT_NAME
+        'getStaticMethod'         | [setDEFAULT_NAME.name, setDEFAULT_NAME.parameterTypes]                                     || setDEFAULT_NAME
+        'getStaticMethod'         | [setDEFAULT_NAME.returnType, setDEFAULT_NAME.name, setDEFAULT_NAME.parameterTypes]         || setDEFAULT_NAME
+        'getStaticMethod'         | [getDEFAULT_AGE.name, getDEFAULT_AGE.parameterTypes]                                       || getDEFAULT_AGE
+        'getStaticMethod'         | [getDEFAULT_AGE.name]                                                                      || getDEFAULT_AGE
+        'getStaticMethod'         | [getDEFAULT_AGE.returnType, getDEFAULT_AGE.name, getDEFAULT_AGE.parameterTypes]            || getDEFAULT_AGE
+        'getStaticMethod'         | [getDEFAULT_AGE.returnType, getDEFAULT_AGE.name]                                           || getDEFAULT_AGE
+        'getStaticMethod'         | [setDEFAULT_AGE.parameterTypes]                                                            || setDEFAULT_AGE
+        'getStaticMethod'         | [setDEFAULT_AGE.name, setDEFAULT_AGE.parameterTypes]                                       || setDEFAULT_AGE
+        'getStaticMethod'         | [setDEFAULT_AGE.returnType, setDEFAULT_AGE.name, setDEFAULT_AGE.parameterTypes]            || setDEFAULT_AGE
+        'getStaticMethod'         | []                                                                                         || getDEFAULT_AGE
+        'getMethod'               | [getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes]                                     || getDEFAULT_NAME
+        'getMethod'               | [getDEFAULT_NAME.name]                                                                     || getDEFAULT_NAME
+        'getMethod'               | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes]         || getDEFAULT_NAME
+        'getMethod'               | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name]                                         || getDEFAULT_NAME
+        'getMethod'               | [setDEFAULT_NAME.name, setDEFAULT_NAME.parameterTypes]                                     || setDEFAULT_NAME
+        'getMethod'               | [setDEFAULT_NAME.returnType, setDEFAULT_NAME.name, setDEFAULT_NAME.parameterTypes]         || setDEFAULT_NAME
+        'getMethod'               | [getName.name, getName.parameterTypes]                                                     || getName
+        'getMethod'               | [getName.name]                                                                             || getName
+        'getMethod'               | [getName.returnType, getName.name, getName.parameterTypes]                                 || getName
+        'getMethod'               | [getName.returnType, getName.name]                                                         || getName
+        'getMethod'               | [setName.parameterTypes]                                                                   || setName
+        'getMethod'               | [setName.name, setName.parameterTypes]                                                     || setName
+        'getMethod'               | [setName.returnType, setName.name, setName.parameterTypes]                                 || setName
+        'getMethod'               | [getDEFAULT_AGE.name, getDEFAULT_AGE.parameterTypes]                                       || getDEFAULT_AGE
+        'getMethod'               | [getDEFAULT_AGE.name]                                                                      || getDEFAULT_AGE
+        'getMethod'               | [getDEFAULT_AGE.returnType, getDEFAULT_AGE.name, getDEFAULT_AGE.parameterTypes]            || getDEFAULT_AGE
+        'getMethod'               | [getDEFAULT_AGE.returnType, getDEFAULT_AGE.name]                                           || getDEFAULT_AGE
+        'getMethod'               | [setDEFAULT_AGE.name, setDEFAULT_AGE.parameterTypes]                                       || setDEFAULT_AGE
+        'getMethod'               | [setDEFAULT_AGE.returnType, setDEFAULT_AGE.name, setDEFAULT_AGE.parameterTypes]            || setDEFAULT_AGE
+        'getMethod'               | [getAge.name, getAge.parameterTypes]                                                       || getAge
+        'getMethod'               | [getAge.name]                                                                              || getAge
+        'getMethod'               | [getAge.returnType, getAge.name, getAge.parameterTypes]                                    || getAge
+        'getMethod'               | [getAge.returnType, getAge.name]                                                           || getAge
+        'getMethod'               | [setAge.parameterTypes]                                                                    || setAge
+        'getMethod'               | [setAge.name, setAge.parameterTypes]                                                       || setAge
+        'getMethod'               | [setAge.returnType, setAge.name, setAge.parameterTypes]                                    || setAge
+        'getMethod'               | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                              || namedEntityCanEqual
+        'getMethod'               | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                                   || personCanEqual
+        'getMethod'               | [((Predicate<Field>) (f) -> true)]                                                         || personCanEqual
+        'getMethod'               | []                                                                                         || getAge
+        // getMethods
+        'getInstanceMethods'      | []                                                                                         || [personCanEqual, getAge, setAge, namedEntityCanEqual, getName, setName]
+        'getStaticMethods'        | []                                                                                         || [getDEFAULT_AGE, setDEFAULT_AGE, getDEFAULT_NAME, setDEFAULT_NAME]
+        'getMethods'              | [((Predicate<Field>) (f) -> false)]                                                        || []
+        'getMethods'              | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                              || [namedEntityCanEqual, getName, setName, getDEFAULT_NAME, setDEFAULT_NAME]
+        'getMethods'              | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                                   || [personCanEqual, getAge, setAge, getDEFAULT_AGE, setDEFAULT_AGE]
+        'getMethods'              | [((Predicate<Field>) (f) -> true)]                                                         || [personCanEqual, getAge, setAge, getDEFAULT_AGE, setDEFAULT_AGE, namedEntityCanEqual, getName, setName, getDEFAULT_NAME, setDEFAULT_NAME]
+        'getMethods'              | []                                                                                         || [personCanEqual, getAge, setAge, getDEFAULT_AGE, setDEFAULT_AGE, namedEntityCanEqual, getName, setName, getDEFAULT_NAME, setDEFAULT_NAME]
     }
 
     def 'test that #method with #arguments throws ReflectException with #expected'() {
