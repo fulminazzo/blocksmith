@@ -714,18 +714,7 @@ public class Reflect {
      * @return the methods
      */
     public @NotNull List<Method> getInstanceMethods() {
-        return getInstanceMethods(false);
-    }
-
-    /**
-     * Gets all the instance methods (methods not declared as static).
-     *
-     * @param includeObjectMethods if <code>false</code>, all the methods inherited from {@link Object}
-     *                             will be ignored (such as toString, equals or hashCode)
-     * @return the methods
-     */
-    public @NotNull List<Method> getInstanceMethods(final boolean includeObjectMethods) {
-        return getMethods(includeObjectMethods, m -> !Modifier.isStatic(m.getModifiers()));
+        return getMethods(m -> !Modifier.isStatic(m.getModifiers()));
     }
 
     /**
@@ -744,19 +733,7 @@ public class Reflect {
      * @return the methods
      */
     public @NotNull List<Method> getMethods(final @NotNull Predicate<Method> predicate) {
-        return getMethods(false, predicate);
-    }
-
-    /**
-     * Gets all the methods that match the predicate.
-     *
-     * @param includeObjectMethods if <code>false</code>, all the methods inherited from {@link Object}
-     *                             will be ignored (such as toString, equals or hashCode)
-     * @param predicate            the predicate
-     * @return the methods
-     */
-    public @NotNull List<Method> getMethods(final boolean includeObjectMethods, final @NotNull Predicate<Method> predicate) {
-        return getMethods(includeObjectMethods).stream().filter(predicate).collect(Collectors.toList());
+        return getMethods().stream().filter(predicate).collect(Collectors.toList());
     }
 
     /**
@@ -765,17 +742,6 @@ public class Reflect {
      * @return the methods
      */
     public @NotNull List<Method> getMethods() {
-        return getMethods(false);
-    }
-
-    /**
-     * Gets all the methods.
-     *
-     * @param includeObjectMethods if <code>false</code>, all the methods inherited from {@link Object}
-     *                             will be ignored (such as toString, equals or hashCode)
-     * @return the methods
-     */
-    public @NotNull List<Method> getMethods(final boolean includeObjectMethods) {
         List<Method> methods = new ArrayList<>();
         Class<?> type = getObjectClass();
         while (type != null) {
@@ -788,15 +754,6 @@ public class Reflect {
             type = type.getSuperclass();
         }
         methods.removeIf(m -> m.isSynthetic() || m.isBridge());
-        if (getObjectClass().equals(Object.class) || includeObjectMethods) return methods;
-        Method[] objectMethods = Object.class.getDeclaredMethods();
-        for (Method objectMethod : objectMethods) {
-            methods.removeIf(m ->
-                    m.getReturnType().equals(objectMethod.getReturnType()) &&
-                            m.getName().equals(objectMethod.getName()) &&
-                            Arrays.equals(m.getParameterTypes(), objectMethod.getParameterTypes())
-            );
-        }
         return methods;
     }
 

@@ -28,7 +28,18 @@ class ReflectTest extends Specification {
     private static final Method setAge = Person.getDeclaredMethod('setAge', Integer)
 
     private static final Method personCanEqual = Person.getDeclaredMethod('canEqual', Object)
+    private static final Method personToString = Person.getDeclaredMethod('toString')
+    private static final Method personEquals = Person.getDeclaredMethod('equals', Object)
+    private static final Method personHashCode = Person.getDeclaredMethod('hashCode')
+
     private static final Method namedEntityCanEqual = NamedEntity.getDeclaredMethod('canEqual', Object)
+    private static final Method namedEntityToString = NamedEntity.getDeclaredMethod('toString')
+    private static final Method namedEntityEquals = NamedEntity.getDeclaredMethod('equals', Object)
+    private static final Method namedEntityHashCode = NamedEntity.getDeclaredMethod('hashCode')
+
+    private static final List<Method> objectMethods = Object.declaredMethods
+            .findAll { !it.synthetic && !it.bridge }
+            .sort { a, b -> a.name <=> b.name ?: a.parameterCount <=> b.parameterCount }
 
     private static final String nameValue = 'Alex'
     private static final int ageValue = 23
@@ -368,13 +379,24 @@ class ReflectTest extends Specification {
         'getMethod'               | [((Predicate<Field>) (f) -> true)]                                                       || personCanEqual
         'getMethod'               | []                                                                                       || getAge
         // getMethods
-        'getInstanceMethods'      | []                                                                                       || [personCanEqual, getAge, setAge, namedEntityCanEqual, getName, setName]
+        'getInstanceMethods'      | []                                                                                       ||
+                [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString,
+                 namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString,
+                 *objectMethods]
         'getStaticMethods'        | []                                                                                       || [getDEFAULT_AGE, setDEFAULT_AGE, getDEFAULT_NAME, setDEFAULT_NAME]
         'getMethods'              | [((Predicate<Field>) (f) -> false)]                                                      || []
-        'getMethods'              | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                            || [namedEntityCanEqual, getName, setName, getDEFAULT_NAME, setDEFAULT_NAME]
-        'getMethods'              | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                                 || [personCanEqual, getAge, setAge, getDEFAULT_AGE, setDEFAULT_AGE]
-        'getMethods'              | [((Predicate<Field>) (f) -> true)]                                                       || [personCanEqual, getAge, setAge, getDEFAULT_AGE, setDEFAULT_AGE, namedEntityCanEqual, getName, setName, getDEFAULT_NAME, setDEFAULT_NAME]
-        'getMethods'              | []                                                                                       || [personCanEqual, getAge, setAge, getDEFAULT_AGE, setDEFAULT_AGE, namedEntityCanEqual, getName, setName, getDEFAULT_NAME, setDEFAULT_NAME]
+        'getMethods'              | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                            ||
+                [namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDEFAULT_NAME, setDEFAULT_NAME]
+        'getMethods'              | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                                 ||
+                [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString, getDEFAULT_AGE, setDEFAULT_AGE]
+        'getMethods'              | [((Predicate<Field>) (f) -> true)]                                                       ||
+                [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString, getDEFAULT_AGE, setDEFAULT_AGE,
+                 namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDEFAULT_NAME, setDEFAULT_NAME,
+                 *objectMethods]
+        'getMethods'              | []                                                                                       ||
+                [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString, getDEFAULT_AGE, setDEFAULT_AGE,
+                 namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDEFAULT_NAME, setDEFAULT_NAME,
+                 *objectMethods]
     }
 
     def 'test that #method with #arguments throws ReflectException with #expected'() {
