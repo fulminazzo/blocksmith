@@ -375,7 +375,7 @@ public class Reflect {
      * @throws ReflectException if no method is found or an error occurs while getting the value
      */
     public @NotNull Reflect invoke(final @Nullable String name,
-                                         final @Nullable Object @NotNull ... parameters) {
+                                   final @Nullable Object @NotNull ... parameters) {
         return invoke(null, name, parameters);
     }
 
@@ -389,8 +389,8 @@ public class Reflect {
      * @throws ReflectException if no method is found or an error occurs while getting the value
      */
     public @NotNull Reflect invoke(final @Nullable Class<?> returnType,
-                                         final @Nullable String name,
-                                         final @Nullable Object @NotNull ... parameters) {
+                                   final @Nullable String name,
+                                   final @Nullable Object @NotNull ... parameters) {
         Class<?>[] parameterTypes = Arrays.stream(parameters)
                 .map(p -> p == null ? null : p.getClass())
                 .toArray(Class<?>[]::new);
@@ -407,7 +407,7 @@ public class Reflect {
      * @throws ReflectException if no method is found or an error occurs while getting the value
      */
     private @NotNull Reflect invoke(final @NotNull Method method,
-                                          final @Nullable Object @NotNull ... parameters) {
+                                    final @Nullable Object @NotNull ... parameters) {
         try {
             method.setAccessible(true);
             return new Reflect(
@@ -602,8 +602,23 @@ public class Reflect {
         List<Method> methods = new ArrayList<>();
         Class<?> type = getObjectClass();
         while (type != null) {
-            methods.addAll(Arrays.asList(type.getDeclaredMethods()));
+            List<Method> list = new ArrayList<>(Arrays.asList(type.getDeclaredMethods()));
+            list.sort(Comparator.<Method, Boolean>comparing(m -> Modifier.isStatic(m.getModifiers()))
+                    .thenComparing(Method::getName)
+                    .thenComparing(Method::getParameterCount)
+            );
+            methods.addAll(list);
             type = type.getSuperclass();
+        }
+        methods.removeIf(m -> m.isSynthetic() || m.isBridge());
+        if (getObjectClass().equals(Object.class)) return methods;
+        Method[] objectMethods = Object.class.getDeclaredMethods();
+        for (Method objectMethod : objectMethods) {
+            methods.removeIf(m ->
+                    m.getReturnType().equals(objectMethod.getReturnType()) &&
+                            m.getName().equals(objectMethod.getName()) &&
+                            Arrays.equals(m.getParameterTypes(), objectMethod.getParameterTypes())
+            );
         }
         return methods;
     }
