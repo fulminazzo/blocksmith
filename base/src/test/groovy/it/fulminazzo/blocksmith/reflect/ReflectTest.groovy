@@ -3,12 +3,15 @@ package it.fulminazzo.blocksmith.reflect
 
 import spock.lang.Specification
 
+import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.util.function.Predicate
 
 class ReflectTest extends Specification {
+    private static final Constructor<?> constructor = Person.getDeclaredConstructor(String, Integer)
+
     private static final Field DEFAULT_NAME = NamedEntity.getDeclaredField('DEFAULT_NAME')
     private static final Field DEFAULT_AGE = Person.getDeclaredField('DEFAULT_AGE')
     private static final Field name = NamedEntity.getDeclaredField('name')
@@ -182,6 +185,18 @@ class ReflectTest extends Specification {
 
         where:
         method                    | arguments                                                                                || expected
+        // init
+        'init'                    | ['Camilla', 21]                                                                          || new Reflect(Person, new Person('Camilla', 21))
+        // getConstructor
+        'getConstructor'          | [String, Integer]                                                                        || constructor
+        'getConstructor'          | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                                 || constructor
+        'getConstructor'          | [((Predicate<Field>) (f) -> true)]                                                       || constructor
+        // getConstructors
+        'getConstructors'         | [((Predicate<Field>) (f) -> false)]                                                      || []
+        'getConstructors'         | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                            || []
+        'getConstructors'         | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                                 || [constructor]
+        'getConstructors'         | [((Predicate<Field>) (f) -> true)]                                                       || [constructor]
+        'getConstructors'         | []                                                                                       || [constructor]
         // getFieldsObject
         'getInstanceFieldsObject' | []                                                                                       || [ageValue, nameValue].collect { new Reflect(it.class, it) }
         'getStaticFieldsObject'   | []                                                                                       || [DEFAULT_AGE.get(null), DEFAULT_NAME.get(null)].collect { new Reflect(it.class, it) }
@@ -331,6 +346,13 @@ class ReflectTest extends Specification {
 
         where:
         method              | arguments                                                                          || expected
+        // init
+        'init'              | []                                                                                 || ReflectException.cannotFindConstructor(Person, new Class[0])
+        'init'              | [21, 'Camilla']                                                                    || ReflectException.cannotFindConstructor(Person, Integer, String)
+        // getConstructor
+        'getConstructor'    | []                                                                                 || ReflectException.cannotFindConstructor(Person, new Class[0])
+        'getConstructor'    | [Integer, String]                                                                  || ReflectException.cannotFindConstructor(Person, Integer, String)
+        'getConstructor'    | [((Predicate<Field>) (f) -> false)]                                                || ReflectException.cannotFindConstructor(Person)
         // get
         'getInstance'       | [DEFAULT_NAME.name]                                                                || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
         'getInstance'       | [DEFAULT_AGE.name]                                                                 || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
@@ -375,6 +397,46 @@ class ReflectTest extends Specification {
         'getMethod'         | ['notExisting', [String, null, Object].toArray(new Class[3])]                      || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
         'getMethod'         | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]             || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
         'getMethod'         | [((Predicate<Field>) (f) -> false)]                                                || ReflectException.cannotFindMethod(Person)
+    }
+
+    def 'test that init with #exception throws #expected'() {
+        given:
+        def constructor = Mock(Constructor)
+        constructor.newInstance(_) >> {
+            throw exception
+        }
+        constructor.declaringClass >> Person
+        constructor.parameters >> [].toArray()
+        constructor.parameterTypes >> [].toArray()
+
+        when:
+        reflect.init(constructor)
+
+        then:
+        thrown(expected)
+
+        where:
+        exception                                                                     || expected
+        new InvocationTargetException(new RuntimeException('Test runtime exception')) || RuntimeException
+        new InvocationTargetException(new Error('Test error'))                        || Error
+        new InvocationTargetException(new Exception('Test exception'))                || ReflectException
+    }
+
+    def 'test that init throws ReflectException on IllegalAccessException'() {
+        given:
+        def constructor = Mock(Constructor)
+        constructor.newInstance(_) >> {
+            throw new IllegalAccessException()
+        }
+        constructor.declaringClass >> Person
+        constructor.parameters >> [].toArray()
+        constructor.parameterTypes >> [].toArray()
+
+        when:
+        reflect.init(constructor)
+
+        then:
+        thrown(ReflectException)
     }
 
     def 'test that get throws ReflectException on IllegalAccessException'() {
