@@ -71,8 +71,8 @@ public class Reflect {
      *
      * @return the class
      */
-    public @NotNull Class<?> getObjectType() {
-        return (Class<?>) type; //TODO: check other types
+    public @NotNull Class<?> getObjectClass() {
+        return ReflectUtils.toClass(type);
     }
 
     /*
@@ -85,7 +85,7 @@ public class Reflect {
      * @return <code>true</code> if it is
      */
     public boolean isPrimitive() {
-        return PRIMITIVE_TO_WRAPPER.containsKey(getObjectType());
+        return PRIMITIVE_TO_WRAPPER.containsKey(getObjectClass());
     }
 
     /**
@@ -94,7 +94,7 @@ public class Reflect {
      * @return <code>true</code> if it is
      */
     public boolean isWrapper() {
-        return PRIMITIVE_TO_WRAPPER.containsValue(getObjectType());
+        return PRIMITIVE_TO_WRAPPER.containsValue(getObjectClass());
     }
 
     /**
@@ -104,7 +104,7 @@ public class Reflect {
      * @return <code>true</code> if it is
      */
     public boolean isBaseType() {
-        return isPrimitive() || isWrapper() || getObjectType().equals(String.class);
+        return isPrimitive() || isWrapper() || getObjectClass().equals(String.class);
     }
 
     /**
@@ -114,7 +114,7 @@ public class Reflect {
      * @return <code>true</code> if it does
      */
     public boolean extendsType(final @NotNull Class<?> type) {
-        return toWrapper(type).isAssignableFrom(toWrapper(getObjectType())); //TODO: check other types
+        return toWrapper(type).isAssignableFrom(toWrapper(getObjectClass())); //TODO: check other types
     }
 
     /**
@@ -124,7 +124,7 @@ public class Reflect {
      */
     public @NotNull Reflect toWrapper() {
         if (isPrimitive()) {
-            Class<?> newType = PRIMITIVE_TO_WRAPPER.get(getObjectType());
+            Class<?> newType = PRIMITIVE_TO_WRAPPER.get(getObjectClass());
             final Object newObject;
             if (object instanceof Class<?>) newObject = newType;
             else newObject = cast(newType, object);
@@ -140,7 +140,7 @@ public class Reflect {
      */
     public @NotNull Reflect toPrimitive() {
         if (isWrapper()) {
-            Class<?> newType = WRAPPER_TO_PRIMITIVE.get(getObjectType());
+            Class<?> newType = WRAPPER_TO_PRIMITIVE.get(getObjectClass());
             final Object newObject;
             if (object instanceof Class<?>) newObject = newType;
             else newObject = cast(newType, object);
@@ -342,7 +342,7 @@ public class Reflect {
      */
     public @NotNull List<Field> getFields() {
         List<Field> fields = new ArrayList<>();
-        Class<?> type = getObjectType();
+        Class<?> type = getObjectClass();
         while (type != null) {
             fields.addAll(Arrays.asList(type.getDeclaredFields()));
             type = type.getSuperclass();
