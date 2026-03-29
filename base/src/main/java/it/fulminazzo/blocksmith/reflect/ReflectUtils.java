@@ -6,10 +6,53 @@ import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import static it.fulminazzo.blocksmith.reflect.Reflect.toWrapper;
+
 /**
  * A collection of utilities for working with reflections.
  */
 final class ReflectUtils {
+
+    /**
+     * Compares the two given types to verify if they match or not at runtime.
+     *
+     * @param source the source type. This comparison assumes that "source" represents
+     *               a concrete type referred to an object.
+     *               Because of this, the {@link WildcardType}, {@link TypeVariable}
+     *               and {@link GenericArrayType} should never be encountered.
+     * @param target the target type
+     * @return <code>true</code> if they match
+     */
+    static boolean typeMatches(final @NotNull Type source, final @NotNull Type target) {
+        final Class<?> sourceClass = toClass(source);
+        if (target instanceof Class<?>)
+            return toWrapper(((Class<?>) target)).isAssignableFrom(toWrapper(sourceClass));
+        else if (target instanceof ParameterizedType) {
+            ParameterizedType targetParameterizedType = (ParameterizedType) target;
+            if (!(source instanceof ParameterizedType)) return typeMatches(source, targetParameterizedType.getRawType());
+            ParameterizedType sourceParameterizedType = (ParameterizedType) source;
+            if (!typeMatches(sourceParameterizedType.getRawType(), targetParameterizedType.getRawType())) return false;
+            Type[] sourceActualTypeArguments = sourceParameterizedType.getActualTypeArguments();
+            Type[] targetActualTypeArguments = targetParameterizedType.getActualTypeArguments();
+            for (int i = 0; i < sourceActualTypeArguments.length; i++) {
+                if (!typeMatches(sourceActualTypeArguments[i], targetActualTypeArguments[i])) return false;
+            }
+            return true;
+        } else if (target instanceof TypeVariable<?>) {
+            TypeVariable<?> targetTypeVariable = (TypeVariable<?>) target;
+            return Arrays.stream(targetTypeVariable.getBounds()).allMatch(b -> typeMatches(source, b));
+        } else if (target instanceof GenericArrayType) {
+            GenericArrayType targetGenericArrayType = (GenericArrayType) target;
+            if (!sourceClass.isArray()) return false;
+            Type targetComponentType = targetGenericArrayType.getGenericComponentType();
+            Type sourceComponentType = sourceClass.getComponentType();
+            return typeMatches(sourceComponentType, targetComponentType);
+        } else if (target instanceof WildcardType) {
+            WildcardType targetWildcardType = (WildcardType) target;
+            return Arrays.stream(targetWildcardType.getUpperBounds()).allMatch(b -> typeMatches(source, b)) &&
+                    Arrays.stream(targetWildcardType.getLowerBounds()).allMatch(b -> typeMatches(b, source));
+        } else return false;
+    }
 
     /**
      * Converts the given type to a {@link Class}.
@@ -72,7 +115,7 @@ final class ReflectUtils {
                 if (!lowerBound.equals(Object.class))
                     string += " super " + toString(lowerBound);
             }
-            
+
             Type[] upperBounds = wildcardType.getUpperBounds();
             if (upperBounds.length > 0) {
                 Type upperBound = upperBounds[0];
