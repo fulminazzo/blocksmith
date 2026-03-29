@@ -358,4 +358,14 @@ public class Reflect {
         }
     }
 
+    /**
+     * Converts a primitive type to its corresponding wrapper type.
+     *
+     * @param type the type
+     * @return the wrapper type
+     */
+    public static @NotNull Class<?> toWrapper(final @NotNull Class<?> type) {
+        return PRIMITIVE_TO_WRAPPER.getOrDefault(type, type);
+    }
+
 }
