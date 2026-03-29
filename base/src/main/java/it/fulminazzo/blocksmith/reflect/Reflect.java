@@ -303,6 +303,18 @@ public class Reflect {
     }
 
     /**
+     * Sets a new value to the first field that matches the predicate.
+     *
+     * @param predicate the predicate
+     * @param value the value of the field
+     * @return this object (for method chaining)
+     * @throws ReflectException if no field was found or an error occurs while setting the value
+     */
+    public @NotNull Reflect set(final @NotNull Predicate<Field> predicate, final Object value) {
+        return set(getField(predicate), value);
+    }
+
+    /**
      * Sets a new value to the field with the given name.
      *
      * @param name  the name of the field

@@ -257,6 +257,9 @@ class ReflectTest extends Specification {
         'set'                     | [DEFAULT_AGE.name, Person.DEFAULT_AGE]                                                   || new Reflect(Person, new Person(nameValue, ageValue))
         'set'                     | [name.name, nameValue]                                                                   || new Reflect(Person, new Person(nameValue, ageValue))
         'set'                     | [age.name, ageValue]                                                                     || new Reflect(Person, new Person(nameValue, ageValue))
+        'set'                     | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity), NamedEntity.DEFAULT_NAME]  || new Reflect(Person, new Person(nameValue, ageValue))
+        'set'                     | [((Predicate<Field>) (f) -> f.declaringClass == Person), Person.DEFAULT_AGE]             || new Reflect(Person, new Person(nameValue, ageValue))
+        'set'                     | [((Predicate<Field>) (f) -> true), Person.DEFAULT_AGE]                                   || new Reflect(Person, new Person(nameValue, ageValue))
         // get
         'getInstance'             | [name.name]                                                                              || new Reflect(name.type, nameValue)
         'getInstance'             | [age.name]                                                                               || new Reflect(age.type, ageValue)
