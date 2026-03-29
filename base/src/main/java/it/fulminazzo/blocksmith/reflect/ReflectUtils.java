@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.reflect;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.*;
 import java.util.Arrays;
@@ -20,7 +21,7 @@ final class ReflectUtils {
      * @param type  the type
      * @return <code>true</code> if it does
      */
-    static boolean extendsType(final @NotNull Class<?> clazz, final @NotNull Type type) {
+    public static boolean extendsType(final @NotNull Class<?> clazz, final @NotNull Type type) {
         Class<?> current = clazz;
         if (typeMatches(current, type)) return true;
         while (current != null) {
@@ -49,7 +50,8 @@ final class ReflectUtils {
             return toWrapper(((Class<?>) target)).isAssignableFrom(sourceClass);
         else if (target instanceof ParameterizedType) {
             ParameterizedType targetParameterizedType = (ParameterizedType) target;
-            if (!(source instanceof ParameterizedType)) return typeMatches(source, targetParameterizedType.getRawType());
+            if (!(source instanceof ParameterizedType))
+                return typeMatches(source, targetParameterizedType.getRawType());
             ParameterizedType sourceParameterizedType = (ParameterizedType) source;
             if (!typeMatches(sourceParameterizedType.getRawType(), targetParameterizedType.getRawType())) return false;
             Type[] sourceActualTypeArguments = sourceParameterizedType.getActualTypeArguments();
@@ -145,6 +147,35 @@ final class ReflectUtils {
 
             return string;
         } else throw new IllegalArgumentException("Unsupported type: " + type);
+    }
+
+    /**
+     * Verifies that the given parameter types match the parameters.
+     *
+     * @param parameters the parameters
+     * @param given      the parameter types
+     * @return <code>true</code> if they match
+     */
+    static boolean parameterMatches(final @NotNull Parameter @NotNull [] parameters,
+                                    final @Nullable Class<?> @NotNull [] given) {
+        for (int i = 0; i < parameters.length; i++) {
+            Parameter parameter = parameters[i];
+            Type type = parameter.getParameterizedType();
+            if (i >= given.length) return parameter.isVarArgs();
+            Class<?> current = given[i];
+            if (parameter.isVarArgs()) {
+                Type componentType = type instanceof Class<?>
+                        ? ((Class<?>) type).getComponentType()
+                        : ((GenericArrayType) type).getGenericComponentType();
+                for (int j = i; j < given.length; j++) {
+                    current = given[j];
+                    if (current != null && !typeMatches(current, componentType)) return false;
+                }
+                return true;
+            }
+            if (current != null && !typeMatches(current, type)) return false;
+        }
+        return given.length == parameters.length;
     }
 
 }
