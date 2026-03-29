@@ -116,7 +116,7 @@ public class Reflect {
         if (isPrimitive()) {
             Class<?> newType = PRIMITIVE_TO_WRAPPER.get(type);
             final Object newObject;
-            if (object instanceof Class<?>) newObject = type;
+            if (object instanceof Class<?>) newObject = newType;
             else newObject = cast(newType, object);
             return new Reflect(newType, newObject);
         }
@@ -132,7 +132,7 @@ public class Reflect {
         if (isWrapper()) {
             Class<?> newType = WRAPPER_TO_PRIMITIVE.get(type);
             final Object newObject;
-            if (object instanceof Class<?>) newObject = type;
+            if (object instanceof Class<?>) newObject = newType;
             else newObject = cast(newType, object);
             return new Reflect(newType, newObject);
         }
