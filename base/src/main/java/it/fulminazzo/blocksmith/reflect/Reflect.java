@@ -306,7 +306,7 @@ public class Reflect {
      * @throws ReflectException if no field is found
      */
     public @NotNull Field getField(final @NotNull Predicate<Field> predicate) {
-        return getFields().stream().filter(predicate).findFirst().orElseThrow(() -> ReflectException.cannotFindField(type));
+        return getFields(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindField(type));
     }
 
     /**
