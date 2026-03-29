@@ -25,6 +25,22 @@ class ReflectTest extends Specification {
         reflect = new Reflect(Person, new Person(nameValue, ageValue))
     }
 
+    def 'test that #type extendsType #superType returns #expected'() {
+        given:
+        def reflect = new Reflect(type, type)
+
+        when:
+        def actual = reflect.extendsType(superType)
+
+        then:
+        actual == expected
+
+        where:
+        type        | superType   || expected
+        Person      | NamedEntity || true
+        NamedEntity | Person      || false
+    }
+
     def 'test that cast toWrapper of #type to #object returns #expected'() {
         given:
         def reflect = new Reflect(type, object)
