@@ -7,10 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -20,15 +17,15 @@ import java.util.stream.Collectors;
 @Value
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Reflect {
-    private static final Set<Class<?>> WRAPPER_TYPES = Set.of(
-            Byte.class,
-            Short.class,
-            Integer.class,
-            Long.class,
-            Float.class,
-            Double.class,
-            Boolean.class,
-            Character.class
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER = Map.of(
+            byte.class, Byte.class,
+            short.class, Short.class,
+            int.class, Integer.class,
+            long.class, Long.class,
+            float.class, Float.class,
+            double.class, Double.class,
+            char.class, Character.class,
+            boolean.class, Boolean.class
     );
 
     @NotNull Class<?> type;
@@ -53,7 +50,7 @@ public class Reflect {
      * @return <code>true</code> if it is
      */
     public boolean isWrapper() {
-        return WRAPPER_TYPES.contains(type);
+        return PRIMITIVE_TO_WRAPPER.containsValue(type);
     }
 
     /**
@@ -74,6 +71,41 @@ public class Reflect {
      */
     public boolean extendsType(final @NotNull Class<?> type) {
         return type.isAssignableFrom(this.type);
+    }
+
+    /**
+     * Converts the internal type to a Java wrapper type (if the type is primitive).
+     *
+     * @return the reflect with the new object
+     */
+    public @NotNull Reflect toWrapper() {
+        if (isPrimitive()) {
+            Class<?> newType = PRIMITIVE_TO_WRAPPER.get(type);
+            final Object newObject;
+            if (object instanceof Class<?>) newObject = type;
+            else newObject = newType.cast(object);
+            return new Reflect(newType, newObject);
+        }
+        return this;
+    }
+
+    /**
+     * Converts the internal type to a Java primitive type (if the type is a wrapper).
+     *
+     * @return the reflect with the new object
+     */
+    public @NotNull Reflect toPrimitive() {
+        if (isWrapper()) {
+            Class<?> newType = PRIMITIVE_TO_WRAPPER.entrySet().stream()
+                    .filter(e -> e.getValue().equals(type))
+                    .map(Map.Entry::getKey)
+                    .findFirst().orElseThrow(); // should never happen
+            final Object newObject;
+            if (object instanceof Class<?>) newObject = type;
+            else newObject = newType.cast(object);
+            return new Reflect(newType, newObject);
+        }
+        return this;
     }
 
     /*
@@ -316,7 +348,7 @@ public class Reflect {
      * @param className   the class name
      * @param classLoader the class loader to load the class from
      * @return the reflect
-      @throws ReflectException if it could not find the class
+     * @throws ReflectException if it could not find the class
      */
     public static @NotNull Reflect of(final @NotNull String className, final @NotNull ClassLoader classLoader) {
         try {
