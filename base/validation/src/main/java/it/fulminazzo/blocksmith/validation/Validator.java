@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.validation;
 
 import it.fulminazzo.blocksmith.reflect.Reflect;
+import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +21,11 @@ public final class Validator {
     private static final Validator INSTANCE = new Validator();
 
     private final @NotNull Map<Class<? extends Annotation>, Function<? extends Annotation, ConstraintValidator>> validators = new ConcurrentHashMap<>();
+
+    static {
+        getInstance()
+                .register(NonNull.class, Objects::nonNull);
+    }
 
     /**
      * Validates the given object against the annotated element.
