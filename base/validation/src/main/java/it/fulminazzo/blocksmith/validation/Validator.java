@@ -42,6 +42,7 @@ public final class Validator {
      * @throws ValidationException if the validation fails
      */
     public void validate(final @NotNull AnnotatedElement annotatedElement, final Object value) throws ValidationException {
+        final Map<Class<? extends Annotation>, ConstraintInfo> parents = new HashMap<>();
         final Set<ConstraintViolation> violations = new HashSet<>();
         final Queue<AnnotatedElement> elements = new LinkedList<>();
         elements.add(annotatedElement);
@@ -50,12 +51,13 @@ public final class Validator {
             for (Annotation annotation : current.getAnnotations()) {
                 Class<? extends Annotation> annotationType = annotation.annotationType();
                 if (!annotationType.isAnnotationPresent(Constraint.class)) continue;
-                ConstraintValidator validator = getValidator(annotation);
-                if (validator != null) {
-                    ConstraintInfo constraintInfo = new ConstraintInfo(annotation);
-                    if (!validator.isValid(value))
-                        violations.add(ConstraintViolation.of(value, constraintInfo));
-                }
+                final ConstraintInfo constraintInfo = parents.getOrDefault(annotationType, new ConstraintInfo(annotation));
+                Arrays.stream(annotationType.getAnnotations())
+                        .map(Annotation::annotationType)
+                        .forEach(a -> parents.putIfAbsent(a, constraintInfo));
+                final ConstraintValidator validator = getValidator(annotation);
+                if (validator != null && !validator.isValid(value))
+                    violations.add(ConstraintViolation.of(value, constraintInfo));
                 elements.add(annotationType);
             }
         }
