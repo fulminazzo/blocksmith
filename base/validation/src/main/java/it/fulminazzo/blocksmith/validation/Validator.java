@@ -40,9 +40,8 @@ public final class Validator {
                 if (annotationType.getPackageName().startsWith("java")) continue;
                 ConstraintValidator validator = getValidator(annotation);
                 if (validator != null) {
-                    Reflect reflect = Reflect.on(annotation);
-                    String message = reflect.invoke("message").get();
-                    String defaultMessage = reflect.getStatic("DEFAULT_MESSAGE", "Invalid value: " + value).get();
+                    String message = Reflect.on(annotation).invoke("message").get();
+                    String defaultMessage = Reflect.on(annotationType).getStatic("DEFAULT_MESSAGE", "Invalid value: " + value).get();
                     if (!validator.isValid(value))
                         violations.add(new ConstraintViolation(value, message, defaultMessage));
                 }
