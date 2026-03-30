@@ -22,7 +22,7 @@ public final class BukkitTaskFactory implements TaskFactory {
             delegate = Reflect.on(BukkitTaskFactory.class.getCanonicalName()
                     .replace("bukkit", "folia")
                     .replace("Bukkit", "Folia")
-            ).get();
+            ).init().get();
         } catch (ClassNotFoundException t) {
             // not on Folia or modern Paper, fallback to default
         }
