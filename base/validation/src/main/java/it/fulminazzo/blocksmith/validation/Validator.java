@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.validation;
 
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.validation.annotation.*;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,13 @@ public final class Validator {
                 .registerSupplier(Min.class, a -> o -> o == null || ((Number) o).doubleValue() >= a.value())
                 .register(Positive.class, o -> o == null || ((Number) o).doubleValue() > 0)
                 .registerSupplier(Range.class, a -> o -> o == null || ((Number) o).doubleValue() >= a.min() && ((Number) o).doubleValue() <= a.max())
+                .registerSupplier(Size.class, a -> o -> {
+                    if (o == null) return true;
+                    Reflect reflect = Reflect.on(o);
+                    Integer size = reflect.get("length", null).get();
+                    if (size == null) size = reflect.invoke("size").get();
+                    return size != null && size >= a.min() && size <= a.max();
+                })
         ;
     }
 
