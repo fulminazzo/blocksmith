@@ -23,4 +23,22 @@ public class ConstraintViolation {
     @Nullable String message;
     @NotNull String defaultMessage;
 
+    /**
+     * Instantiates a new Constraint violation.
+     *
+     * @param value          the value
+     * @param message        the message
+     * @param defaultMessage the default message
+     */
+    public ConstraintViolation(final Object value,
+                               final @Nullable String message,
+                               final @NotNull String defaultMessage) {
+        this.value = value;
+        this.message = message == null
+                ? null
+                : message.replace("%value%", value == null ? "null" : value.toString());
+        this.defaultMessage = String.format(defaultMessage, message);
+    }
+
+
 }
