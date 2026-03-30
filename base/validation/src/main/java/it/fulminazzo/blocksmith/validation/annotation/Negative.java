@@ -15,10 +15,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
 public @interface Negative {
-    /**
-     * The default error message to fall back to in case of violation.
-     */
-    @NotNull String DEFAULT_MESSAGE = "%1$s must be negative";
 
     /**
      * Gets the error message in case of violation.
@@ -28,5 +24,12 @@ public @interface Negative {
      * @return the message
      */
     @NotNull String message() default "error.validation.negative";
+
+    /**
+     * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
+     *
+     * @return the message
+     */
+    @NotNull String exceptionMessage() default "%1$s must be negative";
 
 }

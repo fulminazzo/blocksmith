@@ -13,10 +13,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
 public @interface NonNull {
-    /**
-     * The default error message to fall back to in case of violation.
-     */
-    @NotNull String DEFAULT_MESSAGE = "cannot be null";
 
     /**
      * Gets the error message in case of violation.
@@ -26,5 +22,12 @@ public @interface NonNull {
      * @return the message
      */
     @NotNull String message() default "error.validation.not-null";
+
+    /**
+     * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
+     *
+     * @return the message
+     */
+    @NotNull String exceptionMessage() default "cannot be null";
 
 }

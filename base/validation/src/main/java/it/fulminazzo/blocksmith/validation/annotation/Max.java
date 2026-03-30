@@ -15,10 +15,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
 public @interface Max {
-    /**
-     * The default error message to fall back to in case of violation.
-     */
-    @NotNull String DEFAULT_MESSAGE = "%1$s must be at most %2$s";
 
     /**
      * The maximum value allowed.
@@ -35,5 +31,12 @@ public @interface Max {
      * @return the message
      */
     @NotNull String message() default "error.validation.number-too-big";
+
+    /**
+     * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
+     *
+     * @return the message
+     */
+    @NotNull String exceptionMessage() default "%1$s must be at most %2$s";
 
 }

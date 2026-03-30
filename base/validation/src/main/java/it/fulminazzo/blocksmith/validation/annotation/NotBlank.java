@@ -16,10 +16,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
 public @interface NotBlank {
-    /**
-     * The default error message to fall back to in case of violation.
-     */
-    @NotNull String DEFAULT_MESSAGE = "'%1$s' must at least contain one non-space character";
 
     /**
      * Gets the error message in case of violation.
@@ -29,5 +25,12 @@ public @interface NotBlank {
      * @return the message
      */
     @NotNull String message() default "error.validation.not-blank";
+
+    /**
+     * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
+     *
+     * @return the message
+     */
+    @NotNull String exceptionMessage() default "'%1$s' must at least contain one non-space character";
 
 }
