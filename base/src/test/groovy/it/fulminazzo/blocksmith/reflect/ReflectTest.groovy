@@ -267,6 +267,41 @@ class ReflectTest extends Specification {
         'set'                    | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity), DEFAULT_NAME.get(null)]  || new Reflect(Person, new Person(nameValue, ageValue))
         'set'                    | [((Predicate<Field>) (f) -> f.declaringClass == Person), DEFAULT_AGE.get(null)]        || new Reflect(Person, new Person(nameValue, ageValue))
         'set'                    | [((Predicate<Field>) (f) -> true), DEFAULT_AGE.get(null)]                              || new Reflect(Person, new Person(nameValue, ageValue))
+        // get orElse
+        'getInstance'            | [DEFAULT_NAME.name, 'unknown']                                                         || new Reflect(String, 'unknown')
+        'getInstance'            | [DEFAULT_NAME.name, null]                                                              || new Reflect(null, null)
+        'getInstance'            | [DEFAULT_AGE.name, 15]                                                                 || new Reflect(Integer, 15)
+        'getInstance'            | [DEFAULT_AGE.name, null]                                                               || new Reflect(null, null)
+        'getInstance'            | [name.name, 'unknown']                                                                 || new Reflect(name.type, nameValue)
+        'getInstance'            | [name.name, null]                                                                      || new Reflect(name.type, nameValue)
+        'getInstance'            | [age.name, 15]                                                                         || new Reflect(age.type, ageValue)
+        'getInstance'            | [age.name, null]                                                                       || new Reflect(age.type, ageValue)
+        'getStatic'              | [DEFAULT_NAME.name, 'unknown']                                                         || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'getStatic'              | [DEFAULT_NAME.name, null]                                                              || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'getStatic'              | [DEFAULT_AGE.name, 15]                                                                 || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'getStatic'              | [DEFAULT_AGE.name, null]                                                               || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'getStatic'              | [name.name, 'unknown']                                                                 || new Reflect(String, 'unknown')
+        'getStatic'              | [name.name, null]                                                                      || new Reflect(null, null)
+        'getStatic'              | [age.name, 15]                                                                         || new Reflect(Integer, 15)
+        'getStatic'              | [age.name, null]                                                                       || new Reflect(null, null)
+        'get'                    | [DEFAULT_NAME.name, 'unknown']                                                         || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'get'                    | [DEFAULT_NAME.name, null]                                                              || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'get'                    | [DEFAULT_AGE.name, 15]                                                                 || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'get'                    | [DEFAULT_AGE.name, null]                                                               || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'get'                    | [name.name, 'unknown']                                                                 || new Reflect(name.type, nameValue)
+        'get'                    | [name.name, null]                                                                      || new Reflect(name.type, nameValue)
+        'get'                    | [age.name, 15]                                                                         || new Reflect(age.type, ageValue)
+        'get'                    | [age.name, null]                                                                       || new Reflect(age.type, ageValue)
+        'get'                    | ['unknown', 'unknown']                                                                 || new Reflect(String, 'unknown')
+        'get'                    | ['unknown', null]                                                                      || new Reflect(null, null)
+        'get'                    | [((Predicate<Field>) (f) -> false), 'unknown']                                         || new Reflect(String, 'unknown')
+        'get'                    | [((Predicate<Field>) (f) -> false), null]                                              || new Reflect(null, null)
+        'get'                    | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity), 'unknown']               || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'get'                    | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity), null]                    || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'get'                    | [((Predicate<Field>) (f) -> f.declaringClass == Person), 'unknown']                    || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'get'                    | [((Predicate<Field>) (f) -> f.declaringClass == Person), null]                         || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'get'                    | [((Predicate<Field>) (f) -> true), 'unknown']                                          || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'get'                    | [((Predicate<Field>) (f) -> true), null]                                               || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
         // get
         'getInstance'            | [name.name]                                                                            || new Reflect(name.type, nameValue)
         'getInstance'            | [age.name]                                                                             || new Reflect(age.type, ageValue)
@@ -517,6 +552,22 @@ class ReflectTest extends Specification {
 
         then:
         thrown(ReflectException)
+    }
+
+    def 'test that get of not accessible field does not throw'() {
+        given:
+        def field = Mock(Field)
+        field.get(_) >> {
+            throw new IllegalAccessException()
+        }
+        field.genericType >> String
+        field.type >> String
+
+        when:
+        def actual = reflect.get(field, 'Hello, world!')
+
+        then:
+        actual == new Reflect(String, 'Hello, world!')
     }
 
     def 'test that get throws ReflectException on IllegalAccessException'() {
