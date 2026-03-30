@@ -24,7 +24,7 @@ class ConstraintInfo {
     @NotNull List<Object> values = new ArrayList<>();
 
     @Nullable String message;
-    @NotNull String defaultMessage;
+    @NotNull String exceptionMessage;
 
     /**
      * Instantiates a new Constraint info.
@@ -35,7 +35,7 @@ class ConstraintInfo {
         Reflect reflectType = Reflect.on(constraint.annotationType());
         Reflect reflect = Reflect.on(constraint);
         for (Method method : reflectType.getInstanceMethods())
-            if (!method.getName().equals("message"))
+            if (!method.getName().equals("message") && !method.getName().equals("exceptionMessage"))
                 values.add(reflect.invoke(method).get());
         String message;
         try {
@@ -44,9 +44,13 @@ class ConstraintInfo {
             message = null;
         }
         this.message = message;
-        this.defaultMessage = reflectType
-                .getStatic("DEFAULT_MESSAGE", "Invalid value for annotation " + constraint.annotationType().getSimpleName() + ": %s")
-                .get();
+        String exceptionMessage;
+        try {
+            exceptionMessage = reflect.invoke("exceptionMessage").get();
+        } catch (ReflectException e) {
+            exceptionMessage = "Invalid value for annotation " + constraint.annotationType().getSimpleName() + ": %s";
+        }
+        this.exceptionMessage = exceptionMessage;
     }
 
     /**

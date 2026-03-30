@@ -19,12 +19,11 @@ public class ConstraintViolation {
      * <ul>
      *     <li>the first message is user-defined, but it falls back to a message code
      *     later translated by an appropriate translator;</li>
-     *     <li>the second message is static and used during throwing of exceptions
-     *     in Java code.</li>
+     *     <li>the second message is used in throwing of exceptions in Java code.</li>
      * </ul>
      */
     @Nullable String message;
-    @NotNull String defaultMessage;
+    @NotNull String exceptionMessage;
 
     /**
      * Instantiates a new Constraint violation.
@@ -44,8 +43,8 @@ public class ConstraintViolation {
                     .replace("%max%", arguments[1].toString())
                     .replace("%min%", arguments[2].toString());
         }
-        String defaultMessage = String.format(constraintInfo.getDefaultMessage(), arguments);
-        return new ConstraintViolation(value, message, defaultMessage);
+        String exceptionMessage = String.format(constraintInfo.getExceptionMessage(), arguments);
+        return new ConstraintViolation(value, message, exceptionMessage);
     }
 
 
