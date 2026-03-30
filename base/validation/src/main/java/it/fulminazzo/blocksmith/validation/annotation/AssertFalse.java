@@ -18,7 +18,7 @@ public @interface AssertFalse {
     /**
      * The default error message to fall back to in case of violation.
      */
-    @NotNull String DEFAULT_MESSAGE = "'%s' must be false";
+    @NotNull String DEFAULT_MESSAGE = "'%1$s' must be false";
 
     /**
      * Gets the error message in case of violation.
