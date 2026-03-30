@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a general parameter or type that has a length or size.
  * Supported types are {@link String}, arrays, {@link java.util.Collection} instances
- * and anything with either a <code>length</code> field or <code>size()</code> method.
+ * and anything with either a <code>length</code> field or method or <code>size()</code> method.
  * <br>
  * Accepts <code>null</code> values.
  */
