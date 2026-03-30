@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.*;
 
 /**
- * Identifies a string parameter or type only made of alphabet characters.
+ * Identifies a {@link CharSequence} parameter or type only made of alphabet characters.
  * <br>
  * Accepts <code>null</code> values.
  */

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.*;
 
 /**
- * Identifies a string parameter or type that represents an IPv4.
+ * Identifies a {@link CharSequence} parameter or type that represents an IPv4.
  * <br>
  * Accepts <code>null</code> values.
  */

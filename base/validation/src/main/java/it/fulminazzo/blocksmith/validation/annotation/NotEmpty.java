@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.*;
 
 /**
- * Identifies a string parameter or type that must not be empty.
+ * Identifies a {@link CharSequence} parameter or type that must not be empty.
  * <br>
  * Accepts <code>null</code> values.
  */

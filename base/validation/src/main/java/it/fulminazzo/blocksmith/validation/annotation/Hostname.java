@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.*;
 
 /**
- * Identifies a string parameter or type that represents a hostname.
+ * Identifies a {@link CharSequence} parameter or type that represents a hostname.
  * <br>
  * Accepts <code>null</code> values.
  */

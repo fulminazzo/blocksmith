@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.*;
 
 /**
- * Identifies a char sequence parameter or type that must match the given regular expression.
+ * Identifies a {@link CharSequence} parameter or type that must match the given regular expression.
  * <br>
  * Accepts <code>null</code> values.
  */

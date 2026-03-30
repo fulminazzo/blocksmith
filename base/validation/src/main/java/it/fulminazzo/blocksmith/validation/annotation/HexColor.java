@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.*;
 
 /**
- * Identifies a string parameter or type that is a valid HEX color.
+ * Identifies a {@link CharSequence} parameter or type that is a valid HEX color.
  * <br>
  * Accepts <code>null</code> values.
  */

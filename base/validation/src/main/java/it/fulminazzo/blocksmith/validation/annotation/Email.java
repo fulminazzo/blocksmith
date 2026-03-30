@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.*;
 
 /**
- * Identifies a string parameter or type that represents an email.
+ * Identifies a {@link CharSequence} parameter or type that represents an email.
  * <br>
  * Accepts <code>null</code> values.
  */
