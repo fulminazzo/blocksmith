@@ -1,9 +1,6 @@
 package it.fulminazzo.blocksmith.reflect;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +15,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unchecked")
 @Value
+@EqualsAndHashCode(doNotUseGetters = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Reflect {
     private static final @NotNull Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER = Map.of(
