@@ -42,6 +42,11 @@ class ValidatorTest extends Specification {
     private Map sizeMap
     @Matches('[A-Za-z]+')
     private String matches
+    @Hostname
+    private String hostname
+    @Port
+    @Range(min = 1, max = 100)
+    private int minPort
 
     def 'test that validate of field #fieldName and value #value does not throw'() {
         given:
@@ -155,6 +160,7 @@ class ValidatorTest extends Specification {
         'matches'        | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-string', String.format(Matches.DEFAULT_MESSAGE, '', '[A-Za-z]+'))]
         'matches'        | 'Alessandro!'                            || [new ConstraintViolation('Alessandro!', 'error.validation.invalid-string', String.format(Matches.DEFAULT_MESSAGE, 'Alessandro!', '[A-Za-z]+'))]
         'matches'        | '01001'                                  || [new ConstraintViolation('01001', 'error.validation.invalid-string', String.format(Matches.DEFAULT_MESSAGE, '01001', '[A-Za-z]+'))]
+        'minPort'        | 1007                                     || [new ConstraintViolation(1007, 'error.validation.number-exceeds-range', String.format(Range.DEFAULT_MESSAGE, 1007, 100.0, 1.0))]
     }
 
 }
