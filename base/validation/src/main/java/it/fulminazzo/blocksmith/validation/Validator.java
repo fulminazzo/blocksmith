@@ -52,11 +52,7 @@ public final class Validator {
                 if (validator != null) {
                     ConstraintInfo constraintInfo = new ConstraintInfo(annotation);
                     if (!validator.isValid(value))
-                        violations.add(new ConstraintViolation(
-                                value,
-                                constraintInfo.getMessage(),
-                                constraintInfo.getDefaultMessage()
-                        ));
+                        violations.add(new ConstraintViolation(value, constraintInfo));
                 }
                 elements.add(annotationType);
             }

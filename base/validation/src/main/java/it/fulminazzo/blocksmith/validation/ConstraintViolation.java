@@ -27,17 +27,16 @@ public class ConstraintViolation {
      * Instantiates a new Constraint violation.
      *
      * @param value          the value
-     * @param message        the message
-     * @param defaultMessage the default message
+     * @param constraintInfo the constraint information to generate the messages from
      */
-    public ConstraintViolation(final Object value,
-                               final @Nullable String message,
-                               final @NotNull String defaultMessage) {
+    ConstraintViolation(final Object value,
+                        final @NotNull ConstraintInfo constraintInfo) {
         this.value = value;
+        String message = constraintInfo.getMessage();
         this.message = message == null
                 ? null
                 : message.replace("%value%", value == null ? "null" : value.toString());
-        this.defaultMessage = String.format(defaultMessage, message);
+        this.defaultMessage = String.format(constraintInfo.getDefaultMessage(), constraintInfo.formatArguments(value));
     }
 
 
