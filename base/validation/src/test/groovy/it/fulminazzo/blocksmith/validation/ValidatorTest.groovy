@@ -17,6 +17,8 @@ class ValidatorTest extends Specification {
     private int max
     @NegativeOrZero
     private int negativeOrZero
+    @Negative
+    private int negative
 
     def 'test that validate of field #fieldName and value #value does not throw'() {
         given:
@@ -43,6 +45,9 @@ class ValidatorTest extends Specification {
         'negativeOrZero' | 0
         'negativeOrZero' | -1
         'negativeOrZero' | Integer.MIN_VALUE
+        'negative'       | null
+        'negative'       | -1
+        'negative'       | Integer.MIN_VALUE
     }
 
     def 'test that validate of field #fieldName and value #value throws'() {
@@ -65,6 +70,9 @@ class ValidatorTest extends Specification {
         'max'            | Integer.MAX_VALUE || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.number-too-big', String.format(Max.DEFAULT_MESSAGE, Integer.MAX_VALUE, 0.0))]
         'negativeOrZero' | 1                 || [new ConstraintViolation(1, 'error.validation.negative-or-zero', String.format(NegativeOrZero.DEFAULT_MESSAGE, 1))]
         'negativeOrZero' | Integer.MAX_VALUE || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.negative-or-zero', String.format(NegativeOrZero.DEFAULT_MESSAGE, Integer.MAX_VALUE))]
+        'negative'       | 0                 || [new ConstraintViolation(0, 'error.validation.negative', String.format(Negative.DEFAULT_MESSAGE, 0))]
+        'negative'       | 1                 || [new ConstraintViolation(1, 'error.validation.negative', String.format(Negative.DEFAULT_MESSAGE, 1))]
+        'negative'       | Integer.MAX_VALUE || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.negative', String.format(Negative.DEFAULT_MESSAGE, Integer.MAX_VALUE))]
     }
 
 }
