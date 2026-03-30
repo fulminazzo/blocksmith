@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
  * Defines the violation of a constraint.
  */
 @Value
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class ConstraintViolation {
     Object value;
 
@@ -35,11 +35,16 @@ public class ConstraintViolation {
      */
     static @NotNull ConstraintViolation of(final Object value,
                                            final @NotNull ConstraintInfo constraintInfo) {
+        final @NotNull Object[] arguments = constraintInfo.formatArguments(value);
         String message = constraintInfo.getMessage();
-        message = message == null
-                ? null
-                : message.replace("%value%", value == null ? "null" : value.toString());
-        String defaultMessage = String.format(constraintInfo.getDefaultMessage(), constraintInfo.formatArguments(value));
+        if (message != null) {
+            message = message.replace("%value%", value == null ? "null" : value.toString());
+            if (arguments.length == 2) message = message.replace("%expected%", arguments[1].toString());
+            else if (arguments.length == 3) message = message
+                    .replace("%max%", arguments[1].toString())
+                    .replace("%min%", arguments[2].toString());
+        }
+        String defaultMessage = String.format(constraintInfo.getDefaultMessage(), arguments);
         return new ConstraintViolation(value, message, defaultMessage);
     }
 
