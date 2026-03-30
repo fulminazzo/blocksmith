@@ -75,7 +75,7 @@ public final class Validator {
      */
     public <A extends Annotation> @NotNull Validator register(final @NotNull Class<A> annotationClass,
                                                               final @NotNull ConstraintValidator validator) {
-        return register(annotationClass, (Function<A, ConstraintValidator>) a -> validator);
+        return registerSupplier(annotationClass, a -> validator);
     }
 
     /**
@@ -86,8 +86,8 @@ public final class Validator {
      * @param validatorSupplier the function to create a new validator instance from the annotation
      * @return this object (for method chaining)
      */
-    public <A extends Annotation> @NotNull Validator register(final @NotNull Class<A> annotationClass,
-                                                              final @NotNull Function<A, ConstraintValidator> validatorSupplier) {
+    public <A extends Annotation> @NotNull Validator registerSupplier(final @NotNull Class<A> annotationClass,
+                                                                      final @NotNull Function<A, ConstraintValidator> validatorSupplier) {
         validators.put(annotationClass, validatorSupplier);
         return this;
     }
