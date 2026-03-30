@@ -36,16 +36,16 @@ class JacksonUtilsTest extends Specification {
         1 * logger.warn('Using default value: {}', defaultValue)
 
         where:
-        data                                                                 || message                            | defaultValue
-        ['name': null, 'lastname': null, 'age': 17, 'income': -1]            || 'name cannot be null or empty'     | 'Alex'
-        ['name': '', 'lastname': null, 'age': 17, 'income': -1]              || 'name cannot be null or empty'     | 'Alex'
-        ['name': '     ', 'lastname': null, 'age': 17, 'income': -1]         || 'name cannot be null or empty'     | 'Alex'
-        ['name': 'Alex', 'lastname': null, 'age': 17, 'income': -1]          || 'lastname cannot be null or empty' | 'Fulminazzo'
-        ['name': 'Alex', 'lastname': '', 'age': 17, 'income': -1]            || 'lastname cannot be null or empty' | 'Fulminazzo'
-        ['name': 'Alex', 'lastname': '     ', 'age': 17, 'income': -1]       || 'lastname cannot be null or empty' | 'Fulminazzo'
-        ['name': 'Alex', 'lastname': 'Fulminazzo', 'age': 17, 'income': -1]  || 'minimum age must be 18 years'     | 23
-        ['name': 'Alex', 'lastname': 'Fulminazzo', 'age': 111, 'income': -1] || 'maximum age must be 110 years'    | 23
-        ['name': 'Alex', 'lastname': 'Fulminazzo', 'age': 23, 'income': -1]  || 'income cannot be negative'        | 0.0
+        data                                                                 || message                         | defaultValue
+        ['name': null, 'lastname': null, 'age': 17, 'income': -1]            || 'name cannot be null'           | 'Alex'
+        ['name': '', 'lastname': null, 'age': 17, 'income': -1]              || 'name cannot be empty'          | 'Alex'
+        ['name': '     ', 'lastname': null, 'age': 17, 'income': -1]         || 'name cannot be empty'          | 'Alex'
+        ['name': 'Alex', 'lastname': null, 'age': 17, 'income': -1]          || 'lastname cannot be null'       | 'Fulminazzo'
+        ['name': 'Alex', 'lastname': '', 'age': 17, 'income': -1]            || 'lastname cannot be empty'      | 'Fulminazzo'
+        ['name': 'Alex', 'lastname': '     ', 'age': 17, 'income': -1]       || 'lastname cannot be empty'      | 'Fulminazzo'
+        ['name': 'Alex', 'lastname': 'Fulminazzo', 'age': 17, 'income': -1]  || 'minimum age must be 18 years'  | 23
+        ['name': 'Alex', 'lastname': 'Fulminazzo', 'age': 111, 'income': -1] || 'maximum age must be 110 years' | 23
+        ['name': 'Alex', 'lastname': 'Fulminazzo', 'age': 23, 'income': -1]  || 'income cannot be negative'     | 0.0
     }
 
     def 'test that mapper does not throw on exception'() {
