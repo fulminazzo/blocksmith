@@ -796,8 +796,8 @@ public class Reflect {
     /**
      * Gets the internal wrapped object as an instance of {@link Enum}.
      *
+     * @param <E> the type of the enum
      * @return the object
-     * @param <E> the type of the object
      * @throws ReflectException if the object is not an enum
      */
     public <E extends Enum<E>> E getEnum() {
@@ -806,6 +806,53 @@ public class Reflect {
         } catch (ClassCastException e) {
             throw new ReflectException("%s is not an enum", object);
         }
+    }
+
+    /**
+     * Gets the enum corresponding to the given name.
+     *
+     * @param <E>  the type of the enum
+     * @param name the name (case insensitive)
+     * @return the enum (if found)
+     * @throws ReflectException if the wrapped type is not an enum
+     */
+    public <E extends Enum<E>> @NotNull Optional<E> valueOf(final @NotNull String name) {
+        checkEnum();
+        return values().stream()
+                .filter(e -> e.name().equalsIgnoreCase(name))
+                .map(e -> (E) e)
+                .findFirst();
+    }
+
+    /**
+     * Gets the enum values of the internal wrapped enum.
+     *
+     * @param <E> the type of the enum
+     * @return the enum values
+     * @throws ReflectException if the type is not an enum
+     */
+    public <E extends Enum<E>> @NotNull Set<E> values() {
+        checkEnum();
+        E[] values = invoke("values").get();
+        return new HashSet<>(Arrays.asList(values));
+    }
+
+    /**
+     * Gets the internal wrapped type as a Java enum.
+     *
+     * @param <E> the type of the enum
+     * @return the enum class
+     * @throws ReflectException if the type is not an enum
+     */
+    public <E extends Enum<E>> @NotNull Class<E> getEnumClass() {
+        checkEnum();
+        return (Class<E>) getObjectClass();
+    }
+
+    private void checkEnum() {
+        Class<?> type = getObjectClass();
+        if (!Enum.class.isAssignableFrom(type))
+            throw new ReflectException("Type '%s' is not an enum", type);
     }
 
     /*
