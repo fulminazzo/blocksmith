@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.validation.annotation;
 
+import it.fulminazzo.blocksmith.validation.Constraint;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.*;
@@ -7,6 +8,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a parameter or type that cannot be null.
  */
+@Constraint
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})

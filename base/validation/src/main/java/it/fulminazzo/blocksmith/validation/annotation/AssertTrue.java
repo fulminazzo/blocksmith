@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.validation.annotation;
 
+import it.fulminazzo.blocksmith.validation.Constraint;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.*;
@@ -9,6 +10,7 @@ import java.lang.annotation.*;
  * <br>
  * Accepts <code>null</code> values.
  */
+@Constraint
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
