@@ -48,7 +48,7 @@ public final class Validator {
             AnnotatedElement current = elements.poll();
             for (Annotation annotation : current.getAnnotations()) {
                 Class<? extends Annotation> annotationType = annotation.annotationType();
-                if (annotationType.getPackageName().startsWith("java")) continue;
+                if (!annotationType.isAnnotationPresent(Constraint.class)) continue;
                 ConstraintValidator validator = getValidator(annotation);
                 if (validator != null) {
                     String message = Reflect.on(annotation).invoke("message").get();
