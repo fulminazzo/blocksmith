@@ -51,7 +51,7 @@ public class Reflect {
         NUMBERS_CONVERTER.put(Double.class, Number::doubleValue);
     }
 
-    @NotNull Type type;
+    @Nullable Type type;
     @Getter(AccessLevel.NONE)
     Object object;
 
@@ -66,12 +66,22 @@ public class Reflect {
     }
 
     /**
+     * Gets the internal wrapped object type.
+     *
+     * @return the type
+     */
+    public @NotNull Type getType() {
+        if (type == null) throw new ReflectException("Reflect '%s' has null type", this);
+        return type;
+    }
+
+    /**
      * Gets the internal wrapped object Java class.
      *
      * @return the class
      */
     public @NotNull Class<?> getObjectClass() {
-        return ReflectUtils.toClass(type);
+        return ReflectUtils.toClass(getType());
     }
 
     /*
@@ -209,7 +219,7 @@ public class Reflect {
         return ReflectUtils.findExecutable(
                 getConstructors(),
                 parameterTypes
-        ).orElseThrow(() -> ReflectException.cannotFindConstructor(type, parameterTypes));
+        ).orElseThrow(() -> ReflectException.cannotFindConstructor(getType(), parameterTypes));
     }
 
     /**
@@ -220,7 +230,7 @@ public class Reflect {
      * @throws ReflectException if no constructor was found
      */
     public @NotNull Constructor<?> getConstructor(final @NotNull Predicate<Constructor<?>> predicate) {
-        return getConstructors(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindConstructor(type));
+        return getConstructors(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindConstructor(getType()));
     }
 
     /**
@@ -421,7 +431,7 @@ public class Reflect {
         try {
             return getField(f -> !Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
         } catch (ReflectException e) {
-            throw ReflectException.cannotFindField(type, name);
+            throw ReflectException.cannotFindField(getType(), name);
         }
     }
 
@@ -436,7 +446,7 @@ public class Reflect {
         try {
             return getField(f -> Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
         } catch (ReflectException e) {
-            throw ReflectException.cannotFindField(type, name);
+            throw ReflectException.cannotFindField(getType(), name);
         }
     }
 
@@ -451,7 +461,7 @@ public class Reflect {
         try {
             return getField(f -> f.getName().equals(name));
         } catch (ReflectException e) {
-            throw ReflectException.cannotFindField(type, name);
+            throw ReflectException.cannotFindField(getType(), name);
         }
     }
 
@@ -463,7 +473,7 @@ public class Reflect {
      * @throws ReflectException if no field was found
      */
     public @NotNull Field getField(final @NotNull Predicate<Field> predicate) {
-        return getFields(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindField(type));
+        return getFields(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindField(getType()));
     }
 
     /**
@@ -711,7 +721,7 @@ public class Reflect {
                                 validator.test(m)
                 ),
                 parameterTypes
-        ).orElseThrow(() -> ReflectException.cannotFindMethod(type, returnType, name, parameterTypes));
+        ).orElseThrow(() -> ReflectException.cannotFindMethod(getType(), returnType, name, parameterTypes));
     }
 
     /**
@@ -722,7 +732,7 @@ public class Reflect {
      * @throws ReflectException if no method was found
      */
     public @NotNull Method getMethod(final @NotNull Predicate<Method> predicate) {
-        return getMethods(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindMethod(type));
+        return getMethods(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindMethod(getType()));
     }
 
     /**
@@ -869,7 +879,10 @@ public class Reflect {
         String objectDeclaration;
         if (object == null) objectDeclaration = "null";
         else objectDeclaration = String.format("%s (type: %s)", object, ReflectUtils.toString(object.getClass()));
-        return String.format("%s(type=%s, object=%s)", getObjectClass().getCanonicalName(), ReflectUtils.toString(type), objectDeclaration);
+        return String.format("%s(type=%s, object=%s)", getObjectClass().getCanonicalName(),
+                type == null ? "null" : ReflectUtils.toString(getType()),
+                objectDeclaration
+        );
     }
 
     private static Class<?> @NotNull [] getClasses(final @Nullable Object @NotNull ... parameters) {
