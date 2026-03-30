@@ -1,6 +1,12 @@
 rootProject.name = "blocksmith"
 
+include("base")
+
+include("base:testing")
+
+
 include("example")
+
 
 include("config-starter")
 include("config-starter:config-starter-core")

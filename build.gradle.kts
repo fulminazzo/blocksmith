@@ -17,6 +17,12 @@ allprojects {
     apply { plugin("jacoco-report-aggregation") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(11))
+        }
+    }
+
     repositories {
         mavenCentral()
     }
@@ -54,7 +60,7 @@ allprojects {
 subprojects {
     val testingModuleName: String by rootProject.extra
 
-    if (project.name.endsWith("-$testingModuleName")) {
+    if (project.name.endsWith(testingModuleName)) {
         apply { plugin("groovy") }
 
         dependencies {
