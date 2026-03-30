@@ -765,7 +765,7 @@ public class Reflect {
             methods.addAll(list);
             type = type.getSuperclass();
         }
-        methods.removeIf(m -> m.isSynthetic() || m.isBridge());
+        methods.removeIf(Method::isSynthetic);
         return methods;
     }
 

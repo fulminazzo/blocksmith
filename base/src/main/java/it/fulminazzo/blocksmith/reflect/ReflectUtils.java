@@ -1,5 +1,7 @@
 package it.fulminazzo.blocksmith.reflect;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,6 +14,7 @@ import static it.fulminazzo.blocksmith.reflect.Reflect.toWrapper;
 /**
  * A collection of utilities for working with reflections.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class ReflectUtils {
 
     /**

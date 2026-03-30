@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.reflect;
 
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
@@ -11,9 +12,9 @@ public final class Person extends NamedEntity {
     @Setter
     static Integer DEFAULT_AGE = 18;
 
-    private Integer age;
+    private @Nullable Integer age;
 
-    public Person(final @NotNull String name, final @NotNull Integer age) {
+    public Person(final @Nullable String name, final @Nullable Integer age) {
         super(name);
         this.age = age;
     }

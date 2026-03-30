@@ -72,6 +72,11 @@ class ReflectUtilsTest extends Specification {
         listParameterizedType                                              | upperBoundsWildcardType || true
     }
 
+    def 'test that typeMatches does not throw for unknown type'() {
+        expect:
+        !ReflectUtils.typeMatches(String, Mock(Type))
+    }
+
     def 'test that toClass of #type returns #expected'() {
         when:
         def actual = ReflectUtils.toClass(type)
@@ -93,6 +98,14 @@ class ReflectUtilsTest extends Specification {
         typeVariable                                                || Number
     }
 
+    def 'test that toClass does not throws for unknown type'() {
+        when:
+        ReflectUtils.toClass(Mock(Type))
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
     def 'test that toString of #type returns #expected'() {
         when:
         def actual = ReflectUtils.toString(type)
@@ -108,6 +121,14 @@ class ReflectUtilsTest extends Specification {
         Mock.getDeclaredMethod('wildcard').genericReturnType        || "${Collection.canonicalName}<?>"
         Mock.getDeclaredMethod('wildcardExtends').genericReturnType || "${Collection.canonicalName}<? extends ${List.canonicalName}<${String.canonicalName}>>"
         Mock.getDeclaredMethod('wildcardSuper').genericReturnType   || "${Collection.canonicalName}<? super ${Collection.canonicalName}<T extends ${Number.canonicalName} & ${Comparable.canonicalName}>>"
+    }
+
+    def 'test that toString does not throws for unknown type'() {
+        when:
+        ReflectUtils.toString(Mock(Type))
+
+        then:
+        thrown(IllegalArgumentException)
     }
 
     static class Mock<T extends Number & Comparable> {
