@@ -1,8 +1,8 @@
 package it.fulminazzo.blocksmith.config.jackson;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import it.fulminazzo.blocksmith.validation.annotation.Max;
+import it.fulminazzo.blocksmith.validation.annotation.Min;
+import it.fulminazzo.blocksmith.validation.annotation.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
