@@ -660,9 +660,7 @@ class ReflectTest extends Specification {
 
     def 'test that on of #arguments returns #expected'() {
         when:
-        final actual
-        if (arguments.size() == 1) actual = Reflect.on((Object) arguments[0])
-        else actual = Reflect.on(*arguments)
+        final actual = Reflect.on(*arguments)
 
         then:
         actual == expected
