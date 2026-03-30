@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -52,6 +53,20 @@ public final class Validator {
                 })
                 .registerSupplier(Matches.class, a -> o -> o == null || Pattern.compile(a.value()).matcher((CharSequence) o).matches())
         ;
+    }
+
+    /**
+     * Validates all the fields of the given Java object.
+     *
+     * @param beanType the type of the object
+     * @param bean     the actual object to validate
+     * @throws ValidationException if the validation fails
+     */
+    public void validateBean(final @NotNull Class<?> beanType, final @Nullable Object bean) throws ValidationException {
+        if (bean == null) return;
+        final Reflect beanReflect = Reflect.on(bean);
+        for (Field field : Reflect.on(beanType).getInstanceFields())
+            validate(field, beanReflect.get(field).get());
     }
 
     /**
