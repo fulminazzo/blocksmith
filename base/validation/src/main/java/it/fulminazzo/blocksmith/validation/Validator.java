@@ -27,8 +27,8 @@ public final class Validator {
     static {
         getInstance()
                 .register(NonNull.class, Objects::nonNull)
-                .register(AssertFalse.class, o -> !((Boolean) o))
-                .register(AssertTrue.class, o -> ((Boolean) o))
+                .register(AssertFalse.class, o -> o == null || !((Boolean) o))
+                .register(AssertTrue.class, o -> o == null || ((Boolean) o))
         ;
     }
 

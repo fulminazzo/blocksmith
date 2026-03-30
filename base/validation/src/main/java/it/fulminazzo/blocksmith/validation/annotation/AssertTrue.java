@@ -6,6 +6,8 @@ import java.lang.annotation.*;
 
 /**
  * Identifies a parameter or type that must be <code>true</code>.
+ * <br>
+ * Accepts <code>null</code> values.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
