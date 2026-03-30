@@ -1,6 +1,5 @@
 package it.fulminazzo.blocksmith.validation;
 
-import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.validation.annotation.AssertFalse;
 import it.fulminazzo.blocksmith.validation.annotation.AssertTrue;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
@@ -51,10 +50,13 @@ public final class Validator {
                 if (!annotationType.isAnnotationPresent(Constraint.class)) continue;
                 ConstraintValidator validator = getValidator(annotation);
                 if (validator != null) {
-                    String message = Reflect.on(annotation).invoke("message").get();
-                    String defaultMessage = Reflect.on(annotationType).getStatic("DEFAULT_MESSAGE", "Invalid value: " + value).get();
+                    ConstraintInfo constraintInfo = new ConstraintInfo(annotation);
                     if (!validator.isValid(value))
-                        violations.add(new ConstraintViolation(value, message, defaultMessage));
+                        violations.add(new ConstraintViolation(
+                                value,
+                                constraintInfo.getMessage(),
+                                constraintInfo.getDefaultMessage()
+                        ));
                 }
                 elements.add(annotationType);
             }
