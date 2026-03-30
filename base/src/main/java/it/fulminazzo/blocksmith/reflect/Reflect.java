@@ -428,7 +428,7 @@ public class Reflect {
         try {
             return get(field);
         } catch (ReflectException ignored) {
-            return new Reflect(field.getType(), cast(field.getType(), orElse));
+            return new Reflect(field.getGenericType(), cast(field.getType(), orElse));
         }
     }
 
