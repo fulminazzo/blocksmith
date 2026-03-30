@@ -52,6 +52,16 @@ allprojects {
         buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
     }
 
+    tasks.withType<JacocoReport>().configureEach {
+        classDirectories.setFrom(
+            files(classDirectories.files.map {
+                fileTree(it) {
+                    exclude("**/ProjectInfo**")
+                }
+            })
+        )
+    }
+
 }
 
 /**
@@ -74,7 +84,7 @@ dependencies {
     val testingModuleName: String by rootProject.extra
 
     subprojects
-        .filter { ! it.name.endsWith("-$testingModuleName") }
+        .filter { !it.name.endsWith("-$testingModuleName") }
         .forEach { implementation(project(it.path)) }
 }
 
