@@ -16,7 +16,7 @@ public @interface NonNull {
     /**
      * The default error message to fall back to in case of violation.
      */
-    @NotNull String DEFAULT_MESSAGE = "Cannot be null";
+    @NotNull String DEFAULT_MESSAGE = "cannot be null";
 
     /**
      * Gets the error message in case of violation.

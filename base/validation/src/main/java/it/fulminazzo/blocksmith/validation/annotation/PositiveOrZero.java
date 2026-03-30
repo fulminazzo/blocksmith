@@ -19,7 +19,7 @@ public @interface PositiveOrZero {
     /**
      * The default error message to fall back to in case of violation.
      */
-    @NotNull String DEFAULT_MESSAGE = "%1$s cannot be negative";
+    @NotNull String DEFAULT_MESSAGE = "%1$s must be positive or zero";
 
     /**
      * Gets the error message in case of violation.

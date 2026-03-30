@@ -21,7 +21,7 @@ public @interface Min {
     @NotNull String DEFAULT_MESSAGE = "%1$s must be at least %2$s";
 
     /**
-     * The maximum value allowed.
+     * The minimum value allowed.
      *
      * @return the value
      */

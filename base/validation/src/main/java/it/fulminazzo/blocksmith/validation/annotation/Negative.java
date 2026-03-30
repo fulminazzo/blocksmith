@@ -18,7 +18,7 @@ public @interface Negative {
     /**
      * The default error message to fall back to in case of violation.
      */
-    @NotNull String DEFAULT_MESSAGE = "%1$s cannot be positive or zero";
+    @NotNull String DEFAULT_MESSAGE = "%1$s must be negative";
 
     /**
      * Gets the error message in case of violation.

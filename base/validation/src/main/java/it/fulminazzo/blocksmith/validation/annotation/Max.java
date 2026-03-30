@@ -18,7 +18,7 @@ public @interface Max {
     /**
      * The default error message to fall back to in case of violation.
      */
-    @NotNull String DEFAULT_MESSAGE = "%1$s must be less than or equal to %2$s";
+    @NotNull String DEFAULT_MESSAGE = "%1$s must be at most %2$s";
 
     /**
      * The maximum value allowed.
