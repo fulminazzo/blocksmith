@@ -1,7 +1,5 @@
 rootProject.name = "blocksmith"
 
-include("base")
-
 include("example")
 
 include("config-starter")
