@@ -27,6 +27,8 @@ class ValidatorTest extends Specification {
     private int positive
     @Range(min = 1, max = 10)
     private int range
+    @Port
+    private int port
 
     def 'test that validate of field #fieldName and value #value does not throw'() {
         given:
@@ -70,6 +72,9 @@ class ValidatorTest extends Specification {
         'range'          | null
         'range'          | 1
         'range'          | 10
+        'port'           | null
+        'port'           | 0
+        'port'           | 65535
     }
 
     def 'test that validate of field #fieldName and value #value throws'() {
@@ -106,6 +111,10 @@ class ValidatorTest extends Specification {
         'range'          | 0                 || [new ConstraintViolation(0, 'error.validation.number-exceeds-range', String.format(Range.DEFAULT_MESSAGE, 0, 10.0, 1.0))]
         'range'          | 11                || [new ConstraintViolation(11, 'error.validation.number-exceeds-range', String.format(Range.DEFAULT_MESSAGE, 11, 10.0, 1.0))]
         'range'          | Integer.MAX_VALUE || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.number-exceeds-range', String.format(Range.DEFAULT_MESSAGE, Integer.MAX_VALUE, 10.0, 1.0))]
+        'port'           | Integer.MIN_VALUE || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.invalid-port', String.format(Port.DEFAULT_MESSAGE, Integer.MIN_VALUE))]
+        'port'           | -1                || [new ConstraintViolation(-1, 'error.validation.invalid-port', String.format(Port.DEFAULT_MESSAGE, -1))]
+        'port'           | 65536             || [new ConstraintViolation(65536, 'error.validation.invalid-port', String.format(Port.DEFAULT_MESSAGE, 65536))]
+        'port'           | Integer.MAX_VALUE || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.invalid-port', String.format(Port.DEFAULT_MESSAGE, Integer.MAX_VALUE))]
     }
 
 }
