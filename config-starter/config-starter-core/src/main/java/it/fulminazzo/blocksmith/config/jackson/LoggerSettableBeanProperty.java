@@ -144,7 +144,7 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
          */
         public ViolationException(final @NotNull Set<ConstraintViolation> violations) {
             super(violations.stream()
-                    .map(ConstraintViolation::getDefaultMessage)
+                    .map(ConstraintViolation::getExceptionMessage)
                     .collect(Collectors.joining(", "))
             );
         }
