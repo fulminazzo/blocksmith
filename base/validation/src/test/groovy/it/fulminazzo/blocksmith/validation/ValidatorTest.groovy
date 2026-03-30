@@ -3,6 +3,9 @@ package it.fulminazzo.blocksmith.validation
 
 import it.fulminazzo.blocksmith.annotation.Uuid
 import it.fulminazzo.blocksmith.validation.annotation.*
+import lombok.AllArgsConstructor
+import lombok.Value
+import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 class ValidatorTest extends Specification {
@@ -70,6 +73,38 @@ class ValidatorTest extends Specification {
     private int minPort
     @Uuid
     private String uuid
+
+    def 'test that validate of bean #bean works'() {
+        when:
+        validator.validateBean(Person, bean)
+
+        then:
+        noExceptionThrown()
+
+        where:
+        bean << [
+                new Person('Alex', 23),
+                null
+        ]
+    }
+
+    def 'test that validate of #bean throws'() {
+        when:
+        validator.validateBean(Person, bean)
+
+        then:
+        thrown(ValidationException)
+
+        where:
+        bean << [
+                new Person(null, 23),
+                new Person('', 23),
+                new Person('Alex!', 23),
+                new Person('Alex', 0),
+                new Person('Alex', 13),
+                new Person('Alex', 130)
+        ]
+    }
 
     def 'test that validate of field #fieldName and value #value does not throw'() {
         given:
@@ -269,6 +304,23 @@ class ValidatorTest extends Specification {
         'assertFalse'         | 'Hello, world'                           || []
         'uuid'                | ''                                       || [new ConstraintViolation('', null, "Invalid value for annotation ${Uuid.simpleName}: ")]
         'uuid'                | 'Hello, world!'                          || [new ConstraintViolation('Hello, world!', null, "Invalid value for annotation ${Uuid.simpleName}: Hello, world!")]
+    }
+
+    static final class Person {
+
+        @Alphabetical
+        @NonNull
+        @NotNull
+        private final String name
+
+        @Range(min = 18, max = 115)
+        private final int age
+
+        Person(final @NotNull String name, final int age) {
+            this.name = name
+            this.age = age
+        }
+
     }
 
 }
