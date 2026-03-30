@@ -769,6 +769,49 @@ public class Reflect {
         return methods;
     }
 
+    /*
+     * ENUMS
+     */
+
+    /**
+     * Gets the name of the internal wrapped object assuming it is an instance of {@link Enum}.
+     *
+     * @return the name
+     * @throws ReflectException if the object is not an enum
+     */
+    public @NotNull String name() {
+        return getEnum().name();
+    }
+
+    /**
+     * Gets the associated ordinal of the internal wrapped object assuming it is an instance of {@link Enum}.
+     *
+     * @return the ordinal
+     * @throws ReflectException if the object is not an enum
+     */
+    public int ordinal() {
+        return getEnum().ordinal();
+    }
+
+    /**
+     * Gets the internal wrapped object as an instance of {@link Enum}.
+     *
+     * @return the object
+     * @param <E> the type of the object
+     * @throws ReflectException if the object is not an enum
+     */
+    public <E extends Enum<E>> E getEnum() {
+        try {
+            return (E) object;
+        } catch (ClassCastException e) {
+            throw new ReflectException("%s is not an enum", object);
+        }
+    }
+
+    /*
+     * GENERAL
+     */
+
     @Override
     public @NotNull String toString() {
         String objectDeclaration;
