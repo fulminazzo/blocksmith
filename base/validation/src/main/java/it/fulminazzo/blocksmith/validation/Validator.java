@@ -1,11 +1,13 @@
 package it.fulminazzo.blocksmith.validation;
 
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
-import java.util.Map;
+import java.lang.reflect.AnnotatedElement;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -18,6 +20,37 @@ public final class Validator {
     private static final Validator INSTANCE = new Validator();
 
     private final @NotNull Map<Class<? extends Annotation>, Function<? extends Annotation, ConstraintValidator>> validators = new ConcurrentHashMap<>();
+
+    /**
+     * Validates the given object against the annotated element.
+     * Will recursively look up the annotations of the element.
+     *
+     * @param annotatedElement the element
+     * @param value            the value
+     * @throws ValidationException if the validation fails
+     */
+    public void validate(final @NotNull AnnotatedElement annotatedElement, final Object value) throws ValidationException {
+        final Set<ConstraintViolation> violations = new HashSet<>();
+        final Queue<AnnotatedElement> elements = new LinkedList<>();
+        elements.add(annotatedElement);
+        while (!elements.isEmpty()) {
+            AnnotatedElement current = elements.poll();
+            for (Annotation annotation : current.getAnnotations()) {
+                Class<? extends Annotation> annotationType = annotation.annotationType();
+                if (annotationType.getPackageName().startsWith("java")) continue;
+                ConstraintValidator validator = getValidator(annotation);
+                if (validator != null) {
+                    Reflect reflect = Reflect.on(annotation);
+                    String message = reflect.invoke("message").get();
+                    String defaultMessage = reflect.getStatic("DEFAULT_MESSAGE", "Invalid value: " + value).get();
+                    if (!validator.isValid(value))
+                        violations.add(new ConstraintViolation(value, message, defaultMessage));
+                }
+                elements.add(annotationType);
+            }
+        }
+        if (!violations.isEmpty()) throw new ValidationException(value, violations);
+    }
 
     /**
      * Gets the validator associated with the given annotation.
