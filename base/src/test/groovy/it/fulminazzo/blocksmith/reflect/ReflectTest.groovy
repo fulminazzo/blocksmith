@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 import java.util.concurrent.TimeUnit
 import java.util.function.Predicate
 
@@ -40,7 +41,10 @@ class ReflectTest extends Specification {
 
     private static final List<Method> objectMethods = Object.declaredMethods
             .findAll { !it.synthetic && !it.bridge }
-            .sort { a, b -> a.name <=> b.name ?: a.parameterCount <=> b.parameterCount }
+            .sort { a, b ->
+                Modifier.isStatic(a.modifiers) <=> Modifier.isStatic(b.modifiers) ?:
+                        a.name <=> b.name ?: a.parameterCount <=> b.parameterCount
+            }
 
     private static final String nameValue = 'Alex'
     private static final int ageValue = 23
@@ -427,8 +431,9 @@ class ReflectTest extends Specification {
         'getInstanceMethods'     | []                                                                                     ||
                 [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString,
                  namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString,
-                 *objectMethods]
-        'getStaticMethods'       | []                                                                                     || [getDEFAULT_AGE, setDEFAULT_AGE, getDEFAULT_NAME, setDEFAULT_NAME]
+                 *objectMethods.findAll { !Modifier.isStatic(it.modifiers) }]
+        'getStaticMethods'       | []                                                                                     ||
+                [getDEFAULT_AGE, setDEFAULT_AGE, getDEFAULT_NAME, setDEFAULT_NAME, *objectMethods.findAll { Modifier.isStatic(it.modifiers) }]
         'getMethods'             | [((Predicate<Field>) (f) -> false)]                                                    || []
         'getMethods'             | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                          ||
                 [namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDEFAULT_NAME, setDEFAULT_NAME]
