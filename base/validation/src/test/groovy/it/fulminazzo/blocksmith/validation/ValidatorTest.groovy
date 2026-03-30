@@ -25,6 +25,8 @@ class ValidatorTest extends Specification {
     private int positiveOrZero
     @Positive
     private int positive
+    @Range(min = 1, max = 10)
+    private int range
 
     def 'test that validate of field #fieldName and value #value does not throw'() {
         given:
@@ -65,6 +67,9 @@ class ValidatorTest extends Specification {
         'positive'       | null
         'positive'       | 1
         'positive'       | Integer.MAX_VALUE
+        'range'          | null
+        'range'          | 1
+        'range'          | 10
     }
 
     def 'test that validate of field #fieldName and value #value throws'() {
@@ -97,6 +102,10 @@ class ValidatorTest extends Specification {
         'positive'       | 0                 || [new ConstraintViolation(0, 'error.validation.positive', String.format(Positive.DEFAULT_MESSAGE, 0))]
         'positive'       | -1                || [new ConstraintViolation(-1, 'error.validation.positive', String.format(Positive.DEFAULT_MESSAGE, -1))]
         'positive'       | Integer.MIN_VALUE || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.positive', String.format(Positive.DEFAULT_MESSAGE, Integer.MIN_VALUE))]
+        'range'          | Integer.MIN_VALUE || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.number-exceeds-range', String.format(Range.DEFAULT_MESSAGE, Integer.MIN_VALUE, 1, 10))]
+        'range'          | 0                 || [new ConstraintViolation(0, 'error.validation.number-exceeds-range', String.format(Range.DEFAULT_MESSAGE, 0, 1, 10))]
+        'range'          | 11                || [new ConstraintViolation(11, 'error.validation.number-exceeds-range', String.format(Range.DEFAULT_MESSAGE, 11, 1, 10))]
+        'range'          | Integer.MAX_VALUE || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.number-exceeds-range', String.format(Range.DEFAULT_MESSAGE, Integer.MAX_VALUE, 1, 10))]
     }
 
 }

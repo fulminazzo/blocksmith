@@ -30,6 +30,7 @@ public final class Validator {
                 .register(Negative.class, o -> o == null || ((Number) o).doubleValue() < 0)
                 .registerSupplier(Min.class, a -> o -> o == null || ((Number) o).doubleValue() >= a.value())
                 .register(Positive.class, o -> o == null || ((Number) o).doubleValue() > 0)
+                .registerSupplier(Range.class, a -> o -> o == null || ((Number) o).doubleValue() >= a.min() && ((Number) o).doubleValue() <= a.max())
         ;
     }
 
