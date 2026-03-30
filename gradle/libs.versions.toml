@@ -11,7 +11,7 @@ folia = "1.20.1-R0.1-SNAPSHOT"
 bungeecord = "1.16-R0.2"
 velocity = "3.0.0-SNAPSHOT"
 
-mockbukkit = "3.93.2"
+mockbukkit = "3.43.0"
 
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
