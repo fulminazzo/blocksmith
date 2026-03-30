@@ -65,6 +65,7 @@ public final class Validator {
         final Map<Class<? extends Annotation>, ConstraintInfo> parents = new HashMap<>();
         final Set<ConstraintViolation> violations = new HashSet<>();
         final Queue<AnnotatedElement> elements = new LinkedList<>();
+        final Set<Class<? extends Annotation>> visited = new HashSet<>();
         elements.add(annotatedElement);
         while (!elements.isEmpty()) {
             AnnotatedElement current = elements.poll();
@@ -78,7 +79,7 @@ public final class Validator {
                 final ConstraintValidator validator = getValidator(annotation);
                 if (validator != null && !validator.isValid(value))
                     violations.add(ConstraintViolation.of(value, constraintInfo));
-                elements.add(annotationType);
+                if (visited.add(annotationType)) elements.add(annotationType);
             }
         }
         if (!violations.isEmpty()) throw new ValidationException(value, violations);
