@@ -9,7 +9,7 @@ import java.util.Optional;
  * A function to validate objects.
  */
 @FunctionalInterface
-public interface Validator {
+public interface ConstraintValidator {
 
     /**
      * Validates the given object.
