@@ -45,7 +45,7 @@ class ConstraintInfo {
         }
         this.message = message;
         this.defaultMessage = reflectType
-                .getStatic("DEFAULT_MESSAGE", "Invalid value: %s")
+                .getStatic("DEFAULT_MESSAGE", "Invalid value for annotation " + constraint.annotationType().getSimpleName() + ": %s")
                 .get();
     }
 

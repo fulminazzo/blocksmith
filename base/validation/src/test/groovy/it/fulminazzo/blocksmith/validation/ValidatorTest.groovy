@@ -1,6 +1,7 @@
 //file:noinspection unused
 package it.fulminazzo.blocksmith.validation
 
+import it.fulminazzo.blocksmith.annotation.Uuid
 import it.fulminazzo.blocksmith.validation.annotation.*
 import spock.lang.Specification
 
@@ -67,6 +68,8 @@ class ValidatorTest extends Specification {
     @Port
     @Range(min = 1, max = 100)
     private int minPort
+    @Uuid
+    private String uuid
 
     def 'test that validate of field #fieldName and value #value does not throw'() {
         given:
@@ -175,6 +178,7 @@ class ValidatorTest extends Specification {
         'notEmpty'            | null
         'notEmpty'            | 'hello'
         'notEmpty'            | ' '
+        'uuid'                | UUID.randomUUID().toString()
     }
 
     def 'test that validate of field #fieldName and value #value throws'() {
@@ -262,7 +266,9 @@ class ValidatorTest extends Specification {
         'notBlank'            | '        '                               || [new ConstraintViolation('        ', 'error.validation.not-blank', String.format(NotBlank.DEFAULT_MESSAGE, '        '))]
         'notBlank'            | ''                                       || [new ConstraintViolation('', 'error.validation.not-blank', String.format(NotBlank.DEFAULT_MESSAGE, ''))]
         'notEmpty'            | ''                                       || [new ConstraintViolation('', 'error.validation.not-empty', NotEmpty.DEFAULT_MESSAGE)]
-        'assertFalse'         | 'Hello, world'                            | []
+        'assertFalse'         | 'Hello, world'                           || []
+        'uuid'                | ''                                       || [new ConstraintViolation('', null, "Invalid value for annotation ${Uuid.simpleName}: ")]
+        'uuid'                | 'Hello, world!'                          || [new ConstraintViolation('Hello, world!', null, "Invalid value for annotation ${Uuid.simpleName}: Hello, world!")]
     }
 
 }
