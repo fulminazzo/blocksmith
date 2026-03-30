@@ -126,10 +126,7 @@ public class Reflect {
     public @NotNull Reflect toWrapper() {
         if (isPrimitive()) {
             Class<?> newType = PRIMITIVE_TO_WRAPPER.get(getObjectClass());
-            final Object newObject;
-            if (object instanceof Class<?>) newObject = newType;
-            else newObject = cast(newType, object);
-            return new Reflect(newType, newObject);
+            return cast(newType);
         }
         return this;
     }
@@ -142,12 +139,20 @@ public class Reflect {
     public @NotNull Reflect toPrimitive() {
         if (isWrapper()) {
             Class<?> newType = WRAPPER_TO_PRIMITIVE.get(getObjectClass());
-            final Object newObject;
-            if (object instanceof Class<?>) newObject = newType;
-            else newObject = cast(newType, object);
-            return new Reflect(newType, newObject);
+            return cast(newType);
         }
         return this;
+    }
+
+    /**
+     * Casts the internal object to the given type.
+     *
+     * @param type the type
+     * @return the reflect with the new object
+     */
+    public @NotNull Reflect cast(final @NotNull Class<?> type) {
+        if (object instanceof Class<?>) return new Reflect(type, type);
+        else return new Reflect(type, cast(type, object));
     }
 
     /*
