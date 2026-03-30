@@ -11,13 +11,8 @@ mockito_core = "4.11.0"
 slf4j = "2.0.17"
 log4j = "2.25.3"
 
-joor = "0.9.15"
-
 jackson = "2.21.0"
 night_config = "3.8.3"
-
-validation = "3.1.1"
-validator = "3.0.0"
 
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
@@ -31,8 +26,6 @@ log4j_api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4
 log4j_core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
 log4j_slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
 
-joor = { module = "org.jooq:joor", version.ref = "joor" }
-
 jackson_json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 jackson_yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 jackson_toml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-toml", version.ref = "jackson" }
@@ -40,9 +33,6 @@ jackson_xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xm
 jackson_properties = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-properties", version.ref = "jackson" }
 
 night_config_toml = { module = "com.electronwill.night-config:toml", version.ref = "night_config" }
-
-validation = { module = "jakarta.validation:jakarta.validation-api", version.ref = "validation" }
-validator = { module = "org.apache.bval:bval-jsr", version.ref = "validator" }
 
 [bundles]
 annotations = ["lombok", "jetbrains_annotations"]
@@ -52,8 +42,6 @@ test_framework = ["spock_core", "mockito_core"]
 log4j = ["log4j_api", "log4j_core", "log4j_slf4j"]
 
 toml = ["jackson_toml", "night_config_toml"]
-
-validation = ["validation", "validator"]
 
 [plugins]
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
