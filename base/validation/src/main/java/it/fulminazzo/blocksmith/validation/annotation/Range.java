@@ -18,7 +18,7 @@ public @interface Range {
     /**
      * The default error message to fall back to in case of violation.
      */
-    @NotNull String DEFAULT_MESSAGE = "%1$s must be at least %2$s and at most %3$s";
+    @NotNull String DEFAULT_MESSAGE = "%1$s must be at least %3$s and at most %2$s";
 
     /**
      * The minimum value allowed.
