@@ -953,8 +953,8 @@ public class Reflect {
         String objectDeclaration;
         if (object == null) objectDeclaration = "null";
         else objectDeclaration = String.format("%s (type: %s)", object, ReflectUtils.toString(object.getClass()));
-        return String.format("%s(type=%s, object=%s)", getObjectClass().getCanonicalName(),
-                type == null ? "null" : ReflectUtils.toString(getType()),
+        return String.format("%s(type=%s, object=%s)", getClass().getCanonicalName(),
+                type == null ? "null" : ReflectUtils.toString(type),
                 objectDeclaration
         );
     }
