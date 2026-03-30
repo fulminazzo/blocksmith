@@ -362,6 +362,81 @@ public class Reflect {
     /**
      * Gets the value of the instance field with the given name (field must not be static).
      *
+     * @param name   the name of the field
+     * @param orElse the value to return if the field was not found or there were problems while accessing it
+     * @return the value of the field
+     */
+    public @NotNull Reflect getInstance(final @NotNull String name, final Object orElse) {
+        try {
+            return get(getInstanceField(name), orElse);
+        } catch (ReflectException ignored) {
+            return new Reflect(orElse == null ? null : orElse.getClass(), orElse);
+        }
+    }
+
+    /**
+     * Gets the value of the static field with the given name.
+     *
+     * @param name   the name of the field
+     * @param orElse the value to return if the field was not found or there were problems while accessing it
+     * @return the value of the field
+     */
+    public @NotNull Reflect getStatic(final @NotNull String name, final Object orElse) {
+        try {
+            return get(getStaticField(name), orElse);
+        } catch (ReflectException ignored) {
+            return new Reflect(orElse == null ? null : orElse.getClass(), orElse);
+        }
+    }
+
+    /**
+     * Gets the value of the field with the given name.
+     *
+     * @param name   the name of the field
+     * @param orElse the value to return if the field was not found or there were problems while accessing it
+     * @return the value of the field
+     */
+    public @NotNull Reflect get(final @NotNull String name, final Object orElse) {
+        try {
+            return get(getField(name), orElse);
+        } catch (ReflectException ignored) {
+            return new Reflect(orElse == null ? null : orElse.getClass(), orElse);
+        }
+    }
+
+    /**
+     * Gets the value of the first field that matches the predicate.
+     *
+     * @param predicate the predicate
+     * @param orElse    the value to return if the field was not found or there were problems while accessing it
+     * @return the value of the field
+     */
+    public @NotNull Reflect get(final @NotNull Predicate<Field> predicate, final Object orElse) {
+        try {
+            return get(getField(predicate), orElse);
+        } catch (ReflectException ignored) {
+            return new Reflect(orElse == null ? null : orElse.getClass(), orElse);
+        }
+    }
+
+    /**
+     * Gets the value of the given field.
+     *
+     * @param field  the field
+     * @param orElse the value to return if the field was not found or there were problems while accessing it
+     * @return the value of the field
+     */
+    public @NotNull Reflect get(final @NotNull Field field, final Object orElse) {
+        try {
+            return get(field);
+        } catch (ReflectException ignored) {
+            return new Reflect(field.getType(), cast(field.getType(), orElse));
+        }
+    }
+
+    /**
+     * Gets the value of the instance field with the given name (field must not be static).
+     *
      * @param name the name of the field
      * @return the value of the field
      * @throws ReflectException if no field was found or an error occurs while getting the value
@@ -400,8 +475,7 @@ public class Reflect {
      * @throws ReflectException if no field was found or an error occurs while getting the value
      */
     public @NotNull Reflect get(final @NotNull Predicate<Field> predicate) {
-        Field field = getField(predicate);
-        return get(field);
+        return get(getField(predicate));
     }
 
     /**
