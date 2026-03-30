@@ -10,7 +10,7 @@ import java.lang.annotation.*;
  * <br>
  * Accepts <code>null</code> values.
  */
-@Matches(".+")
+@Matches(".*[^ \\r\\n\\t]+.*")
 @Constraint
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
