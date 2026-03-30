@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
-import jakarta.validation.*;
+import it.fulminazzo.blocksmith.validation.ConstraintViolation;
+import it.fulminazzo.blocksmith.validation.ValidationException;
+import it.fulminazzo.blocksmith.validation.Validator;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -12,8 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A special type of {@link SettableBeanProperty} that will not throw
@@ -22,13 +24,7 @@ import java.util.Set;
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
-    private static final @NotNull Validator validator;
-
-    static {
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            validator = factory.getValidator();
-        }
-    }
+    private static final @NotNull Validator validator = Validator.getInstance();
 
     @NotNull Logger logger;
     @NotNull AnnotatedField field;
@@ -60,9 +56,11 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
     }
 
     private <T> void validateValue(final @NotNull Class<T> beanType, final @Nullable Object value) {
-        Set<ConstraintViolation<T>> violations = validator.validateValue(beanType, field.getName(), value);
-        Optional<ConstraintViolation<T>> first = violations.stream().findFirst();
-        if (first.isPresent()) throw new ViolationException(first.get());
+        try {
+            validator.validateBean(beanType, value);
+        } catch (ValidationException e) {
+            throw new ViolationException(e.getViolations());
+        }
     }
 
     @Override
@@ -142,12 +140,14 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
         /**
          * Instantiates a new Violation exception.
          *
-         * @param constraintViolation the constraint violation that triggered the exception
+         * @param violations the violations that triggered the exception
          */
-        public ViolationException(final @NotNull ConstraintViolation<?> constraintViolation) {
-            super(constraintViolation.getMessage());
+        public ViolationException(final @NotNull Set<ConstraintViolation> violations) {
+            super(violations.stream()
+                    .map(ConstraintViolation::getDefaultMessage)
+                    .collect(Collectors.joining(", "))
+            );
         }
-
     }
 
 }
