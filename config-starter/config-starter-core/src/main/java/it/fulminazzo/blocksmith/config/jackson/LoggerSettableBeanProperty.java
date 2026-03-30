@@ -51,13 +51,13 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
 
     @Override
     public void set(final @NotNull Object instance, final Object value) throws IOException {
-        validateValue(instance.getClass(), value);
+        validateValue(value);
         super.set(instance, value);
     }
 
-    private <T> void validateValue(final @NotNull Class<T> beanType, final @Nullable Object value) {
+    private void validateValue(final @Nullable Object value) {
         try {
-            validator.validateBean(beanType, value);
+            validator.validate(field.getAnnotated(), value);
         } catch (ValidationException e) {
             throw new ViolationException(e.getViolations());
         }
@@ -133,7 +133,7 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
     }
 
     /**
-     * Represents an exception thrown during a failed {@link #validateValue(Class, Object)}
+     * Represents an exception thrown during a failed {@link #validateValue(Object)}
      */
     static final class ViolationException extends RuntimeException {
 
