@@ -22,8 +22,7 @@ public interface BaseConfigurationAdapter {
      * @return the loaded configuration
      * @throws IOException in case of any errors
      */
-    <T> @NotNull T load(final @NotNull File file,
-                        final @NotNull Class<T> type) throws IOException;
+    <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException;
 
     /**
      * Stores the given configuration to file.
@@ -33,7 +32,6 @@ public interface BaseConfigurationAdapter {
      * @param configuration the configuration
      * @throws IOException in case of any errors
      */
-    <T> void store(final @NotNull File file,
-                   final @NotNull T configuration) throws IOException;
+    <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException;
 
 }
