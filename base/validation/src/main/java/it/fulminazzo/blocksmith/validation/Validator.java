@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -35,14 +36,18 @@ public final class Validator {
                 .registerSupplier(Range.class, a -> o -> o == null || ((Number) o).doubleValue() >= a.min() && ((Number) o).doubleValue() <= a.max())
                 .registerSupplier(Size.class, a -> o -> {
                     if (o == null) return true;
-                    Reflect reflect = Reflect.on(o);
-                    Integer size = reflect.get("length", null).get();
-                    if (size == null)
-                        try {
-                            size = reflect.invoke("length").get();
-                        } catch (ReflectException e) {
-                            size = reflect.invoke("size").get();
-                        }
+                    Integer size;
+                    if (o.getClass().isArray()) size = Array.getLength(o);
+                    else {
+                        Reflect reflect = Reflect.on(o);
+                        size = reflect.get("length", null).get();
+                        if (size == null)
+                            try {
+                                size = reflect.invoke("length").get();
+                            } catch (ReflectException e) {
+                                size = reflect.invoke("size").get();
+                            }
+                    }
                     return size != null && size >= a.min() && size <= a.max();
                 })
         ;
