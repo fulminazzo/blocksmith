@@ -4,15 +4,13 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.Config;
 import it.fulminazzo.blocksmith.config.Comment;
 import it.fulminazzo.blocksmith.config.CommentUtils;
-import it.fulminazzo.blocksmith.util.ReflectionUtils;
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joor.Reflect;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.HashSet;
 
 /**
@@ -49,16 +47,14 @@ public final class ConfigUtils {
      */
     public static void setComments(final @NotNull Object reference,
                                    final @NotNull CommentedConfig configuration) {
-        Collection<Field> fields = ReflectionUtils.getInstanceFields(reference.getClass());
-        for (Field field : fields) {
+        Reflect reflect = Reflect.on(reference);
+        for (Field field : reflect.getFields(f -> !f.getType().isPrimitive() && !f.getType().equals(Object.class))) {
             String propertyName = formatToSnakeCase(field.getName());
             if (field.isAnnotationPresent(Comment.class)) {
                 Comment comment = field.getAnnotation(Comment.class);
                 configuration.setComment(propertyName, getCommentValue(comment));
             }
-            Class<?> fieldType = field.getType();
-            if (fieldType.isPrimitive() || fieldType.equals(Object.class)) continue;
-            Object fieldValue = Reflect.on(reference).field(field.getName()).get();
+            Object fieldValue = reflect.get(field).get();
             if (fieldValue == null || fieldValue.equals(reference)) continue;
             Object configValue = configuration.get(propertyName);
             if (configValue instanceof CommentedConfig)

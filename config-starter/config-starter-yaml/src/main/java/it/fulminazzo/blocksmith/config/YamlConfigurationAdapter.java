@@ -12,9 +12,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.util.StringQuotingChecker;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
-import org.joor.Reflect;
 import org.slf4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.comments.CommentType;
@@ -70,7 +70,7 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
         protected void writeComment(final @NotNull JsonGenerator generator,
                                     final @NotNull Comment comment) {
             for (String t : CommentUtils.getText(comment))
-                Reflect.on(generator).call("_emit",
+                Reflect.on(generator).invoke("_emit",
                         new CommentEvent(CommentType.BLOCK, " " + t, null, null)
                 );
         }
