@@ -27,14 +27,14 @@ public @interface Size {
      *
      * @return the value
      */
-    double min();
+    int min();
 
     /**
      * The maximum value allowed.
      *
      * @return the value
      */
-    double max();
+    int max();
 
     /**
      * Gets the error message in case of violation.
