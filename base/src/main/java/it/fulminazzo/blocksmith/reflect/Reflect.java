@@ -974,9 +974,7 @@ public class Reflect {
      * @return the reflect
      */
     public static @NotNull Reflect on(final Object object) {
-        if (object instanceof Type) return on((Type) object);
-        else if (object instanceof String) return on((String) object);
-        else return new Reflect(object.getClass(), object);
+        return new Reflect(object.getClass(), object);
     }
 
     /**
