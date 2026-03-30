@@ -28,6 +28,8 @@ public final class Validator {
                 .register(AssertTrue.class, o -> o == null || ((Boolean) o))
                 .registerSupplier(Max.class, a -> o -> o == null || ((Number) o).doubleValue() <= a.value())
                 .register(Negative.class, o -> o == null || ((Number) o).doubleValue() < 0)
+                .registerSupplier(Min.class, a -> o -> o == null || ((Number) o).doubleValue() >= a.value())
+                .register(Positive.class, o -> o == null || ((Number) o).doubleValue() > 0)
         ;
     }
 

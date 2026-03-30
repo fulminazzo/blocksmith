@@ -19,6 +19,12 @@ class ValidatorTest extends Specification {
     private int negativeOrZero
     @Negative
     private int negative
+    @Min(0)
+    private int min
+    @PositiveOrZero
+    private int positiveOrZero
+    @Positive
+    private int positive
 
     def 'test that validate of field #fieldName and value #value does not throw'() {
         given:
@@ -48,6 +54,17 @@ class ValidatorTest extends Specification {
         'negative'       | null
         'negative'       | -1
         'negative'       | Integer.MIN_VALUE
+        'min'            | null
+        'min'            | 0
+        'min'            | 1
+        'min'            | Integer.MAX_VALUE
+        'positiveOrZero' | null
+        'positiveOrZero' | 0
+        'positiveOrZero' | 1
+        'positiveOrZero' | Integer.MAX_VALUE
+        'positive'       | null
+        'positive'       | 1
+        'positive'       | Integer.MAX_VALUE
     }
 
     def 'test that validate of field #fieldName and value #value throws'() {
@@ -73,6 +90,13 @@ class ValidatorTest extends Specification {
         'negative'       | 0                 || [new ConstraintViolation(0, 'error.validation.negative', String.format(Negative.DEFAULT_MESSAGE, 0))]
         'negative'       | 1                 || [new ConstraintViolation(1, 'error.validation.negative', String.format(Negative.DEFAULT_MESSAGE, 1))]
         'negative'       | Integer.MAX_VALUE || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.negative', String.format(Negative.DEFAULT_MESSAGE, Integer.MAX_VALUE))]
+        'min'            | -1                || [new ConstraintViolation(-1, 'error.validation.number-too-small', String.format(Min.DEFAULT_MESSAGE, -1, 0.0))]
+        'min'            | Integer.MIN_VALUE || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.number-too-small', String.format(Min.DEFAULT_MESSAGE, Integer.MIN_VALUE, 0.0))]
+        'positiveOrZero' | -1                || [new ConstraintViolation(-1, 'error.validation.positive-or-zero', String.format(PositiveOrZero.DEFAULT_MESSAGE, -1))]
+        'positiveOrZero' | Integer.MIN_VALUE || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.positive-or-zero', String.format(PositiveOrZero.DEFAULT_MESSAGE, Integer.MIN_VALUE))]
+        'positive'       | 0                 || [new ConstraintViolation(0, 'error.validation.positive', String.format(Positive.DEFAULT_MESSAGE, 0))]
+        'positive'       | -1                || [new ConstraintViolation(-1, 'error.validation.positive', String.format(Positive.DEFAULT_MESSAGE, -1))]
+        'positive'       | Integer.MIN_VALUE || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.positive', String.format(Positive.DEFAULT_MESSAGE, Integer.MIN_VALUE))]
     }
 
 }
