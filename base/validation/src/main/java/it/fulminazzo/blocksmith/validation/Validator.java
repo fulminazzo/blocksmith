@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.validation;
 
 import it.fulminazzo.blocksmith.reflect.Reflect;
+import it.fulminazzo.blocksmith.validation.annotation.AssertFalse;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,8 @@ public final class Validator {
 
     static {
         getInstance()
-                .register(NonNull.class, Objects::nonNull);
+                .register(NonNull.class, Objects::nonNull)
+                .register(AssertFalse.class, o -> !((Boolean) o));
     }
 
     /**
