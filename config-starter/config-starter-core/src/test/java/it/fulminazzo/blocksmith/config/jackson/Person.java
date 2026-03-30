@@ -15,17 +15,17 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Person {
 
-    @NotBlank(message = "name cannot be null or empty")
+    @NotBlank(exceptionMessage = "name cannot be null or empty")
     String name = "Alex";
 
-    @NotBlank(message = "lastname cannot be null or empty")
+    @NotBlank(exceptionMessage = "lastname cannot be null or empty")
     String lastname = "Fulminazzo";
 
-    @Min(value = 18, message = "minimum age must be 18 years")
-    @Max(value = 110, message = "maximum age must be 110 years")
+    @Min(value = 18, exceptionMessage = "minimum age must be 18 years")
+    @Max(value = 110, exceptionMessage = "maximum age must be 110 years")
     int age = 23;
 
-    @Min(value = 0, message = "income cannot be negative")
+    @Min(value = 0, exceptionMessage = "income cannot be negative")
     double income = 0.0;
 
 }
