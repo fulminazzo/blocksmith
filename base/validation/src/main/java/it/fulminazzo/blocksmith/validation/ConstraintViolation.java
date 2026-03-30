@@ -1,5 +1,7 @@
 package it.fulminazzo.blocksmith.validation;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -8,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
  * Defines the violation of a constraint.
  */
 @Value
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConstraintViolation {
     Object value;
 
@@ -28,15 +31,16 @@ public class ConstraintViolation {
      *
      * @param value          the value
      * @param constraintInfo the constraint information to generate the messages from
+     * @return the constraint violation
      */
-    ConstraintViolation(final Object value,
-                        final @NotNull ConstraintInfo constraintInfo) {
-        this.value = value;
+    static @NotNull ConstraintViolation of(final Object value,
+                                           final @NotNull ConstraintInfo constraintInfo) {
         String message = constraintInfo.getMessage();
-        this.message = message == null
+        message = message == null
                 ? null
                 : message.replace("%value%", value == null ? "null" : value.toString());
-        this.defaultMessage = String.format(constraintInfo.getDefaultMessage(), constraintInfo.formatArguments(value));
+        String defaultMessage = String.format(constraintInfo.getDefaultMessage(), constraintInfo.formatArguments(value));
+        return new ConstraintViolation(value, message, defaultMessage);
     }
 
 
