@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
+import java.util.concurrent.TimeUnit
 import java.util.function.Predicate
 
 class ReflectTest extends Specification {
@@ -463,6 +464,13 @@ class ReflectTest extends Specification {
         'getMethod'         | ['notExisting', [String, null, Object].toArray(new Class[3])]                      || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
         'getMethod'         | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]             || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
         'getMethod'         | [((Predicate<Field>) (f) -> false)]                                                || ReflectException.cannotFindMethod(Person)
+        // enum
+        'name'              | []                                                                                 || new ReflectException('%s is not an enum', new Person(nameValue, ageValue))
+        'ordinal'           | []                                                                                 || new ReflectException('%s is not an enum', new Person(nameValue, ageValue))
+        'getEnum'           | []                                                                                 || new ReflectException('%s is not an enum', new Person(nameValue, ageValue))
+        'valueOf'           | ['invalid']                                                                        || new ReflectException('Type \'%s\' is not an enum', Person)
+        'values'            | []                                                                                 || new ReflectException('Type \'%s\' is not an enum', Person)
+        'getEnumClass'      | []                                                                                 || new ReflectException('Type \'%s\' is not an enum', Person)
     }
 
     def 'test that init with #exception throws #expected'() {
@@ -606,6 +614,71 @@ class ReflectTest extends Specification {
         arguments                            || expected
         ['not.Existing']                     || ReflectException.classNotFound('not.Existing')
         ['not.Existing', Person.classLoader] || ReflectException.classNotFound('not.Existing')
+    }
+
+    def 'test that enum method #method returns expected value for #object'() {
+        given:
+        def reflect = new Reflect(object instanceof Class ? object : object.class, object)
+
+        when:
+        def actual = reflect."$method"(*arguments)
+
+        then:
+        actual == expected(object)
+
+        where:
+        object                | method    | arguments                                    || expected
+        // name
+        TimeUnit.NANOSECONDS  | 'name'    | []                                           || { it -> it.name() }
+        TimeUnit.MICROSECONDS | 'name'    | []                                           || { it -> it.name() }
+        TimeUnit.MILLISECONDS | 'name'    | []                                           || { it -> it.name() }
+        TimeUnit.SECONDS      | 'name'    | []                                           || { it -> it.name() }
+        TimeUnit.MINUTES      | 'name'    | []                                           || { it -> it.name() }
+        TimeUnit.HOURS        | 'name'    | []                                           || { it -> it.name() }
+        TimeUnit.DAYS         | 'name'    | []                                           || { it -> it.name() }
+        // ordinal
+        TimeUnit.NANOSECONDS  | 'ordinal' | []                                           || { it -> it.ordinal() }
+        TimeUnit.MICROSECONDS | 'ordinal' | []                                           || { it -> it.ordinal() }
+        TimeUnit.MILLISECONDS | 'ordinal' | []                                           || { it -> it.ordinal() }
+        TimeUnit.SECONDS      | 'ordinal' | []                                           || { it -> it.ordinal() }
+        TimeUnit.MINUTES      | 'ordinal' | []                                           || { it -> it.ordinal() }
+        TimeUnit.HOURS        | 'ordinal' | []                                           || { it -> it.ordinal() }
+        TimeUnit.DAYS         | 'ordinal' | []                                           || { it -> it.ordinal() }
+        // getEnum
+        TimeUnit.NANOSECONDS  | 'getEnum' | []                                           || { it -> it }
+        TimeUnit.MICROSECONDS | 'getEnum' | []                                           || { it -> it }
+        TimeUnit.MILLISECONDS | 'getEnum' | []                                           || { it -> it }
+        TimeUnit.SECONDS      | 'getEnum' | []                                           || { it -> it }
+        TimeUnit.MINUTES      | 'getEnum' | []                                           || { it -> it }
+        TimeUnit.HOURS        | 'getEnum' | []                                           || { it -> it }
+        TimeUnit.DAYS         | 'getEnum' | []                                           || { it -> it }
+        // valueOf
+        TimeUnit              | 'valueOf' | [TimeUnit.NANOSECONDS.name()]                || { it -> Optional.of(TimeUnit.NANOSECONDS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.NANOSECONDS.name().capitalize()]   || { it -> Optional.of(TimeUnit.NANOSECONDS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.NANOSECONDS.name().toLowerCase()]  || { it -> Optional.of(TimeUnit.NANOSECONDS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.MICROSECONDS.name()]               || { it -> Optional.of(TimeUnit.MICROSECONDS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.MICROSECONDS.name().capitalize()]  || { it -> Optional.of(TimeUnit.MICROSECONDS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.MICROSECONDS.name().toLowerCase()] || { it -> Optional.of(TimeUnit.MICROSECONDS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.MILLISECONDS.name()]               || { it -> Optional.of(TimeUnit.MILLISECONDS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.MILLISECONDS.name().capitalize()]  || { it -> Optional.of(TimeUnit.MILLISECONDS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.MILLISECONDS.name().toLowerCase()] || { it -> Optional.of(TimeUnit.MILLISECONDS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.SECONDS.name()]                    || { it -> Optional.of(TimeUnit.SECONDS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.SECONDS.name().capitalize()]       || { it -> Optional.of(TimeUnit.SECONDS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.SECONDS.name().toLowerCase()]      || { it -> Optional.of(TimeUnit.SECONDS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.MINUTES.name()]                    || { it -> Optional.of(TimeUnit.MINUTES) }
+        TimeUnit              | 'valueOf' | [TimeUnit.MINUTES.name().capitalize()]       || { it -> Optional.of(TimeUnit.MINUTES) }
+        TimeUnit              | 'valueOf' | [TimeUnit.MINUTES.name().toLowerCase()]      || { it -> Optional.of(TimeUnit.MINUTES) }
+        TimeUnit              | 'valueOf' | [TimeUnit.HOURS.name()]                      || { it -> Optional.of(TimeUnit.HOURS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.HOURS.name().capitalize()]         || { it -> Optional.of(TimeUnit.HOURS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.HOURS.name().toLowerCase()]        || { it -> Optional.of(TimeUnit.HOURS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.DAYS.name()]                       || { it -> Optional.of(TimeUnit.DAYS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.DAYS.name().capitalize()]          || { it -> Optional.of(TimeUnit.DAYS) }
+        TimeUnit              | 'valueOf' | [TimeUnit.DAYS.name().toLowerCase()]         || { it -> Optional.of(TimeUnit.DAYS) }
+        TimeUnit              | 'valueOf' | ['INVALID']                                  || { it -> Optional.empty() }
+        TimeUnit              | 'valueOf' | ['Invalid']                                  || { it -> Optional.empty() }
+        TimeUnit              | 'valueOf' | ['invalid']                                  || { it -> Optional.empty() }
+        // values
+        TimeUnit              | 'values'  | []                                           || { it -> TimeUnit.values().toList().toSet() }
     }
 
     def 'test that cast of #type to #object returns #expected'() {
