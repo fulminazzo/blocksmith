@@ -7,6 +7,9 @@ import spock.lang.Specification
 class ValidatorTest extends Specification {
     private static final Validator validator = Validator.instance
 
+    private static final noValuesArray = new Object[0]
+    private static final exceedValuesArray = (1..6).toArray()
+
     @NonNull
     private Object nonNull
     @AssertFalse
@@ -94,7 +97,7 @@ class ValidatorTest extends Specification {
         'sizeCollection' | (1..5).toList()
         'sizeMap'        | null
         'sizeMap'        | ['a']
-        'sizeMap'        | (1..5).collectEntries { it -> [it: it] }
+        'sizeMap'        | (1..5).collectEntries { it -> [it, it] }
     }
 
     def 'test that validate of field #fieldName and value #value throws'() {
@@ -137,13 +140,13 @@ class ValidatorTest extends Specification {
         'port'           | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.invalid-port', String.format(Port.DEFAULT_MESSAGE, Integer.MAX_VALUE))]
         'sizeString'     | ''                                       || [new ConstraintViolation('', 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, '', 5, 1))]
         'sizeString'     | 'a'.repeat(6)                            || [new ConstraintViolation('a'.repeat(6), 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, 'a'.repeat(6), 5, 1))]
-        'sizeArray'      | [].toArray()                             || [new ConstraintViolation([].toArray(), 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, [].toArray(), 5, 1))]
-        'sizeArray'      | (1..6).toArray()                         || [new ConstraintViolation((1..6).toArray(), 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, (1..6).toArray(), 5, 1))]
+        'sizeArray'      | noValuesArray                            || [new ConstraintViolation(noValuesArray, 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, noValuesArray, 5, 1))]
+        'sizeArray'      | exceedValuesArray                        || [new ConstraintViolation(exceedValuesArray, 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, exceedValuesArray, 5, 1))]
         'sizeCollection' | []                                       || [new ConstraintViolation([], 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, [], 5, 1))]
         'sizeCollection' | (1..6).toList()                          || [new ConstraintViolation((1..6).toList(), 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, (1..6).toList(), 5, 1))]
         'sizeMap'        | [:]                                      || [new ConstraintViolation([:], 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, [:], 5, 1))]
-        'sizeMap'        | (1..6).collectEntries { it -> [it: it] } ||
-                [new ConstraintViolation((1..6).collectEntries { it -> [it: it] }, 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, (1..6).collectEntries { it -> [it: it] }, 5, 1))]
+        'sizeMap'        | (1..6).collectEntries { it -> [it, it] } ||
+                [new ConstraintViolation((1..6).collectEntries { it -> [it, it] }, 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, (1..6).collectEntries { it -> [it, it] }, 5, 1))]
     }
 
 }
