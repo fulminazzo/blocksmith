@@ -1,5 +1,5 @@
 val projectName: String = project.name
-val baseModuleName = "base"
+val coreModuleName = "core"
 val testingModuleName: String by rootProject.extra
 
 dependencies {
@@ -19,7 +19,7 @@ allprojects {
 subprojects {
     dependencies {
         compileOnly(rootProject.libs.slf4j)
-        if (!project.name.endsWith(baseModuleName))
-            api(project(":$projectName:$projectName-$baseModuleName"))
+        if (!project.name.endsWith(coreModuleName))
+            api(project(":$projectName:$projectName-$coreModuleName"))
     }
 }
