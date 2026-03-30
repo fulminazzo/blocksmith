@@ -40,15 +40,13 @@ public final class Validator {
                     if (o.getClass().isArray()) size = Array.getLength(o);
                     else {
                         Reflect reflect = Reflect.on(o);
-                        size = reflect.get("length", null).get();
-                        if (size == null)
-                            try {
-                                size = reflect.invoke("length").get();
-                            } catch (ReflectException e) {
-                                size = reflect.invoke("size").get();
-                            }
+                        try {
+                            size = reflect.invoke("length").get();
+                        } catch (ReflectException e) {
+                            size = reflect.invoke("size").get();
+                        }
                     }
-                    return size != null && size >= a.min() && size <= a.max();
+                    return size >= a.min() && size <= a.max();
                 })
         ;
     }
