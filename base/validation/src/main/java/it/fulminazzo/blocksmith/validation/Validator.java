@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * The registry of validators used to validate objects.
@@ -69,17 +70,24 @@ public final class Validator {
         elements.add(annotatedElement);
         while (!elements.isEmpty()) {
             AnnotatedElement current = elements.poll();
-            for (Annotation annotation : current.getAnnotations()) {
+            Set<Annotation> annotations = Arrays.stream(current.getAnnotations())
+                    .filter(a -> a.annotationType().isAnnotationPresent(Constraint.class))
+                    .collect(Collectors.toSet());
+            for (Annotation annotation : annotations) {
                 Class<? extends Annotation> annotationType = annotation.annotationType();
-                if (!annotationType.isAnnotationPresent(Constraint.class)) continue;
+                final ConstraintValidator validator = getValidator(annotation);
+                if (validator != null && !validator.isValid(value)) {
+                    final ConstraintInfo constraintInfo = parents.getOrDefault(annotationType, new ConstraintInfo(annotation));
+                    violations.add(ConstraintViolation.of(value, constraintInfo));
+                }
+                if (visited.add(annotationType)) elements.add(annotationType);
+            }
+            for (Annotation annotation : annotations) {
+                Class<? extends Annotation> annotationType = annotation.annotationType();
                 final ConstraintInfo constraintInfo = parents.getOrDefault(annotationType, new ConstraintInfo(annotation));
                 Arrays.stream(annotationType.getAnnotations())
                         .map(Annotation::annotationType)
                         .forEach(a -> parents.putIfAbsent(a, constraintInfo));
-                final ConstraintValidator validator = getValidator(annotation);
-                if (validator != null && !validator.isValid(value))
-                    violations.add(ConstraintViolation.of(value, constraintInfo));
-                if (visited.add(annotationType)) elements.add(annotationType);
             }
         }
         if (!violations.isEmpty()) throw new ValidationException(value, violations);
