@@ -13,6 +13,8 @@ class ValidatorTest extends Specification {
     private boolean assertFalse
     @AssertTrue
     private boolean assertTrue
+    @Max(0)
+    private int max
 
     def 'test that validate of field #fieldName and value #value does not throw'() {
         given:
@@ -27,10 +29,14 @@ class ValidatorTest extends Specification {
         where:
         fieldName     | value
         'nonNull'     | new Object()
-        'assertFalse' | false
         'assertFalse' | null
-        'assertTrue'  | true
+        'assertFalse' | false
         'assertTrue'  | null
+        'assertTrue'  | true
+        'max'         | null
+        'max'         | 0
+        'max'         | -1
+        'max'         | Integer.MIN_VALUE
     }
 
     def 'test that validate of field #fieldName and value #value throws'() {
@@ -45,10 +51,12 @@ class ValidatorTest extends Specification {
         e.violations == expectedViolations.toSet()
 
         where:
-        fieldName     | value || expectedViolations
-        'nonNull'     | null  || [new ConstraintViolation(null, 'error.validation.not-null', NonNull.DEFAULT_MESSAGE)]
-        'assertFalse' | true  || [new ConstraintViolation(true, 'error.validation.required-false', AssertFalse.DEFAULT_MESSAGE)]
-        'assertTrue'  | false || [new ConstraintViolation(false, 'error.validation.required-true', AssertTrue.DEFAULT_MESSAGE)]
+        fieldName     | value             || expectedViolations
+        'nonNull'     | null              || [new ConstraintViolation(null, 'error.validation.not-null', NonNull.DEFAULT_MESSAGE)]
+        'assertFalse' | true              || [new ConstraintViolation(true, 'error.validation.required-false', String.format(AssertFalse.DEFAULT_MESSAGE, true))]
+        'assertTrue'  | false             || [new ConstraintViolation(false, 'error.validation.required-true', String.format(AssertTrue.DEFAULT_MESSAGE, false))]
+        'max'         | 1                 || [new ConstraintViolation(1, 'error.validation.number-too-big', String.format(Max.DEFAULT_MESSAGE, 1, 0.0))]
+        'max'         | Integer.MAX_VALUE || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.number-too-big', String.format(Max.DEFAULT_MESSAGE, Integer.MAX_VALUE, 0.0))]
     }
 
 }

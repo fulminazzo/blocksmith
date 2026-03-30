@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.validation;
 
 import it.fulminazzo.blocksmith.validation.annotation.AssertFalse;
 import it.fulminazzo.blocksmith.validation.annotation.AssertTrue;
+import it.fulminazzo.blocksmith.validation.annotation.Max;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,7 @@ public final class Validator {
                 .register(NonNull.class, Objects::nonNull)
                 .register(AssertFalse.class, o -> o == null || !((Boolean) o))
                 .register(AssertTrue.class, o -> o == null || ((Boolean) o))
+                .registerSupplier(Max.class, a -> o -> o == null || ((Number) o).doubleValue() <= a.value())
         ;
     }
 
