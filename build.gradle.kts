@@ -12,6 +12,12 @@ allprojects {
     apply { plugin("groovy") }
     apply { plugin("jacoco-report-aggregation") }
 
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(11))
+        }
+    }
+
     repositories {
         mavenCentral()
     }
