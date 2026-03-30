@@ -10,7 +10,7 @@ import java.lang.annotation.*;
  * <br>
  * Accepts <code>null</code> values.
  */
-@Matches("(?!-)[a-zA-Z0-9\\-]{1,63}(?<!-)(\\.[a-zA-Z0-9\\-]{1,63}(?<!-))*(\\.[a-zA-Z]{2,})")
+@Matches("(?!-)[a-zA-Z0-9\\-]{1,63}(?<!-)(\\.([a-zA-Z0-9\\-]{1,63}(?<!-)))*")
 @Constraint
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
