@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,8 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.NONE)
 class ConstraintInfo {
     @Getter(AccessLevel.NONE)
-    @Nullable Object value;
+    @NotNull List<Object> values = new ArrayList<>();
+
     @Nullable String message;
     @NotNull String defaultMessage;
 
@@ -30,14 +32,11 @@ class ConstraintInfo {
      * @param constraint the annotation constraint
      */
     public ConstraintInfo(final @NotNull Annotation constraint) {
+        Reflect reflectType = Reflect.on(constraint.annotationType());
         Reflect reflect = Reflect.on(constraint);
-        Object value;
-        try {
-            value = reflect.invoke("value").get();
-        } catch (ReflectException e) {
-            value = null;
-        }
-        this.value = value;
+        for (Method method : reflectType.getInstanceMethods())
+            if (!method.getName().equals("message"))
+                values.add(reflect.invoke(method).get());
         String message;
         try {
             message = reflect.invoke("message").get();
@@ -45,7 +44,7 @@ class ConstraintInfo {
             message = null;
         }
         this.message = message;
-        this.defaultMessage = Reflect.on(constraint.annotationType())
+        this.defaultMessage = reflectType
                 .getStatic("DEFAULT_MESSAGE", "Invalid value: %s")
                 .get();
     }
@@ -59,7 +58,7 @@ class ConstraintInfo {
     public @NotNull Object @NotNull [] formatArguments(final Object value) {
         List<Object> arguments = new ArrayList<>();
         arguments.add(value);
-        if (this.value != null) arguments.add(this.value);
+        arguments.addAll(values);
         return arguments.toArray();
     }
 
