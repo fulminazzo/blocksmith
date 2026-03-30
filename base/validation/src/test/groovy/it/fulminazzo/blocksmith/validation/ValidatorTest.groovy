@@ -40,6 +40,8 @@ class ValidatorTest extends Specification {
     private Collection sizeCollection
     @Size(min = 1, max = 5)
     private Map sizeMap
+    @Matches('[A-Za-z]+')
+    private String matches
 
     def 'test that validate of field #fieldName and value #value does not throw'() {
         given:
@@ -98,6 +100,9 @@ class ValidatorTest extends Specification {
         'sizeMap'        | null
         'sizeMap'        | ['a']
         'sizeMap'        | (1..5).collectEntries { it -> [it, it] }
+        'matches'        | null
+        'matches'        | 'a'
+        'matches'        | 'Alessandro'
     }
 
     def 'test that validate of field #fieldName and value #value throws'() {
@@ -147,6 +152,9 @@ class ValidatorTest extends Specification {
         'sizeMap'        | [:]                                      || [new ConstraintViolation([:], 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, [:], 5, 1))]
         'sizeMap'        | (1..6).collectEntries { it -> [it, it] } ||
                 [new ConstraintViolation((1..6).collectEntries { it -> [it, it] }, 'error.validation.argument-exceeds-size', String.format(Size.DEFAULT_MESSAGE, (1..6).collectEntries { it -> [it, it] }, 5, 1))]
+        'matches'        | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-string', String.format(Matches.DEFAULT_MESSAGE, '', '[A-Za-z]+'))]
+        'matches'        | 'Alessandro!'                            || [new ConstraintViolation('Alessandro!', 'error.validation.invalid-string', String.format(Matches.DEFAULT_MESSAGE, 'Alessandro!', '[A-Za-z]+'))]
+        'matches'        | '01001'                                  || [new ConstraintViolation('01001', 'error.validation.invalid-string', String.format(Matches.DEFAULT_MESSAGE, '01001', '[A-Za-z]+'))]
     }
 
 }

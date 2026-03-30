@@ -13,6 +13,7 @@ import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 /**
  * The registry of validators used to validate objects.
@@ -48,6 +49,7 @@ public final class Validator {
                     }
                     return size >= a.min() && size <= a.max();
                 })
+                .registerSupplier(Matches.class, a -> o -> o == null || Pattern.compile(a.value()).matcher((CharSequence) o).matches())
         ;
     }
 
