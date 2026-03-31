@@ -1,11 +1,13 @@
 package it.fulminazzo.blocksmith.validation;
 
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,18 +61,27 @@ public class ConstraintViolation {
         String message = constraintInfo.getMessage();
 
         argumentsMap.put("value", value);
-        if (message != null) message = message.replace("%value%", value == null ? "null" : value.toString());
+        if (message != null) message = message.replace("%value%", printObject(value));
 
         @NotNull Map<String, Object> values = constraintInfo.getValues();
         for (String key : values.keySet()) {
             Object v = values.get(key);
             argumentsMap.put(key, v);
-            if (message != null) message = message.replace("%" + key + "%", v == null ? "null" : v.toString());
+            if (message != null) message = message.replace("%" + key + "%", printObject(v));
         }
 
-        String exceptionMessage = String.format(constraintInfo.getExceptionMessage(), arguments);
+        String exceptionMessage = String.format(constraintInfo.getExceptionMessage(), Arrays.stream(arguments)
+                .map(ConstraintViolation::printObject)
+                .toArray());
         return new ConstraintViolation(value, message, exceptionMessage, argumentsMap);
     }
 
+    private static String printObject(final Object value) {
+        return value == null
+                ? "null" :
+                value.getClass().isArray()
+                        ? Reflect.on(Arrays.class).invoke("toString", value).get()
+                        : value.toString();
+    }
 
 }
