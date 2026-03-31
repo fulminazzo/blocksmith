@@ -4,18 +4,14 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
-import it.fulminazzo.blocksmith.validation.ConstraintViolation;
-import it.fulminazzo.blocksmith.validation.ValidationException;
 import it.fulminazzo.blocksmith.validation.Validator;
+import it.fulminazzo.blocksmith.validation.ViolationException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * A special type of {@link SettableBeanProperty} that will not throw
@@ -24,8 +20,6 @@ import java.util.stream.Collectors;
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
-    private static final @NotNull Validator validator = Validator.getInstance();
-
     @NotNull Logger logger;
     @NotNull AnnotatedField field;
 
@@ -51,16 +45,8 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
 
     @Override
     public void set(final @NotNull Object instance, final Object value) throws IOException {
-        validateValue(value);
+        Validator.validateField(field.getAnnotated(), value);
         super.set(instance, value);
-    }
-
-    private void validateValue(final @Nullable Object value) {
-        try {
-            validator.validate(field.getAnnotated(), value);
-        } catch (ValidationException e) {
-            throw new ViolationException(e.getViolations());
-        }
     }
 
     @Override
@@ -130,24 +116,6 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
             super(String.format(message, arguments));
         }
 
-    }
-
-    /**
-     * Represents an exception thrown during a failed {@link #validateValue(Object)}
-     */
-    static final class ViolationException extends RuntimeException {
-
-        /**
-         * Instantiates a new Violation exception.
-         *
-         * @param violations the violations that triggered the exception
-         */
-        public ViolationException(final @NotNull Set<ConstraintViolation> violations) {
-            super(violations.stream()
-                    .map(ConstraintViolation::getExceptionMessage)
-                    .collect(Collectors.joining(", "))
-            );
-        }
     }
 
 }
