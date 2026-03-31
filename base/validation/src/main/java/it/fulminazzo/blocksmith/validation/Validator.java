@@ -78,8 +78,8 @@ public final class Validator {
     public static void validate(final @Nullable Object value) throws ViolationException {
         try {
             getInstance().validateBean(value);
-        } catch (ValidationException e) {
-            throw new ViolationException(e.getViolations());
+        } catch (ComposeValidationException e) {
+            throw new ViolationException(value, e);
         }
     }
 
@@ -97,7 +97,9 @@ public final class Validator {
         try {
             getInstance().validate(field, value);
         } catch (ValidationException e) {
-            throw new ViolationException(e.getViolations());
+            throw new ViolationException(value, e);
+        } catch (ComposeValidationException e) {
+            throw new ViolationException(value, e);
         }
     }
 
