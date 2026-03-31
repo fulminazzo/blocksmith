@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Data
 @AllArgsConstructor
-public abstract class NamedEntity {
+public abstract class NamedEntity implements Entity {
     @Getter
     @Setter
     static String DEFAULT_NAME = "John";
