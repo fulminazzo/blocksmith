@@ -95,15 +95,14 @@ public final class Validator {
             for (Annotation annotation : annotations) {
                 Class<? extends Annotation> annotationType = annotation.annotationType();
                 final ConstraintValidator validator = getValidator(annotation);
-                if (validator != null)
-                    try {
-                        if (!validator.isValid(value)) {
-                            final ConstraintInfo constraintInfo = parents.getOrDefault(annotationType, new ConstraintInfo(annotation));
-                            violations.add(ConstraintViolation.of(value, constraintInfo));
-                        }
-                    } catch (Exception e) {
-                        throw new ValidationException(value, e);
+                if (validator != null) {
+                    if (!validator.matches(value))
+                        violations.add(ConstraintViolation.invalidType(value, validator.getTypeNames()));
+                    else if (!validator.isValid(value)) {
+                        final ConstraintInfo constraintInfo = parents.getOrDefault(annotationType, new ConstraintInfo(annotation));
+                        violations.add(ConstraintViolation.of(value, constraintInfo));
                     }
+                }
 
                 if (visited.add(annotationType)) elements.add(annotationType);
             }
