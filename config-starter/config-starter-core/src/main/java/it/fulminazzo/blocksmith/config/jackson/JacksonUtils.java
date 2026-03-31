@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,15 +50,18 @@ final class JacksonUtils {
         return (M) mapper
                 .registerModule(new SimpleModule() {
 
-                    @Override
-                    public void setupModule(final @NotNull SetupContext context) {
-                        super.setupModule(context);
-                        context.addBeanDeserializerModifier(new JacksonBeanDeserializerModifier(logger));
-                        if (commentPropertyWriterType != null)
-                            context.addBeanSerializerModifier(new JacksonBeanSerializerModifier<>(commentPropertyWriterType));
-                    }
+                            @Override
+                            public void setupModule(final @NotNull SetupContext context) {
+                                super.setupModule(context);
+                                context.addBeanDeserializerModifier(new JacksonBeanDeserializerModifier(logger));
+                                if (commentPropertyWriterType != null)
+                                    context.addBeanSerializerModifier(new JacksonBeanSerializerModifier<>(commentPropertyWriterType));
+                            }
 
-                })
+                        }
+                                .addSerializer(new DurationSerializer())
+                                .addDeserializer(Duration.class, new DurationDeserializer(logger))
+                )
                 .addHandler(new LoggerDeserializationProblemHandler(logger));
     }
 
