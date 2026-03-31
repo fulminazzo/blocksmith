@@ -23,15 +23,4 @@ public final class ValidationException extends Exception {
         this.violations = violations;
     }
 
-    /**
-     * Instantiates a new Validation exception.
-     *
-     * @param object the object
-     * @param cause  the cause that triggered the exception
-     */
-    ValidationException(final Object object, final @NotNull Throwable cause) {
-        super(String.format("Could not complete validation for object %s", object), cause);
-        this.violations = Set.of();
-    }
-
 }

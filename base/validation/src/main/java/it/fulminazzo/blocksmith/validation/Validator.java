@@ -11,6 +11,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -29,17 +31,19 @@ public final class Validator {
 
     static {
         getInstance()
-                .register(NonNull.class, Objects::nonNull)
-                .register(AssertFalse.class, o -> o == null || !((Boolean) o))
-                .register(AssertTrue.class, o -> o == null || ((Boolean) o))
-                .registerSupplier(Max.class, a -> o -> o == null || ((Number) o).doubleValue() <= a.value())
-                .register(Negative.class, o -> o == null || ((Number) o).doubleValue() < 0)
-                .registerSupplier(Min.class, a -> o -> o == null || ((Number) o).doubleValue() >= a.value())
-                .register(Positive.class, o -> o == null || ((Number) o).doubleValue() > 0)
-                .registerSupplier(Range.class, a -> o -> o == null || ((Number) o).doubleValue() >= a.min() && ((Number) o).doubleValue() <= a.max())
-                .registerSupplier(Size.class, a -> o -> {
+                .register(NonNull.class, new ConstraintValidatorImpl(Objects::nonNull))
+                .register(AssertFalse.class, new BooleanConstraintValidator(o -> o == null || !((Boolean) o)))
+                .register(AssertTrue.class, new BooleanConstraintValidator(o -> o == null || ((Boolean) o)))
+                .registerSupplier(Max.class, a -> new NumberConstraintValidator(o -> o == null || ((Number) o).doubleValue() <= a.value()))
+                .register(Negative.class, new NumberConstraintValidator(o -> o == null || ((Number) o).doubleValue() < 0))
+                .registerSupplier(Min.class, a -> new NumberConstraintValidator(o -> o == null || ((Number) o).doubleValue() >= a.value()))
+                .register(Positive.class, new NumberConstraintValidator(o -> o == null || ((Number) o).doubleValue() > 0))
+                .registerSupplier(Range.class, a -> new NumberConstraintValidator(o -> o == null ||
+                        ((Number) o).doubleValue() >= a.min() && ((Number) o).doubleValue() <= a.max())
+                )
+                .registerSupplier(Size.class, a -> new ConstraintValidatorImpl(o -> {
                     if (o == null) return true;
-                    Integer size;
+                    Number size;
                     if (o.getClass().isArray()) size = Array.getLength(o);
                     else {
                         Reflect reflect = Reflect.on(o);
@@ -49,24 +53,46 @@ public final class Validator {
                             size = reflect.invoke("size").get();
                         }
                     }
-                    return size >= a.min() && size <= a.max();
-                })
-                .registerSupplier(Matches.class, a -> o -> o == null || Pattern.compile(a.value()).matcher((CharSequence) o).matches())
+                    return size.longValue() >= a.min() && size.longValue() <= a.max();
+                }))
+                .registerSupplier(Matches.class, a -> new StringConstraintValidator(o -> o == null ||
+                        Pattern.compile(a.value()).matcher((CharSequence) o).matches()
+                ))
+                .register(Url.class, new StringConstraintValidator(o -> {
+                    try {
+                        if (o != null) new URL(o.toString());
+                        return true;
+                    } catch (MalformedURLException e) {
+                        return false;
+                    }
+                }))
         ;
     }
 
     /**
      * Validates all the fields of the given Java object.
      *
-     * @param beanType the type of the object
-     * @param bean     the actual object to validate
+     * @param bean the actual object to validate
      * @throws ValidationException if the validation fails
      */
-    public void validateBean(final @NotNull Class<?> beanType, final @Nullable Object bean) throws ValidationException {
+    public void validateBean(final @Nullable Object bean) throws ValidationException {
         if (bean == null) return;
-        final Reflect beanReflect = Reflect.on(bean);
-        for (Field field : Reflect.on(beanType).getInstanceFields())
-            validate(field, beanReflect.get(field).get());
+        final Queue<Object> queue = new LinkedList<>();
+        final Set<Object> visited = new HashSet<>();
+        queue.add(bean);
+        while (!queue.isEmpty()) {
+            final Object current = queue.remove();
+            if (current == null || visited.contains(current)) continue;
+            visited.add(current);
+            final Reflect beanReflect = Reflect.on(current);
+            if (beanReflect.isBaseType()) continue;
+            if (current.getClass().getPackageName().startsWith("java")) continue;
+            for (Field field : beanReflect.getInstanceFields()) {
+                Object value = beanReflect.get(field).get();
+                validate(field, value);
+                queue.add(value);
+            }
+        }
     }
 
     /**
@@ -91,15 +117,14 @@ public final class Validator {
             for (Annotation annotation : annotations) {
                 Class<? extends Annotation> annotationType = annotation.annotationType();
                 final ConstraintValidator validator = getValidator(annotation);
-                if (validator != null)
-                    try {
-                        if (!validator.isValid(value)) {
-                            final ConstraintInfo constraintInfo = parents.getOrDefault(annotationType, new ConstraintInfo(annotation));
-                            violations.add(ConstraintViolation.of(value, constraintInfo));
-                        }
-                    } catch (Exception e) {
-                        throw new ValidationException(value, e);
+                if (validator != null) {
+                    if (!validator.matches(value))
+                        violations.add(ConstraintViolation.invalidType(value, validator.getTypeNames()));
+                    else if (!validator.isValid(value)) {
+                        final ConstraintInfo constraintInfo = parents.getOrDefault(annotationType, new ConstraintInfo(annotation));
+                        violations.add(ConstraintViolation.of(value, constraintInfo));
                     }
+                }
 
                 if (visited.add(annotationType)) elements.add(annotationType);
             }

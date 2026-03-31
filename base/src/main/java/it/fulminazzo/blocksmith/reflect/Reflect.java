@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A wrapper for Java objects to work with reflections.
@@ -255,11 +256,21 @@ public class Reflect {
      */
 
     /**
-     * Gets the value of all the instance fields (fields must not be static).
+     * Gets the value of all the non-static fields (not including inherited fields).
      *
      * @return the values of the fields
      */
     public @NotNull List<Reflect> getInstanceFieldValues() {
+        final Class<?> type = getObjectClass();
+        return getFieldValues(f -> f.getDeclaringClass().equals(type) && !Modifier.isStatic(f.getModifiers()));
+    }
+
+    /**
+     * Gets the values of all the non-static fields.
+     *
+     * @return the values of the fields
+     */
+    public @NotNull List<Reflect> getNonStaticFieldValues() {
         return getFieldValues(f -> !Modifier.isStatic(f.getModifiers()));
     }
 
@@ -292,7 +303,7 @@ public class Reflect {
     }
 
     /**
-     * Sets a new value to the instance field with the given name (field must not be static).
+     * Sets a new value to the non-static field with the given name (not including inherited fields).
      *
      * @param name  the name of the field
      * @param value the value of the field
@@ -301,6 +312,18 @@ public class Reflect {
      */
     public @NotNull Reflect setInstance(final @NotNull String name, final Object value) {
         return set(getInstanceField(name), value);
+    }
+
+    /**
+     * Sets a new value to the non-static field with the given name.
+     *
+     * @param name  the name of the field
+     * @param value the value of the field
+     * @return this object (for method chaining)
+     * @throws ReflectException if no field was found or an error occurs while setting the value
+     */
+    public @NotNull Reflect setNonStatic(final @NotNull String name, final Object value) {
+        return set(getNonStaticField(name), value);
     }
 
     /**
@@ -358,7 +381,7 @@ public class Reflect {
     }
 
     /**
-     * Gets the value of the instance field with the given name (field must not be static).
+     * Gets the value of the non-static field with the given name (not including inherited fields).
      *
      * @param name   the name of the field
      * @param orElse the value to return if the field was not found or there were problems while accessing it
@@ -367,6 +390,21 @@ public class Reflect {
     public @NotNull Reflect getInstance(final @NotNull String name, final Object orElse) {
         try {
             return get(getInstanceField(name), orElse);
+        } catch (ReflectException ignored) {
+            return new Reflect(orElse == null ? null : orElse.getClass(), orElse);
+        }
+    }
+
+    /**
+     * Gets the value of the non-static field with the given name.
+     *
+     * @param name   the name of the field
+     * @param orElse the value to return if the field was not found or there were problems while accessing it
+     * @return the value of the field
+     */
+    public @NotNull Reflect getNonStatic(final @NotNull String name, final Object orElse) {
+        try {
+            return get(getNonStaticField(name), orElse);
         } catch (ReflectException ignored) {
             return new Reflect(orElse == null ? null : orElse.getClass(), orElse);
         }
@@ -433,7 +471,7 @@ public class Reflect {
     }
 
     /**
-     * Gets the value of the instance field with the given name (field must not be static).
+     * Gets the value of the non-static field with the given name (not including inherited fields).
      *
      * @param name the name of the field
      * @return the value of the field
@@ -441,6 +479,17 @@ public class Reflect {
      */
     public @NotNull Reflect getInstance(final @NotNull String name) {
         return get(getInstanceField(name));
+    }
+
+    /**
+     * Gets the value of the non-static field with the given name.
+     *
+     * @param name the name of the field
+     * @return the value of the field
+     * @throws ReflectException if no field was found or an error occurs while getting the value
+     */
+    public @NotNull Reflect getNonStatic(final @NotNull String name) {
+        return get(getNonStaticField(name));
     }
 
     /**
@@ -493,13 +542,29 @@ public class Reflect {
     }
 
     /**
-     * Gets the instance field with the given name (field must not be static).
+     * Gets the non-static field with the given name (not including inherited fields).
      *
      * @param name the name of the field
      * @return the field
      * @throws ReflectException if no field was found
      */
     public @NotNull Field getInstanceField(final @NotNull String name) {
+        try {
+            final Class<?> type = getObjectClass();
+            return getField(f -> f.getDeclaringClass().equals(type) && !Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
+        } catch (ReflectException e) {
+            throw ReflectException.cannotFindField(getType(), name);
+        }
+    }
+
+    /**
+     * Gets the non-static field with the given name.
+     *
+     * @param name the name of the field
+     * @return the field
+     * @throws ReflectException if no field was found
+     */
+    public @NotNull Field getNonStaticField(final @NotNull String name) {
         try {
             return getField(f -> !Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
         } catch (ReflectException e) {
@@ -549,11 +614,21 @@ public class Reflect {
     }
 
     /**
-     * Gets all the instance fields (fields not declared as static).
+     * Gets all the non-static fields (not including inherited fields).
      *
      * @return the fields
      */
     public @NotNull List<Field> getInstanceFields() {
+        final Class<?> type = getObjectClass();
+        return getFields(f -> f.getDeclaringClass().equals(type) && !Modifier.isStatic(f.getModifiers()));
+    }
+
+    /**
+     * Gets all the non-static fields.
+     *
+     * @return the static fields
+     */
+    public @NotNull List<Field> getNonStaticFields() {
         return getFields(f -> !Modifier.isStatic(f.getModifiers()));
     }
 
@@ -586,6 +661,10 @@ public class Reflect {
         Class<?> type = getObjectClass();
         while (type != null) {
             fields.addAll(Arrays.asList(type.getDeclaredFields()));
+            Arrays.stream(type.getInterfaces())
+                    .map(Class::getDeclaredFields)
+                    .flatMap(Arrays::stream)
+                    .forEach(fields::add);
             type = type.getSuperclass();
         }
         return fields;
@@ -666,7 +745,7 @@ public class Reflect {
     }
 
     /**
-     * Gets the instance method with the given parameter types (method must not be static).
+     * Gets the non-static method with the given name, return type and parameter types (not including inherited methods).
      *
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
      * @return the method
@@ -677,10 +756,21 @@ public class Reflect {
     }
 
     /**
+     * Gets the non-static method with the given parameter types.
+     *
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the method
+     * @throws ReflectException if no method was found
+     */
+    public @NotNull Method getNonStaticMethod(final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return getNonStaticMethod(null, parameterTypes);
+    }
+
+    /**
      * Gets the static method with the given parameter types.
      *
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
-     * @return the static method
+     * @return the method
      * @throws ReflectException if no method was found
      */
     public @NotNull Method getStaticMethod(final @Nullable Class<?> @NotNull ... parameterTypes) {
@@ -699,7 +789,7 @@ public class Reflect {
     }
 
     /**
-     * Gets the instance method with the given name and parameter types (method must not be static).
+     * Gets the non-static method with the given name, return type and parameter types (not including inherited methods).
      *
      * @param name           the name (if <code>null</code> any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
@@ -712,11 +802,24 @@ public class Reflect {
     }
 
     /**
+     * Gets the non-static method with the given name and parameter types.
+     *
+     * @param name           the name (if <code>null</code> any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the method
+     * @throws ReflectException if no method was found
+     */
+    public @NotNull Method getNonStaticMethod(final @Nullable String name,
+                                              final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return getNonStaticMethod(null, name, parameterTypes);
+    }
+
+    /**
      * Gets the static method with the given name and parameter types.
      *
      * @param name           the name (if <code>null</code> any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
-     * @return the static method
+     * @return the method
      * @throws ReflectException if no method was found
      */
     public @NotNull Method getStaticMethod(final @Nullable String name,
@@ -738,7 +841,7 @@ public class Reflect {
     }
 
     /**
-     * Gets the instance method with the given name, return type and parameter types (method must not be static).
+     * Gets the non-static method with the given name, return type and parameter types (not including inherited methods).
      *
      * @param returnType     the return type (if <code>null</code> any method found will be accepted)
      * @param name           the name (if <code>null</code> any method found will be accepted)
@@ -749,6 +852,22 @@ public class Reflect {
     public @NotNull Method getInstanceMethod(final @Nullable Class<?> returnType,
                                              final @Nullable String name,
                                              final @Nullable Class<?> @NotNull ... parameterTypes) {
+        final Class<?> type = getObjectClass();
+        return getMethodHelper(m -> m.getDeclaringClass().equals(type) && !Modifier.isStatic(m.getModifiers()), returnType, name, parameterTypes);
+    }
+
+    /**
+     * Gets the non-static method with the given name, return type and parameter types.
+     *
+     * @param returnType     the return type (if <code>null</code> any method found will be accepted)
+     * @param name           the name (if <code>null</code> any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the method
+     * @throws ReflectException if no method was found
+     */
+    public @NotNull Method getNonStaticMethod(final @Nullable Class<?> returnType,
+                                              final @Nullable String name,
+                                              final @Nullable Class<?> @NotNull ... parameterTypes) {
         return getMethodHelper(m -> !Modifier.isStatic(m.getModifiers()), returnType, name, parameterTypes);
     }
 
@@ -758,7 +877,7 @@ public class Reflect {
      * @param returnType     the return type (if <code>null</code> any method found will be accepted)
      * @param name           the name (if <code>null</code> any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
-     * @return the static method
+     * @return the method
      * @throws ReflectException if no method was found
      */
     public @NotNull Method getStaticMethod(final @Nullable Class<?> returnType,
@@ -808,18 +927,28 @@ public class Reflect {
     }
 
     /**
-     * Gets all the instance methods (methods not declared as static).
+     * Gets all the methods of the internal object (not including inherited methods).
      *
      * @return the methods
      */
     public @NotNull List<Method> getInstanceMethods() {
+        final Class<?> type = getObjectClass();
+        return getMethods(m -> m.getDeclaringClass().equals(type) && !Modifier.isStatic(m.getModifiers()));
+    }
+
+    /**
+     * Gets all the non-static methods.
+     *
+     * @return the methods
+     */
+    public @NotNull List<Method> getNonStaticMethods() {
         return getMethods(m -> !Modifier.isStatic(m.getModifiers()));
     }
 
     /**
      * Gets all the static methods.
      *
-     * @return the static methods
+     * @return the methods
      */
     public @NotNull List<Method> getStaticMethods() {
         return getMethods(m -> Modifier.isStatic(m.getModifiers()));
@@ -844,16 +973,22 @@ public class Reflect {
         List<Method> methods = new ArrayList<>();
         Class<?> type = getObjectClass();
         while (type != null) {
-            List<Method> list = new ArrayList<>(Arrays.asList(type.getDeclaredMethods()));
-            list.sort(Comparator.<Method, Boolean>comparing(m -> Modifier.isStatic(m.getModifiers()))
-                    .thenComparing(Method::getName)
-                    .thenComparing(Method::getParameterCount)
-            );
+            List<Method> list = sortMethods(Arrays.stream(type.getDeclaredMethods())).collect(Collectors.toList());
             methods.addAll(list);
+            sortMethods(Arrays.stream(type.getInterfaces())
+                    .map(Class::getDeclaredMethods)
+                    .flatMap(Arrays::stream))
+                    .forEach(methods::add);
             type = type.getSuperclass();
         }
         methods.removeIf(Method::isSynthetic);
         return methods;
+    }
+
+    private static @NotNull Stream<Method> sortMethods(final @NotNull Stream<Method> methods) {
+        return methods.sorted(Comparator.<Method, Boolean>comparing(m -> Modifier.isStatic(m.getModifiers()))
+                .thenComparing(Method::getName)
+                .thenComparing(Method::getParameterCount));
     }
 
     /*
@@ -973,8 +1108,8 @@ public class Reflect {
      * @param object the object
      * @return the reflect
      */
-    public static @NotNull Reflect on(final Object object) {
-        return new Reflect(object.getClass(), object);
+    public static @NotNull Reflect on(final @Nullable Object object) {
+        return new Reflect(object == null ? null : object.getClass(), object);
     }
 
     /**

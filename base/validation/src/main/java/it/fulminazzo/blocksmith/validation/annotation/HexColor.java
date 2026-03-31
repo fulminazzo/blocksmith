@@ -10,7 +10,7 @@ import java.lang.annotation.*;
  * <br>
  * Accepts <code>null</code> values.
  */
-@Matches("#[A-Fa-f0-9]{6}")
+@Matches("#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})")
 @Constraint
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
