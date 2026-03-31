@@ -17,7 +17,7 @@ public final class ViolationException extends RuntimeException {
      * @param cause  the cause exception
      */
     ViolationException(final @Nullable Object object, final @NotNull ComposeValidationException cause) {
-        super(String.format("Not valid object '%s': %s",
+        super(String.format("Invalid object '%s': %s",
                 object, cause.getViolations().entrySet().stream()
                         .map(entry -> String.format("invalid field '%s': %s",
                                 entry.getKey().getName(), entry.getValue().stream()
@@ -34,7 +34,7 @@ public final class ViolationException extends RuntimeException {
      * @param cause  the cause exception
      */
     ViolationException(final @Nullable Object object, final @NotNull ValidationException cause) {
-        super(String.format("Not valid object '%s': %s",
+        super(String.format("Invalid object '%s': %s",
                 object, cause.getViolations().stream()
                         .map(ConstraintViolation::getExceptionMessage)
                         .collect(Collectors.joining(", "))
