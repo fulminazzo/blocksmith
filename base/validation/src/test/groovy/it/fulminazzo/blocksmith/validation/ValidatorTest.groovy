@@ -1,7 +1,6 @@
 //file:noinspection unused
 package it.fulminazzo.blocksmith.validation
 
-
 import it.fulminazzo.blocksmith.validation.annotation.*
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
@@ -324,8 +323,8 @@ class ValidatorTest extends Specification {
         'sizeString'          | ''                                       || [new ConstraintViolation('', 'error.validation.argument-exceeds-size', String.format('%1$s size must be at least %3$s and at most %2$s elements long', '', 5, 1), ['value': '', 'max': 5, 'min': 1])]
         'sizeString'          | 'a'.repeat(6)                            || [new ConstraintViolation('a'.repeat(6), 'error.validation.argument-exceeds-size', String.format('%1$s size must be at least %3$s and at most %2$s elements long', 'a'.repeat(6), 5, 1), ['value': 'a'.repeat(6), 'max': 5, 'min': 1])]
         // Size (array)
-        'sizeArray'           | noValuesArray                            || [new ConstraintViolation(noValuesArray, 'error.validation.argument-exceeds-size', String.format('%1$s size must be at least %3$s and at most %2$s elements long', noValuesArray, 5, 1), ['value': noValuesArray, 'max': 5, 'min': 1])]
-        'sizeArray'           | exceedValuesArray                        || [new ConstraintViolation(exceedValuesArray, 'error.validation.argument-exceeds-size', String.format('%1$s size must be at least %3$s and at most %2$s elements long', exceedValuesArray, 5, 1), ['value': exceedValuesArray, 'max': 5, 'min': 1])]
+        'sizeArray'           | noValuesArray                            || [new ConstraintViolation(noValuesArray, 'error.validation.argument-exceeds-size', String.format('%1$s size must be at least %3$s and at most %2$s elements long', Arrays.toString(noValuesArray), 5, 1), ['value': noValuesArray, 'max': 5, 'min': 1])]
+        'sizeArray'           | exceedValuesArray                        || [new ConstraintViolation(exceedValuesArray, 'error.validation.argument-exceeds-size', String.format('%1$s size must be at least %3$s and at most %2$s elements long', Arrays.toString(exceedValuesArray), 5, 1), ['value': exceedValuesArray, 'max': 5, 'min': 1])]
         // Size (Collection)
         'sizeCollection'      | []                                       || [new ConstraintViolation([], 'error.validation.argument-exceeds-size', String.format('%1$s size must be at least %3$s and at most %2$s elements long', [], 5, 1), ['value': [], 'max': 5, 'min': 1])]
         'sizeCollection'      | (1..6).toList()                          || [new ConstraintViolation((1..6).toList(), 'error.validation.argument-exceeds-size', String.format('%1$s size must be at least %3$s and at most %2$s elements long', (1..6).toList(), 5, 1), ['value': (1..6).toList(), 'max': 5, 'min': 1])]
