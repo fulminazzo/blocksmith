@@ -984,8 +984,8 @@ public class Reflect {
      * @param object the object
      * @return the reflect
      */
-    public static @NotNull Reflect on(final Object object) {
-        return new Reflect(object.getClass(), object);
+    public static @NotNull Reflect on(final @Nullable Object object) {
+        return new Reflect(object == null ? null : object.getClass(), object);
     }
 
     /**

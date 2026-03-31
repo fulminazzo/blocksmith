@@ -700,6 +700,7 @@ class ReflectTest extends Specification {
 
         where:
         arguments                                  || expected
+        [null]                                     || new Reflect(null, null)
         [new Person('Camilla', 21)]                || new Reflect(Person, new Person('Camilla', 21))
         [Person]                                   || new Reflect(Person, Person)
         [Person.canonicalName]                     || new Reflect(Person, Person)
