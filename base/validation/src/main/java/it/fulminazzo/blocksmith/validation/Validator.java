@@ -70,6 +70,20 @@ public final class Validator {
     }
 
     /**
+     * Validates the given object fields against their {@link Constraint} annotations.
+     *
+     * @param value the value
+     * @throws ViolationException an exception containing all the violations
+     */
+    public static void validate(final @Nullable Object value) throws ViolationException {
+        try {
+            getInstance().validateBean(value);
+        } catch (ValidationException e) {
+            throw new ViolationException(e.getViolations());
+        }
+    }
+
+    /**
      * Validates the value against the given field.
      * <br>
      * The field must have at least one {@link Constraint} annotated annotation
