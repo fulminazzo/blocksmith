@@ -53,15 +53,20 @@ class DurationDeserializerTest extends Specification {
         1 * logger.warn('Unrecognized time notation \'{}\'. Supported units: {} (path: {})', '10i', DurationDeserializer.supportedUnits, '')
     }
 
-    def 'test that deserialize of null works'() {
-        given:
-        def data = 'null'
-
+    def 'test that deserialize of #data returns #expected'() {
         when:
         def value = mapper.readValue(data, Duration)
 
         then:
-        value == null
+        value == expected
+
+        where:
+        data     || expected
+        'null'   || null
+        '"1s"'   || Duration.ofSeconds(1)
+        '"1.5s"' || Duration.ofSeconds(1).plusMillis(500)
+        '"1"'    || Duration.ofSeconds(1)
+        '"1.5"'  || Duration.ofSeconds(1).plusMillis(500)
     }
 
     def 'test that deserialize of invalid '() {
