@@ -6,6 +6,9 @@ import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Defines the violation of a constraint.
  */
@@ -25,6 +28,8 @@ public class ConstraintViolation {
     @Nullable String message;
     @NotNull String exceptionMessage;
 
+    @NotNull Map<String, Object> arguments;
+
     /**
      * Instantiates a new Constraint violation to signal an invalid type violation.
      *
@@ -36,7 +41,8 @@ public class ConstraintViolation {
                                                     final @NotNull String expectedTypeNames) {
         return new ConstraintViolation(value,
                 "error.validation.invalid-type",
-                String.format("Expected %s but got '%s'", expectedTypeNames, value));
+                String.format("Expected %s but got '%s'", expectedTypeNames, value),
+                Map.of("value", value, "expected", expectedTypeNames));
     }
 
     /**
@@ -49,16 +55,25 @@ public class ConstraintViolation {
     static @NotNull ConstraintViolation of(final Object value,
                                            final @NotNull ConstraintInfo constraintInfo) {
         final @NotNull Object[] arguments = constraintInfo.formatArguments(value);
+        final @NotNull Map<String, Object> argumentsMap = new HashMap<>();
         String message = constraintInfo.getMessage();
         if (message != null) {
             message = message.replace("%value%", value == null ? "null" : value.toString());
-            if (arguments.length == 2) message = message.replace("%expected%", arguments[1].toString());
-            else if (arguments.length == 3) message = message
-                    .replace("%max%", arguments[1].toString())
-                    .replace("%min%", arguments[2].toString());
+            argumentsMap.put("value", value);
+            if (arguments.length == 2) {
+                Object expected = arguments[1];
+                message = message.replace("%expected%", expected.toString());
+                argumentsMap.put("expected", expected);
+            } else if (arguments.length == 3) {
+                Object max = arguments[1];
+                Object min = arguments[2];
+                message = message.replace("%max%", max.toString()).replace("%min%", min.toString());
+                argumentsMap.put("max", max);
+                argumentsMap.put("min", min);
+            }
         }
         String exceptionMessage = String.format(constraintInfo.getExceptionMessage(), arguments);
-        return new ConstraintViolation(value, message, exceptionMessage);
+        return new ConstraintViolation(value, message, exceptionMessage, argumentsMap);
     }
 
 
