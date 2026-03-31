@@ -26,6 +26,20 @@ public class ConstraintViolation {
     @NotNull String exceptionMessage;
 
     /**
+     * Instantiates a new Constraint violation to signal an invalid type violation.
+     *
+     * @param value             the value
+     * @param expectedTypeNames the expected types names
+     * @return the constraint violation
+     */
+    static @NotNull ConstraintViolation invalidType(final Object value,
+                                                    final @NotNull String expectedTypeNames) {
+        return new ConstraintViolation(value,
+                "error.validation.invalid-type",
+                String.format("Expected %s but got '%s'", expectedTypeNames, value));
+    }
+
+    /**
      * Instantiates a new Constraint violation.
      *
      * @param value          the value
