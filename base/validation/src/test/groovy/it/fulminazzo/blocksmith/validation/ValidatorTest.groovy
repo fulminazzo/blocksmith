@@ -1,8 +1,7 @@
 //file:noinspection unused
 package it.fulminazzo.blocksmith.validation
 
-import it.fulminazzo.blocksmith.annotation.Character
-import it.fulminazzo.blocksmith.annotation.Uuid
+
 import it.fulminazzo.blocksmith.validation.annotation.*
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable

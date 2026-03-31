@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.annotation;
+package it.fulminazzo.blocksmith.validation.annotation;
 
 import it.fulminazzo.blocksmith.validation.Constraint;
 import it.fulminazzo.blocksmith.validation.annotation.Matches;
