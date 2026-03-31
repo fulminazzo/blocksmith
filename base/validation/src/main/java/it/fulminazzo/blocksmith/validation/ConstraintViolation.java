@@ -71,6 +71,10 @@ public class ConstraintViolation {
             argumentsMap.put("max", max);
             argumentsMap.put("min", min);
             if (message != null) message = message.replace("%max%", max.toString()).replace("%min%", min.toString());
+        } else for (int i = 1; i < arguments.length; i++) {
+            Object argument = arguments[i];
+            argumentsMap.put("argument" + (i - 1), argument);
+            if (message != null) message = message.replace("%arg" + (i - 1) + "%", argument.toString());
         }
 
         String exceptionMessage = String.format(constraintInfo.getExceptionMessage(), arguments);
