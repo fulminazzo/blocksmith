@@ -29,15 +29,17 @@ public final class Validator {
 
     static {
         getInstance()
-                .register(NonNull.class, Objects::nonNull)
-                .register(AssertFalse.class, o -> o == null || !((Boolean) o))
-                .register(AssertTrue.class, o -> o == null || ((Boolean) o))
-                .registerSupplier(Max.class, a -> o -> o == null || ((Number) o).doubleValue() <= a.value())
-                .register(Negative.class, o -> o == null || ((Number) o).doubleValue() < 0)
-                .registerSupplier(Min.class, a -> o -> o == null || ((Number) o).doubleValue() >= a.value())
-                .register(Positive.class, o -> o == null || ((Number) o).doubleValue() > 0)
-                .registerSupplier(Range.class, a -> o -> o == null || ((Number) o).doubleValue() >= a.min() && ((Number) o).doubleValue() <= a.max())
-                .registerSupplier(Size.class, a -> o -> {
+                .register(NonNull.class, new ConstraintValidatorImpl(Objects::nonNull))
+                .register(AssertFalse.class, new BooleanConstraintValidator(o -> o == null || !((Boolean) o)))
+                .register(AssertTrue.class, new BooleanConstraintValidator(o -> o == null || ((Boolean) o)))
+                .registerSupplier(Max.class, a -> new NumberConstraintValidator(o -> o == null || ((Number) o).doubleValue() <= a.value()))
+                .register(Negative.class, new NumberConstraintValidator(o -> o == null || ((Number) o).doubleValue() < 0))
+                .registerSupplier(Min.class, a -> new NumberConstraintValidator(o -> o == null || ((Number) o).doubleValue() >= a.value()))
+                .register(Positive.class, new NumberConstraintValidator(o -> o == null || ((Number) o).doubleValue() > 0))
+                .registerSupplier(Range.class, a -> new NumberConstraintValidator(o -> o == null ||
+                        ((Number) o).doubleValue() >= a.min() && ((Number) o).doubleValue() <= a.max())
+                )
+                .registerSupplier(Size.class, a -> new ConstraintValidatorImpl(o -> {
                     if (o == null) return true;
                     Number size;
                     if (o.getClass().isArray()) size = Array.getLength(o);
@@ -50,8 +52,10 @@ public final class Validator {
                         }
                     }
                     return size.longValue() >= a.min() && size.longValue() <= a.max();
-                })
-                .registerSupplier(Matches.class, a -> o -> o == null || Pattern.compile(a.value()).matcher((CharSequence) o).matches())
+                }))
+                .registerSupplier(Matches.class, a -> new StringConstraintValidator(o -> o == null ||
+                        Pattern.compile(a.value()).matcher((CharSequence) o).matches()
+                ))
         ;
     }
 
