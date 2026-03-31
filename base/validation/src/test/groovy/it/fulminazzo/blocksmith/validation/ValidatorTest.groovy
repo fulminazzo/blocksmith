@@ -223,6 +223,7 @@ class ValidatorTest extends Specification {
         'identifier'          | 'myVariable'
         'identifier'          | '_private'
         'identifier'          | 'a1'
+        'identifier'          | 'a'
         // Alphabetical
         'alphabetical'        | null
         'alphabetical'        | 'Hello'
@@ -369,7 +370,6 @@ class ValidatorTest extends Specification {
         // Identifier
         'identifier'          | '1invalid'                               || [new ConstraintViolation('1invalid', 'error.validation.invalid-identifier', String.format('\'%1$s\' is not a valid identifier', '1invalid'), ['value': '1invalid'])]
         'identifier'          | 'my-var'                                 || [new ConstraintViolation('my-var', 'error.validation.invalid-identifier', String.format('\'%1$s\' is not a valid identifier', 'my-var'), ['value': 'my-var'])]
-        'identifier'          | 'a'                                      || [new ConstraintViolation('a', 'error.validation.invalid-identifier', String.format('\'%1$s\' is not a valid identifier', 'a'), ['value': 'a'])]
         'identifier'          | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-identifier', String.format('\'%1$s\' is not a valid identifier', ''), ['value': ''])]
         'identifier'          | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Alphabetical
