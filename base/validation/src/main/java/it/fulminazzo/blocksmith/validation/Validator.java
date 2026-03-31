@@ -39,7 +39,7 @@ public final class Validator {
                 .registerSupplier(Range.class, a -> o -> o == null || ((Number) o).doubleValue() >= a.min() && ((Number) o).doubleValue() <= a.max())
                 .registerSupplier(Size.class, a -> o -> {
                     if (o == null) return true;
-                    Integer size;
+                    Number size;
                     if (o.getClass().isArray()) size = Array.getLength(o);
                     else {
                         Reflect reflect = Reflect.on(o);
@@ -49,7 +49,7 @@ public final class Validator {
                             size = reflect.invoke("size").get();
                         }
                     }
-                    return size >= a.min() && size <= a.max();
+                    return size.longValue() >= a.min() && size.longValue() <= a.max();
                 })
                 .registerSupplier(Matches.class, a -> o -> o == null || Pattern.compile(a.value()).matcher((CharSequence) o).matches())
         ;
