@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -13,15 +14,16 @@ public final class ValidationException extends Exception {
     @Getter
     private final @Nullable Object object;
     @Getter
-    private final @NotNull Set<ConstraintViolation> violations;
+    private final @NotNull Map<String, Set<ConstraintViolation>> violations;
 
     /**
-     * Instantiates a new Validation exception.
+     * Instantiates a new Compose validation exception.
      *
      * @param object     the object that caused the exception
-     * @param violations the violations
+     * @param violations the violations (a map containing the fields path and the violations for that field)
+     *
      */
-    ValidationException(final @Nullable Object object, final @NotNull Set<ConstraintViolation> violations) {
+    public ValidationException(final @Nullable Object object, final @NotNull Map<String, Set<ConstraintViolation>> violations) {
         super(String.format("Validation failed for object %s: %s constraint(s) violated", object, violations.size()));
         this.object = object;
         this.violations = violations;

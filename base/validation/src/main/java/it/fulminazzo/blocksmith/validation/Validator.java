@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Parameter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -78,7 +79,7 @@ public final class Validator {
     public static void validate(final @Nullable Object value) throws ViolationException {
         try {
             getInstance().validateBean(value);
-        } catch (ComposeValidationException e) {
+        } catch (ValidationException e) {
             throw new ViolationException(e);
         }
     }
@@ -98,23 +99,52 @@ public final class Validator {
             getInstance().validate(field, value);
         } catch (ValidationException e) {
             throw new ViolationException(e);
-        } catch (ComposeValidationException e) {
+        }
+    }
+
+    /**
+     * Validates the value against the given parameter.
+     * <br>
+     * The parameter must have at least one {@link Constraint} annotated annotation
+     * in order for validation to work.
+     *
+     * @param parameter the parameter
+     * @param value     the value
+     * @throws ViolationException an exception containing all the violations
+     */
+    public static void validateParameter(final @NotNull Parameter parameter, final @Nullable Object value) throws ViolationException {
+        try {
+            getInstance().validate(parameter, value);
+        } catch (ValidationException e) {
             throw new ViolationException(e);
         }
     }
 
     /**
-     * Validates the given object against the annotated element.
+     * Validates the given object against the field.
      * Will recursively look up the annotations of the element.
      * Then, will validate the internal fields of the object.
      *
-     * @param annotatedElement the element
-     * @param value            the value
-     * @throws ValidationException        if the validation fails
-     * @throws ComposeValidationException if the validation fails
+     * @param field the element
+     * @param value the value
+     * @throws ValidationException if the validation fails
      */
-    public void validate(final @NotNull AnnotatedElement annotatedElement, final @Nullable Object value) throws ValidationException, ComposeValidationException {
-        validateRec(annotatedElement, value);
+    public void validate(final @NotNull Field field, final @Nullable Object value) throws ValidationException {
+        validateRec(field, field.getName(), value);
+        validateBean(value);
+    }
+
+    /**
+     * Validates the given object against the parameter.
+     * Will recursively look up the annotations of the element.
+     * Then, will validate the internal parameters of the object.
+     *
+     * @param parameter the element
+     * @param value     the value
+     * @throws ValidationException if the validation fails
+     */
+    public void validate(final @NotNull Parameter parameter, final @Nullable Object value) throws ValidationException {
+        validateRec(parameter, parameter.getName(), value);
         validateBean(value);
     }
 
@@ -122,9 +152,9 @@ public final class Validator {
      * Validates all the fields of the given Java object.
      *
      * @param bean the actual object to validate
-     * @throws ComposeValidationException if the validation fails
+     * @throws ValidationException if the validation fails
      */
-    public void validateBean(final @Nullable Object bean) throws ComposeValidationException {
+    public void validateBean(final @Nullable Object bean) throws ValidationException {
         if (bean == null) return;
         final Queue<Object> queue = new LinkedList<>();
         final Map<Object, String> paths = new LinkedHashMap<>();
@@ -144,18 +174,20 @@ public final class Validator {
                 Object value = beanReflect.get(field).get();
                 String fieldPath = (currentPath.isEmpty() ? "" : currentPath + ".") + field.getName();
                 try {
-                    validateRec(field, value);
+                    validateRec(field, fieldPath, value);
                 } catch (ValidationException e) {
-                    violations.put(fieldPath, e.getViolations());
+                    violations.putAll(e.getViolations());
                 }
                 queue.add(value);
                 paths.put(value, fieldPath);
             }
         }
-        if (!violations.isEmpty()) throw new ComposeValidationException(bean, violations);
+        if (!violations.isEmpty()) throw new ValidationException(bean, violations);
     }
 
-    private void validateRec(final @NotNull AnnotatedElement annotatedElement, final @Nullable Object value) throws ValidationException {
+    private void validateRec(final @NotNull AnnotatedElement annotatedElement,
+                             final @NotNull String elementName,
+                             final @Nullable Object value) throws ValidationException {
         final Map<Class<? extends Annotation>, ConstraintInfo> parents = new HashMap<>();
         final Set<ConstraintViolation> violations = new HashSet<>();
         final Queue<AnnotatedElement> elements = new LinkedList<>();
@@ -188,7 +220,7 @@ public final class Validator {
                         .forEach(a -> parents.putIfAbsent(a, constraintInfo));
             }
         }
-        if (!violations.isEmpty()) throw new ValidationException(value, violations);
+        if (!violations.isEmpty()) throw new ValidationException(value, Map.of(elementName, violations));
     }
 
     /**

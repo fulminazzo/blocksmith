@@ -268,7 +268,7 @@ class ValidatorTest extends Specification {
         then:
         def e = thrown(ValidationException)
         assert e.violations.size() > 0
-        def first = e.violations[0]
+        def first = e.violations[fieldName][0]
         def second = expectedViolations[0]
         assert first.value == second.value
         assert first.message == second.message
