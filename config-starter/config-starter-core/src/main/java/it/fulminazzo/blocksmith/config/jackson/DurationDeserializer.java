@@ -59,7 +59,7 @@ final class DurationDeserializer extends StdDeserializer<Duration> {
                     logger.warn("Invalid time value '{}' for unit {} (path: {})", rawValue, unit, JacksonUtils.getCurrentPath(parser));
                 }
             } else
-                logger.warn("Unrecognized time notation '{}' (path: {})", r, JacksonUtils.getCurrentPath(parser));
+                logger.warn("Unrecognized time notation '{}'. Supported units: {} (path: {})", r, getSupportedUnits(), JacksonUtils.getCurrentPath(parser));
         }
 
         if (duration == null) {

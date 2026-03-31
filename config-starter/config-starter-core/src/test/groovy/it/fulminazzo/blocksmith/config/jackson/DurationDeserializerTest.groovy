@@ -47,10 +47,10 @@ class DurationDeserializerTest extends Specification {
         1 * logger.warn('Invalid time value \'{}\' for unit {} (path: {})', 'ABC', 'M', '')
 
         and:
-        1 * logger.warn('Unrecognized time notation \'{}\' (path: {})', '33e', '')
+        1 * logger.warn('Unrecognized time notation \'{}\'. Supported units: {} (path: {})', '33e', DurationDeserializer.supportedUnits, '')
 
         and:
-        1 * logger.warn('Unrecognized time notation \'{}\' (path: {})', '10i', '')
+        1 * logger.warn('Unrecognized time notation \'{}\'. Supported units: {} (path: {})', '10i', DurationDeserializer.supportedUnits, '')
     }
 
     def 'test that deserialize of null works'() {
