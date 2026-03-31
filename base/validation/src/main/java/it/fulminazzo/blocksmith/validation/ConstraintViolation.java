@@ -57,21 +57,22 @@ public class ConstraintViolation {
         final @NotNull Object[] arguments = constraintInfo.formatArguments(value);
         final @NotNull Map<String, Object> argumentsMap = new HashMap<>();
         String message = constraintInfo.getMessage();
-        if (message != null) {
-            message = message.replace("%value%", value == null ? "null" : value.toString());
-            argumentsMap.put("value", value);
-            if (arguments.length == 2) {
-                Object expected = arguments[1];
-                message = message.replace("%expected%", expected.toString());
-                argumentsMap.put("expected", expected);
-            } else if (arguments.length == 3) {
-                Object max = arguments[1];
-                Object min = arguments[2];
-                message = message.replace("%max%", max.toString()).replace("%min%", min.toString());
-                argumentsMap.put("max", max);
-                argumentsMap.put("min", min);
-            }
+
+        argumentsMap.put("value", value);
+        if (message != null) message = message.replace("%value%", value == null ? "null" : value.toString());
+
+        if (arguments.length == 2) {
+            Object expected = arguments[1];
+            argumentsMap.put("expected", expected);
+            if (message != null) message = message.replace("%expected%", expected.toString());
+        } else if (arguments.length == 3) {
+            Object max = arguments[1];
+            Object min = arguments[2];
+            argumentsMap.put("max", max);
+            argumentsMap.put("min", min);
+            if (message != null) message = message.replace("%max%", max.toString()).replace("%min%", min.toString());
         }
+
         String exceptionMessage = String.format(constraintInfo.getExceptionMessage(), arguments);
         return new ConstraintViolation(value, message, exceptionMessage, argumentsMap);
     }
