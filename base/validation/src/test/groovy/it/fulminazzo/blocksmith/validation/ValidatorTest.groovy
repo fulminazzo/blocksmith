@@ -165,7 +165,7 @@ class ValidatorTest extends Specification {
         'range'               | 10
         // Port
         'port'                | null
-        'port'                | 0
+        'port'                | 1
         'port'                | 65535
         // Size
         'sizeString'          | null
@@ -310,7 +310,7 @@ class ValidatorTest extends Specification {
         'range'               | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number')]
         // Port
         'port'                | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.invalid-port', String.format('%1$s is not a valid port', Integer.MIN_VALUE), ['value': Integer.MIN_VALUE])]
-        'port'                | -1                                       || [new ConstraintViolation(-1, 'error.validation.invalid-port', String.format('%1$s is not a valid port', -1), ['value': -1])]
+        'port'                | 0                                        || [new ConstraintViolation(0, 'error.validation.invalid-port', String.format('%1$s is not a valid port', 0), ['value': 0])]
         'port'                | 65536                                    || [new ConstraintViolation(65536, 'error.validation.invalid-port', String.format('%1$s is not a valid port', 65536), ['value': 65536])]
         'port'                | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.invalid-port', String.format('%1$s is not a valid port', Integer.MAX_VALUE), ['value': Integer.MAX_VALUE])]
         'port'                | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number')]

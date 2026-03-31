@@ -9,8 +9,10 @@ import java.lang.annotation.*;
  * Identifies a numeric parameter or type that represents a networking port.
  * <br>
  * Accepts <code>null</code> values.
+ * <br>
+ * <b>WARNING</b>: does not support <code>0</code> as port.
  */
-@Range(min = 0, max = 65535)
+@Range(min = 1, max = 65535)
 @Constraint
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
