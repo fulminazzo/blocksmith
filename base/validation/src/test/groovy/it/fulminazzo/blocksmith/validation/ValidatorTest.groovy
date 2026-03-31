@@ -80,7 +80,7 @@ class ValidatorTest extends Specification {
 
     def 'test that validate of bean #bean works'() {
         when:
-        validator.validateBean(bean)
+        Validator.validate(bean)
 
         then:
         noExceptionThrown()
@@ -92,23 +92,27 @@ class ValidatorTest extends Specification {
         ]
     }
 
-    def 'test that validate of #bean throws'() {
+    def 'test that validate of #bean throws ViolationException with message #expected'() {
         when:
-        validator.validateBean(bean)
+        Validator.validate(bean)
 
         then:
-        thrown(ValidationException)
+        def e = thrown(ViolationException)
+        e.message == expected
 
         where:
-        bean << [
-                new Person(null, 23, null),
-                new Person('', 23, null),
-                new Person('Alex!', 23, null),
-                new Person('Alex', 0, null),
-                new Person('Alex', 13, null),
-                new Person('Alex', 130, null),
-                new Person('Alex', 23, new School(null))
-        ]
+        bean                                     || expected
+        new Person(null, 23, null)               || 'invalid property \'name\': cannot be null'
+        new Person('', 23, null)                 || 'invalid property \'name\': \'\' is not allowed (only letters)'
+        new Person('Alex!', 23, null)            || 'invalid property \'name\': \'Alex!\' is not allowed (only letters)'
+        new Person('Alex', 0, null)              || 'invalid property \'age\': 0 must be at least 18.0 and at most 115.0'
+        new Person('Alex', 13, null)             || 'invalid property \'age\': 13 must be at least 18.0 and at most 115.0'
+        new Person('Alex', 130, null)            || 'invalid property \'age\': 130 must be at least 18.0 and at most 115.0'
+        new Person('Alex', 23, new School(null)) || 'invalid property \'school.name\': cannot be null'
+        new Person(null, 0, new School(null))    ||
+                'invalid property \'name\': cannot be null; ' +
+                'invalid property \'school.name\': cannot be null; ' +
+                'invalid property \'age\': 0 must be at least 18.0 and at most 115.0'
     }
 
     def 'test that validate of field #fieldName and value #value does not throw'() {
