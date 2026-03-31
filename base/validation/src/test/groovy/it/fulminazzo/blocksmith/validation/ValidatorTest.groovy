@@ -217,7 +217,10 @@ class ValidatorTest extends Specification {
         'hexColor'            | '#FF0000'
         'hexColor'            | '#abc123'
         'hexColor'            | '#000000'
+        'hexColor'            | '#FFFFFFAA'
         'hexColor'            | '#FFFFFF'
+        'hexColor'            | '#FFFA'
+        'hexColor'            | '#FFF'
         // Identifier
         'identifier'          | null
         'identifier'          | 'myVariable'
@@ -364,8 +367,8 @@ class ValidatorTest extends Specification {
         // HexColor
         'hexColor'            | 'FF0000'                                 || [new ConstraintViolation('FF0000', 'error.validation.invalid-hex-color', String.format('\'%1$s\' is not a valid HEX color', 'FF0000'), ['value': 'FF0000'])]
         'hexColor'            | '#GGG000'                                || [new ConstraintViolation('#GGG000', 'error.validation.invalid-hex-color', String.format('\'%1$s\' is not a valid HEX color', '#GGG000'), ['value': '#GGG000'])]
-        'hexColor'            | '#FF00'                                  || [new ConstraintViolation('#FF00', 'error.validation.invalid-hex-color', String.format('\'%1$s\' is not a valid HEX color', '#FF00'), ['value': '#FF00'])]
-        'hexColor'            | '#FF00FF00'                              || [new ConstraintViolation('#FF00FF00', 'error.validation.invalid-hex-color', String.format('\'%1$s\' is not a valid HEX color', '#FF00FF00'), ['value': '#FF00FF00'])]
+        'hexColor'            | '#GG00'                                  || [new ConstraintViolation('#GG00', 'error.validation.invalid-hex-color', String.format('\'%1$s\' is not a valid HEX color', '#GG00'), ['value': '#GG00'])]
+        'hexColor'            | '#GG00GG00'                              || [new ConstraintViolation('#GG00GG00', 'error.validation.invalid-hex-color', String.format('\'%1$s\' is not a valid HEX color', '#GG00GG00'), ['value': '#GG00GG00'])]
         'hexColor'            | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Identifier
         'identifier'          | '1invalid'                               || [new ConstraintViolation('1invalid', 'error.validation.invalid-identifier', String.format('\'%1$s\' is not a valid identifier', '1invalid'), ['value': '1invalid'])]
