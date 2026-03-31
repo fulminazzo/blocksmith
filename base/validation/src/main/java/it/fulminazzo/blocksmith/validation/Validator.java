@@ -72,15 +72,27 @@ public final class Validator {
     /**
      * Validates all the fields of the given Java object.
      *
-     * @param beanType the type of the object
-     * @param bean     the actual object to validate
+     * @param bean the actual object to validate
      * @throws ValidationException if the validation fails
      */
-    public void validateBean(final @NotNull Class<?> beanType, final @Nullable Object bean) throws ValidationException {
+    public void validateBean(final @Nullable Object bean) throws ValidationException {
         if (bean == null) return;
-        final Reflect beanReflect = Reflect.on(bean);
-        for (Field field : Reflect.on(beanType).getInstanceFields())
-            validate(field, beanReflect.get(field).get());
+        final Queue<Object> queue = new LinkedList<>();
+        final Set<Object> visited = new HashSet<>();
+        queue.add(bean);
+        while (!queue.isEmpty()) {
+            final Object current = queue.remove();
+            if (current == null || visited.contains(current)) continue;
+            visited.add(current);
+            final Reflect beanReflect = Reflect.on(current);
+            if (beanReflect.isBaseType()) continue;
+            if (current.getClass().getPackageName().startsWith("java")) continue;
+            for (Field field : beanReflect.getInstanceFields()) {
+                Object value = beanReflect.get(field).get();
+                validate(field, value);
+                queue.add(value);
+            }
+        }
     }
 
     /**

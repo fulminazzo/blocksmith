@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.annotation.Character
 import it.fulminazzo.blocksmith.annotation.Uuid
 import it.fulminazzo.blocksmith.validation.annotation.*
 import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 import spock.lang.Specification
 
 class ValidatorTest extends Specification {
@@ -81,33 +82,34 @@ class ValidatorTest extends Specification {
 
     def 'test that validate of bean #bean works'() {
         when:
-        validator.validateBean(Person, bean)
+        validator.validateBean(bean)
 
         then:
         noExceptionThrown()
 
         where:
         bean << [
-                new Person('Alex', 23),
+                new Person('Alex', 23, new School('Galileo')),
                 null
         ]
     }
 
     def 'test that validate of #bean throws'() {
         when:
-        validator.validateBean(Person, bean)
+        validator.validateBean(bean)
 
         then:
         thrown(ValidationException)
 
         where:
         bean << [
-                new Person(null, 23),
-                new Person('', 23),
-                new Person('Alex!', 23),
-                new Person('Alex', 0),
-                new Person('Alex', 13),
-                new Person('Alex', 130)
+                new Person(null, 23, null),
+                new Person('', 23, null),
+                new Person('Alex!', 23, null),
+                new Person('Alex', 0, null),
+                new Person('Alex', 13, null),
+                new Person('Alex', 130, null),
+                new Person('Alex', 23, new School(null))
         ]
     }
 
@@ -413,9 +415,26 @@ class ValidatorTest extends Specification {
         @Range(min = 18, max = 115)
         private final int age
 
-        Person(final @NotNull String name, final int age) {
+        @Nullable
+        private final School school
+
+        Person(final @NotNull String name, final int age, final @Nullable School school) {
             this.name = name
             this.age = age
+            this.school = school
+        }
+
+    }
+
+    static final class School {
+
+        @Alphabetical
+        @NonNull
+        @NotNull
+        private final String name
+
+        School(final @NotNull String name) {
+            this.name = name
         }
 
     }
