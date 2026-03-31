@@ -15,23 +15,27 @@ import java.util.Map;
 import java.util.function.Function;
 
 final class DurationDeserializer extends StdDeserializer<Duration> {
-    private static final int daysInMonth = 30;
-    private static final int daysInYear = 365;
+    private static final long daysInMonth = 30;
+    private static final long daysInYear = 365;
+    private static final long millisInSecond = 1000;
 
-    private static final @NotNull Map<String, Function<Long, Duration>> parsers = new LinkedHashMap<>();
+    private static final @NotNull Map<String, Function<String, Duration>> parsers = new LinkedHashMap<>();
 
     private final @NotNull Logger logger;
 
     static {
-        parsers.put("ns", Duration::ofNanos);
-        parsers.put("ms", Duration::ofMillis);
-        parsers.put("s", Duration::ofSeconds);
-        parsers.put("m", Duration::ofMinutes);
-        parsers.put("h", Duration::ofHours);
-        parsers.put("d", Duration::ofDays);
-        parsers.put("M", l -> Duration.ofDays(l * daysInMonth));
-        parsers.put("y", l -> Duration.ofDays(l * daysInYear));
-        parsers.put("Y", l -> Duration.ofDays(l * daysInYear));
+        parsers.put("ns", s -> Duration.ofNanos(Long.parseLong(s)));
+        parsers.put("ms", s -> Duration.ofMillis(Long.parseLong(s)));
+        parsers.put("s", s -> {
+            long secondsAndMillis = (long) (Double.parseDouble(s) * millisInSecond);
+            return Duration.ofSeconds(secondsAndMillis / 1000).plusMillis(secondsAndMillis % 1000);
+        });
+        parsers.put("m", s -> Duration.ofMinutes(Long.parseLong(s)));
+        parsers.put("h", s -> Duration.ofHours(Long.parseLong(s)));
+        parsers.put("d", s -> Duration.ofDays(Long.parseLong(s)));
+        parsers.put("M", s -> Duration.ofDays(Long.parseLong(s) * daysInMonth));
+        parsers.put("y", s -> Duration.ofDays(Long.parseLong(s) * daysInYear));
+        parsers.put("Y", s -> Duration.ofDays(Long.parseLong(s) * daysInYear));
     }
 
     public DurationDeserializer(final @NotNull Logger logger) {
@@ -47,13 +51,12 @@ final class DurationDeserializer extends StdDeserializer<Duration> {
         Duration duration = null;
 
         for (String r : raw.split("[ \r\n\t]+")) {
-            Map.@Nullable Entry<String, Function<Long, Duration>> durationParser = getParser(r);
+            Map.@Nullable Entry<String, Function<String, Duration>> durationParser = getParser(r);
             if (durationParser != null) {
                 String unit = durationParser.getKey();
                 String rawValue = r.substring(0, r.length() - unit.length());
                 try {
-                    long value = Long.parseLong(rawValue);
-                    Duration d = durationParser.getValue().apply(value);
+                    Duration d = durationParser.getValue().apply(rawValue);
                     duration = duration == null ? d : duration.plus(d);
                 } catch (NumberFormatException e) {
                     logger.warn("Invalid time value '{}' for unit {} (path: {})", rawValue, unit, JacksonUtils.getCurrentPath(parser));
@@ -72,8 +75,8 @@ final class DurationDeserializer extends StdDeserializer<Duration> {
         return duration;
     }
 
-    private static @Nullable Map.Entry<String, Function<Long, Duration>> getParser(final @NotNull String raw) {
-        for (Map.Entry<String, Function<Long, Duration>> entry : parsers.entrySet())
+    private static @Nullable Map.Entry<String, Function<String, Duration>> getParser(final @NotNull String raw) {
+        for (Map.Entry<String, Function<String, Duration>> entry : parsers.entrySet())
             if (raw.endsWith(entry.getKey()))
                 return entry;
         return null;
