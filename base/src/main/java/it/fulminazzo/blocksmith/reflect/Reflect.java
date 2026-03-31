@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A wrapper for Java objects to work with reflections.
@@ -586,6 +587,10 @@ public class Reflect {
         Class<?> type = getObjectClass();
         while (type != null) {
             fields.addAll(Arrays.asList(type.getDeclaredFields()));
+            Arrays.stream(type.getInterfaces())
+                    .map(Class::getDeclaredFields)
+                    .flatMap(Arrays::stream)
+                    .forEach(fields::add);
             type = type.getSuperclass();
         }
         return fields;
@@ -844,16 +849,22 @@ public class Reflect {
         List<Method> methods = new ArrayList<>();
         Class<?> type = getObjectClass();
         while (type != null) {
-            List<Method> list = new ArrayList<>(Arrays.asList(type.getDeclaredMethods()));
-            list.sort(Comparator.<Method, Boolean>comparing(m -> Modifier.isStatic(m.getModifiers()))
-                    .thenComparing(Method::getName)
-                    .thenComparing(Method::getParameterCount)
-            );
+            List<Method> list = sortMethods(Arrays.stream(type.getDeclaredMethods())).collect(Collectors.toList());
             methods.addAll(list);
+            sortMethods(Arrays.stream(type.getInterfaces())
+                    .map(Class::getDeclaredMethods)
+                    .flatMap(Arrays::stream))
+                    .forEach(methods::add);
             type = type.getSuperclass();
         }
         methods.removeIf(Method::isSynthetic);
         return methods;
+    }
+
+    private static @NotNull Stream<Method> sortMethods(final @NotNull Stream<Method> methods) {
+        return methods.sorted(Comparator.<Method, Boolean>comparing(m -> Modifier.isStatic(m.getModifiers()))
+                .thenComparing(Method::getName)
+                .thenComparing(Method::getParameterCount));
     }
 
     /*
@@ -973,8 +984,8 @@ public class Reflect {
      * @param object the object
      * @return the reflect
      */
-    public static @NotNull Reflect on(final Object object) {
-        return new Reflect(object.getClass(), object);
+    public static @NotNull Reflect on(final @Nullable Object object) {
+        return new Reflect(object == null ? null : object.getClass(), object);
     }
 
     /**

@@ -1,23 +1,22 @@
 package it.fulminazzo.blocksmith.reflect
 
-
 import spock.lang.Specification
 
-import java.lang.reflect.Constructor
-import java.lang.reflect.Field
-import java.lang.reflect.InvocationTargetException
-import java.lang.reflect.Method
+import java.lang.reflect.*
 import java.util.concurrent.TimeUnit
 import java.util.function.Predicate
 
 class ReflectTest extends Specification {
     private static final Constructor<?> constructor = Person.getDeclaredConstructor(String, Integer)
 
+    private static final Field ENTITIES_DEFAULT_NAME = Entity.getDeclaredField('ENTITIES_DEFAULT_NAME')
     private static final Field DEFAULT_NAME = NamedEntity.getDeclaredField('DEFAULT_NAME')
     private static final Field DEFAULT_AGE = Person.getDeclaredField('DEFAULT_AGE')
     private static final Field name = NamedEntity.getDeclaredField('name')
     private static final Field age = Person.getDeclaredField('age')
 
+    private static final Method getUniqueId = Entity.getDeclaredMethod('getUniqueId')
+    private static final Method interfaceGetName = Entity.getDeclaredMethod('getName')
     private static final Method getDEFAULT_NAME = NamedEntity.getDeclaredMethod('getDEFAULT_NAME')
     private static final Method getDEFAULT_AGE = Person.getDeclaredMethod('getDEFAULT_AGE')
     private static final Method getName = NamedEntity.getDeclaredMethod('getName')
@@ -40,10 +39,14 @@ class ReflectTest extends Specification {
 
     private static final List<Method> objectMethods = Object.declaredMethods
             .findAll { !it.synthetic && !it.bridge }
-            .sort { a, b -> a.name <=> b.name ?: a.parameterCount <=> b.parameterCount }
+            .sort { a, b ->
+                Modifier.isStatic(a.modifiers) <=> Modifier.isStatic(b.modifiers) ?:
+                        a.name <=> b.name ?: a.parameterCount <=> b.parameterCount
+            }
 
     private static final String nameValue = 'Alex'
     private static final int ageValue = 23
+    private static final UUID uuidValue = UUID.nameUUIDFromBytes(nameValue.bytes)
 
     static {
         DEFAULT_NAME.accessible = true
@@ -249,12 +252,13 @@ class ReflectTest extends Specification {
         'getConstructors'        | []                                                                                     || [constructor]
         // getFieldValues
         'getInstanceFieldValues' | []                                                                                     || [ageValue, nameValue].collect { new Reflect(it.class, it) }
-        'getStaticFieldValues'   | []                                                                                     || [DEFAULT_AGE.get(null), DEFAULT_NAME.get(null)].collect { new Reflect(it.class, it) }
+        'getStaticFieldValues'   | []                                                                                     || [DEFAULT_AGE.get(null), DEFAULT_NAME.get(null), ENTITIES_DEFAULT_NAME.get(null)].collect { new Reflect(it.class, it) }
         'getFieldValues'         | [((Predicate<Field>) (f) -> false)]                                                    || [].collect { new Reflect(it.class, it) }
+        'getFieldValues'         | [((Predicate<Field>) (f) -> f.declaringClass == Entity)]                               || [ENTITIES_DEFAULT_NAME.get(null)].collect { new Reflect(it.class, it) }
         'getFieldValues'         | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                          || [DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
         'getFieldValues'         | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                               || [DEFAULT_AGE.get(null), ageValue].collect { new Reflect(it.class, it) }
-        'getFieldValues'         | [((Predicate<Field>) (f) -> true)]                                                     || [DEFAULT_AGE.get(null), ageValue, DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
-        'getFieldValues'         | []                                                                                     || [DEFAULT_AGE.get(null), ageValue, DEFAULT_NAME.get(null), nameValue].collect { new Reflect(it.class, it) }
+        'getFieldValues'         | [((Predicate<Field>) (f) -> true)]                                                     || [DEFAULT_AGE.get(null), ageValue, DEFAULT_NAME.get(null), nameValue, ENTITIES_DEFAULT_NAME.get(null)].collect { new Reflect(it.class, it) }
+        'getFieldValues'         | []                                                                                     || [DEFAULT_AGE.get(null), ageValue, DEFAULT_NAME.get(null), nameValue, ENTITIES_DEFAULT_NAME.get(null)].collect { new Reflect(it.class, it) }
         // set
         'setInstance'            | [name.name, nameValue]                                                                 || new Reflect(Person, new Person(nameValue, ageValue))
         'setInstance'            | [age.name, ageValue]                                                                   || new Reflect(Person, new Person(nameValue, ageValue))
@@ -278,12 +282,16 @@ class ReflectTest extends Specification {
         'getInstance'            | [age.name, null]                                                                       || new Reflect(age.type, ageValue)
         'getStatic'              | [DEFAULT_NAME.name, 'unknown']                                                         || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
         'getStatic'              | [DEFAULT_NAME.name, null]                                                              || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
+        'getStatic'              | [ENTITIES_DEFAULT_NAME.name, 'unknown']                                                || new Reflect(ENTITIES_DEFAULT_NAME.type, ENTITIES_DEFAULT_NAME.get(null))
+        'getStatic'              | [ENTITIES_DEFAULT_NAME.name, null]                                                     || new Reflect(ENTITIES_DEFAULT_NAME.type, ENTITIES_DEFAULT_NAME.get(null))
         'getStatic'              | [DEFAULT_AGE.name, 15]                                                                 || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
         'getStatic'              | [DEFAULT_AGE.name, null]                                                               || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
         'getStatic'              | [name.name, 'unknown']                                                                 || new Reflect(String, 'unknown')
         'getStatic'              | [name.name, null]                                                                      || new Reflect(null, null)
         'getStatic'              | [age.name, 15]                                                                         || new Reflect(Integer, 15)
         'getStatic'              | [age.name, null]                                                                       || new Reflect(null, null)
+        'get'                    | [ENTITIES_DEFAULT_NAME.name, 'unknown']                                                || new Reflect(ENTITIES_DEFAULT_NAME.type, ENTITIES_DEFAULT_NAME.get(null))
+        'get'                    | [ENTITIES_DEFAULT_NAME.name, null]                                                     || new Reflect(ENTITIES_DEFAULT_NAME.type, ENTITIES_DEFAULT_NAME.get(null))
         'get'                    | [DEFAULT_NAME.name, 'unknown']                                                         || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
         'get'                    | [DEFAULT_NAME.name, null]                                                              || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
         'get'                    | [DEFAULT_AGE.name, 15]                                                                 || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
@@ -296,6 +304,8 @@ class ReflectTest extends Specification {
         'get'                    | ['unknown', null]                                                                      || new Reflect(null, null)
         'get'                    | [((Predicate<Field>) (f) -> false), 'unknown']                                         || new Reflect(String, 'unknown')
         'get'                    | [((Predicate<Field>) (f) -> false), null]                                              || new Reflect(null, null)
+        'get'                    | [((Predicate<Field>) (f) -> f.declaringClass == Entity), 'unknown']                    || new Reflect(ENTITIES_DEFAULT_NAME.type, ENTITIES_DEFAULT_NAME.get(null))
+        'get'                    | [((Predicate<Field>) (f) -> f.declaringClass == Entity), null]                         || new Reflect(ENTITIES_DEFAULT_NAME.type, ENTITIES_DEFAULT_NAME.get(null))
         'get'                    | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity), 'unknown']               || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
         'get'                    | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity), null]                    || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
         'get'                    | [((Predicate<Field>) (f) -> f.declaringClass == Person), 'unknown']                    || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
@@ -305,8 +315,10 @@ class ReflectTest extends Specification {
         // get
         'getInstance'            | [name.name]                                                                            || new Reflect(name.type, nameValue)
         'getInstance'            | [age.name]                                                                             || new Reflect(age.type, ageValue)
+        'getStatic'              | [ENTITIES_DEFAULT_NAME.name]                                                           || new Reflect(ENTITIES_DEFAULT_NAME.type, ENTITIES_DEFAULT_NAME.get(null))
         'getStatic'              | [DEFAULT_NAME.name]                                                                    || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
         'getStatic'              | [DEFAULT_AGE.name]                                                                     || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
+        'get'                    | [ENTITIES_DEFAULT_NAME.name]                                                           || new Reflect(ENTITIES_DEFAULT_NAME.type, ENTITIES_DEFAULT_NAME.get(null))
         'get'                    | [DEFAULT_NAME.name]                                                                    || new Reflect(DEFAULT_NAME.type, DEFAULT_NAME.get(null))
         'get'                    | [DEFAULT_AGE.name]                                                                     || new Reflect(DEFAULT_AGE.type, DEFAULT_AGE.get(null))
         'get'                    | [name.name]                                                                            || new Reflect(name.type, nameValue)
@@ -317,8 +329,10 @@ class ReflectTest extends Specification {
         // getField
         'getInstanceField'       | [name.name]                                                                            || name
         'getInstanceField'       | [age.name]                                                                             || age
+        'getStaticField'         | [ENTITIES_DEFAULT_NAME.name]                                                           || ENTITIES_DEFAULT_NAME
         'getStaticField'         | [DEFAULT_NAME.name]                                                                    || DEFAULT_NAME
         'getStaticField'         | [DEFAULT_AGE.name]                                                                     || DEFAULT_AGE
+        'getField'               | [ENTITIES_DEFAULT_NAME.name]                                                           || ENTITIES_DEFAULT_NAME
         'getField'               | [DEFAULT_NAME.name]                                                                    || DEFAULT_NAME
         'getField'               | [DEFAULT_AGE.name]                                                                     || DEFAULT_AGE
         'getField'               | [name.name]                                                                            || name
@@ -328,13 +342,18 @@ class ReflectTest extends Specification {
         'getField'               | [((Predicate<Field>) (f) -> true)]                                                     || DEFAULT_AGE
         // getFields
         'getInstanceFields'      | []                                                                                     || [age, name]
-        'getStaticFields'        | []                                                                                     || [DEFAULT_AGE, DEFAULT_NAME]
+        'getStaticFields'        | []                                                                                     || [DEFAULT_AGE, DEFAULT_NAME, ENTITIES_DEFAULT_NAME]
         'getFields'              | [((Predicate<Field>) (f) -> false)]                                                    || []
+        'getFields'              | [((Predicate<Field>) (f) -> f.declaringClass == Entity)]                               || [ENTITIES_DEFAULT_NAME]
         'getFields'              | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                          || [DEFAULT_NAME, name]
         'getFields'              | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                               || [DEFAULT_AGE, age]
-        'getFields'              | [((Predicate<Field>) (f) -> true)]                                                     || [DEFAULT_AGE, age, DEFAULT_NAME, name]
-        'getFields'              | []                                                                                     || [DEFAULT_AGE, age, DEFAULT_NAME, name]
+        'getFields'              | [((Predicate<Field>) (f) -> true)]                                                     || [DEFAULT_AGE, age, DEFAULT_NAME, name, ENTITIES_DEFAULT_NAME]
+        'getFields'              | []                                                                                     || [DEFAULT_AGE, age, DEFAULT_NAME, name, ENTITIES_DEFAULT_NAME]
         // invoke
+        'invoke'                 | [getUniqueId.name, [].toArray()]                                                       || new Reflect(uuidValue.class, uuidValue)
+        'invoke'                 | [getUniqueId.name]                                                                     || new Reflect(uuidValue.class, uuidValue)
+        'invoke'                 | [getUniqueId.returnType, getUniqueId.name, [].toArray()]                               || new Reflect(uuidValue.class, uuidValue)
+        'invoke'                 | [getUniqueId.returnType, getUniqueId.name]                                             || new Reflect(uuidValue.class, uuidValue)
         'invoke'                 | [getDEFAULT_NAME.name, [].toArray()]                                                   || new Reflect(DEFAULT_NAME.get(null).class, DEFAULT_NAME.get(null))
         'invoke'                 | [getDEFAULT_NAME.name]                                                                 || new Reflect(DEFAULT_NAME.get(null).class, DEFAULT_NAME.get(null))
         'invoke'                 | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name, [].toArray()]                       || new Reflect(DEFAULT_NAME.get(null).class, DEFAULT_NAME.get(null))
@@ -363,6 +382,10 @@ class ReflectTest extends Specification {
         'invoke'                 | [setAge.returnType, setAge.name, [ageValue].toArray()]                                 || new Reflect(void, null)
         'invoke'                 | []                                                                                     || new Reflect(ageValue.class, ageValue)
         // getMethod
+        'getInstanceMethod'      | [getUniqueId.name, getUniqueId.parameterTypes]                                         || getUniqueId
+        'getInstanceMethod'      | [getUniqueId.name]                                                                     || getUniqueId
+        'getInstanceMethod'      | [getUniqueId.returnType, getUniqueId.name, getUniqueId.parameterTypes]                 || getUniqueId
+        'getInstanceMethod'      | [getUniqueId.returnType, getUniqueId.name]                                             || getUniqueId
         'getInstanceMethod'      | [getName.name, getName.parameterTypes]                                                 || getName
         'getInstanceMethod'      | [getName.name]                                                                         || getName
         'getInstanceMethod'      | [getName.returnType, getName.name, getName.parameterTypes]                             || getName
@@ -393,6 +416,10 @@ class ReflectTest extends Specification {
         'getStaticMethod'        | [setDEFAULT_AGE.name, setDEFAULT_AGE.parameterTypes]                                   || setDEFAULT_AGE
         'getStaticMethod'        | [setDEFAULT_AGE.returnType, setDEFAULT_AGE.name, setDEFAULT_AGE.parameterTypes]        || setDEFAULT_AGE
         'getStaticMethod'        | []                                                                                     || getDEFAULT_AGE
+        'getMethod'              | [getUniqueId.name, getUniqueId.parameterTypes]                                         || getUniqueId
+        'getMethod'              | [getUniqueId.name]                                                                     || getUniqueId
+        'getMethod'              | [getUniqueId.returnType, getUniqueId.name, getUniqueId.parameterTypes]                 || getUniqueId
+        'getMethod'              | [getUniqueId.returnType, getUniqueId.name]                                             || getUniqueId
         'getMethod'              | [getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes]                                 || getDEFAULT_NAME
         'getMethod'              | [getDEFAULT_NAME.name]                                                                 || getDEFAULT_NAME
         'getMethod'              | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes]     || getDEFAULT_NAME
@@ -427,9 +454,13 @@ class ReflectTest extends Specification {
         'getInstanceMethods'     | []                                                                                     ||
                 [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString,
                  namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString,
-                 *objectMethods]
-        'getStaticMethods'       | []                                                                                     || [getDEFAULT_AGE, setDEFAULT_AGE, getDEFAULT_NAME, setDEFAULT_NAME]
+                 interfaceGetName, getUniqueId,
+                 *objectMethods.findAll { !Modifier.isStatic(it.modifiers) }]
+        'getStaticMethods'       | []                                                                                     ||
+                [getDEFAULT_AGE, setDEFAULT_AGE, getDEFAULT_NAME, setDEFAULT_NAME, *objectMethods.findAll { Modifier.isStatic(it.modifiers) }]
         'getMethods'             | [((Predicate<Field>) (f) -> false)]                                                    || []
+        'getMethods'             | [((Predicate<Field>) (f) -> f.declaringClass == Entity)]                               ||
+                [interfaceGetName, getUniqueId]
         'getMethods'             | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                          ||
                 [namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDEFAULT_NAME, setDEFAULT_NAME]
         'getMethods'             | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                               ||
@@ -437,10 +468,12 @@ class ReflectTest extends Specification {
         'getMethods'             | [((Predicate<Field>) (f) -> true)]                                                     ||
                 [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString, getDEFAULT_AGE, setDEFAULT_AGE,
                  namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDEFAULT_NAME, setDEFAULT_NAME,
+                 interfaceGetName, getUniqueId,
                  *objectMethods]
         'getMethods'             | []                                                                                     ||
                 [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString, getDEFAULT_AGE, setDEFAULT_AGE,
                  namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDEFAULT_NAME, setDEFAULT_NAME,
+                 interfaceGetName, getUniqueId,
                  *objectMethods]
     }
 
@@ -667,6 +700,7 @@ class ReflectTest extends Specification {
 
         where:
         arguments                                  || expected
+        [null]                                     || new Reflect(null, null)
         [new Person('Camilla', 21)]                || new Reflect(Person, new Person('Camilla', 21))
         [Person]                                   || new Reflect(Person, Person)
         [Person.canonicalName]                     || new Reflect(Person, Person)
