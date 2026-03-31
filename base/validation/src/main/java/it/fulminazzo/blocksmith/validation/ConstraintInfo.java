@@ -12,7 +12,9 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents information about a constraint.
@@ -20,8 +22,8 @@ import java.util.List;
 @Value
 @AllArgsConstructor(access = AccessLevel.NONE)
 class ConstraintInfo {
-    @Getter(AccessLevel.NONE)
-    @NotNull List<Object> values = new ArrayList<>();
+    @Getter(AccessLevel.PACKAGE)
+    @NotNull Map<String, Object> values = new LinkedHashMap<>();
 
     @Nullable String message;
     @NotNull String exceptionMessage;
@@ -35,8 +37,11 @@ class ConstraintInfo {
         Reflect reflectType = Reflect.on(constraint.annotationType());
         Reflect reflect = Reflect.on(constraint);
         for (Method method : reflectType.getInstanceMethods())
-            if (!method.getName().equals("message") && !method.getName().equals("exceptionMessage"))
-                values.add(reflect.invoke(method).get());
+            if (!method.getName().equals("message") && !method.getName().equals("exceptionMessage")) {
+                String name = method.getName();
+                if (name.equals("value")) name = "expected";
+                values.put(name, reflect.invoke(method).get());
+            }
         String message;
         try {
             message = reflect.invoke("message").get();
@@ -62,7 +67,7 @@ class ConstraintInfo {
     public @NotNull Object @NotNull [] formatArguments(final Object value) {
         List<Object> arguments = new ArrayList<>();
         arguments.add(value);
-        arguments.addAll(values);
+        arguments.addAll(values.values());
         return arguments.toArray();
     }
 
