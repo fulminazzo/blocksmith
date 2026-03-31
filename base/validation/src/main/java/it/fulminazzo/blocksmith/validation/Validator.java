@@ -108,9 +108,10 @@ public final class Validator {
      *
      * @param annotatedElement the element
      * @param value            the value
-     * @throws ValidationException if the validation fails
+     * @throws ValidationException        if the validation fails
+     * @throws ComposeValidationException if the validation fails
      */
-    public void validate(final @NotNull AnnotatedElement annotatedElement, final @Nullable Object value) throws ValidationException {
+    public void validate(final @NotNull AnnotatedElement annotatedElement, final @Nullable Object value) throws ValidationException, ComposeValidationException {
         validateRec(annotatedElement, value);
         validateBean(value);
     }
@@ -119,12 +120,13 @@ public final class Validator {
      * Validates all the fields of the given Java object.
      *
      * @param bean the actual object to validate
-     * @throws ValidationException if the validation fails
+     * @throws ComposeValidationException if the validation fails
      */
-    public void validateBean(final @Nullable Object bean) throws ValidationException {
+    public void validateBean(final @Nullable Object bean) throws ComposeValidationException {
         if (bean == null) return;
         final Queue<Object> queue = new LinkedList<>();
         final Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        final Map<Field, Set<ConstraintViolation>> violations = new HashMap<>();
         queue.add(bean);
         while (!queue.isEmpty()) {
             final Object current = queue.remove();
@@ -135,10 +137,15 @@ public final class Validator {
             if (current.getClass().getPackageName().startsWith("java")) continue;
             for (Field field : beanReflect.getInstanceFields()) {
                 Object value = beanReflect.get(field).get();
-                validateRec(field, value);
+                try {
+                    validateRec(field, value);
+                } catch (ValidationException e) {
+                    violations.put(field, e.getViolations());
+                }
                 queue.add(value);
             }
         }
+        if (!violations.isEmpty()) throw new ComposeValidationException(bean, violations);
     }
 
     private void validateRec(final @NotNull AnnotatedElement annotatedElement, final @Nullable Object value) throws ValidationException {
