@@ -92,7 +92,7 @@ public final class Validator {
     public void validateBean(final @Nullable Object bean) throws ValidationException {
         if (bean == null) return;
         final Queue<Object> queue = new LinkedList<>();
-        final Set<Object> visited = new HashSet<>();
+        final Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
         queue.add(bean);
         while (!queue.isEmpty()) {
             final Object current = queue.remove();
