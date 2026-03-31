@@ -18,6 +18,6 @@ public @interface Character {
 
     @NotNull String message() default "error.validation.invalid-character";
 
-    @NotNull String defaultMessage() default "'%1$s' is not a valid character";
+    @NotNull String exceptionMessage() default "'%1$s' is not a valid character";
 
 }
