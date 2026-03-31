@@ -14,6 +14,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * A Jackson deserializer for {@link Duration} objects.
+ */
 final class DurationDeserializer extends StdDeserializer<Duration> {
     private static final long daysInMonth = 30;
     private static final long daysInYear = 365;
@@ -38,6 +41,11 @@ final class DurationDeserializer extends StdDeserializer<Duration> {
         parsers.put("Y", s -> Duration.ofDays(Long.parseLong(s) * daysInYear));
     }
 
+    /**
+     * Instantiates a new Duration deserializer.
+     *
+     * @param logger the logger
+     */
     public DurationDeserializer(final @NotNull Logger logger) {
         super(Duration.class);
         this.logger = logger;
@@ -48,6 +56,9 @@ final class DurationDeserializer extends StdDeserializer<Duration> {
                                 final @NotNull DeserializationContext context) throws IOException {
         JsonNode node = parser.getCodec().readTree(parser);
         String raw = node.asText();
+        try {
+            return getParser("s").getValue().apply(raw);
+        } catch (NumberFormatException ignored) {}
         Duration duration = null;
 
         for (String r : raw.split("[ \r\n\t]+")) {
