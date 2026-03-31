@@ -70,6 +70,24 @@ public final class Validator {
     }
 
     /**
+     * Validates the value against the given field.
+     * <br>
+     * The field must have at least one {@link Constraint} annotated annotation
+     * in order for validation to work.
+     *
+     * @param field the field
+     * @param value the value
+     * @throws ViolationException an exception containing all the violations
+     */
+    public static void validateField(final @NotNull Field field, final @Nullable Object value) throws ViolationException {
+        try {
+            getInstance().validate(field, value);
+        } catch (ValidationException e) {
+            throw new ViolationException(e.getViolations());
+        }
+    }
+
+    /**
      * Validates the given object against the annotated element.
      * Will recursively look up the annotations of the element.
      * Then, will validate the internal fields of the object.
