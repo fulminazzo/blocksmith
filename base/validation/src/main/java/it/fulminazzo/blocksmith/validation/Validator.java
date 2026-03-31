@@ -70,6 +70,20 @@ public final class Validator {
     }
 
     /**
+     * Validates the given object against the annotated element.
+     * Will recursively look up the annotations of the element.
+     * Then, will validate the internal fields of the object.
+     *
+     * @param annotatedElement the element
+     * @param value            the value
+     * @throws ValidationException if the validation fails
+     */
+    public void validate(final @NotNull AnnotatedElement annotatedElement, final @Nullable Object value) throws ValidationException {
+        validateRec(annotatedElement, value);
+        validateBean(value);
+    }
+
+    /**
      * Validates all the fields of the given Java object.
      *
      * @param bean the actual object to validate
@@ -89,21 +103,13 @@ public final class Validator {
             if (current.getClass().getPackageName().startsWith("java")) continue;
             for (Field field : beanReflect.getInstanceFields()) {
                 Object value = beanReflect.get(field).get();
-                validate(field, value);
+                validateRec(field, value);
                 queue.add(value);
             }
         }
     }
 
-    /**
-     * Validates the given object against the annotated element.
-     * Will recursively look up the annotations of the element.
-     *
-     * @param annotatedElement the element
-     * @param value            the value
-     * @throws ValidationException if the validation fails
-     */
-    public void validate(final @NotNull AnnotatedElement annotatedElement, final Object value) throws ValidationException {
+    private void validateRec(final @NotNull AnnotatedElement annotatedElement, final @Nullable Object value) throws ValidationException {
         final Map<Class<? extends Annotation>, ConstraintInfo> parents = new HashMap<>();
         final Set<ConstraintViolation> violations = new HashSet<>();
         final Queue<AnnotatedElement> elements = new LinkedList<>();
