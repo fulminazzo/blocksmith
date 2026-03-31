@@ -79,7 +79,7 @@ public final class Validator {
         try {
             getInstance().validateBean(value);
         } catch (ComposeValidationException e) {
-            throw new ViolationException(value, e);
+            throw new ViolationException(e);
         }
     }
 
@@ -97,9 +97,9 @@ public final class Validator {
         try {
             getInstance().validate(field, value);
         } catch (ValidationException e) {
-            throw new ViolationException(value, e);
+            throw new ViolationException(e);
         } catch (ComposeValidationException e) {
-            throw new ViolationException(value, e);
+            throw new ViolationException(e);
         }
     }
 
@@ -127,24 +127,29 @@ public final class Validator {
     public void validateBean(final @Nullable Object bean) throws ComposeValidationException {
         if (bean == null) return;
         final Queue<Object> queue = new LinkedList<>();
+        final Map<Object, String> paths = new LinkedHashMap<>();
         final Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
-        final Map<Field, Set<ConstraintViolation>> violations = new HashMap<>();
+        final Map<String, Set<ConstraintViolation>> violations = new HashMap<>();
+        paths.put(bean, "");
         queue.add(bean);
         while (!queue.isEmpty()) {
             final Object current = queue.remove();
             if (current == null || visited.contains(current)) continue;
+            final String currentPath = paths.get(current);
             visited.add(current);
             final Reflect beanReflect = Reflect.on(current);
             if (beanReflect.isBaseType()) continue;
             if (current.getClass().getPackageName().startsWith("java")) continue;
             for (Field field : beanReflect.getInstanceFields()) {
                 Object value = beanReflect.get(field).get();
+                String fieldPath = (currentPath.isEmpty() ? "" : currentPath + ".") + field.getName();
                 try {
                     validateRec(field, value);
                 } catch (ValidationException e) {
-                    violations.put(field, e.getViolations());
+                    violations.put(fieldPath, e.getViolations());
                 }
                 queue.add(value);
+                paths.put(value, fieldPath);
             }
         }
         if (!violations.isEmpty()) throw new ComposeValidationException(bean, violations);
