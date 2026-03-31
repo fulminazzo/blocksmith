@@ -61,20 +61,11 @@ public class ConstraintViolation {
         argumentsMap.put("value", value);
         if (message != null) message = message.replace("%value%", value == null ? "null" : value.toString());
 
-        if (arguments.length == 2) {
-            Object expected = arguments[1];
-            argumentsMap.put("expected", expected);
-            if (message != null) message = message.replace("%expected%", expected.toString());
-        } else if (arguments.length == 3) {
-            Object max = arguments[1];
-            Object min = arguments[2];
-            argumentsMap.put("max", max);
-            argumentsMap.put("min", min);
-            if (message != null) message = message.replace("%max%", max.toString()).replace("%min%", min.toString());
-        } else for (int i = 1; i < arguments.length; i++) {
-            Object argument = arguments[i];
-            argumentsMap.put("argument" + (i - 1), argument);
-            if (message != null) message = message.replace("%arg" + (i - 1) + "%", argument.toString());
+        @NotNull Map<String, Object> values = constraintInfo.getValues();
+        for (String key : values.keySet()) {
+            Object v = values.get(key);
+            argumentsMap.put(key, v);
+            if (message != null) message = message.replace("%" + key + "%", v == null ? "null" : v.toString());
         }
 
         String exceptionMessage = String.format(constraintInfo.getExceptionMessage(), arguments);
