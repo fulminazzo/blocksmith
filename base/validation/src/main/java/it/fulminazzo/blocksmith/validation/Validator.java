@@ -11,6 +11,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -56,6 +58,14 @@ public final class Validator {
                 .registerSupplier(Matches.class, a -> new StringConstraintValidator(o -> o == null ||
                         Pattern.compile(a.value()).matcher((CharSequence) o).matches()
                 ))
+                .register(Url.class, new StringConstraintValidator(o -> {
+                    try {
+                        if (o != null) new URL(o.toString());
+                        return true;
+                    } catch (MalformedURLException e) {
+                        return false;
+                    }
+                }))
         ;
     }
 

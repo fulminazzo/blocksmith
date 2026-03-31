@@ -10,7 +10,6 @@ import java.lang.annotation.*;
  * <br>
  * Accepts <code>null</code> values.
  */
-@Matches("https?:\\/\\/([\\w\\-]+\\.)+[\\w\\-]+(:\\d{1,5})?(\\/[^\\s]*)?(\\?[^\\s]*)?(#[^\\s]*)?")
 @Constraint
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
