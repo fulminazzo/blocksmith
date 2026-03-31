@@ -209,7 +209,6 @@ class ValidatorTest extends Specification {
         'ipv6'                | 'fe80::1'
         // Url
         'url'                 | null
-        'url'                 | 'example.com'
         'url'                 | 'http://example.com'
         'url'                 | 'ftp://example.com'
         'url'                 | 'https://example.com'
@@ -363,6 +362,7 @@ class ValidatorTest extends Specification {
         'ipv6'                | '2001:0db8:85a3:0000:0000:8a2e:0370'     || [new ConstraintViolation('2001:0db8:85a3:0000:0000:8a2e:0370', 'error.validation.invalid-ipv6', String.format('\'%1$s\' is not a valid IPv6', '2001:0db8:85a3:0000:0000:8a2e:0370'), ['value': '2001:0db8:85a3:0000:0000:8a2e:0370'])]
         'ipv6'                | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Url
+        'url'                 | 'example.com'                            || [new ConstraintViolation('example.com', 'error.validation.invalid-url', String.format('\'%1$s\' is not a valid URL', 'example.com'), ['value': 'example.com'])]
         'url'                 | 'not-a-url'                              || [new ConstraintViolation('not-a-url', 'error.validation.invalid-url', String.format('\'%1$s\' is not a valid URL', 'not-a-url'), ['value': 'not-a-url'])]
         'url'                 | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // HexColor
