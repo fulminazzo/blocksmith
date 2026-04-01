@@ -1,10 +1,10 @@
 package it.fulminazzo.blocksmith.data.memory;
 
-import it.fulminazzo.blocksmith.util.ValidationUtils;
+import it.fulminazzo.blocksmith.validation.Validator;
+import it.fulminazzo.blocksmith.validation.annotation.PositiveOrZero;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,8 +47,8 @@ public class ExpirationMap<K, V> implements Map<K, V> {
      *
      * @param expiryInMillis the expiration time (in milliseconds)
      */
-    public void setExpiry(final @Range(from = 0, to = Long.MAX_VALUE) long expiryInMillis) {
-        ValidationUtils.checkPositive(expiryInMillis, "expiry");
+    public void setExpiry(final @PositiveOrZero(exceptionMessage = "the expiration time must be positive or zero") long expiryInMillis) {
+        Validator.validateMethod(expiryInMillis);
         this.expiryInMillis = expiryInMillis;
     }
 

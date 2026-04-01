@@ -3,11 +3,12 @@ package it.fulminazzo.blocksmith.data.sql;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import it.fulminazzo.blocksmith.data.RepositoryDataSourceBuilder;
-import it.fulminazzo.blocksmith.util.ValidationUtils;
+import it.fulminazzo.blocksmith.validation.Validator;
+import it.fulminazzo.blocksmith.validation.annotation.Positive;
+import it.fulminazzo.blocksmith.validation.annotation.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
 import org.jooq.SQLDialect;
 
 import java.util.Objects;
@@ -97,9 +98,9 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param maximumPoolSize the maximum pool size
      * @return this object (for method chaining)
      */
-    public @NotNull B maximumPoolSize(final @Nullable @Range(from = 1, to = Integer.MAX_VALUE) Integer maximumPoolSize) {
+    public @NotNull B maximumPoolSize(final @Nullable @Positive(exceptionMessage = "maximum pool size must be positive") Integer maximumPoolSize) {
         if (maximumPoolSize != null) {
-            ValidationUtils.checkNatural(maximumPoolSize, "maximum pool size");
+            Validator.validateMethod(maximumPoolSize);
             config.setMaximumPoolSize(maximumPoolSize);
         }
         return (B) this;
@@ -113,9 +114,9 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param minimumIdle the minimum idle
      * @return this object (for method chaining)
      */
-    public @NotNull B minimumIdle(final @Nullable @Range(from = 0, to = Integer.MAX_VALUE) Integer minimumIdle) {
+    public @NotNull B minimumIdle(final @Nullable @PositiveOrZero(exceptionMessage = "minimum idle must be at least 0") Integer minimumIdle) {
         if (minimumIdle != null) {
-            ValidationUtils.checkPositive(minimumIdle, "minimum idle");
+            Validator.validateMethod(minimumIdle);
             config.setMinimumIdle(minimumIdle);
         }
         return (B) this;
@@ -129,9 +130,9 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param connectionTimeout the connection timeout
      * @return this object (for method chaining)
      */
-    public @NotNull B connectionTimeout(final @Nullable @Range(from = 1, to = Long.MAX_VALUE) Long connectionTimeout) {
+    public @NotNull B connectionTimeout(final @Nullable @Positive(exceptionMessage = "connection timeout must be positive") Long connectionTimeout) {
         if (connectionTimeout != null) {
-            ValidationUtils.checkNatural(connectionTimeout, "connection timeout");
+            Validator.validateMethod(connectionTimeout);
             config.setConnectionTimeout(connectionTimeout);
         }
         return (B) this;
@@ -145,9 +146,9 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param idleTimeout the idle timeout
      * @return this object (for method chaining)
      */
-    public @NotNull B idleTimeout(final @Nullable @Range(from = 0, to = Long.MAX_VALUE) Long idleTimeout) {
+    public @NotNull B idleTimeout(final @Nullable @PositiveOrZero(exceptionMessage = "idle timeout must be at least 0") Long idleTimeout) {
         if (idleTimeout != null) {
-            ValidationUtils.checkPositive(idleTimeout, "idle timeout");
+            Validator.validateMethod(idleTimeout);
             config.setIdleTimeout(idleTimeout);
         }
         return (B) this;
@@ -161,9 +162,9 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param maxLifetime the max lifetime
      * @return this object (for method chaining)
      */
-    public @NotNull B maxLifeTime(final @Nullable @Range(from = 0, to = Long.MAX_VALUE) Long maxLifetime) {
+    public @NotNull B maxLifeTime(final @Nullable @PositiveOrZero(exceptionMessage = "maximum lifetime must be at least 0") Long maxLifetime) {
         if (maxLifetime != null) {
-            ValidationUtils.checkPositive(maxLifetime, "maximum lifetime");
+            Validator.validateMethod(maxLifetime);
             config.setMaxLifetime(maxLifetime);
         }
         return (B) this;

@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data;
 
-import it.fulminazzo.blocksmith.util.ValidationUtils;
+import it.fulminazzo.blocksmith.validation.Validator;
+import it.fulminazzo.blocksmith.validation.annotation.PositiveOrZero;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -27,8 +28,8 @@ public abstract class CacheRepositorySettings<S extends CacheRepositorySettings<
      * @param expiry the expiration time
      * @return this object (for method chaining)
      */
-    public @NotNull S withTtl(final @NotNull Duration expiry) {
-        ValidationUtils.checkPositive(expiry.toMillis(), "cache expire time");
+    public @NotNull S withTtl(final @PositiveOrZero(exceptionMessage = "cache expire time must be at least 0") @NotNull Duration expiry) {
+        Validator.validateMethod(expiry);
         this.ttl = expiry;
         return (S) this;
     }

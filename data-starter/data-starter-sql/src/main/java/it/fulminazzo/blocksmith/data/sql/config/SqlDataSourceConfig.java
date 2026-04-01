@@ -3,9 +3,11 @@ package it.fulminazzo.blocksmith.data.sql.config;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import it.fulminazzo.blocksmith.data.sql.DatabaseType;
-import jakarta.validation.constraints.*;
+import it.fulminazzo.blocksmith.validation.annotation.*;
+import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
@@ -26,12 +28,12 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
         );
     }
 
-    @NotNull(message = "'database type' must be declared")
-    @org.jetbrains.annotations.NotNull
+    @NonNull(exceptionMessage = "'database type' must be declared")
+    @NotNull
     DatabaseType databaseType;
 
-    @NotEmpty(message = "'database name' must not be empty")
-    @org.jetbrains.annotations.NotNull
+    @NotEmpty(exceptionMessage = "'database name' must not be empty")
+    @NotNull
     String database;
 
     @Nullable
@@ -40,32 +42,32 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     String password;
 
-    @Positive(message = "'maximum pool size' must be greater than 0")
+    @Positive(exceptionMessage = "'maximum pool size' must be greater than 0")
     @Range(from = 1, to = Integer.MAX_VALUE)
     @Nullable
     Integer maximumPoolSize;
 
-    @PositiveOrZero(message = "'minimum idle' must be at least 0")
+    @PositiveOrZero(exceptionMessage = "'minimum idle' must be at least 0")
     @Range(from = 0, to = Integer.MAX_VALUE)
     @Nullable
     Integer minimumIdle;
 
-    @Positive(message = "'connection timeout' must be greater than 0")
+    @Positive(exceptionMessage = "'connection timeout' must be greater than 0")
     @Range(from = 1, to = Long.MAX_VALUE)
     @Nullable
     Long connectionTimeout;
 
-    @PositiveOrZero(message = "'idle timeout' must be at least 0")
+    @PositiveOrZero(exceptionMessage = "'idle timeout' must be at least 0")
     @Range(from = 0, to = Long.MAX_VALUE)
     @Nullable
     Long idleTimeout;
 
-    @PositiveOrZero(message = "'max life time' must be at least 0")
+    @PositiveOrZero(exceptionMessage = "'max life time' must be at least 0")
     @Range(from = 0, to = Long.MAX_VALUE)
     @Nullable
     Long maxLifeTime;
 
-    @org.jetbrains.annotations.NotNull
+    @NotNull
     @Builder.Default
     Map<String, Object> properties = new HashMap<>();
 
@@ -75,8 +77,8 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     String host;
 
-    @Min(value = 1, message = "'port' number must be at least 1")
-    @Max(value = 65535, message = "'port' number must be at most 65535")
+    @Min(value = 1, exceptionMessage = "'port' number must be at least 1")
+    @Max(value = 65535, exceptionMessage = "'port' number must be at most 65535")
     @Range(from = 1, to = 65535)
     @Nullable
     Integer port;
@@ -88,7 +90,7 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     String schemaName;
 
     @Builder.Default
-    @org.jetbrains.annotations.NotNull
+    @NotNull
     Map<String, Object> parameters = new HashMap<>();
 
     /*
@@ -116,8 +118,8 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
         @Nullable
         String host;
 
-        @Min(value = 1, message = "'port' number must be at least 1")
-        @Max(value = 65535, message = "'port' number must be at most 65535")
+        @Min(value = 1, exceptionMessage = "'port' number must be at least 1")
+        @Max(value = 65535, exceptionMessage = "'port' number must be at most 65535")
         @Range(from = 1, to = 65535)
         @Nullable
         Integer port;

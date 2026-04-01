@@ -7,7 +7,8 @@ import it.fulminazzo.blocksmith.data.CacheRepository;
 import it.fulminazzo.blocksmith.data.Page;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
-import it.fulminazzo.blocksmith.util.ValidationUtils;
+import it.fulminazzo.blocksmith.validation.Validator;
+import it.fulminazzo.blocksmith.validation.annotation.PositiveOrZero;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -120,10 +121,9 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
     }
 
     @Override
-    public @NotNull RedisRepository<T, ID> ttl(final @NotNull Duration expiry) {
-        long expiryInMillis = expiry.toMillis();
-        ValidationUtils.checkPositive(expiryInMillis, "expiry");
-        this.expiry = expiryInMillis;
+    public @NotNull RedisRepository<T, ID> ttl(final @PositiveOrZero(exceptionMessage = "expire time must be at least 0") @NotNull Duration expiry) {
+        Validator.validateMethod(expiry);
+        this.expiry = expiry.toMillis();
         return this;
     }
 

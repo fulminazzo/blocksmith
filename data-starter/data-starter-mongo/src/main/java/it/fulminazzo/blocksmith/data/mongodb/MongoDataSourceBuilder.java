@@ -7,12 +7,13 @@ import com.mongodb.ServerAddress;
 import com.mongodb.connection.*;
 import com.mongodb.reactivestreams.client.MongoClients;
 import it.fulminazzo.blocksmith.data.RepositoryDataSourceBuilder;
-import it.fulminazzo.blocksmith.util.ValidationUtils;
+import it.fulminazzo.blocksmith.validation.Validator;
+import it.fulminazzo.blocksmith.validation.annotation.Port;
+import it.fulminazzo.blocksmith.validation.annotation.Positive;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -109,8 +110,8 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
      * @param maxHosts the max hosts
      * @return this object (for method chaining)
      */
-    public @NotNull MongoDataSourceBuilder srvMaxHosts(final @Range(from = 1, to = Integer.MAX_VALUE) int maxHosts) {
-        ValidationUtils.checkNatural(maxHosts, "srv maximum number of hosts");
+    public @NotNull MongoDataSourceBuilder srvMaxHosts(final @Positive(exceptionMessage = "server maximum number of hosts must be at least 1") int maxHosts) {
+        Validator.validateMethod(maxHosts);
         return clusterSettings(c -> c.srvMaxHosts(maxHosts));
     }
 
@@ -134,8 +135,8 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
      * @return this object (for method chaining)
      */
     public @NotNull MongoDataSourceBuilder host(final @NotNull String address,
-                                                final @Range(from = 1, to = 65535) int port) {
-        ValidationUtils.checkPort(port);
+                                                final @Port int port) {
+        Validator.validateMethod(address, port);
         hosts.add(new ServerAddress(address, port));
         return this;
     }

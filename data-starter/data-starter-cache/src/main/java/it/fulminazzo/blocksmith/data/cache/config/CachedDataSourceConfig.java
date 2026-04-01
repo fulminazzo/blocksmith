@@ -6,9 +6,10 @@ import it.fulminazzo.blocksmith.data.cache.CachedDataSource;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import it.fulminazzo.blocksmith.data.memory.MemoryDataSource;
-import jakarta.validation.constraints.NotNull;
+import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executors;
@@ -35,11 +36,11 @@ public final class CachedDataSourceConfig implements DataSourceConfig {
     }
 
     @NotNull
-    @org.jetbrains.annotations.NotNull
+    @NonNull
     DataSourceConfig cache;
 
     @NotNull
-    @org.jetbrains.annotations.NotNull
+    @NonNull
     DataSourceConfig repository;
 
     @Nullable

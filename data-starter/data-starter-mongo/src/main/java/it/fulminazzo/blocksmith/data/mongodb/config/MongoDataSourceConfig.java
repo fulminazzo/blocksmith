@@ -3,9 +3,11 @@ package it.fulminazzo.blocksmith.data.mongodb.config;
 import com.mongodb.ServerAddress;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
-import jakarta.validation.constraints.*;
+import it.fulminazzo.blocksmith.validation.annotation.*;
+import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
@@ -23,11 +25,12 @@ public final class MongoDataSourceConfig implements DataSourceConfig {
         );
     }
 
-    @NotNull(message = "'host' must be declared")
+    @NonNull(exceptionMessage = "'host' must be declared")
+    @NotNull
     String host;
 
-    @Min(value = 1, message = "'port' number must be at least 1")
-    @Max(value = 65535, message = "'port' number must be at most 65535")
+    @Min(value = 1, exceptionMessage = "'port' number must be at least 1")
+    @Max(value = 65535, exceptionMessage = "'port' number must be at most 65535")
     @Range(from = 1, to = 65535)
     @Nullable
     @Builder.Default
@@ -36,7 +39,7 @@ public final class MongoDataSourceConfig implements DataSourceConfig {
     @Nullable
     String srvHost;
 
-    @Positive(message = "'srv max hosts' must be greater than 0")
+    @Positive(exceptionMessage = "'srv max hosts' must be greater than 0")
     @Range(from = 1, to = Integer.MAX_VALUE)
     @Nullable
     Integer srvMaxHosts;
@@ -60,10 +63,10 @@ public final class MongoDataSourceConfig implements DataSourceConfig {
     @Builder
     public static class MongoCredentialConfig {
 
-        @NotEmpty(message = "'username' must not be empty")
+        @NotEmpty(exceptionMessage = "'username' must not be empty")
         String username;
 
-        @NotEmpty(message = "'password' must not be empty")
+        @NotEmpty(exceptionMessage = "'password' must not be empty")
         String password;
 
         @Nullable

@@ -12,11 +12,11 @@ import it.fulminazzo.blocksmith.data.redis.RedisDataSource;
 import it.fulminazzo.blocksmith.data.redis.RedisRepositorySettings;
 import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
 import it.fulminazzo.blocksmith.data.sql.SqlRepositorySettings;
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
-import org.joor.Reflect;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -60,8 +60,8 @@ public final class AllRepositorySettings {
             S extends RepositorySettings
             > @NonNull CachedRepositorySettings<CS, S> getCachedRepositorySettings(final @NonNull RepositoryDataSource<?> dataSource) {
         Reflect reflect = Reflect.on(dataSource);
-        RepositoryDataSource<?> cacheRepositoryDataSource = reflect.field("cacheRepositoryDataSource").get();
-        RepositoryDataSource<?> repositoryDataSource = reflect.field("repositoryDataSource").get();
+        RepositoryDataSource<?> cacheRepositoryDataSource = reflect.get("cacheRepositoryDataSource").get();
+        RepositoryDataSource<?> repositoryDataSource = reflect.get("repositoryDataSource").get();
         return CachedRepositorySettings.combine(
                 (CS) getRepositorySettings(cacheRepositoryDataSource),
                 (S) getRepositorySettings(repositoryDataSource)
