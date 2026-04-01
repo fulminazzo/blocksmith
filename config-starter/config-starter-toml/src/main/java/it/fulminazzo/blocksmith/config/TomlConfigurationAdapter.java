@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,8 +44,8 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
 
     @Override
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
-        CommentedConfig config = (CommentedConfig) ObjectSerializer.standard()
-                .serialize(configuration, CommentedConfig::inMemory);
+        Files.createDirectories(file.getParentFile().toPath());
+        CommentedConfig config = (CommentedConfig) ObjectSerializer.standard().serialize(configuration, CommentedConfig::inMemory);
         removeNulls(config);
         ConfigUtils.fixPropertyNames(config);
         ConfigUtils.setComments(configuration, config);
