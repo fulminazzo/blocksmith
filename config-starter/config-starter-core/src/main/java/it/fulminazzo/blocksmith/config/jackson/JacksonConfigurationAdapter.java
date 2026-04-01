@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.config.jackson;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -47,55 +48,54 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
 
     @Override
     public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
-        Map<String, Object> data = mapper.readValue(file, new TypeReference<>() {
-        });
-        @NotNull Optional<ConfigVersion> versionOpt = ConfigVersion.getVersion(type);
-        if (versionOpt.isPresent()) {
-            final ConfigVersion version = versionOpt.get();
-            unapplyNamingStrategy(data, mapper.getPropertyNamingStrategy());
-            data = MapUtils.flatten(data);
+        JsonNode tree = mapper.readTree(file);
+        if (tree.isObject()) {
+            Map<String, Object> data = mapper.convertValue(tree, new TypeReference<>() {
+            });
+            @NotNull Optional<ConfigVersion> versionOpt = ConfigVersion.getVersion(type);
+            if (versionOpt.isPresent()) {
+                final ConfigVersion version = versionOpt.get();
+                unapplyNamingStrategy(data, mapper.getPropertyNamingStrategy());
+                data = MapUtils.flatten(data);
 
-            Object rawVersion = data.remove("version");
-
-            double latest = version.getVersion();
-            Double currentVersion = null;
-            if (rawVersion != null)
-                try {
-                    currentVersion = Double.parseDouble(rawVersion.toString());
-                } catch (NumberFormatException ignored) {
+                Object rawVersion = data.get("version");
+                double latest = version.getVersion();
+                Double currentVersion = null;
+                if (rawVersion != null)
+                    try {
+                        currentVersion = Double.parseDouble(rawVersion.toString());
+                    } catch (NumberFormatException ignored) {
+                    }
+                if (currentVersion == null) {
+                    logger.warn("Invalid version '{}'. Expected a decimal number.", rawVersion);
+                    logger.warn("Using latest version {}", latest);
+                    currentVersion = latest;
                 }
-            if (currentVersion == null) {
-                logger.warn("Invalid version '{}'. Expected a decimal number.", rawVersion);
-                logger.warn("Using latest version {}", latest);
-                currentVersion = latest;
+
+                if (currentVersion != latest) {
+                    logger.info("Migrating configuration '{}' from version {} to version {}", file.getName(), currentVersion, latest);
+
+                    String tmp = file.getName();
+                    String name = tmp.substring(0, tmp.lastIndexOf('.'));
+                    String extension = tmp.substring(tmp.lastIndexOf('.') + 1);
+                    File backupFile = new File(file.getParentFile(), String.format("%s-%s.%s.bk",
+                            name,
+                            backupTimeFormat.format(System.currentTimeMillis()),
+                            extension
+                    ));
+                    Files.move(file.toPath(), backupFile.toPath());
+                    logger.info("Configuration '{}' has been backed up to '{}'", file.getName(), backupFile.getName());
+
+                    data = version.applyMigrations(currentVersion, data);
+                    data = MapUtils.unflatten(data);
+                    data.put("version", latest);
+                    applyNamingStrategy(data, mapper.getPropertyNamingStrategy());
+                    store(file, data);
+                    return load(file, type);
+                }
             }
-
-            if (currentVersion != latest) {
-                logger.info("Migrating configuration '{}' from version {} to version {}", file.getName(), currentVersion, latest);
-
-                String tmp = file.getName();
-                String name = tmp.substring(0, tmp.lastIndexOf('.'));
-                String extension = tmp.substring(tmp.lastIndexOf('.') + 1);
-                File backupFile = new File(file.getParentFile(), String.format("%s-%s.%s.bk",
-                        name,
-                        backupTimeFormat.format(System.currentTimeMillis()),
-                        extension
-                ));
-                Files.move(file.toPath(), backupFile.toPath());
-                logger.info("Configuration '{}' has been backed up to '{}'", file.getName(), backupFile.getName());
-
-                data = version.applyMigrations(currentVersion, data);
-                data = MapUtils.unflatten(data);
-                applyNamingStrategy(data, mapper.getPropertyNamingStrategy());
-                T value = mapper.convertValue(data, type);
-                store(file, value);
-                return value;
-            }
-
-            data = MapUtils.unflatten(data);
-            applyNamingStrategy(data, mapper.getPropertyNamingStrategy());
         }
-        return mapper.convertValue(data, type);
+        return mapper.readValue(file, type);
     }
 
     @Override
