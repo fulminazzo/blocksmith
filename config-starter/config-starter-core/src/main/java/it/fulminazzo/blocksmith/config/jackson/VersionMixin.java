@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.config.jackson;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
@@ -52,7 +53,11 @@ interface VersionMixin {
                                                     final @NotNull AnnotatedClass declaringClass,
                                                     final @NotNull BeanPropertyDefinition propDef,
                                                     final @NotNull JavaType type) {
-            return new VersionPropertyWriter(propDef, declaringClass.getAnnotations(), type);
+            PropertyNamingStrategy strategy = config.getPropertyNamingStrategy();
+            String name = "version";
+            if (strategy != null) name = strategy.nameForField(config, null, name);
+            BeanPropertyDefinition renamedPropDef = propDef.withSimpleName(name);
+            return new VersionPropertyWriter(renamedPropDef, declaringClass.getAnnotations(), type);
         }
 
     }

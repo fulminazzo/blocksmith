@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.config.jackson;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import it.fulminazzo.blocksmith.config.BaseConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigVersion;
 import it.fulminazzo.blocksmith.util.MapUtils;
@@ -22,8 +23,6 @@ import java.util.Optional;
  * for serialization and deserialization.
  */
 public final class JacksonConfigurationAdapter implements BaseConfigurationAdapter {
-    private static final @NotNull String versionPropertyName = "version";
-    private static final double baseVersion = 1.0;
     private static final @NotNull SimpleDateFormat backupTimeFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS");
 
     private final @NotNull ObjectMapper mapper;
@@ -52,8 +51,12 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
             final ConfigVersion version = versionOpt.get();
             data = MapUtils.flatten(data);
 
-            double latest = version.getVersion();
+            String versionPropertyName = "version";
+            PropertyNamingStrategy strategy = mapper.getPropertyNamingStrategy();
+            if (strategy != null) versionPropertyName = strategy.nameForField(null, null, versionPropertyName);
             Object rawVersion = data.remove(versionPropertyName);
+
+            double latest = version.getVersion();
             Double currentVersion = null;
             if (rawVersion != null)
                 try {
@@ -81,7 +84,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
 
                 data = version.applyMigrations(currentVersion, data);
                 data = MapUtils.unflatten(data);
-                T value = mapper.copy().setPropertyNamingStrategy(null).convertValue(data, type);
+                T value = mapper.convertValue(data, type);
                 store(file, value);
                 return value;
             }
