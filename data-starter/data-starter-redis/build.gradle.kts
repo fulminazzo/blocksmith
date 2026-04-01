@@ -1,5 +1,5 @@
 dependencies {
-    api(libs.validation)
+    api(project(":base:validation"))
 
     api(libs.lettuce)
 

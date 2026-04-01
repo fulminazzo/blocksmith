@@ -1,5 +1,5 @@
 dependencies {
-    api(libs.validation)
+    api(project(":base:validation"))
 
     implementation(platform(libs.mongodb.driver.platform))
 

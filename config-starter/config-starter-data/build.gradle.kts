@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":data-starter:data-starter-core"))
+    api(project(":data-starter:data-starter-base"))
 
     testImplementation(project(":config-starter:config-starter-yaml"))
     testImplementation(project(":data-starter:data-starter-cache"))
