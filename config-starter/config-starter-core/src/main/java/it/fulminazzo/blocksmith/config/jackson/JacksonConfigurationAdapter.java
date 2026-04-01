@@ -95,7 +95,10 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
     @Override
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
         Files.createDirectories(file.getParentFile().toPath());
-        mapper.writeValue(file, configuration);
+        ObjectMapper writer = getVersion(configuration.getClass()).isPresent()
+                ? mapper.copy().addMixIn(configuration.getClass(), VersionMixin.class)
+                : mapper;
+        writer.writeValue(file, configuration);
     }
 
     private static @NotNull Optional<ConfigVersion> getVersion(final @NotNull Class<?> type) {
