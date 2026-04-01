@@ -54,11 +54,12 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
 
             double latest = version.getVersion();
             Object rawVersion = data.remove(versionPropertyName);
-            Double currentVersion;
-            try {
-                currentVersion = (Double) rawVersion;
-                if (currentVersion == null) throw new ClassCastException();
-            } catch (ClassCastException e) {
+            Double currentVersion = null;
+            if (rawVersion != null)
+                try {
+                    currentVersion = Double.parseDouble(rawVersion.toString());
+                } catch (NumberFormatException ignored) {}
+            if (currentVersion == null) {
                 logger.warn("Invalid version '{}'. Expected a decimal number.", rawVersion);
                 logger.warn("Using latest version {}", latest);
                 currentVersion = latest;
