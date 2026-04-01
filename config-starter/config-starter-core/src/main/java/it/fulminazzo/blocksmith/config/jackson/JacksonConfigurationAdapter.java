@@ -81,7 +81,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
 
                 data = version.applyMigrations(currentVersion, data);
                 data = MapUtils.unflatten(data);
-                T value = mapper.convertValue(data, type);
+                T value = mapper.copy().setPropertyNamingStrategy(null).convertValue(data, type);
                 store(file, value);
                 return value;
             }
