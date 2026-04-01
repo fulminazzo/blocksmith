@@ -1,11 +1,11 @@
 package it.fulminazzo.blocksmith.data.entity;
 
-import it.fulminazzo.blocksmith.util.ReflectionUtils;
+import it.fulminazzo.blocksmith.reflect.Reflect;
+import it.fulminazzo.blocksmith.reflect.ReflectException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.joor.Reflect;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -55,7 +55,8 @@ public final class EntityMapper<T, ID> {
      * @return the entity mapper
      */
     public static <T, ID> @NotNull EntityMapper<T, ID> create(final @NotNull Class<T> type) {
-        @NotNull List<Field> fields = ReflectionUtils.getInstanceFields(type).stream()
+        final Reflect reflect = Reflect.on(type);
+        @NotNull List<Field> fields = reflect.getNonStaticFields().stream()
                 .filter(f -> f.isAnnotationPresent(Id.class))
                 .collect(Collectors.toList());
         if (!fields.isEmpty()) {
@@ -66,12 +67,15 @@ public final class EntityMapper<T, ID> {
                 ));
             return create(type, fields.get(0).getName());
         }
-        if (ReflectionUtils.getInstanceField(type, defaultIdFieldName).isEmpty()) {
+        try {
+            reflect.getNonStaticField(defaultIdFieldName);
+            return create(type, defaultIdFieldName);
+        } catch (ReflectException e) {
             throw new IllegalArgumentException(String.format(
                     "Invalid entity '%s'. Could not find field '%s' and no field annotated with %s was present",
                     type.getCanonicalName(), defaultIdFieldName, Id.class.getSimpleName()
             ));
-        } else return create(type, defaultIdFieldName);
+        }
     }
 
     /**
@@ -87,15 +91,18 @@ public final class EntityMapper<T, ID> {
             final @NotNull Class<T> type,
             final @NotNull String idFieldName
     ) {
-        if (ReflectionUtils.getInstanceField(type, idFieldName).isEmpty())
+        try {
+            Reflect.on(type).getNonStaticField(idFieldName);
+            return create(
+                    type,
+                    idFieldName,
+                    e -> Reflect.on(e).getNonStatic(idFieldName).get()
+            );
+        } catch (ReflectException e) {
             throw new IllegalArgumentException(String.format("Could not find field '%s' in %s",
                     idFieldName, type.getCanonicalName())
             );
-        return create(
-                type,
-                idFieldName,
-                e -> Reflect.on(e).field(idFieldName).get()
-        );
+        }
     }
 
     /**

@@ -1,7 +1,8 @@
 package it.fulminazzo.blocksmith.data;
 
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
-import it.fulminazzo.blocksmith.util.ValidationUtils;
+import it.fulminazzo.blocksmith.validation.Validator;
+import it.fulminazzo.blocksmith.validation.ViolationException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -28,8 +29,8 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
     @Override
     public final @NotNull CompletableFuture<T> save(final @NotNull T entity) {
         try {
-            ValidationUtils.validate(entity);
-        } catch (ValidationUtils.ViolationException e) {
+            Validator.validate(entity);
+        } catch (ViolationException e) {
             CompletableFuture<T> future = new CompletableFuture<>();
             future.completeExceptionally(e);
             return future;
@@ -101,10 +102,10 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
         try {
             for (T t : entities)
                 if (t != null) {
-                    ValidationUtils.validate(t);
+                    Validator.validate(t);
                     actualEntities.add(t);
                 }
-        } catch (ValidationUtils.ViolationException e) {
+        } catch (ViolationException e) {
             CompletableFuture<Collection<T>> future = new CompletableFuture<>();
             future.completeExceptionally(e);
             return future;

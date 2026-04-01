@@ -1,12 +1,10 @@
 package it.fulminazzo.blocksmith.data.mapper;
 
 import it.fulminazzo.blocksmith.ProjectInfo;
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Mappers {
@@ -17,20 +15,10 @@ public final class Mappers {
     static @NotNull Mapper getMapper(final @NotNull String prefix) {
         String className = Mapper.class.getPackageName() + "." + prefix + Mapper.class.getSimpleName();
         try {
-            Class<Mapper> clazz = (Class<Mapper>) Class.forName(className);
-            Constructor<Mapper> constructor = clazz.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
+            Class<Mapper> type = (Class<Mapper>) Class.forName(className);
+            return Reflect.on(type).init().get();
         } catch (ClassNotFoundException e) {
             return new MissingMapper(prefix);
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) throw (RuntimeException) cause;
-            else throw new RuntimeException(cause);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException(String.format("Could not find constructor %s()", className));
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new IllegalArgumentException(String.format("Could not instantiate %s", className), e);
         }
     }
 
