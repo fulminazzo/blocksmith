@@ -47,6 +47,6 @@ public @interface Size {
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "%1$s size must be at least %3$s and at most %2$s elements long";
+    @NotNull String exceptionMessage() default "size must be at least %3$s and at most %2$s elements long";
 
 }
