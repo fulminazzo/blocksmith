@@ -220,7 +220,8 @@ public final class Validator {
                         .forEach(a -> parents.putIfAbsent(a, constraintInfo));
             }
         }
-        if (!violations.isEmpty()) throw new ValidationException(value, Map.of(elementName, violations));
+        if (!violations.isEmpty())
+            throw new ValidationException(String.format("property '%s'", value), Map.of(elementName, violations));
     }
 
     /**
