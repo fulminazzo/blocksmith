@@ -2,8 +2,6 @@
 package it.fulminazzo.blocksmith.validation
 
 import it.fulminazzo.blocksmith.validation.annotation.*
-import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
 import spock.lang.Specification
 
 class ValidatorTest extends Specification {
@@ -87,7 +85,7 @@ class ValidatorTest extends Specification {
 
         where:
         bean << [
-                new Person('Alex', 23, new School('Galileo')),
+                new Person('Alex', 23, new Person.School('Galileo')),
                 null
         ]
     }
@@ -101,18 +99,18 @@ class ValidatorTest extends Specification {
         e.message == expected
 
         where:
-        bean                                     || expected
-        new Person(null, 23, null)               || 'invalid property \'name\': cannot be null'
-        new Person('', 23, null)                 || 'invalid property \'name\': \'\' is not allowed (only letters)'
-        new Person('Alex!', 23, null)            || 'invalid property \'name\': \'Alex!\' is not allowed (only letters)'
-        new Person('Alex', 0, null)              || 'invalid property \'age\': 0 must be at least 18.0 and at most 115.0'
-        new Person('Alex', 13, null)             || 'invalid property \'age\': 13 must be at least 18.0 and at most 115.0'
-        new Person('Alex', 130, null)            || 'invalid property \'age\': 130 must be at least 18.0 and at most 115.0'
-        new Person('Alex', 23, new School(null)) || 'invalid property \'school.name\': cannot be null'
-        new Person(null, 0, new School(null))    ||
+        bean                                            || expected
+        new Person(null, 23, null)                      || 'invalid property \'name\': cannot be null'
+        new Person('', 23, null)                        || 'invalid property \'name\': \'\' is not allowed (only letters)'
+        new Person('Alex!', 23, null)                   || 'invalid property \'name\': \'Alex!\' is not allowed (only letters)'
+        new Person('Alex', 0, null)                     || 'invalid property \'age\': 0 must be at least 18.0 and at most 115.0'
+        new Person('Alex', 13, null)                    || 'invalid property \'age\': 13 must be at least 18.0 and at most 115.0'
+        new Person('Alex', 130, null)                   || 'invalid property \'age\': 130 must be at least 18.0 and at most 115.0'
+        new Person('Alex', 23, new Person.School(null)) || 'invalid property \'school.name\': cannot be null'
+        new Person(null, 0, new Person.School(null))    ||
+                'invalid property \'age\': 0 must be at least 18.0 and at most 115.0; ' +
                 'invalid property \'name\': cannot be null; ' +
-                'invalid property \'school.name\': cannot be null; ' +
-                'invalid property \'age\': 0 must be at least 18.0 and at most 115.0'
+                'invalid property \'school.name\': cannot be null'
     }
 
     def 'test that validate of field #fieldName and value #value does not throw'() {
