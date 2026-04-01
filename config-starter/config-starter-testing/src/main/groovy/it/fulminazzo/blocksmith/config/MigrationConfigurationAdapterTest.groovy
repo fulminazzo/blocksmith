@@ -32,7 +32,7 @@ abstract class MigrationConfigurationAdapterTest extends Specification {
         where:
         data << [
                 [
-                        'version' : 1.0,
+                        'version' : 1.0d,
                         'server'  : ['host': '0.0.0.0', 'port': 8080],
                         'database': [
                                 'host'    : 'localhost',
@@ -42,7 +42,7 @@ abstract class MigrationConfigurationAdapterTest extends Specification {
                         ]
                 ],
                 [
-                        'version' : 2.0,
+                        'version' : 2.0d,
                         'server'  : ['host': '0.0.0.0', 'port': 8080, 'timeoutSeconds': 30],
                         'database': [
                                 'host'          : 'localhost',
