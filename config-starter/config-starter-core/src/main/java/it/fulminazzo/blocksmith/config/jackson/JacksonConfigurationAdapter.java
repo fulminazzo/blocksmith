@@ -50,6 +50,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
         @NotNull Optional<ConfigVersion> versionOpt = ConfigVersion.getVersion(type);
         if (versionOpt.isPresent()) {
             final ConfigVersion version = versionOpt.get();
+            data.remove(versionPropertyName);
             data = MapUtils.flatten(data);
 
             double latest = version.getVersion();
