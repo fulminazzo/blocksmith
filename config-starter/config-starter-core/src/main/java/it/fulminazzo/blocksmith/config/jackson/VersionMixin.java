@@ -23,7 +23,11 @@ import java.lang.reflect.Modifier;
 ))
 interface VersionMixin {
 
+    @SuppressWarnings("unused")
     final class VersionPropertyWriter extends VirtualBeanPropertyWriter {
+
+        public VersionPropertyWriter() {
+        }
 
         public VersionPropertyWriter(final @NotNull BeanPropertyDefinition propDef,
                                      final @NotNull Annotations annotations,
