@@ -87,7 +87,7 @@ public final class Validator {
     public static void validateMethod(final @Nullable Object @NotNull ... parameters) throws ViolationException {
         StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[2];
         Method method = Reflect.on(stackTrace.getClassName())
-                .getMethod(stackTrace.getMethodName(), Reflect.getClasses(parameters));
+                .getMethod(stackTrace.getMethodName(), Reflect.getParameterTypes(parameters));
         Parameter[] params = method.getParameters();
         if (params.length != parameters.length)
             throw new IllegalArgumentException("Method parameters do not match with the given number of parameters. " +
