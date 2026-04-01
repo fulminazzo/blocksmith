@@ -50,20 +50,19 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
         @NotNull Optional<ConfigVersion> versionOpt = ConfigVersion.getVersion(type);
         if (versionOpt.isPresent()) {
             final ConfigVersion version = versionOpt.get();
-            data.remove(versionPropertyName);
             data = MapUtils.flatten(data);
 
             double latest = version.getVersion();
-            Object rawVersion = data.get(versionPropertyName);
+            Object rawVersion = data.remove(versionPropertyName);
             Double currentVersion;
             try {
                 currentVersion = (Double) rawVersion;
+                if (currentVersion == null) throw new ClassCastException();
             } catch (ClassCastException e) {
                 logger.warn("Invalid version '{}'. Expected a decimal number.", rawVersion);
                 logger.warn("Using latest version {}", latest);
                 currentVersion = latest;
             }
-            if (currentVersion == null) currentVersion = baseVersion;
 
             if (currentVersion != latest) {
                 logger.info("Migrating configuration '{}' from version {} to version {}", file.getName(), currentVersion, latest);
