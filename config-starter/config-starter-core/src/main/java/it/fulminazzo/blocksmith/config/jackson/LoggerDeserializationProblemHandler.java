@@ -32,7 +32,8 @@ final class LoggerDeserializationProblemHandler extends DeserializationProblemHa
                                          final @NotNull String propertyName) throws IOException {
         // when the JSON contains a property not present in the bean
         String path = JacksonUtils.getCurrentPath(parser);
-        logger.warn("Ignoring unrecognized property '{}' (path: '{}')", propertyName, path);
+        if (!propertyName.equalsIgnoreCase("version"))
+            logger.warn("Ignoring unrecognized property '{}' (path: '{}')", propertyName, path);
         parser.skipChildren();
         return true;
     }
