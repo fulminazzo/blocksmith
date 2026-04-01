@@ -48,6 +48,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         removeNulls(config);
         ConfigUtils.fixPropertyNames(config);
         ConfigUtils.setComments(configuration, config);
+        ConfigVersion.getVersion(configuration.getClass()).ifPresent(v -> config.set("version", v.getVersion()));
         newTomlWriter().write(config, file, WritingMode.REPLACE);
         indentArrays(file);
     }
