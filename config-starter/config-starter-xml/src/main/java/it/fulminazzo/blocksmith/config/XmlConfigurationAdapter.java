@@ -10,11 +10,11 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.fasterxml.jackson.dataformat.xml.util.DefaultXmlPrettyPrinter;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
-import org.joor.Reflect;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -66,10 +66,10 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
             for (String t : CommentUtils.getText(comment)) {
                 if (prettyPrinter instanceof DefaultXmlPrettyPrinter)
                     Reflect.on(prettyPrinter)
-                            .field("_objectIndenter")
-                            .call("writeIndentation",
+                            .get("_objectIndenter")
+                            .invoke("writeIndentation",
                                     generator,
-                                    Reflect.on(prettyPrinter).field("_nesting").get()
+                                    Reflect.on(prettyPrinter).get("_nesting").get()
                             );
                 generator.writeRaw(String.format("<!-- %s -->", t));
             }

@@ -17,6 +17,12 @@ allprojects {
     apply { plugin("jacoco-report-aggregation") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(11))
+        }
+    }
+
     repositories {
         mavenCentral()
     }
@@ -51,6 +57,16 @@ allprojects {
         buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
     }
 
+    tasks.withType<JacocoReport>().configureEach {
+        classDirectories.setFrom(
+            files(classDirectories.files.map {
+                fileTree(it) {
+                    exclude("**/ProjectInfo**")
+                }
+            })
+        )
+    }
+
 }
 
 /**
@@ -59,7 +75,7 @@ allprojects {
 subprojects {
     val testingModuleName: String by rootProject.extra
 
-    if (project.name.endsWith("-$testingModuleName")) {
+    if (project.name.endsWith(testingModuleName)) {
         apply { plugin("groovy") }
 
         dependencies {
@@ -73,7 +89,7 @@ dependencies {
     val testingModuleName: String by rootProject.extra
 
     subprojects
-        .filter { ! it.name.endsWith("-$testingModuleName") }
+        .filter { !it.name.endsWith("-$testingModuleName") }
         .forEach { implementation(project(it.path)) }
 }
 
