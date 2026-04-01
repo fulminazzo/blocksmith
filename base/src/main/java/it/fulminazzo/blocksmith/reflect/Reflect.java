@@ -176,7 +176,7 @@ public class Reflect {
      * @throws ReflectException if no method was found or an error occurs while getting the value
      */
     public @NotNull Reflect init(final @Nullable Object @NotNull ... parameters) {
-        Class<?>[] parameterTypes = getClasses(parameters);
+        Class<?>[] parameterTypes = getParameterTypes(parameters);
         Constructor<?> constructor = getConstructor(parameterTypes);
         return init(constructor, parameters);
     }
@@ -710,7 +710,7 @@ public class Reflect {
     public @NotNull Reflect invoke(final @Nullable Class<?> returnType,
                                    final @Nullable String name,
                                    final @Nullable Object @NotNull ... parameters) {
-        Class<?>[] parameterTypes = getClasses(parameters);
+        Class<?>[] parameterTypes = getParameterTypes(parameters);
         Method method = getMethod(returnType, name, parameterTypes);
         return invoke(method, parameters);
     }
@@ -1092,12 +1092,6 @@ public class Reflect {
         );
     }
 
-    private static Class<?> @NotNull [] getClasses(final @Nullable Object @NotNull ... parameters) {
-        return Arrays.stream(parameters)
-                .map(p -> p == null ? null : p.getClass())
-                .toArray(Class<?>[]::new);
-    }
-
     /*
      * INITIALIZERS
      */
@@ -1192,6 +1186,20 @@ public class Reflect {
         } catch (ClassCastException e) {
             throw ReflectException.cannotCast(object, type);
         }
+    }
+
+    /**
+     * Converts the given parameters to an array of classes.
+     * <br>
+     * Any <code>null</code> parameter will have a <code>null</code> class.
+     *
+     * @param parameters the parameters
+     * @return the parameters types
+     */
+    public static @Nullable Class<?> @NotNull [] getParameterTypes(final @Nullable Object @NotNull ... parameters) {
+        return Arrays.stream(parameters)
+                .map(p -> p == null ? null : p.getClass())
+                .toArray(Class<?>[]::new);
     }
 
 }
