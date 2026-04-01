@@ -91,6 +91,10 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
             super(builder);
         }
 
+        private SingleQuoteYAMLFactory(final @NotNull SingleQuoteYAMLFactory singleQuoteYAMLFactory) {
+            super(singleQuoteYAMLFactory, null);
+        }
+
         @Override
         protected YAMLGenerator _createGenerator(final Writer out,
                                                  final IOContext context) throws IOException {
@@ -102,6 +106,11 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
                 return new SingleQuoteYAMLGenerator(context, _generatorFeatures, feats,
                         _quotingChecker, _objectCodec, out, _dumperOptions);
             }
+        }
+
+        @Override
+        public YAMLFactory copy() {
+            return new SingleQuoteYAMLFactory(this);
         }
 
     }
