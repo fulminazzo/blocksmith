@@ -45,8 +45,7 @@ public final class MapUtils {
             Object value = entry.getValue();
             if (value instanceof Map<?, ?>) {
                 Map<?, ?> mapValue = (Map<?, ?>) value;
-                if (mapValue.isEmpty()) flattened.put(key, value);
-                else {
+                if (!mapValue.isEmpty()) {
                     Map<String, Object> stringObjectMap = new HashMap<>();
                     mapValue.forEach((k, v) -> stringObjectMap.put(k.toString(), v));
                     flatten(stringObjectMap).forEach((k, v) -> flattened.put(key + "." + k, v));

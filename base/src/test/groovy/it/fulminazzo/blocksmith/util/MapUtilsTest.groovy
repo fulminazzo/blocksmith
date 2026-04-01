@@ -15,16 +15,17 @@ class MapUtilsTest extends Specification {
         def unflattened = MapUtils.unflatten(flattened)
 
         then:
-        unflattened == map
+        if (expected.isEmpty()) assert unflattened.isEmpty()
+        else unflattened == map
 
         where:
         map                                                                                             || expected
         [:]                                                                                             || [:]
+        ['a': ['b': ['c': [:]]]]                                                                        || [:]
         ['Hello': 'world!']                                                                             || ['Hello': 'world!']
         ['players': ['Steve', 'Alex'], 'player': ['join': 'Welcome!', 'leave': 'Goodbye!']]             ||
                 ['players': ['Steve', 'Alex'], 'player.join': 'Welcome!', 'player.leave': 'Goodbye!']
-        ['a': ['b': ['c': ['d': 'deep']]]]                                                              ||
-                ['a.b.c.d': 'deep']
+        ['a': ['b': ['c': ['d': 'deep']]]]                                                              || ['a.b.c.d': 'deep']
         ['server': ['host': 'localhost', 'port': ['http': 8080, 'https': 8443]]]                        ||
                 ['server.host': 'localhost', 'server.port.http': 8080, 'server.port.https': 8443]
         ['db': ['hosts': ['node1', 'node2'], 'credentials': ['user': 'root', 'pass': 'secret']]]        ||
@@ -35,8 +36,7 @@ class MapUtilsTest extends Specification {
                 ['level1.1': 'one', 'level1.2': 'two']
         ['config': ['timeout': null, 'retries': 3]]                                                     ||
                 ['config.timeout': null, 'config.retries': 3]
-        ['foo': 'bar', 'baz': 'qux']                                                                    ||
-                ['foo': 'bar', 'baz': 'qux']
+        ['foo': 'bar', 'baz': 'qux']                                                                    || ['foo': 'bar', 'baz': 'qux']
         ['world': ['regions': ['EU', 'US'], 'settings': ['lang': ['default': 'en', 'fallback': 'it']]]] ||
                 ['world.regions': ['EU', 'US'], 'world.settings.lang.default': 'en', 'world.settings.lang.fallback': 'it']
     }
