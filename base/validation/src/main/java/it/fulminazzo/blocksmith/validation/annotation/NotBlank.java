@@ -31,6 +31,6 @@ public @interface NotBlank {
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "'%1$s' must at least contain one non-space character";
+    @NotNull String exceptionMessage() default "must at least contain one non-space character";
 
 }

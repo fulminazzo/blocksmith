@@ -44,6 +44,6 @@ public @interface Range {
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "%1$s must be at least %3$s and at most %2$s";
+    @NotNull String exceptionMessage() default "must be at least %3$s and at most %2$s";
 
 }

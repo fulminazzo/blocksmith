@@ -30,6 +30,6 @@ public @interface AssertFalse {
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "'%1$s' must be false";
+    @NotNull String exceptionMessage() default "must be false";
 
 }

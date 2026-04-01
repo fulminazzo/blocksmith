@@ -31,6 +31,6 @@ public @interface PositiveOrZero {
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "%1$s must be positive or zero";
+    @NotNull String exceptionMessage() default "must be positive or zero";
 
 }

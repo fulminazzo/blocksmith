@@ -37,6 +37,6 @@ public @interface Min {
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "%1$s must be at least %2$s";
+    @NotNull String exceptionMessage() default "must be at least %2$s";
 
 }
