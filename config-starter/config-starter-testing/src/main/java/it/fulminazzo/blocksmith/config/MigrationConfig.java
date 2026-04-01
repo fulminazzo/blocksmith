@@ -14,10 +14,10 @@ public final class MigrationConfig {
 
     private static final @NotNull ConfigVersion configVersion = ConfigVersion.of(3.0)
             .migrate(2.0, m -> m
-                    .add("server.timeout-seconds", 30)
-                    .add("database.max-connections", 100)
-                    .add("features.enable-beta-ui", true)
-                    .add("features.enable-metrics", false)
+                    .add("server.timeoutSeconds", 30)
+                    .add("database.maxConnections", 100)
+                    .add("features.enableBetaUi", true)
+                    .add("features.enableMetrics", false)
             )
             .migrate(3.0, m -> {
                 MigrationConfig defaultConfig = new MigrationConfig();
@@ -25,24 +25,24 @@ public final class MigrationConfig {
                         .add("environment", "production")
                         .rename("server.port", "server.ports.http")
                         .add("server.ports.https", defaultConfig.server.ports.https)
-                        .remove("server.timeout-seconds")
+                        .remove("server.timeoutSeconds")
                         .add("server.ssl.enabled", defaultConfig.server.ssl.enabled)
-                        .add("server.ssl.cert-path", defaultConfig.server.ssl.certPath)
-                        .add("server.ssl.key-path", defaultConfig.server.ssl.keyPath)
-                        .add("database.cluster-mode", defaultConfig.database.clusterMode)
+                        .add("server.ssl.certPath", defaultConfig.server.ssl.certPath)
+                        .add("server.ssl.keyPath", defaultConfig.server.ssl.keyPath)
+                        .add("database.clusterMode", defaultConfig.database.clusterMode)
                         .rename("database.user", "database.credentials.user")
                         .rename("database.password", "database.credentials.password")
                         .remove("database.host")
                         .remove("database.port")
-                        .add("database.pool.min-size", defaultConfig.database.pool.minSize)
-                        .rename("database.max-connections", "database.pool.max-size")
+                        .add("database.pool.minSize", defaultConfig.database.pool.minSize)
+                        .rename("database.maxConnections", "database.pool.maxSize")
                         .add("cache.provider", defaultConfig.cache.provider)
-                        .add("cache.connection-string", defaultConfig.cache.connectionString)
-                        .add("cache.ttl-seconds", defaultConfig.cache.ttlSeconds)
-                        .remove("features.enable-beta-ui")
-                        .remove("features.enable-metrics")
-                        .add("features.rollouts.new-dashboard", defaultConfig.features.rollouts.newDashboard)
-                        .add("features.rollouts.legacy-api-deprecation", defaultConfig.features.rollouts.legacyApiDeprecation);
+                        .add("cache.connectionString", defaultConfig.cache.connectionString)
+                        .add("cache.ttlSeconds", defaultConfig.cache.ttlSeconds)
+                        .remove("features.enableBetaUi")
+                        .remove("features.enableMetrics")
+                        .add("features.rollouts.newDashboard", defaultConfig.features.rollouts.newDashboard)
+                        .add("features.rollouts.legacyApiDeprecation", defaultConfig.features.rollouts.legacyApiDeprecation);
             });
 
     @NotNull String environment = "production";

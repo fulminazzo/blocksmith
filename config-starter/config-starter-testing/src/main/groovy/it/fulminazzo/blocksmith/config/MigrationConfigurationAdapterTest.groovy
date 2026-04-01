@@ -38,15 +38,15 @@ abstract class MigrationConfigurationAdapterTest extends Specification {
                 ],
                 [
                         'version': 2.0,
-                        'server': ['host': '0.0.0.0', 'port': 8080, 'timeout-seconds': 30],
+                        'server': ['host': '0.0.0.0', 'port': 8080, 'timeoutSeconds': 30],
                         'database': [
                                 'host': 'localhost',
                                 'port': 5432,
                                 'user': 'admin',
                                 'password': 'password123',
-                                'max-connections': 100
+                                'maxConnections': 100
                         ],
-                        'features': ['enable-beta-ui': true, 'enable-metrics': false]
+                        'features': ['enableBetaUi': true, 'enableMetrics': false]
                 ],
                 new MigrationConfig()
         ]
