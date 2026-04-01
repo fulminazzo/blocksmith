@@ -1,3 +1,3 @@
 dependencies {
-    implementation(libs.bundles.log4j)
+    api(project(":base:testing"))
 }
