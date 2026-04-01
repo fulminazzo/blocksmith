@@ -8,10 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -71,6 +68,50 @@ public final class Validator {
     }
 
     /**
+     * Validates method invocation parameters.
+     * This call should be put first in the method declaration.
+     * <br>
+     * <pre>{@code
+     * public void myMethod(@NonNull String name, @Positive int age) {
+     *     Validator.validateMethod(name, age);
+     *     // rest of logic
+     * }
+     * }</pre>
+     *
+     * @param parameters the actual values of the parameters
+     * @throws ViolationException an exception containing all the violations
+     */
+    public static void validateMethod(final @Nullable Object @NotNull ... parameters) throws ViolationException {
+        StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[2];
+        Method method = Reflect.on(stackTrace.getClassName())
+                .getMethod(stackTrace.getMethodName(), Reflect.getClasses(parameters));
+        Parameter[] params = method.getParameters();
+        if (params.length != parameters.length)
+            throw new IllegalArgumentException("Method parameters do not match with the given number of parameters. " +
+                    "Please include all the parameters of the method to validate it");
+        Map<String, Set<ConstraintViolation>> violations = new HashMap<>();
+        for (int i = 0; i < params.length; i++) {
+            Parameter parameter = params[i];
+            String name = parameter.getName();
+            try {
+                getInstance().validate(parameter, parameters[i]);
+            } catch (ValidationException e) {
+                Map<String, Set<ConstraintViolation>> tmp = e.getViolations();
+                for (String key : new ArrayList<>(tmp.keySet())) {
+                    if (key.equals(name)) {
+                        Set<ConstraintViolation> value = tmp.get(key);
+                        tmp.remove(key, value);
+                        tmp.put(String.format("parameter at position %s", i), value);
+                    }
+                }
+                violations.putAll(tmp);
+            }
+        }
+        if (!violations.isEmpty())
+            throw new ViolationException(violations);
+    }
+
+    /**
      * Validates the given object fields against their {@link Constraint} annotations.
      *
      * @param value the value
@@ -97,24 +138,6 @@ public final class Validator {
     public static void validateField(final @NotNull Field field, final @Nullable Object value) throws ViolationException {
         try {
             getInstance().validate(field, value);
-        } catch (ValidationException e) {
-            throw new ViolationException(e);
-        }
-    }
-
-    /**
-     * Validates the value against the given parameter.
-     * <br>
-     * The parameter must have at least one {@link Constraint} annotated annotation
-     * in order for validation to work.
-     *
-     * @param parameter the parameter
-     * @param value     the value
-     * @throws ViolationException an exception containing all the violations
-     */
-    public static void validateParameter(final @NotNull Parameter parameter, final @Nullable Object value) throws ViolationException {
-        try {
-            getInstance().validate(parameter, value);
         } catch (ValidationException e) {
             throw new ViolationException(e);
         }
