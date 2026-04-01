@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.config.jackson;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import it.fulminazzo.blocksmith.config.BaseConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigVersion;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 
@@ -22,6 +24,7 @@ import java.util.Optional;
  * that uses the <a href="https://github.com/FasterXML/jackson">jackson project</a>
  * for serialization and deserialization.
  */
+@SuppressWarnings("unchecked")
 public final class JacksonConfigurationAdapter implements BaseConfigurationAdapter {
     private static final @NotNull SimpleDateFormat backupTimeFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS");
 
@@ -49,19 +52,18 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
         @NotNull Optional<ConfigVersion> versionOpt = ConfigVersion.getVersion(type);
         if (versionOpt.isPresent()) {
             final ConfigVersion version = versionOpt.get();
+            unapplyNamingStrategy(data, mapper.getPropertyNamingStrategy());
             data = MapUtils.flatten(data);
 
-            String versionPropertyName = "version";
-            PropertyNamingStrategy strategy = mapper.getPropertyNamingStrategy();
-            if (strategy != null) versionPropertyName = strategy.nameForField(null, null, versionPropertyName);
-            Object rawVersion = data.remove(versionPropertyName);
+            Object rawVersion = data.remove("version");
 
             double latest = version.getVersion();
             Double currentVersion = null;
             if (rawVersion != null)
                 try {
                     currentVersion = Double.parseDouble(rawVersion.toString());
-                } catch (NumberFormatException ignored) {}
+                } catch (NumberFormatException ignored) {
+                }
             if (currentVersion == null) {
                 logger.warn("Invalid version '{}'. Expected a decimal number.", rawVersion);
                 logger.warn("Using latest version {}", latest);
@@ -84,12 +86,14 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
 
                 data = version.applyMigrations(currentVersion, data);
                 data = MapUtils.unflatten(data);
+                applyNamingStrategy(data, mapper.getPropertyNamingStrategy());
                 T value = mapper.convertValue(data, type);
                 store(file, value);
                 return value;
             }
 
             data = MapUtils.unflatten(data);
+            applyNamingStrategy(data, mapper.getPropertyNamingStrategy());
         }
         return mapper.convertValue(data, type);
     }
@@ -101,6 +105,49 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                 ? mapper.copy().addMixIn(configuration.getClass(), VersionMixin.class)
                 : mapper;
         writer.writeValue(file, configuration);
+    }
+
+    private void applyNamingStrategy(final @NotNull Map<String, Object> data,
+                                     final @Nullable PropertyNamingStrategy strategy) {
+        if (strategy == null) return;
+        for (String key : new ArrayList<>(data.keySet())) {
+            Object value = data.remove(key);
+            if (value instanceof Map) applyNamingStrategy((Map<String, Object>) value, strategy);
+            data.put(strategy.nameForField(null, null, key), value);
+        }
+    }
+
+    private void unapplyNamingStrategy(final @NotNull Map<String, Object> data,
+                                       final @Nullable PropertyNamingStrategy strategy) {
+        if (strategy == null) return;
+        for (String key : new ArrayList<>(data.keySet())) {
+            Object value = data.remove(key);
+            if (value instanceof Map) unapplyNamingStrategy((Map<String, Object>) value, strategy);
+            if (strategy.equals(PropertyNamingStrategies.KEBAB_CASE)) key = dashedCaseToCamel(key, '-');
+            else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE)) key = dashedCaseToCamel(key, '_');
+            else key = key.substring(0, 1).toLowerCase() + key.substring(1);
+            data.put(key, value);
+        }
+    }
+
+    private static String dashedCaseToCamel(final @NotNull String string,
+                                            final char dash) {
+        if (!string.contains(String.valueOf(dash))) return string;
+
+        StringBuilder sb = new StringBuilder();
+        boolean makeUpper = false;
+
+        for (char c : string.toCharArray()) {
+            if (c == dash) {
+                makeUpper = true;
+            } else if (makeUpper) {
+                sb.append(Character.toUpperCase(c));
+                makeUpper = false;
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
 }
