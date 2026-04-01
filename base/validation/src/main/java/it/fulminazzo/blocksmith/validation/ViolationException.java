@@ -27,6 +27,7 @@ public final class ViolationException extends RuntimeException {
      */
     ViolationException(final @NotNull Map<String, Set<ConstraintViolation>> violations) {
         super(violations.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
                 .map(entry -> String.format("invalid %s: %s",
                         entry.getKey(), entry.getValue().stream()
                                 .map(ConstraintViolation::getExceptionMessage)
