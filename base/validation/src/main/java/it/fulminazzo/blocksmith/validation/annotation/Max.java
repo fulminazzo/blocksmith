@@ -8,6 +8,8 @@ import java.lang.annotation.*;
 /**
  * Identifies a numeric parameter or type that must be less than or equal to the given value.
  * <br>
+ * Also supports {@link java.time.Duration}, where the milliseconds are compared.
+ * <br>
  * Accepts <code>null</code> values.
  */
 @Constraint
