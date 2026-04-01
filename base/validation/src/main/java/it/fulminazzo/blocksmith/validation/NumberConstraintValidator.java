@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.validation;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.function.Predicate;
 
 /**
@@ -15,12 +16,12 @@ final class NumberConstraintValidator extends ConstraintValidatorImpl {
      * @param validPredicate the valid predicate
      */
     public NumberConstraintValidator(final @NotNull Predicate<Object> validPredicate) {
-        super(validPredicate, Number.class);
+        super(validPredicate, Number.class, Duration.class);
     }
 
     @Override
     public @NotNull String getTypeNames() {
-        return "number";
+        return "number or time duration";
     }
 
 }

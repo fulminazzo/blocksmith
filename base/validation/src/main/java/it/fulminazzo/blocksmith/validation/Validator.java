@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -35,13 +36,31 @@ public final class Validator {
                 .register(NonNull.class, new ConstraintValidatorImpl(Objects::nonNull))
                 .register(AssertFalse.class, new BooleanConstraintValidator(o -> o == null || !((Boolean) o)))
                 .register(AssertTrue.class, new BooleanConstraintValidator(o -> o == null || ((Boolean) o)))
-                .registerSupplier(Max.class, a -> new NumberConstraintValidator(o -> o == null || ((Number) o).doubleValue() <= a.value()))
-                .register(Negative.class, new NumberConstraintValidator(o -> o == null || ((Number) o).doubleValue() < 0))
-                .registerSupplier(Min.class, a -> new NumberConstraintValidator(o -> o == null || ((Number) o).doubleValue() >= a.value()))
-                .register(Positive.class, new NumberConstraintValidator(o -> o == null || ((Number) o).doubleValue() > 0))
-                .registerSupplier(Range.class, a -> new NumberConstraintValidator(o -> o == null ||
-                        ((Number) o).doubleValue() >= a.min() && ((Number) o).doubleValue() <= a.max())
-                )
+                .registerSupplier(Max.class, a -> new NumberConstraintValidator(o -> {
+                    if (o == null) return true;
+                    else if (o instanceof Duration) o = ((Duration) o).toMillis();
+                    return ((Number) o).doubleValue() <= a.value();
+                }))
+                .register(Negative.class, new NumberConstraintValidator(o -> {
+                    if (o == null) return true;
+                    else if (o instanceof Duration) o = ((Duration) o).toMillis();
+                    return ((Number) o).doubleValue() < 0;
+                }))
+                .registerSupplier(Min.class, a -> new NumberConstraintValidator(o -> {
+                    if (o == null) return true;
+                    else if (o instanceof Duration) o = ((Duration) o).toMillis();
+                    return ((Number) o).doubleValue() >= a.value();
+                }))
+                .register(Positive.class, new NumberConstraintValidator(o -> {
+                    if (o == null) return true;
+                    else if (o instanceof Duration) o = ((Duration) o).toMillis();
+                    return ((Number) o).doubleValue() > 0;
+                }))
+                .registerSupplier(Range.class, a -> new NumberConstraintValidator(o -> {
+                    if (o == null) return true;
+                    else if (o instanceof Duration) o = ((Duration) o).toMillis();
+                    return ((Number) o).doubleValue() >= a.min() && ((Number) o).doubleValue() <= a.max();
+                }))
                 .registerSupplier(Size.class, a -> new ConstraintValidatorImpl(o -> {
                     if (o == null) return true;
                     Number size;
