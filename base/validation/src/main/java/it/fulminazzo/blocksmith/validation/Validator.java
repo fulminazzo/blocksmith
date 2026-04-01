@@ -99,7 +99,7 @@ public final class Validator {
             try {
                 getInstance().validate(parameter, parameters[i]);
             } catch (ValidationException e) {
-                Map<String, Set<ConstraintViolation>> tmp = e.getViolations();
+                Map<String, Set<ConstraintViolation>> tmp = new HashMap<>(e.getViolations());
                 for (String key : new ArrayList<>(tmp.keySet())) {
                     if (key.equals(name)) {
                         Set<ConstraintViolation> value = tmp.get(key);
