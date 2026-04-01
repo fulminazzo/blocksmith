@@ -1,14 +1,22 @@
 package it.fulminazzo.blocksmith.config.jackson;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.fulminazzo.blocksmith.config.BaseConfigurationAdapter;
+import it.fulminazzo.blocksmith.config.ConfigVersion;
+import it.fulminazzo.blocksmith.reflect.Reflect;
+import it.fulminazzo.blocksmith.util.MapUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * A special implementation of {@link BaseConfigurationAdapter}
@@ -16,7 +24,12 @@ import java.nio.file.Files;
  * for serialization and deserialization.
  */
 public final class JacksonConfigurationAdapter implements BaseConfigurationAdapter {
+    private static final @NotNull String versionPropertyName = "version";
+    private static final double baseVersion = 1.0;
+    private static final @NotNull SimpleDateFormat backupTimeFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS");
+
     private final @NotNull ObjectMapper mapper;
+    private final @NotNull Logger logger;
 
     /**
      * Instantiates a new Jackson configuration adapter.
@@ -29,17 +42,68 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                                        final @NotNull Logger logger,
                                        final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
         this.mapper = JacksonUtils.setupMapper(mapper, logger, commentPropertyWriterType);
+        this.logger = logger;
     }
 
     @Override
     public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
-        return mapper.readValue(file, type);
+        Map<String, Object> data = mapper.readValue(file, new TypeReference<>() {
+        });
+        @NotNull Optional<ConfigVersion> versionOpt = getVersion(type);
+        if (versionOpt.isPresent()) {
+            final ConfigVersion version = versionOpt.get();
+            data = MapUtils.flatten(data);
+
+            double latest = version.getVersion();
+            Object rawVersion = data.get(versionPropertyName);
+            Double currentVersion;
+            try {
+                currentVersion = (Double) rawVersion;
+            } catch (ClassCastException e) {
+                logger.warn("Invalid version '{}'. Expected a decimal number.", rawVersion);
+                logger.warn("Using latest version {}", latest);
+                currentVersion = latest;
+            }
+            if (currentVersion == null) currentVersion = baseVersion;
+
+            if (currentVersion != latest) {
+                logger.info("Migrating configuration '{}' from version {} to version {}", file.getName(), currentVersion, latest);
+
+                String tmp = file.getName();
+                String name = tmp.substring(0, tmp.lastIndexOf('.'));
+                String extension = tmp.substring(tmp.lastIndexOf('.') + 1);
+                File backupFile = new File(file.getParentFile(), String.format("%s-%s.%s.bk",
+                        name,
+                        backupTimeFormat.format(System.currentTimeMillis()),
+                        extension
+                ));
+                Files.move(file.toPath(), backupFile.toPath());
+                logger.info("Configuration '{}' has been backed up to '{}'", file.getName(), backupFile.getName());
+
+                data = version.applyMigrations(currentVersion, data);
+                data = MapUtils.unflatten(data);
+                T value = mapper.convertValue(data, type);
+                store(file, value);
+                return value;
+            }
+
+            data = MapUtils.unflatten(data);
+        }
+        return mapper.convertValue(data, type);
     }
 
     @Override
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
         Files.createDirectories(file.getParentFile().toPath());
         mapper.writeValue(file, configuration);
+    }
+
+    private static @NotNull Optional<ConfigVersion> getVersion(final @NotNull Class<?> type) {
+        Reflect reflect = Reflect.on(type);
+        return reflect.getFields(f -> Modifier.isStatic(f.getModifiers()) && f.getType().equals(ConfigVersion.class))
+                .stream()
+                .findFirst()
+                .map(f -> reflect.get(f).get());
     }
 
 }
