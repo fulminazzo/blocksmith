@@ -7,10 +7,12 @@ class MigrationTest extends Specification {
     def 'test that migration methods work'() {
         given:
         def data = [
-                'to_rename': true,
-                'to_change': '',
-                'to_update': 1.0,
-                'to_remove': 'invalid value'
+                'to_rename'           : true,
+                'to_change'           : '',
+                'to_update'           : 1.0,
+                'to_remove'           : 'invalid value',
+                'to_direct_update'    : [],
+                'to_direct_update_map': ['Hello': 'world']
         ]
 
         when:
@@ -19,6 +21,8 @@ class MigrationTest extends Specification {
                 .rename('to_rename', 'valid')
                 .update('to_change', 'Hello, world!')
                 .update('to_update', 'version', 2.0)
+                .update('to_direct_update', o -> o.addAll([1, 2, 3]))
+                .update('to_direct_update_map', 'map', o -> o.put('Goodbye', 'mars'))
                 .add('name', 'blocksmith')
 
         and:
@@ -26,10 +30,12 @@ class MigrationTest extends Specification {
 
         then:
         actual == [
-                'valid'    : true,
-                'to_change': 'Hello, world!',
-                'version'  : 2.0,
-                'name'     : 'blocksmith'
+                'valid'           : true,
+                'to_change'       : 'Hello, world!',
+                'version'         : 2.0,
+                'name'            : 'blocksmith',
+                'to_direct_update': [1, 2, 3],
+                'map'             : ['Hello': 'world', 'Goodbye': 'mars']
         ]
     }
 
@@ -49,6 +55,8 @@ class MigrationTest extends Specification {
         [:]             | 'remove' | ['valid']
         [:]             | 'update' | ['valid', false]
         [:]             | 'update' | ['valid', 'not-valid', false]
+        [:]             | 'update' | ['valid', (o) -> { }]
+        [:]             | 'update' | ['valid', 'not-valid', (o) -> { }]
         [:]             | 'rename' | ['valid', 'not-valid']
     }
 
