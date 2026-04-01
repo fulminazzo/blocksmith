@@ -4,14 +4,14 @@ import groovy.util.logging.Slf4j
 import spock.lang.Specification
 
 @Slf4j
-class PropertiesConfigurationAdapterTest extends Specification {
+class PropertiesConfigurationAdapterTest extends MigrationConfigurationAdapterTest {
 
     def 'test that load correctly loads file'() {
         given:
-        def file = new File('build/resources/test/load.properties')
+        def file = getFile('load')
 
         and:
-        def adapter = new PropertiesConfigurationAdapter(log)
+        def adapter = getAdapter()
 
         when:
         def actual = adapter.load(file, MockConfig)
@@ -31,11 +31,11 @@ class PropertiesConfigurationAdapterTest extends Specification {
 
     def 'test that store correctly saves file'() {
         given:
-        def file = new File('build/resources/test/store.properties')
+        def file = getFile('store')
         if (file.exists()) file.delete()
 
         and:
-        def adapter = new PropertiesConfigurationAdapter(log)
+        def adapter = getAdapter()
 
         when:
         adapter.store(file, new MockConfig())
@@ -58,6 +58,14 @@ class PropertiesConfigurationAdapterTest extends Specification {
                 'internal.version=1.0',
                 'internal.verified='
         ]
+    }
+
+    File getFile(final String name) {
+        return new File("build/resources/test/${name}.properties")
+    }
+
+    BaseConfigurationAdapter getAdapter() {
+        return new PropertiesConfigurationAdapter(log)
     }
 
 }

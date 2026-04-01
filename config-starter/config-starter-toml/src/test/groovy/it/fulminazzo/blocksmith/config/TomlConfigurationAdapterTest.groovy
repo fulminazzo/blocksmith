@@ -4,14 +4,14 @@ import groovy.util.logging.Slf4j
 import spock.lang.Specification
 
 @Slf4j
-class TomlConfigurationAdapterTest extends Specification {
+class TomlConfigurationAdapterTest extends MigrationConfigurationAdapterTest {
 
     def 'test that load correctly loads file'() {
         given:
-        def file = new File('build/resources/test/load.toml')
+        def file = getFile('load')
 
         and:
-        def adapter = new TomlConfigurationAdapter(TomlConfigurationAdapterTest.log)
+        def adapter = getAdapter()
 
         when:
         def actual = adapter.load(file, MockConfig)
@@ -31,11 +31,11 @@ class TomlConfigurationAdapterTest extends Specification {
 
     def 'test that store correctly saves file'() {
         given:
-        def file = new File('build/resources/test/store.toml')
+        def file = getFile('store')
         if (file.exists()) file.delete()
 
         and:
-        def adapter = new TomlConfigurationAdapter(TomlConfigurationAdapterTest.log)
+        def adapter = getAdapter()
 
         when:
         adapter.store(file, new MockConfig())
@@ -67,11 +67,11 @@ class TomlConfigurationAdapterTest extends Specification {
 
     def 'test that store with #array returns #expected'() {
         given:
-        def file = new File('build/resources/test/store_array.toml')
+        def file = getFile('store_array')
         if (file.exists()) file.delete()
 
         and:
-        def adapter = new TomlConfigurationAdapter(TomlConfigurationAdapterTest.log)
+        def adapter = getAdapter()
 
         when:
         adapter.store(file, ['data': array])
@@ -92,6 +92,14 @@ class TomlConfigurationAdapterTest extends Specification {
         array || expected
         []    || ['data = []']
         [1]   || ['data = [', '    1', ']']
+    }
+
+    File getFile(final String name) {
+        return new File("build/resources/test/${name}.toml")
+    }
+
+    BaseConfigurationAdapter getAdapter() {
+        return new TomlConfigurationAdapter(log)
     }
 
 }

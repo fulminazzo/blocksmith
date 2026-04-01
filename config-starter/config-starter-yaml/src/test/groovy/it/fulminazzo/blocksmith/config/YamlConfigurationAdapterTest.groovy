@@ -4,14 +4,14 @@ import groovy.util.logging.Slf4j
 import spock.lang.Specification
 
 @Slf4j
-class YamlConfigurationAdapterTest extends Specification {
+class YamlConfigurationAdapterTest extends MigrationConfigurationAdapterTest {
 
     def 'test that load correctly loads file'() {
         given:
-        def file = new File('build/resources/test/load.yml')
+        def file = getFile('load')
 
         and:
-        def adapter = new YamlConfigurationAdapter(log)
+        def adapter = getAdapter()
 
         when:
         def actual = adapter.load(file, MockConfig)
@@ -31,11 +31,11 @@ class YamlConfigurationAdapterTest extends Specification {
 
     def 'test that store correctly saves file'() {
         given:
-        def file = new File('build/resources/test/store.yml')
+        def file = getFile('store')
         if (file.exists()) file.delete()
 
         and:
-        def adapter = new YamlConfigurationAdapter(log)
+        def adapter = getAdapter()
 
         when:
         adapter.store(file, new MockConfig())
@@ -62,6 +62,14 @@ class YamlConfigurationAdapterTest extends Specification {
                 '  version: 1.0',
                 '  verified: null'
         ]
+    }
+
+    File getFile(final String name) {
+        return new File("build/resources/test/${name}.yml")
+    }
+
+    BaseConfigurationAdapter getAdapter() {
+        return new YamlConfigurationAdapter(log)
     }
 
 }

@@ -4,14 +4,14 @@ import groovy.util.logging.Slf4j
 import spock.lang.Specification
 
 @Slf4j
-class JsonConfigurationAdapterTest extends Specification {
+class JsonConfigurationAdapterTest extends MigrationConfigurationAdapterTest {
 
     def 'test that load correctly loads file'() {
         given:
-        def file = new File('build/resources/test/load.json')
+        def file = getFile('load')
 
         and:
-        def adapter = new JsonConfigurationAdapter(log)
+        def adapter = getAdapter()
 
         when:
         def actual = adapter.load(file, MockConfig)
@@ -31,11 +31,11 @@ class JsonConfigurationAdapterTest extends Specification {
 
     def 'test that store correctly saves file'() {
         given:
-        def file = new File('build/resources/test/store.json')
+        def file = getFile('store')
         if (file.exists()) file.delete()
 
         and:
-        def adapter = new JsonConfigurationAdapter(log)
+        def adapter = getAdapter()
 
         when:
         adapter.store(file, new MockConfig())
@@ -59,6 +59,14 @@ class JsonConfigurationAdapterTest extends Specification {
                 '  }',
                 '}'
         ]
+    }
+
+    File getFile(final String name) {
+        return new File("build/resources/test/${name}.json")
+    }
+
+    BaseConfigurationAdapter getAdapter() {
+        return new JsonConfigurationAdapter(log)
     }
 
 }
