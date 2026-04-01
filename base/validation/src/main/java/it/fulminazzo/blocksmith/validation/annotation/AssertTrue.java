@@ -30,6 +30,6 @@ public @interface AssertTrue {
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "'%1$s' must be true";
+    @NotNull String exceptionMessage() default "must be true";
 
 }

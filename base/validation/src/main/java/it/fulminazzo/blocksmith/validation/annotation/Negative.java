@@ -30,6 +30,6 @@ public @interface Negative {
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "%1$s must be negative";
+    @NotNull String exceptionMessage() default "must be negative";
 
 }

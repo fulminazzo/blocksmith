@@ -8,9 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -25,7 +23,10 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public final class Validator {
-    private static final Validator INSTANCE = new Validator();
+    private static final @NotNull String propertyFormat = "property '%s'";
+    private static final @NotNull String parameterFormat = "parameter at position %s";
+
+    private static final @NotNull Validator INSTANCE = new Validator();
 
     private final @NotNull Map<Class<? extends Annotation>, Function<? extends Annotation, ConstraintValidator>> validators = new ConcurrentHashMap<>();
 
@@ -70,6 +71,64 @@ public final class Validator {
     }
 
     /**
+     * Validates method invocation parameters.
+     * This call should be put first in the method declaration.
+     * <br>
+     * <pre>{@code
+     * public void myMethod(@NonNull String name, @Positive int age) {
+     *     Validator.validateMethod(name, age);
+     *     // rest of logic
+     * }
+     * }</pre>
+     *
+     * @param parameters the actual values of the parameters
+     * @throws ViolationException an exception containing all the violations
+     */
+    public static void validateMethod(final @Nullable Object @NotNull ... parameters) throws ViolationException {
+        StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[2];
+        Method method = Reflect.on(stackTrace.getClassName())
+                .getMethod(stackTrace.getMethodName(), Reflect.getParameterTypes(parameters));
+        Parameter[] params = method.getParameters();
+        if (params.length != parameters.length)
+            throw new IllegalArgumentException("Method parameters do not match with the given number of parameters. " +
+                    "Please include all the parameters of the method to validate it");
+        Map<String, Set<ConstraintViolation>> violations = new HashMap<>();
+        for (int i = 0; i < params.length; i++) {
+            Parameter parameter = params[i];
+            String name = parameter.getName();
+            try {
+                getInstance().validate(parameter, parameters[i]);
+            } catch (ValidationException e) {
+                Map<String, Set<ConstraintViolation>> tmp = new HashMap<>(e.getViolations());
+                for (String key : new ArrayList<>(tmp.keySet())) {
+                    if (key.equals(name)) {
+                        Set<ConstraintViolation> value = tmp.get(key);
+                        tmp.remove(key, value);
+                        tmp.put(String.format(parameterFormat, i), value);
+                    }
+                }
+                violations.putAll(tmp);
+            }
+        }
+        if (!violations.isEmpty())
+            throw new ViolationException(violations);
+    }
+
+    /**
+     * Validates the given object fields against their {@link Constraint} annotations.
+     *
+     * @param value the value
+     * @throws ViolationException an exception containing all the violations
+     */
+    public static void validate(final @Nullable Object value) throws ViolationException {
+        try {
+            getInstance().validateBean(value);
+        } catch (ValidationException e) {
+            throw new ViolationException(e);
+        }
+    }
+
+    /**
      * Validates the value against the given field.
      * <br>
      * The field must have at least one {@link Constraint} annotated annotation
@@ -83,21 +142,35 @@ public final class Validator {
         try {
             getInstance().validate(field, value);
         } catch (ValidationException e) {
-            throw new ViolationException(e.getViolations());
+            throw new ViolationException(e);
         }
     }
 
     /**
-     * Validates the given object against the annotated element.
+     * Validates the given object against the field.
      * Will recursively look up the annotations of the element.
      * Then, will validate the internal fields of the object.
      *
-     * @param annotatedElement the element
-     * @param value            the value
+     * @param field the element
+     * @param value the value
      * @throws ValidationException if the validation fails
      */
-    public void validate(final @NotNull AnnotatedElement annotatedElement, final @Nullable Object value) throws ValidationException {
-        validateRec(annotatedElement, value);
+    public void validate(final @NotNull Field field, final @Nullable Object value) throws ValidationException {
+        validateRec(field, field.getName(), value);
+        validateBean(value);
+    }
+
+    /**
+     * Validates the given object against the parameter.
+     * Will recursively look up the annotations of the element.
+     * Then, will validate the internal parameters of the object.
+     *
+     * @param parameter the element
+     * @param value     the value
+     * @throws ValidationException if the validation fails
+     */
+    public void validate(final @NotNull Parameter parameter, final @Nullable Object value) throws ValidationException {
+        validateRec(parameter, parameter.getName(), value);
         validateBean(value);
     }
 
@@ -110,24 +183,37 @@ public final class Validator {
     public void validateBean(final @Nullable Object bean) throws ValidationException {
         if (bean == null) return;
         final Queue<Object> queue = new LinkedList<>();
+        final Map<Object, String> paths = new LinkedHashMap<>();
         final Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        final Map<String, Set<ConstraintViolation>> violations = new HashMap<>();
+        paths.put(bean, "");
         queue.add(bean);
         while (!queue.isEmpty()) {
             final Object current = queue.remove();
             if (current == null || visited.contains(current)) continue;
+            final String currentPath = paths.get(current);
             visited.add(current);
             final Reflect beanReflect = Reflect.on(current);
             if (beanReflect.isBaseType()) continue;
             if (current.getClass().getPackageName().startsWith("java")) continue;
             for (Field field : beanReflect.getInstanceFields()) {
                 Object value = beanReflect.get(field).get();
-                validateRec(field, value);
+                String fieldPath = (currentPath.isEmpty() ? "" : currentPath + ".") + field.getName();
+                try {
+                    validateRec(field, String.format(propertyFormat, fieldPath), value);
+                } catch (ValidationException e) {
+                    violations.putAll(e.getViolations());
+                }
                 queue.add(value);
+                paths.put(value, fieldPath);
             }
         }
+        if (!violations.isEmpty()) throw new ValidationException(bean, violations);
     }
 
-    private void validateRec(final @NotNull AnnotatedElement annotatedElement, final @Nullable Object value) throws ValidationException {
+    private void validateRec(final @NotNull AnnotatedElement annotatedElement,
+                             final @NotNull String elementName,
+                             final @Nullable Object value) throws ValidationException {
         final Map<Class<? extends Annotation>, ConstraintInfo> parents = new HashMap<>();
         final Set<ConstraintViolation> violations = new HashSet<>();
         final Queue<AnnotatedElement> elements = new LinkedList<>();
@@ -160,7 +246,8 @@ public final class Validator {
                         .forEach(a -> parents.putIfAbsent(a, constraintInfo));
             }
         }
-        if (!violations.isEmpty()) throw new ValidationException(value, violations);
+        if (!violations.isEmpty())
+            throw new ValidationException(String.format(propertyFormat, value), Map.of(elementName, violations));
     }
 
     /**

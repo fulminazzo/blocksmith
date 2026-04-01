@@ -37,6 +37,6 @@ public @interface Max {
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "%1$s must be at most %2$s";
+    @NotNull String exceptionMessage() default "must be at most %2$s";
 
 }

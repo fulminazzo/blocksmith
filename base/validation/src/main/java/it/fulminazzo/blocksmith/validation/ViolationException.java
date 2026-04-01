@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.validation;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,12 +14,25 @@ public final class ViolationException extends RuntimeException {
     /**
      * Instantiates a new Violation exception.
      *
-     * @param violations the violations that triggered the exception
+     * @param cause the cause exception
      */
-    ViolationException(final @NotNull Set<ConstraintViolation> violations) {
-        super(violations.stream()
-                .map(ConstraintViolation::getExceptionMessage)
-                .collect(Collectors.joining(", "))
+    ViolationException(final @NotNull ValidationException cause) {
+        this(cause.getViolations());
+    }
+
+    /**
+     * Instantiates a new Violation exception.
+     *
+     * @param violations the violations
+     */
+    ViolationException(final @NotNull Map<String, Set<ConstraintViolation>> violations) {
+        super(violations.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(entry -> String.format("invalid %s: %s",
+                        entry.getKey(), entry.getValue().stream()
+                                .map(ConstraintViolation::getExceptionMessage)
+                                .collect(Collectors.joining(", "))))
+                .collect(Collectors.joining("; "))
         );
     }
 
