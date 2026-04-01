@@ -1,11 +1,14 @@
 package it.fulminazzo.blocksmith.config;
 
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Modifier;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
 
@@ -56,6 +59,21 @@ public final class ConfigVersion {
      */
     public static @NotNull ConfigVersion of(final double version) {
         return new ConfigVersion(version);
+    }
+
+    /**
+     * Gets the version of a general type.
+     * Basically looks up for a static field of type {@link ConfigVersion}.
+     *
+     * @param type the type
+     * @return the version (if found)
+     */
+    public static @NotNull Optional<ConfigVersion> getVersion(final @NotNull Class<?> type) {
+        Reflect reflect = Reflect.on(type);
+        return reflect.getFields(f -> Modifier.isStatic(f.getModifiers()) && f.getType().equals(ConfigVersion.class))
+                .stream()
+                .findFirst()
+                .map(f -> reflect.get(f).get());
     }
 
 }

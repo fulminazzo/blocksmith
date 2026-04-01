@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.fulminazzo.blocksmith.config.BaseConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigVersion;
-import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.util.MapUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +11,6 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Map;
@@ -49,7 +47,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
     public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         Map<String, Object> data = mapper.readValue(file, new TypeReference<>() {
         });
-        @NotNull Optional<ConfigVersion> versionOpt = getVersion(type);
+        @NotNull Optional<ConfigVersion> versionOpt = ConfigVersion.getVersion(type);
         if (versionOpt.isPresent()) {
             final ConfigVersion version = versionOpt.get();
             data = MapUtils.flatten(data);
@@ -95,18 +93,10 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
     @Override
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
         Files.createDirectories(file.getParentFile().toPath());
-        ObjectMapper writer = getVersion(configuration.getClass()).isPresent()
+        ObjectMapper writer = ConfigVersion.getVersion(configuration.getClass()).isPresent()
                 ? mapper.copy().addMixIn(configuration.getClass(), VersionMixin.class)
                 : mapper;
         writer.writeValue(file, configuration);
-    }
-
-    private static @NotNull Optional<ConfigVersion> getVersion(final @NotNull Class<?> type) {
-        Reflect reflect = Reflect.on(type);
-        return reflect.getFields(f -> Modifier.isStatic(f.getModifiers()) && f.getType().equals(ConfigVersion.class))
-                .stream()
-                .findFirst()
-                .map(f -> reflect.get(f).get());
     }
 
 }
