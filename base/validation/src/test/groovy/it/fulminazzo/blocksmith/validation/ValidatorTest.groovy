@@ -76,6 +76,45 @@ class ValidatorTest extends Specification {
     @Character
     private String character
 
+    def 'test that validate method works'() {
+        given:
+        def person = new Person('Alex', 23, null)
+
+        when:
+        person.setName('Steve')
+
+        then:
+        noExceptionThrown()
+    }
+
+    def 'test that validate method throws for invalid parameter'() {
+        given:
+        def person = new Person('Alex', 23, null)
+
+        when:
+        person.setName(*parameters)
+
+        then:
+        def e = thrown(ViolationException)
+        e.message == expected
+
+        where:
+        parameters               || expected
+        [null, 'name update']    || 'invalid parameter at position 0: cannot be null'
+        ['', 'name update']      || 'invalid parameter at position 0: \'\' is not allowed (only letters)'
+        ['Alex!', 'name update'] || 'invalid parameter at position 0: \'Alex!\' is not allowed (only letters)'
+        ['Alex', null]           || 'invalid parameter at position 1: cannot be null'
+        ['Alex', '']             || 'invalid parameter at position 1: cannot be empty'
+        [null, null]             || 'invalid parameter at position 0: cannot be null; ' +
+                'invalid parameter at position 1: cannot be null'
+        ['', null]               || 'invalid parameter at position 0: \'\' is not allowed (only letters); ' +
+                'invalid parameter at position 1: cannot be null'
+        [null, '']               || 'invalid parameter at position 0: cannot be null; ' +
+                'invalid parameter at position 1: cannot be empty'
+        ['', '']                 || 'invalid parameter at position 0: \'\' is not allowed (only letters); ' +
+                'invalid parameter at position 1: cannot be empty'
+    }
+
     def 'test that validate of bean #bean works'() {
         when:
         Validator.validate(bean)
@@ -405,38 +444,5 @@ class ValidatorTest extends Specification {
         'character'           | 42                                       || [ConstraintViolation.invalidType(42, "$CharSequence.canonicalName")]
     }
 
-    static final class Person {
-
-        @Alphabetical
-        @NonNull
-        @NotNull
-        private final String name
-
-        @Range(min = 18, max = 115)
-        private final int age
-
-        @Nullable
-        private final School school
-
-        Person(final @NotNull String name, final int age, final @Nullable School school) {
-            this.name = name
-            this.age = age
-            this.school = school
-        }
-
-    }
-
-    static final class School {
-
-        @Alphabetical
-        @NonNull
-        @NotNull
-        private final String name
-
-        School(final @NotNull String name) {
-            this.name = name
-        }
-
-    }
 
 }
