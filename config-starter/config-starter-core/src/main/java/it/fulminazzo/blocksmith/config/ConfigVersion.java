@@ -19,9 +19,25 @@ public final class ConfigVersion {
     private final @NotNull Map<Double, Function<Migration, Migration>> migrations = new TreeMap<>();
 
     /**
+     * Applies the migrations for the specified version to the data.
+     *
+     * @param currentVersion the current version of the data
+     * @param data           the data
+     * @return the updated data
+     */
+    public @NotNull Map<String, Object> applyMigrations(final double currentVersion, @NotNull Map<String, Object> data) {
+        for (double v : migrations.keySet()) {
+            if (v <= currentVersion) continue;
+            Function<Migration, Migration> migration = migrations.get(v);
+            data = migration.apply(new Migration(data)).getData();
+        }
+        return data;
+    }
+
+    /**
      * Adds a new migration logic for the specified version.
      *
-     * @param version the version at which the configuration will be updated
+     * @param version   the version at which the configuration will be updated
      * @param migration the migration logic
      * @return this object (for method chaining)
      */
