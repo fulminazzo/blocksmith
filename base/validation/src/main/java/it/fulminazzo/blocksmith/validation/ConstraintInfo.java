@@ -40,7 +40,12 @@ class ConstraintInfo {
             if (!method.getName().equals("message") && !method.getName().equals("exceptionMessage")) {
                 String name = method.getName();
                 if (name.equals("value")) name = "expected";
-                values.put(name, reflect.invoke(method).get());
+                Object value = reflect.invoke(method).get();
+                if (value instanceof Number) {
+                    Number number = (Number) value;
+                    if (number.doubleValue() == number.longValue()) value = number.longValue();
+                }
+                values.put(name, value);
             }
         String message;
         try {
