@@ -9,6 +9,7 @@ plugins {
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
+extra["baseProjectName"] = "base"
 extra["testingModuleName"] = "testing"
 
 allprojects {
@@ -16,6 +17,10 @@ allprojects {
     apply { plugin("groovy") }
     apply { plugin("jacoco-report-aggregation") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
+
+    val baseProjectName: String by rootProject.extra
+    val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
+    val mockitoAgent: Configuration by configurations.creating
 
     java {
         toolchain {
@@ -31,21 +36,34 @@ allprojects {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
 
-        val baseProjectName = "base"
         if (project.name != baseProjectName) api(project(":$baseProjectName"))
 
         testImplementation(rootProject.libs.bundles.annotations)
+        testRuntimeOnly(rootProject.libs.junit.platform)
         testAnnotationProcessor(rootProject.libs.lombok)
         testImplementation(rootProject.libs.bundles.test.framework)
+
+        mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
 
-    java {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+    tasks.withType<GroovyCompile> {
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = currentJava
+        }
+    }
+
+    tasks.compileTestJava {
+        javaCompiler = javaToolchains.compilerFor {
+            languageVersion = currentJava
+        }
     }
 
     tasks.test {
         useJUnitPlatform()
+        jvmArgs("-javaagent:${mockitoAgent.asPath}")
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = currentJava
+        }
     }
 
     configure<com.github.gmazzo.buildconfig.BuildConfigExtension> {
