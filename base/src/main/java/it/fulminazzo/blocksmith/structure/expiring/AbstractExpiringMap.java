@@ -326,6 +326,7 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
          * @param ttl the time-to-live (after which it will expire)
          */
         public void setTimeToLive(final long ttl) {
+            checkTtl(ttl);
             this.expireTime = now() + ttl;
         }
 
