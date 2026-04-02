@@ -228,12 +228,12 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     }
 
     @Override
-    public void renewTtl(final @Nullable K key, final @NotNull Duration ttl) {
-        renewTtl(key, ttl.toMillis());
+    public void renew(final @Nullable K key, final @NotNull Duration ttl) {
+        renew(key, ttl.toMillis());
     }
 
     @Override
-    public void renewTtl(final @Nullable K key, final long ttl) {
+    public void renew(final @Nullable K key, final long ttl) {
         checkTtl(ttl);
         ExpiringEntry<V> entry = getExpiring(key);
         if (entry == null) throw new NoSuchElementException("key: " + key);

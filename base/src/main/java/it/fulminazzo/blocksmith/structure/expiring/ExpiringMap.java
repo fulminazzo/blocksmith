@@ -311,7 +311,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param key the key of the element
      * @param ttl the new time-to-live
      */
-    void renewTtl(final @Nullable K key, final @NotNull Duration ttl);
+    void renew(final @Nullable K key, final @NotNull Duration ttl);
 
     /**
      * Updates the time-to-live of the given element.
@@ -320,6 +320,6 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param key the key of the element
      * @param ttl the new time-to-live in milliseconds
      */
-    void renewTtl(final @Nullable K key, final long ttl);
+    void renew(final @Nullable K key, final long ttl);
 
 }

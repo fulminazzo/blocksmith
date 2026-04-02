@@ -370,13 +370,13 @@ class AbstractExpiringMapTest extends Specification {
         duration == null
     }
 
-    def 'test that renewTtl correctly applies new time-to-live'() {
+    def 'test that renew correctly applies new time-to-live'() {
         given:
         def entry = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
         internal['Hello'] = entry
 
         when:
-        map.renewTtl('Hello', 20L)
+        map.renew('Hello', 20L)
 
         then:
         def millis = entry.expireTime - System.currentTimeMillis()
@@ -386,7 +386,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that getTtl of non-existing throws NoSuchElementException'() {
         when:
-        map.renewTtl('Hello', 1L)
+        map.renew('Hello', 1L)
 
         then:
         thrown(NoSuchElementException)
@@ -407,7 +407,7 @@ class AbstractExpiringMapTest extends Specification {
         'computeIfAbsent' | ['Hello', function, -1L]
         'compute'         | ['Hello', bifunction, -1L]
         'merge'           | ['Hello', 'world', bifunction, -1L]
-        'renewTtl'        | ['Hello', -1L]
+        'renew'           | ['Hello', -1L]
     }
 
     def 'test that #method(#arguments) delegates to #expectedMethod(#expectedArguments)'() {
@@ -434,7 +434,7 @@ class AbstractExpiringMapTest extends Specification {
         'compute'         | ['Hello', bifunction, Duration.ofMillis(1337)]          || 'compute'         | ['Hello', bifunction, 1337L]
         'merge'           | ['Hello', 'world', bifunction, Duration.ofMillis(1337)] || 'merge'           | ['Hello', 'world', bifunction, 1337L]
         'putAll'          | [[:], Duration.ofMillis(1337)]                          || 'putAll'          | [[:], 1337]
-        'renewTtl'        | ['Hello', Duration.ofMillis(1337)]                      || 'renewTtl'        | ['Hello', 1337L]
+        'renew'           | ['Hello', Duration.ofMillis(1337)]                      || 'renew'           | ['Hello', 1337L]
     }
 
     def 'test that invocation of #method throws UnsupportedOperationException'() {
