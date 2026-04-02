@@ -2,7 +2,8 @@ package it.fulminazzo.blocksmith.validation;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Instant;
+import java.time.*;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,10 +41,22 @@ final class TemporalConstraintValidator extends ConstraintValidatorImpl {
      * @param object the object
      * @return the milliseconds
      */
-    static @NotNull Long toMillis(final @NotNull Object object) {
-        if (object instanceof Date) return ((Date) object).getTime();
-        else if (object instanceof Calendar) return ((Calendar) object).getTimeInMillis();
-        else return Instant.from((TemporalAccessor) object).toEpochMilli();
+    static long toMillis(final @NotNull Object object) {
+        if (object instanceof Date) return ((Date) object).getTime() / 1000;
+        else if (object instanceof Calendar) return ((Calendar) object).getTimeInMillis() / 1000;
+        else {
+            TemporalAccessor time = (TemporalAccessor) object;
+            if (time.isSupported(ChronoField.INSTANT_SECONDS)) return time.getLong(ChronoField.INSTANT_SECONDS);
+            else {
+                ZoneId zone = ZoneId.systemDefault();
+                ZoneOffset offset = zone.getRules().getOffset(Instant.now());
+                if (time.isSupported(ChronoField.EPOCH_DAY))
+                    if (time.isSupported(ChronoField.NANO_OF_DAY))
+                        return LocalDateTime.from(time).toEpochSecond(offset);
+                    else return LocalDate.from(time).toEpochSecond(LocalTime.now(), offset);
+                else return LocalTime.from(time).toEpochSecond(LocalDate.now(), offset);
+            }
+        }
     }
 
 }

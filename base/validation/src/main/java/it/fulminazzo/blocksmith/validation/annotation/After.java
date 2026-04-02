@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 
 /**
  * Identifies a time parameter or type that
- * must be after the current time of execution.
+ * must be after the current time of execution (milliseconds are ignored).
  * <br>
  * Supported types are:
  * <ul>

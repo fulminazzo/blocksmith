@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 
 /**
  * Identifies a {@link java.time.temporal.Temporal} parameter or type that
- * must be before or equal to the current time of execution.
+ * must be before or equal to the current time of execution (milliseconds are ignored).
  * <br>
  * Supported types are:
  * <ul>
