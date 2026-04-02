@@ -37,6 +37,7 @@ tasks.shadowJar {
 }
 
 jooq {
+    version.set(libs.versions.jooq.asProvider().orNull!!)
     configurations {
         create("main") {
             jooqConfiguration.apply {
