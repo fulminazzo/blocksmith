@@ -4,7 +4,6 @@ import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.data.mapper.Mappers
 import it.fulminazzo.blocksmith.data.memory.MemoryDataSource
-import it.fulminazzo.blocksmith.data.memory.MemoryRepository
 import it.fulminazzo.blocksmith.data.memory.MemoryRepositorySettings
 import it.fulminazzo.blocksmith.data.redis.RedisDataSource
 import it.fulminazzo.blocksmith.data.redis.RedisRepositorySettings
@@ -25,7 +24,7 @@ import java.util.concurrent.Executors
 import static org.jooq.impl.DSL.constraint
 
 class CachedRepositoryBuilderTest extends Specification {
-    private static final int serverPort = 16379
+    private static final int serverPort = 16478
 
     private static final ExecutorService executor = Executors.newSingleThreadExecutor()
 
@@ -75,6 +74,11 @@ class CachedRepositoryBuilderTest extends Specification {
         sqlDataSource?.close()
         server?.stop()
         executor?.shutdown()
+    }
+
+    def 'test that server is online'() {
+        expect:
+        server.active
     }
 
     def 'test creation of repository'() {

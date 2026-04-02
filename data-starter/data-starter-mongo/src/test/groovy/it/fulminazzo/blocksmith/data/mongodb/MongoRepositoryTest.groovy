@@ -5,20 +5,8 @@ import com.mongodb.client.model.Filters
 import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.MongoClients
 import com.mongodb.reactivestreams.client.MongoCollection
-import de.flapdoodle.embed.mongo.config.Net
-import de.flapdoodle.embed.mongo.distribution.Version
-import de.flapdoodle.embed.mongo.packageresolver.PlatformPackageResolver
-import de.flapdoodle.embed.mongo.transitions.Mongod
-import de.flapdoodle.embed.mongo.transitions.PackageOfCommandDistribution
 import de.flapdoodle.embed.mongo.transitions.RunningMongodProcess
-import de.flapdoodle.embed.process.distribution.Distribution
-import de.flapdoodle.embed.process.distribution.PackageResolver
-import de.flapdoodle.os.CommonOS
-import de.flapdoodle.os.ImmutablePlatform
-import de.flapdoodle.os.linux.LinuxDistribution
-import de.flapdoodle.os.linux.UbuntuVersion
 import de.flapdoodle.reverse.TransitionWalker
-import de.flapdoodle.reverse.transitions.Start
 import it.fulminazzo.blocksmith.data.RepositoryTest
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
@@ -58,6 +46,11 @@ class MongoRepositoryTest extends RepositoryTest<MongoRepository<User, Long>> {
     void cleanupSpec() {
         client?.close()
         server?.close()
+    }
+
+    def 'test that server is online'() {
+        expect:
+        TestUtils.isRunning(server)
     }
 
     @Override

@@ -43,6 +43,11 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
         server?.stop()
     }
 
+    def 'test that server is online'() {
+        expect:
+        server.active
+    }
+
     def 'test that save respects expiration time'() {
         given:
         def expected = Users.NEW1

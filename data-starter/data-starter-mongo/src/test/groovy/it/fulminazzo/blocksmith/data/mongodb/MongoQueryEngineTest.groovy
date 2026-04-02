@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono
 import spock.lang.Specification
 
 class MongoQueryEngineTest extends Specification {
-    private static final int port = 47017
+    private static final int port = 47016
 
     private static TransitionWalker.ReachedState<RunningMongodProcess> server
     private static MongoClient client
@@ -40,6 +40,11 @@ class MongoQueryEngineTest extends Specification {
     void cleanupSpec() {
         client?.close()
         server?.close()
+    }
+
+    def 'test that server is online'() {
+        expect:
+        TestUtils.isRunning(server)
     }
 
     def 'test that queryMany returns all data'() {

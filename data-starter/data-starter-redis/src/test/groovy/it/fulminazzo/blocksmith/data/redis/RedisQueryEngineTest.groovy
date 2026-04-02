@@ -12,7 +12,7 @@ import spock.lang.Specification
 
 class RedisQueryEngineTest extends Specification {
     private static final Mapper mapper = Mappers.JSON
-    private static final int serverPort = 16380
+    private static final int serverPort = 16378
 
     private static RedisServer server
     private static RedisClient client
@@ -46,6 +46,11 @@ class RedisQueryEngineTest extends Specification {
         connection?.close()
         client?.shutdown()
         server?.stop()
+    }
+
+    def 'test that server is online'() {
+        expect:
+        server.active
     }
 
     def 'test that getValues returns #expected'() {

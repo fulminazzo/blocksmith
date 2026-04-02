@@ -22,7 +22,7 @@ import java.util.concurrent.Executors
 import static org.jooq.impl.DSL.constraint
 
 class CachedDataSourceTest extends Specification {
-    private static final int serverPort = 16379
+    private static final int serverPort = 16479
 
     private static final ExecutorService executor = Executors.newSingleThreadExecutor()
 
@@ -36,6 +36,11 @@ class CachedDataSourceTest extends Specification {
     void cleanupSpec() {
         server?.stop()
         executor?.shutdown()
+    }
+
+    def 'test that server is online'() {
+        expect:
+        server.active
     }
 
     def 'test datasource life cycle'() {

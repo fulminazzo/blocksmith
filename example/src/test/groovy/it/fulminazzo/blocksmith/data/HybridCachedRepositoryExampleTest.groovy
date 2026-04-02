@@ -27,6 +27,14 @@ class HybridCachedRepositoryExampleTest extends Specification {
         mariadb?.stop()
     }
 
+    def 'test that servers are online'() {
+        expect:
+        mariadb.mysqldProcess.isAlive()
+
+        and:
+        redis.active
+    }
+
     def 'test that main functioning does not throw'() {
         when:
         HybridCachedRepositoryExample.main(new String[0])

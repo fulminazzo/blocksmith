@@ -8,7 +8,7 @@ import spock.lang.Specification
 import java.time.Duration
 
 class RedisDataSourceTest extends Specification {
-    private static final int serverPort = 16378
+    private static final int serverPort = 16380
 
     private static RedisServer server
 
@@ -19,6 +19,11 @@ class RedisDataSourceTest extends Specification {
 
     void cleanupSpec() {
         server?.stop()
+    }
+
+    def 'test that server is online'() {
+        expect:
+        server.active
     }
 
     def 'test datasource life cycle'() {

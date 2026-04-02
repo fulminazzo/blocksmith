@@ -18,6 +18,11 @@ class MongoDataSourceTest extends Specification {
         server?.close()
     }
 
+    def 'test that server is online'() {
+        expect:
+        TestUtils.isRunning(server)
+    }
+
     def 'test datasource life cycle'() {
         given:
         def dataSource = MongoDataSource.builder()
