@@ -14,7 +14,7 @@ import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +88,7 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
     }
 
     @Override
-    public @NonNull MongoDataSource build() {
+    public @NotNull MongoDataSource build() {
         if (hosts.isEmpty()) hosts.add(new ServerAddress());
         clientSettings.applyToClusterSettings(c -> c.hosts(hosts));
         return new MongoDataSource(MongoClients.create(clientSettings.build()));
@@ -110,7 +110,10 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
      * @param maxHosts the max hosts
      * @return this object (for method chaining)
      */
-    public @NotNull MongoDataSourceBuilder srvMaxHosts(final @Positive(exceptionMessage = "server maximum number of hosts must be at least 1") int maxHosts) {
+    public @NotNull MongoDataSourceBuilder srvMaxHosts(final
+                                                       @Range(from = 1, to = Integer.MAX_VALUE)
+                                                       @Positive(exceptionMessage = "server maximum number of hosts must be at least 1")
+                                                       int maxHosts) {
         Validator.validateMethod(maxHosts);
         return clusterSettings(c -> c.srvMaxHosts(maxHosts));
     }
@@ -135,7 +138,7 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
      * @return this object (for method chaining)
      */
     public @NotNull MongoDataSourceBuilder host(final @NotNull String address,
-                                                final @Port int port) {
+                                                final @Range(from = 1, to = 65535) @Port int port) {
         Validator.validateMethod(address, port);
         hosts.add(new ServerAddress(address, port));
         return this;

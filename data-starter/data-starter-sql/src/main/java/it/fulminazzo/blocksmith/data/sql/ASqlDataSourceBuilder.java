@@ -9,6 +9,7 @@ import it.fulminazzo.blocksmith.validation.annotation.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import org.jooq.SQLDialect;
 
 import java.util.Objects;
@@ -98,7 +99,11 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param maximumPoolSize the maximum pool size
      * @return this object (for method chaining)
      */
-    public @NotNull B maximumPoolSize(final @Nullable @Positive(exceptionMessage = "maximum pool size must be positive") Integer maximumPoolSize) {
+    public @NotNull B maximumPoolSize(final
+                                      @Nullable
+                                      @Range(from = 1, to = Integer.MAX_VALUE)
+                                      @Positive(exceptionMessage = "maximum pool size must be positive")
+                                      Integer maximumPoolSize) {
         if (maximumPoolSize != null) {
             Validator.validateMethod(maximumPoolSize);
             config.setMaximumPoolSize(maximumPoolSize);
@@ -114,7 +119,11 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param minimumIdle the minimum idle
      * @return this object (for method chaining)
      */
-    public @NotNull B minimumIdle(final @Nullable @PositiveOrZero(exceptionMessage = "minimum idle must be at least 0") Integer minimumIdle) {
+    public @NotNull B minimumIdle(final
+                                  @Nullable
+                                  @Range(from = 0, to = Integer.MAX_VALUE)
+                                  @PositiveOrZero(exceptionMessage = "minimum idle must be at least 0")
+                                  Integer minimumIdle) {
         if (minimumIdle != null) {
             Validator.validateMethod(minimumIdle);
             config.setMinimumIdle(minimumIdle);
@@ -130,7 +139,11 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param connectionTimeout the connection timeout
      * @return this object (for method chaining)
      */
-    public @NotNull B connectionTimeout(final @Nullable @Positive(exceptionMessage = "connection timeout must be positive") Long connectionTimeout) {
+    public @NotNull B connectionTimeout(final
+                                        @Nullable
+                                        @Range(from = 1, to = Long.MAX_VALUE)
+                                        @Positive(exceptionMessage = "connection timeout must be positive")
+                                        Long connectionTimeout) {
         if (connectionTimeout != null) {
             Validator.validateMethod(connectionTimeout);
             config.setConnectionTimeout(connectionTimeout);
@@ -146,7 +159,11 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param idleTimeout the idle timeout
      * @return this object (for method chaining)
      */
-    public @NotNull B idleTimeout(final @Nullable @PositiveOrZero(exceptionMessage = "idle timeout must be at least 0") Long idleTimeout) {
+    public @NotNull B idleTimeout(final
+                                  @Nullable
+                                  @Range(from = 0, to = Long.MAX_VALUE)
+                                  @PositiveOrZero(exceptionMessage = "idle timeout must be at least 0")
+                                  Long idleTimeout) {
         if (idleTimeout != null) {
             Validator.validateMethod(idleTimeout);
             config.setIdleTimeout(idleTimeout);

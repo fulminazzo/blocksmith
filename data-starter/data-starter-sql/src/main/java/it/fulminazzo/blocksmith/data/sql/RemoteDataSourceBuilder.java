@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.validation.Validator;
 import it.fulminazzo.blocksmith.validation.annotation.Port;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import org.jooq.SQLDialect;
 
 import java.util.Objects;
@@ -92,7 +93,7 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
      * @param port the port
      * @return this object (for method chaining)
      */
-    public @NotNull RemoteDataSourceBuilder port(final @Nullable @Port Integer port) {
+    public @NotNull RemoteDataSourceBuilder port(final @Nullable @Range(from = 1, to = 65535) @Port Integer port) {
         if (port != null) {
             Validator.validateMethod(port);
             this.port = port;

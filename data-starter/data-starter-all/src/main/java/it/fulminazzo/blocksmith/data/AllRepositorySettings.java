@@ -17,7 +17,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 /**
  * This is a special class to encapsulate all the {@link RepositorySettings} implementations.
@@ -58,7 +57,7 @@ public final class AllRepositorySettings {
     private <
             CS extends CacheRepositorySettings<CS>,
             S extends RepositorySettings
-            > @NonNull CachedRepositorySettings<CS, S> getCachedRepositorySettings(final @NonNull RepositoryDataSource<?> dataSource) {
+            > @NotNull CachedRepositorySettings<CS, S> getCachedRepositorySettings(final @NotNull RepositoryDataSource<?> dataSource) {
         Reflect reflect = Reflect.on(dataSource);
         RepositoryDataSource<?> cacheRepositoryDataSource = reflect.get("cacheRepositoryDataSource").get();
         RepositoryDataSource<?> repositoryDataSource = reflect.get("repositoryDataSource").get();

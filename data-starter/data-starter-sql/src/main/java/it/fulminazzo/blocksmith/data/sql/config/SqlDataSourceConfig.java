@@ -32,6 +32,7 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     @NotNull
     DatabaseType databaseType;
 
+    @NonNull(exceptionMessage = "'database name' must not be empty")
     @NotEmpty(exceptionMessage = "'database name' must not be empty")
     @NotNull
     String database;
@@ -77,8 +78,7 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     String host;
 
-    @Min(value = 1, exceptionMessage = "'port' number must be at least 1")
-    @Max(value = 65535, exceptionMessage = "'port' number must be at most 65535")
+    @Port
     @Range(from = 1, to = 65535)
     @Nullable
     Integer port;
@@ -118,8 +118,7 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
         @Nullable
         String host;
 
-        @Min(value = 1, exceptionMessage = "'port' number must be at least 1")
-        @Max(value = 65535, exceptionMessage = "'port' number must be at most 65535")
+        @Port
         @Range(from = 1, to = 65535)
         @Nullable
         Integer port;

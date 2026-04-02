@@ -10,7 +10,6 @@ import it.fulminazzo.blocksmith.data.Page;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,27 +34,27 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID, MongoQuery
      * @param queryEngine  the query engine
      * @param entityMapper the entity mapper
      */
-    protected MongoRepository(final @NonNull MongoQueryEngine<T, ID> queryEngine,
+    protected MongoRepository(final @NotNull MongoQueryEngine<T, ID> queryEngine,
                               final @NotNull EntityMapper<T, ID> entityMapper) {
         super(queryEngine, entityMapper);
     }
 
     @Override
-    public @NotNull CompletableFuture<Optional<T>> findById(final @NonNull ID id) {
+    public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
         return queryEngine.query(collection ->
                 collection.find(eq(getIdFieldName(), id))
         ).thenApply(Optional::ofNullable);
     }
 
     @Override
-    public @NotNull CompletableFuture<Boolean> existsById(final @NonNull ID id) {
+    public @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id) {
         return queryEngine.query(collection ->
                 collection.countDocuments(eq(getIdFieldName(), id), new CountOptions().limit(1))
         ).thenApply(c -> c > 0);
     }
 
     @Override
-    public @NotNull CompletableFuture<T> saveImpl(final @NonNull T entity) {
+    public @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
         return queryEngine.query(collection ->
                 collection.replaceOne(
                         eq(getIdFieldName(), entityMapper.getId(entity)),
@@ -66,7 +65,7 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID, MongoQuery
     }
 
     @Override
-    protected @NotNull CompletableFuture<?> deleteImpl(final @NonNull ID id) {
+    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id) {
         return queryEngine.query(collection ->
                 collection.deleteOne(eq(getIdFieldName(), id))
         );
@@ -121,7 +120,7 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID, MongoQuery
      *
      * @return the id field name
      */
-    private @NonNull String getIdFieldName() {
+    private @NotNull String getIdFieldName() {
         String idFieldName = entityMapper.getIdFieldName();
         if (idFieldName.equals("id")) idFieldName = "_" + idFieldName;
         return idFieldName;

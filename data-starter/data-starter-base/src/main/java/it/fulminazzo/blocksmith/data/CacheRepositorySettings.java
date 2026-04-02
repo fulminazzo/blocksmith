@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.time.Duration;
 
@@ -28,7 +29,11 @@ public abstract class CacheRepositorySettings<S extends CacheRepositorySettings<
      * @param expiry the expiration time
      * @return this object (for method chaining)
      */
-    public @NotNull S withTtl(final @PositiveOrZero(exceptionMessage = "cache expire time must be at least 0") @NotNull Duration expiry) {
+    public @NotNull S withTtl(final
+                              @Range(from = 0, to = Long.MAX_VALUE)
+                              @PositiveOrZero(exceptionMessage = "cache expire time must be at least 0")
+                              @NotNull
+                              Duration expiry) {
         Validator.validateMethod(expiry);
         this.ttl = expiry;
         return (S) this;

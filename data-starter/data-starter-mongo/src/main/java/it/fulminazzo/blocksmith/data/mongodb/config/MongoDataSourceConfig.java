@@ -29,8 +29,7 @@ public final class MongoDataSourceConfig implements DataSourceConfig {
     @NotNull
     String host;
 
-    @Min(value = 1, exceptionMessage = "'port' number must be at least 1")
-    @Max(value = 65535, exceptionMessage = "'port' number must be at most 65535")
+    @Port
     @Range(from = 1, to = 65535)
     @Nullable
     @Builder.Default
@@ -64,9 +63,13 @@ public final class MongoDataSourceConfig implements DataSourceConfig {
     public static class MongoCredentialConfig {
 
         @NotEmpty(exceptionMessage = "'username' must not be empty")
+        @NonNull
+        @NotNull
         String username;
 
         @NotEmpty(exceptionMessage = "'password' must not be empty")
+        @NonNull
+        @NotNull
         String password;
 
         @Nullable
