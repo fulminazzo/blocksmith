@@ -65,6 +65,10 @@ public final class Validator {
                         return false;
                     }
                 }))
+                .register(After.class, new TemporalConstraintValidator(t -> t > System.currentTimeMillis()))
+                .register(AfterOrNow.class, new TemporalConstraintValidator(t -> t >= System.currentTimeMillis()))
+                .register(Before.class, new TemporalConstraintValidator(t -> t < System.currentTimeMillis()))
+                .register(BeforeOrNow.class, new TemporalConstraintValidator(t -> t <= System.currentTimeMillis()))
         ;
     }
 
