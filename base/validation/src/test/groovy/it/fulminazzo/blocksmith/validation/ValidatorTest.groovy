@@ -325,41 +325,41 @@ class ValidatorTest extends Specification {
         // Max
         'max'                 | 1                                        || [new ConstraintViolation(1, 'error.validation.number-too-big', String.format('must be at most %2$s', 1, 0), ['value': 1, 'expected': 0])]
         'max'                 | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.number-too-big', String.format('must be at most %2$s', Integer.MAX_VALUE, 0), ['value': Integer.MAX_VALUE, 'expected': 0])]
-        'max'                 | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number')]
+        'max'                 | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // NegativeOrZero
         'negativeOrZero'      | 1                                        || [new ConstraintViolation(1, 'error.validation.negative-or-zero', String.format('must be negative or zero', 1), ['value': 1])]
         'negativeOrZero'      | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.negative-or-zero', String.format('must be negative or zero', Integer.MAX_VALUE), ['value': Integer.MAX_VALUE])]
-        'negativeOrZero'      | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number')]
+        'negativeOrZero'      | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Negative
         'negative'            | 0                                        || [new ConstraintViolation(0, 'error.validation.negative', String.format('must be negative', 0), ['value': 0])]
         'negative'            | 1                                        || [new ConstraintViolation(1, 'error.validation.negative', String.format('must be negative', 1), ['value': 1])]
         'negative'            | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.negative', String.format('must be negative', Integer.MAX_VALUE), ['value': Integer.MAX_VALUE])]
-        'negative'            | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number')]
+        'negative'            | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Min
         'min'                 | -1                                       || [new ConstraintViolation(-1, 'error.validation.number-too-small', String.format('must be at least %2$s', -1, 0), ['value': -1, 'expected': 0])]
         'min'                 | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.number-too-small', String.format('must be at least %2$s', Integer.MIN_VALUE, 0), ['value': Integer.MIN_VALUE, 'expected': 0])]
-        'min'                 | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number')]
+        'min'                 | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // PositiveOrZero
         'positiveOrZero'      | -1                                       || [new ConstraintViolation(-1, 'error.validation.positive-or-zero', String.format('must be positive or zero', -1), ['value': -1])]
         'positiveOrZero'      | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.positive-or-zero', String.format('must be positive or zero', Integer.MIN_VALUE), ['value': Integer.MIN_VALUE])]
-        'positiveOrZero'      | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number')]
+        'positiveOrZero'      | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Positive
         'positive'            | 0                                        || [new ConstraintViolation(0, 'error.validation.positive', String.format('must be positive', 0), ['value': 0])]
         'positive'            | -1                                       || [new ConstraintViolation(-1, 'error.validation.positive', String.format('must be positive', -1), ['value': -1])]
         'positive'            | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.positive', String.format('must be positive', Integer.MIN_VALUE), ['value': Integer.MIN_VALUE])]
-        'positive'            | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number')]
+        'positive'            | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Range
         'range'               | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', Integer.MIN_VALUE, 10.5, 0.5), ['value': Integer.MIN_VALUE, 'max': 10.5, 'min': 0.5])]
         'range'               | 0                                        || [new ConstraintViolation(0, 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', 0, 10.5, 0.5), ['value': 0, 'max': 10.5, 'min': 0.5])]
         'range'               | 11                                       || [new ConstraintViolation(11, 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', 11, 10.5, 0.5), ['value': 11, 'max': 10.5, 'min': 0.5])]
         'range'               | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', Integer.MAX_VALUE, 10.5, 0.5), ['value': Integer.MAX_VALUE, 'max': 10.5, 'min': 0.5])]
-        'range'               | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number')]
+        'range'               | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Port
         'port'                | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.invalid-port', String.format('%1$s is not a valid port', Integer.MIN_VALUE), ['value': Integer.MIN_VALUE])]
         'port'                | 0                                        || [new ConstraintViolation(0, 'error.validation.invalid-port', String.format('%1$s is not a valid port', 0), ['value': 0])]
         'port'                | 65536                                    || [new ConstraintViolation(65536, 'error.validation.invalid-port', String.format('%1$s is not a valid port', 65536), ['value': 65536])]
         'port'                | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.invalid-port', String.format('%1$s is not a valid port', Integer.MAX_VALUE), ['value': Integer.MAX_VALUE])]
-        'port'                | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number')]
+        'port'                | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Size (String)
         'sizeString'          | ''                                       || [new ConstraintViolation('', 'error.validation.argument-exceeds-size', String.format('size must be at least %3$s and at most %2$s elements long', '', 5, 1), ['value': '', 'max': 5, 'min': 1])]
         'sizeString'          | 'a'.repeat(6)                            || [new ConstraintViolation('a'.repeat(6), 'error.validation.argument-exceeds-size', String.format('size must be at least %3$s and at most %2$s elements long', 'a'.repeat(6), 5, 1), ['value': 'a'.repeat(6), 'max': 5, 'min': 1])]
@@ -379,7 +379,7 @@ class ValidatorTest extends Specification {
         'matches'             | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Port + @Range (minPort)
         'minPort'             | 1007                                     || [new ConstraintViolation(1007, 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', 1007, 100, 1), ['value': 1007, 'max': 100, 'min': 1])]
-        'minPort'             | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number')]
+        'minPort'             | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Hostname
         'hostname'            | '-invalid.com'                           || [new ConstraintViolation('-invalid.com', 'error.validation.invalid-hostname', String.format('\'%1$s\' is not a valid hostname', '-invalid.com'), ['value': '-invalid.com'])]
         'hostname'            | 'trailing-.com'                          || [new ConstraintViolation('trailing-.com', 'error.validation.invalid-hostname', String.format('\'%1$s\' is not a valid hostname', 'trailing-.com'), ['value': 'trailing-.com'])]
@@ -443,6 +443,5 @@ class ValidatorTest extends Specification {
         'character'           | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-character', String.format('\'%1$s\' is not a valid character', ''), ['value': ''])]
         'character'           | 42                                       || [ConstraintViolation.invalidType(42, "$CharSequence.canonicalName")]
     }
-
 
 }
