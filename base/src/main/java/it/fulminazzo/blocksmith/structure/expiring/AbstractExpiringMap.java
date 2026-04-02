@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.structure.expiring;
 
-import lombok.Data;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -318,6 +318,54 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
          */
         public void setTimeToLive(final long ttl) {
             this.expireTime = now() + ttl;
+        }
+
+    }
+
+    @ToString
+    @RequiredArgsConstructor
+    private static final class ExpiringEntryMapEntry<K, V> implements Entry<K, V> {
+        private final @Nullable K key;
+        private final @NotNull ExpiringEntry<V> entry;
+
+        @Override
+        public @Nullable K getKey() {
+            checkExpired();
+            return key;
+        }
+
+        @Override
+        public @Nullable V getValue() {
+            checkExpired();
+            return entry.getValue();
+        }
+
+        @Override
+        public V setValue(final @Nullable V value) {
+            checkExpired();
+            entry.setValue(value);
+            return value;
+        }
+
+        @Override
+        public boolean equals(final @Nullable Object obj) {
+            checkExpired();
+            if (obj instanceof Entry<?, ?>) {
+                Entry<?, ?> e = (Entry<?, ?>) obj;
+                return Objects.equals(e.getKey(), key) && Objects.equals(e.getValue(), entry.getValue());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            checkExpired();
+            return Objects.hash(key, entry);
+        }
+
+        private void checkExpired() {
+            if (entry.isExpired())
+                throw new IllegalStateException(String.format("Entry %s:%s is expired", key, entry.getValue()));
         }
 
     }
