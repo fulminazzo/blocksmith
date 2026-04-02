@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.validation;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
@@ -19,8 +18,8 @@ final class TemporalConstraintValidator extends ConstraintValidatorImpl {
      *
      * @param validPredicate the valid predicate
      */
-    public TemporalConstraintValidator(final @NotNull Predicate<Object> validPredicate) {
-        super(validPredicate, Date.class, Calendar.class, TemporalAccessor.class);
+    public TemporalConstraintValidator(final @NotNull Predicate<@NotNull Long> validPredicate) {
+        super(o -> o == null || validPredicate.test(toMillis(o)), Date.class, Calendar.class, TemporalAccessor.class);
     }
 
     @Override
@@ -41,8 +40,7 @@ final class TemporalConstraintValidator extends ConstraintValidatorImpl {
      * @param object the object
      * @return the milliseconds
      */
-    public static @Nullable Long toMillis(final @Nullable Object object) {
-        if (object == null) return null;
+    static @NotNull Long toMillis(final @NotNull Object object) {
         if (object instanceof Date) return ((Date) object).getTime();
         else if (object instanceof Calendar) return ((Calendar) object).getTimeInMillis();
         else return Instant.from((TemporalAccessor) object).toEpochMilli();

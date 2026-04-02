@@ -14,8 +14,8 @@ final class StringConstraintValidator extends ConstraintValidatorImpl {
      *
      * @param validPredicate the valid predicate
      */
-    public StringConstraintValidator(final @NotNull Predicate<Object> validPredicate) {
-        super(validPredicate, CharSequence.class);
+    public StringConstraintValidator(final @NotNull Predicate<@NotNull CharSequence> validPredicate) {
+        super(o -> o == null || validPredicate.test((CharSequence) o), CharSequence.class);
     }
 
     @Override

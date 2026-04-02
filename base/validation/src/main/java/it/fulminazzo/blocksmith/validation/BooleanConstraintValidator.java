@@ -14,8 +14,8 @@ final class BooleanConstraintValidator extends ConstraintValidatorImpl {
      *
      * @param validPredicate the valid predicate
      */
-    public BooleanConstraintValidator(final @NotNull Predicate<Object> validPredicate) {
-        super(validPredicate, Boolean.class);
+    public BooleanConstraintValidator(final @NotNull Predicate<@NotNull Boolean> validPredicate) {
+        super(o -> o == null || validPredicate.test((Boolean) o), Boolean.class);
     }
 
     @Override
