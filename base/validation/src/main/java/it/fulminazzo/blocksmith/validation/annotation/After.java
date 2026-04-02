@@ -32,13 +32,13 @@ public @interface After {
      *
      * @return the message
      */
-    @NotNull String message() default "error.validation.required-future-date";
+    @NotNull String message() default "error.validation.not-after";
 
     /**
      * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "must be later than now";
+    @NotNull String exceptionMessage() default "must be after now";
 
 }

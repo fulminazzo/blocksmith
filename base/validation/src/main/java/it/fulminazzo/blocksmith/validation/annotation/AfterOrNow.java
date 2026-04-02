@@ -32,13 +32,13 @@ public @interface AfterOrNow {
      *
      * @return the message
      */
-    @NotNull String message() default "error.validation.required-future-or-now-date";
+    @NotNull String message() default "error.validation.not-after-or-now";
 
     /**
      * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "must be later than or equal to now";
+    @NotNull String exceptionMessage() default "must be now or in the future";
 
 }

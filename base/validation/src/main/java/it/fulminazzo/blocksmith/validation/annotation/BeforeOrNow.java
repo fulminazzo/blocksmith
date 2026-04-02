@@ -32,13 +32,13 @@ public @interface BeforeOrNow {
      *
      * @return the message
      */
-    @NotNull String message() default "error.validation.required-past-or-now-date";
+    @NotNull String message() default "error.validation.not-before-or-now";
 
     /**
      * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "must be before or equal to now";
+    @NotNull String exceptionMessage() default "must be now or in the past";
 
 }

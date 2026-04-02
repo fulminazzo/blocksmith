@@ -32,7 +32,7 @@ public @interface Before {
      *
      * @return the message
      */
-    @NotNull String message() default "error.validation.required-past-date";
+    @NotNull String message() default "error.validation.not-before";
 
     /**
      * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
