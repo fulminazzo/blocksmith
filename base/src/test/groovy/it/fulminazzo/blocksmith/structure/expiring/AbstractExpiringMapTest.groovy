@@ -403,7 +403,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that entrySet returns all entries'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1000L)
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 2000L)
 
         when:
@@ -553,6 +553,126 @@ class AbstractExpiringMapTest extends Specification {
         'compute'         | ['Hello', bifunction]
         'merge'           | ['Hello', 'world', bifunction]
         'putAll'          | [[:]]
+    }
+
+    /**
+     * ExpiringEntryMapEntry
+     */
+
+    def 'test that entry getters and setter work'() {
+        given:
+        def entry = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
+                'Hello',
+                new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
+        )
+
+        expect:
+        entry.key == 'Hello'
+
+        and:
+        entry.value == 'world'
+
+        when:
+        entry.value = 'mars'
+
+        then:
+        entry.key == 'Hello'
+
+        and:
+        entry.value == 'mars'
+    }
+
+    def 'test that entry equals self'() {
+        given:
+        def first = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
+                'Hello',
+                new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
+        )
+
+        and:
+        def second = Map.entry('Hello', 'world')
+
+        expect:
+        first.equals(second)
+    }
+
+    def 'test that entry does not equal #other'() {
+        given:
+        def entry = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
+                'Hello',
+                new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
+        )
+
+        expect:
+        !entry.equals(other)
+
+        where:
+        other << [
+                null,
+                Map.entry('Goodbye', 'mars'),
+                Map.entry('Hello', 'mars'),
+                Map.entry('Goodbye', 'world')
+        ]
+    }
+
+    def 'test that entry hashcode equals self'() {
+        given:
+        def first = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
+                'Hello',
+                new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
+        )
+
+        and:
+        def second = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
+                'Hello',
+                new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
+        )
+
+        expect:
+        first.hashCode() == second.hashCode()
+    }
+
+    def 'test that entry hashcode does not equal #other'() {
+        given:
+        def entry = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
+                'Hello',
+                new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
+        )
+
+        expect:
+        entry.hashCode() != other.hashCode()
+
+        where:
+        other << [
+                Map.entry('Goodbye', 'mars'),
+                Map.entry('Hello', 'mars'),
+                Map.entry('Goodbye', 'world')
+        ]
+    }
+
+    def 'test that #method(#arguments) throws IllegalStateException if expired'() {
+        given:
+        def entry = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
+                'Hello',
+                new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        )
+
+        and:
+        sleep(1L)
+
+        when:
+        entry."$method"(*arguments)
+
+        then:
+        thrown(IllegalStateException)
+
+        where:
+        method     | arguments
+        'getKey'   | []
+        'getValue' | []
+        'setValue' | ['mars']
+        'equals'   | ['mars']
+        'hashCode' | []
     }
 
 }
