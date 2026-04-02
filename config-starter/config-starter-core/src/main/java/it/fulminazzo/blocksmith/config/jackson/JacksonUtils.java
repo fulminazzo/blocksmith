@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.deser.BeanDeserializerBuilder;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.deser.std.MapDeserializer;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.type.MapType;
 import it.fulminazzo.blocksmith.config.Comment;
 import it.fulminazzo.blocksmith.config.CommentUtils;
 import it.fulminazzo.blocksmith.reflect.Reflect;
+import it.fulminazzo.blocksmith.reflect.ReflectException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -21,16 +23,30 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * A collection of utilities to work with jackson.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class JacksonUtils {
+    private static final @NotNull List<Function<Logger, StdDeserializer<?>>> customDeserializers = new ArrayList<>();
+
+    static {
+        addCustomDeserializer(DurationDeserializer.class.getSimpleName());
+    }
+
+    private static void addCustomDeserializer(final @NotNull String deserializerName) {
+        try {
+            Reflect reflect = Reflect.on(JacksonUtils.class.getPackageName() + "." + deserializerName);
+            customDeserializers.add(l -> reflect.init(l).get());
+        } catch (ReflectException ignored) {
+        }
+    }
 
     /**
      * Sets up the given {@link ObjectMapper} so that many exceptions
@@ -47,22 +63,32 @@ final class JacksonUtils {
     public static <M extends ObjectMapper> M setupMapper(final @NotNull M mapper,
                                                          final @NotNull Logger logger,
                                                          final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
+        final SimpleModule module = new SimpleModule() {
+
+            @Override
+            public void setupModule(final @NotNull SetupContext context) {
+                super.setupModule(context);
+                context.addBeanDeserializerModifier(new JacksonBeanDeserializerModifier(logger));
+                if (commentPropertyWriterType != null)
+                    context.addBeanSerializerModifier(new JacksonBeanSerializerModifier<>(commentPropertyWriterType));
+            }
+
+        };
+        for (Function<Logger, StdDeserializer<?>> deserializerProvider : customDeserializers) {
+            StdDeserializer<?> deserializer = deserializerProvider.apply(logger);
+            registerDeserializer(module, deserializer);
+        }
         return (M) mapper
-                .registerModule(new SimpleModule() {
-
-                            @Override
-                            public void setupModule(final @NotNull SetupContext context) {
-                                super.setupModule(context);
-                                context.addBeanDeserializerModifier(new JacksonBeanDeserializerModifier(logger));
-                                if (commentPropertyWriterType != null)
-                                    context.addBeanSerializerModifier(new JacksonBeanSerializerModifier<>(commentPropertyWriterType));
-                            }
-
-                        }
-                                .addSerializer(new DurationSerializer())
-                                .addDeserializer(Duration.class, new DurationDeserializer(logger))
+                .registerModule(module
+                        .addSerializer(new DurationSerializer())
                 )
                 .addHandler(new LoggerDeserializationProblemHandler(logger));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> void registerDeserializer(final @NotNull SimpleModule module, final @NotNull StdDeserializer<?> deserializer) {
+        Class<T> type = (Class<T>) deserializer.handledType();
+        module.addDeserializer(type, (JsonDeserializer<? extends T>) deserializer);
     }
 
     /**
