@@ -11,7 +11,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -34,33 +33,13 @@ public final class Validator {
     static {
         getInstance()
                 .register(NonNull.class, new ConstraintValidatorImpl(Objects::nonNull))
-                .register(AssertFalse.class, new BooleanConstraintValidator(o -> o == null || !((Boolean) o)))
-                .register(AssertTrue.class, new BooleanConstraintValidator(o -> o == null || ((Boolean) o)))
-                .registerSupplier(Max.class, a -> new NumberConstraintValidator(o -> {
-                    if (o == null) return true;
-                    else if (o instanceof Duration) o = ((Duration) o).toMillis();
-                    return ((Number) o).doubleValue() <= a.value();
-                }))
-                .register(Negative.class, new NumberConstraintValidator(o -> {
-                    if (o == null) return true;
-                    else if (o instanceof Duration) o = ((Duration) o).toMillis();
-                    return ((Number) o).doubleValue() < 0;
-                }))
-                .registerSupplier(Min.class, a -> new NumberConstraintValidator(o -> {
-                    if (o == null) return true;
-                    else if (o instanceof Duration) o = ((Duration) o).toMillis();
-                    return ((Number) o).doubleValue() >= a.value();
-                }))
-                .register(Positive.class, new NumberConstraintValidator(o -> {
-                    if (o == null) return true;
-                    else if (o instanceof Duration) o = ((Duration) o).toMillis();
-                    return ((Number) o).doubleValue() > 0;
-                }))
-                .registerSupplier(Range.class, a -> new NumberConstraintValidator(o -> {
-                    if (o == null) return true;
-                    else if (o instanceof Duration) o = ((Duration) o).toMillis();
-                    return ((Number) o).doubleValue() >= a.min() && ((Number) o).doubleValue() <= a.max();
-                }))
+                .register(AssertFalse.class, new BooleanConstraintValidator(o -> !o))
+                .register(AssertTrue.class, new BooleanConstraintValidator(o -> o))
+                .registerSupplier(Max.class, a -> new NumberDurationConstraintValidator(o -> o <= a.value()))
+                .register(Negative.class, new NumberDurationConstraintValidator(o -> o < 0))
+                .registerSupplier(Min.class, a -> new NumberDurationConstraintValidator(o -> o >= a.value()))
+                .register(Positive.class, new NumberDurationConstraintValidator(o -> o > 0))
+                .registerSupplier(Range.class, a -> new NumberDurationConstraintValidator(o -> o >= a.min() && o <= a.max()))
                 .registerSupplier(Size.class, a -> new ConstraintValidatorImpl(o -> {
                     if (o == null) return true;
                     Number size;
@@ -75,94 +54,22 @@ public final class Validator {
                     }
                     return size.longValue() >= a.min() && size.longValue() <= a.max();
                 }))
-                .registerSupplier(Matches.class, a -> new StringConstraintValidator(o -> o == null ||
-                        Pattern.compile(a.value()).matcher((CharSequence) o).matches()
+                .registerSupplier(Matches.class, a -> new StringConstraintValidator(o ->
+                        Pattern.compile(a.value()).matcher(o).matches()
                 ))
                 .register(Url.class, new StringConstraintValidator(o -> {
                     try {
-                        if (o != null) new URL(o.toString());
+                        new URL(o.toString());
                         return true;
                     } catch (MalformedURLException e) {
                         return false;
                     }
                 }))
+                .register(After.class, new TemporalConstraintValidator(t -> t > now()))
+                .register(AfterOrNow.class, new TemporalConstraintValidator(t -> t >= now()))
+                .register(Before.class, new TemporalConstraintValidator(t -> t < now()))
+                .register(BeforeOrNow.class, new TemporalConstraintValidator(t -> t <= now()))
         ;
-    }
-
-    /**
-     * Validates method invocation parameters.
-     * This call should be put first in the method declaration.
-     * <br>
-     * <pre>{@code
-     * public void myMethod(@NonNull String name, @Positive int age) {
-     *     Validator.validateMethod(name, age);
-     *     // rest of logic
-     * }
-     * }</pre>
-     *
-     * @param parameters the actual values of the parameters
-     * @throws ViolationException an exception containing all the violations
-     */
-    public static void validateMethod(final @Nullable Object @NotNull ... parameters) throws ViolationException {
-        StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[2];
-        Method method = Reflect.on(stackTrace.getClassName())
-                .getMethod(stackTrace.getMethodName(), Reflect.getParameterTypes(parameters));
-        Parameter[] params = method.getParameters();
-        if (params.length != parameters.length)
-            throw new IllegalArgumentException("Method parameters do not match with the given number of parameters. " +
-                    "Please include all the parameters of the method to validate it");
-        Map<String, Set<ConstraintViolation>> violations = new HashMap<>();
-        for (int i = 0; i < params.length; i++) {
-            Parameter parameter = params[i];
-            String name = parameter.getName();
-            try {
-                getInstance().validate(parameter, parameters[i]);
-            } catch (ValidationException e) {
-                Map<String, Set<ConstraintViolation>> tmp = new HashMap<>(e.getViolations());
-                for (String key : new ArrayList<>(tmp.keySet())) {
-                    if (key.equals(name)) {
-                        Set<ConstraintViolation> value = tmp.get(key);
-                        tmp.remove(key, value);
-                        tmp.put(String.format(parameterFormat, i), value);
-                    }
-                }
-                violations.putAll(tmp);
-            }
-        }
-        if (!violations.isEmpty())
-            throw new ViolationException(violations);
-    }
-
-    /**
-     * Validates the given object fields against their {@link Constraint} annotations.
-     *
-     * @param value the value
-     * @throws ViolationException an exception containing all the violations
-     */
-    public static void validate(final @Nullable Object value) throws ViolationException {
-        try {
-            getInstance().validateBean(value);
-        } catch (ValidationException e) {
-            throw new ViolationException(e);
-        }
-    }
-
-    /**
-     * Validates the value against the given field.
-     * <br>
-     * The field must have at least one {@link Constraint} annotated annotation
-     * in order for validation to work.
-     *
-     * @param field the field
-     * @param value the value
-     * @throws ViolationException an exception containing all the violations
-     */
-    public static void validateField(final @NotNull Field field, final @Nullable Object value) throws ViolationException {
-        try {
-            getInstance().validate(field, value);
-        } catch (ValidationException e) {
-            throw new ViolationException(e);
-        }
     }
 
     /**
@@ -310,12 +217,92 @@ public final class Validator {
     }
 
     /**
+     * Validates method invocation parameters.
+     * This call should be put first in the method declaration.
+     * <br>
+     * <pre>{@code
+     * public void myMethod(@NonNull String name, @Positive int age) {
+     *     Validator.validateMethod(name, age);
+     *     // rest of logic
+     * }
+     * }</pre>
+     *
+     * @param parameters the actual values of the parameters
+     * @throws ViolationException an exception containing all the violations
+     */
+    public static void validateMethod(final @Nullable Object @NotNull ... parameters) throws ViolationException {
+        StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[2];
+        Method method = Reflect.on(stackTrace.getClassName())
+                .getMethod(stackTrace.getMethodName(), Reflect.getParameterTypes(parameters));
+        Parameter[] params = method.getParameters();
+        if (params.length != parameters.length)
+            throw new IllegalArgumentException("Method parameters do not match with the given number of parameters. " +
+                    "Please include all the parameters of the method to validate it");
+        Map<String, Set<ConstraintViolation>> violations = new HashMap<>();
+        for (int i = 0; i < params.length; i++) {
+            Parameter parameter = params[i];
+            String name = parameter.getName();
+            try {
+                getInstance().validate(parameter, parameters[i]);
+            } catch (ValidationException e) {
+                Map<String, Set<ConstraintViolation>> tmp = new HashMap<>(e.getViolations());
+                for (String key : new ArrayList<>(tmp.keySet())) {
+                    if (key.equals(name)) {
+                        Set<ConstraintViolation> value = tmp.get(key);
+                        tmp.remove(key, value);
+                        tmp.put(String.format(parameterFormat, i), value);
+                    }
+                }
+                violations.putAll(tmp);
+            }
+        }
+        if (!violations.isEmpty())
+            throw new ViolationException(violations);
+    }
+
+    /**
+     * Validates the given object fields against their {@link Constraint} annotations.
+     *
+     * @param value the value
+     * @throws ViolationException an exception containing all the violations
+     */
+    public static void validate(final @Nullable Object value) throws ViolationException {
+        try {
+            getInstance().validateBean(value);
+        } catch (ValidationException e) {
+            throw new ViolationException(e);
+        }
+    }
+
+    /**
+     * Validates the value against the given field.
+     * <br>
+     * The field must have at least one {@link Constraint} annotated annotation
+     * in order for validation to work.
+     *
+     * @param field the field
+     * @param value the value
+     * @throws ViolationException an exception containing all the violations
+     */
+    public static void validateField(final @NotNull Field field, final @Nullable Object value) throws ViolationException {
+        try {
+            getInstance().validate(field, value);
+        } catch (ValidationException e) {
+            throw new ViolationException(e);
+        }
+    }
+
+    /**
      * Gets the validator global instance.
      *
      * @return the instance
      */
     public static @NotNull Validator getInstance() {
         return INSTANCE;
+    }
+
+    private static long now() {
+        return System.currentTimeMillis() / 1000;
     }
 
 }
