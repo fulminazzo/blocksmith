@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.data.memory
 
+import it.fulminazzo.blocksmith.validation.ViolationException
 import spock.lang.Specification
 
 class ExpirationMapTest extends Specification {
@@ -9,6 +10,20 @@ class ExpirationMapTest extends Specification {
 
     void setup() {
         map = new ExpirationMap<>(EXPIRATION_TIME)
+    }
+
+    def 'test that initialize throws for #arguments'() {
+        when:
+        new ExpirationMap<>(*arguments)
+
+        then:
+        thrown(ViolationException)
+
+        where:
+        arguments << [
+                [-1],
+                [[:], -1]
+        ]
     }
 
     def 'test that size returns size of non-expired values'() {

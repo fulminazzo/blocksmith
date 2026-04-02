@@ -27,7 +27,7 @@ public class ExpirationMap<K, V> implements Map<K, V> {
      * @param expiryInMillis the expiration time in milliseconds
      */
     public ExpirationMap(final long expiryInMillis) {
-        this.expiryInMillis = expiryInMillis;
+        setExpiry(expiryInMillis);
     }
 
     /**
@@ -36,9 +36,8 @@ public class ExpirationMap<K, V> implements Map<K, V> {
      * @param map            the data to use to populate this map
      * @param expiryInMillis the expiration time in milliseconds
      */
-    public ExpirationMap(final @NotNull Map<K, V> map,
-                         final long expiryInMillis) {
-        this.expiryInMillis = expiryInMillis;
+    public ExpirationMap(final @NotNull Map<K, V> map, final long expiryInMillis) {
+        setExpiry(expiryInMillis);
         putAll(map);
     }
 
@@ -154,9 +153,9 @@ public class ExpirationMap<K, V> implements Map<K, V> {
         }
 
         /**
-         * Is expired boolean.
+         * Checks if the value is expired.
          *
-         * @return the boolean
+         * @return <code>true</code> if it is
          */
         public boolean isExpired() {
             return System.currentTimeMillis() > expirationTime;
