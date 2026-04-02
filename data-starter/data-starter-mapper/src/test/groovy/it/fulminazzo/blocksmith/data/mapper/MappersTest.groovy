@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.data.mapper
 
+import it.fulminazzo.blocksmith.reflect.ReflectException
 import spock.lang.Specification
 
 class MappersTest extends Specification {
@@ -30,32 +31,13 @@ class MappersTest extends Specification {
                 "Please check that the module it.fulminazzo.blocksmith:data-starter-mapper-json is correctly installed."
     }
 
-    def 'test that getMapper of #prefix throws #expected'() {
+    def 'test that getMapper throws ReflectException for missing constructor'() {
         when:
-        Mappers.getMapper(prefix)
+        Mappers.getMapper('NoMethod')
 
         then:
-        def e = thrown(expected.class)
-        e.message == expected.message
-
-        and:
-        def eCause = expected.cause
-        def cause = e.cause
-
-        if (eCause == null) assert cause == null
-        else {
-            assert cause != null
-            assert cause.class == eCause.class
-            assert cause.message == eCause.message
-        }
-
-        where:
-        prefix             || expected
-        'NoMethod'         || new IllegalArgumentException(
-                "Could not find constructor ${NoMethodMapper.canonicalName}()"
-        )
-        'RuntimeException' || new RuntimeException('Test runtime exception')
-        'Exception'        || new RuntimeException(new Exception('Test exception'))
+        def e = thrown(ReflectException)
+        e.message == "Could not find constructor with types () in type '${NoMethodMapper.canonicalName}'"
     }
 
 }

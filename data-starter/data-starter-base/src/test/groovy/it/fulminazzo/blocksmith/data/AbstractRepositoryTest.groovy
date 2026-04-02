@@ -38,7 +38,7 @@ class AbstractRepositoryTest extends Specification {
         and:
         def ex = e.cause
         ex != null
-        ex.message == 'Cat age should at least be 1'
+        ex.message == 'invalid property \'age\': Cat age should at least be 1'
     }
 
     def 'test that delete returns null'() {
@@ -107,7 +107,7 @@ class AbstractRepositoryTest extends Specification {
         and:
         def ex = e.cause
         ex != null
-        ex.message == 'Cat name should not be empty'
+        ex.message == 'invalid property \'name\': Cat name should not be empty'
     }
 
     def 'test that deleteAll ignores null ids'() {
