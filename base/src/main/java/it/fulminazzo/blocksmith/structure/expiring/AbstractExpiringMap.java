@@ -370,7 +370,7 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
         @Override
         public int hashCode() {
             checkExpired();
-            return Objects.hash(key, entry);
+            return Objects.hash(key, entry.getValue());
         }
 
         private void checkExpired() {
