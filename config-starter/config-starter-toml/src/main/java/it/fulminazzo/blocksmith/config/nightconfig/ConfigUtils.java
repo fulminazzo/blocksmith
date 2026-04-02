@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 
 /**
@@ -48,7 +49,7 @@ public final class ConfigUtils {
     public static void setComments(final @NotNull Object reference,
                                    final @NotNull CommentedConfig configuration) {
         Reflect reflect = Reflect.on(reference);
-        for (Field field : reflect.getFields()) {
+        for (Field field : reflect.getFields(f -> !Modifier.isStatic(f.getModifiers()) && !Modifier.isTransient(f.getModifiers()))) {
             String propertyName = formatToSnakeCase(field.getName());
             if (field.isAnnotationPresent(Comment.class)) {
                 Comment comment = field.getAnnotation(Comment.class);
