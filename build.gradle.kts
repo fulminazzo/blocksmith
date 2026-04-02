@@ -15,6 +15,7 @@ allprojects {
     apply { plugin("jacoco-report-aggregation") }
 
     val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
+    val mockitoAgent: Configuration by configurations.creating
 
     java {
         toolchain {
@@ -32,8 +33,10 @@ allprojects {
 
         testImplementation(rootProject.libs.bundles.annotations)
         testRuntimeOnly(rootProject.libs.junit.platform)
-        testImplementation(rootProject.libs.bundles.test.framework)
         testAnnotationProcessor(rootProject.libs.lombok)
+        testImplementation(rootProject.libs.bundles.test.framework)
+
+        mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
 
     tasks.withType<GroovyCompile> {
@@ -50,6 +53,7 @@ allprojects {
 
     tasks.test {
         useJUnitPlatform()
+        jvmArgs("-javaagent:${mockitoAgent.asPath}")
         javaLauncher = javaToolchains.launcherFor {
             languageVersion = currentJava
         }
