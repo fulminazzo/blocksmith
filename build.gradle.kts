@@ -12,6 +12,8 @@ allprojects {
     apply { plugin("groovy") }
     apply { plugin("jacoco-report-aggregation") }
 
+    val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
+
     java {
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(11))
@@ -30,8 +32,23 @@ allprojects {
         testImplementation(rootProject.libs.bundles.test.framework)
     }
 
+    tasks.withType<GroovyCompile> {
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = currentJava
+        }
+    }
+
+    tasks.compileTestJava {
+        javaCompiler = javaToolchains.compilerFor {
+            languageVersion = currentJava
+        }
+    }
+
     tasks.test {
         useJUnitPlatform()
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = currentJava
+        }
     }
 
 }
