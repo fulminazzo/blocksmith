@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.config;
 import it.fulminazzo.blocksmith.ProjectInfo;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,7 @@ public enum ConfigurationFormat {
     XML("xml"),
     YAML("yml");
 
+    @Getter
     @NotNull String fileExtension;
 
     /**
@@ -61,8 +63,8 @@ public enum ConfigurationFormat {
      * @param fileName  the file name
      * @return the file
      */
-    @NotNull File getFile(final @NotNull File parentDir,
-                          final @NotNull String fileName) {
+    public @NotNull File getFile(final @NotNull File parentDir,
+                                 final @NotNull String fileName) {
         return new File(parentDir, fileName + "." + fileExtension);
     }
 
