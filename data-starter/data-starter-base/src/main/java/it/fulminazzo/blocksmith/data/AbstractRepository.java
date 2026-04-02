@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +26,19 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
     protected final @NotNull E queryEngine;
     @Getter
     protected final @NotNull EntityMapper<T, ID> entityMapper;
+
+    @Override
+    public @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull ID id, final @NotNull T entity) {
+        return findByIdOrCreate(id, i -> entity);
+    }
+
+    @Override
+    public @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull ID id, final @NotNull Function<ID, T> supplier) {
+        return findById(id).thenCompose(o -> o
+                .map(CompletableFuture::completedFuture)
+                .orElseGet(() -> save(supplier.apply(id)))
+        );
+    }
 
     @Override
     public final @NotNull CompletableFuture<T> save(final @NotNull T entity) {
@@ -65,7 +79,8 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
 
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAll(final @NotNull Page page) {
-        if (page.getNumber() < 0 || page.getSize() < 1) return CompletableFuture.completedFuture(Collections.emptyList());
+        if (page.getNumber() < 0 || page.getSize() < 1)
+            return CompletableFuture.completedFuture(Collections.emptyList());
         return findAllImpl(page);
     }
 

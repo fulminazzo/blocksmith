@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * A general repository for handling entities in a data source.
@@ -21,6 +22,26 @@ public interface Repository<T, ID> {
      * @return the entity
      */
     @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id);
+
+    /**
+     * Attempts to find the entity with the associated it.
+     * If it was not found, it will be created.
+     *
+     * @param id the id
+     * @param entity the entity (will be stored in the database if existing not found)
+     * @return the entity
+     */
+    @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull ID id, final @NotNull T entity);
+
+    /**
+     * Attempts to find the entity with the associated it.
+     * If it was not found, it will be created.
+     *
+     * @param id the id
+     * @param supplier the supplier to create and store a new entity from the given id
+     * @return the entity
+     */
+    @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull ID id, final @NotNull Function<ID, T> supplier);
 
     /**
      * Checks if an entity with the associated id exists.

@@ -14,6 +14,27 @@ class AbstractRepositoryTest extends Specification {
         repository = new MockRepository()
     }
 
+    def 'test that findByIdOrCreate of #arguments returns #expected'() {
+        given:
+        repository.queryEngine.query(m -> m.put('Kali', new Cat('Kali', 12, true))).get()
+
+        when:
+        def actual = repository.findByIdOrCreate(*arguments).get()
+
+        then:
+        actual == expected
+
+        cleanup:
+        repository.queryEngine.query(m -> m.remove('Kali'))
+
+        where:
+        arguments                                    || expected
+        ['Kali', new Cat('Kali', 12, false)]         || new Cat('Kali', 12, true)
+        ['Garfield', new Cat('Garfield', 11, false)] || new Cat('Garfield', 11, false)
+        ['Kali', (i) -> new Cat(i, 12, false)]       || new Cat('Kali', 12, true)
+        ['Garfield', (i) -> new Cat(i, 11, false)]   || new Cat('Garfield', 11, false)
+    }
+
     def 'test that save does not throw on valid entity'() {
         given:
         def entity = new Cat('Sissi', 15, true)
