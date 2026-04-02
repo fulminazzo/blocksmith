@@ -15,7 +15,7 @@ extra["testingModuleName"] = "testing"
 allprojects {
     apply { plugin("java-library") }
     apply { plugin("groovy") }
-    apply { plugin("jacoco-report-aggregation") }
+    apply { plugin("jacoco") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
     val baseProjectName: String by rootProject.extra
@@ -76,7 +76,7 @@ allprojects {
         buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
     }
 
-    tasks.named<JacocoReport>("testCodeCoverageReport") {
+    tasks.withType<JacocoReport>().configureEach {
         classDirectories.setFrom(
             files(classDirectories.files.map {
                 fileTree(it) {
