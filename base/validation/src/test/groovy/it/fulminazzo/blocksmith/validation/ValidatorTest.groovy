@@ -4,7 +4,8 @@ package it.fulminazzo.blocksmith.validation
 import it.fulminazzo.blocksmith.validation.annotation.*
 import spock.lang.Specification
 
-import java.time.Duration
+import java.time.*
+import java.time.temporal.TemporalAccessor
 
 class ValidatorTest extends Specification {
     private static final Validator validator = Validator.instance
@@ -91,6 +92,30 @@ class ValidatorTest extends Specification {
     private String uuid
     @Character
     private String character
+    @After
+    private Date afterDate
+    @After
+    private Calendar afterCalendar
+    @After
+    private TemporalAccessor afterTemporal
+    @AfterOrNow
+    private Date afterOrNowDate
+    @AfterOrNow
+    private Calendar afterOrNowCalendar
+    @AfterOrNow
+    private TemporalAccessor afterOrNowTemporal
+    @Before
+    private Date beforeDate
+    @Before
+    private Calendar beforeCalendar
+    @Before
+    private TemporalAccessor beforeTemporal
+    @BeforeOrNow
+    private Date beforeOrNowDate
+    @BeforeOrNow
+    private Calendar beforeOrNowCalendar
+    @BeforeOrNow
+    private TemporalAccessor beforeOrNowTemporal
 
     def 'test that validate method works'() {
         given:
@@ -172,8 +197,13 @@ class ValidatorTest extends Specification {
         given:
         def field = ValidatorTest.getDeclaredField(fieldName)
 
+        and:
+        def toValidate = value
+        if (fieldName.contains('OrNow') && value != null)
+            toValidate = value()
+
         when:
-        validator.validate(field, value)
+        validator.validate(field, toValidate)
 
         then:
         noExceptionThrown()
@@ -341,6 +371,58 @@ class ValidatorTest extends Specification {
         'uuid'                   | UUID.randomUUID().toString()
         // Character
         'character'              | 'a'
+        // After
+        'afterDate'              | null
+        'afterDate'              | new Date(new Date().getTime() + 3000)
+        'afterCalendar'          | null
+        'afterCalendar'          | Calendar.instance.add(Calendar.SECOND, 3)
+        'afterTemporal'          | null
+        'afterTemporal'          | Instant.now().plusSeconds(3)
+        'afterTemporal'          | LocalTime.now().plusSeconds(3)
+        'afterTemporal'          | LocalDate.now().plusDays(1)
+        'afterTemporal'          | LocalDateTime.now().plusSeconds(3)
+        // AfterOrNow
+        'afterOrNowDate'         | null
+        'afterOrNowDate'         | { new Date(new Date().getTime()) }
+        'afterOrNowDate'         | { new Date(new Date().getTime() + 3000) }
+        'afterOrNowCalendar'     | null
+        'afterOrNowCalendar'     | { Calendar.instance }
+        'afterOrNowCalendar'     | { Calendar.instance.add(Calendar.SECOND, 3) }
+        'afterOrNowTemporal'     | null
+        'afterOrNowTemporal'     | { Instant.now() }
+        'afterOrNowTemporal'     | { Instant.now().plusSeconds(3) }
+        'afterOrNowTemporal'     | { LocalTime.now() }
+        'afterOrNowTemporal'     | { LocalTime.now().plusSeconds(3) }
+        'afterOrNowTemporal'     | { LocalDate.now() }
+        'afterOrNowTemporal'     | { LocalDate.now().plusDays(1) }
+        'afterOrNowTemporal'     | { LocalDateTime.now() }
+        'afterOrNowTemporal'     | { LocalDateTime.now().plusSeconds(3) }
+        // Before
+        'beforeDate'             | null
+        'beforeDate'             | new Date(new Date().getTime() - 2000)
+        'beforeCalendar'         | null
+        'beforeCalendar'         | Calendar.instance.add(Calendar.SECOND, -2)
+        'beforeTemporal'         | null
+        'beforeTemporal'         | Instant.now().minusSeconds(3)
+        'beforeTemporal'         | LocalTime.now().minusSeconds(3)
+        'beforeTemporal'         | LocalDate.now().minusDays(1)
+        'beforeTemporal'         | LocalDateTime.now().minusSeconds(3)
+        // BeforeOrNow
+        'beforeOrNowDate'        | null
+        'beforeOrNowDate'        | { new Date(new Date().getTime()) }
+        'beforeOrNowDate'        | { new Date(new Date().getTime() - 2000) }
+        'beforeOrNowCalendar'    | null
+        'beforeOrNowCalendar'    | { Calendar.instance }
+        'beforeOrNowCalendar'    | { Calendar.instance.add(Calendar.SECOND, -2) }
+        'beforeOrNowTemporal'    | null
+        'beforeOrNowTemporal'    | { Instant.now() }
+        'beforeOrNowTemporal'    | { Instant.now().minusSeconds(2) }
+        'beforeOrNowTemporal'    | { LocalTime.now() }
+        'beforeOrNowTemporal'    | { LocalTime.now().minusSeconds(2) }
+        'beforeOrNowTemporal'    | { LocalDate.now() }
+        'beforeOrNowTemporal'    | { LocalDate.now().minusDays(1) }
+        'beforeOrNowTemporal'    | { LocalDateTime.now() }
+        'beforeOrNowTemporal'    | { LocalDateTime.now().minusSeconds(2) }
     }
 
     def 'test that validate of field #fieldName and value #value throws'() {
@@ -522,6 +604,46 @@ class ValidatorTest extends Specification {
         'character'              | 'Hello, world!'                          || [new ConstraintViolation('Hello, world!', 'error.validation.invalid-character', String.format('\'%1$s\' is not a valid character', 'Hello, world!'), ['value': 'Hello, world!'])]
         'character'              | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-character', String.format('\'%1$s\' is not a valid character', ''), ['value': ''])]
         'character'              | 42                                       || [ConstraintViolation.invalidType(42, "$CharSequence.canonicalName")]
+        // After
+        'afterDate'              | new Date(0)                              || [new ConstraintViolation(new Date(0), 'error.validation.not-after', 'must be after now', ['value': new Date(0)])]
+        'afterDate'              | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
+        'afterCalendar'          | new GregorianCalendar(2000, 0, 1)        || [new ConstraintViolation(new GregorianCalendar(2000, 0, 1), 'error.validation.not-after', 'must be after now', ['value': new GregorianCalendar(2000, 0, 1)])]
+        'afterCalendar'          | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
+        'afterTemporal'          | Instant.ofEpochMilli(0)                  || [new ConstraintViolation(Instant.ofEpochMilli(0), 'error.validation.not-after', 'must be after now', ['value': Instant.ofEpochMilli(0)])]
+        'afterTemporal'          | LocalTime.of(0, 0)                       || [new ConstraintViolation(LocalTime.of(0, 0), 'error.validation.not-after', 'must be after now', ['value': LocalTime.of(0, 0)])]
+        'afterTemporal'          | LocalDate.of(2000, 1, 1)                 || [new ConstraintViolation(LocalDate.of(2000, 1, 1), 'error.validation.not-after', 'must be after now', ['value': LocalDate.of(2000, 1, 1)])]
+        'afterTemporal'          | LocalDateTime.of(2000, 1, 1, 0, 0)       || [new ConstraintViolation(LocalDateTime.of(2000, 1, 1, 0, 0), 'error.validation.not-after', 'must be after now', ['value': LocalDateTime.of(2000, 1, 1, 0, 0)])]
+        'afterTemporal'          | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
+        // AfterOrNow
+        'afterOrNowDate'         | new Date(0)                              || [new ConstraintViolation(new Date(0), 'error.validation.not-after-or-now', 'must be now or in the future', ['value': new Date(0)])]
+        'afterOrNowDate'         | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
+        'afterOrNowCalendar'     | new GregorianCalendar(2000, 0, 1)        || [new ConstraintViolation(new GregorianCalendar(2000, 0, 1), 'error.validation.not-after-or-now', 'must be now or in the future', ['value': new GregorianCalendar(2000, 0, 1)])]
+        'afterOrNowCalendar'     | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
+        'afterOrNowTemporal'     | Instant.ofEpochMilli(0)                  || [new ConstraintViolation(Instant.ofEpochMilli(0), 'error.validation.not-after-or-now', 'must be now or in the future', ['value': Instant.ofEpochMilli(0)])]
+        'afterOrNowTemporal'     | LocalTime.of(0, 0)                       || [new ConstraintViolation(LocalTime.of(0, 0), 'error.validation.not-after-or-now', 'must be now or in the future', ['value': LocalTime.of(0, 0)])]
+        'afterOrNowTemporal'     | LocalDate.of(2000, 1, 1)                 || [new ConstraintViolation(LocalDate.of(2000, 1, 1), 'error.validation.not-after-or-now', 'must be now or in the future', ['value': LocalDate.of(2000, 1, 1)])]
+        'afterOrNowTemporal'     | LocalDateTime.of(2000, 1, 1, 0, 0)       || [new ConstraintViolation(LocalDateTime.of(2000, 1, 1, 0, 0), 'error.validation.not-after-or-now', 'must be now or in the future', ['value': LocalDateTime.of(2000, 1, 1, 0, 0)])]
+        'afterOrNowTemporal'     | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
+        // Before
+        'beforeDate'             | new Date(4102444800000L)                 || [new ConstraintViolation(new Date(4102444800000L), 'error.validation.not-before', 'must be before now', ['value': new Date(4102444800000L)])]
+        'beforeDate'             | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
+        'beforeCalendar'         | new GregorianCalendar(2100, 0, 1)        || [new ConstraintViolation(new GregorianCalendar(2100, 0, 1), 'error.validation.not-before', 'must be before now', ['value': new GregorianCalendar(2100, 0, 1)])]
+        'beforeCalendar'         | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
+        'beforeTemporal'         | Instant.ofEpochSecond(4102444800L)       || [new ConstraintViolation(Instant.ofEpochSecond(4102444800L), 'error.validation.not-before', 'must be before now', ['value': Instant.ofEpochSecond(4102444800L)])]
+        'beforeTemporal'         | LocalTime.of(23, 59, 59)                 || [new ConstraintViolation(LocalTime.of(23, 59, 59), 'error.validation.not-before', 'must be before now', ['value': LocalTime.of(23, 59, 59)])]
+        'beforeTemporal'         | LocalDate.of(2100, 1, 1)                 || [new ConstraintViolation(LocalDate.of(2100, 1, 1), 'error.validation.not-before', 'must be before now', ['value': LocalDate.of(2100, 1, 1)])]
+        'beforeTemporal'         | LocalDateTime.of(2100, 1, 1, 0, 0)       || [new ConstraintViolation(LocalDateTime.of(2100, 1, 1, 0, 0), 'error.validation.not-before', 'must be before now', ['value': LocalDateTime.of(2100, 1, 1, 0, 0)])]
+        'beforeTemporal'         | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
+        // BeforeOrNow
+        'beforeOrNowDate'        | new Date(4102444800000L)                 || [new ConstraintViolation(new Date(4102444800000L), 'error.validation.not-before-or-now', 'must be now or in the past', ['value': new Date(4102444800000L)])]
+        'beforeOrNowDate'        | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
+        'beforeOrNowCalendar'    | new GregorianCalendar(2100, 0, 1)        || [new ConstraintViolation(new GregorianCalendar(2100, 0, 1), 'error.validation.not-before-or-now', 'must be now or in the past', ['value': new GregorianCalendar(2100, 0, 1)])]
+        'beforeOrNowCalendar'    | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
+        'beforeOrNowTemporal'    | Instant.ofEpochSecond(4102444800L)       || [new ConstraintViolation(Instant.ofEpochSecond(4102444800L), 'error.validation.not-before-or-now', 'must be now or in the past', ['value': Instant.ofEpochSecond(4102444800L)])]
+        'beforeOrNowTemporal'    | LocalTime.of(23, 59, 59)                 || [new ConstraintViolation(LocalTime.of(23, 59, 59), 'error.validation.not-before-or-now', 'must be now or in the past', ['value': LocalTime.of(23, 59, 59)])]
+        'beforeOrNowTemporal'    | LocalDate.of(2100, 1, 1)                 || [new ConstraintViolation(LocalDate.of(2100, 1, 1), 'error.validation.not-before-or-now', 'must be now or in the past', ['value': LocalDate.of(2100, 1, 1)])]
+        'beforeOrNowTemporal'    | LocalDateTime.of(2100, 1, 1, 0, 0)       || [new ConstraintViolation(LocalDateTime.of(2100, 1, 1, 0, 0), 'error.validation.not-before-or-now', 'must be now or in the past', ['value': LocalDateTime.of(2100, 1, 1, 0, 0)])]
+        'beforeOrNowTemporal'    | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
     }
 
 }
