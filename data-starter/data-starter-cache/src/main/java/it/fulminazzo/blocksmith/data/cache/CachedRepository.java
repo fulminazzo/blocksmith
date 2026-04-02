@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,6 +37,19 @@ public class CachedRepository<T, ID> implements Repository<T, ID> {
                         else return CompletableFuture.completedFuture(o);
                     });
         });
+    }
+
+    @Override
+    public @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull ID id, final @NotNull T entity) {
+        return findByIdOrCreate(id, i -> entity);
+    }
+
+    @Override
+    public @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull ID id, final @NotNull Function<ID, T> supplier) {
+        return findById(id).thenCompose(o -> o
+                .map(CompletableFuture::completedFuture)
+                .orElseGet(() -> save(supplier.apply(id)))
+        );
     }
 
     @Override
