@@ -3,6 +3,12 @@ plugins {
     alias(libs.plugins.jooq)
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(Runtime.version().feature()))
+    }
+}
+
 tasks.compileJava {
     dependsOn("generateJooq")
 }
@@ -61,7 +67,3 @@ jooq {
     }
 }
 
-tasks.compileTestJava {
-    sourceCompatibility = JavaVersion.VERSION_17.toString()
-    targetCompatibility = JavaVersion.VERSION_17.toString()
-}
