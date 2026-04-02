@@ -29,6 +29,7 @@ allprojects {
         annotationProcessor(rootProject.libs.lombok)
 
         testImplementation(rootProject.libs.bundles.annotations)
+        testRuntimeOnly(rootProject.libs.junit.platform)
         testImplementation(rootProject.libs.bundles.test.framework)
     }
 
