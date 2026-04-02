@@ -17,6 +17,8 @@ allprojects {
     apply { plugin("jacoco-report-aggregation") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
+    val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
+
     java {
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(11))
@@ -35,12 +37,28 @@ allprojects {
         if (project.name != baseProjectName) api(project(":$baseProjectName"))
 
         testImplementation(rootProject.libs.bundles.annotations)
+        testRuntimeOnly(rootProject.libs.junit.platform)
         testAnnotationProcessor(rootProject.libs.lombok)
         testImplementation(rootProject.libs.bundles.test.framework)
     }
 
+    tasks.withType<GroovyCompile> {
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = currentJava
+        }
+    }
+
+    tasks.compileTestJava {
+        javaCompiler = javaToolchains.compilerFor {
+            languageVersion = currentJava
+        }
+    }
+
     tasks.test {
         useJUnitPlatform()
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = currentJava
+        }
     }
 
     configure<com.github.gmazzo.buildconfig.BuildConfigExtension> {
