@@ -401,6 +401,25 @@ class AbstractExpiringMapTest extends Specification {
         internal['Goodbye'] == null
     }
 
+    def 'test that entrySet returns all entries'() {
+        given:
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1000L)
+        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 2000L)
+
+        when:
+        def entries = map.entrySet()
+
+        then:
+        def first = entries.find { it.key == 'Hello' }
+        first != null
+        first.value == 'world'
+
+        and:
+        def second = entries.find { it.key == 'Goodbye' }
+        second != null
+        second.value == 'mars'
+    }
+
     def 'test that clear delegates to internal'() {
         given:
         def internal = Mock(Map)
@@ -438,6 +457,14 @@ class AbstractExpiringMapTest extends Specification {
         duration == null
     }
 
+    def 'test that getTtl of non-existing throws NoSuchElementException'() {
+        when:
+        map.renew('Hello', 1L)
+
+        then:
+        thrown(NoSuchElementException)
+    }
+
     def 'test that renew correctly applies new time-to-live'() {
         given:
         def entry = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
@@ -453,14 +480,6 @@ class AbstractExpiringMapTest extends Specification {
         def millis = entry.expireTime - now
         millis >= 19L
         millis <= 21L
-    }
-
-    def 'test that getTtl of non-existing throws NoSuchElementException'() {
-        when:
-        map.renew('Hello', 1L)
-
-        then:
-        thrown(NoSuchElementException)
     }
 
     def 'test that #method(#arguments) throws invalid TTL exception'() {

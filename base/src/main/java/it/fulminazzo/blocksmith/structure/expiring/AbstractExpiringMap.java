@@ -8,9 +8,11 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Basic implementation of {@link ExpiringMap} with internal logic.
@@ -238,6 +240,13 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     @Override
     public void clear() {
         delegate.clear();
+    }
+
+    @Override
+    public @NotNull Set<Entry<K, V>> entrySet() {
+        return delegate.entrySet().stream()
+                .map(e -> new ExpiringEntryMapEntry<>(e.getKey(), e.getValue()))
+                .collect(Collectors.toSet());
     }
 
     @Override

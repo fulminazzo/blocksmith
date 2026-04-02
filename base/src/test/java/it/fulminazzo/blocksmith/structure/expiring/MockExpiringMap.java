@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,13 +59,6 @@ public final class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
         return delegate.values().stream()
                 .map(ExpiringEntry::getValue)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public @NotNull Set<Entry<K, V>> entrySet() {
-        return delegate.entrySet().stream()
-                .map(e -> Map.entry(e.getKey(), e.getValue().getValue()))
-                .collect(Collectors.toSet());
     }
 
 }
