@@ -6,9 +6,16 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.*;
 
 /**
- * Identifies a numeric parameter or type that must negative (zero not allowed).
+ * Identifies a {@link java.time.temporal.Temporal} parameter or type that 
+ * must be before the current time of execution (milliseconds are ignored).
  * <br>
- * Also supports {@link java.time.Duration}, where the milliseconds are compared.
+ * Supported types are:
+ * <ul>
+ *     <li>{@link java.util.Date};</li>
+ *     <li>{@link java.util.Calendar};</li>
+ *     <li>any {@link java.time.temporal.TemporalAccessor} implementation, like
+ *     {@link java.time.Instant}, {@link java.time.LocalTime} or {@link java.time.LocalDate}.</li>
+ * </ul>
  * <br>
  * Accepts <code>null</code> values.
  */
@@ -16,7 +23,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
-public @interface Negative {
+public @interface Before {
 
     /**
      * Gets the error message in case of violation.
@@ -25,13 +32,13 @@ public @interface Negative {
      *
      * @return the message
      */
-    @NotNull String message() default "error.validation.negative";
+    @NotNull String message() default "error.validation.not-before";
 
     /**
      * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
      *
      * @return the message
      */
-    @NotNull String exceptionMessage() default "must be negative";
+    @NotNull String exceptionMessage() default "must be before now";
 
 }
