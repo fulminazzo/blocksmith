@@ -7,18 +7,30 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceType;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 
+/**
+ * Jackson deserializer for {@link DataSourceConfig} objects.
+ */
 final class DataSourceConfigDeserializer extends StdDeserializer<DataSourceConfig> {
+    private final @NotNull Logger logger;
 
-    public DataSourceConfigDeserializer() {
+    /**
+     * Instantiates a new Data source config deserializer.
+     *
+     * @param logger the logger
+     */
+    public DataSourceConfigDeserializer(final @NotNull Logger logger) {
         super(DataSourceConfig.class);
+        this.logger = logger;
     }
 
     @Override
-    public DataSourceConfig deserialize(final JsonParser jsonParser,
-                                        final DeserializationContext deserializationContext) throws IOException {
+    public DataSourceConfig deserialize(final @NotNull JsonParser jsonParser,
+                                        final @NotNull DeserializationContext deserializationContext) throws IOException {
         final JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
         String rawType = node.get("type").asText();
@@ -28,9 +40,9 @@ final class DataSourceConfigDeserializer extends StdDeserializer<DataSourceConfi
             ((ObjectNode) node).remove("type");
             return deserializationContext.readTreeAsValue(node, type.getConfigClass());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid datasource configuration type: " + rawType);
+            logger.warn("Invalid database configuration: unidentified type '{}'", rawType);
+            return null;
         }
     }
-
 
 }
