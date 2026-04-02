@@ -21,6 +21,51 @@ class AbstractExpiringMapTest extends Specification {
         internal = Reflect.on(map).get('delegate').get()
     }
 
+    def 'test that put updates if not present'() {
+        when:
+        def actual = map.put('Hello', 'moon', 10L)
+
+        then:
+        def entry = internal['Hello']
+        entry != null
+        entry.value == 'moon'
+
+        and:
+        actual == null
+    }
+
+    def 'test that put updates if present'() {
+        given:
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+
+        when:
+        def actual = map.put('Hello', 'moon', 10L)
+
+        then:
+        def entry = internal['Hello']
+        entry != null
+        entry.value == 'moon'
+
+        and:
+        actual == 'world'
+    }
+
+    def 'test that containsValue of #value returns #expected'() {
+        given:
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+
+        when:
+        def actual = map.containsValue(value)
+
+        then:
+        actual == expected
+
+        where:
+        value   || expected
+        'world' || true
+        'mars'  || false
+    }
+
     def 'test that putIfAbsent updates if not present'() {
         when:
         def actual = map.putIfAbsent('Hello', 'moon', 10L)
@@ -310,7 +355,30 @@ class AbstractExpiringMapTest extends Specification {
         actual == null
     }
 
-    def 'test that putAll adds every non-expired key'() {
+    def 'test that putAll adds every element with same TTL'() {
+        given:
+        def map = ['Hello': 'world', 'Goodbye': 'mars']
+
+        and:
+        def now = System.currentTimeMillis()
+
+        when:
+        this.map.putAll(map, 10L)
+
+        then:
+        def first = internal['Hello']
+        first != null
+        first.value == 'world'
+        first.expireTime >= now
+
+        and:
+        def second = internal['Goodbye']
+        second != null
+        second.value == 'mars'
+        second.expireTime >= now
+    }
+
+    def 'test that putAll without TTL adds every non-expired key'() {
         given:
         def map = Mock(ExpiringMap)
         map.getTtl(_) >> { a -> a[0] == 'Hello' ? Duration.ofMillis(10L) : null }
@@ -375,13 +443,16 @@ class AbstractExpiringMapTest extends Specification {
         def entry = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
         internal['Hello'] = entry
 
+        and:
+        def now = System.currentTimeMillis()
+
         when:
         map.renew('Hello', 20L)
 
         then:
-        def millis = entry.expireTime - System.currentTimeMillis()
+        def millis = entry.expireTime - now
         millis >= 19L
-        millis <= 20L
+        millis <= 21L
     }
 
     def 'test that getTtl of non-existing throws NoSuchElementException'() {
@@ -402,11 +473,13 @@ class AbstractExpiringMapTest extends Specification {
 
         where:
         method            | arguments
+        'put'             | ['Hello', 'world', -1L]
         'putIfAbsent'     | ['Hello', 'world', -1L]
         'replace'         | ['Hello', 'mars', 'world', -1L]
         'computeIfAbsent' | ['Hello', function, -1L]
         'compute'         | ['Hello', bifunction, -1L]
         'merge'           | ['Hello', 'world', bifunction, -1L]
+        'putAll'          | [[:], -1]
         'renew'           | ['Hello', -1L]
     }
 

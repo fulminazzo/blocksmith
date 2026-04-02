@@ -23,19 +23,6 @@ public final class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
     }
 
     @Override
-    public @Nullable V put(final @Nullable K key, final @Nullable V value, final long ttl) {
-        checkTtl(ttl);
-        ExpiringEntry<V> previous = delegate.put(key, new ExpiringEntry<>(value, ttl));
-        return previous == null ? null : previous.getValue();
-    }
-
-    @Override
-    public void putAll(final @NotNull Map<? extends K, ? extends V> map, final long ttl) {
-        checkTtl(ttl);
-        map.forEach((k, v) -> put(k, v, ttl));
-    }
-
-    @Override
     public int size() {
         return delegate.size();
     }
@@ -48,12 +35,6 @@ public final class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
     @Override
     public boolean containsKey(final @Nullable Object key) {
         return delegate.containsKey(key);
-    }
-
-    @Override
-    public boolean containsValue(final @Nullable Object value) {
-        return delegate.values().stream()
-                .anyMatch(entry -> entry.getValue() != null && entry.getValue().equals(value));
     }
 
     @Override

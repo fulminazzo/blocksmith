@@ -35,8 +35,21 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     }
 
     @Override
+    public @Nullable V put(final @Nullable K key, final @Nullable V value, final long ttl) {
+        checkTtl(ttl);
+        V previous = get(key);
+        delegate.put(key, new ExpiringEntry<>(value, ttl));
+        return previous;
+    }
+
+    @Override
     public @Nullable V put(final @Nullable K key, final @Nullable V value) {
         throw getPutNotSupportedException();
+    }
+
+    @Override
+    public boolean containsValue(final Object value) {
+        return values().stream().anyMatch(v -> Objects.equals(v, value));
     }
 
     @Override
@@ -209,6 +222,12 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     @Override
     public void putAll(final @NotNull Map<? extends K, ? extends V> map, final @NotNull Duration ttl) {
         putAll(map, ttl.toMillis());
+    }
+
+    @Override
+    public void putAll(final @NotNull Map<? extends K, ? extends V> map, final long ttl) {
+        checkTtl(ttl);
+        map.forEach((k, v) -> delegate.put(k, new ExpiringEntry<>(v, ttl)));
     }
 
     @Override
