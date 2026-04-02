@@ -19,6 +19,7 @@ allprojects {
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
     val baseProjectName: String by rootProject.extra
+    val projectInfoClassName = "ProjectInfo"
     val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
     val mockitoAgent: Configuration by configurations.creating
 
@@ -68,18 +69,18 @@ allprojects {
 
     configure<com.github.gmazzo.buildconfig.BuildConfigExtension> {
         packageName = "${rootProject.group}.${rootProject.name}"
-        className = "ProjectInfo"
+        className = projectInfoClassName
 
         buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
         buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
         buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
     }
 
-    tasks.withType<JacocoReport>().configureEach {
+    tasks.named<JacocoReport>("testCodeCoverageReport") {
         classDirectories.setFrom(
             files(classDirectories.files.map {
                 fileTree(it) {
-                    exclude("**/ProjectInfo**")
+                    exclude("**/$projectInfoClassName**")
                 }
             })
         )
