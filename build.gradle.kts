@@ -79,7 +79,7 @@ allprojects {
         classDirectories.setFrom(
             files(classDirectories.files.map {
                 fileTree(it) {
-                    exclude("**/ProjectInfo**")
+                    exclude("**/ProjectInfo**", "**/data/jooq/**")
                 }
             })
         )
@@ -118,13 +118,4 @@ tasks.testCodeCoverageReport {
         xml.required = true
         csv.required = true
     }
-
-    classDirectories.setFrom(files(classDirectories.files.map {
-        fileTree(it) {
-            exclude(
-                "**/ProjectInfo**",
-                "**/data/jooq/**"
-            )
-        }
-    }))
 }
