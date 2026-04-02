@@ -11,6 +11,8 @@ log4j = "2.25.4"
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jetbrains_annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains_annotations" }
 
+junit_platform = { module = "org.junit.platform:junit-platform-launcher" }
+
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock_core" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 
