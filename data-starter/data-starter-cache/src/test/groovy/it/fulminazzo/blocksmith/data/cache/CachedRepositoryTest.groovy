@@ -77,6 +77,28 @@ class CachedRepositoryTest extends RepositoryTest<CachedRepository<User, Long>> 
         cache.existsById(entity.id).get()
     }
 
+    def 'test that findByIdOrCreate of #arguments returns #expected'() {
+        given:
+        insert(new User(5L, 'James', 18))
+
+        when:
+        def actual = repository.findByIdOrCreate(*arguments).get()
+
+        then:
+        actual == expected
+
+        cleanup:
+        remove(5L)
+        remove(6L)
+
+        where:
+        arguments                              || expected
+        [5L, new User(5L, 'James', 17)]        || new User(5L, 'James', 18)
+        [6L, new User(6L, 'Sheila', 22)]       || new User(6L, 'Sheila', 22)
+        [5L, (i) -> new User(i, 'James', 17)]  || new User(5L, 'James', 18)
+        [6L, (i) -> new User(i, 'Sheila', 22)] || new User(6L, 'Sheila', 22)
+    }
+
     def 'test that save saves on cache repository the updated version of entity'() {
         given:
         def expected = Users.NEW1

@@ -24,9 +24,6 @@ class AbstractRepositoryTest extends Specification {
         then:
         actual == expected
 
-        cleanup:
-        repository.queryEngine.query(m -> m.remove('Kali'))
-
         where:
         arguments                                    || expected
         ['Kali', new Cat('Kali', 12, false)]         || new Cat('Kali', 12, true)
