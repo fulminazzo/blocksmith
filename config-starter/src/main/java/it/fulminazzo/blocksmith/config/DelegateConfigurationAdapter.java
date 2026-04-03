@@ -42,6 +42,11 @@ final class DelegateConfigurationAdapter implements ConfigurationAdapter {
     }
 
     @Override
+    public @NotNull <T> T loadFromResource(final @NotNull String resource, final @NotNull Class<T> type) throws IOException {
+        return getDelegate().loadFromResource(resource, type);
+    }
+
+    @Override
     public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         return getDelegate().load(file, type);
     }
@@ -66,6 +71,13 @@ final class DelegateConfigurationAdapter implements ConfigurationAdapter {
     @Override
     public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
         getDelegate().store(stream, configuration);
+    }
+
+    @Override
+    public @NotNull <T> T extractAndLoad(final @NotNull String resource,
+                                         final @NotNull File directory,
+                                         final @NotNull Class<T> type) throws IOException {
+        return getDelegate().extractAndLoad(resource, directory, type);
     }
 
     @Override

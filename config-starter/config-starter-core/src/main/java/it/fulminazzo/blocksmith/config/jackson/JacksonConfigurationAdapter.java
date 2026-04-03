@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import it.fulminazzo.blocksmith.config.BaseConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigVersion;
 import it.fulminazzo.blocksmith.util.MapUtils;
+import it.fulminazzo.blocksmith.util.ResourceUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -107,6 +108,11 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
     }
 
     @Override
+    public @NotNull <T> T loadFromResource(final @NotNull String resource, final @NotNull Class<T> type) throws IOException {
+        return load(ResourceUtils.getResource(JacksonConfigurationAdapter.class.getClassLoader(), resource), type);
+    }
+
+    @Override
     public <T> @NotNull String serialize(final @NotNull T configuration) throws IOException {
         return mapper.writeValueAsString(configuration);
     }
@@ -123,6 +129,14 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
     @Override
     public <T> void store(@NotNull OutputStream stream, @NotNull T configuration) throws IOException {
         mapper.writeValue(stream, configuration);
+    }
+
+    @Override
+    public @NotNull <T> T extractAndLoad(final @NotNull String resource,
+                                         final @NotNull File directory,
+                                         final @NotNull Class<T> type) throws IOException {
+        File file = ResourceUtils.extractIfAbsent(JacksonConfigurationAdapter.class.getClassLoader(), resource, directory);
+        return load(file, type);
     }
 
     private void applyNamingStrategy(final @NotNull Map<String, Object> data,

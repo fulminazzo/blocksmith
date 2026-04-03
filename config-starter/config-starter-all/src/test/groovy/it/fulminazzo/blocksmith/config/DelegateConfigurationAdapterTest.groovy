@@ -51,13 +51,15 @@ class DelegateConfigurationAdapterTest extends Specification {
         }
 
         where:
-        method      || arguments
-        'load'      || ['', MockConfig]
-        'load'      || [new ByteArrayInputStream(''.bytes), MockConfig]
-        'load'      || [new File('build/resources/test/load.json'), MockConfig]
-        'serialize' || [new MockConfig()]
-        'store'     || [new File('build/resources/test/store.json'), new MockConfig()]
-        'store'     || [new ByteArrayOutputStream(), new MockConfig()]
+        method           || arguments
+        'load'           || ['', MockConfig]
+        'load'           || [new ByteArrayInputStream(''.bytes), MockConfig]
+        'load'           || [new File('build/resources/test/load.json'), MockConfig]
+        'loadResource'   || ['load.json', MockConfig]
+        'serialize'      || [new MockConfig()]
+        'store'          || [new File('build/resources/test/store.json'), new MockConfig()]
+        'store'          || [new ByteArrayOutputStream(), new MockConfig()]
+        'extractAndLoad' || ['load.json', new File('build/resources/test/load.json'), MockConfig]
     }
 
     def 'test that getFormat throws if not initialized'() {

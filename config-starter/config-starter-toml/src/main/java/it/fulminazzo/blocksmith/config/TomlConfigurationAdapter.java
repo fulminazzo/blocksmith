@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.dataformat.toml.TomlMapper;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.nightconfig.ConfigUtils;
+import it.fulminazzo.blocksmith.util.ResourceUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -53,6 +54,11 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     @Override
+    public @NotNull <T> T loadFromResource(final @NotNull String resource, final @NotNull Class<T> type) throws IOException {
+        return load(ResourceUtils.getResource(TomlConfigurationAdapter.class.getClassLoader(), resource), type);
+    }
+
+    @Override
     public <T> @NotNull String serialize(final @NotNull T configuration) throws IOException {
         try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             store(output, configuration);
@@ -74,6 +80,14 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         OutputStreamWriter writer = new OutputStreamWriter(stream);
         newTomlWriter().write(config, writer);
         writer.close();
+    }
+
+    @Override
+    public @NotNull <T> T extractAndLoad(final @NotNull String resource,
+                                         final @NotNull File directory,
+                                         final @NotNull Class<T> type) throws IOException {
+        File file = ResourceUtils.extractIfAbsent(TomlConfigurationAdapter.class.getClassLoader(), resource, directory);
+        return load(file, type);
     }
 
     private <T> @NotNull Config toNightConfig(@NotNull T configuration) {
