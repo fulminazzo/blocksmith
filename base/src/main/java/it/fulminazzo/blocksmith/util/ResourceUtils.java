@@ -172,7 +172,7 @@ public final class ResourceUtils {
     /**
      * Lists all the resources of the current classloader in the specified folder.
      *
-     * @param resourceFolder the resources folder
+     * @param resourceFolder the resources folder (should NOT have a preceding "/")
      * @return the list of resources
      * @throws IOException if an error occurs while listing the resources
      */
@@ -184,7 +184,7 @@ public final class ResourceUtils {
      * Lists all the resources of the current classloader in the specified folder.
      *
      * @param classLoader    the classloader
-     * @param resourceFolder the resources folder
+     * @param resourceFolder the resources folder (should NOT have a preceding "/")
      * @return the list of resources
      * @throws IOException if an error occurs while listing the resources
      */
@@ -196,7 +196,7 @@ public final class ResourceUtils {
     /**
      * Lists all the resources of the current classloader that match the filter in the specified folder.
      *
-     * @param resourceFolder the resources folder
+     * @param resourceFolder the resources folder (should NOT have a preceding "/")
      * @param filter         the filter to apply to the resources
      * @return the list of resources
      * @throws IOException if an error occurs while listing the resources
@@ -210,7 +210,7 @@ public final class ResourceUtils {
      * Lists all the resources of the given classloader that match the filter in the specified folder.
      *
      * @param classLoader    the classloader
-     * @param resourceFolder the resources folder
+     * @param resourceFolder the resources folder (should NOT have a preceding "/")
      * @param filter         the filter to apply to the resources
      * @return the list of resources
      * @throws IOException if an error occurs while listing the resources
