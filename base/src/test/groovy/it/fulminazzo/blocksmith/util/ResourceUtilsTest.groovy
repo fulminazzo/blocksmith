@@ -6,6 +6,7 @@ import java.nio.file.Path
 
 class ResourceUtilsTest extends Specification {
     private static final File extractTestsDirectory = new File('build/resources/test/resource_utils/extract')
+    private static final File extractIfAbsentTestsDirectory = new File('build/resources/test/resource_utils/extract_absent')
 
     def 'test that getResource with #arguments does not throw'() {
         when:
@@ -59,6 +60,44 @@ class ResourceUtilsTest extends Specification {
         [ResourceUtils.classLoader, 'data/schema.sql', extractTestsDirectory.toPath()] || ['CREATE TABLE secret (id INT);']
     }
 
+    def 'test that extractIfAbsent with #arguments stores #expected and does not overwrite'() {
+        given:
+        extractIfAbsentTestsDirectory.deleteDir()
+
+        when:
+        def first = ResourceUtils.extractIfAbsent(*arguments)
+        if (first instanceof Path) first = first.toFile()
+
+        then:
+        first.exists()
+
+        and:
+        first.readLines() == expected
+
+        when:
+        def second = ResourceUtils.extractIfAbsent(*arguments)
+        if (second instanceof Path) second = second.toFile()
+
+        then:
+        second.lastModified() == first.lastModified()
+
+        and:
+        second.readLines() == expected
+
+        where:
+        arguments                                                                              || expected
+        // simple
+        ['test.txt', extractIfAbsentTestsDirectory]                                            || ['Hello, world!']
+        [ResourceUtils.classLoader, 'test.txt', extractIfAbsentTestsDirectory]                 || ['Hello, world!']
+        ['test.txt', extractIfAbsentTestsDirectory.toPath()]                                   || ['Hello, world!']
+        [ResourceUtils.classLoader, 'test.txt', extractIfAbsentTestsDirectory.toPath()]        || ['Hello, world!']
+        // nested
+        ['data/schema.sql', extractIfAbsentTestsDirectory]                                     || ['CREATE TABLE secret (id INT);']
+        [ResourceUtils.classLoader, 'data/schema.sql', extractIfAbsentTestsDirectory]          || ['CREATE TABLE secret (id INT);']
+        ['data/schema.sql', extractIfAbsentTestsDirectory.toPath()]                            || ['CREATE TABLE secret (id INT);']
+        [ResourceUtils.classLoader, 'data/schema.sql', extractIfAbsentTestsDirectory.toPath()] || ['CREATE TABLE secret (id INT);']
+    }
+
     def 'test that #method with invalid resource throws'() {
         when:
         ResourceUtils."$method"(*arguments)
@@ -68,15 +107,20 @@ class ResourceUtilsTest extends Specification {
         e.message =~ '.*\'not_existing.zip\'.*'
 
         where:
-        method        | arguments
+        method            | arguments
         // getResource
-        'getResource' | ['not_existing.zip']
-        'getResource' | [ResourceUtils.classLoader, 'not_existing.zip']
+        'getResource'     | ['not_existing.zip']
+        'getResource'     | [ResourceUtils.classLoader, 'not_existing.zip']
+        // extractIfAbsent
+        'extractIfAbsent' | ['not_existing.zip', extractTestsDirectory]
+        'extractIfAbsent' | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory]
+        'extractIfAbsent' | ['not_existing.zip', extractTestsDirectory.toPath()]
+        'extractIfAbsent' | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory.toPath()]
         // extract
-        'extract'     | ['not_existing.zip', extractTestsDirectory]
-        'extract'     | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory]
-        'extract'     | ['not_existing.zip', extractTestsDirectory.toPath()]
-        'extract'     | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory.toPath()]
+        'extract'         | ['not_existing.zip', extractTestsDirectory]
+        'extract'         | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory]
+        'extract'         | ['not_existing.zip', extractTestsDirectory.toPath()]
+        'extract'         | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory.toPath()]
     }
 
 }

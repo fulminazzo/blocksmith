@@ -45,6 +45,62 @@ public final class ResourceUtils {
     }
 
     /**
+     * Extracts a resource to the given directory (only if it is not previously existing).
+     *
+     * @param resource  the resource (should NOT have a preceding "/")
+     * @param directory the directory to extract to
+     * @return the extracted resource
+     * @throws IOException if an error occurs while extracting the resource
+     */
+    public static @NotNull File extractIfAbsent(final @NotNull String resource, final @NotNull File directory) throws IOException {
+        return extractIfAbsent(resource, directory.toPath()).toFile();
+    }
+
+    /**
+     * Extracts a resource to the given directory (only if it is not previously existing).
+     *
+     * @param classLoader the classloader
+     * @param resource    the resource (should NOT have a preceding "/")
+     * @param directory   the directory to extract to
+     * @return the extracted resource
+     * @throws IOException if an error occurs while extracting the resource
+     */
+    public static File extractIfAbsent(final @NotNull ClassLoader classLoader,
+                                       final @NotNull String resource,
+                                       final @NotNull File directory) throws IOException {
+        return extractIfAbsent(classLoader, resource, directory.toPath()).toFile();
+    }
+
+    /**
+     * Extracts a resource to the given directory (only if it is not previously existing).
+     *
+     * @param resource  the resource (should NOT have a preceding "/")
+     * @param directory the directory to extract to
+     * @return the path to the extracted resource
+     * @throws IOException if an error occurs while extracting the resource
+     */
+    public static @NotNull Path extractIfAbsent(final @NotNull String resource, final @NotNull Path directory) throws IOException {
+        return extractIfAbsent(classLoader, resource, directory);
+    }
+
+    /**
+     * Extracts a resource to the given directory (only if it is not previously existing).
+     *
+     * @param classLoader the classloader
+     * @param resource    the resource (should NOT have a preceding "/")
+     * @param directory   the directory to extract to
+     * @return the path to the extracted resource
+     * @throws IOException if an error occurs while extracting the resource
+     */
+    public static @NotNull Path extractIfAbsent(final @NotNull ClassLoader classLoader,
+                                                final @NotNull String resource,
+                                                final @NotNull Path directory) throws IOException {
+        Path target = directory.resolve(getResourceName(resource));
+        if (target.toFile().exists()) return target;
+        else return extract(classLoader, resource, directory);
+    }
+
+    /**
      * Extracts a resource to the given directory.
      *
      * @param resource  the resource (should NOT have a preceding "/")
@@ -96,13 +152,17 @@ public final class ResourceUtils {
                                         final @NotNull String resource,
                                         final @NotNull Path directory) throws IOException {
         Files.createDirectories(directory);
-        String fileName = resource;
-        if (resource.contains("/")) fileName = resource.substring(resource.lastIndexOf("/") + 1);
+        String fileName = getResourceName(resource);
         try (InputStream stream = getResource(classLoader, resource)) {
             Path path = directory.resolve(fileName);
             Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
             return path;
         }
+    }
+
+    private static @NotNull String getResourceName(final @NotNull String resource) {
+        if (resource.contains("/")) return resource.substring(resource.lastIndexOf("/") + 1);
+        else return resource;
     }
 
 }
