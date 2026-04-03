@@ -4,12 +4,17 @@ import it.fulminazzo.blocksmith.data.CacheRepository;
 import it.fulminazzo.blocksmith.data.CacheRepositoryDataSource;
 import it.fulminazzo.blocksmith.data.RepositoryDataSource;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
+import it.fulminazzo.blocksmith.structure.expiring.ExpiringMap;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 /**
@@ -52,6 +57,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryRepositorySettings> {
     private final @NotNull ExecutorService executor;
+    private final @NotNull List<ScheduledExecutorService> schedulers = new ArrayList<>();
 
     @Override
     public <T, ID> @NotNull CacheRepository<T, ID> newRepository(
@@ -75,14 +81,25 @@ public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryR
             final @NotNull Function<MemoryQueryEngine<T, ID>, R> repositoryBuilder,
             final @NotNull MemoryRepositorySettings settings
     ) {
-        MemoryQueryEngine<T, ID> engine = new MemoryQueryEngine<>(executor);
-        Duration ttl = settings.getTtl();
-        if (ttl != null) engine.setExpiry(ttl.toMillis());
-        return repositoryBuilder.apply(engine);
+        final Duration ttl = settings.getTtl();
+
+        MemoryRepositorySettings.ExpiryStrategy strategy = settings.getStrategy();
+        final ExpiringMap<ID, T> map;
+        if (strategy == MemoryRepositorySettings.ExpiryStrategy.SCHEDULED && ttl != null) {
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            map = ExpiringMap.scheduled(scheduler, ttl.dividedBy(2));
+            schedulers.add(scheduler);
+        } else map = ExpiringMap.lazy();
+
+        MemoryQueryEngine<T, ID> engine = new MemoryQueryEngine<>(map, executor);
+        R repository = repositoryBuilder.apply(engine);
+        if (ttl != null) repository.ttl(ttl);
+        return repository;
     }
 
     @Override
     public void close() {
+        schedulers.forEach(ExecutorService::shutdown);
         executor.shutdown();
     }
 
