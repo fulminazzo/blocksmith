@@ -103,4 +103,23 @@ public final class MapUtils {
         return unflattened;
     }
 
+    /**
+     * Converts the given object accordingly.
+     * <br>
+     * If the object is an array, it is converted to a {@link Collection}.
+     * The same conversion is done recursively for each element.
+     * If the object is not an array, it is returned as is.
+     *
+     * @param object the object
+     * @return the potentially converted object
+     */
+    static Object convertArray(final @Nullable Object object) {
+        if (object == null) return null;
+        else if (object.getClass().isArray()) {
+            Object[] array = (Object[]) object;
+            for (int i = 0; i < array.length; i++) array[i] = convertArray(array[i]);
+            return Arrays.asList(array);
+        } else return object;
+    }
+
 }

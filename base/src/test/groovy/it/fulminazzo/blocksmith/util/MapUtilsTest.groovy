@@ -41,4 +41,27 @@ class MapUtilsTest extends Specification {
                 ['world.regions': ['EU', 'US'], 'world.settings.lang.default': 'en', 'world.settings.lang.fallback': 'it']
     }
 
+    def 'test that convertArray converts #object to #expected'() {
+        when:
+        def actual = MapUtils.convertArray(object)
+
+        then:
+        actual == expected
+
+        where:
+        object                                                                       || expected
+        null                                                                         || null
+        [:]                                                                          || [:]
+        (0..9).collect { it as byte }.toArray(new byte[10])                          || (0..9).collect { it as byte }
+        (0..9).collect { it as short }.toArray(new short[10])                        || (0..9).collect { it as short }
+        (0..9).collect { it as int }.toArray(new int[10])                            || (0..9).collect { it as int }
+        (0..9).collect { it as long }.toArray(new long[10])                          || (0..9).collect { it as long }
+        (0..9).collect { it as float }.toArray(new float[10])                        || (0..9).collect { it as float }
+        (0..9).collect { it as double }.toArray(new double[10])                      || (0..9).collect { it as double }
+        ('a'..'z').collect { it as char }.toArray(new char[26])                      || ('a'..'z').collect { it as char }
+        [true, false].collect { it as boolean }.toArray(new boolean[2])              || [true, false].collect { it as boolean }
+        ['Hello', 'world'].toArray(new String[2])                                    || ['Hello', 'world']
+        ['nested', ['Hello', 'world'].toArray(new String[2])].toArray(new Object[2]) || ['nested', ['Hello', 'world']]
+    }
+
 }
