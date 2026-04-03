@@ -41,14 +41,13 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
 
     /**
      * Adds a new key-value pair in the map.
+     * The pair will have no expiration time.
      *
      * @param key   the key
      * @param value the value
      * @return the previous value present in the map
-     * @deprecated <code>put</code> methods with TTL parameter should be used instead
      */
     @Override
-    @Deprecated
     @Nullable V put(final @Nullable K key, final @Nullable V value);
 
     /**
@@ -73,13 +72,12 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
 
     /**
      * Adds a key-value pair in the map (if not already present).
+     * The pair will have no expiration time.
      *
      * @param key   the key
      * @param value the value
      * @return the value of the map if present, otherwise the value parameter
-     * @deprecated <code>putIfAbsent</code> methods with TTL parameter should be used instead
      */
-    @Deprecated
     @Override
     @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value);
 
@@ -163,13 +161,12 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
     /**
      * Adds a new key-value pair computed from the given function in the map
      * only if an element with the given key is not present.
+     * The pair will have no expiration time.
      *
      * @param key             the key
      * @param mappingFunction the function to get the new value from
      * @return the value of the map if present, otherwise the value parameter
-     * @deprecated <code>computeIfAbsent</code> methods with TTL parameter should be used instead
      */
-    @Deprecated
     @Override
     @Nullable V computeIfAbsent(final @Nullable K key, final @NotNull Function<? super K, ? extends V> mappingFunction);
 
@@ -210,13 +207,13 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
 
     /**
      * Adds, updates or removes a key-value pair in the map.
+     * If the pair was added, it will have no expiration time.
+     * If the pair was updated, it will keep its expiration time.
      *
      * @param key               the key
      * @param remappingFunction the function to update the value from
      * @return the previous value present in the map
-     * @deprecated <code>compute</code> methods with TTL parameter should be used instead
      */
-    @Deprecated
     @Override
     @Nullable V compute(final @Nullable K key, final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction);
 
@@ -248,14 +245,13 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
 
     /**
      * Updates an element in the map.
+     * The element will maintain its expiration time.
      *
      * @param key               the key
      * @param value             the value inserted if the pair was not present
      * @param remappingFunction the function used to update an existing pair value
      * @return the updated value
-     * @deprecated <code>merge</code> methods with TTL parameter should be used instead
      */
-    @Deprecated
     @Override
     @Nullable V merge(final @Nullable K key, final @NotNull V value, final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction);
 
@@ -286,13 +282,11 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
 
     /**
      * Adds all the elements of the given map to the current one.
-     * Each element will have the same expiration time.
+     * If the map is not a {@link ExpiringMap}, every element will have no expiration time.
      *
      * @param map the map to take elements from
-     * @deprecated <code>putAll</code> methods with TTL parameter should be used instead
      */
     @Override
-    @Deprecated
     void putAll(final @NotNull Map<? extends K, ? extends V> map);
 
     /**
@@ -320,6 +314,20 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param ttl the new time-to-live in milliseconds
      */
     void renew(final @Nullable K key, final long ttl);
+
+    /**
+     * Prints out the contents of this map.
+     * <br>
+     * Entries will be printed in the format <code>&lt;key&gt;=&lt;value&gt;</code>.
+     * <br>
+     * If an entry is <b>never expiring</b>, it will be printed as <code>&lt;key&gt;=&lt;value&gt; (!)</code>.
+     * <br>
+     * If an entry is <b>expired</b> but not yet removed, it will be printed as <code>&lt;key&gt;=&lt;value&gt; (*)</code>.
+     *
+     * @return the string representation of this map
+     */
+    @Override
+    @NotNull String toString();
 
     /**
      * Initializes a new lazy ExpirationMap.

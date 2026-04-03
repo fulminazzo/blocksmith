@@ -18,6 +18,11 @@ import java.util.stream.Collectors;
  * @param <V> the type of the values
  */
 public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
+    /**
+     * Expire TTL for an endless entry.
+     */
+    static final long NEVER_EXPIRE = Long.MAX_VALUE;
+
     protected final @NotNull Map<K, ExpiringEntry<V>> delegate = new ConcurrentHashMap<>();
 
     /**
@@ -43,7 +48,7 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
 
     @Override
     public @Nullable V put(final @Nullable K key, final @Nullable V value) {
-        throw getPutNotSupportedException();
+        return put(key, value, NEVER_EXPIRE);
     }
 
     @Override
@@ -68,7 +73,7 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
 
     @Override
     public @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value) {
-        throw getPutNotSupportedException();
+        return putIfAbsent(key, value, NEVER_EXPIRE);
     }
 
     @Override
@@ -139,7 +144,7 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     @Override
     public @Nullable V computeIfAbsent(final @Nullable K key,
                                        final @NotNull Function<? super K, ? extends V> mappingFunction) {
-        throw getPutNotSupportedException();
+        return computeIfAbsent(key, mappingFunction, NEVER_EXPIRE);
     }
 
     @Override
@@ -175,7 +180,8 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     @Override
     public @Nullable V compute(final @Nullable K key,
                                final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-        throw getPutNotSupportedException();
+        Duration ttl = getTtl(key);
+        return compute(key, remappingFunction, ttl == null ? NEVER_EXPIRE : ttl.toMillis());
     }
 
     @Override
@@ -203,7 +209,8 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     public @Nullable V merge(final @Nullable K key,
                              final @NotNull V value,
                              final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
-        throw getPutNotSupportedException();
+        Duration ttl = getTtl(key);
+        return merge(key, value, remappingFunction, ttl == null ? NEVER_EXPIRE : ttl.toMillis());
     }
 
     @Override
@@ -231,7 +238,8 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
 
     @Override
     public void putAll(final @NotNull Map<? extends K, ? extends V> map) {
-        throw getPutNotSupportedException();
+        if (map instanceof ExpiringMap) putAll((ExpiringMap<? extends K, ? extends V>) map);
+        else putAll(map, NEVER_EXPIRE);
     }
 
     /**
@@ -273,10 +281,6 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
         ExpiringEntry<V> entry = getExpiring(key);
         if (entry == null) throw new NoSuchElementException("key: " + key);
         entry.setTimeToLive(ttl);
-    }
-
-    private @NotNull UnsupportedOperationException getPutNotSupportedException() {
-        return new UnsupportedOperationException(getClass().getSimpleName() + " does not support put without TTL");
     }
 
     @Override
@@ -342,6 +346,15 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
         }
 
         /**
+         * Checks if the current entry never expires.
+         *
+         * @return <code>true</code> if it does not
+         */
+        public boolean neverExpires() {
+            return expireTime == NEVER_EXPIRE;
+        }
+
+        /**
          * Checks if the current entry is expired.
          *
          * @return <code>true</code> if it is
@@ -357,12 +370,15 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
          */
         public void setTimeToLive(final long ttl) {
             checkTtl(ttl);
-            this.expireTime = now() + ttl;
+            this.expireTime = ttl == NEVER_EXPIRE ? NEVER_EXPIRE : now() + ttl;
         }
 
         @Override
         public @NotNull String toString() {
-            return (isExpired() ? "*" : "") + value;
+            StringBuilder builder = new StringBuilder(value == null ? "null" : value.toString());
+            if (neverExpires()) builder.append(" (!)");
+            else if (isExpired()) builder.append(" (*)");
+            return builder.toString();
         }
 
     }
