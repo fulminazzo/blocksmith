@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -56,8 +54,15 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryRepositorySettings> {
+    private static int threadsCount = 1;
+
     private final @NotNull ExecutorService executor;
-    private final @NotNull List<ScheduledExecutorService> schedulers = new ArrayList<>();
+    private final @NotNull ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(runnable -> {
+        Thread thread = new Thread(runnable);
+        thread.setDaemon(true);
+        thread.setName(String.format("%s-Cleaner-%s", ExpiringMap.class.getSimpleName(), threadsCount++));
+        return thread;
+    });
 
     @Override
     public <T, ID> @NotNull CacheRepository<T, ID> newRepository(
@@ -85,11 +90,9 @@ public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryR
 
         MemoryRepositorySettings.ExpiryStrategy strategy = settings.getStrategy();
         final ExpiringMap<ID, T> map;
-        if (strategy == MemoryRepositorySettings.ExpiryStrategy.SCHEDULED && ttl != null) {
-            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        if (strategy == MemoryRepositorySettings.ExpiryStrategy.SCHEDULED && ttl != null)
             map = ExpiringMap.scheduled(scheduler, ttl.dividedBy(2));
-            schedulers.add(scheduler);
-        } else map = ExpiringMap.lazy();
+        else map = ExpiringMap.lazy();
 
         MemoryQueryEngine<T, ID> engine = new MemoryQueryEngine<>(map, executor);
         R repository = repositoryBuilder.apply(engine);
@@ -99,7 +102,7 @@ public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryR
 
     @Override
     public void close() {
-        schedulers.forEach(ExecutorService::shutdown);
+        scheduler.shutdown();
         executor.shutdown();
     }
 
