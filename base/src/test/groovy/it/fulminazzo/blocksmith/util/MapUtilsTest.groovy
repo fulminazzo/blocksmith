@@ -41,6 +41,43 @@ class MapUtilsTest extends Specification {
                 ['world.regions': ['EU', 'US'], 'world.settings.lang.default': 'en', 'world.settings.lang.fallback': 'it']
     }
 
+    def 'test that expandCollection works'() {
+        given:
+        def expanded = [:]
+
+        and:
+        def collection = [
+                null,
+                'Hello, world!',
+                ['first', 'second'],
+                [['even', 'more'], ['nested', 'collection']],
+                ['map': ['should', 'work', 'too']]
+        ]
+
+        and:
+        def expected = [
+                'list[0]': null,
+                'list[1]': 'Hello, world!',
+                'list[2][0]': 'first',
+                'list[2][1]': 'second',
+                'list[3][0][0]': 'even',
+                'list[3][0][1]': 'more',
+                'list[3][1][0]': 'nested',
+                'list[3][1][1]': 'collection',
+                'list[4]': [
+                        'map[0]': 'should',
+                        'map[1]': 'work',
+                        'map[2]': 'too'
+                ]
+        ]
+
+        when:
+        MapUtils.expandCollection(expanded, collection, 'list')
+
+        then:
+        expanded == expected
+    }
+
     def 'test that convertArray converts #object to #expected'() {
         when:
         def actual = MapUtils.convertArray(object)

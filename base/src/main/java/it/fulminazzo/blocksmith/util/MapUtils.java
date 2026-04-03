@@ -100,6 +100,30 @@ public final class MapUtils {
     }
 
     /**
+     * Each element of the collection is put in the map in the format
+     * <code>&lt;keyPrefix&gt;[&lt;index&gt;]</code> where <code>&lt;index&gt;</code>
+     * is the index of the element.
+     * If an element is a {@link Collection}, then its elements will be
+     * put instead (with the format <code>&lt;keyPrefix&gt;[&lt;indexOfCollection&gt;][&lt;indexOfElement&gt;]</code>).
+     *
+     * @param expanded   the map to put the elements into
+     * @param collection the collection to get elements from
+     * @param keyPrefix  the key prefix
+     */
+    static void expandCollection(final @NotNull Map<String, Object> expanded,
+                                 final @NotNull Collection<?> collection,
+                                 final @NotNull String keyPrefix) {
+        List<Object> list = new ArrayList<>(collection);
+        for (int i = 0; i < list.size(); i++) {
+            Object value = list.get(i);
+            String key = keyPrefix + String.format("[%s]", i);
+            if (value instanceof Collection<?>)
+                expandCollection(expanded, (Collection<?>) value, key);
+            else expanded.put(key, value);
+        }
+    }
+
+    /**
      * Converts the given object accordingly.
      * <br>
      * If the object is an array, it is converted to a {@link Collection}.
