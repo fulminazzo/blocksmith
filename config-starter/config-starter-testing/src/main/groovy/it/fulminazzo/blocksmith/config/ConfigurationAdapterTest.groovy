@@ -52,6 +52,17 @@ abstract class ConfigurationAdapterTest extends Specification {
         !stream.channel.open
     }
 
+    def 'test that serialize correctly writes data'() {
+        when:
+        def actual = adapter.serialize(new MockConfig())
+
+        then:
+        noExceptionThrown()
+
+        and:
+        actual.trim() == expectedStoreLines.join('\n').trim()
+    }
+
     def 'test that store correctly saves file'() {
         given:
         def file = getFile('store')
@@ -64,7 +75,29 @@ abstract class ConfigurationAdapterTest extends Specification {
         noExceptionThrown()
 
         and:
-        file.readLines() == getExpectedStoreLines()
+        file.readLines() == expectedStoreLines
+    }
+    
+    def 'test that store correctly writes to stream'() {
+        given:
+        def file = getFile('store')
+        if (file.exists()) file.delete()
+        file.createNewFile()
+        
+        and:
+        def output = new FileOutputStream(file)
+
+        when:
+        adapter.store(output, new MockConfig())
+
+        then:
+        noExceptionThrown()
+
+        and:
+        file.readLines() == expectedStoreLines
+        
+        and:
+        !output.channel.open
     }
 
     def 'test that configuration with #data is correctly migrated'() {
