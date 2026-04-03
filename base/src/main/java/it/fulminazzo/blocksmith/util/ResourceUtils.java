@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.util;
 
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -168,6 +169,60 @@ public final class ResourceUtils {
             Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
             return path;
         }
+    }
+
+    /**
+     * Loads all the classes of the given package.
+     *
+     * @param packageName the package name
+     * @return the loaded classes
+     * @throws IOException if an error occurs while getting the classes
+     */
+    public static @NotNull List<Class<?>> loadClasses(final @NotNull String packageName) throws IOException {
+        return loadClasses(packageName, s -> true);
+    }
+
+    /**
+     * Loads all the classes of the given package.
+     *
+     * @param classLoader the classloader to check into
+     * @param packageName the package name
+     * @return the loaded classes
+     * @throws IOException if an error occurs while getting the classes
+     */
+    public static @NotNull List<Class<?>> loadClasses(final @NotNull ClassLoader classLoader,
+                                                      final @NotNull String packageName) throws IOException {
+        return loadClasses(classLoader, packageName, s -> true);
+    }
+
+    /**
+     * Loads all the classes of the given package that match the filter.
+     *
+     * @param packageName the package name
+     * @param filter      the filter to apply to the class names
+     * @return the loaded classes
+     * @throws IOException if an error occurs while getting the classes
+     */
+    public static @NotNull List<Class<?>> loadClasses(final @NotNull String packageName,
+                                                      final @NotNull Predicate<String> filter) throws IOException {
+        return loadClasses(classLoader, packageName, filter);
+    }
+
+    /**
+     * Loads all the classes of the given package that match the filter.
+     *
+     * @param classLoader the classloader to check into
+     * @param packageName the package name
+     * @param filter      the filter to apply to the class names
+     * @return the loaded classes
+     * @throws IOException if an error occurs while getting the classes
+     */
+    public static @NotNull List<Class<?>> loadClasses(final @NotNull ClassLoader classLoader,
+                                                      final @NotNull String packageName,
+                                                      final @NotNull Predicate<String> filter) throws IOException {
+        return listClassNames(classLoader, packageName, filter).stream()
+                .map(c -> Reflect.on(c).getObjectClass())
+                .collect(Collectors.toList());
     }
 
     /**
