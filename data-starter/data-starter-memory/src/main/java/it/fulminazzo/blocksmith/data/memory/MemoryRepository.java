@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.data.CacheRepository;
 import it.fulminazzo.blocksmith.data.Page;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
+import it.fulminazzo.blocksmith.structure.expiring.ExpiringMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
  */
 public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQueryEngine<T, ID>>
         implements CacheRepository<T, ID> {
+    private @NotNull Duration expiry;
 
     /**
      * Instantiates a new Memory repository.
@@ -43,6 +45,7 @@ public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQue
     public MemoryRepository(final @NotNull MemoryQueryEngine<T, ID> queryEngine,
                             final @NotNull EntityMapper<T, ID> entityMapper) {
         super(queryEngine, entityMapper);
+        expiry = Duration.ofMillis(Long.MAX_VALUE);
     }
 
     @Override
@@ -58,7 +61,7 @@ public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQue
     @Override
     protected @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
         return queryEngine.query(m -> {
-            m.put(entityMapper.getId(entity), entity);
+            m.put(entityMapper.getId(entity), entity, expiry);
             return entity;
         });
     }
@@ -94,7 +97,7 @@ public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQue
     @Override
     protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities) {
         return queryEngine.query(m -> {
-            entities.forEach(e -> m.put(entityMapper.getId(e), e));
+            entities.forEach(e -> m.put(entityMapper.getId(e), e, expiry));
             return entities;
         });
     }
@@ -114,7 +117,7 @@ public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQue
 
     @Override
     public @NotNull MemoryRepository<T, ID> ttl(final @NotNull Duration expiry) {
-        queryEngine.setExpiry(expiry.toMillis());
+        this.expiry = expiry;
         return this;
     }
 
@@ -144,7 +147,7 @@ public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQue
      */
     public static <T, ID> @NotNull MemoryRepository<T, ID> create(final @NotNull EntityMapper<T, ID> entityMapper) {
         return new MemoryRepository<>(
-                new MemoryQueryEngine<>(Runnable::run),
+                new MemoryQueryEngine<>(ExpiringMap.lazy(), Runnable::run),
                 entityMapper
         );
     }

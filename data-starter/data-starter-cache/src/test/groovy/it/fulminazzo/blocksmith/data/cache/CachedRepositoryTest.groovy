@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.data.Users
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.data.memory.MemoryQueryEngine
 import it.fulminazzo.blocksmith.data.memory.MemoryRepository
+import it.fulminazzo.blocksmith.structure.expiring.ExpiringMap
 import org.jetbrains.annotations.NotNull
 
 import java.time.Duration
@@ -19,11 +20,11 @@ class CachedRepositoryTest extends RepositoryTest<CachedRepository<User, Long>> 
 
     private static final EntityMapper<User, Long> entityMapper = EntityMapper.create(User)
     private static final MemoryRepository<User, Long> cache = new MemoryRepository(
-            new MemoryQueryEngine<>(executor),
+            new MemoryQueryEngine<>(ExpiringMap.lazy(), executor),
             entityMapper
     ).ttl(Duration.ofMinutes(1))
     private static final MemoryRepository<User, Long> actual = new MemoryRepository<User, Long>(
-            new MemoryQueryEngine<User, Long>(executor),
+            new MemoryQueryEngine<User, Long>(ExpiringMap.lazy(), executor),
             entityMapper
     ) {
 
