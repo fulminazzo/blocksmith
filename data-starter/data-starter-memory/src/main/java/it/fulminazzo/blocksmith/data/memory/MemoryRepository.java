@@ -61,7 +61,7 @@ public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQue
     @Override
     protected @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
         return queryEngine.query(m -> {
-            m.put(entityMapper.getId(entity), entity, expiry);
+            m.put(entityMapper.getId(entity), entity, getExpiry());
             return entity;
         });
     }
@@ -97,7 +97,7 @@ public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQue
     @Override
     protected @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities) {
         return queryEngine.query(m -> {
-            entities.forEach(e -> m.put(entityMapper.getId(e), e, expiry));
+            entities.forEach(e -> m.put(entityMapper.getId(e), e, getExpiry()));
             return entities;
         });
     }
@@ -119,6 +119,18 @@ public class MemoryRepository<T, ID> extends AbstractRepository<T, ID, MemoryQue
     public @NotNull MemoryRepository<T, ID> ttl(final @NotNull Duration expiry) {
         this.expiry = expiry;
         return this;
+    }
+
+    private long getExpiry() {
+        /*
+         * to support a never expiring Memory repository,
+         * we must set the expiration time to a value incredibly
+         * high that does not overflow.
+         */
+        long time = expiry.toMillis();
+        long now = System.currentTimeMillis();
+        if (time + now < 0) return time - now - 1;
+        else return time;
     }
 
     /**
