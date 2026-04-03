@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 final class LazyExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
-    protected @Nullable ExpiringEntry<V> getExpiring(final @Nullable K key) {
+    protected @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
         clearExpired();
         return delegate.get(key);
     }
