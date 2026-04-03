@@ -46,12 +46,12 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
         return load(new ByteArrayInputStream(data.getBytes()), type);
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         JsonNode tree = mapper.readTree(file);
         if (tree.isObject()) {
             Map<String, Object> data = mapper.convertValue(tree, new TypeReference<>() {
@@ -102,12 +102,12 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
         return load(new FileInputStream(file), type);
     }
 
-    public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
         return mapper.readValue(stream, type);
     }
 
     @Override
-    public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
+    public <T> @NotNull String serialize(final @NotNull T configuration) throws IOException {
         return mapper.writeValueAsString(configuration);
     }
 

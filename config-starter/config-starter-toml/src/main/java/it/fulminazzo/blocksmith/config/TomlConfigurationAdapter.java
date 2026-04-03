@@ -38,22 +38,22 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
         return delegate.load(data, type);
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         return delegate.load(file, type);
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
         return delegate.load(stream, type);
     }
 
     @Override
-    public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
+    public <T> @NotNull String serialize(final @NotNull T configuration) throws IOException {
         try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             store(output, configuration);
             return output.toString();

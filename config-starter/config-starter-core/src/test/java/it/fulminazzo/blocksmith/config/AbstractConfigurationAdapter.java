@@ -25,7 +25,7 @@ abstract class AbstractConfigurationAdapter implements BaseConfigurationAdapter 
     }
 
     @Override
-    public @NotNull <T> String serialize(final @NonNull T configuration) {
+    public <T> @NotNull String serialize(final @NonNull T configuration) {
         throw new UnsupportedOperationException();
     }
 

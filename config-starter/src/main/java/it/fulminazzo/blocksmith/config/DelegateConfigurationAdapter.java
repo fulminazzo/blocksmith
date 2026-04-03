@@ -25,29 +25,29 @@ final class DelegateConfigurationAdapter implements ConfigurationAdapter {
     @Nullable BaseConfigurationAdapter delegate;
 
     @Override
-    public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
         return getDelegate().load(data, type);
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull File parentDirectory,
+    public <T> @NotNull T load(final @NotNull File parentDirectory,
                                final @NotNull String fileName,
                                final @NotNull Class<T> type) throws IOException {
         return load(getFormat().getFile(parentDirectory, fileName), type);
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
         return getDelegate().load(stream, type);
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         return getDelegate().load(file, type);
     }
 
     @Override
-    public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
+    public <T> @NotNull String serialize(final @NotNull T configuration) throws IOException {
         return getDelegate().serialize(configuration);
     }
 
