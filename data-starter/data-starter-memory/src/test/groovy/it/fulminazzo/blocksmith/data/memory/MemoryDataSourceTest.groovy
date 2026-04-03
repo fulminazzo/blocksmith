@@ -21,6 +21,7 @@ class MemoryDataSourceTest extends Specification {
                 User,
                 new MemoryRepositorySettings()
                         .withTtl(Duration.ofSeconds(1))
+                        .withStrategy(MemoryRepositorySettings.ExpiryStrategy.SCHEDULED)
         )
 
         then:
