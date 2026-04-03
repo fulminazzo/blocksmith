@@ -316,6 +316,20 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
     void renew(final @Nullable K key, final long ttl);
 
     /**
+     * Prints out the contents of this map.
+     * <br>
+     * Entries will be printed in the format <code>&lt;key&gt;=&lt;value&gt;</code>.
+     * <br>
+     * If an entry is <b>never expiring</b>, it will be printed as <code>&lt;key&gt;=&lt;value&gt; (!)</code>.
+     * <br>
+     * If an entry is <b>expired</b> but not yet removed, it will be printed as <code>&lt;key&gt;=&lt;value&gt; (*)</code>.
+     *
+     * @return the string representation of this map
+     */
+    @Override
+    @NotNull String toString();
+
+    /**
      * Initializes a new lazy ExpirationMap.
      * <br>
      * The key-value pairs will persist in memory until an operation has been done

@@ -588,6 +588,8 @@ class AbstractExpiringMapTest extends Specification {
         given:
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1000L)
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 1L)
+        internal['Ciao'] = new AbstractExpiringMap.ExpiringEntry<>('moon', AbstractExpiringMap.NEVER_EXPIRE)
+        internal['Bye'] = new AbstractExpiringMap.ExpiringEntry<>(null, 1500L)
 
         and:
         sleep(5L)
@@ -596,7 +598,7 @@ class AbstractExpiringMapTest extends Specification {
         def string = map.toString()
 
         then:
-        string == '{Hello=world, Goodbye=*mars}'
+        string == '{Hello=world, Ciao=moon (!), Goodbye=mars (*), Bye=null}'
     }
 
     /**

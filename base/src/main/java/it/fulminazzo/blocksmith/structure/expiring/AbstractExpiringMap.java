@@ -346,6 +346,15 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
         }
 
         /**
+         * Checks if the current entry never expires.
+         *
+         * @return <code>true</code> if it does not
+         */
+        public boolean neverExpires() {
+            return expireTime == NEVER_EXPIRE;
+        }
+
+        /**
          * Checks if the current entry is expired.
          *
          * @return <code>true</code> if it is
@@ -366,7 +375,10 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
 
         @Override
         public @NotNull String toString() {
-            return (isExpired() ? "*" : "") + value;
+            StringBuilder builder = new StringBuilder(value == null ? "null" : value.toString());
+            if (neverExpires()) builder.append(" (!)");
+            else if (isExpired()) builder.append(" (*)");
+            return builder.toString();
         }
 
     }
