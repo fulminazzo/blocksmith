@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.data.CacheRepositorySettings;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
@@ -14,6 +15,11 @@ public final class MemoryRepositorySettings extends CacheRepositorySettings<Memo
 
     @Getter
     private @Nullable ExpiryStrategy strategy;
+
+    public @NotNull MemoryRepositorySettings withStrategy(final @NotNull ExpiryStrategy strategy) {
+        this.strategy = strategy;
+        return this;
+    }
 
     /**
      * Identifies the strategy to use to clear out expired entities.
