@@ -4,7 +4,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 /**
  * A collection of utilities to work with resources.
@@ -28,7 +33,7 @@ public final class ResourceUtils {
      * Gets a resource from the given classloader.
      *
      * @param classLoader the classloader
-     * @param resource the resource (should NOT have a preceding "/")
+     * @param resource    the resource (should NOT have a preceding "/")
      * @return the resource
      * @throws IllegalArgumentException if the resource was not found
      */
@@ -37,6 +42,67 @@ public final class ResourceUtils {
         if (inputStream == null)
             throw new IllegalArgumentException(String.format("Could not find resource '%s' from classloader", resource));
         return inputStream;
+    }
+
+    /**
+     * Extracts a resource to the given directory.
+     *
+     * @param resource  the resource (should NOT have a preceding "/")
+     * @param directory the directory to extract to
+     * @return the extracted resource
+     * @throws IOException if an error occurs while extracting the resource
+     */
+    public static @NotNull File extract(final @NotNull String resource, final @NotNull File directory) throws IOException {
+        return extract(resource, directory.toPath()).toFile();
+    }
+
+    /**
+     * Extracts a resource to the given directory.
+     *
+     * @param classLoader the classloader
+     * @param resource    the resource (should NOT have a preceding "/")
+     * @param directory   the directory to extract to
+     * @return the extracted resource
+     * @throws IOException if an error occurs while extracting the resource
+     */
+    public static File extract(final @NotNull ClassLoader classLoader,
+                               final @NotNull String resource,
+                               final @NotNull File directory) throws IOException {
+        return extract(classLoader, resource, directory.toPath()).toFile();
+    }
+
+    /**
+     * Extracts a resource to the given directory.
+     *
+     * @param resource  the resource (should NOT have a preceding "/")
+     * @param directory the directory to extract to
+     * @return the path to the extracted resource
+     * @throws IOException if an error occurs while extracting the resource
+     */
+    public static @NotNull Path extract(final @NotNull String resource, final @NotNull Path directory) throws IOException {
+        return extract(classLoader, resource, directory);
+    }
+
+    /**
+     * Extracts a resource to the given directory.
+     *
+     * @param classLoader the classloader
+     * @param resource    the resource (should NOT have a preceding "/")
+     * @param directory   the directory to extract to
+     * @return the path to the extracted resource
+     * @throws IOException if an error occurs while extracting the resource
+     */
+    public static @NotNull Path extract(final @NotNull ClassLoader classLoader,
+                                        final @NotNull String resource,
+                                        final @NotNull Path directory) throws IOException {
+        Files.createDirectories(directory);
+        String fileName = resource;
+        if (resource.contains("/")) fileName = resource.substring(resource.lastIndexOf("/") + 1);
+        try (InputStream stream = getResource(classLoader, resource)) {
+            Path path = directory.resolve(fileName);
+            Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
+            return path;
+        }
     }
 
 }
