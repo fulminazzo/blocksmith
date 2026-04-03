@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -238,10 +239,13 @@ public final class ResourceUtils {
     static void loadFromJar(final @NotNull URL url,
                             final @NotNull List<String> results,
                             final @NotNull Predicate<String> filter) throws IOException {
-        try (JarFile jarFile = new JarFile(url.getFile())) {
+        JarURLConnection connection = (JarURLConnection) url.openConnection();
+        String entryPrefix = connection.getEntryName();
+        try (JarFile jarFile = connection.getJarFile()) {
             jarFile.stream()
-                    .filter(jarEntry -> !jarEntry.isDirectory())
+                    .filter(e -> !e.isDirectory())
                     .map(ZipEntry::getName)
+                    .filter(n -> entryPrefix == null || n.startsWith(entryPrefix + "/"))
                     .filter(filter)
                     .forEach(results::add);
         }
