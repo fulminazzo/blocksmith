@@ -389,7 +389,7 @@ class AbstractExpiringMapTest extends Specification {
         }
 
         when:
-        this.map.putAll(map)
+        this.map.putAll((Map) map)
 
         then:
         def first = internal['Hello']
@@ -507,6 +507,9 @@ class AbstractExpiringMapTest extends Specification {
         def map = Mock(AbstractExpiringMap)
         def matchCount = 0
 
+        and:
+        map.getTtl('Goodbye') >> Duration.ofMillis(1337)
+
         when:
         map."$method"(*arguments)
 
@@ -519,40 +522,22 @@ class AbstractExpiringMapTest extends Specification {
 
         where:
         method            | arguments                                               || expectedMethod    | expectedArguments
+        'put'             | ['Hello', 'world']                                      || 'put'             | ['Hello', 'world', AbstractExpiringMap.NEVER_EXPIRE]
         'put'             | ['Hello', 'world', Duration.ofMillis(1337)]             || 'put'             | ['Hello', 'world', 1337L]
+        'putIfAbsent'     | ['Hello', 'world']                                      || 'putIfAbsent'     | ['Hello', 'world', AbstractExpiringMap.NEVER_EXPIRE]
         'putIfAbsent'     | ['Hello', 'world', Duration.ofMillis(1337)]             || 'putIfAbsent'     | ['Hello', 'world', 1337L]
         'replace'         | ['Hello', 'world', 'moon', Duration.ofMillis(1337)]     || 'replace'         | ['Hello', 'world', 'moon', 1337L]
+        'computeIfAbsent' | ['Hello', function]                                     || 'computeIfAbsent' | ['Hello', function, AbstractExpiringMap.NEVER_EXPIRE]
         'computeIfAbsent' | ['Hello', function, Duration.ofMillis(1337)]            || 'computeIfAbsent' | ['Hello', function, 1337L]
+        'compute'         | ['Hello', bifunction]                                   || 'compute'         | ['Hello', bifunction, AbstractExpiringMap.NEVER_EXPIRE]
+        'compute'         | ['Goodbye', bifunction]                                 || 'compute'         | ['Goodbye', bifunction, 1337L]
         'compute'         | ['Hello', bifunction, Duration.ofMillis(1337)]          || 'compute'         | ['Hello', bifunction, 1337L]
+        'merge'           | ['Hello', 'world', bifunction]                          || 'merge'           | ['Hello', 'world', bifunction, AbstractExpiringMap.NEVER_EXPIRE]
+        'merge'           | ['Goodbye', 'world', bifunction]                        || 'merge'           | ['Goodbye', 'world', bifunction, 1337L]
         'merge'           | ['Hello', 'world', bifunction, Duration.ofMillis(1337)] || 'merge'           | ['Hello', 'world', bifunction, 1337L]
+        'putAll'          | [[:]]                                                   || 'putAll'          | [[:], AbstractExpiringMap.NEVER_EXPIRE]
         'putAll'          | [[:], Duration.ofMillis(1337)]                          || 'putAll'          | [[:], 1337]
         'renew'           | ['Hello', Duration.ofMillis(1337)]                      || 'renew'           | ['Hello', 1337L]
-    }
-
-    def 'test that invocation of #method throws UnsupportedOperationException'() {
-        given:
-        def map = Mock(AbstractExpiringMap)
-
-        and:
-        map."$method"(*_) >> {
-            callRealMethod()
-        }
-
-        when:
-        map."$method"(*arguments)
-
-        then:
-        def e = thrown(UnsupportedOperationException)
-        e.message == "${map.getClass().simpleName} does not support put without TTL"
-
-        where:
-        method            | arguments
-        'put'             | ['Hello', 'world']
-        'putIfAbsent'     | ['Hello', 'world']
-        'computeIfAbsent' | ['Hello', function]
-        'compute'         | ['Hello', bifunction]
-        'merge'           | ['Hello', 'world', bifunction]
-        'putAll'          | [[:]]
     }
 
     def 'test that map is equal to self'() {
@@ -560,7 +545,7 @@ class AbstractExpiringMapTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1000L)
 
         expect:
-        map.equals(map)
+        Objects.equals(map, map)
 
         and:
         map.hashCode() == map.hashCode()
@@ -581,22 +566,22 @@ class AbstractExpiringMapTest extends Specification {
         actual == expected
 
         where:
-        object                           || expected
-        null                             || false
-        'Hello=world'                    || false
-        [:]                              || false
-        ['Hello': 'world']               || true
-        ['Goodbye': 'mars']              || false
+        object                                || expected
+        null                                  || false
+        'Hello=world'                         || false
+        [:]                                   || false
+        ['Hello': 'world']                    || true
+        ['Goodbye': 'mars']                   || false
         new MockExpiringMap() {
             {
                 put('Hello', 'world', 1000L)
             }
-        }                                || true
+        }                                     || true
         new MockExpiringMap() {
             {
                 put('Goodbye', 'mars', 1000L)
             }
-        }                                || false
+        }                                     || false
     }
 
     def 'test that toString correctly prints expired entries'() {
