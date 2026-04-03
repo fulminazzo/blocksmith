@@ -38,6 +38,9 @@ class ScheduledExpiringMapDelayedTest extends Specification {
         given:
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
+        and:
+        sleep(5L)
+
         when:
         def entry = map.getExpiring('Hello')
 
@@ -51,6 +54,9 @@ class ScheduledExpiringMapDelayedTest extends Specification {
     def 'test that remove returns null if expired but not yet removed'() {
         given:
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+
+        and:
+        sleep(5L)
 
         when:
         def entry = map.remove('Hello')
@@ -67,6 +73,9 @@ class ScheduledExpiringMapDelayedTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 1000L)
 
+        and:
+        sleep(5L)
+
         when:
         def keys = map.keySet()
 
@@ -78,6 +87,9 @@ class ScheduledExpiringMapDelayedTest extends Specification {
         given:
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 1000L)
+
+        and:
+        sleep(5L)
 
         when:
         def values = map.values()

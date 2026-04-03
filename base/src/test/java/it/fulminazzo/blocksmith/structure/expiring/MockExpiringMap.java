@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * @param <K> the type of the keys
  * @param <V> the type of the values
  */
-public final class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
+public class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     protected @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
@@ -23,6 +23,7 @@ public final class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     public int size() {
+        clearExpired();
         return delegate.size();
     }
 
