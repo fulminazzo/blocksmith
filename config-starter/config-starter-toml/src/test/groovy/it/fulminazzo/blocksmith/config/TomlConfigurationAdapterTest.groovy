@@ -10,9 +10,6 @@ class TomlConfigurationAdapterTest extends ConfigurationAdapterTest {
         def file = getFile('store_array')
         if (file.exists()) file.delete()
 
-        and:
-        def adapter = getAdapter()
-
         when:
         adapter.store(file, ['data': array])
 

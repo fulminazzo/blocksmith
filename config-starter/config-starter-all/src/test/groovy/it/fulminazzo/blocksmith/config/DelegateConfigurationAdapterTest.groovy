@@ -33,6 +33,33 @@ class DelegateConfigurationAdapterTest extends Specification {
         format << ConfigurationFormat.values()
     }
 
+    def 'test that #method with #arguments delegates'() {
+        given:
+        def delegate = Mock(BaseConfigurationAdapter)
+
+        and:
+        def adapter = new DelegateConfigurationAdapter(log)
+        adapter.format = ConfigurationFormat.JSON
+        adapter.delegate = delegate
+
+        when:
+        adapter."$method"(*arguments)
+
+        then:
+        1 * delegate."$method"(*_) >> { a ->
+            assert a == arguments
+        }
+
+        where:
+        method      || arguments
+        'load'      || ['', MockConfig]
+        'load'      || [new ByteArrayInputStream(''.bytes), MockConfig]
+        'load'      || [new File('build/resources/test/load.json'), MockConfig]
+        'serialize' || [new MockConfig()]
+        'store'     || [new File('build/resources/test/store.json'), new MockConfig()]
+        'store'     || [new ByteArrayOutputStream(), new MockConfig()]
+    }
+
     def 'test that getFormat throws if not initialized'() {
         given:
         def adapter = new DelegateConfigurationAdapter(log)

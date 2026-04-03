@@ -45,6 +45,8 @@ class ConfigUtilsTest extends Specification {
         expected.set('version', 1.0d)
         expected.setComment('players', ' This comment is multiline\n Hope it will work!')
         expected.set('players', 2)
+        expected.setComment('data', ' This should not be searched')
+        expected.set('data', null)
         expected.set('allowed', null)
         expected.set('current', null)
 

@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public final class MigrationConfig {
 
+    private static final double version = 4.0; // should be ignored
+
     private static final @NotNull ConfigVersion configVersion = ConfigVersion.of(3.0)
             .migrate(2.0, m -> m
                     .add("server.timeoutSeconds", 30)

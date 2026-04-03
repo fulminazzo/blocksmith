@@ -83,8 +83,7 @@ public final class ConfigUtils {
      * @param string the string
      * @return the snake case string
      */
-    public static String formatToSnakeCase(String string) {
-        if (string == null) return null;
+    public static @NotNull String formatToSnakeCase(final @NotNull String string) {
         String result = string.replaceAll("([a-z0-9])([A-Z])", "$1_$2");
         result = result.replaceAll("[\\s\\-.]", "_");
         return result.toLowerCase().replaceAll("_{2,}", "_");

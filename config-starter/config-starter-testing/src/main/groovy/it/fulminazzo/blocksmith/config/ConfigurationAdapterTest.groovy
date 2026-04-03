@@ -158,8 +158,18 @@ abstract class ConfigurationAdapterTest extends Specification {
                         ],
                         'features': ['enableBetaUi': true, 'enableMetrics': false]
                 ],
+                newMigrationConfig(null),
+                newMigrationConfig('invalid'),
+                newMigrationConfig('3.0'),
                 new MigrationConfig()
         ]
+    }
+
+    private Map<String, Object> newMigrationConfig(final Object version) {
+        def properties = (new MigrationConfig()).properties
+        properties.removeAll {it.key in ['version', 'configVersion', 'class']}
+        properties['version'] = version
+        return properties
     }
 
     protected MockConfig getExpectedConfig() {
