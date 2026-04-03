@@ -17,6 +17,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
@@ -41,7 +42,7 @@ public final class ResourceUtils {
     /**
      * Gets a resource from the given classloader.
      *
-     * @param classLoader the classloader
+     * @param classLoader the classloader to check into
      * @param resource    the resource (should NOT have a preceding "/")
      * @return the resource
      * @throws IllegalArgumentException if the resource was not found
@@ -68,7 +69,7 @@ public final class ResourceUtils {
     /**
      * Extracts a resource to the given directory (only if it is not previously existing).
      *
-     * @param classLoader the classloader
+     * @param classLoader the classloader to check into
      * @param resource    the resource (should NOT have a preceding "/")
      * @param directory   the directory to extract to
      * @return the extracted resource
@@ -95,7 +96,7 @@ public final class ResourceUtils {
     /**
      * Extracts a resource to the given directory (only if it is not previously existing).
      *
-     * @param classLoader the classloader
+     * @param classLoader the classloader to check into
      * @param resource    the resource (should NOT have a preceding "/")
      * @param directory   the directory to extract to
      * @return the path to the extracted resource
@@ -124,7 +125,7 @@ public final class ResourceUtils {
     /**
      * Extracts a resource to the given directory.
      *
-     * @param classLoader the classloader
+     * @param classLoader the classloader to check into
      * @param resource    the resource (should NOT have a preceding "/")
      * @param directory   the directory to extract to
      * @return the extracted resource
@@ -151,7 +152,7 @@ public final class ResourceUtils {
     /**
      * Extracts a resource to the given directory.
      *
-     * @param classLoader the classloader
+     * @param classLoader the classloader to check into
      * @param resource    the resource (should NOT have a preceding "/")
      * @param directory   the directory to extract to
      * @return the path to the extracted resource
@@ -167,6 +168,63 @@ public final class ResourceUtils {
             Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
             return path;
         }
+    }
+
+    /**
+     * Lists all the class names of the given package.
+     *
+     * @param packageName the package name
+     * @return the list of class names
+     * @throws IOException if an error occurs while listing the classes
+     */
+    public static @NotNull List<String> listClassNames(final @NotNull String packageName) throws IOException {
+        return listClassNames(packageName, s -> true);
+    }
+
+    /**
+     * Lists all the class names of the given package.
+     *
+     * @param classLoader the classloader to check into
+     * @param packageName the package name
+     * @return the list of class names
+     * @throws IOException if an error occurs while listing the classes
+     */
+    public static @NotNull List<String> listClassNames(final @NotNull ClassLoader classLoader,
+                                                       final @NotNull String packageName) throws IOException {
+        return listClassNames(classLoader, packageName, s -> true);
+    }
+
+    /**
+     * Lists all the class names of the given package that match the filter.
+     *
+     * @param packageName the package name
+     * @param filter      the filter to apply to the class names
+     * @return the list of class names
+     * @throws IOException if an error occurs while listing the classes
+     */
+    public static @NotNull List<String> listClassNames(final @NotNull String packageName,
+                                                       final @NotNull Predicate<String> filter) throws IOException {
+        return listClassNames(classLoader, packageName, filter);
+    }
+
+    /**
+     * Lists all the class names of the given package that match the filter.
+     *
+     * @param classLoader the classloader to check into
+     * @param packageName the package name
+     * @param filter      the filter to apply to the class names
+     * @return the list of class names
+     * @throws IOException if an error occurs while listing the classes
+     */
+    public static @NotNull List<String> listClassNames(final @NotNull ClassLoader classLoader,
+                                                       final @NotNull String packageName,
+                                                       final @NotNull Predicate<String> filter) throws IOException {
+        final String extension = ".class";
+        return listResources(classLoader, packageName.replace(".", "/"), filter).stream()
+                .filter(r -> r.endsWith(extension))
+                .map(r -> r.substring(0, r.length() - extension.length()).replace("/", "."))
+                .map(r -> r.startsWith(packageName) ? r : packageName + "." + r)
+                .collect(Collectors.toList());
     }
 
     /**

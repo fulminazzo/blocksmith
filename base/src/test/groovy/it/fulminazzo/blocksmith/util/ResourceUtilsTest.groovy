@@ -128,6 +128,26 @@ class ResourceUtilsTest extends Specification {
         'extract'         | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory.toPath()]
     }
 
+    def 'test that listClassnames with #arguments loads this class'() {
+        when:
+        def classes = ResourceUtils.listClassNames(*arguments)
+
+        then:
+        classes.contains(ResourceUtilsTest.canonicalName)
+
+        where:
+        arguments << [
+                [''],
+                [ResourceUtilsTest.classLoader, ''],
+                ['', (s) -> true],
+                [ResourceUtilsTest.classLoader, '', (s) -> true],
+                [ResourceUtilsTest.packageName],
+                [ResourceUtilsTest.classLoader, ResourceUtilsTest.packageName],
+                [ResourceUtilsTest.packageName, (s) -> true],
+                [ResourceUtilsTest.classLoader, ResourceUtilsTest.packageName, (s) -> true]
+        ]
+    }
+
     def 'test that listResources with #arguments loads our resources from file'() {
         when:
         def resources = ResourceUtils.listResources(*arguments)
