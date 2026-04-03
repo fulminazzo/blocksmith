@@ -36,6 +36,7 @@ import java.util.function.Function;
  *                 EntityMapper.create(User.class),
  *                 new MemoryRepositorySettings()
  *                         .withExpiryInMillis(300000) // optional
+ *                         .withExpirationStrategy(ExpiryStrategy.SCHEDULED) // optional, defines how the expired entities will be cleared
  *         );
  *         }</pre>
  *     </li>
@@ -46,6 +47,7 @@ import java.util.function.Function;
  *                 engine -> new CustomMemoryRepository<>(engine),
  *                 new MemoryRepositorySettings()
  *                         .withExpiryInMillis(300000) // optional
+ *                         .withExpirationStrategy(ExpiryStrategy.SCHEDULED) // optional, defines how the expired entities will be cleared
  *         );
  *         }</pre>
  *         where CustomMemoryRepository extends MemoryRepository and adds custom behavior.

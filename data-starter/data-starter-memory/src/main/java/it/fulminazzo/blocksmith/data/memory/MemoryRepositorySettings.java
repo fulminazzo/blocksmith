@@ -16,7 +16,7 @@ public final class MemoryRepositorySettings extends CacheRepositorySettings<Memo
     @Getter
     private @Nullable ExpiryStrategy strategy;
 
-    public @NotNull MemoryRepositorySettings withStrategy(final @NotNull ExpiryStrategy strategy) {
+    public @NotNull MemoryRepositorySettings withExpirationStrategy(final @NotNull ExpiryStrategy strategy) {
         this.strategy = strategy;
         return this;
     }
