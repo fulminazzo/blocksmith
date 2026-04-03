@@ -4,6 +4,42 @@ import spock.lang.Specification
 
 class MapUtilsTest extends Specification {
 
+    def 'test that stringify works'() {
+        given:
+        def map = [
+                (null)      : 'invalid',
+                'invalid'   : null,
+                'object'    : 10,
+                'collection': [
+                        null,
+                        'Hello, world!',
+                        ['first', 'second'],
+                        [['even', 'more'], ['nested', 'collection']]
+                ],
+                'map'       : [
+                        'null'      : null,
+                        'object'    : 10,
+                        'collection': ['should', 'work', 'too'],
+                        'nested'    : ['values': [1, 2, 3]]
+                ]
+        ]
+
+        and:
+        def expected = [
+                'object'           : '10',
+                'collection'       : 'Hello, world!\nfirst\nsecond\neven\nmore\nnested\ncollection',
+                'map.object'       : '10',
+                'map.collection'   : 'should\nwork\ntoo',
+                'map.nested.values': '1\n2\n3'
+        ]
+
+        when:
+        def actual = MapUtils.stringify(map)
+
+        then:
+        actual.sort() == expected.sort()
+    }
+
     def 'test that flattening and unflattening of #map returns source map'() {
         when:
         def flattened = MapUtils.flatten(map)
@@ -52,30 +88,30 @@ class MapUtilsTest extends Specification {
                 ['first', 'second'],
                 [['even', 'more'], ['nested', 'collection']],
                 [
-                        'null': null,
-                        'object': 10,
+                        'null'      : null,
+                        'object'    : 10,
                         'collection': ['should', 'work', 'too'],
-                        'nested': ['values': [1, 2, 3]]
+                        'nested'    : ['values': [1, 2, 3]]
                 ]
         ]
 
         and:
         def expected = [
-                'list[0]': null,
-                'list[1]': 'Hello, world!',
-                'list[2][0]': 'first',
-                'list[2][1]': 'second',
+                'list[0]'      : null,
+                'list[1]'      : 'Hello, world!',
+                'list[2][0]'   : 'first',
+                'list[2][1]'   : 'second',
                 'list[3][0][0]': 'even',
                 'list[3][0][1]': 'more',
                 'list[3][1][0]': 'nested',
                 'list[3][1][1]': 'collection',
-                'list[4]': [
-                        'null': null,
-                        'object': 10,
+                'list[4]'      : [
+                        'null'         : null,
+                        'object'       : 10,
                         'collection[0]': 'should',
                         'collection[1]': 'work',
                         'collection[2]': 'too',
-                        'nested': [
+                        'nested'       : [
                                 'values[0]': 1,
                                 'values[1]': 2,
                                 'values[2]': 3

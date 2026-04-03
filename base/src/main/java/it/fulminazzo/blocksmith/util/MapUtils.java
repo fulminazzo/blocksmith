@@ -6,12 +6,44 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Collection of utilities to work with maps.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MapUtils {
+
+    /**
+     * Converts the given map to a map of string keys and string values.
+     * <br>
+     * {@link Map} instances are flattened using {@link #flatten(Map)}.
+     * {@link Collection} instances are merged in a single string separated by "\n".
+     *
+     * @param map the map to stringify
+     * @return the stringified map
+     */
+    public static @NotNull Map<@NotNull String, @NotNull String> stringify(final @NotNull Map<?, ?> map) {
+        Map<@NotNull String, @Nullable Object> transformed = toStringKeyMap(map);
+        transformed = flatten(transformed);
+        final Map<@NotNull String, @NotNull String> stringified = new LinkedHashMap<>();
+        for (final Map.Entry<String, Object> entry : transformed.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if (value != null) stringified.put(key, stringifyValue(value));
+        }
+        return stringified;
+    }
+
+    private static @NotNull String stringifyValue(final @NotNull Object value) {
+        if (value instanceof Collection<?>) {
+            Collection<?> collection = (Collection<?>) value;
+            return collection.stream()
+                    .filter(Objects::nonNull)
+                    .map(MapUtils::stringifyValue)
+                    .collect(Collectors.joining("\n"));
+        } else return value.toString();
+    }
 
     /**
      * Flattens a nested {@link Map} into a single-level map using dot-notation keys.
