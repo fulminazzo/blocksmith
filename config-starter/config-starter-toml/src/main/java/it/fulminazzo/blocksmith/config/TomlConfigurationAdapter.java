@@ -38,20 +38,50 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     @Override
+    public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
+        return delegate.load(data, type);
+    }
+
+    @Override
     public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         return delegate.load(file, type);
     }
 
     @Override
+    public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
+        return delegate.load(stream, type);
+    }
+
+    @Override
+    public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
+        try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            store(output, configuration);
+            return output.toString();
+        }
+    }
+
+    @Override
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
         Files.createDirectories(file.getParentFile().toPath());
+        Config config = toNightConfig(configuration);
+        newTomlWriter().write(config, file, WritingMode.REPLACE);
+        indentArrays(file);
+    }
+
+    @Override
+    public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
+        Config config = toNightConfig(configuration);
+        OutputStreamWriter writer = new OutputStreamWriter(stream);
+        newTomlWriter().write(config, writer);
+    }
+
+    private <T> @NotNull Config toNightConfig(@NotNull T configuration) {
         CommentedConfig config = (CommentedConfig) ObjectSerializer.standard().serialize(configuration, CommentedConfig::inMemory);
         removeNulls(config);
         ConfigUtils.fixPropertyNames(config);
         ConfigUtils.setComments(configuration, config);
         ConfigVersion.getVersion(configuration.getClass()).ifPresent(v -> config.set("version", v.getVersion()));
-        newTomlWriter().write(config, file, WritingMode.REPLACE);
-        indentArrays(file);
+        return config;
     }
 
     private static void removeNulls(final @NotNull Config config) {

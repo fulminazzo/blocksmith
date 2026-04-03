@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Implementation of {@link ConfigurationAdapter} that delegates
@@ -23,10 +25,30 @@ final class DelegateConfigurationAdapter implements ConfigurationAdapter {
     @Nullable BaseConfigurationAdapter delegate;
 
     @Override
+    public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
+        return getDelegate().load(data, type);
+    }
+
+    @Override
     public @NotNull <T> T load(final @NotNull File parentDirectory,
                                final @NotNull String fileName,
                                final @NotNull Class<T> type) throws IOException {
         return load(getFormat().getFile(parentDirectory, fileName), type);
+    }
+
+    @Override
+    public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
+        return getDelegate().load(stream, type);
+    }
+
+    @Override
+    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
+        return getDelegate().load(file, type);
+    }
+
+    @Override
+    public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
+        return getDelegate().serialize(configuration);
     }
 
     @Override
@@ -37,15 +59,13 @@ final class DelegateConfigurationAdapter implements ConfigurationAdapter {
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull File file,
-                               final @NotNull Class<T> type) throws IOException {
-        return getDelegate().load(file, type);
+    public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
+        getDelegate().store(file, configuration);
     }
 
     @Override
-    public <T> void store(final @NotNull File file,
-                          final @NotNull T configuration) throws IOException {
-        getDelegate().store(file, configuration);
+    public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
+        getDelegate().store(stream, configuration);
     }
 
     @Override

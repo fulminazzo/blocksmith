@@ -12,8 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,6 +43,11 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                                        final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
         this.mapper = JacksonUtils.setupMapper(mapper, logger, commentPropertyWriterType);
         this.logger = logger;
+    }
+
+    @Override
+    public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
+        return load(new ByteArrayInputStream(data.getBytes()), type);
     }
 
     @Override
@@ -95,7 +99,16 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                 }
             }
         }
-        return mapper.readValue(file, type);
+        return load(new FileInputStream(file), type);
+    }
+
+    public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
+        return mapper.readValue(stream, type);
+    }
+
+    @Override
+    public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
+        return mapper.writeValueAsString(configuration);
     }
 
     @Override
@@ -105,6 +118,11 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                 ? mapper.copy().addMixIn(configuration.getClass(), VersionMixin.class)
                 : mapper;
         writer.writeValue(file, configuration);
+    }
+
+    @Override
+    public <T> void store(@NotNull OutputStream stream, @NotNull T configuration) throws IOException {
+        mapper.writeValue(stream, configuration);
     }
 
     private void applyNamingStrategy(final @NotNull Map<String, Object> data,
