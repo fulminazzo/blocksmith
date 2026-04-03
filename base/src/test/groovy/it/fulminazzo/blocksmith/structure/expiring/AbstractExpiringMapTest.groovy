@@ -555,6 +555,50 @@ class AbstractExpiringMapTest extends Specification {
         'putAll'          | [[:]]
     }
 
+    def 'test that map is equal to self'() {
+        given:
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1000L)
+
+        expect:
+        map.equals(map)
+
+        and:
+        map.hashCode() == map.hashCode()
+    }
+
+    def 'test that equals with #object returns #expected'() {
+        given:
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1000L)
+        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 1L)
+
+        and:
+        sleep(5L)
+
+        when:
+        def actual = Objects.equals(map, object)
+
+        then:
+        actual == expected
+
+        where:
+        object                           || expected
+        null                             || false
+        'Hello=world'                    || false
+        [:]                              || false
+        ['Hello': 'world']               || true
+        ['Goodbye': 'mars']              || false
+        new MockExpiringMap() {
+            {
+                put('Hello', 'world', 1000L)
+            }
+        }                                || true
+        new MockExpiringMap() {
+            {
+                put('Goodbye', 'mars', 1000L)
+            }
+        }                                || false
+    }
+
     def 'test that toString correctly prints expired entries'() {
         given:
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1000L)

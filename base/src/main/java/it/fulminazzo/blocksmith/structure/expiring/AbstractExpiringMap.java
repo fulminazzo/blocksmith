@@ -250,6 +250,7 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
 
     @Override
     public @NotNull Set<Entry<K, V>> entrySet() {
+        clearExpired();
         return delegate.entrySet().stream()
                 .map(e -> new ExpiringEntryMapEntry<>(e.getKey(), e.getValue()))
                 .collect(Collectors.toSet());
@@ -276,6 +277,23 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
 
     private @NotNull UnsupportedOperationException getPutNotSupportedException() {
         return new UnsupportedOperationException(getClass().getSimpleName() + " does not support put without TTL");
+    }
+
+    @Override
+    public boolean equals(final @Nullable Object obj) {
+        if (obj == this) return true;
+        if (!(obj instanceof Map)) return false;
+        Map<?, ?> map = (Map<?, ?>) obj;
+        if (map.size() != size()) return false;
+        Set<? extends Entry<?, ?>> mapEntries = map.entrySet();
+        return entrySet().stream().allMatch(e -> mapEntries.stream().anyMatch(e::equals));
+    }
+
+    @Override
+    public int hashCode() {
+        return entrySet().stream()
+                .mapToInt(Entry::hashCode)
+                .sum();
     }
 
     @Override
@@ -309,6 +327,7 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     @Data
     protected static final class ExpiringEntry<V> {
         private V value;
+        @EqualsAndHashCode.Exclude
         private long expireTime;
 
         /**
