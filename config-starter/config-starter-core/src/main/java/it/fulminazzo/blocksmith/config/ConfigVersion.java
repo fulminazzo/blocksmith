@@ -14,6 +14,35 @@ import java.util.function.Function;
 
 /**
  * Identifies a configuration version along with migrations to update previous versions.
+ * <br>
+ * Configuration objects can be specified with a <code>static</code> field that
+ * represents their current version.
+ * Each migration must specify the version it refers to.
+ * <br>
+ * Example:
+ * <pre>{@code
+ * @Data
+ * @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+ * public class Configuration {
+ *
+ *     private static final ConfigVersion version = ConfigVersion.of(3.0) // current version is 3.0
+ *             .migrate(2.0, m -> m // version 2.0 migrations from 1.0 (default base version)
+ *                     .add("port", 8080)
+ *                     .rename("hostname", "host")
+ *             )
+ *             .migrate(3.0, m -> m // version 3.0 migrations from 2.0
+ *                     .add("timeoutSeconds", 60 * 5)
+ *                     .remove("ssl")
+ *             );
+ *
+ *     String hostname;
+ *
+ *     int port = 8080;
+ *
+ *     int timeoutSeconds = 60 * 5;
+ *
+ * }
+ * }</pre>
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConfigVersion {
