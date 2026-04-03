@@ -5,7 +5,48 @@ import spock.lang.Specification
 
 import java.nio.file.Files
 
-abstract class MigrationConfigurationAdapterTest extends Specification {
+abstract class ConfigurationAdapterTest extends Specification {
+
+    def 'test that load correctly loads file'() {
+        given:
+        def file = getFile('load')
+
+        and:
+        def adapter = getAdapter()
+
+        when:
+        def actual = adapter.load(file, MockConfig)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        actual == new MockConfig(
+                false,
+                'Blocksmith',
+                supportsNull() ? null : '',
+                ['Fulminazzo', 'Camilla', 'Alex'],
+                new MockConfig.Internal(1.0, isProperties() ? false : null)
+        )
+    }
+
+    def 'test that store correctly saves file'() {
+        given:
+        def file = getFile('store')
+        if (file.exists()) file.delete()
+
+        and:
+        def adapter = getAdapter()
+
+        when:
+        adapter.store(file, new MockConfig())
+
+        then:
+        noExceptionThrown()
+
+        and:
+        file.readLines() == getExpectedStoreLines()
+    }
 
     def 'test that configuration with #data is correctly migrated'() {
         given:
@@ -57,9 +98,23 @@ abstract class MigrationConfigurationAdapterTest extends Specification {
         ]
     }
 
+    /**
+     * Special case for properties tests that do not support <code>null</code>
+     * under any circumstance.
+     *
+     * @return <code>true</code> if the test is for the properties configuration adapter
+     */
+    protected boolean isProperties() {
+        return false
+    }
+
+    protected abstract boolean supportsNull()
+
     protected abstract File getFile(final String name)
 
     protected abstract BaseConfigurationAdapter getAdapter()
+
+    protected abstract List<String> getExpectedStoreLines()
 
     private static Map<String, Object> renameMap(final Map<String, Object> map, final PropertyNamingStrategy strategy) {
         if (strategy == null) return map

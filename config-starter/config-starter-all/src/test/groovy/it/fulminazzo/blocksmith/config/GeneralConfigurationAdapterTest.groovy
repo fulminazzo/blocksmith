@@ -4,7 +4,7 @@ import groovy.util.logging.Slf4j
 import spock.lang.Specification
 
 @Slf4j
-class ConfigurationAdapterTest extends Specification {
+class GeneralConfigurationAdapterTest extends Specification {
 
     def 'test documentation functioning'() {
         given:

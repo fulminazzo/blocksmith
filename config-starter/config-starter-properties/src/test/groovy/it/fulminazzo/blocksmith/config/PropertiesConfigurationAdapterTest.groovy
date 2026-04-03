@@ -1,50 +1,33 @@
 package it.fulminazzo.blocksmith.config
 
 import groovy.util.logging.Slf4j
-import spock.lang.Specification
 
 @Slf4j
-class PropertiesConfigurationAdapterTest extends MigrationConfigurationAdapterTest {
+class PropertiesConfigurationAdapterTest extends ConfigurationAdapterTest {
 
-    def 'test that load correctly loads file'() {
-        given:
-        def file = getFile('load')
-
-        and:
-        def adapter = getAdapter()
-
-        when:
-        def actual = adapter.load(file, MockConfig)
-
-        then:
-        noExceptionThrown()
-
-        and:
-        actual == new MockConfig(
-                false,
-                'Blocksmith',
-                '',
-                ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0, false)
-        )
+    @Override
+    protected boolean isProperties() {
+        return true
     }
 
-    def 'test that store correctly saves file'() {
-        given:
-        def file = getFile('store')
-        if (file.exists()) file.delete()
+    @Override
+    protected boolean supportsNull() {
+        return false
+    }
 
-        and:
-        def adapter = getAdapter()
+    @Override
+    protected File getFile(final String name) {
+        return new File("build/resources/test/${name}.properties")
+    }
 
-        when:
-        adapter.store(file, new MockConfig())
+    @Override
+    protected BaseConfigurationAdapter getAdapter() {
+        return new PropertiesConfigurationAdapter(log)
+    }
 
-        then:
-        noExceptionThrown()
-
-        and:
-        file.readLines() == [
+    @Override
+    protected List<String> getExpectedStoreLines() {
+        return  [
                 '# Example comment',
                 'commentsEnabled=true',
                 '# This comment should be',
@@ -58,14 +41,6 @@ class PropertiesConfigurationAdapterTest extends MigrationConfigurationAdapterTe
                 'internal.version=1.0',
                 'internal.verified='
         ]
-    }
-
-    File getFile(final String name) {
-        return new File("build/resources/test/${name}.properties")
-    }
-
-    BaseConfigurationAdapter getAdapter() {
-        return new PropertiesConfigurationAdapter(log)
     }
 
 }
