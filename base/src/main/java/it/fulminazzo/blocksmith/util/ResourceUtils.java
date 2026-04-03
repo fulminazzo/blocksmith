@@ -266,7 +266,7 @@ public final class ResourceUtils {
         try (Stream<Path> stream = Files.walk(directory)) {
             stream.filter(Files::isRegularFile)
                     .map(directory::relativize)
-                    .map(Path::toString)
+                    .map(p -> p.toString().replace(File.separatorChar, '/'))
                     .filter(filter)
                     .forEach(results::add);
         }
