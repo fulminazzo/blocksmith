@@ -26,6 +26,14 @@ class ScheduledExpiringMapDelayedTest extends Specification {
         internal = Reflect.on(map).get('delegate').get()
     }
 
+    def 'test that initialization of invalid duration throws'() {
+        when:
+        new ScheduledExpiringMap<>(scheduler, Duration.ofSeconds(0))
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
     def 'test that getExpiring returns null if expired but not yet removed'() {
         given:
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)

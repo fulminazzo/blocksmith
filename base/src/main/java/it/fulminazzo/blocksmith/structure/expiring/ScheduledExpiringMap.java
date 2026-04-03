@@ -28,7 +28,10 @@ final class ScheduledExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
      */
     public ScheduledExpiringMap(final @NotNull ScheduledExecutorService scheduler,
                                 final @NotNull Duration taskInterval) {
-        scheduler.scheduleAtFixedRate(this::clearExpired, taskInterval.toMillis(), taskInterval.toMillis(), TimeUnit.MILLISECONDS);
+        long millis = taskInterval.toMillis();
+        if (millis <= 0)
+            throw new IllegalArgumentException("task interval must be greater than 0");
+        scheduler.scheduleAtFixedRate(this::clearExpired, millis, millis, TimeUnit.MILLISECONDS);
     }
 
     @Override
