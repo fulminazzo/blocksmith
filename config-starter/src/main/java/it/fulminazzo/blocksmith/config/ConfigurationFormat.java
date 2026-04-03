@@ -57,6 +57,16 @@ public enum ConfigurationFormat {
     }
 
     /**
+     * Checks if the file name matches the current format.
+     *
+     * @param fileName the file name
+     * @return <code>true</code> if it matches
+     */
+    public boolean matches(final @NotNull String fileName) {
+        return fileName.endsWith("." + fileExtension);
+    }
+
+    /**
      * Gets the corresponding file with the extension of the current format.
      *
      * @param parentDir the parent folder
@@ -66,6 +76,20 @@ public enum ConfigurationFormat {
     public @NotNull File getFile(final @NotNull File parentDir,
                                  final @NotNull String fileName) {
         return new File(parentDir, fileName + "." + fileExtension);
+    }
+
+    /**
+     * Gets the format from the file extension.
+     *
+     * @param fileName the file name
+     * @return the format
+     * @throws IllegalArgumentException if the file extension is not supported
+     */
+    public static @NotNull ConfigurationFormat fromExtension(final @NotNull String fileName) {
+        for (ConfigurationFormat format : values())
+            if (format.matches(fileName))
+                return format;
+        throw new IllegalArgumentException("Unsupported file extension: " + fileName);
     }
 
 }
