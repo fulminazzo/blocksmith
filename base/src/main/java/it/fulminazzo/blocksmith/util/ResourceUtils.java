@@ -96,7 +96,7 @@ public final class ResourceUtils {
                                                 final @NotNull String resource,
                                                 final @NotNull Path directory) throws IOException {
         Path target = directory.resolve(getResourceName(resource));
-        if (target.toFile().exists()) return target;
+        if (Files.exists(target)) return target;
         else return extract(classLoader, resource, directory);
     }
 
