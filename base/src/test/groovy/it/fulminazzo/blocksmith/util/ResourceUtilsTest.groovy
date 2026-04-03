@@ -47,14 +47,36 @@ class ResourceUtilsTest extends Specification {
 
         where:
         arguments                                                                      || expected
+        // simple
         ['test.txt', extractTestsDirectory]                                            || ['Hello, world!']
         [ResourceUtils.classLoader, 'test.txt', extractTestsDirectory]                 || ['Hello, world!']
         ['test.txt', extractTestsDirectory.toPath()]                                   || ['Hello, world!']
         [ResourceUtils.classLoader, 'test.txt', extractTestsDirectory.toPath()]        || ['Hello, world!']
+        // nested
         ['data/schema.sql', extractTestsDirectory]                                     || ['CREATE TABLE secret (id INT);']
         [ResourceUtils.classLoader, 'data/schema.sql', extractTestsDirectory]          || ['CREATE TABLE secret (id INT);']
         ['data/schema.sql', extractTestsDirectory.toPath()]                            || ['CREATE TABLE secret (id INT);']
         [ResourceUtils.classLoader, 'data/schema.sql', extractTestsDirectory.toPath()] || ['CREATE TABLE secret (id INT);']
+    }
+
+    def 'test that #method with invalid resource throws'() {
+        when:
+        ResourceUtils."$method"(*arguments)
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.message =~ '.*\'not_existing.zip\'.*'
+
+        where:
+        method        | arguments
+        // getResource
+        'getResource' | ['not_existing.zip']
+        'getResource' | [ResourceUtils.classLoader, 'not_existing.zip']
+        // extract
+        'extract'     | ['not_existing.zip', extractTestsDirectory]
+        'extract'     | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory]
+        'extract'     | ['not_existing.zip', extractTestsDirectory.toPath()]
+        'extract'     | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory.toPath()]
     }
 
 }
