@@ -214,7 +214,7 @@ class ResourceUtilsTest extends Specification {
         ResourceUtils.loadFromFileSystem(testResourcesDirectory.toURI().toURL(), '', results, predicate)
 
         then:
-        results == expected
+        results.sort() == expected.sort()
 
         where:
         predicate                                           || expected
