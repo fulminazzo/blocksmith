@@ -40,7 +40,7 @@ class MemoryRepositoryTest extends RepositoryTest<MemoryRepository<User, Long>> 
 
     @Override
     void insert(final @NotNull User entity) {
-        engine.internalMap.put(entity.id, entity)
+        engine.internalMap.put(entity.id, entity, 3600_000)
     }
 
     @Override
