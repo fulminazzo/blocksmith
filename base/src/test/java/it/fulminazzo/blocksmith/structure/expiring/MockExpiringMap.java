@@ -23,6 +23,7 @@ public class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     public int size() {
+        clearExpired();
         return delegate.size();
     }
 

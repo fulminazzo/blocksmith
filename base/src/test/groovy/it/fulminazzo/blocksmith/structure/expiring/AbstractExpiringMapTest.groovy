@@ -604,6 +604,9 @@ class AbstractExpiringMapTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1000L)
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 1L)
 
+        and:
+        sleep(5L)
+
         when:
         def string = map.toString()
 
