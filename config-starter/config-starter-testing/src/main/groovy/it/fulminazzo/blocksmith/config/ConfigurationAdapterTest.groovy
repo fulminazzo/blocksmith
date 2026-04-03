@@ -7,12 +7,23 @@ import java.nio.file.Files
 
 abstract class ConfigurationAdapterTest extends Specification {
 
+    def 'test that load correctly loads raw data'() {
+        given:
+        def data = getFile('load').readLines().join('\n')
+
+        when:
+        def actual = adapter.load(data, MockConfig)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        actual == expectedConfig
+    }
+
     def 'test that load correctly loads file'() {
         given:
         def file = getFile('load')
-
-        and:
-        def adapter = getAdapter()
 
         when:
         def actual = adapter.load(file, MockConfig)
@@ -21,22 +32,30 @@ abstract class ConfigurationAdapterTest extends Specification {
         noExceptionThrown()
 
         and:
-        actual == new MockConfig(
-                false,
-                'Blocksmith',
-                supportsNull() ? null : '',
-                ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0, isProperties() ? false : null)
-        )
+        actual == expectedConfig
+    }
+
+    def 'test that load correctly loads stream'() {
+        given:
+        def stream = new FileInputStream(getFile('load'))
+
+        when:
+        def actual = adapter.load(stream, MockConfig)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        actual == expectedConfig
+
+        and:
+        !stream.channel.open
     }
 
     def 'test that store correctly saves file'() {
         given:
         def file = getFile('store')
         if (file.exists()) file.delete()
-
-        and:
-        def adapter = getAdapter()
 
         when:
         adapter.store(file, new MockConfig())
@@ -96,6 +115,16 @@ abstract class ConfigurationAdapterTest extends Specification {
                 ],
                 new MigrationConfig()
         ]
+    }
+
+    protected MockConfig getExpectedConfig() {
+        return new MockConfig(
+                false,
+                'Blocksmith',
+                supportsNull() ? null : '',
+                ['Fulminazzo', 'Camilla', 'Alex'],
+                new MockConfig.Internal(1.0, isProperties() ? false : null)
+        )
     }
 
     /**
