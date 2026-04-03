@@ -278,65 +278,64 @@ public final class ResourceUtils {
         return listResources(classLoader, packageName.replace(".", "/"), filter).stream()
                 .filter(r -> r.endsWith(extension))
                 .map(r -> r.substring(0, r.length() - extension.length()).replace("/", "."))
-                .map(r -> r.startsWith(packageName) ? r : packageName + "." + r)
                 .collect(Collectors.toList());
     }
 
     /**
      * Lists all the resources of the current classloader in the specified folder.
      *
-     * @param resourceFolder the resources folder (should NOT have a preceding "/")
+     * @param resourcesFolder the resources folder (should NOT have a preceding "/")
      * @return the list of resources
      * @throws IOException if an error occurs while listing the resources
      */
-    public static @NotNull List<String> listResources(final @NotNull String resourceFolder) throws IOException {
-        return listResources(resourceFolder, s -> true);
+    public static @NotNull List<String> listResources(final @NotNull String resourcesFolder) throws IOException {
+        return listResources(resourcesFolder, s -> true);
     }
 
     /**
      * Lists all the resources of the current classloader in the specified folder.
      *
-     * @param classLoader    the classloader
-     * @param resourceFolder the resources folder (should NOT have a preceding "/")
+     * @param classLoader     the classloader
+     * @param resourcesFolder the resources folder (should NOT have a preceding "/")
      * @return the list of resources
      * @throws IOException if an error occurs while listing the resources
      */
     public static @NotNull List<String> listResources(final @NotNull ClassLoader classLoader,
-                                                      final @NotNull String resourceFolder) throws IOException {
-        return listResources(classLoader, resourceFolder, s -> true);
+                                                      final @NotNull String resourcesFolder) throws IOException {
+        return listResources(classLoader, resourcesFolder, s -> true);
     }
 
     /**
      * Lists all the resources of the current classloader that match the filter in the specified folder.
      *
-     * @param resourceFolder the resources folder (should NOT have a preceding "/")
-     * @param filter         the filter to apply to the resources
+     * @param resourcesFolder the resources folder (should NOT have a preceding "/")
+     * @param filter          the filter to apply to the resources
      * @return the list of resources
      * @throws IOException if an error occurs while listing the resources
      */
-    public static @NotNull List<String> listResources(final @NotNull String resourceFolder,
+    public static @NotNull List<String> listResources(final @NotNull String resourcesFolder,
                                                       final @NotNull Predicate<String> filter) throws IOException {
-        return listResources(classLoader, resourceFolder, filter);
+        return listResources(classLoader, resourcesFolder, filter);
     }
 
     /**
      * Lists all the resources of the given classloader that match the filter in the specified folder.
      *
-     * @param classLoader    the classloader
-     * @param resourceFolder the resources folder (should NOT have a preceding "/")
-     * @param filter         the filter to apply to the resources
+     * @param classLoader     the classloader
+     * @param resourcesFolder the resources folder (should NOT have a preceding "/")
+     * @param filter          the filter to apply to the resources
      * @return the list of resources
      * @throws IOException if an error occurs while listing the resources
      */
     public static @NotNull List<String> listResources(final @NotNull ClassLoader classLoader,
-                                                      final @NotNull String resourceFolder,
+                                                      final @NotNull String resourcesFolder,
                                                       final @NotNull Predicate<String> filter) throws IOException {
         final List<String> results = new ArrayList<>();
-        final Enumeration<URL> urls = classLoader.getResources(resourceFolder);
+        final Enumeration<URL> urls = classLoader.getResources(resourcesFolder);
         while (urls.hasMoreElements()) {
             final URL url = urls.nextElement();
             if (url.getProtocol().equals("jar")) loadFromJar(url, results, filter);
-            else loadFromFileSystem(url, results, filter);
+            else loadFromFileSystem(url, resourcesFolder, results, filter);
         }
         return results;
     }
@@ -353,6 +352,7 @@ public final class ResourceUtils {
                             final @NotNull List<String> results,
                             final @NotNull Predicate<String> filter) throws IOException {
         JarURLConnection connection = (JarURLConnection) url.openConnection();
+        connection.setUseCaches(false);
         String entryPrefix = connection.getEntryName();
         try (JarFile jarFile = connection.getJarFile()) {
             jarFile.stream()
@@ -367,19 +367,24 @@ public final class ResourceUtils {
     /**
      * Loads all the files from the given URL that match the filter.
      *
-     * @param url     the URL to load from
-     * @param results the list to add the results to
-     * @param filter  the filter to apply to the files
+     * @param url             the URL to load from
+     * @param resourcesFolder the folder to prepend to every file path
+     * @param results         the list to add the results to
+     * @param filter          the filter to apply to the files
      * @throws IOException if an error occurs while loading the files
      */
     static void loadFromFileSystem(final @NotNull URL url,
+                                   final @NotNull String resourcesFolder,
                                    final @NotNull List<String> results,
                                    final @NotNull Predicate<String> filter) throws IOException {
+        final char separator = '/';
         final Path directory = Path.of(url.getPath());
         try (Stream<Path> stream = Files.walk(directory)) {
             stream.filter(Files::isRegularFile)
                     .map(directory::relativize)
-                    .map(p -> p.toString().replace(File.separatorChar, '/'))
+                    .map(p -> (resourcesFolder.isEmpty() ? "" : resourcesFolder + separator) +
+                            p.toString().replace(File.separatorChar, separator)
+                    )
                     .filter(filter)
                     .forEach(results::add);
         }

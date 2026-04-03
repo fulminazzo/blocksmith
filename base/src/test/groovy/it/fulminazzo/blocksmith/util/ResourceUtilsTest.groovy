@@ -211,7 +211,7 @@ class ResourceUtilsTest extends Specification {
         def results = []
 
         when:
-        ResourceUtils.loadFromFileSystem(testResourcesDirectory.toURI().toURL(), results, predicate)
+        ResourceUtils.loadFromFileSystem(testResourcesDirectory.toURI().toURL(), '', results, predicate)
 
         then:
         results == expected
