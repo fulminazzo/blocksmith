@@ -73,6 +73,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         Config config = toNightConfig(configuration);
         OutputStreamWriter writer = new OutputStreamWriter(stream);
         newTomlWriter().write(config, writer);
+        writer.close();
     }
 
     private <T> @NotNull Config toNightConfig(@NotNull T configuration) {
