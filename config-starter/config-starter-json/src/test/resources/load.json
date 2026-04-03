@@ -1,0 +1,10 @@
+{
+  "commentsEnabled": false,
+  "name": "Blocksmith",
+  "description": null,
+  "authors": ["Fulminazzo", "Camilla", "Alex"],
+  "internal": {
+    "version": true,
+    "verified": null
+  }
+}
