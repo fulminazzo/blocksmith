@@ -7,9 +7,13 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * A collection of utilities to work with resources.
@@ -158,6 +162,27 @@ public final class ResourceUtils {
             Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
             return path;
         }
+    }
+
+    /**
+     * Loads all the files from the given URL that match the filter.
+     *
+     * @param url     the URL to load from
+     * @param results the list to add the results to
+     * @param filter  the filter to apply to the files
+     * @throws IOException if an error occurs while loading the files
+     */
+    static void loadFromFileSystem(final @NotNull URL url,
+                                   final @NotNull List<String> results,
+                                   final @NotNull Predicate<String> filter) throws IOException {
+        final Path directory = Path.of(url.getPath());
+            try (Stream<Path> stream = Files.walk(directory)) {
+                stream.filter(Files::isRegularFile)
+                        .map(directory::relativize)
+                        .map(Path::toString)
+                        .filter(filter)
+                        .forEach(results::add);
+            }
     }
 
     private static @NotNull String getResourceName(final @NotNull String resource) {

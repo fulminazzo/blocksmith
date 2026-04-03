@@ -3,8 +3,10 @@ package it.fulminazzo.blocksmith.util
 import spock.lang.Specification
 
 import java.nio.file.Path
+import java.util.function.Predicate
 
 class ResourceUtilsTest extends Specification {
+    private static final File testResourcesDirectory = new File('src/test/resources')
     private static final File extractTestsDirectory = new File('build/resources/test/resource_utils/extract')
     private static final File extractIfAbsentTestsDirectory = new File('build/resources/test/resource_utils/extract_absent')
 
@@ -121,6 +123,24 @@ class ResourceUtilsTest extends Specification {
         'extract'         | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory]
         'extract'         | ['not_existing.zip', extractTestsDirectory.toPath()]
         'extract'         | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory.toPath()]
+    }
+
+    def 'test that loadFromFileSystem of #url and predicate returns #expected'() {
+        given:
+        def results = []
+
+        when:
+        ResourceUtils.loadFromFileSystem(testResourcesDirectory.toURI().toURL(), results, predicate)
+
+        then:
+        results == expected
+
+        where:
+        predicate                                           || expected
+        (Predicate<String>) ((f) -> true)                   || ['test.txt', 'data/schema.sql']
+        (Predicate<String>) ((f) -> f == 'test.txt')        || ['test.txt']
+        (Predicate<String>) ((f) -> f == 'data/schema.sql') || ['data/schema.sql']
+        (Predicate<String>) ((f) -> false)                  || []
     }
 
 }
