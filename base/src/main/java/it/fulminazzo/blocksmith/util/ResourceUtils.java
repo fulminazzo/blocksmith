@@ -13,7 +13,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.jar.JarFile;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
 
 /**
  * A collection of utilities to work with resources.
@@ -161,6 +163,26 @@ public final class ResourceUtils {
             Path path = directory.resolve(fileName);
             Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
             return path;
+        }
+    }
+
+    /**
+     * Loads all the resources of the given JAR URL that match the filter.
+     *
+     * @param url the JAR URL
+     * @param results the list to add the results to
+     * @param filter the filter to apply to the resources
+     * @throws IOException if an error occurs while loading the resources
+     */
+    static void loadFromJar(final @NotNull URL url,
+                            final @NotNull List<String> results,
+                            final @NotNull Predicate<String> filter) throws IOException {
+        try (JarFile jarFile = new JarFile(url.getFile())) {
+            jarFile.stream()
+                    .filter(jarEntry -> !jarEntry.isDirectory())
+                    .map(ZipEntry::getName)
+                    .filter(filter)
+                    .forEach(results::add);
         }
     }
 

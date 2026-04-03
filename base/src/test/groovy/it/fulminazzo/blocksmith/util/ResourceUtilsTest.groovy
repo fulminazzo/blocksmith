@@ -2,8 +2,11 @@ package it.fulminazzo.blocksmith.util
 
 import spock.lang.Specification
 
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.function.Predicate
+import java.util.jar.JarEntry
+import java.util.jar.JarOutputStream
 
 class ResourceUtilsTest extends Specification {
     private static final File testResourcesDirectory = new File('src/test/resources')
@@ -125,7 +128,28 @@ class ResourceUtilsTest extends Specification {
         'extract'         | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory.toPath()]
     }
 
-    def 'test that loadFromFileSystem of #url and predicate returns #expected'() {
+    def 'test that loadFromJar with predicate returns #expected'() {
+        given:
+        def results = []
+
+        and:
+        def jar = createTestJar()
+
+        when:
+        ResourceUtils.loadFromJar(jar.toUri().toURL(), results, predicate)
+
+        then:
+        results == expected
+
+        where:
+        predicate                                           || expected
+        (Predicate<String>) ((f) -> true)                   || ['test.txt', 'data/schema.sql']
+        (Predicate<String>) ((f) -> f == 'test.txt')        || ['test.txt']
+        (Predicate<String>) ((f) -> f == 'data/schema.sql') || ['data/schema.sql']
+        (Predicate<String>) ((f) -> false)                  || []
+    }
+
+    def 'test that loadFromFileSystem with predicate returns #expected'() {
         given:
         def results = []
 
@@ -141,6 +165,22 @@ class ResourceUtilsTest extends Specification {
         (Predicate<String>) ((f) -> f == 'test.txt')        || ['test.txt']
         (Predicate<String>) ((f) -> f == 'data/schema.sql') || ['data/schema.sql']
         (Predicate<String>) ((f) -> false)                  || []
+    }
+
+    private Path createTestJar() {
+        final Map<String, String> entries = [
+                'test.txt'       : 'Hello, world!',
+                'data/schema.sql': 'CREATE TABLE secret (id INT);'
+        ]
+        Path jar = Files.createTempFile('test-resources', '.jar')
+        new JarOutputStream(Files.newOutputStream(jar)).withCloseable { o ->
+            entries.each { n, c ->
+                o.putNextEntry(new JarEntry(n))
+                o.write(c.bytes)
+                o.closeEntry()
+            }
+        }
+        return jar
     }
 
 }
