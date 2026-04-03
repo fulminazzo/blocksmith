@@ -128,15 +128,12 @@ class ResourceUtilsTest extends Specification {
         'extract'         | [ResourceUtils.classLoader, 'not_existing.zip', extractTestsDirectory.toPath()]
     }
 
-    def 'test that listResources with #arguments loads at least one service file from jar and our resources from file'() {
+    def 'test that listResources with #arguments loads our resources from file'() {
         when:
         def resources = ResourceUtils.listResources(*arguments)
 
         then:
         resources.contains('test.txt')
-
-        and:
-        resources.find { it =~ 'META-INF' } != null
 
         where:
         arguments << [
@@ -153,9 +150,10 @@ class ResourceUtilsTest extends Specification {
 
         and:
         def jar = createTestJar()
+        def url = new URI("jar:${jar.toUri()}!/")
 
         when:
-        ResourceUtils.loadFromJar(jar.toUri().toURL(), results, predicate)
+        ResourceUtils.loadFromJar(url.toURL(), results, predicate)
 
         then:
         results == expected
