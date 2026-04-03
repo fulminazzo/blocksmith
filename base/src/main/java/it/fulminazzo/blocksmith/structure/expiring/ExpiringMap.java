@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -89,8 +90,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param oldValue the old value
      * @param newValue the new value
      * @param ttl      the time-to-live (after which it will expire)
-     * @return <code>true</code> if the replacement was successful,
-     * <code>false</code> if no element matching the pair was found
+     * @return <code>true</code> if the replacement was successful, <code>false</code> if no element matching the pair was found
      */
     boolean replace(final @Nullable K key,
                     final @Nullable V oldValue,
@@ -104,8 +104,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param oldValue the old value
      * @param newValue the new value
      * @param ttl      the time-to-live (after which it will expire) in milliseconds
-     * @return <code>true</code> if the replacement was successful,
-     * <code>false</code> if no element matching the pair was found
+     * @return <code>true</code> if the replacement was successful, <code>false</code> if no element matching the pair was found
      */
     boolean replace(final @Nullable K key,
                     final @Nullable V oldValue,
@@ -321,5 +320,35 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param ttl the new time-to-live in milliseconds
      */
     void renew(final @Nullable K key, final long ttl);
+
+    /**
+     * Initializes a new lazy ExpirationMap.
+     * <br>
+     * The key-value pairs will persist in memory until an operation has been done
+     * to the map itself, at which point the expired elements will be removed.
+     *
+     * @param <K> the type of the keys
+     * @param <V> the type of the values
+     * @return the map
+     */
+    static <K, V> @NotNull ExpiringMap<K, V> lazy() {
+        return new LazyExpiringMap<>();
+    }
+
+    /**
+     * Initializes a new scheduled ExpirationMap.
+     * <br>
+     * The key-value pairs will be periodically check for expiration and be removed.
+     *
+     * @param <K>          the type of the keys
+     * @param <V>          the type of the values
+     * @param scheduler    the scheduler that will handle the periodical removal
+     * @param taskInterval the interval upon which to check expirations
+     * @return the map
+     */
+    static <K, V> @NotNull ExpiringMap<K, V> scheduled(final @NotNull ScheduledExecutorService scheduler,
+                                                       final @NotNull Duration taskInterval) {
+        return new ScheduledExpiringMap<>(scheduler, taskInterval);
+    }
 
 }
