@@ -5,10 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -235,6 +232,15 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     @Override
     public void putAll(final @NotNull Map<? extends K, ? extends V> map) {
         throw getPutNotSupportedException();
+    }
+
+    /**
+     * Manually removes all the expired entries.
+     */
+    public void clearExpired() {
+        for (Entry<K, ExpiringEntry<V>> entry : new ArrayList<>(delegate.entrySet()))
+            if (entry.getValue().isExpired())
+                delegate.remove(entry.getKey());
     }
 
     @Override

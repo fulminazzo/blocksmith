@@ -72,10 +72,4 @@ final class LazyExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
         return super.entrySet();
     }
 
-    private void clearExpired() {
-        for (Entry<K, ExpiringEntry<V>> entry : new ArrayList<>(delegate.entrySet()))
-            if (entry.getValue().isExpired())
-                delegate.remove(entry.getKey());
-    }
-
 }
