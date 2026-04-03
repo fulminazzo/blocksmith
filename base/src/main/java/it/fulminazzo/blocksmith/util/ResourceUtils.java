@@ -11,6 +11,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.jar.JarFile;
@@ -167,11 +169,70 @@ public final class ResourceUtils {
     }
 
     /**
+     * Lists all the resources of the current classloader in the specified folder.
+     *
+     * @param resourceFolder the resources folder
+     * @return the list of resources
+     * @throws IOException if an error occurs while listing the resources
+     */
+    public static @NotNull List<String> listResources(final @NotNull String resourceFolder) throws IOException {
+        return listResources(resourceFolder, s -> true);
+    }
+
+    /**
+     * Lists all the resources of the current classloader in the specified folder.
+     *
+     * @param classLoader    the classloader
+     * @param resourceFolder the resources folder
+     * @return the list of resources
+     * @throws IOException if an error occurs while listing the resources
+     */
+    public static @NotNull List<String> listResources(final @NotNull ClassLoader classLoader,
+                                                      final @NotNull String resourceFolder) throws IOException {
+        return listResources(classLoader, resourceFolder, s -> true);
+    }
+
+    /**
+     * Lists all the resources of the current classloader that match the filter in the specified folder.
+     *
+     * @param resourceFolder the resources folder
+     * @param filter         the filter to apply to the resources
+     * @return the list of resources
+     * @throws IOException if an error occurs while listing the resources
+     */
+    public static @NotNull List<String> listResources(final @NotNull String resourceFolder,
+                                                      final @NotNull Predicate<String> filter) throws IOException {
+        return listResources(classLoader, resourceFolder, filter);
+    }
+
+    /**
+     * Lists all the resources of the given classloader that match the filter in the specified folder.
+     *
+     * @param classLoader    the classloader
+     * @param resourceFolder the resources folder
+     * @param filter         the filter to apply to the resources
+     * @return the list of resources
+     * @throws IOException if an error occurs while listing the resources
+     */
+    public static @NotNull List<String> listResources(final @NotNull ClassLoader classLoader,
+                                                      final @NotNull String resourceFolder,
+                                                      final @NotNull Predicate<String> filter) throws IOException {
+        final List<String> results = new ArrayList<>();
+        final Enumeration<URL> urls = classLoader.getResources(resourceFolder);
+        while (urls.hasMoreElements()) {
+            final URL url = urls.nextElement();
+            if (url.getProtocol().equals("jar")) loadFromJar(url, results, filter);
+            else loadFromFileSystem(url, results, filter);
+        }
+        return results;
+    }
+
+    /**
      * Loads all the resources of the given JAR URL that match the filter.
      *
-     * @param url the JAR URL
+     * @param url     the JAR URL
      * @param results the list to add the results to
-     * @param filter the filter to apply to the resources
+     * @param filter  the filter to apply to the resources
      * @throws IOException if an error occurs while loading the resources
      */
     static void loadFromJar(final @NotNull URL url,
@@ -198,13 +259,13 @@ public final class ResourceUtils {
                                    final @NotNull List<String> results,
                                    final @NotNull Predicate<String> filter) throws IOException {
         final Path directory = Path.of(url.getPath());
-            try (Stream<Path> stream = Files.walk(directory)) {
-                stream.filter(Files::isRegularFile)
-                        .map(directory::relativize)
-                        .map(Path::toString)
-                        .filter(filter)
-                        .forEach(results::add);
-            }
+        try (Stream<Path> stream = Files.walk(directory)) {
+            stream.filter(Files::isRegularFile)
+                    .map(directory::relativize)
+                    .map(Path::toString)
+                    .filter(filter)
+                    .forEach(results::add);
+        }
     }
 
     private static @NotNull String getResourceName(final @NotNull String resource) {
