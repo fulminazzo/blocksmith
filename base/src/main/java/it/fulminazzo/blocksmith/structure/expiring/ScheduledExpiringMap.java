@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +33,12 @@ final class ScheduledExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     protected @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
-        return delegate.get(key);
+        ExpiringEntry<V> entry = delegate.get(key);
+        if (entry == null) return null;
+        else if (entry.isExpired()) {
+            delegate.remove(key);
+            return null;
+        } else return entry;
     }
 
     @Override
@@ -49,29 +53,35 @@ final class ScheduledExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     public boolean containsKey(final Object key) {
-        return delegate.containsKey(key);
+        return getExpiring(key) != null;
     }
 
     @Override
     public V get(final Object key) {
-        ExpiringEntry<V> entry = delegate.get(key);
+        ExpiringEntry<V> entry = getExpiring(key);
         return entry == null ? null : entry.getValue();
     }
 
     @Override
     public V remove(final Object key) {
         ExpiringEntry<V> entry = delegate.remove(key);
-        return entry == null ? null : entry.getValue();
+        return entry == null || entry.isExpired() ? null : entry.getValue();
     }
 
     @Override
     public @NotNull Set<K> keySet() {
-        return new HashSet<>(delegate.keySet());
+        return delegate.entrySet().stream()
+                .filter(e -> !e.getValue().isExpired())
+                .map(Entry::getKey)
+                .collect(Collectors.toSet());
     }
 
     @Override
     public @NotNull Collection<V> values() {
-        return delegate.values().stream().map(ExpiringEntry::getValue).collect(Collectors.toList());
+        return delegate.values().stream()
+                .filter(e -> !e.isExpired())
+                .map(ExpiringEntry::getValue)
+                .collect(Collectors.toList());
     }
 
 }
