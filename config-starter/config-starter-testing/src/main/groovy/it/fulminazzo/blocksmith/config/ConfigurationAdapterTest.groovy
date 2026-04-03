@@ -52,6 +52,20 @@ abstract class ConfigurationAdapterTest extends Specification {
         !stream.channel.open
     }
 
+    def 'test that loadResource correctly loads resource'() {
+        given:
+        def file = getFile('load').name
+
+        when:
+        def actual = adapter.loadFromResource(file, MockConfig)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        actual == expectedConfig
+    }
+
     def 'test that serialize correctly writes data'() {
         given:
         def expected = (toml
@@ -110,6 +124,24 @@ abstract class ConfigurationAdapterTest extends Specification {
 
         and:
         !output.channel.open
+    }
+
+    def 'test that extractAndLoad does not overwrite file if existing'() {
+        given:
+        def file = getFile('load')
+        def lastUpdate = file.lastModified()
+
+        when:
+        def actual = adapter.extractAndLoad(file.name, file.parentFile, MockConfig)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        actual == expectedConfig
+
+        and:
+        file.lastModified() == lastUpdate
     }
 
     def 'test that configuration with #data is correctly migrated'() {
