@@ -555,6 +555,18 @@ class AbstractExpiringMapTest extends Specification {
         'putAll'          | [[:]]
     }
 
+    def 'test that toString correctly prints expired entries'() {
+        given:
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1000L)
+        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 1L)
+
+        when:
+        def string = map.toString()
+
+        then:
+        string == '{Hello=world, Goodbye=*mars}'
+    }
+
     /**
      * ExpiringEntryMapEntry
      */

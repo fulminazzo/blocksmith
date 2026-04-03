@@ -278,6 +278,11 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
         return new UnsupportedOperationException(getClass().getSimpleName() + " does not support put without TTL");
     }
 
+    @Override
+    public @NotNull String toString() {
+        return delegate.toString();
+    }
+
     /**
      * Checks if the given time-to-live is valid.
      *
@@ -334,6 +339,11 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
         public void setTimeToLive(final long ttl) {
             checkTtl(ttl);
             this.expireTime = now() + ttl;
+        }
+
+        @Override
+        public @NotNull String toString() {
+            return (isExpired() ? "*" : "") + value;
         }
 
     }
