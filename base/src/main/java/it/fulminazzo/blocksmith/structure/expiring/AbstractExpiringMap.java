@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
  * @param <V> the type of the values
  */
 public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
+    private static final long NEVER_EXPIRE = Long.MAX_VALUE;
+
     protected final @NotNull Map<K, ExpiringEntry<V>> delegate = new ConcurrentHashMap<>();
 
     /**
@@ -357,7 +359,7 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
          */
         public void setTimeToLive(final long ttl) {
             checkTtl(ttl);
-            this.expireTime = now() + ttl;
+            this.expireTime = ttl == NEVER_EXPIRE ? NEVER_EXPIRE : now() + ttl;
         }
 
         @Override
