@@ -46,12 +46,8 @@ public final class MapUtils {
             String key = entry.getKey();
             Object value = entry.getValue();
             if (value instanceof Map<?, ?>) {
-                Map<?, ?> mapValue = (Map<?, ?>) value;
-                if (!mapValue.isEmpty()) {
-                    Map<String, Object> stringObjectMap = new HashMap<>();
-                    mapValue.forEach((k, v) -> stringObjectMap.put(k.toString(), v));
-                    flatten(stringObjectMap).forEach((k, v) -> flattened.put(key + "." + k, v));
-                }
+                Map<String, Object> stringObjectMap = toStringKeyMap((Map<?, ?>) value);
+                flatten(stringObjectMap).forEach((k, v) -> flattened.put(key + "." + k, v));
             } else flattened.put(key, value);
         }
         return flattened;
@@ -120,6 +116,12 @@ public final class MapUtils {
             for (int i = 0; i < array.length; i++) array[i] = convertArray(array[i]);
             return Arrays.asList(array);
         } else return object;
+    }
+
+    private static @NotNull Map<String, Object> toStringKeyMap(final @NotNull Map<?, ?> map) {
+        final Map<String, Object> stringKeyMap = new HashMap<>();
+        map.forEach((k, v) -> stringKeyMap.put(k.toString(), v));
+        return stringKeyMap;
     }
 
 }
