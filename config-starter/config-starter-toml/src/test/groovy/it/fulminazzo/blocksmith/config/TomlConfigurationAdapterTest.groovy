@@ -35,6 +35,11 @@ class TomlConfigurationAdapterTest extends ConfigurationAdapterTest {
     }
 
     @Override
+    protected boolean isToml() {
+        return true
+    }
+
+    @Override
     protected boolean supportsNull() {
         return false
     }

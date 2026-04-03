@@ -53,6 +53,12 @@ abstract class ConfigurationAdapterTest extends Specification {
     }
 
     def 'test that serialize correctly writes data'() {
+        given:
+        def expected = (toml
+                ? expectedStoreLines.collect { it.startsWith('    ') ? it.trim() : it }
+                : expectedStoreLines
+        ).join('\n').trim()
+
         when:
         def actual = adapter.serialize(new MockConfig())
 
@@ -60,7 +66,7 @@ abstract class ConfigurationAdapterTest extends Specification {
         noExceptionThrown()
 
         and:
-        actual.trim() == expectedStoreLines.join('\n').trim()
+        actual.trim() == expected
     }
 
     def 'test that store correctly saves file'() {
@@ -77,13 +83,19 @@ abstract class ConfigurationAdapterTest extends Specification {
         and:
         file.readLines() == expectedStoreLines
     }
-    
+
     def 'test that store correctly writes to stream'() {
         given:
+        def expected = (toml
+                ? expectedStoreLines.collect { it.startsWith('    ') ? it.trim() : it }
+                : expectedStoreLines
+        )
+
+        and:
         def file = getFile('store')
         if (file.exists()) file.delete()
         file.createNewFile()
-        
+
         and:
         def output = new FileOutputStream(file)
 
@@ -94,8 +106,8 @@ abstract class ConfigurationAdapterTest extends Specification {
         noExceptionThrown()
 
         and:
-        file.readLines() == expectedStoreLines
-        
+        file.readLines() == expected
+
         and:
         !output.channel.open
     }
@@ -167,6 +179,16 @@ abstract class ConfigurationAdapterTest extends Specification {
      * @return <code>true</code> if the test is for the properties configuration adapter
      */
     protected boolean isProperties() {
+        return false
+    }
+
+    /**
+     * Special case for TOML tests that do not support automatic indentation
+     * of array.
+     *
+     * @return <code>true</code> if the test is for the toml configuration adapter
+     */
+    protected boolean isToml() {
         return false
     }
 
