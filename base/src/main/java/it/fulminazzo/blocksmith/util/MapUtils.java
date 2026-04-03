@@ -176,9 +176,18 @@ public final class MapUtils {
         } else return object;
     }
 
-    private static @NotNull Map<String, Object> toStringKeyMap(final @NotNull Map<?, ?> map) {
+    /**
+     * Converts the given map to a map of {@link String} as keys.
+     * Keys that are <code>null</code> are ignored.
+     *
+     * @param map the map
+     * @return the converted map
+     */
+    public static @NotNull Map<@NotNull String, @Nullable Object> toStringKeyMap(final @NotNull Map<?, ?> map) {
         final Map<String, Object> stringKeyMap = new HashMap<>();
-        map.forEach((k, v) -> stringKeyMap.put(k.toString(), v));
+        map.forEach((k, v) -> {
+            if (k != null) stringKeyMap.put(k.toString(), v);
+        });
         return stringKeyMap;
     }
 
