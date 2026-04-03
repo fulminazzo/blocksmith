@@ -390,7 +390,13 @@ public final class ResourceUtils {
         }
     }
 
-    private static @NotNull String getResourceName(final @NotNull String resource) {
+    /**
+     * Returns the name of the resource without the path.
+     *
+     * @param resource the resource
+     * @return the name of the resource
+     */
+    public static @NotNull String getResourceName(final @NotNull String resource) {
         if (resource.contains("/")) return resource.substring(resource.lastIndexOf("/") + 1);
         else return resource;
     }
