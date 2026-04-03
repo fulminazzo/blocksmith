@@ -51,7 +51,12 @@ class MapUtilsTest extends Specification {
                 'Hello, world!',
                 ['first', 'second'],
                 [['even', 'more'], ['nested', 'collection']],
-                ['map': ['should', 'work', 'too']]
+                [
+                        'null': null,
+                        'object': 10,
+                        'collection': ['should', 'work', 'too'],
+                        'nested': ['values': [1, 2, 3]]
+                ]
         ]
 
         and:
@@ -65,9 +70,16 @@ class MapUtilsTest extends Specification {
                 'list[3][1][0]': 'nested',
                 'list[3][1][1]': 'collection',
                 'list[4]': [
-                        'map[0]': 'should',
-                        'map[1]': 'work',
-                        'map[2]': 'too'
+                        'null': null,
+                        'object': 10,
+                        'collection[0]': 'should',
+                        'collection[1]': 'work',
+                        'collection[2]': 'too',
+                        'nested': [
+                                'values[0]': 1,
+                                'values[1]': 2,
+                                'values[2]': 3
+                        ]
                 ]
         ]
 

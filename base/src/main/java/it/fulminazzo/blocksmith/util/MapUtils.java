@@ -75,6 +75,9 @@ public final class MapUtils {
      *   "players": ["Steve", "Alex"]
      * }
      * }</pre>
+     *
+     * @param map the map to unflatten
+     * @return the unflattened map
      */
     public static @NotNull Map<@NotNull String, @Nullable Object> unflatten(final @NotNull Map<@NotNull String, @Nullable Object> map) {
         final Map<String, Object> unflattened = new HashMap<>();
@@ -100,6 +103,34 @@ public final class MapUtils {
     }
 
     /**
+     * Expands the collections contained in the given map.
+     * Collections are either {@link Collection} instances or array objects.
+     * Keys <b>must not</b> be <code>null</code>.
+     * <br>
+     * Each element of the collection is put in the map in the format
+     * <code>&lt;keyPrefix&gt;[&lt;index&gt;]</code> where <code>&lt;index&gt;</code>
+     * is the index of the element.
+     *
+     * @param map the map to expand
+     * @return the expanded map
+     */
+    public static @NotNull Map<@NotNull String, @Nullable Object> expandCollections(final @NotNull Map<@NotNull String, @Nullable Object> map) {
+        final Map<@NotNull String, @Nullable Object> expanded = new HashMap<>();
+        for (Map.Entry<@NotNull String, @Nullable Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Object value = convertArray(entry.getValue());
+            if (value instanceof Map<?, ?>) {
+                Map<String, Object> stringObjectMap = toStringKeyMap((Map<?, ?>) value);
+                expanded.put(key, expandCollections(stringObjectMap));
+            } else if (value instanceof Collection<?>) {
+                Collection<?> collection = (Collection<?>) value;
+                expandCollection(expanded, collection, key);
+            } else expanded.put(key, value);
+        }
+        return expanded;
+    }
+
+    /**
      * Each element of the collection is put in the map in the format
      * <code>&lt;keyPrefix&gt;[&lt;index&gt;]</code> where <code>&lt;index&gt;</code>
      * is the index of the element.
@@ -117,7 +148,10 @@ public final class MapUtils {
         for (int i = 0; i < list.size(); i++) {
             Object value = list.get(i);
             String key = keyPrefix + String.format("[%s]", i);
-            if (value instanceof Collection<?>)
+            if (value instanceof Map<?, ?>) {
+                Map<String, Object> stringObjectMap = toStringKeyMap((Map<?, ?>) value);
+                expanded.put(key, expandCollections(stringObjectMap));
+            } else if (value instanceof Collection<?>)
                 expandCollection(expanded, (Collection<?>) value, key);
             else expanded.put(key, value);
         }
