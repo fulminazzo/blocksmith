@@ -11,6 +11,7 @@ import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.structure.Pair;
 import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.AccessLevel;
@@ -358,6 +359,7 @@ public class BeanConfigurationBuilder {
      * @return the class
      */
     static @NotNull Class<?> getTypeFromObject(final @Nullable Object value) {
+        if (value instanceof Float) return Double.class; // Floats suck
         return value == null ? nullClass : value.getClass();
     }
 
