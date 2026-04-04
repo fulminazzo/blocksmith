@@ -21,7 +21,9 @@ public final class CaseConverter {
     public static @NotNull String convert(final @NotNull String input,
                                           final @NotNull Convention from,
                                           final @NotNull Convention to) {
-        return from.convertTo(input, to);
+        NamingConvention fromConvention = from.getConvention();
+        NamingConvention toConvention = to.getConvention();
+        return toConvention.format(fromConvention.tokenize(input));
     }
 
 }

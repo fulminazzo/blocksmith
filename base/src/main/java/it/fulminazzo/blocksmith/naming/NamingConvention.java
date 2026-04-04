@@ -7,18 +7,7 @@ import java.util.List;
 /**
  * Represents a naming convention.
  */
-public interface NamingConvention {
-
-    /**
-     * Converts the given string to the target naming convention.
-     *
-     * @param input the input
-     * @param target the naming convention to convert to
-     * @return the converted string
-     */
-    default @NotNull String convertTo(final @NotNull String input, final @NotNull NamingConvention target) {
-        return target.format(tokenize(input));
-    }
+interface NamingConvention {
 
     /**
      * Splits the string into tokens according to the convention rules.
