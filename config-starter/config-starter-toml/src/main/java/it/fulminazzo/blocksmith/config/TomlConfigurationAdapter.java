@@ -4,6 +4,8 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import com.electronwill.nightconfig.core.serde.ObjectSerializer;
+import com.electronwill.nightconfig.toml.TomlFormat;
+import com.electronwill.nightconfig.toml.TomlParser;
 import com.electronwill.nightconfig.toml.TomlWriter;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.dataformat.toml.TomlMapper;
@@ -14,15 +16,16 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Implementation of {@link BaseConfigurationAdapter} for TOML.
  */
 final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     private final @NotNull BaseConfigurationAdapter delegate;
+    private final @NotNull TomlParser parser;
     private final @NotNull TomlWriter writer;
 
     /**
@@ -37,9 +40,26 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
                 logger,
                 null // will be handled by night-config
         );
+        this.parser = TomlFormat.instance().createParser();
         this.writer = new TomlWriter();
         writer.setIndent("");
         writer.setIndentArrayElementsPredicate(l -> !l.isEmpty());
+    }
+
+    @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull String data) {
+        return loadComments(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull File file) throws IOException {
+        return loadComments(new FileInputStream(file));
+    }
+
+    @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) {
+        CommentedConfig config = parser.parse(stream);
+        return toCommentedMap(config);
     }
 
     @Override
@@ -92,6 +112,21 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
                                          final @NotNull Class<T> type) throws IOException {
         File file = ResourceUtils.extractIfAbsent(TomlConfigurationAdapter.class.getClassLoader(), resource, directory);
         return load(file, type);
+    }
+
+    private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull CommentedConfig config) {
+        final Map<String, List<String>> keysComments = new HashMap<>();
+        for (CommentedConfig.Entry entry : config.entrySet()) {
+            String key = entry.getKey();
+            String comment = entry.getComment();
+            if (comment != null) keysComments.put(key, Arrays.asList(comment.split("\n")));
+            Object value = entry.getValue();
+            if (value instanceof CommentedConfig)
+                toCommentedMap((CommentedConfig) value).forEach((k, c) ->
+                        keysComments.put(key + "." + k, c)
+                );
+        }
+        return keysComments;
     }
 
     private <T> @NotNull Config toNightConfig(final @NotNull T configuration) {
