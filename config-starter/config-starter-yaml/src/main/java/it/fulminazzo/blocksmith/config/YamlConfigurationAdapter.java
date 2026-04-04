@@ -12,6 +12,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.util.StringQuotingChecker;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
+import it.fulminazzo.blocksmith.naming.CaseConverter;
+import it.fulminazzo.blocksmith.naming.Convention;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -38,6 +40,8 @@ import java.util.stream.Collectors;
  * Implementation of {@link BaseConfigurationAdapter} for YAML.
  */
 final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
+    private static final @NotNull Convention yamlNamingConvention = Convention.KEBAB_CASE;
+
     private final @NotNull BaseConfigurationAdapter delegate;
 
     /**
@@ -54,7 +58,9 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
                 ))
                         .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
                         .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)
-                        .setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE),
+                        .setPropertyNamingStrategy(Reflect.on(PropertyNamingStrategies.class)
+                                .get(yamlNamingConvention.name())
+                                .get()),
                 logger,
                 YamlCommentPropertyWriter.class
         );
@@ -84,7 +90,7 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
         final Map<String, List<String>> nodesComments = new HashMap<>();
         for (NodeTuple nodeTuple : node.getValue()) {
             ScalarNode keyNode = (ScalarNode) nodeTuple.getKeyNode();
-            String key = keyNode.getValue();
+            String key = CaseConverter.convert(keyNode.getValue(), yamlNamingConvention, JacksonConfigurationAdapter.javaNamingConvention);
             @NotNull List<String> comments = extractComments(keyNode);
             if (!comments.isEmpty()) nodesComments.put(key, comments);
             Node value = nodeTuple.getValueNode();

@@ -27,8 +27,12 @@ import java.util.*;
  */
 @SuppressWarnings("unchecked")
 public final class JacksonConfigurationAdapter implements BaseConfigurationAdapter {
+    /**
+     * Java default naming convention for properties (fields).
+     */
+    public static final @NotNull Convention javaNamingConvention = Convention.CAMEL_CASE;
+
     private static final @NotNull SimpleDateFormat backupTimeFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS");
-    private static final @NotNull Convention javaNamingConvention = Convention.CAMEL_CASE;
 
     private final @NotNull ObjectMapper mapper;
     private final @NotNull Logger logger;

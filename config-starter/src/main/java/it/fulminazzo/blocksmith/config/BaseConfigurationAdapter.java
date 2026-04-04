@@ -19,7 +19,8 @@ public interface BaseConfigurationAdapter {
      * Loads all the comments from the data.
      * The comments will be grouped by the key they belong to.
      * If a key has no comment, it will not be present in the map.
-     * Nested keys will be put in dot notation.
+     * Nested keys will be put in dot notation and will follow Java naming conventions
+     * (if a key is in kebab-case, it will be converted to camelCase).
      * For example:
      * <pre>{@code
      * player:
@@ -42,7 +43,8 @@ public interface BaseConfigurationAdapter {
      * Loads all the comments from the data.
      * The comments will be grouped by the key they belong to.
      * If a key has no comment, it will not be present in the map.
-     * Nested keys will be put in dot notation.
+     * Nested keys will be put in dot notation and will follow Java naming conventions
+     * (if a key is in kebab-case, it will be converted to camelCase).
      * For example:
      * <pre>{@code
      * player:
@@ -65,7 +67,8 @@ public interface BaseConfigurationAdapter {
      * Loads all the comments from the data.
      * The comments will be grouped by the key they belong to.
      * If a key has no comment, it will not be present in the map.
-     * Nested keys will be put in dot notation.
+     * Nested keys will be put in dot notation and will follow Java naming conventions
+     * (if a key is in kebab-case, it will be converted to camelCase).
      * For example:
      * <pre>{@code
      * player:
