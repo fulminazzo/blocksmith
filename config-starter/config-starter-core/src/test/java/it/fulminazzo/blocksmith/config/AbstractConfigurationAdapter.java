@@ -4,8 +4,25 @@ import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.io.*;
+import java.util.List;
+import java.util.Map;
 
 abstract class AbstractConfigurationAdapter implements BaseConfigurationAdapter {
+
+    @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull String data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull File file) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public @NonNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) {

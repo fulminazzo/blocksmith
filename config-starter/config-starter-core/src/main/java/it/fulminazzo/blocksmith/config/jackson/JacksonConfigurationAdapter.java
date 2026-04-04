@@ -18,9 +18,7 @@ import org.slf4j.Logger;
 import java.io.*;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * A special implementation of {@link BaseConfigurationAdapter}
@@ -47,6 +45,24 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                                        final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
         this.mapper = JacksonUtils.setupMapper(mapper, logger, commentPropertyWriterType);
         this.logger = logger;
+    }
+
+    @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull String data) {
+        // JSON does not support comments
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull File file) {
+        // JSON does not support comments
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) {
+        // JSON does not support comments
+        return Collections.emptyMap();
     }
 
     @Override

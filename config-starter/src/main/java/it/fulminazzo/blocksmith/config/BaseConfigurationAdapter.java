@@ -6,12 +6,44 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A specialized adapter to load and store <b>Java beans</b>
  * representing configuration files in different language data formats.
  */
 public interface BaseConfigurationAdapter {
+
+    /**
+     * Loads all the comments from the data.
+     * The comments will be grouped by the key they belong to.
+     * If a key has no comment, it will not be present in the map.
+     *
+     * @param data the raw data
+     * @return the comments
+     */
+    @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull String data) throws IOException;
+
+    /**
+     * Loads all the comments from the data.
+     * The comments will be grouped by the key they belong to.
+     * If a key has no comment, it will not be present in the map.
+     *
+     * @param file the file
+     * @return the comments
+     */
+    @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull File file) throws IOException;
+
+    /**
+     * Loads all the comments from the data.
+     * The comments will be grouped by the key they belong to.
+     * If a key has no comment, it will not be present in the map.
+     *
+     * @param stream the stream of data to load from
+     * @return the comments
+     */
+    @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) throws IOException;
 
     /**
      * Attempts to load the configuration to the specified type.

@@ -52,13 +52,16 @@ class DelegateConfigurationAdapterTest extends Specification {
 
         where:
         method             || arguments
+        'loadComments'     || ['']
+        'loadComments'     || [new File('build/resources/test/load.json')]
+        'loadComments'     || [new ByteArrayInputStream(''.bytes)]
         'load'             || ['', MockConfig]
-        'load'             || [new ByteArrayInputStream(''.bytes), MockConfig]
         'load'             || [new File('build/resources/test/load.json'), MockConfig]
+        'load'             || [new ByteArrayInputStream(''.bytes), MockConfig]
         'loadFromResource' || ['load.json', MockConfig]
         'serialize'        || [new MockConfig()]
-        'store'            || [new File('build/resources/test/store.json'), new MockConfig()]
         'store'            || [new ByteArrayOutputStream(), new MockConfig()]
+        'store'            || [new File('build/resources/test/store.json'), new MockConfig()]
         'extractAndLoad'   || ['load.json', new File('build/resources/test/load.json'), MockConfig]
     }
 
