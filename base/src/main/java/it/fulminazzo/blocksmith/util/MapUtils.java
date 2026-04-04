@@ -24,10 +24,10 @@ public final class MapUtils {
      * @return the stringified map
      */
     public static @NotNull Map<@NotNull String, @NotNull String> stringify(final @NotNull Map<?, ?> map) {
-        Map<@NotNull String, @Nullable Object> transformed = toStringKeyMap(map);
+        Map<@NotNull String, ?> transformed = toStringKeyMap(map);
         transformed = flatten(transformed);
         final Map<@NotNull String, @NotNull String> stringified = new LinkedHashMap<>();
-        for (final Map.Entry<String, Object> entry : transformed.entrySet()) {
+        for (final Map.Entry<String, ?> entry : transformed.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
             if (value != null) stringified.put(key, stringifyValue(value));
@@ -72,13 +72,13 @@ public final class MapUtils {
      * @param map the map to flatten
      * @return the flattened map
      */
-    public static @NotNull Map<@NotNull String, @Nullable Object> flatten(final @NotNull Map<@NotNull String, @Nullable Object> map) {
+    public static @NotNull Map<@NotNull String, @Nullable Object> flatten(final @NotNull Map<@NotNull String, ?> map) {
         final Map<String, Object> flattened = new HashMap<>();
-        for (Map.Entry<@NotNull String, @Nullable Object> entry : map.entrySet()) {
+        for (Map.Entry<@NotNull String, ?> entry : map.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
             if (value instanceof Map<?, ?>) {
-                Map<String, Object> stringObjectMap = toStringKeyMap((Map<?, ?>) value);
+                Map<String, ?> stringObjectMap = toStringKeyMap((Map<?, ?>) value);
                 flatten(stringObjectMap).forEach((k, v) -> flattened.put(key + "." + k, v));
             } else flattened.put(key, value);
         }
@@ -111,10 +111,10 @@ public final class MapUtils {
      * @param map the map to unflatten
      * @return the unflattened map
      */
-    public static @NotNull Map<@NotNull String, @Nullable Object> unflatten(final @NotNull Map<@NotNull String, @Nullable Object> map) {
+    public static @NotNull Map<@NotNull String, @Nullable Object> unflatten(final @NotNull Map<@NotNull String, ?> map) {
         final Map<String, Object> unflattened = new HashMap<>();
         final Set<String> toUnflatten = new HashSet<>();
-        for (Map.Entry<@NotNull String, @Nullable Object> entry : map.entrySet()) {
+        for (Map.Entry<@NotNull String, ?> entry : map.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
             if (key.contains(".")) toUnflatten.add(key.substring(0, key.indexOf(".")));
@@ -124,7 +124,7 @@ public final class MapUtils {
             String key = toUnflatten.iterator().next();
             toUnflatten.remove(key);
             Map<String, Object> subMap = new HashMap<>();
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
+            for (Map.Entry<String, ?> entry : map.entrySet()) {
                 String subKey = entry.getKey();
                 if (subKey.startsWith(key + "."))
                     subMap.put(subKey.substring(key.length() + 1), entry.getValue());
@@ -146,9 +146,9 @@ public final class MapUtils {
      * @param map the map to expand
      * @return the expanded map
      */
-    public static @NotNull Map<@NotNull String, @Nullable Object> expandCollections(final @NotNull Map<@NotNull String, @Nullable Object> map) {
+    public static @NotNull Map<@NotNull String, @Nullable Object> expandCollections(final @NotNull Map<@NotNull String, ?> map) {
         final Map<@NotNull String, @Nullable Object> expanded = new HashMap<>();
-        for (Map.Entry<@NotNull String, @Nullable Object> entry : map.entrySet()) {
+        for (Map.Entry<@NotNull String, ?> entry : map.entrySet()) {
             String key = entry.getKey();
             Object value = convertArray(entry.getValue());
             if (value instanceof Map<?, ?>) {
