@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.util
 
+import it.fulminazzo.blocksmith.structure.Pair
 import spock.lang.Specification
 
 class StringUtilsTest extends Specification {
@@ -66,6 +67,45 @@ class StringUtilsTest extends Specification {
 
         '"a\\'                             | ','    | true   | ['"']      || ['"a']
         '"a\\'                             | ','    | false  | ['"']      || ['"a']
+    }
+
+    def 'test that split with parenthesis #string, #regex, #parenthesis returns #expected'() {
+        when:
+        def actual = StringUtils.split(string, regex, parenthesis.toArray(new Pair[parenthesis.size()]))
+
+        then:
+        actual == expected
+
+        where:
+        string                          | regex  | parenthesis                            || expected
+        'a,b,c'                         | ','    | []                                     || ['a', 'b', 'c']
+        'hello world'                   | ' '    | []                                     || ['hello', 'world']
+        'one'                           | ','    | []                                     || ['one']
+        ''                              | ','    | []                                     || ['']
+        null                            | ','    | []                                     || []
+        'a,,b'                          | ','    | []                                     || ['a', '', 'b']
+
+        'a1b2c'                         | '\\d'  | []                                     || ['a', 'b', 'c']
+        'a1b2c3'                        | '\\d'  | []                                     || ['a', 'b', 'c', '']
+        'one  two'                      | '\\s+' | []                                     || ['one', 'two']
+
+        '<a,b>,c'                       | ','    | [Pair.of('<', '>')]                    || ['<a,b>', 'c']
+        '<a,b>,c>'                      | ','    | [Pair.of('<', '>')]                    || ['<a,b>', 'c>']
+        '<a,b>,<c,d>'                   | ','    | [Pair.of('<', '>')]                    || ['<a,b>', '<c,d>']
+        '<a,b>,<c,d'                    | ','    | [Pair.of('<', '>')]                    || ['<a,b>', '<c,d']
+
+        '<first>,hello,<second<third>>' | ','    | [Pair.of('<', '>')]                    || ['<first>', 'hello', '<second<third>>']
+        '<a<b<c>>>,d'                   | ','    | [Pair.of('<', '>')]                    || ['<a<b<c>>>', 'd']
+
+        '<a,b,c'                        | ','    | [Pair.of('<', '>')]                    || ['<a,b,c']
+
+        'nodivision'                    | ','    | [Pair.of('<', '>')]                    || ['nodivision']
+
+        '(a,b),<c,d>,e'                 | ','    | [Pair.of('(', ')'), Pair.of('<', '>')] || ['(a,b)', '<c,d>', 'e']
+        '(a,<b,c>),d'                   | ','    | [Pair.of('(', ')'), Pair.of('<', '>')] || ['(a,<b,c>)', 'd']
+
+        ',a,b'                          | ','    | []                                     || ['', 'a', 'b']
+        'a,b,'                          | ','    | []                                     || ['a', 'b', '']
     }
 
 }

@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.util;
 
+import it.fulminazzo.blocksmith.structure.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,6 +94,75 @@ public final class StringUtils {
                 for (; i < chars.length; i++) {
                     tmp += chars[i];
                     if (!tmp.matches(current + regex + "$")) {
+                        i--;
+                        break;
+                    }
+                }
+                strings.add(current);
+                current = "";
+                continue;
+            }
+
+            current += c;
+        }
+        strings.add(current);
+        return List.copyOf(strings);
+    }
+
+    /**
+     * Divides the given string into multiple substrings, based on the provided regular expression.
+     *
+     * @param string      the string
+     * @param regex       the expression to use for splitting
+     * @param parenthesis if any of these "parenthesis" are met during splitting,
+     *                    if the expression is found before the same quote is met,
+     *                    the string will not be split (useful for splitting parenthesized arguments).
+     *                    Supports regular expressions
+     * @return the strings
+     */
+    public static @NotNull List<String> split(final @Nullable String string,
+                                              final @NotNull String regex,
+                                              final @NotNull Pair<String, String> @NotNull ... parenthesis) {
+        if (string == null) return Collections.emptyList();
+        if (string.isEmpty()) return Collections.singletonList("");
+        final List<String> strings = new LinkedList<>();
+        final Pattern pattern = Pattern.compile(regex + "$");
+        final Map<Pair<String, String>, Pair<Pattern, Pattern>> parenthesisPatterns = Arrays.stream(parenthesis)
+                .collect(Collectors.toMap(
+                        p -> p,
+                        p -> Pair.of(
+                                Pattern.compile(Pattern.quote(p.getFirst()) + "$"),
+                                Pattern.compile(Pattern.quote(p.getSecond()) + "$")
+                        )
+                ));
+
+        String current = "";
+        char[] chars = string.toCharArray();
+        main:
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+            for (Pair<String, String> p : parenthesis) {
+                Pattern openPattern = parenthesisPatterns.get(p).getFirst();
+                Pattern closePattern = parenthesisPatterns.get(p).getSecond();
+                if (openPattern.matcher(current + c).find()) {
+                    int depth = 1;
+                    current += c;
+                    for (++i; i < chars.length; i++) {
+                        c = chars[i];
+                        current += c;
+                        if (openPattern.matcher(current).find()) depth++;
+                        else if (closePattern.matcher(current).find()) depth--;
+                        if (depth == 0) break;
+                    }
+                    continue main;
+                }
+            }
+
+            if (pattern.matcher(current + c).find()) {
+                String tmp = current;
+                for (; i < chars.length; i++) {
+                    tmp += chars[i];
+                    if (!tmp.matches(Pattern.quote(current) + regex + "$")) {
                         i--;
                         break;
                     }
