@@ -7,6 +7,30 @@ import java.nio.file.Files
 
 abstract class ConfigurationAdapterTest extends Specification {
 
+    def 'test that loadWithComments of #data returns expected data'() {
+        when:
+        def actual = adapter.loadWithComments(data)
+
+        then:
+        actual.sort() == [
+                (new CommentKey('commentsEnabled', supportsComments() ? ['Example comment'] : []))          : false,
+                (new CommentKey('name', supportsComments() ? ['This comment should be', 'Multiline!'] : [])): 'Blocksmith',
+                (new CommentKey('description'))                                                             : supportsNull() ? null : '',
+                (new CommentKey('authors'))                                                                 : ['Fulminazzo', 'Camilla', 'Alex'],
+                (new CommentKey('internal'))                                                                : [
+                        (new CommentKey('version', supportsComments() ? ['This comment should be indented'] : [])): true,
+                        (new CommentKey('verified'))                                                              : isProperties() ? '' : null
+                ]
+        ].sort()
+
+        where:
+        data << [
+                getFile('load').readLines().join('\n'),
+                getFile('load'),
+                new FileInputStream(getFile('load'))
+        ]
+    }
+
     def 'test that loadComments of #data returns expected data'() {
         when:
         def actual = adapter.loadComments(data)
