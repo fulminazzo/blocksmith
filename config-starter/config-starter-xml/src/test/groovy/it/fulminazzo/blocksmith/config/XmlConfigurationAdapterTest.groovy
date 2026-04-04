@@ -5,6 +5,14 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class XmlConfigurationAdapterTest extends ConfigurationAdapterTest {
 
+    def 'test that loadComments with invalid data throws IOException'() {
+        when:
+        adapter.loadComments('Hello, world')
+
+        then:
+        thrown(IOException)
+    }
+
     @Override
     protected boolean supportsNull() {
         return true
