@@ -4,6 +4,8 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.Config;
 import it.fulminazzo.blocksmith.config.Comment;
 import it.fulminazzo.blocksmith.config.CommentUtils;
+import it.fulminazzo.blocksmith.naming.CaseConverter;
+import it.fulminazzo.blocksmith.naming.Convention;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.HashSet;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConfigUtils {
+    private static final @NotNull Convention namingConvention = Convention.SNAKE_CASE;
 
     /**
      * Updates all the properties names of the given configuration
@@ -30,7 +33,7 @@ public final class ConfigUtils {
         for (Config.Entry entry : new HashSet<>(configuration.entrySet())) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            String translation = formatToSnakeCase(key);
+            String translation = CaseConverter.convert(key, namingConvention);
             if (!key.equals(translation)) {
                 configuration.remove(key);
                 configuration.set(translation, value);
@@ -50,7 +53,7 @@ public final class ConfigUtils {
                                    final @NotNull CommentedConfig configuration) {
         Reflect reflect = Reflect.on(reference);
         for (Field field : reflect.getFields(f -> !Modifier.isStatic(f.getModifiers()) && !Modifier.isTransient(f.getModifiers()))) {
-            String propertyName = formatToSnakeCase(field.getName());
+            String propertyName = CaseConverter.convert(field.getName(), namingConvention);
             if (field.isAnnotationPresent(Comment.class)) {
                 Comment comment = field.getAnnotation(Comment.class);
                 configuration.setComment(propertyName, getCommentValue(comment));
@@ -75,18 +78,6 @@ public final class ConfigUtils {
         String commentText = String.join("\n", CommentUtils.getText(comment));
         if (commentText.trim().isEmpty()) return null;
         return commentText.replaceAll("^|\n", "\n ").substring(1);
-    }
-
-    /**
-     * Formats the given string to a snake case.
-     *
-     * @param string the string
-     * @return the snake case string
-     */
-    public static @NotNull String formatToSnakeCase(final @NotNull String string) {
-        String result = string.replaceAll("([a-z0-9])([A-Z])", "$1_$2");
-        result = result.replaceAll("[\\s\\-.]", "_");
-        return result.toLowerCase().replaceAll("_{2,}", "_");
     }
 
 }

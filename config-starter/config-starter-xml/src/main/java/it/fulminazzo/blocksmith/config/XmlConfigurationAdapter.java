@@ -10,6 +10,8 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.fasterxml.jackson.dataformat.xml.util.DefaultXmlPrettyPrinter;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
+import it.fulminazzo.blocksmith.naming.CaseConverter;
+import it.fulminazzo.blocksmith.naming.Convention;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -86,17 +88,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
 
         @Override
         public @NotNull String translate(final @NotNull String propertyName) {
-            StringBuilder result = new StringBuilder();
-            String[] words = propertyName.split("[^a-zA-Z0-9]+");
-
-            for (String word : words) {
-                if (!word.isEmpty()) {
-                    result.append(Character.toUpperCase(word.charAt(0)));
-                    result.append(word.substring(1));
-                }
-            }
-
-            return result.toString();
+            return CaseConverter.convert(propertyName, Convention.PASCAL_CASE);
         }
 
     }

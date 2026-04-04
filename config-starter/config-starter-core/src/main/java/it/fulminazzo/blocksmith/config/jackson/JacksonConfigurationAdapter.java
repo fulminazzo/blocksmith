@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import it.fulminazzo.blocksmith.config.BaseConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigVersion;
+import it.fulminazzo.blocksmith.naming.CaseConverter;
+import it.fulminazzo.blocksmith.naming.Convention;
 import it.fulminazzo.blocksmith.util.MapUtils;
 import it.fulminazzo.blocksmith.util.ResourceUtils;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +30,7 @@ import java.util.Optional;
 @SuppressWarnings("unchecked")
 public final class JacksonConfigurationAdapter implements BaseConfigurationAdapter {
     private static final @NotNull SimpleDateFormat backupTimeFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS");
+    private static final @NotNull Convention javaNamingConvention = Convention.CAMEL_CASE;
 
     private final @NotNull ObjectMapper mapper;
     private final @NotNull Logger logger;
@@ -155,31 +158,13 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
         for (String key : new ArrayList<>(data.keySet())) {
             Object value = data.remove(key);
             if (value instanceof Map) unapplyNamingStrategy((Map<String, Object>) value, strategy);
-            if (strategy.equals(PropertyNamingStrategies.KEBAB_CASE)) key = dashedCaseToCamel(key, '-');
-            else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE)) key = dashedCaseToCamel(key, '_');
+            if (strategy.equals(PropertyNamingStrategies.KEBAB_CASE))
+                key = CaseConverter.convert(key, Convention.KEBAB_CASE, javaNamingConvention);
+            else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE))
+                key = CaseConverter.convert(key, Convention.SNAKE_CASE, javaNamingConvention);
             else key = key.substring(0, 1).toLowerCase() + key.substring(1);
             data.put(key, value);
         }
-    }
-
-    private static String dashedCaseToCamel(final @NotNull String string,
-                                            final char dash) {
-        if (!string.contains(String.valueOf(dash))) return string;
-
-        StringBuilder sb = new StringBuilder();
-        boolean makeUpper = false;
-
-        for (char c : string.toCharArray()) {
-            if (c == dash) {
-                makeUpper = true;
-            } else if (makeUpper) {
-                sb.append(Character.toUpperCase(c));
-                makeUpper = false;
-            } else {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
     }
 
 }

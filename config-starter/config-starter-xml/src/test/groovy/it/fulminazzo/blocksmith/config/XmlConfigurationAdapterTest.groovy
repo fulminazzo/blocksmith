@@ -5,26 +5,6 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class XmlConfigurationAdapterTest extends ConfigurationAdapterTest {
 
-    def 'test that PascalCaseStrategy converts #string to #expected'() {
-        given:
-        def strategy = new XmlConfigurationAdapter.PascalCaseStrategy()
-
-        when:
-        def actual = strategy.translate(string)
-
-        then:
-        actual == expected
-
-        where:
-        string       || expected
-        ''           || ''
-        'field_name' || 'FieldName'
-        'field-name' || 'FieldName'
-        'field.name' || 'FieldName'
-        'FieldName'  || 'FieldName'
-        'fieldName'  || 'FieldName'
-    }
-
     @Override
     protected boolean supportsNull() {
         return true
