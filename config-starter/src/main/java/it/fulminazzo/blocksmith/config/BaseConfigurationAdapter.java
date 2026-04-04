@@ -37,7 +37,9 @@ public interface BaseConfigurationAdapter {
      * @return the load configuration with comments
      */
     default @NotNull Map<@NotNull CommentKey, @Nullable Object> loadWithComments(final @NotNull File file) throws IOException {
-        return loadWithComments(new FileInputStream(file));
+        try (InputStream inputStream = new FileInputStream(file)) {
+            return loadWithComments(inputStream);
+        }
     }
 
     /**
@@ -106,7 +108,9 @@ public interface BaseConfigurationAdapter {
      * @return the comments
      */
     default @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull File file) throws IOException {
-        return loadComments(new FileInputStream(file));
+        try (InputStream inputStream = new FileInputStream(file)) {
+            return loadComments(inputStream);
+        }
     }
 
     /**

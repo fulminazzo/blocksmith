@@ -25,8 +25,6 @@ public final class ConfigUtils {
     public static final @NotNull Convention javaNamingConvention = Convention.CAMEL_CASE;
 
     private static final @NotNull List<Function<String, Object>> primitiveConverters = List.of(
-            Byte::valueOf,
-            Short::valueOf,
             Integer::valueOf,
             Long::valueOf,
             Float::valueOf,
