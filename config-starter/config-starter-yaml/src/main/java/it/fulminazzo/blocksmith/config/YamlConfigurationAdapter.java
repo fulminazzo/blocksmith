@@ -128,6 +128,7 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
         List<CommentLine> blockComments = node.getBlockComments();
         if (blockComments != null) comments.addAll(blockComments);
         return comments.stream()
+                .filter(c -> c.getCommentType() == CommentType.BLOCK)
                 .map(CommentLine::getValue)
                 .map(String::trim)
                 .collect(Collectors.toList());
