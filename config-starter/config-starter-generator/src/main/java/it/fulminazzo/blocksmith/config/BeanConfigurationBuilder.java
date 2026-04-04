@@ -53,10 +53,9 @@ public class BeanConfigurationBuilder {
         // field
         final FieldDeclaration field = fields.computeIfAbsent(
                 propertyName,
-                k -> new FieldDeclaration()
-                        .setPrivate(true)
-                        .addVariable(new VariableDeclarator().setName(k))
+                k -> new FieldDeclaration().setPrivate(true)
         ).setAllTypes(type);
+        if (field.getVariables().isEmpty()) field.addVariable(new VariableDeclarator().setName(propertyName));
         field.getVariable(0).setInitializer(getInitializer(value));
 
         // comment annotation
