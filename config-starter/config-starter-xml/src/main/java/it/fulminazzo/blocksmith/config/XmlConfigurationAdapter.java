@@ -66,17 +66,17 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
 
     @Override
     public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
-        return ConfigUtils.checkMap(delegate.load(data, type), xmlNamingConvention, ConfigUtils.javaNamingConvention);
+        return checkLoaded(delegate.load(data, type));
     }
 
     @Override
     public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
-        return ConfigUtils.checkMap(delegate.load(file, type), xmlNamingConvention, ConfigUtils.javaNamingConvention);
+        return checkLoaded(delegate.load(file, type));
     }
 
     @Override
     public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
-        return ConfigUtils.checkMap(delegate.load(stream, type), xmlNamingConvention, ConfigUtils.javaNamingConvention);
+        return checkLoaded(delegate.load(stream, type));
     }
 
     @Override
@@ -92,6 +92,52 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
     @Override
     public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
         delegate.store(stream, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> @NotNull T checkLoaded(final @NotNull T loaded) {
+        T actual = ConfigUtils.checkMap(loaded, xmlNamingConvention, ConfigUtils.javaNamingConvention);
+        if (actual instanceof Map<?, ?>) return (T) flattenCollectionMaps((Map<?, ?>) actual);
+        else return actual;
+    }
+
+    /**
+     * Jackson loads maps that contain collections with maps with just one key.
+     * For example:
+     * <pre>{@code
+     * <Authors>
+     *   <Author>Fulminazzo</Author>
+     *   <Author>Alex</Author>
+     * </Authors>
+     * }</pre>
+     * would be loaded as:
+     * <pre>{@code
+     * {
+     *     "authors": {
+     *         "authors": ["Fulminazzo", "Alex"]
+     *     }
+     * }
+     * }</pre>
+     * This function attempts to remove that by merging the inner map into the outer one.
+     *
+     * @param map the map to flatten
+     * @return the flattened map
+     */
+    static @NotNull Map<?, ?> flattenCollectionMaps(final @NotNull Map<?, ?> map) {
+        final Map<Object, Object> result = new HashMap<>();
+        for (final Map.Entry<?, ?> entry : map.entrySet()) {
+            final Object key = entry.getKey();
+            Object value = entry.getValue();
+            if (value instanceof Map<?, ?>) {
+                Map<?, ?> innerMap = flattenCollectionMaps((Map<?, ?>) value);
+                if (innerMap.size() == 1) {
+                    final Object innerKey = innerMap.keySet().iterator().next();
+                    if (key.equals(innerKey)) value = innerMap.get(innerKey);
+                }
+            }
+            result.put(key, value);
+        }
+        return result;
     }
 
     private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull InputStream stream) throws XMLStreamException {
