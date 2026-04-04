@@ -4,16 +4,13 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.Type;
 import it.fulminazzo.blocksmith.structure.Pair;
 import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +21,6 @@ import java.util.stream.Collectors;
 /**
  * A builder to generate a Java bean from a configuration file.
  */
-@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BeanConfigurationBuilder {
     private static final @NotNull String defaultJavaPackage = "java.lang";
@@ -33,9 +29,38 @@ public class BeanConfigurationBuilder {
 
     @NotNull Map<CommentKey, Object> data;
 
+    @NotNull ClassOrInterfaceDeclaration root;
     @NotNull Map<String, ImportDeclaration> imports;
+    @NotNull Map<String, ClassOrInterfaceDeclaration> nestedClasses = new HashMap<>();
     @NotNull Map<String, FieldDeclaration> fields = new HashMap<>();
     @NotNull Map<String, MethodDeclaration> methods = new HashMap<>();
+
+    /**
+     * Instantiates a new Bean configuration builder.
+     *
+     * @param data    the data
+     * @param root    the root
+     * @param imports the imports
+     */
+    public BeanConfigurationBuilder(final @NotNull Map<CommentKey, Object> data,
+                                    final @NotNull ClassOrInterfaceDeclaration root,
+                                    final @NotNull Map<String, ImportDeclaration> imports) {
+        this.data = data;
+        this.root = root;
+        this.imports = imports;
+
+        root.getMembers().stream()
+                .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
+                .map(ClassOrInterfaceDeclaration.class::cast)
+                .filter(d -> !d.isInterface())
+                .forEach(d -> nestedClasses.put(d.getNameAsString(), d));
+
+        root.getFields().forEach(f -> f.getVariables().forEach(
+                v -> fields.put(v.getNameAsString(), f)
+        ));
+
+        root.getMethods().forEach(m -> methods.put(m.getNameAsString(), m));
+    }
 
     /**
      * Parses simple values such as <code>null</code>, primitives, wrappers,
