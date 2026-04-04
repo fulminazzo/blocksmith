@@ -173,6 +173,8 @@ public class BeanConfigurationBuilder {
         String typeName = getTypeFromObject(object).getSimpleName();
         if (object instanceof Collection<?>) {
             Collection<?> collection = (Collection<?>) object;
+            if (collection instanceof List) typeName = List.class.getSimpleName();
+            else if (collection instanceof Set) typeName = Set.class.getSimpleName();
             typeName += String.format(genericsFormat, guessCollectionGenericType(collection));
             return parseGenericTypesImports(typeName);
         } else return typeName;
