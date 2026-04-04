@@ -1,11 +1,13 @@
 package it.fulminazzo.blocksmith.config;
 
 import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
@@ -13,15 +15,22 @@ import it.fulminazzo.blocksmith.structure.Pair;
 import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * A builder to generate a Java bean from a configuration file.
  */
+@Slf4j
 @SuppressWarnings("unchecked")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BeanConfigurationBuilder {
@@ -44,9 +53,9 @@ public class BeanConfigurationBuilder {
      * @param root    the root
      * @param imports the imports
      */
-    public BeanConfigurationBuilder(final @NotNull Map<CommentKey, Object> data,
-                                    final @NotNull ClassOrInterfaceDeclaration root,
-                                    final @NotNull Map<String, ImportDeclaration> imports) {
+    BeanConfigurationBuilder(final @NotNull Map<CommentKey, Object> data,
+                             final @NotNull ClassOrInterfaceDeclaration root,
+                             final @NotNull Map<String, ImportDeclaration> imports) {
         this.data = data;
         this.root = root;
         this.imports = imports;
@@ -67,7 +76,7 @@ public class BeanConfigurationBuilder {
     /**
      * Converts all the given {@link #data} to Java fields for the bean creation.
      */
-    void parse() {
+    public void parse() {
         data.forEach((k, v) -> {
             if (v instanceof Map<?, ?>) parseNestedConfig(k, (Map<CommentKey, Object>) v);
             else parseProperty(k, v);
@@ -282,6 +291,63 @@ public class BeanConfigurationBuilder {
             types.set(i, type.substring(type.lastIndexOf('.') + 1));
         }
         return baseType + String.format(genericsFormat, String.join(", ", types));
+    }
+
+    /**
+     * Generates a new Java Bean from the given configuration file
+     * under the specified source directory and at the given package.
+     * <br>
+     * If the class already exists, then it is updated with the new configuration
+     * entries (or updates).
+     *
+     * @param configurationFile the configuration file
+     * @param sourceDirectory   the src/main/java directory location
+     * @param packageName       the package name
+     * @param className         the class name
+     * @return the newly created bean
+     */
+    public static @NotNull File generate(final @NotNull File configurationFile,
+                                         final @NotNull File sourceDirectory,
+                                         final @NotNull String packageName,
+                                         final @NotNull String className) throws IOException {
+        ConfigurationAdapter configurationAdapter = ConfigurationAdapter.newAdapter(
+                log,
+                ConfigurationFormat.fromExtension(configurationFile.getName())
+        );
+        final Map<CommentKey, Object> data = configurationAdapter.loadWithComments(configurationFile);
+
+        final File beanFile = new File(sourceDirectory,
+                packageName.replace(".", File.separator) +
+                        File.separator + className + ".java"
+        );
+        Files.createDirectories(beanFile.getParentFile().toPath());
+
+        final CompilationUnit compilationUnit;
+        if (beanFile.exists()) compilationUnit = StaticJavaParser.parse(beanFile);
+        else compilationUnit = new CompilationUnit();
+
+        compilationUnit.setPackageDeclaration(packageName);
+
+        final Map<String, ImportDeclaration> imports = compilationUnit.getImports().stream()
+                .collect(Collectors.toMap(NodeWithName::getNameAsString, i -> i));
+
+        final ClassOrInterfaceDeclaration root = compilationUnit.getClassByName(className)
+                .orElseGet(() -> compilationUnit.addClass(className).setPublic(true));
+
+        final BeanConfigurationBuilder builder = new BeanConfigurationBuilder(
+                data,
+                root,
+                imports
+        );
+        builder.parse();
+        builder.imports.values().forEach(compilationUnit::addImport);
+
+        final String code = compilationUnit.toString();
+        try (FileOutputStream output = new FileOutputStream(beanFile)) {
+            output.write(code.getBytes(StandardCharsets.UTF_8));
+        }
+
+        return beanFile;
     }
 
     /**
