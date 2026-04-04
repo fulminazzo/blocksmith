@@ -11,6 +11,19 @@ import org.jetbrains.annotations.NotNull;
 public final class CaseConverter {
 
     /**
+     * Converts the input to the target one.
+     * Assumes that the input is formatted in the {@link Convention#CAMEL_CASE} convention.
+     *
+     * @param input      the input
+     * @param convention the convention to convert to
+     * @return the converted string
+     */
+    public static @NotNull String convert(final @NotNull String input,
+                                          final @NotNull Convention convention) {
+        return convert(input, Convention.CAMEL_CASE, convention);
+    }
+
+    /**
      * Converts the input from the given naming convention to the target one.
      *
      * @param input the input
