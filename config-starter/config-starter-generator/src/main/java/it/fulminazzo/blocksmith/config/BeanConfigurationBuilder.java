@@ -11,6 +11,10 @@ import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
+import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
+import com.github.javaparser.printer.configuration.PrinterConfiguration;
+import com.github.javaparser.printer.configuration.imports.IntelliJImportOrderingStrategy;
 import it.fulminazzo.blocksmith.structure.Pair;
 import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.AccessLevel;
@@ -307,6 +311,7 @@ public class BeanConfigurationBuilder {
      * @param packageName       the package name
      * @param className         the class name
      * @return the newly created bean
+     * @throws IOException in case of any errors
      */
     public static @NotNull File generate(final @NotNull File configurationFile,
                                          final @NotNull File sourceDirectory,
@@ -346,7 +351,17 @@ public class BeanConfigurationBuilder {
         builder.imports.values().forEach(compilationUnit::addImport);
         sortClass(root);
 
-        final String code = compilationUnit.toString();
+        final PrinterConfiguration configuration = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(
+                        DefaultPrinterConfiguration.ConfigOption.SORT_IMPORTS_STRATEGY,
+                        new IntelliJImportOrderingStrategy()
+                ))
+                .addOption(new DefaultConfigurationOption(
+                        DefaultPrinterConfiguration.ConfigOption.INDENT_PRINT_ARRAYS_OF_ANNOTATIONS,
+                        true
+                ));
+        final String code = compilationUnit.toString(configuration);
+
         try (FileOutputStream output = new FileOutputStream(beanFile)) {
             output.write(code.getBytes(StandardCharsets.UTF_8));
         }
