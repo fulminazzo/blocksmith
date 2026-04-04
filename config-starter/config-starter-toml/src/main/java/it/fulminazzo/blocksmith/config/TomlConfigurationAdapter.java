@@ -11,6 +11,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.dataformat.toml.TomlMapper;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.nightconfig.ConfigUtils;
+import it.fulminazzo.blocksmith.naming.CaseConverter;
+import it.fulminazzo.blocksmith.naming.Convention;
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.util.ResourceUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -25,6 +28,8 @@ import java.util.stream.Collectors;
  * Implementation of {@link BaseConfigurationAdapter} for TOML.
  */
 final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
+    private static final @NotNull Convention tomlNamingConvention = Convention.SNAKE_CASE;
+
     private final @NotNull BaseConfigurationAdapter delegate;
     private final @NotNull TomlParser parser;
     private final @NotNull TomlWriter writer;
@@ -37,7 +42,9 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     public TomlConfigurationAdapter(final @NotNull Logger logger) {
         this.delegate = new JacksonConfigurationAdapter(
                 new TomlMapper()
-                        .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE),
+                        .setPropertyNamingStrategy(Reflect.on(PropertyNamingStrategies.class)
+                                .get(tomlNamingConvention.name())
+                                .get()),
                 logger,
                 null // will be handled by night-config
         );
@@ -118,7 +125,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull CommentedConfig config) {
         final Map<String, List<String>> keysComments = new HashMap<>();
         for (CommentedConfig.Entry entry : config.entrySet()) {
-            String key = entry.getKey();
+            String key = CaseConverter.convert(entry.getKey(), tomlNamingConvention, JacksonConfigurationAdapter.javaNamingConvention);
             String comment = entry.getComment();
             if (comment != null) keysComments.put(key, Arrays.stream(comment.split("\n"))
                     .map(String::trim)
