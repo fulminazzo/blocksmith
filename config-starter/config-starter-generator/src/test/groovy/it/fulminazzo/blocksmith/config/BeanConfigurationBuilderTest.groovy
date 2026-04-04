@@ -4,7 +4,6 @@ import com.github.javaparser.StaticJavaParser
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.MethodDeclaration
-import com.github.javaparser.ast.body.VariableDeclarator
 import spock.lang.Specification
 
 class BeanConfigurationBuilderTest extends Specification {
@@ -25,7 +24,6 @@ class BeanConfigurationBuilderTest extends Specification {
                 .setPublic(true)
                 .setAllTypes(StaticJavaParser.parseType('OldType'))
                 .addSingleMemberAnnotation('Annotation', 'true')
-        f.addVariable(new VariableDeclarator(StaticJavaParser.parseType('OldType'), 'nested'))
         builder.fields['nested'] = f
 
         and:
@@ -138,7 +136,6 @@ class BeanConfigurationBuilderTest extends Specification {
                 .setPublic(true)
                 .setAllTypes(StaticJavaParser.parseType('double'))
                 .addSingleMemberAnnotation('Annotation', 'true')
-        f.addVariable(new VariableDeclarator(StaticJavaParser.parseType('Boolean'), 'object'))
         builder.fields['object'] = f
         def method = new MethodDeclaration()
                 .setName('getObject')
@@ -185,13 +182,16 @@ class BeanConfigurationBuilderTest extends Specification {
                 "}"
 
         where:
-        value                                      | type
-        null                                       | 'Object'
-        10                                         | 'Integer'
-        'Goodbye, mars!'                           | 'String'
-        ['Goodbye', 'mars']                        | 'List<String>'
-        ['Goodbye', 'mars'].toSet()                | 'Set<String>'
-        [['Hello', 'world'], ['Goodbye', 'mars!']] | 'List<ArrayList<String>>'
+        value                                                 | type
+        null                                                  | 'Object'
+        10                                                    | 'Integer'
+        3.14f                                                 | 'Double'
+        'Goodbye, mars!'                                      | 'String'
+        ['Goodbye', null, 'mars']                             | 'List<String>'
+        ['Goodbye', 1]                                        | 'List<Object>'
+        ['Goodbye', 'mars'].toSet()                           | 'Set<String>'
+        [['Hello', 'world'], ['Goodbye', 'mars!']]            | 'List<ArrayList<String>>'
+        new PriorityQueue<>(Arrays.asList('Hello', 'world!')) | 'PriorityQueue<String>'
     }
 
     def 'test that parseProperty of non-existing field and getter correctly creates nodes'() {
@@ -222,13 +222,16 @@ class BeanConfigurationBuilderTest extends Specification {
                 "}"
 
         where:
-        value                                      | type
-        null                                       | 'Object'
-        10                                         | 'Integer'
-        'Goodbye, mars!'                           | 'String'
-        ['Goodbye', 'mars']                        | 'List<String>'
-        ['Goodbye', 'mars'].toSet()                | 'Set<String>'
-        [['Hello', 'world'], ['Goodbye', 'mars!']] | 'List<ArrayList<String>>'
+        value                                                 | type
+        null                                                  | 'Object'
+        10                                                    | 'Integer'
+        3.14f                                                 | 'Double'
+        'Goodbye, mars!'                                      | 'String'
+        ['Goodbye', null, 'mars']                             | 'List<String>'
+        ['Goodbye', 1]                                        | 'List<Object>'
+        ['Goodbye', 'mars'].toSet()                           | 'Set<String>'
+        [['Hello', 'world'], ['Goodbye', 'mars!']]            | 'List<ArrayList<String>>'
+        new PriorityQueue<>(Arrays.asList('Hello', 'world!')) | 'PriorityQueue<String>'
     }
 
     def 'test that convertComments correctly converts #key'() {

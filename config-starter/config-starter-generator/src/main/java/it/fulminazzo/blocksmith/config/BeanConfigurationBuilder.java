@@ -383,8 +383,10 @@ public class BeanConfigurationBuilder {
             if (object instanceof Collection<?>) {
                 String genericType = guessCollectionGenericType((Collection<?>) object);
                 typeNames = getCollectionTypeNames(object.getClass(), genericType);
-            } else if (object == null) typeNames = Set.of(nullClass.getCanonicalName());
-            else typeNames = getBasicTypeNames(object.getClass(), object.getClass());
+            } else if (object == null) {
+                typesCount.replaceAll((k, v) -> v + 1);
+                continue;
+            } else typeNames = getBasicTypeNames(object.getClass(), object.getClass());
             typeNames.forEach(t -> typesCount.merge(t, 1, Integer::sum));
         }
         return typesCount.entrySet().stream()
