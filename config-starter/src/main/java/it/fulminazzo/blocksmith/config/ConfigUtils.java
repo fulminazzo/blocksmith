@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -51,7 +48,7 @@ public final class ConfigUtils {
             final @NotNull Map<@NotNull String, @Nullable Object> configuration,
             final @NotNull Map<@NotNull String, @NotNull Object> comments
     ) {
-        final Map<CommentKey, Object> result = new HashMap<>();
+        final Map<CommentKey, Object> result = new LinkedHashMap<>();
         for (final Map.Entry<String, Object> entry : configuration.entrySet()) {
             final String key = entry.getKey();
             Object value = convertValue(entry.getValue());

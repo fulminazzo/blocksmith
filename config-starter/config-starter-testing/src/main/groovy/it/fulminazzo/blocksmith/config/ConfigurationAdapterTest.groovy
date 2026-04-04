@@ -12,7 +12,7 @@ abstract class ConfigurationAdapterTest extends Specification {
         def actual = adapter.loadWithComments(data)
 
         then:
-        actual.sort() == [
+        actual == [
                 (new CommentKey('commentsEnabled', supportsComments() ? ['Example comment'] : []))          : false,
                 (new CommentKey('name', supportsComments() ? ['This comment should be', 'Multiline!'] : [])): 'Blocksmith',
                 (new CommentKey('description'))                                                             : supportsNull() ? null : '',
@@ -21,7 +21,7 @@ abstract class ConfigurationAdapterTest extends Specification {
                         (new CommentKey('version', supportsComments() ? ['This comment should be indented'] : [])): true,
                         (new CommentKey('verified'))                                                              : isProperties() || isToml() ? '' : null
                 ]
-        ].sort()
+        ]
 
         where:
         data << [
