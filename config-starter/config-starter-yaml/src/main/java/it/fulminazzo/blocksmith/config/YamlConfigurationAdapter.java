@@ -86,34 +86,6 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
         else return Collections.emptyMap();
     }
 
-    private static @NotNull Map<String, List<String>> extractComments(final @NotNull MappingNode node) {
-        final Map<String, List<String>> nodesComments = new HashMap<>();
-        for (NodeTuple nodeTuple : node.getValue()) {
-            ScalarNode keyNode = (ScalarNode) nodeTuple.getKeyNode();
-            String key = CaseConverter.convert(keyNode.getValue(), yamlNamingConvention, JacksonConfigurationAdapter.javaNamingConvention);
-            @NotNull List<String> comments = extractComments(keyNode);
-            if (!comments.isEmpty()) nodesComments.put(key, comments);
-            Node value = nodeTuple.getValueNode();
-            if (value instanceof MappingNode)
-                extractComments((MappingNode) value).forEach((k, c) ->
-                        nodesComments.put(key + "." + k, c)
-                );
-        }
-        return nodesComments;
-    }
-
-    private static @NotNull List<String> extractComments(final @NotNull Node node) {
-        List<CommentLine> comments = new ArrayList<>();
-        List<CommentLine> inlineComments = node.getInLineComments();
-        if (inlineComments != null) comments.addAll(inlineComments);
-        List<CommentLine> blockComments = node.getBlockComments();
-        if (blockComments != null) comments.addAll(blockComments);
-        return comments.stream()
-                .map(CommentLine::getValue)
-                .map(String::trim)
-                .collect(Collectors.toList());
-    }
-
     @Override
     public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
         return delegate.load(data, type);
@@ -154,6 +126,34 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
                                          final @NotNull File directory,
                                          final @NotNull Class<T> type) throws IOException {
         return delegate.extractAndLoad(resource, directory, type);
+    }
+
+    private static @NotNull Map<String, List<String>> extractComments(final @NotNull MappingNode node) {
+        final Map<String, List<String>> nodesComments = new HashMap<>();
+        for (NodeTuple nodeTuple : node.getValue()) {
+            ScalarNode keyNode = (ScalarNode) nodeTuple.getKeyNode();
+            String key = CaseConverter.convert(keyNode.getValue(), yamlNamingConvention, JacksonConfigurationAdapter.javaNamingConvention);
+            @NotNull List<String> comments = extractComments(keyNode);
+            if (!comments.isEmpty()) nodesComments.put(key, comments);
+            Node value = nodeTuple.getValueNode();
+            if (value instanceof MappingNode)
+                extractComments((MappingNode) value).forEach((k, c) ->
+                        nodesComments.put(key + "." + k, c)
+                );
+        }
+        return nodesComments;
+    }
+
+    private static @NotNull List<String> extractComments(final @NotNull Node node) {
+        List<CommentLine> comments = new ArrayList<>();
+        List<CommentLine> inlineComments = node.getInLineComments();
+        if (inlineComments != null) comments.addAll(inlineComments);
+        List<CommentLine> blockComments = node.getBlockComments();
+        if (blockComments != null) comments.addAll(blockComments);
+        return comments.stream()
+                .map(CommentLine::getValue)
+                .map(String::trim)
+                .collect(Collectors.toList());
     }
 
     /**
