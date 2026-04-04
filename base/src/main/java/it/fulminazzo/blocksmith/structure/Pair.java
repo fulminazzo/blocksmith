@@ -15,6 +15,8 @@ import java.util.function.Function;
  */
 @Value(staticConstructor = "of")
 public class Pair<F, S> implements Serializable, Comparable<Pair<F, S>> {
+    private static final long serialVersionUID = -4140010585755672306L;
+
     F first;
     S second;
 
