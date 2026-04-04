@@ -22,7 +22,7 @@ class BeanConfigurationBuilderTest extends Specification {
         def field = builder.fields['object']
         field != null
         field.toString() == "@Comment(\"Hello, world!\")\n" +
-                "private final $type object = ${builder.getInitializer(value)};"
+                "private $type object = ${builder.getInitializer(value)};"
 
         and:
         def method = builder.methods['getObject']

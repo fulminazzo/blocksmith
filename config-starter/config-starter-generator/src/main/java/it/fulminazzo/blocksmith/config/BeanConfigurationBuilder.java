@@ -52,7 +52,6 @@ public class BeanConfigurationBuilder {
                 key.getKey(),
                 k -> new FieldDeclaration()
                         .setPrivate(true)
-                        .setFinal(true)
                         .addVariable(new VariableDeclarator().setName(k))
         ).setAllTypes(StaticJavaParser.parseType(className));
         field.getVariable(0).setInitializer(getInitializer(value));
