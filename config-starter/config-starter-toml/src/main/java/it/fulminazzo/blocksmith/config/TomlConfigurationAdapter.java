@@ -19,6 +19,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link BaseConfigurationAdapter} for TOML.
@@ -119,7 +120,10 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         for (CommentedConfig.Entry entry : config.entrySet()) {
             String key = entry.getKey();
             String comment = entry.getComment();
-            if (comment != null) keysComments.put(key, Arrays.asList(comment.split("\n")));
+            if (comment != null) keysComments.put(key, Arrays.stream(comment.split("\n"))
+                    .map(String::trim)
+                    .collect(Collectors.toList())
+            );
             Object value = entry.getValue();
             if (value instanceof CommentedConfig)
                 toCommentedMap((CommentedConfig) value).forEach((k, c) ->
