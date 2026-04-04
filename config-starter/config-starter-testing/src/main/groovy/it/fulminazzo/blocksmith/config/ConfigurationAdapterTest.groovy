@@ -12,7 +12,7 @@ abstract class ConfigurationAdapterTest extends Specification {
         def actual = adapter.loadComments(data)
 
         then:
-        actual == supportsComments()
+        actual == (supportsComments()
                 ? [
                 'commentsEnabled': ['Example comment'],
                 'name'           : ['This comment should be', 'Multiline!'],
@@ -20,7 +20,7 @@ abstract class ConfigurationAdapterTest extends Specification {
                         'version': ['This comment should be indented']
                 ]
         ]
-                : [:]
+                : [:])
 
         where:
         data << [
