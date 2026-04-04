@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BeanConfigurationBuilder {
+    private static final @NotNull String defaultJavaPackage = "java.lang";
+
     @NotNull Map<CommentKey, Object> data;
 
     @NotNull Map<String, ImportDeclaration> imports;
@@ -39,7 +41,7 @@ public class BeanConfigurationBuilder {
      * @param value the value
      */
     void parseProperty(final @NotNull CommentKey key, final @Nullable Object value) {
-        final String className = getTypeFromObject(value).getCanonicalName();
+        final String className = getTypeFromObject(value).getSimpleName();
 
         // field
         final FieldDeclaration field = fields.computeIfAbsent(
@@ -120,7 +122,7 @@ public class BeanConfigurationBuilder {
 
     /**
      * Adds an import to the imports list.
-     * If the import belongs to "java.lang",
+     * If the import belongs to defaultJavaPackage,
      * then nothing is done (as already imported by default).
      *
      * @param value the value to get the type from (if <code>null</code>, nothing is done)
@@ -131,7 +133,7 @@ public class BeanConfigurationBuilder {
 
     /**
      * Adds an import to the imports list.
-     * If the import belongs to "java.lang",
+     * If the import belongs to defaultJavaPackage,
      * then nothing is done (as already imported by default).
      *
      * @param type the type to add
@@ -142,13 +144,13 @@ public class BeanConfigurationBuilder {
 
     /**
      * Adds an import to the imports list.
-     * If the import belongs to "java.lang",
+     * If the import belongs to {@link #defaultJavaPackage},
      * then nothing is done (as already imported by default).
      *
      * @param classCanonicalName the canonical name of the class to add
      */
     void addImport(final @NotNull String classCanonicalName) {
-        if (!classCanonicalName.startsWith("java.lang"))
+        if (!classCanonicalName.startsWith(defaultJavaPackage))
             imports.computeIfAbsent(
                     classCanonicalName,
                     c -> new ImportDeclaration(c, false, false)
