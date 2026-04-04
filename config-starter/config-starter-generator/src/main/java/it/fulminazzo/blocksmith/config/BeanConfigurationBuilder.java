@@ -105,7 +105,8 @@ public class BeanConfigurationBuilder {
                     ClassOrInterfaceDeclaration nc = new ClassOrInterfaceDeclaration()
                             .setName(k)
                             .setPublic(true)
-                            .setStatic(true);
+                            .setStatic(true)
+                            .setFinal(true);
                     root.addMember(nc);
                     return nc;
                 });
@@ -333,7 +334,7 @@ public class BeanConfigurationBuilder {
                 .collect(Collectors.toMap(NodeWithName::getNameAsString, i -> i));
 
         final ClassOrInterfaceDeclaration root = compilationUnit.getClassByName(className)
-                .orElseGet(() -> compilationUnit.addClass(className).setPublic(true));
+                .orElseGet(() -> compilationUnit.addClass(className).setPublic(true).setFinal(true));
 
         final BeanConfigurationBuilder builder = new BeanConfigurationBuilder(
                 data,
