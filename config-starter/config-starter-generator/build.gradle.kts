@@ -1,5 +1,5 @@
 dependencies {
     api(libs.java.parser)
 
-    project(":config-starter:config-starter-all")
+    api(project(":config-starter:config-starter-all"))
 }
