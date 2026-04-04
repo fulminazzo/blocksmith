@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.config
 
 import com.github.javaparser.StaticJavaParser
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.body.VariableDeclarator
@@ -11,7 +12,121 @@ class BeanConfigurationBuilderTest extends Specification {
     private BeanConfigurationBuilder builder
 
     void setup() {
-        builder = new BeanConfigurationBuilder([:], [:])
+        builder = new BeanConfigurationBuilder([:], new ClassOrInterfaceDeclaration(), [:])
+    }
+
+    def 'test that parseNestedConfig of existing field and getter correctly updates nodes and nested class'() {
+        given:
+        def key = new CommentKey('nested', ['Updated comment'])
+        def data = [(new CommentKey('value', [])): 1]
+
+        and:
+        def f = new FieldDeclaration()
+                .setPublic(true)
+                .setAllTypes(StaticJavaParser.parseType('OldType'))
+                .addSingleMemberAnnotation('Annotation', 'true')
+        f.addVariable(new VariableDeclarator(StaticJavaParser.parseType('OldType'), 'nested'))
+        builder.fields['nested'] = f
+
+        and:
+        def existingGetter = new MethodDeclaration()
+                .setName('getNested')
+                .setProtected(true)
+                .setFinal(true)
+                .setType(StaticJavaParser.parseType('OldType'))
+        existingGetter.createBody().addStatement(
+                StaticJavaParser.parseStatement('throw new UnsupportedOperationException();')
+        )
+        builder.methods['getNested'] = existingGetter
+
+        and:
+        def existingSetter = new MethodDeclaration()
+                .setName('setNested')
+                .setPrivate(true)
+                .setAbstract(true)
+                .setType(StaticJavaParser.parseType('String'))
+        existingSetter.addParameter('OldType', 'oldParam')
+        existingSetter.createBody().addStatement(
+                StaticJavaParser.parseStatement('throw new UnsupportedOperationException();')
+        )
+        builder.methods['setNested'] = existingSetter
+
+        and:
+        def existingNestedClass = new ClassOrInterfaceDeclaration()
+                .setName('Nested')
+                .setPublic(true)
+                .setStatic(true)
+        builder.nestedClasses['Nested'] = existingNestedClass
+
+        when:
+        builder.parseNestedConfig(key, data)
+
+        then:
+        def field = builder.fields['nested']
+        field != null
+        field.toString() == "@Annotation(true)\n" +
+                "@Comment(\"Updated comment\")\n" +
+                "public Nested nested = new Nested();"
+
+        and:
+        def getter = builder.methods['getNested']
+        getter != null
+        getter.toString() == "protected final Nested getNested() {\n" +
+                "    throw new UnsupportedOperationException();\n" +
+                "}"
+
+        and:
+        def setter = builder.methods['setNested']
+        setter != null
+        setter.toString() == "private void setNested(final Nested nested) {\n" +
+                "    throw new UnsupportedOperationException();\n" +
+                "}"
+
+        and:
+        builder.nestedClasses['Nested'].is(existingNestedClass)
+
+        and:
+        existingNestedClass.fields.any { it.getVariable(0).nameAsString == 'value' }
+    }
+
+    def 'test that parseNestedConfig of non-existing field and getter correctly creates nodes and nested class'() {
+        given:
+        def key = new CommentKey('nested', ['Nested config'])
+        def data = [(new CommentKey('value', [])): 1]
+
+        when:
+        builder.parseNestedConfig(key, data)
+
+        then:
+        def field = builder.fields['nested']
+        field != null
+        field.toString() == "@Comment(\"Nested config\")\n" +
+                "private Nested nested = new Nested();"
+
+        and:
+        def getter = builder.methods['getNested']
+        getter != null
+        getter.toString() == "public Nested getNested() {" +
+                "\n    return nested;\n" +
+                "}"
+
+        and:
+        def setter = builder.methods['setNested']
+        setter != null
+        setter.toString() == "public void setNested(final Nested nested) {" +
+                "\n    this.nested = nested;\n" +
+                "}"
+
+        and:
+        def nestedClass = builder.nestedClasses['Nested']
+        nestedClass != null
+        nestedClass.nameAsString == 'Nested'
+        nestedClass.isPublic()
+        nestedClass.isStatic()
+        builder.root.members.contains(nestedClass)
+
+        and:
+        nestedClass.fields.any { it.getVariable(0).nameAsString == 'value' }
     }
 
     def 'test that parseProperty of existing field and getter correctly updates nodes'() {
