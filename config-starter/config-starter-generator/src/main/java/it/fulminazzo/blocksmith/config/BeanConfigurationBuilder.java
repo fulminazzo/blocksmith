@@ -9,8 +9,11 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A builder to generate a Java bean from a configuration file.
@@ -23,6 +26,31 @@ public class BeanConfigurationBuilder {
     @NotNull Map<String, ImportDeclaration> imports;
     @NotNull Map<String, FieldDeclaration> fields = new HashMap<>();
     @NotNull Map<String, MethodDeclaration> methods = new HashMap<>();
+
+    /**
+     * Gets the initializer value for the given value.
+     * <br>
+     * For example, for strings the initializer is <code>"value"</code>.
+     * <br>
+     * If collections are given, they are imported and initialized properly.
+     *
+     * @param value the value
+     * @return the initializer value
+     */
+    @NotNull String getInitializer(final @Nullable Object value) {
+        if (value == null) return "null";
+        else if (value instanceof Collection<?>) {
+            Collection<?> collection = (Collection<?>) value;
+            addImport(collection);
+            addImport(Arrays.class);
+            return String.format("new %s<>(Arrays.asList(%s))",
+                    collection.getClass().getSimpleName(),
+                    collection.stream().map(this::getInitializer).collect(Collectors.joining(", "))
+            );
+        } else if (value instanceof String) return "\"" + value + "\"";
+        else if (value instanceof Character) return "'" + value + "'";
+        else return value.toString();
+    }
 
     /**
      * Adds an import to the imports list.
