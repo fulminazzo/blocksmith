@@ -4,12 +4,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 final class PascalCaseConvention implements NamingConvention {
 
     @Override
     public @NotNull List<String> tokenize(final @NotNull String input) {
-        return Arrays.asList(input.split("(?=[A-Z])"));
+        return Arrays.stream(input.split("(?=[A-Z])"))
+                .map(String::toLowerCase)
+                .collect(Collectors.toList());
     }
 
     @Override

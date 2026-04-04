@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents a {@link NamingConvention} that uses a separator to tokenize and format the input.
@@ -15,7 +16,9 @@ final class SeparatedCaseConvention implements NamingConvention {
 
     @Override
     public @NotNull List<String> tokenize(final @NotNull String input) {
-        return Arrays.asList(input.split(separator));
+        return Arrays.stream(input.split(separator))
+                .map(String::toLowerCase)
+                .collect(Collectors.toList());
     }
 
     @Override
