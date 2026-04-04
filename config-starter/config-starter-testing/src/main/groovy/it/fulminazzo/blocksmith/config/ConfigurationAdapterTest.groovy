@@ -19,7 +19,7 @@ abstract class ConfigurationAdapterTest extends Specification {
                 (new CommentKey('authors'))                                                                 : ['Fulminazzo', 'Camilla', 'Alex'],
                 (new CommentKey('internal'))                                                                : [
                         (new CommentKey('version', supportsComments() ? ['This comment should be indented'] : [])): true,
-                        (new CommentKey('verified'))                                                              : isProperties() ? '' : null
+                        (new CommentKey('verified'))                                                              : isProperties() || isToml() ? '' : null
                 ]
         ].sort()
 
