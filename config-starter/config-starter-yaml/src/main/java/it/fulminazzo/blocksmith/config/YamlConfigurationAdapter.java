@@ -77,39 +77,39 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
 
     @Override
     public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
-        return delegate.load(data, type);
+        return ConfigUtils.checkMap(delegate.load(data, type), yamlNamingConvention, ConfigUtils.javaNamingConvention);
     }
 
     @Override
     public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
-        return delegate.load(file, type);
+        return ConfigUtils.checkMap(delegate.load(file, type), yamlNamingConvention, ConfigUtils.javaNamingConvention);
     }
 
     @Override
     public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
-        return delegate.load(stream, type);
+        return ConfigUtils.checkMap(delegate.load(stream, type), yamlNamingConvention, ConfigUtils.javaNamingConvention);
     }
 
     @Override
     public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
-        return delegate.serialize(configuration);
+        return delegate.serialize(ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention));
     }
 
     @Override
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
-        delegate.store(file, configuration);
+        delegate.store(file, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention));
     }
 
     @Override
     public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
-        delegate.store(stream, configuration);
+        delegate.store(stream, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention));
     }
 
     private static @NotNull Map<String, List<String>> extractComments(final @NotNull MappingNode node) {
         final Map<String, List<String>> nodesComments = new HashMap<>();
         for (NodeTuple nodeTuple : node.getValue()) {
             ScalarNode keyNode = (ScalarNode) nodeTuple.getKeyNode();
-            String key = CaseConverter.convert(keyNode.getValue(), yamlNamingConvention, JacksonConfigurationAdapter.javaNamingConvention);
+            String key = CaseConverter.convert(keyNode.getValue(), yamlNamingConvention, ConfigUtils.javaNamingConvention);
             @NotNull List<String> comments = extractComments(keyNode);
             if (!comments.isEmpty()) nodesComments.put(key, comments);
             Node value = nodeTuple.getValueNode();

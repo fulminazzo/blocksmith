@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import it.fulminazzo.blocksmith.config.BaseConfigurationAdapter;
+import it.fulminazzo.blocksmith.config.ConfigUtils;
 import it.fulminazzo.blocksmith.config.ConfigVersion;
 import it.fulminazzo.blocksmith.naming.CaseConverter;
 import it.fulminazzo.blocksmith.naming.Convention;
@@ -26,11 +27,6 @@ import java.util.*;
  */
 @SuppressWarnings("unchecked")
 public final class JacksonConfigurationAdapter implements BaseConfigurationAdapter {
-    /**
-     * Java default naming convention for properties (fields).
-     */
-    public static final @NotNull Convention javaNamingConvention = Convention.CAMEL_CASE;
-
     private static final @NotNull SimpleDateFormat backupTimeFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS");
 
     private final @NotNull ObjectMapper mapper;
@@ -153,9 +149,9 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
             Object value = data.remove(key);
             if (value instanceof Map) unapplyNamingStrategy((Map<String, Object>) value, strategy);
             if (strategy.equals(PropertyNamingStrategies.KEBAB_CASE))
-                key = CaseConverter.convert(key, Convention.KEBAB_CASE, javaNamingConvention);
+                key = CaseConverter.convert(key, Convention.KEBAB_CASE, ConfigUtils.javaNamingConvention);
             else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE))
-                key = CaseConverter.convert(key, Convention.SNAKE_CASE, javaNamingConvention);
+                key = CaseConverter.convert(key, Convention.SNAKE_CASE, ConfigUtils.javaNamingConvention);
             else key = key.substring(0, 1).toLowerCase() + key.substring(1);
             data.put(key, value);
         }

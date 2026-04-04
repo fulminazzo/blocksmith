@@ -11,7 +11,7 @@ import com.electronwill.nightconfig.toml.TomlWriter;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.dataformat.toml.TomlMapper;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
-import it.fulminazzo.blocksmith.config.nightconfig.ConfigUtils;
+import it.fulminazzo.blocksmith.config.nightconfig.NightConfigUtils;
 import it.fulminazzo.blocksmith.naming.CaseConverter;
 import it.fulminazzo.blocksmith.naming.Convention;
 import it.fulminazzo.blocksmith.reflect.Reflect;
@@ -61,17 +61,17 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
 
     @Override
     public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
-        return delegate.load(data, type);
+        return ConfigUtils.checkMap(delegate.load(data, type), tomlNamingConvention, ConfigUtils.javaNamingConvention);
     }
 
     @Override
     public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
-        return delegate.load(file, type);
+        return ConfigUtils.checkMap(delegate.load(file, type), tomlNamingConvention, ConfigUtils.javaNamingConvention);
     }
 
     @Override
     public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
-        return delegate.load(stream, type);
+        return ConfigUtils.checkMap(delegate.load(stream, type), tomlNamingConvention, ConfigUtils.javaNamingConvention);
     }
 
     @Override
@@ -101,7 +101,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull Map<String, UnmodifiableCommentedConfig.CommentNode> nodes) {
         final Map<String, List<String>> keysComments = new HashMap<>();
         for (Map.Entry<String, UnmodifiableCommentedConfig.CommentNode> entry : nodes.entrySet()) {
-            String key = CaseConverter.convert(entry.getKey(), tomlNamingConvention, JacksonConfigurationAdapter.javaNamingConvention);
+            String key = CaseConverter.convert(entry.getKey(), tomlNamingConvention, it.fulminazzo.blocksmith.config.ConfigUtils.javaNamingConvention);
             UnmodifiableCommentedConfig.CommentNode value = entry.getValue();
             String comment = value.getComment();
             if (comment != null) keysComments.put(key, Arrays.stream(comment.split("\n"))
@@ -115,11 +115,12 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         return keysComments;
     }
 
-    private <T> @NotNull Config toNightConfig(final @NotNull T configuration) {
+    private <T> @NotNull Config toNightConfig(@NotNull T configuration) {
+        configuration = ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, tomlNamingConvention);
         CommentedConfig config = (CommentedConfig) ObjectSerializer.standard().serialize(configuration, CommentedConfig::inMemory);
         removeNulls(config);
-        ConfigUtils.fixPropertyNames(config);
-        ConfigUtils.setComments(configuration, config);
+        NightConfigUtils.fixPropertyNames(config);
+        NightConfigUtils.setComments(configuration, config);
         ConfigVersion.getVersion(configuration.getClass()).ifPresent(v -> config.set("version", v.getVersion()));
         return config;
     }

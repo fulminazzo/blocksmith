@@ -64,6 +64,36 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
         }
     }
 
+    @Override
+    public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
+        return ConfigUtils.checkMap(delegate.load(data, type), xmlNamingConvention, ConfigUtils.javaNamingConvention);
+    }
+
+    @Override
+    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
+        return ConfigUtils.checkMap(delegate.load(file, type), xmlNamingConvention, ConfigUtils.javaNamingConvention);
+    }
+
+    @Override
+    public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
+        return ConfigUtils.checkMap(delegate.load(stream, type), xmlNamingConvention, ConfigUtils.javaNamingConvention);
+    }
+
+    @Override
+    public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
+        return delegate.serialize(ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention));
+    }
+
+    @Override
+    public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
+        delegate.store(file, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention));
+    }
+
+    @Override
+    public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
+        delegate.store(stream, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention));
+    }
+
     private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull InputStream stream) throws XMLStreamException {
         final XMLInputFactory factory = new WstxInputFactory();
         final XMLStreamReader reader = factory.createXMLStreamReader(stream);
@@ -127,38 +157,8 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
         List<String> parts = new ArrayList<>(path);
         Collections.reverse(parts);
         return parts.stream()
-                .map(p -> CaseConverter.convert(p, xmlNamingConvention, JacksonConfigurationAdapter.javaNamingConvention))
+                .map(p -> CaseConverter.convert(p, xmlNamingConvention, ConfigUtils.javaNamingConvention))
                 .collect(Collectors.joining("."));
-    }
-
-    @Override
-    public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
-        return delegate.load(data, type);
-    }
-
-    @Override
-    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
-        return delegate.load(file, type);
-    }
-
-    @Override
-    public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
-        return delegate.load(stream, type);
-    }
-
-    @Override
-    public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
-        return delegate.serialize(configuration);
-    }
-
-    @Override
-    public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
-        delegate.store(file, configuration);
-    }
-
-    @Override
-    public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
-        delegate.store(stream, configuration);
     }
 
     /**

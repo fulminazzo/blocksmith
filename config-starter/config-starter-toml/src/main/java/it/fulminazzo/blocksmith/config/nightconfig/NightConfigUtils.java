@@ -20,7 +20,7 @@ import java.util.HashSet;
  * A collection of utilities to work with {@link Config} objects.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ConfigUtils {
+public final class NightConfigUtils {
     private static final @NotNull Convention namingConvention = Convention.SNAKE_CASE;
 
     /**
