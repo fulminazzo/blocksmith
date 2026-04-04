@@ -1,11 +1,14 @@
 package it.fulminazzo.blocksmith.config;
 
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.stmt.ReturnStmt;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,6 +29,43 @@ public class BeanConfigurationBuilder {
     @NotNull Map<String, ImportDeclaration> imports;
     @NotNull Map<String, FieldDeclaration> fields = new HashMap<>();
     @NotNull Map<String, MethodDeclaration> methods = new HashMap<>();
+
+    /**
+     * Parses simple values such as <code>null</code>, primitives, wrappers,
+     * {@link String}s or {@link java.util.Collection}s.
+     * Generates {@link Comment} annotation and getter for the field.
+     *
+     * @param key   the key
+     * @param value the value
+     */
+    void parseProperty(final @NotNull CommentKey key, final @Nullable Object value) {
+        final String className = getTypeFromObject(value).getCanonicalName();
+
+        // field
+        final FieldDeclaration field = fields.computeIfAbsent(
+                key.getKey(),
+                k -> new FieldDeclaration()
+                        .setPrivate(true)
+                        .setFinal(true)
+                        .addVariable(new VariableDeclarator().setName(k))
+        ).setAllTypes(StaticJavaParser.parseType(className));
+        field.getVariable(0).setInitializer(getInitializer(value));
+
+        // comment annotation
+        convertComments(key, field);
+
+        // getter
+        methods.computeIfAbsent(
+                "get" + capitalize(key.getKey()),
+                k -> {
+                    MethodDeclaration method = new MethodDeclaration()
+                            .setPublic(true)
+                            .setType(className);
+                    method.createBody().addStatement(new ReturnStmt(new NameExpr(k)));
+                    return method;
+                }
+        );
+    }
 
     /**
      * Converts the comments of the key to a {@link Comment} annotation for the field.
@@ -124,6 +164,10 @@ public class BeanConfigurationBuilder {
      */
     static @NotNull Class<?> getTypeFromObject(final @Nullable Object value) {
         return value == null ? Object.class : value.getClass();
+    }
+
+    private static @NotNull String capitalize(final @NotNull String string) {
+        return string.substring(0, 1).toUpperCase() + string.substring(1);
     }
 
 }
