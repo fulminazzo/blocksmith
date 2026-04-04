@@ -1,18 +1,18 @@
 package it.fulminazzo.blocksmith.config;
 
 import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +26,32 @@ public class BeanConfigurationBuilder {
     @NotNull Map<String, ImportDeclaration> imports;
     @NotNull Map<String, FieldDeclaration> fields = new HashMap<>();
     @NotNull Map<String, MethodDeclaration> methods = new HashMap<>();
+
+    /**
+     * Converts the comments of the key to a {@link Comment} annotation for the field.
+     *
+     * @param key   the key to pull the comments from
+     * @param field the field to add the annotation to
+     */
+    void convertComments(final @NotNull CommentKey key, final @NotNull FieldDeclaration field) {
+        final Expression initializer;
+        final @NotNull List<String> comments = key.getComments();
+        if (comments.isEmpty()) {
+            field.getAnnotationByClass(Comment.class).ifPresent(Node::remove);
+            return;
+        } else if (comments.size() == 1) initializer = new StringLiteralExpr(comments.get(0));
+        else
+            initializer = new ArrayInitializerExpr(NodeList.nodeList(
+                    comments.stream().map(StringLiteralExpr::new).collect(Collectors.toList())
+            ));
+
+        Optional<SingleMemberAnnotationExpr> annotation = field.getAnnotationByClass(Comment.class)
+                .map(Expression::asSingleMemberAnnotationExpr);
+        annotation.ifPresentOrElse(
+                a -> a.setMemberValue(initializer),
+                () -> field.addSingleMemberAnnotation(Comment.class, initializer)
+        );
+    }
 
     /**
      * Gets the initializer value for the given value.
