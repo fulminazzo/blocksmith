@@ -27,6 +27,14 @@ abstract class ConfigurationAdapterTest extends Specification {
         ]
     }
 
+    def 'test that loadComments does not throw for non-root node'() {
+        when:
+        def actual = adapter.loadComments('\"string\"')
+
+        then:
+        actual == [:]
+    }
+
     def 'test that load correctly loads raw data'() {
         given:
         def data = getFile('load').readLines().join('\n')
