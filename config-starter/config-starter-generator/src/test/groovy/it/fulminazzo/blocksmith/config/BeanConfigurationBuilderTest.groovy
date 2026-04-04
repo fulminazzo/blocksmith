@@ -11,6 +11,39 @@ class BeanConfigurationBuilderTest extends Specification {
         builder = new BeanConfigurationBuilder([:], [:])
     }
 
+    def 'test that parseProperty of non-existing field and getter correctly creates nodes'() {
+        given:
+        def key = new CommentKey('object', ['Hello, world!'])
+
+        and:
+        def type = BeanConfigurationBuilder.getTypeFromObject(value).simpleName
+
+        when:
+        builder.parseProperty(key, value)
+
+        then:
+        def field = builder.fields['object']
+        field != null
+        field.toString() == "@Comment(\"Hello, world!\")\n" +
+                "private final $type object = ${builder.getInitializer(value)};"
+
+        and:
+        def method = builder.methods['getObject']
+        method != null
+        method.toString() == "public $type getObject() {\n" +
+                "    return object;\n" +
+                "}"
+
+        where:
+        value << [
+                null,
+                10,
+                'Goodbye, mars!',
+                ['Goodbye', 'mars'],
+                [['Hello', 'world'], ['Goodbye', 'mars!']]
+        ]
+    }
+
     def 'test that convertComments correctly converts #key'() {
         when:
         builder.convertComments(key, field)
