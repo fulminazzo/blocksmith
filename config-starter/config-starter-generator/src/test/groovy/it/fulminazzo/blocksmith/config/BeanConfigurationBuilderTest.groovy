@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.config
 
+import com.github.javaparser.ast.body.FieldDeclaration
 import spock.lang.Specification
 
 class BeanConfigurationBuilderTest extends Specification {
@@ -8,6 +9,33 @@ class BeanConfigurationBuilderTest extends Specification {
 
     void setup() {
         builder = new BeanConfigurationBuilder([:], [:])
+    }
+
+    def 'test that convertComments correctly converts #key'() {
+        when:
+        builder.convertComments(key, field)
+
+        and:
+        def annotation = field.getAnnotationByClass(Comment)
+                .map { it.asSingleMemberAnnotationExpr() }
+
+        then:
+        if (expected instanceof String) {
+            assert annotation.isPresent()
+            assert annotation.get().toString() == expected
+        } else assert !annotation.isPresent()
+
+        where:
+        key                                        | field                  || expected
+        new CommentKey('key', [])                  | new FieldDeclaration() || null
+        new CommentKey('key', ['Hello, world!'])   | new FieldDeclaration() || '@Comment("Hello, world!")'
+        new CommentKey('key', ['Hello', 'world!']) | new FieldDeclaration() || '@Comment({ "Hello", "world!" })'
+        new CommentKey('key', [])                  | new FieldDeclaration().addSingleMemberAnnotation(Comment, '"Goodbye, mars!"')
+                                                                            || null
+        new CommentKey('key', ['Hello, world!'])   | new FieldDeclaration().addSingleMemberAnnotation(Comment, '"Goodbye, mars!"')
+                                                                            || '@Comment("Hello, world!")'
+        new CommentKey('key', ['Hello', 'world!']) | new FieldDeclaration().addSingleMemberAnnotation(Comment, '"Goodbye, mars!"')
+                                                                            || '@Comment({ "Hello", "world!" })'
     }
 
     def 'test that getInitializer of collection #collection returns #expected and adds #imports'() {
