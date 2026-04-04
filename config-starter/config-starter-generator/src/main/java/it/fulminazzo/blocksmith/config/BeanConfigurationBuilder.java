@@ -11,7 +11,6 @@ import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
-import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.structure.Pair;
 import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.AccessLevel;
@@ -288,7 +287,6 @@ public class BeanConfigurationBuilder {
         ));
         for (int i = 0; i < types.size(); i++) {
             String type = parseGenericTypesImports(types.get(i));
-            addImport(type);
             types.set(i, type.substring(type.lastIndexOf('.') + 1));
         }
         return baseType + String.format(genericsFormat, String.join(", ", types));
