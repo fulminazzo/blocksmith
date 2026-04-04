@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.config;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.Config;
+import com.electronwill.nightconfig.core.UnmodifiableCommentedConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import com.electronwill.nightconfig.core.serde.ObjectSerializer;
 import com.electronwill.nightconfig.toml.TomlFormat;
@@ -67,7 +68,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     @Override
     public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) {
         CommentedConfig config = parser.parse(stream);
-        return toCommentedMap(config);
+        return toCommentedMap(config.getComments());
     }
 
     @Override
@@ -122,18 +123,17 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         return load(file, type);
     }
 
-    private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull CommentedConfig config) {
+    private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull Map<String, UnmodifiableCommentedConfig.CommentNode> nodes) {
         final Map<String, List<String>> keysComments = new HashMap<>();
-        for (CommentedConfig.Entry entry : config.entrySet()) {
+        for (Map.Entry<String, UnmodifiableCommentedConfig.CommentNode> entry : nodes.entrySet()) {
             String key = CaseConverter.convert(entry.getKey(), tomlNamingConvention, JacksonConfigurationAdapter.javaNamingConvention);
-            String comment = entry.getComment();
+            UnmodifiableCommentedConfig.CommentNode value = entry.getValue();
+            String comment = value.getComment();
             if (comment != null) keysComments.put(key, Arrays.stream(comment.split("\n"))
                     .map(String::trim)
-                    .collect(Collectors.toList())
-            );
-            Object value = entry.getValue();
-            if (value instanceof CommentedConfig)
-                toCommentedMap((CommentedConfig) value).forEach((k, c) ->
+                    .collect(Collectors.toUnmodifiableList()));
+            if (value.getChildren() != null)
+                toCommentedMap(value.getChildren()).forEach((k, c) ->
                         keysComments.put(key + "." + k, c)
                 );
         }
