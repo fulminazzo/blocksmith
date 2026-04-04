@@ -9,6 +9,8 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.ReturnStmt;
+import it.fulminazzo.blocksmith.structure.Pair;
+import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -169,9 +171,30 @@ public class BeanConfigurationBuilder {
      */
     @NotNull String getGenericTypeNameFromObject(final @Nullable Object object) {
         String typeName = getTypeFromObject(object).getSimpleName();
-        if (object instanceof Collection<?>)
-            typeName += String.format(genericsFormat, guessCollectionGenericType((Collection<?>) object));
-        return typeName;
+        if (object instanceof Collection<?>) {
+            Collection<?> collection = (Collection<?>) object;
+            typeName += String.format(genericsFormat, guessCollectionGenericType(collection));
+            return parseGenericTypesImports(typeName);
+        } else return typeName;
+    }
+
+    @SuppressWarnings("unchecked")
+    private @NotNull String parseGenericTypesImports(final @NotNull String genericType) {
+        addImport(genericType);
+        int index = genericType.indexOf('<');
+        if (index == -1) return genericType.substring(genericType.lastIndexOf('.') + 1);
+        String baseType = genericType.substring(0, index);
+        List<String> types = new ArrayList<>(StringUtils.split(
+                genericType.substring(index + 1, genericType.length() - 1),
+                ",",
+                Pair.of("<", ">")
+        ));
+        for (int i = 0; i < types.size(); i++) {
+            String type = parseGenericTypesImports(types.get(i));
+            addImport(type);
+            types.set(i, type.substring(type.lastIndexOf('.') + 1));
+        }
+        return baseType + String.format(genericsFormat, String.join(", ", types));
     }
 
     /**
