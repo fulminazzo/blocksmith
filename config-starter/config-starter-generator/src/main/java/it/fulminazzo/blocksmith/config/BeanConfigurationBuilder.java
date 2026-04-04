@@ -341,7 +341,9 @@ public class BeanConfigurationBuilder {
                 imports
         );
         builder.parse();
+
         builder.imports.values().forEach(compilationUnit::addImport);
+        root.getMembers().sort(Comparator.comparingInt(BeanConfigurationBuilder::getMemberPriority));
 
         final String code = compilationUnit.toString();
         try (FileOutputStream output = new FileOutputStream(beanFile)) {
@@ -433,6 +435,13 @@ public class BeanConfigurationBuilder {
         for (Class<?> interfaceType : type.getInterfaces())
             typeNames.addAll(getCollectionTypeNames(interfaceType, genericType));
         return typeNames;
+    }
+
+    private static int getMemberPriority(final @NotNull BodyDeclaration<?> member) {
+        if (member instanceof FieldDeclaration) return 1;
+        if (member instanceof MethodDeclaration) return 2;
+        if (member instanceof ClassOrInterfaceDeclaration) return 3;
+        return 4;
     }
 
 }
