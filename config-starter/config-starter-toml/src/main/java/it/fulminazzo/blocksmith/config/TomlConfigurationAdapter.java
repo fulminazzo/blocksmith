@@ -23,6 +23,7 @@ import java.util.List;
  */
 final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     private final @NotNull BaseConfigurationAdapter delegate;
+    private final @NotNull TomlWriter writer;
 
     /**
      * Instantiates a new TOML configuration adapter.
@@ -36,6 +37,9 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
                 logger,
                 null // will be handled by night-config
         );
+        this.writer = new TomlWriter();
+        writer.setIndent("");
+        writer.setIndentArrayElementsPredicate(l -> !l.isEmpty());
     }
 
     @Override
@@ -70,16 +74,16 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
         Files.createDirectories(file.getParentFile().toPath());
         Config config = toNightConfig(configuration);
-        newTomlWriter().write(config, file, WritingMode.REPLACE);
+        writer.write(config, file, WritingMode.REPLACE);
         indentArrays(file);
     }
 
     @Override
     public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
-        Config config = toNightConfig(configuration);
-        OutputStreamWriter writer = new OutputStreamWriter(stream);
-        newTomlWriter().write(config, writer);
-        writer.close();
+        try (OutputStreamWriter objectWriter = new OutputStreamWriter(stream)) {
+            Config config = toNightConfig(configuration);
+            writer.write(config, objectWriter);
+        }
     }
 
     @Override
@@ -90,7 +94,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         return load(file, type);
     }
 
-    private <T> @NotNull Config toNightConfig(@NotNull T configuration) {
+    private <T> @NotNull Config toNightConfig(final @NotNull T configuration) {
         CommentedConfig config = (CommentedConfig) ObjectSerializer.standard().serialize(configuration, CommentedConfig::inMemory);
         removeNulls(config);
         ConfigUtils.fixPropertyNames(config);
@@ -127,18 +131,6 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
                 if (line.matches("^ *[A-Za-z.0-9_-]+ *= *\\[ *$")) indent = "    ";
             }
         }
-    }
-
-    /**
-     * Gets a new TOML writer with predefined configuration.
-     *
-     * @return the toml writer
-     */
-    static @NotNull TomlWriter newTomlWriter() {
-        TomlWriter writer = new TomlWriter();
-        writer.setIndent("");
-        writer.setIndentArrayElementsPredicate(l -> !l.isEmpty());
-        return writer;
     }
 
 }
