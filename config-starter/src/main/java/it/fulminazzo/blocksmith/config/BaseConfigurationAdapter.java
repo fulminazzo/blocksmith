@@ -1,7 +1,9 @@
 package it.fulminazzo.blocksmith.config;
 
+import it.fulminazzo.blocksmith.util.MapUtils;
 import it.fulminazzo.blocksmith.util.ResourceUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +15,47 @@ import java.util.Map;
  * representing configuration files in different language data formats.
  */
 public interface BaseConfigurationAdapter {
+
+    /**
+     * Attempts to load the configuration from the given data.
+     * The returned map will contain {@link CommentKey}s as keys
+     * to represent the property names with their respective comments.
+     *
+     * @param data the raw data
+     * @return the load configuration with comments
+     */
+    default @NotNull Map<@NotNull CommentKey, @Nullable Object> loadWithComments(final @NotNull String data) throws IOException {
+        return loadWithComments(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    /**
+     * Attempts to load the configuration from the given data.
+     * The returned map will contain {@link CommentKey}s as keys
+     * to represent the property names with their respective comments.
+     *
+     * @param file the file
+     * @return the load configuration with comments
+     */
+    default @NotNull Map<@NotNull CommentKey, @Nullable Object> loadWithComments(final @NotNull File file) throws IOException {
+        return loadWithComments(new FileInputStream(file));
+    }
+
+    /**
+     * Attempts to load the configuration from the given data.
+     * The returned map will contain {@link CommentKey}s as keys
+     * to represent the property names with their respective comments.
+     *
+     * @param stream the stream of data to load from
+     * @return the load configuration with comments
+     */
+    @SuppressWarnings("unchecked")
+    default @NotNull Map<@NotNull CommentKey, @Nullable Object> loadWithComments(final @NotNull InputStream stream) throws IOException {
+        InputStream buffered = new ByteArrayInputStream(stream.readAllBytes());
+        Map<String, Object> data = load(buffered, Map.class);
+        buffered.reset();
+        Map<String, Object> comments = MapUtils.unflatten(loadComments(buffered));
+        return ConfigUtils.mergeDataMaps(data, comments);
+    }
 
     /**
      * Loads all the comments from the data.
