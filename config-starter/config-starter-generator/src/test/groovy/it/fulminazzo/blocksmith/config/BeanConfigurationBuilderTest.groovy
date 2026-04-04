@@ -1,6 +1,9 @@
 package it.fulminazzo.blocksmith.config
 
+import com.github.javaparser.StaticJavaParser
 import com.github.javaparser.ast.body.FieldDeclaration
+import com.github.javaparser.ast.body.MethodDeclaration
+import com.github.javaparser.ast.body.VariableDeclarator
 import spock.lang.Specification
 
 class BeanConfigurationBuilderTest extends Specification {
@@ -9,6 +12,71 @@ class BeanConfigurationBuilderTest extends Specification {
 
     void setup() {
         builder = new BeanConfigurationBuilder([:], [:])
+    }
+
+    def 'test that parseProperty of existing field and getter correctly updates nodes'() {
+        given:
+        def key = new CommentKey('object', ['Hello, world!'])
+
+        and:
+        def f = new FieldDeclaration()
+                .setPublic(true)
+                .setAllTypes(StaticJavaParser.parseType('double'))
+                .addSingleMemberAnnotation('Annotation', 'true')
+        f.addVariable(new VariableDeclarator(StaticJavaParser.parseType('Boolean'), 'object'))
+        builder.fields['object'] = f
+        def method = new MethodDeclaration()
+                .setName('getObject')
+                .setProtected(true)
+                .setFinal(true)
+                .setType(StaticJavaParser.parseType('double'))
+        method.createBody().addStatement(
+                StaticJavaParser.parseStatement('throw new UnsupportedOperationException();')
+        )
+        builder.methods['getObject'] = method
+        method = new MethodDeclaration()
+                .setName('setObject')
+                .setPrivate(true)
+                .setAbstract(true)
+                .setType(StaticJavaParser.parseType('String'))
+        method.addParameter('String', 'value')
+        method.createBody().addStatement(
+                StaticJavaParser.parseStatement('throw new UnsupportedOperationException();')
+        )
+        builder.methods['setObject'] = method
+
+        when:
+        builder.parseProperty(key, value)
+
+        then:
+        def field = builder.fields['object']
+        field != null
+        field.toString() == "@Annotation(true)\n" +
+                "@Comment(\"Hello, world!\")\n" +
+                "public $type object = ${builder.getInitializer(value)};"
+
+        and:
+        def getter = builder.methods['getObject']
+        getter != null
+        getter.toString() == "protected final $type getObject() {\n" +
+                "    throw new UnsupportedOperationException();\n" +
+                "}"
+
+        and:
+        def setter = builder.methods['setObject']
+        setter != null
+        setter.toString() == "private void setObject(final $type object) {\n" +
+                "    throw new UnsupportedOperationException();\n" +
+                "}"
+
+        where:
+        value                                      | type
+        null                                       | 'Object'
+        10                                         | 'Integer'
+        'Goodbye, mars!'                           | 'String'
+        ['Goodbye', 'mars']                        | 'List<String>'
+        ['Goodbye', 'mars'].toSet()                | 'Set<String>'
+        [['Hello', 'world'], ['Goodbye', 'mars!']] | 'List<ArrayList<String>>'
     }
 
     def 'test that parseProperty of non-existing field and getter correctly creates nodes'() {
