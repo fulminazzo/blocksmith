@@ -21,4 +21,5 @@ include("config-starter:config-starter-yaml")
 include("config-starter:config-starter-all")
 
 include("config-starter:config-starter-testing")
+include("config-starter:config-starter-generator")
 
