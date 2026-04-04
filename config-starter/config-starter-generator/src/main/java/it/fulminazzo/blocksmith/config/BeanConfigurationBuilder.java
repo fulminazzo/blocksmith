@@ -62,8 +62,9 @@ public class BeanConfigurationBuilder {
                 k -> {
                     MethodDeclaration method = new MethodDeclaration()
                             .setPublic(true)
-                            .setType(className);
-                    method.createBody().addStatement(new ReturnStmt(new NameExpr(k)));
+                            .setType(className)
+                            .setName(k);
+                    method.createBody().addStatement(new ReturnStmt(new NameExpr(key.getKey())));
                     return method;
                 }
         );
