@@ -19,6 +19,19 @@ public interface BaseConfigurationAdapter {
      * Loads all the comments from the data.
      * The comments will be grouped by the key they belong to.
      * If a key has no comment, it will not be present in the map.
+     * Nested keys will be put in dot notation.
+     * For example:
+     * <pre>{@code
+     * player:
+     *   # The welcome message
+     *   join: 'Welcome back!'
+     * }</pre>
+     * will become:
+     * <pre>{@code
+     * {
+     *     "player.join": "The welcome message"
+     * }
+     * }</pre>
      *
      * @param data the raw data
      * @return the comments
@@ -29,6 +42,19 @@ public interface BaseConfigurationAdapter {
      * Loads all the comments from the data.
      * The comments will be grouped by the key they belong to.
      * If a key has no comment, it will not be present in the map.
+     * Nested keys will be put in dot notation.
+     * For example:
+     * <pre>{@code
+     * player:
+     *   # The welcome message
+     *   join: 'Welcome back!'
+     * }</pre>
+     * will become:
+     * <pre>{@code
+     * {
+     *     "player.join": "The welcome message"
+     * }
+     * }</pre>
      *
      * @param file the file
      * @return the comments
@@ -39,6 +65,19 @@ public interface BaseConfigurationAdapter {
      * Loads all the comments from the data.
      * The comments will be grouped by the key they belong to.
      * If a key has no comment, it will not be present in the map.
+     * Nested keys will be put in dot notation.
+     * For example:
+     * <pre>{@code
+     * player:
+     *   # The welcome message
+     *   join: 'Welcome back!'
+     * }</pre>
+     * will become:
+     * <pre>{@code
+     * {
+     *     "player.join": "The welcome message"
+     * }
+     * }</pre>
      *
      * @param stream the stream of data to load from
      * @return the comments

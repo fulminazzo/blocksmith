@@ -14,13 +14,10 @@ abstract class ConfigurationAdapterTest extends Specification {
         then:
         actual == (supportsComments()
                 ? [
-                'commentsEnabled': ['Example comment'],
-                'name'           : ['This comment should be', 'Multiline!'],
-                'internal'       : [
-                        'version': ['This comment should be indented']
-                ]
-        ]
-                : [:])
+                'commentsEnabled' : ['Example comment'],
+                'name'            : ['This comment should be', 'Multiline!'],
+                'internal.version': ['This comment should be indented']
+        ] : [:])
 
         where:
         data << [
