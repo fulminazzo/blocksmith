@@ -14,6 +14,25 @@ class BeanConfigurationBuilderTest extends Specification {
         builder = new BeanConfigurationBuilder([:], new ClassOrInterfaceDeclaration(), [:])
     }
 
+    def 'test that initialization correctly adds nested classes (not interfaces), methods and fields'() {
+        given:
+        def classDeclaration = new ClassOrInterfaceDeclaration()
+        def field = classDeclaration.addField('String', 'string')
+        def method = classDeclaration.addMethod('getString')
+        def nested = new ClassOrInterfaceDeclaration().setName('NestedClass')
+        classDeclaration.addMember(nested)
+        classDeclaration.addMember(new ClassOrInterfaceDeclaration().setInterface(true).setName('NestedInterface'))
+
+        when:
+        def builder = new BeanConfigurationBuilder([:], classDeclaration, [:])
+
+        then:
+        builder.nestedClasses['NestedClass'] == nested
+        builder.nestedClasses['NestedInterface'] == null
+        builder.fields['string'] == field
+        builder.methods['getString'] == method
+    }
+
     def 'test that parseNestedConfig of existing field and getter correctly updates nodes and nested class'() {
         given:
         def key = new CommentKey('nested', ['Updated comment'])
