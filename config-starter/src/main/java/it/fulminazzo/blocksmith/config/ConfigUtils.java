@@ -32,17 +32,17 @@ final class ConfigUtils {
         for (final Map.Entry<String, Object> entry : configuration.entrySet()) {
             final String key = entry.getKey();
             Object value = entry.getValue();
+            final Object comment = comments.get(key);
 
             if (value instanceof Map<?, ?>) {
                 Map<String, Object> subConfiguration = (Map<String, Object>) value;
-                value = mergeDataMaps(subConfiguration, comments.containsKey(key)
+                value = mergeDataMaps(subConfiguration, comment instanceof Map
                         ? (Map<String, Object>) comments.get(key)
                         : Collections.emptyMap()
                 );
             }
 
-            if (comments.containsKey(key))
-                result.put(new CommentKey(key, (List<String>) comments.get(key)), value);
+            if (comment instanceof List<?>) result.put(new CommentKey(key, (List<String>) comment), value);
             else result.put(new CommentKey(key), value);
         }
         return result;
