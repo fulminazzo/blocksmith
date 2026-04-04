@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BeanConfigurationBuilder {
     private static final @NotNull String defaultJavaPackage = "java.lang";
+    private static final @NotNull String genericsFormat = "<%s>";
+    private static final @NotNull Class<?> nullClass = Object.class;
 
     @NotNull Map<CommentKey, Object> data;
 
@@ -41,7 +43,7 @@ public class BeanConfigurationBuilder {
      * @param value the value
      */
     void parseProperty(final @NotNull CommentKey key, final @Nullable Object value) {
-        final String className = getTypeFromObject(value).getSimpleName();
+        final String className = getGenericTypeNameFromObject(value);
 
         // field
         final FieldDeclaration field = fields.computeIfAbsent(
@@ -159,6 +161,20 @@ public class BeanConfigurationBuilder {
     }
 
     /**
+     * Gets the type name of the given object.
+     * If the object is a collection, the generic type is returned.
+     *
+     * @param object the object
+     * @return the type name
+     */
+    @NotNull String getGenericTypeNameFromObject(final @Nullable Object object) {
+        String typeName = getTypeFromObject(object).getSimpleName();
+        if (object instanceof Collection<?>)
+            typeName += String.format(genericsFormat, guessCollectionGenericType((Collection<?>) object));
+        return typeName;
+    }
+
+    /**
      * Converts the given value to a class.
      * If the value is <code>null</code>, {@link Object} is returned.
      *
@@ -166,11 +182,79 @@ public class BeanConfigurationBuilder {
      * @return the class
      */
     static @NotNull Class<?> getTypeFromObject(final @Nullable Object value) {
-        return value == null ? Object.class : value.getClass();
+        return value == null ? nullClass : value.getClass();
     }
 
     private static @NotNull String capitalize(final @NotNull String string) {
         return string.substring(0, 1).toUpperCase() + string.substring(1);
+    }
+
+    /**
+     * Attempts to guess the generic type of the given collection based on its elements types.
+     *
+     * @param collection the collection
+     * @return the guessed type name (with its generic parameters if present)
+     */
+    private static @NotNull String guessCollectionGenericType(final @NotNull Collection<?> collection) {
+        final Map<String, Integer> typesCount = new LinkedHashMap<>();
+        for (Object object : collection) {
+            final Set<String> typeNames;
+            if (object instanceof Collection<?>) {
+                String genericType = guessCollectionGenericType((Collection<?>) object);
+                typeNames = getCollectionTypeNames(object.getClass(), genericType);
+            } else if (object == null) typeNames = Set.of(nullClass.getCanonicalName());
+            else typeNames = getBasicTypeNames(object.getClass(), object.getClass());
+            typeNames.forEach(t -> typesCount.merge(t, 1, Integer::sum));
+        }
+        return typesCount.entrySet().stream()
+                .filter(e -> e.getValue() == collection.size())
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(nullClass.getCanonicalName());
+    }
+
+    /**
+     * Gets all the names of the classes (given, inherited and interface) of the basic type.
+     * A basic type is a primitive, a wrapper, {@link String} or {@link Object}.
+     * If the class requires a generic type, the base one is provided.
+     *
+     * @param type the class to get the types of
+     * @param base the type to get the types of
+     * @return the types names
+     */
+    private static @NotNull Set<String> getBasicTypeNames(final @Nullable Class<?> type,
+                                                          final @NotNull Class<?> base) {
+        final Set<String> typeNames = new LinkedHashSet<>();
+        if (type == null) return typeNames;
+        String typeName = type.getCanonicalName();
+        if (type.getTypeParameters().length == 1) typeName += String.format(genericsFormat, base.getSimpleName());
+        typeNames.add(typeName);
+        if (type.equals(Object.class)) return typeNames;
+        typeNames.addAll(getBasicTypeNames(type.getSuperclass(), base));
+        for (Class<?> interfaceType : type.getInterfaces())
+            typeNames.addAll(getBasicTypeNames(interfaceType, base));
+        return typeNames;
+    }
+
+    /**
+     * Gets all the names of the classes (given, inherited and interfaces) of the given collection type.
+     * If the class requires a generic type, the given one is provided.
+     *
+     * @param type        the class to get the types of
+     * @param genericType the generic type
+     * @return the types names
+     */
+    private static @NotNull Set<String> getCollectionTypeNames(final @Nullable Class<?> type,
+                                                               final @NotNull String genericType) {
+        final Set<String> typeNames = new LinkedHashSet<>();
+        if (type == null || type.equals(Object.class)) return typeNames;
+        String typeName = type.getCanonicalName();
+        if (type.getTypeParameters().length == 1) typeName += String.format(genericsFormat, genericType);
+        typeNames.add(typeName);
+        typeNames.addAll(getCollectionTypeNames(type.getSuperclass(), genericType));
+        for (Class<?> interfaceType : type.getInterfaces())
+            typeNames.addAll(getCollectionTypeNames(interfaceType, genericType));
+        return typeNames;
     }
 
 }
