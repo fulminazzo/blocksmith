@@ -92,11 +92,14 @@ public class BeanConfigurationBuilder {
         // nested class
         ClassOrInterfaceDeclaration nestedClass = nestedClasses.computeIfAbsent(
                 nestedClassName,
-                k -> new ClassOrInterfaceDeclaration()
-                        .setName(k)
-                        .setPublic(true)
-                        .setStatic(true)
-        );
+                k -> {
+                    ClassOrInterfaceDeclaration nc = new ClassOrInterfaceDeclaration()
+                            .setName(k)
+                            .setPublic(true)
+                            .setStatic(true);
+                    root.addMember(nc);
+                    return nc;
+                });
         new BeanConfigurationBuilder(data, nestedClass, imports).parse();
     }
 
@@ -121,7 +124,7 @@ public class BeanConfigurationBuilder {
         // field
         final FieldDeclaration field = fields.computeIfAbsent(
                 propertyName,
-                k -> new FieldDeclaration().setPrivate(true)
+                k -> root.addPrivateField(type, propertyName)
         );
         if (field.getVariables().isEmpty()) field.addVariable(new VariableDeclarator().setName(propertyName));
 
@@ -132,9 +135,7 @@ public class BeanConfigurationBuilder {
         methods.computeIfAbsent(
                 "get" + capitalize(propertyName),
                 k -> {
-                    MethodDeclaration method = new MethodDeclaration()
-                            .setPublic(true)
-                            .setName(k);
+                    MethodDeclaration method = root.addMethod(k).setPublic(true);
                     method.createBody().addStatement(new ReturnStmt(new NameExpr(propertyName)));
                     return method;
                 }
@@ -144,9 +145,7 @@ public class BeanConfigurationBuilder {
         MethodDeclaration setter = methods.computeIfAbsent(
                 "set" + capitalize(propertyName),
                 k -> {
-                    MethodDeclaration method = new MethodDeclaration()
-                            .setPublic(true)
-                            .setName(k);
+                    MethodDeclaration method = root.addMethod(k).setPublic(true);
                     method.createBody().addStatement(new AssignExpr(
                             new FieldAccessExpr(new ThisExpr(), propertyName),
                             new NameExpr(propertyName),
