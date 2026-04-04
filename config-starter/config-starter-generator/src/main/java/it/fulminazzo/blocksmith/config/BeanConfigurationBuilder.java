@@ -7,6 +7,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import it.fulminazzo.blocksmith.structure.Pair;
 import it.fulminazzo.blocksmith.util.StringUtils;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 /**
  * A builder to generate a Java bean from a configuration file.
  */
+@SuppressWarnings("unchecked")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BeanConfigurationBuilder {
     private static final @NotNull String defaultJavaPackage = "java.lang";
@@ -63,17 +65,58 @@ public class BeanConfigurationBuilder {
     }
 
     /**
+     * Converts all the given {@link #data} to Java fields for the bean creation.
+     */
+    void parse() {
+        data.forEach((k, v) -> {
+            if (v instanceof Map<?, ?>) parseNestedConfig(k, (Map<CommentKey, Object>) v);
+            else parseProperty(k, v);
+        });
+    }
+
+    /**
+     * Parses nested values in the form of {@link Map}s.
+     * Generates {@link Comment} annotation, getter and setter for the field.
+     *
+     * @param key  the key
+     * @param data the data
+     */
+    void parseNestedConfig(final @NotNull CommentKey key, final @NotNull Map<CommentKey, Object> data) {
+        final String propertyName = key.getKey();
+        final String nestedClassName = capitalize(propertyName);
+
+        generateField(key, nestedClassName).setInitializer(
+                new ObjectCreationExpr().setType(new ClassOrInterfaceType(null, nestedClassName))
+        );
+
+        // nested class
+        ClassOrInterfaceDeclaration nestedClass = nestedClasses.computeIfAbsent(
+                nestedClassName,
+                k -> new ClassOrInterfaceDeclaration()
+                        .setName(k)
+                        .setPublic(true)
+                        .setStatic(true)
+        );
+        new BeanConfigurationBuilder(data, nestedClass, imports).parse();
+    }
+
+    /**
      * Parses simple values such as <code>null</code>, primitives, wrappers,
      * {@link String}s or {@link java.util.Collection}s.
-     * Generates {@link Comment} annotation and getter for the field.
+     * Generates {@link Comment} annotation, getter and setter for the field.
      *
      * @param key   the key
      * @param value the value
      */
     void parseProperty(final @NotNull CommentKey key, final @Nullable Object value) {
         final String className = getGenericTypeNameFromObject(value);
+        generateField(key, className).setInitializer(getInitializer(value));
+    }
+
+    private @NotNull VariableDeclarator generateField(final @NotNull CommentKey key,
+                                                      final @NotNull String fieldClassName) {
         final String propertyName = key.getKey();
-        final Type type = StaticJavaParser.parseType(className);
+        final Type type = StaticJavaParser.parseType(fieldClassName);
 
         // field
         final FieldDeclaration field = fields.computeIfAbsent(
@@ -81,9 +124,6 @@ public class BeanConfigurationBuilder {
                 k -> new FieldDeclaration().setPrivate(true)
         );
         if (field.getVariables().isEmpty()) field.addVariable(new VariableDeclarator().setName(propertyName));
-        field.getVariable(0)
-                .setType(type)
-                .setInitializer(getInitializer(value));
 
         // comment annotation
         convertComments(key, field);
@@ -98,7 +138,7 @@ public class BeanConfigurationBuilder {
                     method.createBody().addStatement(new ReturnStmt(new NameExpr(propertyName)));
                     return method;
                 }
-        ).setType(className).setAbstract(false);
+        ).setType(fieldClassName).setAbstract(false);
 
         // setter
         MethodDeclaration setter = methods.computeIfAbsent(
@@ -117,6 +157,8 @@ public class BeanConfigurationBuilder {
         ).setType("void").setAbstract(false);
         if (setter.getParameters().isEmpty()) setter.addParameter(type, propertyName);
         setter.getParameter(0).setType(type).setName(propertyName).setFinal(true);
+
+        return field.getVariable(0).setType(type);
     }
 
     /**
@@ -225,7 +267,6 @@ public class BeanConfigurationBuilder {
         } else return typeName;
     }
 
-    @SuppressWarnings("unchecked")
     private @NotNull String parseGenericTypesImports(final @NotNull String genericType) {
         addImport(genericType);
         int index = genericType.indexOf('<');
