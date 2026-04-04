@@ -9,6 +9,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.type.Type;
 import it.fulminazzo.blocksmith.structure.Pair;
 import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.AccessLevel;
@@ -46,14 +47,16 @@ public class BeanConfigurationBuilder {
      */
     void parseProperty(final @NotNull CommentKey key, final @Nullable Object value) {
         final String className = getGenericTypeNameFromObject(value);
+        final String propertyName = key.getKey();
+        final Type type = StaticJavaParser.parseType(className);
 
         // field
         final FieldDeclaration field = fields.computeIfAbsent(
-                key.getKey(),
+                propertyName,
                 k -> new FieldDeclaration()
                         .setPrivate(true)
                         .addVariable(new VariableDeclarator().setName(k))
-        ).setAllTypes(StaticJavaParser.parseType(className));
+        ).setAllTypes(type);
         field.getVariable(0).setInitializer(getInitializer(value));
 
         // comment annotation
@@ -61,16 +64,33 @@ public class BeanConfigurationBuilder {
 
         // getter
         methods.computeIfAbsent(
-                "get" + capitalize(key.getKey()),
+                "get" + capitalize(propertyName),
                 k -> {
                     MethodDeclaration method = new MethodDeclaration()
                             .setPublic(true)
-                            .setType(className)
                             .setName(k);
-                    method.createBody().addStatement(new ReturnStmt(new NameExpr(key.getKey())));
+                    method.createBody().addStatement(new ReturnStmt(new NameExpr(propertyName)));
                     return method;
                 }
-        );
+        ).setType(className);
+
+        // setter
+        MethodDeclaration setter = methods.computeIfAbsent(
+                "set" + capitalize(propertyName),
+                k -> {
+                    MethodDeclaration method = new MethodDeclaration()
+                            .setPublic(true)
+                            .setName(k);
+                    method.createBody().addStatement(new AssignExpr(
+                            new FieldAccessExpr(new ThisExpr(), propertyName),
+                            new NameExpr(propertyName),
+                            AssignExpr.Operator.ASSIGN
+                    ));
+                    return method;
+                }
+        ).setType("void");
+        if (setter.getParameters().isEmpty()) setter.addParameter(type, propertyName);
+        setter.getParameter(0).setType(type).setName(propertyName).setFinal(true);
     }
 
     /**

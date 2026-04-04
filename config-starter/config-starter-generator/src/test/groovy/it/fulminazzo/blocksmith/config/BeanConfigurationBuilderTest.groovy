@@ -25,10 +25,17 @@ class BeanConfigurationBuilderTest extends Specification {
                 "private $type object = ${builder.getInitializer(value)};"
 
         and:
-        def method = builder.methods['getObject']
-        method != null
-        method.toString() == "public $type getObject() {\n" +
+        def getter = builder.methods['getObject']
+        getter != null
+        getter.toString() == "public $type getObject() {\n" +
                 "    return object;\n" +
+                "}"
+
+        and:
+        def setter = builder.methods['setObject']
+        setter != null
+        setter.toString() == "public void setObject(final $type object) {\n" +
+                "    this.object = object;\n" +
                 "}"
 
         where:
