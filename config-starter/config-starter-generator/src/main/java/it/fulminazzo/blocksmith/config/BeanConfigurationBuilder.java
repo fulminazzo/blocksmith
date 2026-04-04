@@ -265,21 +265,23 @@ public class BeanConfigurationBuilder {
      * @return the type name
      */
     @NotNull String getGenericTypeNameFromObject(final @Nullable Object object) {
-        String typeName = getTypeFromObject(object).getSimpleName();
         if (object instanceof Collection<?>) {
             Collection<?> collection = (Collection<?>) object;
-            if (collection instanceof List) typeName = List.class.getSimpleName();
-            else if (collection instanceof Set) typeName = Set.class.getSimpleName();
+            String typeName;
+            if (collection instanceof List) typeName = List.class.getCanonicalName();
+            else if (collection instanceof Set) typeName = Set.class.getCanonicalName();
+            else typeName = object.getClass().getCanonicalName();
             typeName += String.format(genericsFormat, guessCollectionGenericType(collection));
-            return parseGenericTypesImports(typeName);
-        } else return typeName;
+            typeName = parseGenericTypesImports(typeName);
+            return typeName.substring(typeName.lastIndexOf('.') + 1);
+        } else return getTypeFromObject(object).getSimpleName();
     }
 
     private @NotNull String parseGenericTypesImports(final @NotNull String genericType) {
-        addImport(genericType);
         int index = genericType.indexOf('<');
         if (index == -1) return genericType.substring(genericType.lastIndexOf('.') + 1);
         String baseType = genericType.substring(0, index);
+        addImport(baseType);
         List<String> types = new ArrayList<>(StringUtils.split(
                 genericType.substring(index + 1, genericType.length() - 1),
                 ",",
