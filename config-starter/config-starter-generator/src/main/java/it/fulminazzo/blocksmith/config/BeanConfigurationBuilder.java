@@ -344,7 +344,7 @@ public class BeanConfigurationBuilder {
         builder.parse();
 
         builder.imports.values().forEach(compilationUnit::addImport);
-        root.getMembers().sort(Comparator.comparingInt(BeanConfigurationBuilder::getMemberPriority));
+        sortClass(root);
 
         final String code = compilationUnit.toString();
         try (FileOutputStream output = new FileOutputStream(beanFile)) {
@@ -436,6 +436,13 @@ public class BeanConfigurationBuilder {
         for (Class<?> interfaceType : type.getInterfaces())
             typeNames.addAll(getCollectionTypeNames(interfaceType, genericType));
         return typeNames;
+    }
+
+    private static void sortClass(final @NotNull ClassOrInterfaceDeclaration classDeclaration) {
+        classDeclaration.getMembers().sort(Comparator.comparingInt(BeanConfigurationBuilder::getMemberPriority));
+        classDeclaration.getMembers().stream()
+                .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
+                .forEach(m -> sortClass((ClassOrInterfaceDeclaration) m));
     }
 
     private static int getMemberPriority(final @NotNull BodyDeclaration<?> member) {
