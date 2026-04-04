@@ -1,11 +1,10 @@
 package it.fulminazzo.blocksmith.config;
 
+import it.fulminazzo.blocksmith.util.ResourceUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +36,9 @@ public interface BaseConfigurationAdapter {
      * @param data the raw data
      * @return the comments
      */
-    @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull String data) throws IOException;
+    default @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull String data) throws IOException {
+        return loadComments(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
+    }
 
     /**
      * Loads all the comments from the data.
@@ -61,7 +62,9 @@ public interface BaseConfigurationAdapter {
      * @param file the file
      * @return the comments
      */
-    @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull File file) throws IOException;
+    default @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull File file) throws IOException {
+        return loadComments(new FileInputStream(file));
+    }
 
     /**
      * Loads all the comments from the data.
@@ -137,7 +140,9 @@ public interface BaseConfigurationAdapter {
      * @return the loaded configuration
      * @throws IOException in case of any errors
      */
-    <T> @NotNull T loadFromResource(final @NotNull String resource, final @NotNull Class<T> type) throws IOException;
+    default <T> @NotNull T loadFromResource(final @NotNull String resource, final @NotNull Class<T> type) throws IOException {
+        return load(ResourceUtils.getResource(BaseConfigurationAdapter.class.getClassLoader(), resource), type);
+    }
 
     /**
      * Serializes the given configuration to the format of this adapter.
@@ -182,8 +187,11 @@ public interface BaseConfigurationAdapter {
      * @return the loaded configuration
      * @throws IOException in case of any errors
      */
-    <T> @NotNull T extractAndLoad(final @NotNull String resource,
-                                  final @NotNull File directory,
-                                  final @NotNull Class<T> type) throws IOException;
+    default <T> @NotNull T extractAndLoad(final @NotNull String resource,
+                                          final @NotNull File directory,
+                                          final @NotNull Class<T> type) throws IOException {
+        File file = ResourceUtils.extractIfAbsent(BaseConfigurationAdapter.class.getClassLoader(), resource, directory);
+        return load(file, type);
+    }
 
 }

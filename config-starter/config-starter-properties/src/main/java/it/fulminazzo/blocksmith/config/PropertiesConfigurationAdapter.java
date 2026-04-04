@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -35,16 +34,6 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull String data) throws IOException {
-        return loadComments(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
-    }
-
-    @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull File file) throws IOException {
-        return loadComments(new FileInputStream(file));
-    }
-
-    @Override
     public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) throws IOException {
         return toCommentedMap(stream);
     }
@@ -65,11 +54,6 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     @Override
-    public @NotNull <T> T loadFromResource(final @NotNull String resource, final @NotNull Class<T> type) throws IOException {
-        return delegate.loadFromResource(resource, type);
-    }
-
-    @Override
     public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
         return delegate.serialize(configuration);
     }
@@ -82,13 +66,6 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
     @Override
     public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
         delegate.store(stream, configuration);
-    }
-
-    @Override
-    public @NotNull <T> T extractAndLoad(final @NotNull String resource,
-                                         final @NotNull File directory,
-                                         final @NotNull Class<T> type) throws IOException {
-        return delegate.extractAndLoad(resource, directory, type);
     }
 
     private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull InputStream inputStream) throws IOException {

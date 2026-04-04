@@ -27,16 +27,6 @@ final class DelegateConfigurationAdapter implements ConfigurationAdapter {
     @Nullable BaseConfigurationAdapter delegate;
 
     @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull String data) throws IOException {
-        return getDelegate().loadComments(data);
-    }
-
-    @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull File data) throws IOException {
-        return getDelegate().loadComments(data);
-    }
-
-    @Override
     public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) throws IOException {
         return getDelegate().loadComments(stream);
     }
@@ -56,11 +46,6 @@ final class DelegateConfigurationAdapter implements ConfigurationAdapter {
     @Override
     public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
         return getDelegate().load(stream, type);
-    }
-
-    @Override
-    public @NotNull <T> T loadFromResource(final @NotNull String resource, final @NotNull Class<T> type) throws IOException {
-        return getDelegate().loadFromResource(resource, type);
     }
 
     @Override
@@ -88,13 +73,6 @@ final class DelegateConfigurationAdapter implements ConfigurationAdapter {
     @Override
     public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
         getDelegate().store(stream, configuration);
-    }
-
-    @Override
-    public @NotNull <T> T extractAndLoad(final @NotNull String resource,
-                                         final @NotNull File directory,
-                                         final @NotNull Class<T> type) throws IOException {
-        return getDelegate().extractAndLoad(resource, directory, type);
     }
 
     @Override

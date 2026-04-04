@@ -15,12 +15,10 @@ import it.fulminazzo.blocksmith.config.nightconfig.ConfigUtils;
 import it.fulminazzo.blocksmith.naming.CaseConverter;
 import it.fulminazzo.blocksmith.naming.Convention;
 import it.fulminazzo.blocksmith.reflect.Reflect;
-import it.fulminazzo.blocksmith.util.ResourceUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,16 +54,6 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull String data) {
-        return loadComments(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
-    }
-
-    @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull File file) throws IOException {
-        return loadComments(new FileInputStream(file));
-    }
-
-    @Override
     public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) {
         CommentedConfig config = parser.parse(stream);
         return toCommentedMap(config.getComments());
@@ -84,11 +72,6 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     @Override
     public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
         return delegate.load(stream, type);
-    }
-
-    @Override
-    public @NotNull <T> T loadFromResource(final @NotNull String resource, final @NotNull Class<T> type) throws IOException {
-        return load(ResourceUtils.getResource(TomlConfigurationAdapter.class.getClassLoader(), resource), type);
     }
 
     @Override
@@ -113,14 +96,6 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
             Config config = toNightConfig(configuration);
             writer.write(config, objectWriter);
         }
-    }
-
-    @Override
-    public @NotNull <T> T extractAndLoad(final @NotNull String resource,
-                                         final @NotNull File directory,
-                                         final @NotNull Class<T> type) throws IOException {
-        File file = ResourceUtils.extractIfAbsent(TomlConfigurationAdapter.class.getClassLoader(), resource, directory);
-        return load(file, type);
     }
 
     private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull Map<String, UnmodifiableCommentedConfig.CommentNode> nodes) {
