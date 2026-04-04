@@ -15,9 +15,6 @@ class BeanConfigurationBuilderTest extends Specification {
         given:
         def key = new CommentKey('object', ['Hello, world!'])
 
-        and:
-        def type = BeanConfigurationBuilder.getTypeFromObject(value).simpleName
-
         when:
         builder.parseProperty(key, value)
 
@@ -35,13 +32,13 @@ class BeanConfigurationBuilderTest extends Specification {
                 "}"
 
         where:
-        value << [
-                null,
-                10,
-                'Goodbye, mars!',
-                ['Goodbye', 'mars'],
-                [['Hello', 'world'], ['Goodbye', 'mars!']]
-        ]
+        value                                      | type
+        null                                       | 'Object'
+        10                                         | 'Integer'
+        'Goodbye, mars!'                           | 'String'
+        ['Goodbye', 'mars']                        | 'List<String>'
+        ['Goodbye', 'mars'].toSet()                | 'Set<String>'
+        [['Hello', 'world'], ['Goodbye', 'mars!']] | 'List<ArrayList<String>>'
     }
 
     def 'test that convertComments correctly converts #key'() {
