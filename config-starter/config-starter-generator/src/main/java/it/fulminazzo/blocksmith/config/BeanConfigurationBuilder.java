@@ -71,7 +71,7 @@ public class BeanConfigurationBuilder {
                     method.createBody().addStatement(new ReturnStmt(new NameExpr(propertyName)));
                     return method;
                 }
-        ).setType(className);
+        ).setType(className).setAbstract(false);
 
         // setter
         MethodDeclaration setter = methods.computeIfAbsent(
@@ -87,7 +87,7 @@ public class BeanConfigurationBuilder {
                     ));
                     return method;
                 }
-        ).setType("void");
+        ).setType("void").setAbstract(false);
         if (setter.getParameters().isEmpty()) setter.addParameter(type, propertyName);
         setter.getParameter(0).setType(type).setName(propertyName).setFinal(true);
     }
