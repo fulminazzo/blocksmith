@@ -102,7 +102,7 @@ public final class ConfigUtils {
     private static @NotNull Map<String, Object> convertKeysFormat(final @NotNull Map<String, ?> configuration,
                                                                   final @NotNull Convention from,
                                                                   final @NotNull Convention to) {
-        final Map<String, Object> converted = new HashMap<>();
+        final Map<String, Object> converted = new LinkedHashMap<>();
         for (final Map.Entry<String, ?> entry : configuration.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();

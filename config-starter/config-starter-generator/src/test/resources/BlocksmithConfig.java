@@ -14,12 +14,12 @@ public final class BlocksmithConfig {
     })
     private Server server = new Server();
 
-    private Object lastUpdate = null;
-
     @Comment("Name of the application")
     private String name = "blocksmith";
 
     private List<String> authors = new ArrayList<>(Arrays.asList("Fulminazzo"));
+
+    private Object lastUpdate = null;
 
     public Server getServer() {
         return server;
@@ -27,14 +27,6 @@ public final class BlocksmithConfig {
 
     public void setServer(final Server server) {
         this.server = server;
-    }
-
-    public Object getLastUpdate() {
-        return lastUpdate;
-    }
-
-    public void setLastUpdate(final Object lastUpdate) {
-        this.lastUpdate = lastUpdate;
     }
 
     public String getName() {
@@ -53,19 +45,19 @@ public final class BlocksmithConfig {
         this.authors = authors;
     }
 
-    public static final class Server {
+    public Object getLastUpdate() {
+        return lastUpdate;
+    }
 
-        private Integer port = 8080;
+    public void setLastUpdate(final Object lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
+    public static final class Server {
 
         private String host = "localhost";
 
-        public Integer getPort() {
-            return port;
-        }
-
-        public void setPort(final Integer port) {
-            this.port = port;
-        }
+        private Integer port = 8080;
 
         public String getHost() {
             return host;
@@ -73,6 +65,14 @@ public final class BlocksmithConfig {
 
         public void setHost(final String host) {
             this.host = host;
+        }
+
+        public Integer getPort() {
+            return port;
+        }
+
+        public void setPort(final Integer port) {
+            this.port = port;
         }
     }
 }
