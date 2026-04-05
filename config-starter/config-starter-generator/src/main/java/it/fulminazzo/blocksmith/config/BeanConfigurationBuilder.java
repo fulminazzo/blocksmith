@@ -235,8 +235,14 @@ public class BeanConfigurationBuilder {
                     collection.getClass().getSimpleName(),
                     collection.stream().map(this::getInitializer).collect(Collectors.joining(", "))
             );
-        } else if (value instanceof String) return "\"" + value + "\"";
-        else if (value instanceof Character) return "'" + value + "'";
+        } else if (value instanceof String) return String.format("\"%s\"", value.toString()
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t")
+        );
+        else if (value instanceof Character) return String.format(String.format("'%s'", value));
         else if (value.getClass().isArray()) {
             Object[] array = (Object[]) value;
             String initializer = String.format("new %s[]", array.getClass().getComponentType().getSimpleName());
