@@ -19,7 +19,7 @@ import com.github.javaparser.printer.configuration.PrinterConfiguration;
 import com.github.javaparser.printer.configuration.imports.IntelliJImportOrderingStrategy;
 import it.fulminazzo.blocksmith.structure.Pair;
 import it.fulminazzo.blocksmith.util.StringUtils;
-import lombok.AccessLevel;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.github.javaparser.utils.Utils.isNullOrEmpty;
 
@@ -45,6 +46,13 @@ public class BeanConfigurationBuilder {
     private static final @NotNull String defaultJavaPackage = "java.lang";
     private static final @NotNull String genericsFormat = "<%s>";
     private static final @NotNull Class<?> nullClass = Object.class;
+
+    private static final @NotNull String[] lombokGetterAnnotations = Stream.of(
+            Getter.class, Data.class, Value.class
+    ).map(Class::getSimpleName).toArray(String[]::new);
+    private static final @NotNull String[] lombokSetterAnnotations = Stream.of(
+            Setter.class, Data.class, Value.class
+    ).map(Class::getSimpleName).toArray(String[]::new);
 
     @NotNull Map<CommentKey, Object> data;
 
@@ -150,30 +158,33 @@ public class BeanConfigurationBuilder {
         convertComments(key, field);
 
         // getter
-        methods.computeIfAbsent(
-                "get" + capitalize(propertyName),
-                k -> {
-                    MethodDeclaration method = root.addMethod(k).setPublic(true);
-                    method.createBody().addStatement(new ReturnStmt(new NameExpr(propertyName)));
-                    return method;
-                }
-        ).setType(fieldClassName).setAbstract(false);
+        if (!isAnnotationPresent(field, lombokGetterAnnotations))
+            methods.computeIfAbsent(
+                    "get" + capitalize(propertyName),
+                    k -> {
+                        MethodDeclaration method = root.addMethod(k).setPublic(true);
+                        method.createBody().addStatement(new ReturnStmt(new NameExpr(propertyName)));
+                        return method;
+                    }
+            ).setType(fieldClassName).setAbstract(false);
 
         // setter
-        MethodDeclaration setter = methods.computeIfAbsent(
-                "set" + capitalize(propertyName),
-                k -> {
-                    MethodDeclaration method = root.addMethod(k).setPublic(true);
-                    method.createBody().addStatement(new AssignExpr(
-                            new FieldAccessExpr(new ThisExpr(), propertyName),
-                            new NameExpr(propertyName),
-                            AssignExpr.Operator.ASSIGN
-                    ));
-                    return method;
-                }
-        ).setType("void").setAbstract(false);
-        if (setter.getParameters().isEmpty()) setter.addParameter(type, propertyName);
-        setter.getParameter(0).setType(type).setName(propertyName).setFinal(true);
+        if (!isAnnotationPresent(field, lombokSetterAnnotations)) {
+            MethodDeclaration setter = methods.computeIfAbsent(
+                    "set" + capitalize(propertyName),
+                    k -> {
+                        MethodDeclaration method = root.addMethod(k).setPublic(true);
+                        method.createBody().addStatement(new AssignExpr(
+                                new FieldAccessExpr(new ThisExpr(), propertyName),
+                                new NameExpr(propertyName),
+                                AssignExpr.Operator.ASSIGN
+                        ));
+                        return method;
+                    }
+            ).setType("void").setAbstract(false);
+            if (setter.getParameters().isEmpty()) setter.addParameter(type, propertyName);
+            setter.getParameter(0).setType(type).setName(propertyName).setFinal(true);
+        }
 
         return field.getVariable(0).setType(type);
     }
@@ -234,6 +245,23 @@ public class BeanConfigurationBuilder {
                     .map(this::getInitializer)
                     .collect(Collectors.joining(", ")));
         } else return value.toString();
+    }
+
+    /**
+     * Checks if an annotation with any of the given names is present
+     * in the root class or field.
+     *
+     * @param field       the field declaration
+     * @param annotations the annotation names
+     * @return <code>true</code> if at least one is
+     */
+    boolean isAnnotationPresent(final @NotNull FieldDeclaration field,
+                                final @NotNull String @NotNull ... annotations) {
+        for (String name : annotations) {
+            if (root.isAnnotationPresent(name)) return true;
+            else if (field.isAnnotationPresent(name)) return true;
+        }
+        return false;
     }
 
     /**
