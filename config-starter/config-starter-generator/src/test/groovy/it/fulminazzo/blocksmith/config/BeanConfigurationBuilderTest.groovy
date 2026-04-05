@@ -321,23 +321,27 @@ class BeanConfigurationBuilderTest extends Specification {
         builder.imports.isEmpty()
 
         where:
-        object           || expected
-        null             || 'null'
-        1 as byte        || '1'
-        1 as Byte        || '1'
-        1 as short       || '1'
-        1 as Short       || '1'
-        1 as int         || '1'
-        1 as Integer     || '1'
-        1 as long        || '1'
-        1 as Long        || '1'
-        1 as float       || '1.0'
-        1 as Float       || '1.0'
-        1 as double      || '1.0'
-        1 as Double      || '1.0'
-        'a' as char      || '\'a\''
-        'a' as Character || '\'a\''
-        'Hello, world!'  || '"Hello, world!"'
+        object                                       || expected
+        null                                         || 'null'
+        1 as byte                                    || '1'
+        1 as Byte                                    || '1'
+        1 as short                                   || '1'
+        1 as Short                                   || '1'
+        1 as int                                     || '1'
+        1 as Integer                                 || '1'
+        1 as long                                    || '1'
+        1 as Long                                    || '1'
+        1 as float                                   || '1.0'
+        1 as Float                                   || '1.0'
+        1 as double                                  || '1.0'
+        1 as Double                                  || '1.0'
+        'a' as char                                  || '\'a\''
+        'a' as Character                             || '\'a\''
+        'Hello, world!'                              || '"Hello, world!"'
+        ['Hello', 'world'].toArray(new String[2])    || 'new String[]{"Hello", "world"}'
+        new String[0]                                || 'new String[0]'
+        new String[0][0]                             || 'new String[0][0]'
+        new String[][]{new String[0], new String[0]} || 'new String[][]{new String[0], new String[0]}'
     }
 
 }

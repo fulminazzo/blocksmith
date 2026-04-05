@@ -222,7 +222,14 @@ public class BeanConfigurationBuilder {
             );
         } else if (value instanceof String) return "\"" + value + "\"";
         else if (value instanceof Character) return "'" + value + "'";
-        else return value.toString();
+        else if (value.getClass().isArray()) {
+            Object[] array = (Object[]) value;
+            String initializer = String.format("new %s[]", array.getClass().getComponentType().getSimpleName());
+            if (array.length == 0) return initializer.replace("[]", "[0]");
+            else return String.format("%s{%s}", initializer, Arrays.stream(array)
+                    .map(this::getInitializer)
+                    .collect(Collectors.joining(", ")));
+        } else return value.toString();
     }
 
     /**
