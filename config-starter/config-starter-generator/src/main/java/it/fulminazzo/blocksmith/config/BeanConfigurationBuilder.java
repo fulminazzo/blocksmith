@@ -11,6 +11,8 @@ import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.printer.DefaultPrettyPrinter;
+import com.github.javaparser.printer.DefaultPrettyPrinterVisitor;
 import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
 import com.github.javaparser.printer.configuration.PrinterConfiguration;
@@ -30,6 +32,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.github.javaparser.utils.Utils.isNullOrEmpty;
 
 /**
  * A builder to generate a Java bean from a configuration file.
@@ -348,6 +352,7 @@ public class BeanConfigurationBuilder {
         final ClassOrInterfaceDeclaration root = compilationUnit.getClassByName(className)
                 .orElseGet(() -> compilationUnit.addClass(className).setPublic(true).setFinal(true));
 
+        data.put(new CommentKey("test"), new String[]{"hello", "world"});
         final BeanConfigurationBuilder builder = new BeanConfigurationBuilder(
                 data,
                 root,
@@ -362,12 +367,11 @@ public class BeanConfigurationBuilder {
                 .addOption(new DefaultConfigurationOption(
                         DefaultPrinterConfiguration.ConfigOption.SORT_IMPORTS_STRATEGY,
                         new IntelliJImportOrderingStrategy()
-                ))
-                .addOption(new DefaultConfigurationOption(
-                        DefaultPrinterConfiguration.ConfigOption.INDENT_PRINT_ARRAYS_OF_ANNOTATIONS,
-                        true
                 ));
-        final String code = compilationUnit.toString(configuration);
+        final String code = new DefaultPrettyPrinter(
+                BlocksmithVisitor::new,
+                configuration
+        ).print(compilationUnit);
 
         try (FileOutputStream output = new FileOutputStream(beanFile)) {
             output.write(code.getBytes(StandardCharsets.UTF_8));
@@ -474,6 +478,57 @@ public class BeanConfigurationBuilder {
         if (member instanceof MethodDeclaration) return 2;
         if (member instanceof ClassOrInterfaceDeclaration) return 3;
         return 4;
+    }
+
+    /**
+     * {@link DefaultPrettyPrinterVisitor} override with our custom rules.
+     */
+    final static class BlocksmithVisitor extends DefaultPrettyPrinterVisitor {
+
+        /**
+         * Instantiates a new Blocksmith visitor.
+         *
+         * @param configuration the configuration
+         */
+        public BlocksmithVisitor(final @NotNull PrinterConfiguration configuration) {
+            super(configuration);
+        }
+
+        @Override
+        public void visit(final @NotNull ArrayInitializerExpr expression,
+                          final @NotNull Void argument) {
+            printOrphanCommentsBeforeThisChildNode(expression);
+            printComment(expression.getComment(), argument);
+            printer.print("{");
+            if (!isNullOrEmpty(expression.getValues())) {
+                final boolean multiLine = expression.getValues().stream().allMatch(Expression::isStringLiteralExpr);
+                if (multiLine) {
+                    printer.println();
+                    printer.indent();
+                    printer.indent();
+                } else {
+                    printer.print(" ");
+                }
+                for (final Iterator<Expression> i = expression.getValues().iterator(); i.hasNext(); ) {
+                    final Expression expr = i.next();
+                    expr.accept(this, argument);
+                    if (i.hasNext()) {
+                        printer.print(multiLine ? "," : ", ");
+                        if (multiLine) printer.println();
+                    }
+                }
+                if (multiLine) {
+                    printer.println();
+                    printer.unindent();
+                    printer.unindent();
+                } else {
+                    printer.print(" ");
+                }
+            }
+            printOrphanCommentsEnding(expression);
+            printer.print("}");
+        }
+
     }
 
 }
