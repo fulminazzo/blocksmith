@@ -21,8 +21,6 @@ public final class BlocksmithConfig {
 
     private List<String> authors = new ArrayList<>(Arrays.asList("Fulminazzo"));
 
-    private String[] test = new String[]{"hello", "world"};
-
     public Server getServer() {
         return server;
     }
@@ -53,14 +51,6 @@ public final class BlocksmithConfig {
 
     public void setAuthors(final List<String> authors) {
         this.authors = authors;
-    }
-
-    public String[] getTest() {
-        return test;
-    }
-
-    public void setTest(final String[] test) {
-        this.test = test;
     }
 
     public static final class Server {

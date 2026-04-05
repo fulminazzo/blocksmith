@@ -352,7 +352,6 @@ public class BeanConfigurationBuilder {
         final ClassOrInterfaceDeclaration root = compilationUnit.getClassByName(className)
                 .orElseGet(() -> compilationUnit.addClass(className).setPublic(true).setFinal(true));
 
-        data.put(new CommentKey("test"), new String[]{"hello", "world"});
         final BeanConfigurationBuilder builder = new BeanConfigurationBuilder(
                 data,
                 root,
