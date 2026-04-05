@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.config;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CommentKey implements Comparable<CommentKey> {
     @NotNull String key;
+    @EqualsAndHashCode.Exclude
     @NotNull List<String> comments;
 
     /**
