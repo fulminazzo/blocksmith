@@ -14,6 +14,27 @@ class BeanConfigurationBuilderTest extends Specification {
         builder = new BeanConfigurationBuilder([:], new ClassOrInterfaceDeclaration(), [:])
     }
 
+    def 'test generate of not-existing class'() {
+        given:
+        def configurationFile = new File('build/resources/test/config.yml')
+        def sourceDirectory = new File('build/resources/src')
+        def packageName = 'it.fulminazzo.blocksmith'
+        def className = 'BlocksmithConfig'
+        def expected = new File('build/resources/test/BlocksmithConfig.java')
+
+        and:
+        if (sourceDirectory.exists()) sourceDirectory.deleteDir()
+
+        when:
+        def file = BeanConfigurationBuilder.generate(configurationFile, sourceDirectory, packageName, className)
+
+        then:
+        file.exists()
+
+        and:
+        file.readLines() == expected.readLines()
+    }
+
     def 'test that initialization correctly adds nested classes (not interfaces), methods and fields'() {
         given:
         def classDeclaration = new ClassOrInterfaceDeclaration()
