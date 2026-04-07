@@ -45,6 +45,11 @@ import java.util.function.Function;
  */
 @Value(staticConstructor = "of")
 public class ConfigVersion {
+    /**
+     * The name of the property associated with the configuration version.
+     */
+    public static final @NotNull String PROPERTY_NAME = "version";
+
     @Getter
     double version;
     @NotNull Map<Double, Function<Migration, Migration>> migrations = new TreeMap<>();

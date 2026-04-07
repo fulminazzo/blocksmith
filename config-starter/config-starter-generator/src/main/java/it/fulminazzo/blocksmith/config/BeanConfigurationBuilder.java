@@ -150,7 +150,7 @@ public class BeanConfigurationBuilder {
         // field
         final FieldDeclaration field = fields.computeIfAbsent(
                 propertyName,
-                k -> root.addPrivateField(type, propertyName)
+                k -> root.addPrivateField(type, k)
         );
         if (field.getVariables().isEmpty()) field.addVariable(new VariableDeclarator().setName(propertyName));
 

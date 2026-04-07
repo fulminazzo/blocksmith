@@ -69,7 +69,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                 unapplyNamingStrategy(data, mapper.getPropertyNamingStrategy());
                 data = MapUtils.flatten(data);
 
-                Object rawVersion = data.get("version");
+                Object rawVersion = data.get(ConfigVersion.PROPERTY_NAME);
                 double latest = version.getVersion();
                 Double currentVersion = null;
                 if (rawVersion != null)
@@ -99,7 +99,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
 
                     data = version.applyMigrations(currentVersion, data);
                     data = MapUtils.unflatten(data);
-                    data.put("version", latest);
+                    data.put(ConfigVersion.PROPERTY_NAME, latest);
                     applyNamingStrategy(data, mapper.getPropertyNamingStrategy());
                     store(file, data);
                     return load(file, type);

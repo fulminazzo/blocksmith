@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Modifier;
 
 @JsonAppend(prepend = true, props = @JsonAppend.Prop(
-        name = "version",
+        name = ConfigVersion.PROPERTY_NAME,
         value = VersionMixin.VersionPropertyWriter.class,
         include = JsonInclude.Include.NON_NULL
 ))
@@ -54,7 +54,7 @@ interface VersionMixin {
                                                     final @NotNull BeanPropertyDefinition propDef,
                                                     final @NotNull JavaType type) {
             PropertyNamingStrategy strategy = config.getPropertyNamingStrategy();
-            String name = "version";
+            String name = ConfigVersion.PROPERTY_NAME;
             if (strategy != null) name = strategy.nameForField(config, null, name);
             BeanPropertyDefinition renamedPropDef = propDef.withSimpleName(name);
             return new VersionPropertyWriter(renamedPropDef, declaringClass.getAnnotations(), type);

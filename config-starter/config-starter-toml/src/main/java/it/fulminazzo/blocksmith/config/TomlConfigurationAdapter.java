@@ -121,7 +121,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         removeNulls(config);
         NightConfigUtils.fixPropertyNames(config);
         NightConfigUtils.setComments(configuration, config);
-        ConfigVersion.getVersion(configuration.getClass()).ifPresent(v -> config.set("version", v.getVersion()));
+        ConfigVersion.getVersion(configuration.getClass()).ifPresent(v -> config.set(ConfigVersion.PROPERTY_NAME, v.getVersion()));
         return config;
     }
 
