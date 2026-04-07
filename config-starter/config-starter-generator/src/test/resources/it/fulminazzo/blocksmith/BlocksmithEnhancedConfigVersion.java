@@ -17,14 +17,14 @@ import java.util.ArrayList;
  * The blocksmith configuration
  */
 @Value
-public class BlocksmithEnhancedConfig {
+public class BlocksmithEnhancedConfigVersion {
 
     private static final ConfigVersion version = ConfigVersion.of(2.0)
             .migrate(1.0, m -> m
                     .rename("host", "server.host")
                     .add("server.port", 8080)
                     .add("lastUpdate", null)
-            )
+            );
 
     @Comment({
             "Server settings of the application.",

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 public final class BlocksmithConfig {
 
+    //TODO: auto-generated, handle migrations manually
     @Comment({
             "Server settings of the application.",
             "Set these accordingly!"
