@@ -14,6 +14,45 @@ class BeanConfigurationBuilderTest extends Specification {
         builder = new BeanConfigurationBuilder([:], new ClassOrInterfaceDeclaration(), [:])
     }
 
+    def 'test generate of existing class with version'() {
+        given:
+        def configurationFile = new File('build/resources/test/config-version.yml')
+        def sourceDirectory = new File('build/resources/test')
+        def packageName = 'it.fulminazzo.blocksmith'
+        def className = 'BlocksmithEnhancedConfigVersion'
+        def expected = new File('src/test/resources/it/fulminazzo/blocksmith/BlocksmithEnhancedConfigVersion.java')
+
+        when:
+        def file = BeanConfigurationBuilder.generate(configurationFile, sourceDirectory, packageName, className)
+
+        then:
+        file.exists()
+
+        and:
+        file.readLines() == expected.readLines()
+    }
+
+    def 'test generate of not-existing class with version'() {
+        given:
+        def configurationFile = new File('build/resources/test/config-version.yml')
+        def sourceDirectory = new File('build/resources/src')
+        def packageName = 'it.fulminazzo.blocksmith'
+        def className = 'BlocksmithConfigVersion'
+        def expected = new File('build/resources/test/BlocksmithConfigVersion.java')
+
+        and:
+        if (sourceDirectory.exists()) sourceDirectory.deleteDir()
+
+        when:
+        def file = BeanConfigurationBuilder.generate(configurationFile, sourceDirectory, packageName, className)
+
+        then:
+        file.exists()
+
+        and:
+        file.readLines() == expected.readLines()
+    }
+
     def 'test generate of existing class'() {
         given:
         def configurationFile = new File('build/resources/test/config.yml')
