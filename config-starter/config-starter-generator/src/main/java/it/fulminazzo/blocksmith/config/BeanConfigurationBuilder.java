@@ -138,8 +138,46 @@ public class BeanConfigurationBuilder {
      * @param value the value
      */
     void parseProperty(final @NotNull CommentKey key, final @Nullable Object value) {
-        final String className = getGenericTypeNameFromObject(value);
-        generateField(key, className).setInitializer(getInitializer(value));
+        if (key.getKey().equals(ConfigVersion.PROPERTY_NAME) && value instanceof Number)
+            parseVersion((Number) value);
+        else {
+            final String className = getGenericTypeNameFromObject(value);
+            generateField(key, className).setInitializer(getInitializer(value));
+        }
+    }
+
+    /**
+     * Parses the <code>version</code> property separately.
+     * Only works if a <b>non-null number</b> was specified.
+     *
+     * @param version the version
+     */
+    void parseVersion(final @NotNull Number version) {
+        final Class<?> versionClass = ConfigVersion.class;
+        addImport(versionClass);
+        final String propertyName = ConfigVersion.PROPERTY_NAME;
+        final Type type = StaticJavaParser.parseType(versionClass.getSimpleName());
+
+        final FieldDeclaration field = fields.computeIfAbsent(
+                propertyName,
+                k -> root.addPrivateField(type, k).setFinal(true)
+        ).setStatic(true);
+        if (field.getVariables().isEmpty()) field.addVariable(new VariableDeclarator()
+                .setName(propertyName)
+                .setType(type)
+        );
+
+        VariableDeclarator fieldVariable = field.getVariable(0);
+        Expression initializer = fieldVariable.getInitializer().orElse(null);
+        if (initializer instanceof MethodCallExpr); //TODO
+        else {
+            field.setLineComment("TODO: auto-generated, handle migrations manually");
+            fieldVariable.setInitializer(new MethodCallExpr(
+                    new NameExpr(versionClass.getSimpleName()),
+                    new SimpleName("of"),
+                    new NodeList<>(new DoubleLiteralExpr(version.doubleValue()))
+            ));
+        }
     }
 
     private @NotNull VariableDeclarator generateField(final @NotNull CommentKey key,
