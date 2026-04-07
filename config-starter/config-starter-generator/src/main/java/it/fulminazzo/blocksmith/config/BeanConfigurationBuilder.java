@@ -162,12 +162,11 @@ public class BeanConfigurationBuilder {
                 propertyName,
                 k -> root.addPrivateField(type, k).setFinal(true)
         ).setStatic(true);
-        if (field.getVariables().isEmpty()) field.addVariable(new VariableDeclarator()
-                .setName(propertyName)
-                .setType(type)
-        );
+        if (field.getVariables().isEmpty()) field.addVariable(new VariableDeclarator());
 
-        VariableDeclarator fieldVariable = field.getVariable(0);
+        VariableDeclarator fieldVariable = field.getVariable(0)
+                .setName(propertyName)
+                .setType(type);
         Expression initializer = fieldVariable.getInitializer().orElse(null);
         if (initializer instanceof MethodCallExpr); //TODO
         else {
