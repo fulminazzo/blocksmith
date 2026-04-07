@@ -4,6 +4,8 @@ import com.github.javaparser.StaticJavaParser
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.MethodDeclaration
+import com.github.javaparser.ast.body.VariableDeclarator
+import com.github.javaparser.ast.expr.DoubleLiteralExpr
 import spock.lang.Specification
 
 class BeanConfigurationBuilderTest extends Specification {
@@ -51,6 +53,26 @@ class BeanConfigurationBuilderTest extends Specification {
 
         and:
         file.readLines() == expected.readLines()
+    }
+
+    def 'test that parseVersion of non-version class field overrides existing'() {
+        given:
+        def f = new FieldDeclaration().setPublic(true).setStatic(false)
+        f.addVariable(new VariableDeclarator()
+                .setName(ConfigVersion.PROPERTY_NAME)
+                .setType(double)
+                .setInitializer(new DoubleLiteralExpr(1.0))
+        )
+        builder.fields['version'] = f
+
+        when:
+        builder.parseVersion(2)
+
+        then:
+        def field = builder.fields['version']
+        field != null
+        field.toString() == '//TODO: auto-generated, handle migrations manually\n' +
+                'public static ConfigVersion version = ConfigVersion.of(2.0);'
     }
 
     def 'test generate of existing class'() {
