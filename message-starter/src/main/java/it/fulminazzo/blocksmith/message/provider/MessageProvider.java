@@ -97,7 +97,7 @@ public interface MessageProvider {
         }
         for (String resourceName : resources) {
             if (format.matches(resourceName)) {
-                String fileName = resourceName.substring(0, resourceName.lastIndexOf('.'));
+                String fileName = resourceName.substring(resourceName.lastIndexOf('/') + 1, resourceName.lastIndexOf('.'));
                 Locale locale = LocaleUtils.fromString(fileName);
                 if (locale.getCountry().isEmpty() || locale.getLanguage().isEmpty()) {
                     logger.warn("Ignoring invalid translation file {}. The expected format is %language%_%country%.{}", resourceName, format.name().toLowerCase());
