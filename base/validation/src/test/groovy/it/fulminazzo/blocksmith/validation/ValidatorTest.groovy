@@ -484,9 +484,9 @@ class ValidatorTest extends Specification {
         'rangeDuration'          | Duration.ofMillis(Integer.MAX_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MAX_VALUE), 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', Duration.ofMillis(Integer.MAX_VALUE), 10.5, 0.5), ['value': Duration.ofMillis(Integer.MAX_VALUE), 'max': 10.5, 'min': 0.5])]
         'rangeDuration'          | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Range Character
-        'range'                  | '\n' as char                             || [new ConstraintViolation('\n' as char, 'error.validation.character-exceeds-range', String.format('must be at least \'%3$s\' and at most \'%2$s\'', '\n' as char, A, Z), ['value': '\n' as char, 'max': Z, 'min': A])]
-        'range'                  | 'z' as char                              || [new ConstraintViolation('z' as char, 'error.validation.character-exceeds-range', String.format('must be at least \'%3$s\' and at most \'%2$s\'', 'z' as char, A, Z), ['value': 'z' as char, 'max': Z, 'min': A])]
-        'range'                  | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'character')]
+        'rangeCharacter'         | '\n' as char                             || [new ConstraintViolation('\n' as char, 'error.validation.character-exceeds-range', String.format('must be at least \'%3$s\' and at most \'%2$s\'', '\n' as char, Z, A), ['value': '\n' as char, 'max': Z, 'min': A])]
+        'rangeCharacter'         | 'z' as char                              || [new ConstraintViolation('z' as char, 'error.validation.character-exceeds-range', String.format('must be at least \'%3$s\' and at most \'%2$s\'', 'z' as char, Z, A), ['value': 'z' as char, 'max': Z, 'min': A])]
+        'rangeCharacter'         | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'character')]
         // Port
         'port'                   | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.invalid-port', String.format('%1$s is not a valid port', Integer.MIN_VALUE), ['value': Integer.MIN_VALUE])]
         'port'                   | 0                                        || [new ConstraintViolation(0, 'error.validation.invalid-port', String.format('%1$s is not a valid port', 0), ['value': 0])]
