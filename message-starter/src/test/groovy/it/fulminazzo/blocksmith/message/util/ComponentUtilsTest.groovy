@@ -4,6 +4,27 @@ import spock.lang.Specification
 
 class ComponentUtilsTest extends Specification {
 
+    def 'test that truncate with #length returns #expected'() {
+        given:
+        def component = ComponentUtils.toComponent('Hello, world!')
+
+        when:
+        def truncated = ComponentUtils.truncate(component, length)
+
+        then:
+        ComponentUtils.toString(truncated) == expected
+
+        where:
+        length || expected
+        0      || ''
+        1      || 'H'
+        2      || 'He'
+        3      || 'Hel'
+        4      || 'H...'
+        8      || 'Hello...'
+        20     || 'Hello, world!'
+    }
+
     def 'test that subcomponent of #rawComponent from #from to #to returns #expected'() {
         given:
         def component = ComponentUtils.toComponent(rawComponent)

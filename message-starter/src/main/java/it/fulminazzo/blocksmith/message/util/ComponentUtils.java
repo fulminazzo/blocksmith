@@ -55,6 +55,23 @@ public final class ComponentUtils {
     private static final char tagStart = '<', tagEnd = '>', escapeChar = '\\';
 
     /**
+     * Truncates the component text while maintaining any previous styling.
+     * If the component {@link #actualLength(Component)} is less than the index,
+     * the whole component is returned.
+     *
+     * @param component the component
+     * @param length the final length of the component
+     * @return the component
+     */
+    public static @NotNull Component truncate(final @NotNull Component component,
+                                              final int length) {
+        final int actual = actualLength(component);
+        if (actual <= length) return component;
+        else if (length > 3) return subcomponent(component, 0, length - 3).append(Component.text("..."));
+        else return subcomponent(component, 0, length);
+    }
+
+    /**
      * Cuts the component text at the given indexes, while maintaining any previous styling.
      *
      * @param component the component
