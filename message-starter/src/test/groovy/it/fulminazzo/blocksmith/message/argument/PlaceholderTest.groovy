@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.message.argument
 
 import groovy.util.logging.Slf4j
+import it.fulminazzo.blocksmith.ServerApplication
 import it.fulminazzo.blocksmith.message.MessageParseContext
 import it.fulminazzo.blocksmith.message.Messenger
 import it.fulminazzo.blocksmith.message.provider.MessageNotFoundException
@@ -22,7 +23,9 @@ class PlaceholderTest extends Specification {
             else throw new MessageNotFoundException(code, a[1])
         }
 
-        messenger = new Messenger(log)
+        def application = Mock(ServerApplication)
+        application.logger() >> log
+        messenger = new Messenger(application)
         messenger.messageProvider = provider
     }
 

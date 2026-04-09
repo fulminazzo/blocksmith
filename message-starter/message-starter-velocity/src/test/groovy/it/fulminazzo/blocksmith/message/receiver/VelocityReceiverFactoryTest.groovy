@@ -15,7 +15,7 @@ class VelocityReceiverFactoryTest extends Specification {
         server = Mock(ProxyServer)
 
         application = Mock(ServerApplication)
-        application.server >> server
+        application.server() >> server
         application.as(_) >> application
     }
 

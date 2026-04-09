@@ -28,10 +28,11 @@ class BukkitReceiverFactoryTest extends Specification {
 
         server = Mock(Server)
         server.pluginManager >> Mock(PluginManager)
+        plugin.server >> server
 
         application = plugin as ServerApplication
         application.as(_) >> application
-        application.server >> server
+        application.server() >> server
     }
 
     def 'test that getAllReceivers returns all the receivers'() {
