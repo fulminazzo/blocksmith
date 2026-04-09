@@ -12,6 +12,7 @@ import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.title.TitlePart
+import net.kyori.adventure.translation.GlobalTranslator
 import spock.lang.Specification
 
 import java.time.Duration
@@ -43,8 +44,82 @@ class MessengerTest extends Specification {
 
         def application = Mock(ServerApplication)
         application.logger() >> log
+        application.lowercaseName() >> 'blocksmith'
 
         messenger = new Messenger(application).setMessageProvider(provider)
+    }
+
+    def 'test that adventure translation system works'() {
+        given:
+        messages['greeting'] = Component.text('Hello, world!')
+
+        and:
+        def translator = GlobalTranslator.translator()
+
+        expect:
+        translator.sources.empty
+
+        when:
+        messenger.setupTranslator()
+
+        then:
+        !translator.sources.empty
+
+        when:
+        def component = Component.translatable('blocksmith.greeting')
+
+        and:
+        def text = translator.translate(component, Locale.US).content
+
+        then:
+        text == 'Hello, world!'
+
+        when:
+        component = Component.translatable('greeting')
+
+        and:
+        text = translator.translate(component, Locale.US)
+
+        then:
+        text == null
+
+        when:
+        messenger.removeTranslator()
+
+        then:
+        translator.sources.empty
+
+        when:
+        component = Component.translatable('blocksmith.greeting')
+
+        and:
+        text = translator.translate(component, Locale.US)
+
+        then:
+        text == null
+    }
+
+    def 'test that setupTranslator throws if already initialized'() {
+        given:
+        messenger.setupTranslator()
+
+        when:
+        messenger.setupTranslator()
+
+        then:
+        thrown(IllegalStateException)
+
+        cleanup:
+        def translator = GlobalTranslator.translator()
+        translator.removeSource(translator.sources[0])
+    }
+
+    def 'test that removeTranslator throws if not initialized'() {
+        when:
+        messenger.removeTranslator()
+
+        then:
+        thrown(IllegalStateException)
     }
 
     def 'test that broadcastTitle correctly converts and sends message to all receivers'() {

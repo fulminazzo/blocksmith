@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message;
 
+import it.fulminazzo.blocksmith.ProjectInfo;
 import it.fulminazzo.blocksmith.ServerApplication;
 import it.fulminazzo.blocksmith.message.argument.Argument;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
@@ -10,12 +11,17 @@ import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactory;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.TitlePart;
+import net.kyori.adventure.translation.GlobalTranslator;
+import net.kyori.adventure.translation.Translator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
@@ -28,7 +34,42 @@ import java.util.function.BiConsumer;
 public final class Messenger {
     private final @NotNull ServerApplication application;
 
+    private @Nullable Translator translator;
     private @Nullable MessageProvider messageProvider;
+
+    /**
+     * If this method is used, translations will be available through the
+     * Adventure default translation system.
+     * <br>
+     * Assuming the messenger has access to <code>greeting: 'Hello, world!'</code>
+     * and the {@link #application} name is "blocksmith",
+     * <code>Component.translatable("blocksmith.greeting")</code> will
+     * return "Hello, world!".
+     *
+     * @return this object (for method chaining)
+     */
+    public @NotNull Messenger setupTranslator() {
+        if (translator == null) {
+            translator = new MessengerTranslator();
+            GlobalTranslator.translator().addSource(translator);
+        } else throw new IllegalStateException("Adventure translator has been already initialized");
+        return this;
+    }
+
+    /**
+     * Removes the Adventure translator (if set).
+     * <br>
+     * Requires {@link #setupTranslator()} to be called first.
+     *
+     * @return this object (for method chaining)
+     */
+    public @NotNull Messenger removeTranslator() {
+        if (translator != null) {
+            GlobalTranslator.translator().removeSource(translator);
+            translator = null;
+        } else throw new IllegalStateException("Adventure translator has not been set up yet");
+        return this;
+    }
 
     /**
      * Broadcasts a message to all the available receivers through titles.
@@ -256,6 +297,34 @@ public final class Messenger {
                     )
             );
         return messageProvider;
+    }
+
+    /**
+     * Implementation of {@link Translator} for the {@link Messenger} messages.
+     */
+    final class MessengerTranslator implements Translator {
+
+        @Override
+        public @NotNull Key name() {
+            return Key.key(ProjectInfo.PROJECT_NAME, application.lowercaseName());
+        }
+
+        @Override
+        public @Nullable MessageFormat translate(final @NotNull String key,
+                                                 final @NotNull Locale locale) {
+            return null;
+        }
+
+        @Override
+        public @Nullable Component translate(final @NotNull TranslatableComponent component,
+                                             final @NotNull Locale locale) {
+            final String translatorKey = name().value() + ".";
+            String key = component.key();
+            if (key.startsWith(translatorKey))
+                return getComponentOrNull(key.substring(translatorKey.length()), locale);
+            else return null;
+        }
+
     }
 
 }
