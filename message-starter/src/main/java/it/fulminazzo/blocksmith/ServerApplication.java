@@ -1,0 +1,27 @@
+package it.fulminazzo.blocksmith;
+
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Identifies an application bound to a server.
+ */
+public interface ServerApplication {
+
+    /**
+     * Gets the server that the application is running on.
+     *
+     * @param <S> the type of the server
+     * @return the server
+     */
+    <S> @NotNull S getServer();
+
+    /**
+     * Returns the application as an instance of the given type.
+     *
+     * @param <T>  the type of the cast
+     * @param type the type
+     * @return the cast application
+     */
+    <T> @NotNull T as(final @NotNull Class<T> type);
+
+}
