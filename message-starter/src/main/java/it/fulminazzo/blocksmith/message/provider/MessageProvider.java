@@ -52,15 +52,17 @@ public interface MessageProvider {
      *
      * @param workingDir the working directory
      * @param resource   the resource
+     * @param logger     the logger to display any loading-storing errors
      * @return the message provider
      * @throws IOException in case of any errors
      */
     @SuppressWarnings("unchecked")
     static @NotNull MessageProvider resource(final @NotNull File workingDir,
-                                             final @NotNull String resource) throws IOException {
+                                             final @NotNull String resource,
+                                             final @NotNull Logger logger) throws IOException {
         File file = ResourceUtils.extractIfAbsent(resource, new File(workingDir, resource));
         ConfigurationAdapter adapter = ConfigurationAdapter.newAdapter(
-                null,
+                logger,
                 ConfigurationFormat.fromExtension(file.getName())
         );
         Map<String, Object> messages = adapter.load(file, Map.class);
@@ -75,7 +77,7 @@ public interface MessageProvider {
      * @param workingDir   the working directory
      * @param resourcesDir the resources directory
      * @param format       the format of the translation files
-     * @param logger       the logger to display errors
+     * @param logger       the logger to display any loading-storing errors
      * @return the translation message provider
      * @throws IOException in case of any errors
      */
@@ -101,10 +103,7 @@ public interface MessageProvider {
                     logger.warn("Ignoring invalid translation file {}. The expected format is %language%_%country%.{}", resourceName, format.name().toLowerCase());
                     continue;
                 }
-                provider.registerProvider(
-                        locale,
-                        resource(directory, resourceName)
-                );
+                provider.registerProvider(locale, resource(directory, resourceName, logger));
             }
         }
         return provider;
