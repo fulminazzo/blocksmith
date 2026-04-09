@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.validation.annotation;
 
 import it.fulminazzo.blocksmith.validation.Constraint;
 import it.fulminazzo.blocksmith.validation.annotation.Matches;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.*;
 
@@ -17,5 +18,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
 public @interface Uuid {
     // represents a custom annotation with no message methods
+
+    @NotNull String regex() default "DEFAULT";
 
 }

@@ -119,10 +119,10 @@ class ValidatorTest extends Specification {
 
     def 'test that validate method works'() {
         given:
-        def person = new Person('Alex', 23, null)
+        def person = new Person('Alex', 23, new Person.School('Galileo'))
 
         when:
-        person.setName('Steve')
+        person.setName('Steve', 'name update')
 
         then:
         noExceptionThrown()
@@ -154,6 +154,54 @@ class ValidatorTest extends Specification {
                 'invalid parameter at position 1: cannot be empty'
         ['', '']                 || 'invalid parameter at position 0: \'\' is not allowed (only letters); ' +
                 'invalid parameter at position 1: cannot be empty'
+    }
+
+    def 'test that validate method throws if not enough parameters are given'() {
+        given:
+        def person = new Person('Alex', 23, null)
+
+        when:
+        person.invalidSetName('Alex', 'name updated')
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.message =~ '.*Please include all the parameters of the method to validate it.*'
+    }
+
+    def 'test that validate field works'() {
+        given:
+        def field = Person.getDeclaredField(fieldName)
+
+        when:
+        Validator.validateField(field, value)
+
+        then:
+        noExceptionThrown()
+
+        where:
+        fieldName | value
+        'name'    | 'Alex'
+        'age'     | 23
+        'school'  | null
+        'school'  | new Person.School('Galileo')
+    }
+
+    def 'test that validate field throws for invalid value'() {
+        given:
+        def field = Person.getDeclaredField('name')
+
+        when:
+        Validator.validateField(field, value)
+
+        then:
+        def e = thrown(ViolationException)
+        e.message == expected
+
+        where:
+        value   || expected
+        null    || 'invalid name: cannot be null'
+        ''      || 'invalid name: \'\' is not allowed (only letters)'
+        'Alex!' || 'invalid name: \'Alex!\' is not allowed (only letters)'
     }
 
     def 'test that validate of bean #bean works'() {
@@ -597,8 +645,8 @@ class ValidatorTest extends Specification {
         'notEmpty'               | ''                                       || [new ConstraintViolation('', 'error.validation.not-empty', 'cannot be empty', ['value': ''])]
         'notEmpty'               | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Uuid
-        'uuid'                   | 'Hello, world!'                          || [new ConstraintViolation('Hello, world!', null, "Invalid value for annotation ${Uuid.simpleName}: Hello, world!", ['value': 'Hello, world!'])]
-        'uuid'                   | ''                                       || [new ConstraintViolation('', null, "Invalid value for annotation ${Uuid.simpleName}: ", ['value': ''])]
+        'uuid'                   | 'Hello, world!'                          || [new ConstraintViolation('Hello, world!', null, "Invalid value for annotation ${Uuid.simpleName}: Hello, world!", ['value': 'Hello, world!', 'regex': 'DEFAULT'])]
+        'uuid'                   | ''                                       || [new ConstraintViolation('', null, "Invalid value for annotation ${Uuid.simpleName}: ", ['value': '', 'regex': 'DEFAULT'])]
         'uuid'                   | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Character
         'character'              | 'Hello, world!'                          || [new ConstraintViolation('Hello, world!', 'error.validation.invalid-character', String.format('\'%1$s\' is not a valid character', 'Hello, world!'), ['value': 'Hello, world!'])]

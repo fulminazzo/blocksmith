@@ -232,12 +232,15 @@ public final class Validator {
      */
     public static void validateMethod(final @Nullable Object @NotNull ... parameters) throws ViolationException {
         StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[2];
-        Method method = Reflect.on(stackTrace.getClassName())
-                .getMethod(stackTrace.getMethodName(), Reflect.getParameterTypes(parameters));
+        final Method method;
+        try {
+            method = Reflect.on(stackTrace.getClassName())
+                    .getMethod(stackTrace.getMethodName(), Reflect.getParameterTypes(parameters));
+        } catch (ReflectException e) {
+            throw new IllegalArgumentException(e.getMessage() +
+                    ". Please include all the parameters of the method to validate it");
+        }
         Parameter[] params = method.getParameters();
-        if (params.length != parameters.length)
-            throw new IllegalArgumentException("Method parameters do not match with the given number of parameters. " +
-                    "Please include all the parameters of the method to validate it");
         Map<String, Set<ConstraintViolation>> violations = new HashMap<>();
         for (int i = 0; i < params.length; i++) {
             Parameter parameter = params[i];
