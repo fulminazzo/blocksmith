@@ -60,7 +60,7 @@ public interface MessageProvider {
     static @NotNull MessageProvider resource(final @NotNull File workingDir,
                                              final @NotNull String resource,
                                              final @NotNull Logger logger) throws IOException {
-        File file = ResourceUtils.extractIfAbsent(resource, new File(workingDir, resource));
+        File file = ResourceUtils.extractIfAbsent(resource, workingDir);
         ConfigurationAdapter adapter = ConfigurationAdapter.newAdapter(
                 logger,
                 ConfigurationFormat.fromExtension(file.getName())
