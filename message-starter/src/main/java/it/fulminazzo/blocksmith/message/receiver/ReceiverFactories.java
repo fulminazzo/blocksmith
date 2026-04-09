@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -14,11 +15,11 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReceiverFactories {
-    private static final @NotNull LinkedList<ReceiverFactory> factories;
+    private static final @NotNull LinkedList<Supplier<ReceiverFactory>> factories;
 
     static {
         factories = new LinkedList<>();
-        factories.add(new ReceiverFactory() {
+        registerCustomFactory(() -> new ReceiverFactory() {
 
             @Override
             public @NotNull ReceiverFactory setup(final @NotNull ServerApplication application) {
@@ -41,19 +42,18 @@ public final class ReceiverFactories {
             }
 
         });
-        ServiceLoader.load(ReceiverFactory.class, ReceiverFactory.class.getClassLoader()).stream()
-                .map(ServiceLoader.Provider::get)
-                .forEach(factories::add);
+        ServiceLoader.load(ReceiverFactory.class, ReceiverFactory.class.getClassLoader()).stream().forEach(factories::add);
     }
 
     /**
      * Gets all receivers across all the factories.
      *
+     * @param application the application requesting the receivers
      * @return all the receivers
      */
-    public static @NotNull Collection<Receiver> getAllReceivers() {
+    public static @NotNull Collection<Receiver> getAllReceivers(final @NotNull ServerApplication application) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return factories.stream()
+        return getFactories(application).stream()
                 .map(ReceiverFactory::getAllReceivers)
                 .flatMap(Collection::stream)
                 .filter(r -> seen.add(r.getInternal()))
@@ -63,10 +63,10 @@ public final class ReceiverFactories {
     /**
      * Registers a new custom Receiver factory.
      *
-     * @param factory the factory
+     * @param factorySupplier the function to create the factory
      */
-    public static void registerCustomFactory(final @NotNull ReceiverFactory factory) {
-        factories.addFirst(factory);
+    public static void registerCustomFactory(final @NotNull Supplier<ReceiverFactory> factorySupplier) {
+        factories.addFirst(factorySupplier);
     }
 
     /**
@@ -80,13 +80,23 @@ public final class ReceiverFactories {
      */
     public static @NotNull ReceiverFactory get(final @NotNull Class<?> receiverType,
                                                final @NotNull ServerApplication application) {
-        for (final ReceiverFactory factory : factories)
-            if (factory.setup(application).supports(receiverType)) {
+        for (final ReceiverFactory factory : getFactories(application))
+            if (factory.supports(receiverType)) {
                 return factory;
             }
         throw new IllegalArgumentException(String.format("Could not find a %s for receiver type %s.",
                 ReceiverFactory.class.getSimpleName(), receiverType.getCanonicalName()
         ));
+    }
+
+    /**
+     * Gets all the factories (static and dynamic) for the given application.
+     *
+     * @param application the application requesting the factories
+     * @return the factories
+     */
+    public static @NotNull List<ReceiverFactory> getFactories(final @NotNull ServerApplication application) {
+        return factories.stream().map(Supplier::get).map(f -> f.setup(application)).collect(Collectors.toList());
     }
 
 }
