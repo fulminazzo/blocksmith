@@ -8,15 +8,15 @@ import it.fulminazzo.blocksmith.message.provider.MessageProvider;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.jul.JDK14LoggerAdapter;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public final class Blocksmith extends JavaPlugin {
+public final class Blocksmith extends JavaPlugin implements ServerApplication {
     private final @NotNull Logger logger;
 
     @Getter
@@ -27,7 +27,7 @@ public final class Blocksmith extends JavaPlugin {
             Constructor<JDK14LoggerAdapter> constructor = JDK14LoggerAdapter.class.getDeclaredConstructor(java.util.logging.Logger.class);
             constructor.setAccessible(true);
             this.logger = constructor.newInstance(getLogger());
-            this.messenger = new Messenger(logger);
+            this.messenger = new Messenger(this);
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException |
                  NoSuchMethodException e) {
             throw new RuntimeException("Could not instantiate SLF4J logger", e);
@@ -69,6 +69,22 @@ public final class Blocksmith extends JavaPlugin {
         messenger.setMessageProvider(null);
 
         logger.info("{} disabled. Goodbye!", getDescription().getName());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <S> @NotNull S server() {
+        return (S) getServer();
+    }
+
+    @Override
+    public @NonNull <T> T as(final @NotNull Class<T> type) {
+        return type.cast(this);
+    }
+
+    @Override
+    public @NotNull Logger logger() {
+        return logger;
     }
 
 }
