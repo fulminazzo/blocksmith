@@ -15,11 +15,11 @@ import java.util.stream.Stream;
 /**
  * Implementation of {@link ReceiverFactory} for Bukkit platform.
  */
-public final class BukkitReceiverFactory implements ReceiverFactory {
+public final class BukkitReceiverFactory extends AbstractReceiverFactory {
     private static @Nullable BukkitAudiences adventure;
 
     @Override
-    public @NotNull Collection<Receiver> getAllReceivers() {
+    protected @NotNull Collection<Receiver> getAllReceiversImpl() {
         final Server server = Bukkit.getServer();
         return Stream.concat(
                 server.getOnlinePlayers().stream(),
@@ -28,12 +28,12 @@ public final class BukkitReceiverFactory implements ReceiverFactory {
     }
 
     @Override
-    public @NotNull <R> Receiver create(final @NotNull R receiver) {
+    protected @NotNull <R> Receiver createImpl(final @NotNull R receiver) {
         return new BukkitReceiver(getAdventure(), (CommandSender) receiver);
     }
 
     @Override
-    public boolean supports(final @NotNull Class<?> receiverType) {
+    protected boolean supportsImpl(final @NotNull Class<?> receiverType) {
         return CommandSender.class.isAssignableFrom(receiverType);
     }
 

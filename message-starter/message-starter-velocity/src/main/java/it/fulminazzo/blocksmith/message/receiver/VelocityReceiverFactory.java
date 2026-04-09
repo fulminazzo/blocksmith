@@ -13,11 +13,11 @@ import java.util.stream.Stream;
 /**
  * Implementation of {@link ReceiverFactory} for Velocity platform.
  */
-public final class VelocityReceiverFactory implements ReceiverFactory {
+public final class VelocityReceiverFactory extends AbstractReceiverFactory {
     private static @Nullable ProxyServer server;
 
     @Override
-    public @NotNull Collection<Receiver> getAllReceivers() {
+    protected @NotNull Collection<Receiver> getAllReceiversImpl() {
         final ProxyServer server = getServer();
         return Stream.concat(
                 server.getAllPlayers().stream(),
@@ -26,12 +26,12 @@ public final class VelocityReceiverFactory implements ReceiverFactory {
     }
 
     @Override
-    public @NotNull <R> Receiver create(final @NotNull R receiver) {
+    protected @NotNull <R> Receiver createImpl(final @NotNull R receiver) {
         return new VelocityReceiver((CommandSource) receiver);
     }
 
     @Override
-    public boolean supports(final @NotNull Class<?> receiverType) {
+    protected boolean supportsImpl(final @NotNull Class<?> receiverType) {
         return CommandSource.class.isAssignableFrom(receiverType);
     }
 

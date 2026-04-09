@@ -15,11 +15,11 @@ import java.util.stream.Stream;
 /**
  * Implementation of {@link ReceiverFactory} for BungeeCord platform.
  */
-public final class BungeeReceiverFactory implements ReceiverFactory {
+public final class BungeeReceiverFactory extends AbstractReceiverFactory {
     private static @Nullable BungeeAudiences adventure;
 
     @Override
-    public @NotNull Collection<Receiver> getAllReceivers() {
+    protected @NotNull Collection<Receiver> getAllReceiversImpl() {
         final ProxyServer server = ProxyServer.getInstance();
         return Stream.concat(
                 server.getPlayers().stream(),
@@ -28,12 +28,12 @@ public final class BungeeReceiverFactory implements ReceiverFactory {
     }
 
     @Override
-    public @NotNull <R> Receiver create(final @NotNull R receiver) {
+    protected @NotNull <R> Receiver createImpl(final @NotNull R receiver) {
         return new BungeeReceiver(getAdventure(), (CommandSender) receiver);
     }
 
     @Override
-    public boolean supports(final @NotNull Class<?> receiverType) {
+    protected boolean supportsImpl(final @NotNull Class<?> receiverType) {
         return CommandSender.class.isAssignableFrom(receiverType);
     }
 
