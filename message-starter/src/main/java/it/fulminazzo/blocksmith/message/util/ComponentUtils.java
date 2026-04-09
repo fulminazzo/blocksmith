@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ComponentUtils {
     private static final @NotNull MiniMessage mini = MiniMessage.miniMessage();
-    private static final @NotNull Map<String, String> CHAT_CODES = new HashMap<>() {{
+    private static final @NotNull Map<String, String> chatCodes = new HashMap<>() {{
         put("0", "<black>");
         put("1", "<dark_blue>");
         put("2", "<dark_green>");
@@ -42,14 +42,14 @@ public final class ComponentUtils {
         put("o", "<italic>");
         put("r", "<reset>");
     }};
-    private static final @NotNull Pattern LEGACY_CHAT_CODES_REGEX = Pattern.compile("[&§]([" +
-            CHAT_CODES.keySet().stream()
+    private static final @NotNull Pattern legacyChatCodesRegex = Pattern.compile("[&§]([" +
+            chatCodes.keySet().stream()
                     .map(c -> c + c.toUpperCase())
                     .collect(Collectors.joining()) +
             "])"
     );
-    private static final @NotNull Pattern AMPERSAND_HEX_CODE_REGEX = Pattern.compile("&(#[0-9a-fA-F]{6})");
-    private static final @NotNull Pattern SECTIONSIGN_HEX_CODE_REGEX = Pattern.compile("§x((?:§[0-9a-fA-F]){6})");
+    private static final @NotNull Pattern ampersandHexCodeRegex = Pattern.compile("&(#[0-9a-fA-F]{6})");
+    private static final @NotNull Pattern sectionSignHexCodeRegex = Pattern.compile("§x((?:§[0-9a-fA-F]){6})");
 
     /**
      * Converts the given string to a component.
@@ -75,20 +75,20 @@ public final class ComponentUtils {
     }
 
     private static @NotNull String legacyToMini(@NotNull String message) {
-        Matcher matcher = AMPERSAND_HEX_CODE_REGEX.matcher(message);
+        Matcher matcher = ampersandHexCodeRegex.matcher(message);
         while (matcher.find())
             message = message.replace(matcher.group(), String.format("<%s>", matcher.group(1)));
 
-        matcher = SECTIONSIGN_HEX_CODE_REGEX.matcher(message);
+        matcher = sectionSignHexCodeRegex.matcher(message);
         while (matcher.find())
             message = message.replace(
                     matcher.group(),
                     String.format("<%s>", "#" + matcher.group(1).replace("§", ""))
             );
 
-        matcher = LEGACY_CHAT_CODES_REGEX.matcher(message);
+        matcher = legacyChatCodesRegex.matcher(message);
         while (matcher.find())
-            message = message.replace(matcher.group(), CHAT_CODES.get(matcher.group(1).toLowerCase()));
+            message = message.replace(matcher.group(), chatCodes.get(matcher.group(1).toLowerCase()));
 
         return message;
     }
