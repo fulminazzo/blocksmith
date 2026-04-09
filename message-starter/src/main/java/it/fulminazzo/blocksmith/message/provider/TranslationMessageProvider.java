@@ -1,9 +1,9 @@
 package it.fulminazzo.blocksmith.message.provider;
 
 import it.fulminazzo.blocksmith.ProjectInfo;
+import it.fulminazzo.blocksmith.reflect.Reflect;
+import it.fulminazzo.blocksmith.reflect.ReflectException;
 import org.jetbrains.annotations.NotNull;
-import org.joor.Reflect;
-import org.joor.ReflectException;
 
 import java.util.Locale;
 
@@ -36,7 +36,7 @@ public interface TranslationMessageProvider extends MessageProvider {
      */
     static @NotNull TranslationMessageProvider newProvider() {
         try {
-            return Reflect.onClass(TranslationMessageProvider.class.getCanonicalName() + "Impl").create().get();
+            return Reflect.on(TranslationMessageProvider.class.getCanonicalName() + "Impl").init().get();
         } catch (ReflectException e) {
             String moduleName = String.format("%s.%s:%s-translation",
                     ProjectInfo.GROUP,
