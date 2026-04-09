@@ -11,8 +11,10 @@ import net.kyori.adventure.title.TitlePart
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
+import java.util.function.Supplier
+
 class ReceiverFactoriesTest extends Specification {
-    private static List<ReceiverFactories> previous
+    private static List<Supplier<ReceiverFactory>> previous
 
     void setupSpec() {
         previous = [*ReceiverFactories.factories]
@@ -29,7 +31,7 @@ class ReceiverFactoriesTest extends Specification {
         def player = new Player('Luke')
 
         and:
-        ReceiverFactories.registerCustomFactory(new PlayerReceiverFactory() {
+        ReceiverFactories.registerCustomFactory(() -> new PlayerReceiverFactory() {
 
             @Override
             @NotNull Collection<Receiver> getAllReceivers() {
@@ -39,7 +41,7 @@ class ReceiverFactoriesTest extends Specification {
         })
 
         and:
-        ReceiverFactories.registerCustomFactory(new PlayerReceiverFactory() {
+        ReceiverFactories.registerCustomFactory(() -> new PlayerReceiverFactory() {
 
             @Override
             @NotNull Collection<Receiver> getAllReceivers() {
@@ -54,7 +56,7 @@ class ReceiverFactoriesTest extends Specification {
         })
 
         when:
-        def receivers = ReceiverFactories.allReceivers
+        def receivers = ReceiverFactories.getAllReceivers(Mock(ServerApplication))
 
         then:
         receivers.size() == 1
@@ -71,7 +73,7 @@ class ReceiverFactoriesTest extends Specification {
         user.locale = Locale.ITALY
 
         and:
-        ReceiverFactories.registerCustomFactory(new UserDataReceiverFactory())
+        ReceiverFactories.registerCustomFactory(() -> new UserDataReceiverFactory())
 
         when:
         def factory = ReceiverFactories.get(user.class, Mock(ServerApplication))

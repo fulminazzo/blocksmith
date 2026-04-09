@@ -11,7 +11,7 @@ public class PlayerReceiverFactory implements ReceiverFactory {
 
     @Override
     public @NotNull ReceiverFactory setup(final @NotNull ServerApplication application) {
-        throw new UnsupportedOperationException();
+        return this;
     }
 
     @Override
