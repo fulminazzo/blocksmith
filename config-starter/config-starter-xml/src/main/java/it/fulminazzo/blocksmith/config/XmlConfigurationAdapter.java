@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.config;
 
+import com.ctc.wstx.stax.WstxInputFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -10,20 +11,31 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.fasterxml.jackson.dataformat.xml.util.DefaultXmlPrettyPrinter;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
+import it.fulminazzo.blocksmith.naming.CaseConverter;
+import it.fulminazzo.blocksmith.naming.Convention;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link BaseConfigurationAdapter} for XML.
  */
 final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
-    @Delegate
+    private static final @NotNull Convention xmlNamingConvention = Convention.PASCAL_CASE;
+
     private final @NotNull BaseConfigurationAdapter delegate;
 
     /**
@@ -41,6 +53,158 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
                 logger,
                 XmlCommentPropertyWriter.class
         );
+    }
+
+    @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) throws IOException {
+        try {
+            return toCommentedMap(stream);
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
+        return checkLoaded(delegate.load(data, type));
+    }
+
+    @Override
+    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
+        return checkLoaded(delegate.load(file, type));
+    }
+
+    @Override
+    public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
+        return checkLoaded(delegate.load(stream, type));
+    }
+
+    @Override
+    public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
+        return delegate.serialize(ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention));
+    }
+
+    @Override
+    public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
+        delegate.store(file, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention));
+    }
+
+    @Override
+    public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
+        delegate.store(stream, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> @NotNull T checkLoaded(final @NotNull T loaded) {
+        T actual = ConfigUtils.checkMap(loaded, xmlNamingConvention, ConfigUtils.javaNamingConvention);
+        if (actual instanceof Map<?, ?>) return (T) flattenCollectionMaps((Map<?, ?>) actual);
+        else return actual;
+    }
+
+    /**
+     * Jackson loads maps that contain collections with maps with just one key.
+     * For example:
+     * <pre>{@code
+     * <Authors>
+     *   <Author>Fulminazzo</Author>
+     *   <Author>Alex</Author>
+     * </Authors>
+     * }</pre>
+     * would be loaded as:
+     * <pre>{@code
+     * {
+     *     "authors": {
+     *         "authors": ["Fulminazzo", "Alex"]
+     *     }
+     * }
+     * }</pre>
+     * This function attempts to remove that by merging the inner map into the outer one.
+     *
+     * @param map the map to flatten
+     * @return the flattened map
+     */
+    static @NotNull Map<?, ?> flattenCollectionMaps(final @NotNull Map<?, ?> map) {
+        final Map<Object, Object> result = new HashMap<>();
+        for (final Map.Entry<?, ?> entry : map.entrySet()) {
+            final Object key = entry.getKey();
+            Object value = entry.getValue();
+            if (value instanceof Map<?, ?>) {
+                Map<?, ?> innerMap = flattenCollectionMaps((Map<?, ?>) value);
+                if (innerMap.size() == 1) {
+                    final Object innerKey = innerMap.keySet().iterator().next();
+                    if (key.equals(innerKey)) value = innerMap.get(innerKey);
+                }
+            }
+            result.put(key, value);
+        }
+        return result;
+    }
+
+    private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull InputStream stream) throws XMLStreamException {
+        final XMLInputFactory factory = new WstxInputFactory();
+        final XMLStreamReader reader = factory.createXMLStreamReader(stream);
+
+        boolean isRoot = true;
+        Map<String, List<String>> result = new LinkedHashMap<>();
+        Deque<String> path = new ArrayDeque<>();
+        Deque<Map<String, Integer>> childCounts = new ArrayDeque<>();
+        Deque<Boolean> isCollection = new ArrayDeque<>();
+        List<String> pending = new ArrayList<>();
+
+        while (reader.hasNext()) {
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.COMMENT: {
+                    for (String line : reader.getText().split("\\r?\\n")) {
+                        String t = line.trim();
+                        if (!t.isEmpty()) pending.add(t);
+                    }
+                    break;
+                }
+                case XMLStreamConstants.START_ELEMENT: {
+                    String name = reader.getLocalName();
+                    boolean parentIsCollection = !isCollection.isEmpty() && isCollection.peek();
+
+                    if (!childCounts.isEmpty()) {
+                        int count = childCounts.peek().merge(name, 1, Integer::sum);
+                        if (count == 2) {
+                            isCollection.pop();
+                            isCollection.push(true);
+                            parentIsCollection = true;
+                            String parentPath = dotPath(path);
+                            result.remove(parentPath.isEmpty() ? name : parentPath + "." + name);
+                        }
+                    }
+
+                    if (isRoot) isRoot = false;
+                    else path.push(name);
+                    childCounts.push(new HashMap<>());
+                    isCollection.push(false);
+
+                    if (!parentIsCollection && !pending.isEmpty())
+                        result.computeIfAbsent(dotPath(path), k -> new ArrayList<>()).addAll(pending);
+                    pending.clear();
+                    break;
+                }
+                case XMLStreamConstants.END_ELEMENT: {
+                    if (!path.isEmpty()) path.pop();
+                    childCounts.pop();
+                    isCollection.pop();
+                    pending.clear();
+                }
+            }
+        }
+
+        reader.close();
+        return result;
+    }
+
+    private static String dotPath(final @NotNull Deque<String> path) {
+        List<String> parts = new ArrayList<>(path);
+        Collections.reverse(parts);
+        return parts.stream()
+                .map(p -> CaseConverter.convert(p, xmlNamingConvention, ConfigUtils.javaNamingConvention))
+                .collect(Collectors.joining("."));
     }
 
     /**
@@ -86,17 +250,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
 
         @Override
         public @NotNull String translate(final @NotNull String propertyName) {
-            StringBuilder result = new StringBuilder();
-            String[] words = propertyName.split("[^a-zA-Z0-9]+");
-
-            for (String word : words) {
-                if (!word.isEmpty()) {
-                    result.append(Character.toUpperCase(word.charAt(0)));
-                    result.append(word.substring(1));
-                }
-            }
-
-            return result.toString();
+            return CaseConverter.convert(propertyName, xmlNamingConvention);
         }
 
     }

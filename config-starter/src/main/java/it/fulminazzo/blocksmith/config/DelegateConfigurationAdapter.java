@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of {@link ConfigurationAdapter} that delegates
@@ -23,6 +25,11 @@ final class DelegateConfigurationAdapter implements ConfigurationAdapter {
     final @NotNull Logger logger;
     @Nullable ConfigurationFormat format;
     @Nullable BaseConfigurationAdapter delegate;
+
+    @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) throws IOException {
+        return getDelegate().loadComments(stream);
+    }
 
     @Override
     public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {

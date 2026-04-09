@@ -20,4 +20,26 @@ class ConfigurationFormatTest extends Specification {
         configurationFormat << ConfigurationFormat.values()
     }
 
+    def 'test that fromExtension of filename returns #expected'() {
+        given:
+        def filename = "file.$expected.fileExtension"
+
+        when:
+        def format = ConfigurationFormat.fromExtension(filename)
+
+        then:
+        format == expected
+
+        where:
+        expected << ConfigurationFormat.values()
+    }
+
+    def 'test that fromExtension of unknown filename throws'() {
+        when:
+        ConfigurationFormat.fromExtension('unknown')
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
 }

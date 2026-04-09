@@ -1,9 +1,8 @@
 package it.fulminazzo.blocksmith.config;
 
 import it.fulminazzo.blocksmith.reflect.Reflect;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Modifier;
@@ -44,11 +43,16 @@ import java.util.function.Function;
  * }
  * }</pre>
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ConfigVersion {
+@Value(staticConstructor = "of")
+public class ConfigVersion {
+    /**
+     * The name of the property associated with the configuration version.
+     */
+    public static final @NotNull String PROPERTY_NAME = "version";
+
     @Getter
-    private final double version;
-    private final @NotNull Map<Double, Function<Migration, Migration>> migrations = new TreeMap<>();
+    double version;
+    @NotNull Map<Double, Function<Migration, Migration>> migrations = new TreeMap<>();
 
     /**
      * Applies the migrations for the specified version to the data.
@@ -78,16 +82,6 @@ public final class ConfigVersion {
             throw new IllegalArgumentException("Migration already present for version " + version);
         migrations.put(version, migration);
         return this;
-    }
-
-    /**
-     * Instantiates a new Config version.
-     *
-     * @param version the version
-     * @return the config version
-     */
-    public static @NotNull ConfigVersion of(final double version) {
-        return new ConfigVersion(version);
     }
 
     /**

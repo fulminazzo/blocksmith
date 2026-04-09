@@ -12,22 +12,35 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.util.StringQuotingChecker;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
+import it.fulminazzo.blocksmith.naming.CaseConverter;
+import it.fulminazzo.blocksmith.naming.Convention;
 import it.fulminazzo.blocksmith.reflect.Reflect;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.comments.CommentLine;
 import org.yaml.snakeyaml.comments.CommentType;
+import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.events.CommentEvent;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.parser.ParserImpl;
+import org.yaml.snakeyaml.reader.StreamReader;
+import org.yaml.snakeyaml.resolver.Resolver;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link BaseConfigurationAdapter} for YAML.
  */
 final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
-    @Delegate
+    private static final @NotNull Convention yamlNamingConvention = Convention.KEBAB_CASE;
+
     private final @NotNull BaseConfigurationAdapter delegate;
 
     /**
@@ -44,10 +57,81 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
                 ))
                         .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
                         .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)
-                        .setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE),
+                        .setPropertyNamingStrategy(Reflect.on(PropertyNamingStrategies.class)
+                                .get(yamlNamingConvention.name())
+                                .get()),
                 logger,
                 YamlCommentPropertyWriter.class
         );
+    }
+
+    @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) {
+        final LoaderOptions options = new LoaderOptions().setProcessComments(true);
+        StreamReader reader = new StreamReader(new InputStreamReader(stream));
+        Composer composer = new Composer(new ParserImpl(reader, options), new Resolver(), options);
+        Node root = composer.getSingleNode();
+        if (root instanceof MappingNode) return extractComments((MappingNode) root);
+        else return Collections.emptyMap();
+    }
+
+    @Override
+    public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
+        return ConfigUtils.checkMap(delegate.load(data, type), yamlNamingConvention, ConfigUtils.javaNamingConvention);
+    }
+
+    @Override
+    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
+        return ConfigUtils.checkMap(delegate.load(file, type), yamlNamingConvention, ConfigUtils.javaNamingConvention);
+    }
+
+    @Override
+    public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
+        return ConfigUtils.checkMap(delegate.load(stream, type), yamlNamingConvention, ConfigUtils.javaNamingConvention);
+    }
+
+    @Override
+    public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
+        return delegate.serialize(ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention));
+    }
+
+    @Override
+    public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
+        delegate.store(file, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention));
+    }
+
+    @Override
+    public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
+        delegate.store(stream, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention));
+    }
+
+    private static @NotNull Map<String, List<String>> extractComments(final @NotNull MappingNode node) {
+        final Map<String, List<String>> nodesComments = new HashMap<>();
+        for (NodeTuple nodeTuple : node.getValue()) {
+            ScalarNode keyNode = (ScalarNode) nodeTuple.getKeyNode();
+            String key = CaseConverter.convert(keyNode.getValue(), yamlNamingConvention, ConfigUtils.javaNamingConvention);
+            @NotNull List<String> comments = extractComments(keyNode);
+            if (!comments.isEmpty()) nodesComments.put(key, comments);
+            Node value = nodeTuple.getValueNode();
+            if (value instanceof MappingNode)
+                extractComments((MappingNode) value).forEach((k, c) ->
+                        nodesComments.put(key + "." + k, c)
+                );
+        }
+        return nodesComments;
+    }
+
+    private static @NotNull List<String> extractComments(final @NotNull Node node) {
+        List<CommentLine> comments = new ArrayList<>();
+        List<CommentLine> inlineComments = node.getInLineComments();
+        if (inlineComments != null) comments.addAll(inlineComments);
+        List<CommentLine> blockComments = node.getBlockComments();
+        if (blockComments != null) comments.addAll(blockComments);
+        return comments.stream()
+                .filter(c -> c.getCommentType() == CommentType.BLOCK)
+                .map(CommentLine::getValue)
+                .map(String::trim)
+                .collect(Collectors.toList());
     }
 
     /**

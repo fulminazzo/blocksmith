@@ -5,24 +5,12 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class XmlConfigurationAdapterTest extends ConfigurationAdapterTest {
 
-    def 'test that PascalCaseStrategy converts #string to #expected'() {
-        given:
-        def strategy = new XmlConfigurationAdapter.PascalCaseStrategy()
-
+    def 'test that loadComments with invalid data throws IOException'() {
         when:
-        def actual = strategy.translate(string)
+        adapter.loadComments('Hello, world')
 
         then:
-        actual == expected
-
-        where:
-        string       || expected
-        ''           || ''
-        'field_name' || 'FieldName'
-        'field-name' || 'FieldName'
-        'field.name' || 'FieldName'
-        'FieldName'  || 'FieldName'
-        'fieldName'  || 'FieldName'
+        thrown(IOException)
     }
 
     @Override

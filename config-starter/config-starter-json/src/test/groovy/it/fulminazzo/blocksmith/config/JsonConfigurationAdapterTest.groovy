@@ -6,6 +6,11 @@ import groovy.util.logging.Slf4j
 class JsonConfigurationAdapterTest extends ConfigurationAdapterTest {
 
     @Override
+    protected boolean supportsComments() {
+        return false
+    }
+
+    @Override
     protected boolean supportsNull() {
         return true
     }

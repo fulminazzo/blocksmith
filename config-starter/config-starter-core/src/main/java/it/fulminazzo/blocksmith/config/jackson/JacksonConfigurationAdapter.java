@@ -6,7 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import it.fulminazzo.blocksmith.config.BaseConfigurationAdapter;
+import it.fulminazzo.blocksmith.config.ConfigUtils;
 import it.fulminazzo.blocksmith.config.ConfigVersion;
+import it.fulminazzo.blocksmith.naming.CaseConverter;
+import it.fulminazzo.blocksmith.naming.Convention;
 import it.fulminazzo.blocksmith.util.MapUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,9 +18,7 @@ import org.slf4j.Logger;
 import java.io.*;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * A special implementation of {@link BaseConfigurationAdapter}
@@ -46,6 +47,12 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
     }
 
     @Override
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) {
+        // JSON does not support comments
+        return Collections.emptyMap();
+    }
+
+    @Override
     public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
         return load(new ByteArrayInputStream(data.getBytes()), type);
     }
@@ -62,7 +69,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                 unapplyNamingStrategy(data, mapper.getPropertyNamingStrategy());
                 data = MapUtils.flatten(data);
 
-                Object rawVersion = data.get("version");
+                Object rawVersion = data.get(ConfigVersion.PROPERTY_NAME);
                 double latest = version.getVersion();
                 Double currentVersion = null;
                 if (rawVersion != null)
@@ -92,7 +99,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
 
                     data = version.applyMigrations(currentVersion, data);
                     data = MapUtils.unflatten(data);
-                    data.put("version", latest);
+                    data.put(ConfigVersion.PROPERTY_NAME, latest);
                     applyNamingStrategy(data, mapper.getPropertyNamingStrategy());
                     store(file, data);
                     return load(file, type);
@@ -141,31 +148,13 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
         for (String key : new ArrayList<>(data.keySet())) {
             Object value = data.remove(key);
             if (value instanceof Map) unapplyNamingStrategy((Map<String, Object>) value, strategy);
-            if (strategy.equals(PropertyNamingStrategies.KEBAB_CASE)) key = dashedCaseToCamel(key, '-');
-            else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE)) key = dashedCaseToCamel(key, '_');
+            if (strategy.equals(PropertyNamingStrategies.KEBAB_CASE))
+                key = CaseConverter.convert(key, Convention.KEBAB_CASE, ConfigUtils.javaNamingConvention);
+            else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE))
+                key = CaseConverter.convert(key, Convention.SNAKE_CASE, ConfigUtils.javaNamingConvention);
             else key = key.substring(0, 1).toLowerCase() + key.substring(1);
             data.put(key, value);
         }
-    }
-
-    private static String dashedCaseToCamel(final @NotNull String string,
-                                            final char dash) {
-        if (!string.contains(String.valueOf(dash))) return string;
-
-        StringBuilder sb = new StringBuilder();
-        boolean makeUpper = false;
-
-        for (char c : string.toCharArray()) {
-            if (c == dash) {
-                makeUpper = true;
-            } else if (makeUpper) {
-                sb.append(Character.toUpperCase(c));
-                makeUpper = false;
-            } else {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
     }
 
 }

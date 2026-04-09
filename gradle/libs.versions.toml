@@ -5,6 +5,8 @@ shadow = "9.1.0"
 lombok = "1.18.44"
 jetbrains_annotations = "26.1.0"
 
+java_parser = "3.28.0"
+
 spock_core = "2.4-groovy-5.0"
 mockito = "5.23.0"
 
@@ -26,6 +28,8 @@ lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jetbrains_annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains_annotations" }
 
 junit_platform = { module = "org.junit.platform:junit-platform-launcher" }
+
+java_parser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "java_parser" }
 
 spock_core = { module = "org.spockframework:spock-core", version.ref = "spock_core" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }

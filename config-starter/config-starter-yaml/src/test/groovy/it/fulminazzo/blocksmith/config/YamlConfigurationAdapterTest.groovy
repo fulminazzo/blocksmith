@@ -5,6 +5,14 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class YamlConfigurationAdapterTest extends ConfigurationAdapterTest {
 
+    def 'test that loadComments does not throw for non-root node'() {
+        when:
+        def actual = adapter.loadComments('\"string\"')
+
+        then:
+        actual == [:]
+    }
+
     @Override
     protected boolean supportsNull() {
         return true

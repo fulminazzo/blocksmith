@@ -7,6 +7,50 @@ import java.nio.file.Files
 
 abstract class ConfigurationAdapterTest extends Specification {
 
+    def 'test that loadWithComments of #data returns expected data'() {
+        when:
+        def actual = adapter.loadWithComments(data)
+
+        then:
+        actual == [
+                (new CommentKey('commentsEnabled', supportsComments() ? ['Example comment'] : []))          : false,
+                (new CommentKey('name', supportsComments() ? ['This comment should be', 'Multiline!'] : [])): 'Blocksmith',
+                (new CommentKey('description'))                                                             : supportsNull() ? null : '',
+                (new CommentKey('authors'))                                                                 : ['Fulminazzo', 'Camilla', 'Alex'],
+                (new CommentKey('internal'))                                                                : [
+                        (new CommentKey('version', supportsComments() ? ['This comment should be indented'] : [])): true,
+                        (new CommentKey('verified'))                                                              : isProperties() || isToml() ? '' : null
+                ]
+        ]
+
+        where:
+        data << [
+                getFile('load').readLines().join('\n'),
+                getFile('load'),
+                new FileInputStream(getFile('load'))
+        ]
+    }
+
+    def 'test that loadComments of #data returns expected data'() {
+        when:
+        def actual = adapter.loadComments(data)
+
+        then:
+        actual == (supportsComments()
+                ? [
+                'commentsEnabled' : ['Example comment'],
+                'name'            : ['This comment should be', 'Multiline!'],
+                'internal.version': ['This comment should be indented']
+        ] : [:])
+
+        where:
+        data << [
+                getFile('load').readLines().join('\n'),
+                getFile('load'),
+                new FileInputStream(getFile('load'))
+        ]
+    }
+
     def 'test that load correctly loads raw data'() {
         given:
         def data = getFile('load').readLines().join('\n')
@@ -50,6 +94,20 @@ abstract class ConfigurationAdapterTest extends Specification {
 
         and:
         !stream.channel.open
+    }
+
+    def 'test that loadResource correctly loads resource'() {
+        given:
+        def file = getFile('load').name
+
+        when:
+        def actual = adapter.loadFromResource(file, MockConfig)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        actual == expectedConfig
     }
 
     def 'test that serialize correctly writes data'() {
@@ -112,6 +170,24 @@ abstract class ConfigurationAdapterTest extends Specification {
         !output.channel.open
     }
 
+    def 'test that extractAndLoad does not overwrite file if existing'() {
+        given:
+        def file = getFile('load')
+        def lastUpdate = file.lastModified()
+
+        when:
+        def actual = adapter.extractAndLoad(file.name, file.parentFile, MockConfig)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        actual == expectedConfig
+
+        and:
+        file.lastModified() == lastUpdate
+    }
+
     def 'test that configuration with #data is correctly migrated'() {
         given:
         def adapter = getAdapter()
@@ -167,7 +243,7 @@ abstract class ConfigurationAdapterTest extends Specification {
 
     private Map<String, Object> newMigrationConfig(final Object version) {
         def properties = (new MigrationConfig()).properties
-        properties.removeAll {it.key in ['version', 'configVersion', 'class']}
+        properties.removeAll { it.key in ['version', 'configVersion', 'class'] }
         properties['version'] = version
         return properties
     }
@@ -200,6 +276,10 @@ abstract class ConfigurationAdapterTest extends Specification {
      */
     protected boolean isToml() {
         return false
+    }
+
+    protected boolean supportsComments() {
+        return true
     }
 
     protected abstract boolean supportsNull()

@@ -2,8 +2,8 @@
 comments_enabled = false
 # This comment should be
 # Multiline!
-description = ''
 name = 'Blocksmith'
+description = ''
 authors = ['Fulminazzo', 'Camilla', "Alex"]
 [internal]
 # This comment should be indented
