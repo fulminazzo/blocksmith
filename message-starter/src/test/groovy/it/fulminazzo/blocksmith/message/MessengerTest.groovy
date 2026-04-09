@@ -42,7 +42,7 @@ class MessengerTest extends Specification {
         messages['prefix'] = Component.text('blocksmith | ')
 
         def application = Mock(ServerApplication)
-        application.logger >> log
+        application.logger() >> log
 
         messenger = new Messenger(application).setMessageProvider(provider)
     }

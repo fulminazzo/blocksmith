@@ -186,7 +186,7 @@ public final class Messenger {
             Component message = getComponent(messageCode, locale, arguments);
             function.accept(rec.toAudience(), message);
         } catch (MessageNotFoundException e) {
-            application.getLogger().warn(e.getMessage());
+            application.logger().warn(e.getMessage());
         }
     }
 

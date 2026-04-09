@@ -14,7 +14,7 @@ public interface ServerApplication {
      * @param <S> the type of the server
      * @return the server
      */
-    <S> @NotNull S getServer();
+    <S> @NotNull S server();
 
     /**
      * Returns the application as an instance of the given type.
@@ -30,6 +30,6 @@ public interface ServerApplication {
      *
      * @return the logger
      */
-    @NotNull Logger getLogger();
+    @NotNull Logger logger();
 
 }

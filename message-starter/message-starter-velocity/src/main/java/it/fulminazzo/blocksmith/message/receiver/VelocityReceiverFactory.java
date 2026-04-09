@@ -18,7 +18,7 @@ public final class VelocityReceiverFactory extends AbstractReceiverFactory {
     @Override
     public @NotNull ReceiverFactory setup(final @NotNull ServerApplication application) {
         super.setup(application);
-        server = application.getServer();
+        server = application.server();
         return this;
     }
 
