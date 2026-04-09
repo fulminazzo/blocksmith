@@ -20,11 +20,9 @@ import java.util.ArrayList;
 public class BlocksmithEnhancedConfigVersion {
 
     private static final ConfigVersion version = ConfigVersion.of(2.0)
-            .migrate(1.0, m -> m
-                    .rename("host", "server.host")
-                    .add("server.port", 8080)
-                    .add("lastUpdate", null)
-            );
+            .migrate(1.0, m -> m.rename("host", "server.host")
+                    .add("server.port", 8080))
+            .migrate(1.5, m -> m.add("lastUpdate", null));
 
     @Comment({
             "Server settings of the application.",

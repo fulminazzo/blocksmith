@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public final class BlocksmithConfigVersion {
 
     //TODO: auto-generated, handle migrations manually
-    private final static ConfigVersion version = ConfigVersion.of(1.0);
+    private final static ConfigVersion version = ConfigVersion.of(2.0);
 
     @Comment({
             "Server settings of the application.",
