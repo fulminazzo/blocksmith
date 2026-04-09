@@ -1,33 +1,37 @@
 package it.fulminazzo.blocksmith.message.receiver
 
-import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import it.fulminazzo.blocksmith.ServerApplication
 import org.bukkit.Bukkit
 import org.bukkit.Server
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.command.RemoteConsoleCommandSender
 import org.bukkit.entity.Player
-import org.mockito.MockedStatic
-import org.mockito.Mockito
+import org.bukkit.plugin.Plugin
+import org.bukkit.plugin.PluginDescriptionFile
+import org.bukkit.plugin.PluginManager
 import spock.lang.Specification
 
 import java.util.logging.Logger
 
 class BukkitReceiverFactoryTest extends Specification {
+    private Server server
+    private ServerApplication application
 
-    private static MockedStatic<?> mock
+    void setup() {
+        def plugin = Mock(Plugin, additionalInterfaces: [ServerApplication])
+        plugin.description >> {
+            def description = Mock(PluginDescriptionFile)
+            description.name >> 'Blocksmith'
+            return description
+        }
 
-    void setupSpec() {
-        def adventure = Mock(BukkitAudiences)
-        adventure.sender(_) >> Mock(Audience)
+        server = Mock(Server)
+        server.pluginManager >> Mock(PluginManager)
 
-        mock = Mockito.mockStatic(BukkitReceiverFactory)
-        mock.when(BukkitReceiverFactory::getAdventure).thenReturn(adventure)
-    }
-
-    void cleanupSpec() {
-        mock?.close()
+        application = plugin as ServerApplication
+        application.as(_) >> application
+        application.server >> server
     }
 
     def 'test that getAllReceivers returns all the receivers'() {
@@ -36,7 +40,6 @@ class BukkitReceiverFactoryTest extends Specification {
         def console = Mock(ConsoleCommandSender)
 
         and:
-        def server = Mock(Server)
         server.onlinePlayers >> players
         server.consoleSender >> console
         server.logger >> Logger.anonymousLogger
@@ -44,7 +47,7 @@ class BukkitReceiverFactoryTest extends Specification {
         Bukkit.server = server
 
         and:
-        def factory = new BukkitReceiverFactory()
+        def factory = new BukkitReceiverFactory().setup(application)
 
         when:
         def receivers = factory.allReceivers
@@ -64,7 +67,7 @@ class BukkitReceiverFactoryTest extends Specification {
         def sender = Mock(CommandSender)
 
         and:
-        def factory = new BukkitReceiverFactory()
+        def factory = new BukkitReceiverFactory().setup(application)
 
         when:
         def receiver = factory.create(sender)

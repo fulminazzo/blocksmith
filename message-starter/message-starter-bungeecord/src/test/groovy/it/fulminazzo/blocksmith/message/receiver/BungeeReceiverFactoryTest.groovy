@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.receiver
 
+import it.fulminazzo.blocksmith.ServerApplication
 import net.md_5.bungee.api.CommandSender
 import net.md_5.bungee.api.ProxyServer
 import net.md_5.bungee.api.connection.ConnectedPlayer
@@ -11,19 +12,24 @@ import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 class BungeeReceiverFactoryTest extends Specification {
+    private ProxyServer server
+    private ServerApplication application
 
     void setup() {
-        def plugin = Mock(Plugin)
+        def plugin = Mock(Plugin, additionalInterfaces: [ServerApplication])
         def description = Mock(PluginDescription)
         plugin.description >> description
-        def server = Mock(ProxyServer)
+
+        server = Mock(ProxyServer)
         server.pluginManager >> Mock(PluginManager)
         server.console >> Mock(CommandSender)
         server.players >> []
         plugin.proxy >> server
         setServer(server)
 
-        BungeeReceiverFactory.setup(plugin)
+        application = plugin as ServerApplication
+        application.as(_) >> application
+        application.server >> server
     }
 
     def 'test that getAllReceivers returns all the receivers'() {
@@ -38,7 +44,7 @@ class BungeeReceiverFactoryTest extends Specification {
         setServer(server)
 
         and:
-        def factory = new BungeeReceiverFactory()
+        def factory = new BungeeReceiverFactory().setup(application)
 
         when:
         def receivers = factory.allReceivers
@@ -58,7 +64,7 @@ class BungeeReceiverFactoryTest extends Specification {
         def sender = Mock(CommandSender)
 
         and:
-        def factory = new BungeeReceiverFactory()
+        def factory = new BungeeReceiverFactory().setup(application)
 
         when:
         def receiver = factory.create(sender)

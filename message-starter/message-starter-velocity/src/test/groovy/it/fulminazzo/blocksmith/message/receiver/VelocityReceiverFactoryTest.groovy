@@ -4,9 +4,20 @@ import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.proxy.ConsoleCommandSource
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
+import it.fulminazzo.blocksmith.ServerApplication
 import spock.lang.Specification
 
 class VelocityReceiverFactoryTest extends Specification {
+    private ProxyServer server
+    private ServerApplication application
+
+    void setup() {
+        server = Mock(ProxyServer)
+
+        application = Mock(ServerApplication)
+        application.server >> server
+        application.as(_) >> application
+    }
 
     def 'test that getAllReceivers returns all the receivers'() {
         given:
@@ -14,13 +25,11 @@ class VelocityReceiverFactoryTest extends Specification {
         def console = Mock(ConsoleCommandSource)
 
         and:
-        def server = Mock(ProxyServer)
         server.allPlayers >> players
         server.consoleCommandSource >> console
-        VelocityReceiverFactory.setup(server)
 
         and:
-        def factory = new VelocityReceiverFactory()
+        def factory = new VelocityReceiverFactory().setup(application)
 
         when:
         def receivers = factory.allReceivers
@@ -40,7 +49,7 @@ class VelocityReceiverFactoryTest extends Specification {
         def sender = Mock(CommandSource)
 
         and:
-        def factory = new VelocityReceiverFactory()
+        def factory = new VelocityReceiverFactory().setup(application)
 
         when:
         def receiver = factory.create(sender)
