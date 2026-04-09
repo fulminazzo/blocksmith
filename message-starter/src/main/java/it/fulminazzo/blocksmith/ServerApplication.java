@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 /**
  * Identifies an application bound to a server.
@@ -23,5 +24,12 @@ public interface ServerApplication {
      * @return the cast application
      */
     <T> @NotNull T as(final @NotNull Class<T> type);
+
+    /**
+     * Gets the logger associated with the application.
+     *
+     * @return the logger
+     */
+    @NotNull Logger getLogger();
 
 }
