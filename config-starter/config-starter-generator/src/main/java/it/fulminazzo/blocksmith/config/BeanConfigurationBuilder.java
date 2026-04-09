@@ -8,6 +8,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.nodeTypes.NodeWithName;
+import com.github.javaparser.ast.nodeTypes.NodeWithTraversableScope;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,6 +45,12 @@ import static com.github.javaparser.utils.Utils.isNullOrEmpty;
 @SuppressWarnings("unchecked")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BeanConfigurationBuilder {
+    private static final @NotNull PrinterConfiguration printConfiguration = new DefaultPrinterConfiguration()
+            .addOption(new DefaultConfigurationOption(
+                    DefaultPrinterConfiguration.ConfigOption.SORT_IMPORTS_STRATEGY,
+                    new IntelliJImportOrderingStrategy()
+            ));
+
     private static final @NotNull List<Class<? extends Expression>> numberExpressions = Arrays.asList(
             IntegerLiteralExpr.class, LongLiteralExpr.class, DoubleLiteralExpr.class
     );
@@ -445,15 +453,7 @@ public class BeanConfigurationBuilder {
         builder.imports.values().forEach(compilationUnit::addImport);
         sortClass(root);
 
-        final PrinterConfiguration configuration = new DefaultPrinterConfiguration()
-                .addOption(new DefaultConfigurationOption(
-                        DefaultPrinterConfiguration.ConfigOption.SORT_IMPORTS_STRATEGY,
-                        new IntelliJImportOrderingStrategy()
-                ));
-        final String code = new DefaultPrettyPrinter(
-                BlocksmithVisitor::new,
-                configuration
-        ).print(compilationUnit);
+        final String code = new DefaultPrettyPrinter(BlocksmithVisitor::new, printConfiguration).print(compilationUnit);
 
         try (FileOutputStream output = new FileOutputStream(beanFile)) {
             output.write(code.getBytes(StandardCharsets.UTF_8));
@@ -641,6 +641,75 @@ public class BeanConfigurationBuilder {
             }
             printOrphanCommentsEnding(expression);
             printer.print("}");
+        }
+
+        @Override
+        public void visit(final @NotNull MethodCallExpr expression,
+                          final @NotNull Void argument) {
+            printOrphanCommentsBeforeThisChildNode(expression);
+            printComment(expression.getComment(), argument);
+            // we are at the last method call of a call chain
+            // this means we do not start reindenting for alignment or we undo it
+            AtomicBoolean lastMethodInCallChain = new AtomicBoolean(true);
+            Node node = expression;
+            while (node.getParentNode()
+                    .filter(NodeWithTraversableScope.class::isInstance)
+                    .map(NodeWithTraversableScope.class::cast)
+                    .flatMap(NodeWithTraversableScope::traverseScope)
+                    .map(node::equals)
+                    .orElse(false)) {
+                node = node.getParentNode().orElseThrow(AssertionError::new);
+                if (node instanceof MethodCallExpr) {
+                    lastMethodInCallChain.set(false);
+                    break;
+                }
+            }
+            // search whether there is a method call with scope in the scope already
+            // this means that we probably started reindenting for alignment there
+            AtomicBoolean methodCallWithScopeInScope = new AtomicBoolean();
+            Optional<Expression> s = expression.getScope();
+            while (s.filter(NodeWithTraversableScope.class::isInstance).isPresent()) {
+                Optional<Expression> parentScope =
+                        s.map(NodeWithTraversableScope.class::cast).flatMap(NodeWithTraversableScope::traverseScope);
+                if (s.filter(MethodCallExpr.class::isInstance).isPresent() && parentScope.isPresent()) {
+                    methodCallWithScopeInScope.set(true);
+                    break;
+                }
+                s = parentScope;
+            }
+            // we have a scope
+            // this means we are not the first method in the chain
+            expression.getScope().ifPresent(scope -> {
+                scope.accept(this, argument);
+                if (methodCallWithScopeInScope.get()) {
+                    /* We're a method call on the result of something (method call, property access, ...) that is not stand alone,
+                    and not the first one with scope, like:
+                    we're x() in a.b().x(), or in a=b().c[15].d.e().x().
+                    That means that the "else" has been executed by one of the methods in the scope chain, so that the alignment
+                    is set to the "." of that method.
+                    That means we will align to that "." when we start a new line: */
+                    printer.println();
+                } else if (!lastMethodInCallChain.get()) {
+                    /* We're the first method call on the result of something in the chain (method call, property access, ...),
+                    but we are not at the same time the last method call in that chain, like:
+                    we're x() in a().x().y(), or in Long.x().y.z(). That means we get to dictate the indent of following method
+                    calls in this chain by setting the cursor to where we are now: just before the "."
+                    that start this method call. */
+                    printer.indent();
+                    printer.indent();
+                }
+                printer.print(".");
+            });
+            printTypeArgs(expression, argument);
+            expression.getName().accept(this, argument);
+            printer.duplicateIndent();
+            printArguments(expression.getArguments(), argument);
+            printer.unindent();
+            if (methodCallWithScopeInScope.get() && lastMethodInCallChain.get()) {
+                // undo the aligning after the arguments of the last method call are printed
+                printer.unindent();
+                printer.unindent();
+            }
         }
 
     }
