@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.receiver;
 
+import it.fulminazzo.blocksmith.ServerApplication;
 import it.fulminazzo.blocksmith.message.UserData;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +10,11 @@ import java.util.Collection;
 import java.util.Locale;
 
 public final class UserDataReceiverFactory implements ReceiverFactory {
+
+    @Override
+    public @NotNull ReceiverFactory setup(final @NotNull ServerApplication application) {
+        return this;
+    }
 
     @Override
     public @NotNull Collection<Receiver> getAllReceivers() {

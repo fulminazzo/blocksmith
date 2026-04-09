@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.receiver;
 
+import it.fulminazzo.blocksmith.ServerApplication;
 import it.fulminazzo.blocksmith.message.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -7,6 +8,11 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class PlayerReceiverFactory implements ReceiverFactory {
+
+    @Override
+    public @NotNull ReceiverFactory setup(final @NotNull ServerApplication application) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public @NotNull Collection<Receiver> getAllReceivers() {

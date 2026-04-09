@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.receiver;
 
+import it.fulminazzo.blocksmith.ServerApplication;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +21,11 @@ public final class ReceiverFactories {
         factories.add(new ReceiverFactory() {
 
             @Override
+            public @NotNull ReceiverFactory setup(final @NotNull ServerApplication application) {
+                return this;
+            }
+
+            @Override
             public @NotNull Collection<Receiver> getAllReceivers() {
                 return Collections.emptyList();
             }
@@ -33,6 +39,7 @@ public final class ReceiverFactories {
             public boolean supports(final @NotNull Class<?> receiverType) {
                 return Receiver.class.isAssignableFrom(receiverType);
             }
+
         });
         ServiceLoader.load(ReceiverFactory.class, ReceiverFactory.class.getClassLoader()).stream()
                 .map(ServiceLoader.Provider::get)
