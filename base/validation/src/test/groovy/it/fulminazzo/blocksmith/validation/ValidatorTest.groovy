@@ -1,11 +1,10 @@
-//file:noinspection unused
 package it.fulminazzo.blocksmith.validation
 
-import it.fulminazzo.blocksmith.validation.annotation.*
+import it.fulminazzo.blocksmith.validation.annotation.Character
+import it.fulminazzo.blocksmith.validation.annotation.Uuid
 import spock.lang.Specification
 
 import java.time.*
-import java.time.temporal.TemporalAccessor
 
 class ValidatorTest extends Specification {
     private static final Validator validator = Validator.instance
@@ -13,109 +12,12 @@ class ValidatorTest extends Specification {
     private static final noValuesArray = new Object[0]
     private static final exceedValuesArray = (1..6).toArray()
 
+    private static final char A = 'A'
+    private static final char Z = 'Z'
+
     static {
         validator.register(Character, new ConstraintValidatorImpl((o) -> ((CharSequence) o).size() == 1, CharSequence))
     }
-
-    @NonNull
-    private Object nonNull
-    @AssertFalse
-    private boolean assertFalse
-    @AssertTrue
-    private boolean assertTrue
-    @Max(0)
-    private int max
-    @Max(0)
-    private Duration maxDuration
-    @NegativeOrZero
-    private int negativeOrZero
-    @NegativeOrZero
-    private Duration negativeOrZeroDuration
-    @Negative
-    private int negative
-    @Negative
-    private Duration negativeDuration
-    @Min(0)
-    private int min
-    @Min(0)
-    private Duration minDuration
-    @PositiveOrZero
-    private int positiveOrZero
-    @PositiveOrZero
-    private Duration positiveOrZeroDuration
-    @Positive
-    private int positive
-    @Positive
-    private Duration positiveDuration
-    @Range(min = 0.5, max = 10.5)
-    private int range
-    @Range(min = 0.5, max = 10.5)
-    private Duration rangeDuration
-    @Port
-    private int port
-    @Size(min = 1, max = 5)
-    private String sizeString
-    @Size(min = 1, max = 5)
-    private Object[] sizeArray
-    @Size(min = 1, max = 5)
-    private Collection sizeCollection
-    @Size(min = 1, max = 5)
-    private Map sizeMap
-    @Matches('[A-Za-z]+')
-    private String matches
-    @Hostname
-    private String hostname
-    @Email
-    private String email
-    @IPv4
-    private String ipv4
-    @IPv6
-    private String ipv6
-    @Url
-    private String url
-    @HexColor
-    private String hexColor
-    @Identifier
-    private String identifier
-    @Alphabetical
-    private String alphabetical
-    @AlphabeticalOrDigit
-    private String alphabeticalOrDigit
-    @NotBlank
-    private String notBlank
-    @NotEmpty
-    private String notEmpty
-    @Port
-    @Range(min = 1, max = 100)
-    private int minPort
-    @Uuid
-    private String uuid
-    @Character
-    private String character
-    @After
-    private Date afterDate
-    @After
-    private Calendar afterCalendar
-    @After
-    private TemporalAccessor afterTemporal
-    @AfterOrNow
-    private Date afterOrNowDate
-    @AfterOrNow
-    private Calendar afterOrNowCalendar
-    @AfterOrNow
-    private TemporalAccessor afterOrNowTemporal
-    @Before
-    private Date beforeDate
-    @Before
-    private Calendar beforeCalendar
-    @Before
-    private TemporalAccessor beforeTemporal
-    @BeforeOrNow
-    private Date beforeOrNowDate
-    @BeforeOrNow
-    private Calendar beforeOrNowCalendar
-    @BeforeOrNow
-    private TemporalAccessor beforeOrNowTemporal
 
     def 'test that validate method works'() {
         given:
@@ -243,7 +145,7 @@ class ValidatorTest extends Specification {
 
     def 'test that validate of field #fieldName and value #value does not throw'() {
         given:
-        def field = ValidatorTest.getDeclaredField(fieldName)
+        def field = Fields.getDeclaredField(fieldName)
 
         and:
         def toValidate = value
@@ -276,6 +178,9 @@ class ValidatorTest extends Specification {
         'maxDuration'            | Duration.ofMillis(0)
         'maxDuration'            | Duration.ofMillis(-1)
         'maxDuration'            | Duration.ofMillis(Integer.MIN_VALUE)
+        // Max Character
+        'maxCharacter'           | null
+        'maxCharacter'           | Z
         // NegativeOrZero
         'negativeOrZero'         | null
         'negativeOrZero'         | 0
@@ -304,6 +209,9 @@ class ValidatorTest extends Specification {
         'minDuration'            | Duration.ofMillis(0)
         'minDuration'            | Duration.ofMillis(1)
         'minDuration'            | Duration.ofMillis(Integer.MAX_VALUE)
+        // Min Character
+        'minCharacter'           | null
+        'minCharacter'           | A
         // PositiveOrZero
         'positiveOrZero'         | null
         'positiveOrZero'         | 0
@@ -330,6 +238,11 @@ class ValidatorTest extends Specification {
         'rangeDuration'          | null
         'rangeDuration'          | Duration.ofMillis(1)
         'rangeDuration'          | Duration.ofMillis(10)
+        // Range Character
+        'rangeCharacter'         | null
+        'rangeCharacter'         | A
+        'rangeCharacter'         | 'F' as char
+        'rangeCharacter'         | Z
         // Port
         'port'                   | null
         'port'                   | 1
@@ -475,7 +388,7 @@ class ValidatorTest extends Specification {
 
     def 'test that validate of field #fieldName and value #value throws'() {
         given:
-        def field = ValidatorTest.getDeclaredField(fieldName)
+        def field = Fields.getDeclaredField(fieldName)
 
         when:
         validator.validate(field, value)
@@ -508,6 +421,9 @@ class ValidatorTest extends Specification {
         'maxDuration'            | Duration.ofMillis(1)                     || [new ConstraintViolation(Duration.ofMillis(1), 'error.validation.number-too-big', String.format('must be at most %2$s', Duration.ofMillis(1), 0), ['value': Duration.ofMillis(1), 'expected': 0])]
         'maxDuration'            | Duration.ofMillis(Integer.MAX_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MAX_VALUE), 'error.validation.number-too-big', String.format('must be at most %2$s', Duration.ofMillis(Integer.MAX_VALUE), 0), ['value': Duration.ofMillis(Integer.MAX_VALUE), 'expected': 0])]
         'maxDuration'            | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
+        // Max Character
+        'maxCharacter'           | 'z' as char                              || [new ConstraintViolation('z' as char, 'error.validation.character-too-big', String.format('must be at most \'%2$s\'', 'z' as char, Z), ['value': 'z' as char, 'expected': Z])]
+        'maxCharacter'           | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'character')]
         // NegativeOrZero
         'negativeOrZero'         | 1                                        || [new ConstraintViolation(1, 'error.validation.negative-or-zero', String.format('must be negative or zero', 1), ['value': 1])]
         'negativeOrZero'         | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.negative-or-zero', String.format('must be negative or zero', Integer.MAX_VALUE), ['value': Integer.MAX_VALUE])]
@@ -534,6 +450,9 @@ class ValidatorTest extends Specification {
         'minDuration'            | Duration.ofMillis(-1)                    || [new ConstraintViolation(Duration.ofMillis(-1), 'error.validation.number-too-small', String.format('must be at least %2$s', Duration.ofMillis(-1), 0), ['value': Duration.ofMillis(-1), 'expected': 0])]
         'minDuration'            | Duration.ofMillis(Integer.MIN_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MIN_VALUE), 'error.validation.number-too-small', String.format('must be at least %2$s', Duration.ofMillis(Integer.MIN_VALUE), 0), ['value': Duration.ofMillis(Integer.MIN_VALUE), 'expected': 0])]
         'minDuration'            | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
+        // Min Character
+        'minCharacter'           | '\n' as char                             || [new ConstraintViolation('\n' as char, 'error.validation.character-too-small', String.format('must be at least \'%2$s\'', '\n' as char, A), ['value': '\n' as char, 'expected': A])]
+        'minCharacter'           | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'character')]
         // PositiveOrZero
         'positiveOrZero'         | -1                                       || [new ConstraintViolation(-1, 'error.validation.positive-or-zero', String.format('must be positive or zero', -1), ['value': -1])]
         'positiveOrZero'         | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.positive-or-zero', String.format('must be positive or zero', Integer.MIN_VALUE), ['value': Integer.MIN_VALUE])]
@@ -564,6 +483,10 @@ class ValidatorTest extends Specification {
         'rangeDuration'          | Duration.ofMillis(11)                    || [new ConstraintViolation(Duration.ofMillis(11), 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', Duration.ofMillis(11), 10.5, 0.5), ['value': Duration.ofMillis(11), 'max': 10.5, 'min': 0.5])]
         'rangeDuration'          | Duration.ofMillis(Integer.MAX_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MAX_VALUE), 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', Duration.ofMillis(Integer.MAX_VALUE), 10.5, 0.5), ['value': Duration.ofMillis(Integer.MAX_VALUE), 'max': 10.5, 'min': 0.5])]
         'rangeDuration'          | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
+        // Range Character
+        'range'                  | '\n' as char                             || [new ConstraintViolation('\n' as char, 'error.validation.character-exceeds-range', String.format('must be at least \'%3$s\' and at most \'%2$s\'', '\n' as char, A, Z), ['value': '\n' as char, 'max': Z, 'min': A])]
+        'range'                  | 'z' as char                              || [new ConstraintViolation('z' as char, 'error.validation.character-exceeds-range', String.format('must be at least \'%3$s\' and at most \'%2$s\'', 'z' as char, A, Z), ['value': 'z' as char, 'max': Z, 'min': A])]
+        'range'                  | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'character')]
         // Port
         'port'                   | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.invalid-port', String.format('%1$s is not a valid port', Integer.MIN_VALUE), ['value': Integer.MIN_VALUE])]
         'port'                   | 0                                        || [new ConstraintViolation(0, 'error.validation.invalid-port', String.format('%1$s is not a valid port', 0), ['value': 0])]
