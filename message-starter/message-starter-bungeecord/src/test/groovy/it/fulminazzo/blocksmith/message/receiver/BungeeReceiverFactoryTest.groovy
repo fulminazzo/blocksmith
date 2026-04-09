@@ -78,7 +78,7 @@ class BungeeReceiverFactoryTest extends Specification {
 
     def 'test that ReceiverFactories returns correct factory for #receiverType'() {
         when:
-        def factory = ReceiverFactories.get(receiverType)
+        def factory = ReceiverFactories.get(receiverType, application)
 
         then:
         (factory instanceof BungeeReceiverFactory)

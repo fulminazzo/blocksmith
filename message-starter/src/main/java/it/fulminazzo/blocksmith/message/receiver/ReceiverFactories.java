@@ -75,11 +75,13 @@ public final class ReceiverFactories {
      * Throws {@link IllegalArgumentException} if none found.
      *
      * @param receiverType the receiver type
+     * @param application  the application requesting the factory
      * @return the receiver factory
      */
-    public static @NotNull ReceiverFactory get(final @NotNull Class<?> receiverType) {
+    public static @NotNull ReceiverFactory get(final @NotNull Class<?> receiverType,
+                                               final @NotNull ServerApplication application) {
         for (final ReceiverFactory factory : factories)
-            if (factory.supports(receiverType)) {
+            if (factory.setup(application).supports(receiverType)) {
                 return factory;
             }
         throw new IllegalArgumentException(String.format("Could not find a %s for receiver type %s.",

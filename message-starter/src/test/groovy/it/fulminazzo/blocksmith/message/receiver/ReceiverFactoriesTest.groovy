@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.receiver
 
+import it.fulminazzo.blocksmith.ServerApplication
 import it.fulminazzo.blocksmith.message.Player
 import it.fulminazzo.blocksmith.message.UserData
 import net.kyori.adventure.audience.Audience
@@ -73,7 +74,7 @@ class ReceiverFactoriesTest extends Specification {
         ReceiverFactories.registerCustomFactory(new UserDataReceiverFactory())
 
         when:
-        def factory = ReceiverFactories.get(user.class)
+        def factory = ReceiverFactories.get(user.class, Mock(ServerApplication))
 
         then:
         factory != null
