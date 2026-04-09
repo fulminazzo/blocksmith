@@ -21,7 +21,7 @@ abstract class AbstractReceiverFactory implements ReceiverFactory {
     }
 
     @Override
-    public final @NotNull Collection<Receiver> getAllReceivers() {
+    public @NotNull Collection<Receiver> getAllReceivers() {
         if (isInitialized()) return getAllReceiversImpl();
         else throw notInitializedException();
     }
@@ -39,7 +39,7 @@ abstract class AbstractReceiverFactory implements ReceiverFactory {
     protected abstract @NotNull Collection<Receiver> getAllReceiversImpl();
 
     @Override
-    public final @NotNull <R> Receiver create(final @NotNull R receiver) {
+    public @NotNull <R> Receiver create(final @NotNull R receiver) {
         if (isInitialized()) return createImpl(receiver);
         else throw notInitializedException();
     }
@@ -58,7 +58,7 @@ abstract class AbstractReceiverFactory implements ReceiverFactory {
     protected abstract <R> @NotNull Receiver createImpl(final @NotNull R receiver);
 
     @Override
-    public final boolean supports(final @NotNull Class<?> receiverType) {
+    public boolean supports(final @NotNull Class<?> receiverType) {
         if (isInitialized()) return supportsImpl(receiverType);
         else throw notInitializedException();
     }
