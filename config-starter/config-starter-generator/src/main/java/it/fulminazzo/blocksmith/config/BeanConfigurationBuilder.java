@@ -43,6 +43,10 @@ import static com.github.javaparser.utils.Utils.isNullOrEmpty;
 @SuppressWarnings("unchecked")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BeanConfigurationBuilder {
+    private static final @NotNull List<Class<? extends Expression>> numberExpressions = Arrays.asList(
+            IntegerLiteralExpr.class, LongLiteralExpr.class, DoubleLiteralExpr.class
+    );
+
     private static final @NotNull String defaultJavaPackage = "java.lang";
     private static final @NotNull String genericsFormat = "<%s>";
     private static final @NotNull Class<?> nullClass = Object.class;
@@ -100,6 +104,47 @@ public class BeanConfigurationBuilder {
     }
 
     /**
+     * Parses the <code>version</code> property separately.
+     * Only works if a <b>non-null number</b> was specified.
+     *
+     * @param version the version
+     */
+    void parseVersion(final @NotNull Number version) {
+        final Class<?> versionClass = ConfigVersion.class;
+        addImport(versionClass);
+        final String propertyName = ConfigVersion.PROPERTY_NAME;
+        final Type type = StaticJavaParser.parseType(versionClass.getSimpleName());
+
+        final FieldDeclaration field = fields.computeIfAbsent(
+                propertyName,
+                k -> root.addPrivateField(type, k).setFinal(true)
+        ).setStatic(true);
+        if (field.getVariables().isEmpty()) field.addVariable(new VariableDeclarator());
+
+        final double actualVersion = version.doubleValue();
+
+        VariableDeclarator fieldVariable = field.getVariable(0)
+                .setName(propertyName)
+                .setType(type);
+        Expression initializer = fieldVariable.getInitializer().orElse(null);
+        if (isValidVersionInitializer(versionClass, initializer)) {
+            MethodCallExpr methodCall = getFirstCall(initializer.asMethodCallExpr());
+            double current = Double.parseDouble(methodCall.getArgument(0).toString());
+            if (current != actualVersion) {
+                methodCall.setArgument(0, new DoubleLiteralExpr(actualVersion));
+                field.setLineComment("TODO: auto-updated, handle migrations manually");
+            }
+        } else {
+            field.setLineComment("TODO: auto-generated, handle migrations manually");
+            fieldVariable.setInitializer(new MethodCallExpr(
+                    new NameExpr(versionClass.getSimpleName()),
+                    new SimpleName("of"),
+                    new NodeList<>(new DoubleLiteralExpr(actualVersion))
+            ));
+        }
+    }
+
+    /**
      * Parses nested values in the form of {@link Map}s.
      * Generates {@link Comment} annotation, getter and setter for the field.
      *
@@ -143,39 +188,6 @@ public class BeanConfigurationBuilder {
         else {
             final String className = getGenericTypeNameFromObject(value);
             generateField(key, className).setInitializer(getInitializer(value));
-        }
-    }
-
-    /**
-     * Parses the <code>version</code> property separately.
-     * Only works if a <b>non-null number</b> was specified.
-     *
-     * @param version the version
-     */
-    void parseVersion(final @NotNull Number version) {
-        final Class<?> versionClass = ConfigVersion.class;
-        addImport(versionClass);
-        final String propertyName = ConfigVersion.PROPERTY_NAME;
-        final Type type = StaticJavaParser.parseType(versionClass.getSimpleName());
-
-        final FieldDeclaration field = fields.computeIfAbsent(
-                propertyName,
-                k -> root.addPrivateField(type, k).setFinal(true)
-        ).setStatic(true);
-        if (field.getVariables().isEmpty()) field.addVariable(new VariableDeclarator());
-
-        VariableDeclarator fieldVariable = field.getVariable(0)
-                .setName(propertyName)
-                .setType(type);
-        Expression initializer = fieldVariable.getInitializer().orElse(null);
-        if (initializer instanceof MethodCallExpr); //TODO
-        else {
-            field.setLineComment("TODO: auto-generated, handle migrations manually");
-            fieldVariable.setInitializer(new MethodCallExpr(
-                    new NameExpr(versionClass.getSimpleName()),
-                    new SimpleName("of"),
-                    new NodeList<>(new DoubleLiteralExpr(version.doubleValue()))
-            ));
         }
     }
 
@@ -548,6 +560,38 @@ public class BeanConfigurationBuilder {
         if (member instanceof MethodDeclaration) return 2;
         if (member instanceof ClassOrInterfaceDeclaration) return 3;
         return 4;
+    }
+
+    private static boolean isValidVersionInitializer(final @NotNull Class<?> classVersion,
+                                                     final @Nullable Expression expression) {
+        if (!(expression instanceof MethodCallExpr)) return false;
+        MethodCallExpr methodCall = (MethodCallExpr) expression;
+        methodCall = getFirstCall(methodCall);
+
+        // ConfigVersion.
+        Optional<Expression> scopeOpt = methodCall.getScope();
+        if (scopeOpt.isEmpty()) return false;
+        Expression scope = scopeOpt.get();
+        if (!scope.isNameExpr()) return false;
+        if (!scope.asNameExpr().getNameAsString().equals(classVersion.getSimpleName())) return false;
+
+        // of
+        if (!methodCall.getNameAsString().equals("of")) return false;
+
+        NodeList<Expression> arguments = methodCall.getArguments();
+        if (arguments.size() != 1) return false;
+        Expression argument = arguments.get(0);
+        return numberExpressions.stream().anyMatch(t -> t.isAssignableFrom(argument.getClass()));
+    }
+
+    private static @NotNull MethodCallExpr getFirstCall(@NotNull MethodCallExpr expression) {
+        Optional<Expression> scope;
+        while ((scope = expression.getScope()).isPresent()) {
+            Expression scopeExpression = scope.get();
+            if (scopeExpression instanceof MethodCallExpr) expression = (MethodCallExpr) scopeExpression;
+            else break;
+        }
+        return expression;
     }
 
     /**
