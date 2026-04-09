@@ -32,4 +32,20 @@ public interface ServerApplication {
      */
     @NotNull Logger logger();
 
+    /**
+     * Gets the name of the application in lower case.
+     *
+     * @return the name
+     */
+    default @NotNull String lowercaseName() {
+        return getName().toLowerCase();
+    }
+
+    /**
+     * Gets the name of the application.
+     *
+     * @return the name
+     */
+    @NotNull String getName();
+
 }
