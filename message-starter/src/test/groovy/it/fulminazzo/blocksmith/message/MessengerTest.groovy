@@ -1,11 +1,13 @@
 package it.fulminazzo.blocksmith.message
 
 import groovy.util.logging.Slf4j
+import it.fulminazzo.blocksmith.ServerApplication
 import it.fulminazzo.blocksmith.message.argument.Placeholder
 import it.fulminazzo.blocksmith.message.provider.MessageNotFoundException
 import it.fulminazzo.blocksmith.message.provider.MessageProvider
 import it.fulminazzo.blocksmith.message.receiver.PlayerReceiverFactory
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories
+import it.fulminazzo.blocksmith.message.receiver.ReceiverFactory
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
@@ -14,6 +16,7 @@ import spock.lang.Specification
 
 import java.time.Duration
 import java.time.temporal.ChronoUnit
+import java.util.function.Supplier
 
 @Slf4j
 class MessengerTest extends Specification {
@@ -25,7 +28,7 @@ class MessengerTest extends Specification {
     private Map<String, Component> messages = [:]
 
     void setup() {
-        ReceiverFactories.factories.add(new PlayerReceiverFactory())
+        ReceiverFactories.factories.add((Supplier<ReceiverFactory>) () -> new PlayerReceiverFactory())
 
         player = new Player('Luke')
 
@@ -38,7 +41,10 @@ class MessengerTest extends Specification {
 
         messages['prefix'] = Component.text('blocksmith | ')
 
-        messenger = new Messenger(log).setMessageProvider(provider)
+        def application = Mock(ServerApplication)
+        application.logger >> log
+
+        messenger = new Messenger(application).setMessageProvider(provider)
     }
 
     def 'test that broadcastTitle correctly converts and sends message to all receivers'() {

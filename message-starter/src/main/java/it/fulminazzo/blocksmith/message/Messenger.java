@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message;
 
+import it.fulminazzo.blocksmith.ServerApplication;
 import it.fulminazzo.blocksmith.message.argument.Argument;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.provider.MessageNotFoundException;
@@ -14,7 +15,6 @@ import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.TitlePart;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -26,7 +26,7 @@ import java.util.function.BiConsumer;
  */
 @RequiredArgsConstructor
 public final class Messenger {
-    private final @NotNull Logger logger;
+    private final @NotNull ServerApplication application;
 
     private @Nullable MessageProvider messageProvider;
 
@@ -42,7 +42,7 @@ public final class Messenger {
     public void broadcastTitle(final @Nullable String titleCode,
                                final @Nullable String subtitleCode,
                                final Argument @NotNull ... arguments) {
-        ReceiverFactories.getAllReceivers().forEach(r -> sendTitle(r, titleCode, subtitleCode, arguments));
+        ReceiverFactories.getAllReceivers(application).forEach(r -> sendTitle(r, titleCode, subtitleCode, arguments));
     }
 
     /**
@@ -59,7 +59,7 @@ public final class Messenger {
                                final @Nullable String subtitleCode,
                                final @NotNull Title.Times times,
                                final Argument @NotNull ... arguments) {
-        ReceiverFactories.getAllReceivers().forEach(r -> sendTitle(r, titleCode, subtitleCode, times, arguments));
+        ReceiverFactories.getAllReceivers(application).forEach(r -> sendTitle(r, titleCode, subtitleCode, times, arguments));
     }
 
     /**
@@ -72,7 +72,7 @@ public final class Messenger {
      */
     public void broadcastActionBar(final @NotNull String messageCode,
                                    final Argument @NotNull ... arguments) {
-        ReceiverFactories.getAllReceivers().forEach(r -> sendActionBar(r, messageCode, arguments));
+        ReceiverFactories.getAllReceivers(application).forEach(r -> sendActionBar(r, messageCode, arguments));
     }
 
     /**
@@ -85,7 +85,7 @@ public final class Messenger {
      */
     public void broadcastMessage(final @NotNull String messageCode,
                                  final Argument @NotNull ... arguments) {
-        ReceiverFactories.getAllReceivers().forEach(r -> sendMessage(r, messageCode, arguments));
+        ReceiverFactories.getAllReceivers(application).forEach(r -> sendMessage(r, messageCode, arguments));
     }
 
     /**
@@ -134,7 +134,7 @@ public final class Messenger {
                               final @NotNull Title.Times times,
                               final Argument @NotNull ... arguments) {
         if (titleCode == null && subtitleCode == null) return;
-        ReceiverFactory factory = ReceiverFactories.get(receiver.getClass());
+        ReceiverFactory factory = ReceiverFactories.get(receiver.getClass(), application);
         Receiver rec = factory.create(receiver);
         rec.toAudience().sendTitlePart(TitlePart.TIMES, times);
         if (subtitleCode != null)
@@ -180,13 +180,13 @@ public final class Messenger {
                                        final @NotNull String messageCode,
                                        final Argument @NotNull ... arguments) {
         try {
-            ReceiverFactory factory = ReceiverFactories.get(receiver.getClass());
+            ReceiverFactory factory = ReceiverFactories.get(receiver.getClass(), application);
             Receiver rec = factory.create(receiver);
             Locale locale = rec.getLocale();
             Component message = getComponent(messageCode, locale, arguments);
             function.accept(rec.toAudience(), message);
         } catch (MessageNotFoundException e) {
-            logger.warn(e.getMessage());
+            application.getLogger().warn(e.getMessage());
         }
     }
 
