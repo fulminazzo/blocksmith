@@ -36,10 +36,13 @@ public final class Validator {
                 .register(AssertFalse.class, new BooleanConstraintValidator(o -> !o))
                 .register(AssertTrue.class, new BooleanConstraintValidator(o -> o))
                 .registerSupplier(Max.class, a -> new NumberDurationConstraintValidator(o -> o <= a.value()))
+                .registerSupplier(MaxChar.class, a -> new CharacterConstraintValidator(o -> o <= a.value()))
                 .register(Negative.class, new NumberDurationConstraintValidator(o -> o < 0))
                 .registerSupplier(Min.class, a -> new NumberDurationConstraintValidator(o -> o >= a.value()))
+                .registerSupplier(MinChar.class, a -> new CharacterConstraintValidator(o -> o >= a.value()))
                 .register(Positive.class, new NumberDurationConstraintValidator(o -> o > 0))
                 .registerSupplier(Range.class, a -> new NumberDurationConstraintValidator(o -> o >= a.min() && o <= a.max()))
+                .registerSupplier(RangeChar.class, a -> new CharacterConstraintValidator(o -> o >= a.min() && o <= a.max()))
                 .registerSupplier(Size.class, a -> new ConstraintValidatorImpl(o -> {
                     if (o == null) return true;
                     Number size;
