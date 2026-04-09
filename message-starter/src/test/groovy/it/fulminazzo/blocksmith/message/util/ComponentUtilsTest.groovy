@@ -4,6 +4,60 @@ import spock.lang.Specification
 
 class ComponentUtilsTest extends Specification {
 
+    def 'test that subcomponent of #rawComponent from #from to #to returns #expected'() {
+        given:
+        def component = ComponentUtils.toComponent(rawComponent)
+
+        when:
+        def subComponent = ComponentUtils.subcomponent(component, from, to)
+
+        then:
+        ComponentUtils.toString(subComponent) == expected
+
+        where:
+        rawComponent                                                                                                  | from | to | expected
+        ''                                                                                                            | 0    | 0  | ''
+        'Hello, world!'                                                                                               | 0    | 5  | 'Hello'
+        'Hello, world!'                                                                                               | 7    | 12 | 'world'
+        'Hello, world!'                                                                                               | 0    | 13 | 'Hello, world!'
+        'Hello, world!'                                                                                               | 13   | 13 | ''
+        '<red>Hello, world!'                                                                                          | 0    | 13 | '<red>Hello, world!'
+        '<red>Hello, world!'                                                                                          | 0    | 5  | '<red>Hello'
+        '<red>Hello, world!'                                                                                          | 7    | 12 | '<red>world'
+        '<red>Hello, world!'                                                                                          | 0    | 13 | '<red>Hello, world!'
+        '<red>Hello, world!'                                                                                          | 13   | 13 | '<red>'
+        '<red>Hello</red>, <blue>world!'                                                                              | 0    | 5  | '<red>Hello'
+        '<red>Hello</red>, <blue>world!'                                                                              | 7    | 12 | '<blue>world'
+        '<red>Hello</red>, <blue>world!'                                                                              | 0    | 13 | '<red>Hello</red>, <blue>world!'
+        '<red>Hello</red>, <blue>world!'                                                                              | 13   | 13 | ''
+        '<red>Hello</red>, <click:open_url:\'www.google.com\'>world</click>'                                          | 0    | 5  | '<red>Hello'
+        '<red>Hello</red>, <click:open_url:\'www.google.com\'>world</click>'                                          | 7    | 12 | '<click:open_url:\'www.google.com\'>world'
+        'Hello, <click:copy_to_clipboard:\'<iper<super<nested<tag> even <though>> really> unlikely>\'>world</click>!' | 0    | 5  | 'Hello'
+        'Hello, <click:copy_to_clipboard:\'<iper<super<nested<tag> even <though>> really> unlikely>\'>world</click>!' | 7    | 12 |
+                '<click:copy_to_clipboard:\'<iper<super<nested<tag> even <though>> really> unlikely>\'>world'
+        'Hello, <click:copy_to_clipboard:\'<iper<super<nested<tag> even <though>> really> unlikely>\'>world</click>!' | 7    | 13 |
+                '<click:copy_to_clipboard:\'<iper<super<nested<tag> even <though>> really> unlikely>\'>world</click>!'
+    }
+
+    def 'test that subcomponent of #from and #to throws'() {
+        given:
+        def component = ComponentUtils.toComponent('Hello, world!')
+
+        when:
+        ComponentUtils.subcomponent(component, from, to)
+
+        then:
+        thrown(IndexOutOfBoundsException)
+
+        where:
+        from | to
+        -1   | 13
+        14   | 13
+        0    | 14
+        0    | -1
+        12   | 7
+    }
+
     def 'test that actualLength of #rawComponent returns #expected'() {
         given:
         def component = ComponentUtils.toComponent(rawComponent)

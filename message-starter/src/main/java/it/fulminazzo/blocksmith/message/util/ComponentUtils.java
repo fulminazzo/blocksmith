@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +53,47 @@ public final class ComponentUtils {
     private static final @NotNull Pattern sectionSignHexCodeRegex = Pattern.compile("§x((?:§[0-9a-fA-F]){6})");
 
     private static final char tagStart = '<', tagEnd = '>', escapeChar = '\\';
+
+    /**
+     * Cuts the component text at the given indexes, while maintaining any previous styling.
+     *
+     * @param component the component
+     * @param from      the index to start cutting from
+     * @param to        the index to end cutting to
+     * @return the newly cut component
+     */
+    public static @NotNull Component subcomponent(final @NotNull Component component,
+                                                  final @Range(from = 0, to = Integer.MAX_VALUE) int from,
+                                                  final @Range(from = 0, to = Integer.MAX_VALUE) int to) {
+        int length = actualLength(component);
+        if (to > length || from > to || from < 0)
+            throw new IndexOutOfBoundsException(String.format("Range [%s, %s) out of bounds for length %s", from, to, length));
+
+        final StringBuilder builder = new StringBuilder();
+        final char[] rawComponent = toString(component).toCharArray();
+        int curr = 0, tags = 0;
+        boolean escaped = false;
+        for (int i = 0; i < rawComponent.length; i++) {
+            char c = rawComponent[i];
+            if (!escaped && c == tagStart) {
+                builder.append(c);
+                while (++i < rawComponent.length && ((c = rawComponent[i]) != tagEnd || tags > 0 || escaped)) {
+                    if (c == tagStart) tags++;
+                    else if (c == tagEnd) tags--;
+                    escaped = c == escapeChar;
+                    builder.append(c);
+                }
+                if (i < rawComponent.length) builder.append(c);
+            } else {
+                if (curr >= to) break;
+                else if (curr >= from) builder.append(c);
+                escaped = c == escapeChar;
+                curr++;
+            }
+        }
+
+        return toComponent(builder.toString());
+    }
 
     /**
      * Returns the actual length of the text contained in the component.
