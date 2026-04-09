@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.receiver;
 
+import it.fulminazzo.blocksmith.ServerApplication;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -8,6 +9,16 @@ import java.util.Collection;
  * Creates {@link Receiver} objects accordingly.
  */
 public interface ReceiverFactory {
+
+    /**
+     * Sets up the factory internal fields.
+     * <br>
+     * <b>WARNING</b>: this is required for all the other methods to work properly.
+     *
+     * @param application the application using the factory
+     * @return this object (for method chaining)
+     */
+    @NotNull ReceiverFactory setup(final @NotNull ServerApplication application);
 
     /**
      * Gets all the receivers of the platform.
