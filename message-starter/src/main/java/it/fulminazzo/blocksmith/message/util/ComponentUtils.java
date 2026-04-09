@@ -51,6 +51,47 @@ public final class ComponentUtils {
     private static final @NotNull Pattern ampersandHexCodeRegex = Pattern.compile("&(#[0-9a-fA-F]{6})");
     private static final @NotNull Pattern sectionSignHexCodeRegex = Pattern.compile("§x((?:§[0-9a-fA-F]){6})");
 
+    private static final char tagStart = '<', tagEnd = '>', escapeChar = '\\';
+
+    /**
+     * Returns the actual length of the text contained in the component.
+     * The text of the component refers to the characters that identify
+     * the raw text, excluding any formatting, styling or action tags.
+     * <br>
+     * For example, in
+     * <br>
+     * <code>Hello &lt;rainbow&gt;world&lt;/rainbow&gt;, isn't
+     * &lt;blue&gt;&lt;u&gt;&lt;click:open_url:'https://docs.papermc.io/adventure/minimessage/'&gt;
+     * MiniMessage
+     * &lt;/click&gt;&lt;/u&gt;&lt;/blue&gt; fun?</code>
+     * <br>
+     * the length is <i>35</i> as the real text is
+     * <br>
+     * <code>Hello world, isn't MiniMessage fun?</code>
+     *
+     * @param component the component
+     * @return the length
+     */
+    public static int actualLength(final @NotNull Component component) {
+        final char[] rawComponent = toString(component).toCharArray();
+        int length = 0, tags = 0;
+        boolean escaped = false;
+        for (int i = 0; i < rawComponent.length; i++) {
+            char c = rawComponent[i];
+            if (!escaped && c == tagStart) {
+                while (++i < rawComponent.length && ((c = rawComponent[i]) != tagEnd || tags > 0 || escaped)) {
+                    if (c == tagStart) tags++;
+                    else if (c == tagEnd) tags--;
+                    escaped = c == escapeChar;
+                }
+            } else {
+                escaped = c == escapeChar;
+                length++;
+            }
+        }
+        return length;
+    }
+
     /**
      * Converts the given string to a component.
      * Supports both <a href="https://docs.papermc.io/adventure/minimessage/">MiniMessage</a> and
