@@ -37,13 +37,8 @@ public interface MessageProvider {
      * @param messages the messages
      * @return the message provider
      */
-    static @NotNull MessageProvider memory(@NotNull Map<String, Object> messages) {
-        messages = MapUtils.flattenMap(MapUtils.listToStrings(messages));
-        Map<String, String> stringMessages = new HashMap<>();
-        messages.forEach((key, value) -> {
-            if (value != null) stringMessages.put(key, value.toString());
-        });
-        return new SimpleMessageProvider(stringMessages);
+    static @NotNull MessageProvider memory(final @NotNull Map<String, Object> messages) {
+        return new SimpleMessageProvider(MapUtils.stringify(messages));
     }
 
     /**
@@ -63,11 +58,10 @@ public interface MessageProvider {
     @SuppressWarnings("unchecked")
     static @NotNull MessageProvider resource(final @NotNull File workingDir,
                                              final @NotNull String resource) throws IOException {
-        File file = new File(workingDir, resource);
-        if (!file.exists()) ResourceUtils.storeResource(resource, file);
+        File file = ResourceUtils.extractIfAbsent(resource, new File(workingDir, resource));
         ConfigurationAdapter adapter = ConfigurationAdapter.newAdapter(
                 null,
-                ConfigurationFormat.fromFile(file)
+                ConfigurationFormat.fromExtension(file.getName())
         );
         Map<String, Object> messages = adapter.load(file, Map.class);
         return memory(messages);
@@ -100,11 +94,7 @@ public interface MessageProvider {
             resources = Arrays.stream(files).map(File::getName).collect(Collectors.toList());
         }
         for (String resourceName : resources) {
-            if (format.isValidFile(resourceName)) {
-                File resourceFile = new File(directory, resourceName);
-                if (!resourceFile.exists())
-                    ResourceUtils.storeResource(resourcesDir + "/" + resourceName, resourceFile);
-
+            if (format.matches(resourceName)) {
                 String fileName = resourceName.substring(0, resourceName.lastIndexOf('.'));
                 Locale locale = LocaleUtils.fromString(fileName);
                 if (locale.getCountry().isEmpty() || locale.getLanguage().isEmpty()) {
