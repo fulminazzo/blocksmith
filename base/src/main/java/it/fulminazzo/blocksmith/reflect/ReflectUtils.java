@@ -29,7 +29,7 @@ public final class ReflectUtils {
         else if (type instanceof TypeVariable<?>) {
             TypeVariable<?> typeVariable = (TypeVariable<?>) type;
             Type[] bounds = typeVariable.getBounds();
-            return bounds.length > 0 ? toClass(bounds[0]) : Object.class;
+            return toClass(bounds[0]);
         } else if (type instanceof GenericArrayType) {
             Class<?> componentType = toClass(((GenericArrayType) type).getGenericComponentType());
             return Array.newInstance(componentType, 0).getClass();
@@ -80,11 +80,9 @@ public final class ReflectUtils {
             }
 
             Type[] upperBounds = wildcardType.getUpperBounds();
-            if (upperBounds.length > 0) {
-                Type upperBound = upperBounds[0];
-                if (!upperBound.equals(Object.class))
-                    string += " extends " + toString(upperBound);
-            }
+            Type upperBound = upperBounds[0];
+            if (!upperBound.equals(Object.class))
+                string += " extends " + toString(upperBound);
 
             return string;
         } else throw new IllegalArgumentException("Unsupported type: " + type);
