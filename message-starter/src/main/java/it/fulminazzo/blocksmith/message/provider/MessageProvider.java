@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.message.provider;
 import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
 import it.fulminazzo.blocksmith.message.util.LocaleUtils;
+import it.fulminazzo.blocksmith.naming.Convention;
 import it.fulminazzo.blocksmith.util.MapUtils;
 import it.fulminazzo.blocksmith.util.ResourceUtils;
 import net.kyori.adventure.text.Component;
@@ -91,6 +92,7 @@ public interface MessageProvider {
                 ConfigurationFormat.fromExtension(file.getName())
         );
         Map<String, Object> messages = adapter.load(file, Map.class);
+        messages = MapUtils.convertNames(messages, Convention.CAMEL_CASE, Convention.KEBAB_CASE);
         if (version != null) {
             Object rawVersion = messages.remove(MessageVersion.PROPERTY_NAME);
             double latest = version.getVersion();
@@ -121,8 +123,10 @@ public interface MessageProvider {
                 logger.info("Messages file '{}' has been backed up to '{}'", file.getName(), backupFile.getName());
 
                 Map<String, Object> resourceMessages = adapter.loadFromResource(resource, Map.class);
+                resourceMessages = MapUtils.convertNames(resourceMessages, Convention.CAMEL_CASE, Convention.KEBAB_CASE);
                 messages = version.applyMigrations(currentVersion, messages, resourceMessages);
                 messages.put(MessageVersion.PROPERTY_NAME, latest);
+                messages = MapUtils.convertNames(messages, Convention.KEBAB_CASE, Convention.CAMEL_CASE);
                 adapter.store(file, messages);
                 return resource(workingDir, resource, logger, version);
             }
