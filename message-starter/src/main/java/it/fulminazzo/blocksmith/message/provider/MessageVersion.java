@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.message.provider;
 
+import it.fulminazzo.blocksmith.util.MapUtils;
 import lombok.Getter;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
@@ -29,13 +30,15 @@ public class MessageVersion {
      */
     public @NotNull Map<String, Object> applyMigrations(final double currentVersion,
                                                         @NotNull Map<String, Object> messages,
-                                                        final @NotNull Map<String, Object> reference) {
+                                                        @NotNull Map<String, Object> reference) {
+        messages = MapUtils.flatten(messages);
+        reference = MapUtils.flatten(reference);
         for (double v : migrations.keySet()) {
             if (v <= currentVersion) continue;
             Function<Migration, Migration> migration = migrations.get(v);
             messages = migration.apply(new Migration(messages, reference)).getData();
         }
-        return messages;
+        return MapUtils.unflatten(messages);
     }
 
     /**

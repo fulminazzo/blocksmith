@@ -7,16 +7,16 @@ class MessageVersionTest extends Specification {
     def 'test that migrate of #version and #messages returns updated messages'() {
         given:
         def expected = [
-                'prefix'                    : 'Blocksmith',
-                'general.greeting'          : '%prefix%Hello, %name%!',
-                'error.not-enough-arguments': '%prefix%You did not specify enough arguments'
+                'prefix' : 'Blocksmith',
+                'general': ['greeting': '%prefix%Hello, %name%!'],
+                'error'  : ['not-enough-arguments': '%prefix%You did not specify enough arguments']
         ]
 
         and:
         def reference = [
-                'prefix'                    : 'Blocksmith',
-                'general.greeting'          : '%prefix%Hello, %name%!',
-                'error.not-enough-arguments': '%prefix%You did not specify enough arguments'
+                'prefix' : 'Blocksmith',
+                'general': ['greeting': '%prefix%Hello, %name%!'],
+                'error'  : ['not-enough-arguments': '%prefix%You did not specify enough arguments']
         ]
 
         and:
@@ -41,17 +41,17 @@ class MessageVersionTest extends Specification {
         version | messages
         0.0     | [:]
         1.0     | [
-                'greeting'        : 'Hello, world!',
-                'errors.arguments': 'Not enough arguments!'
+                'greeting': 'Hello, world!',
+                'errors'  : ['arguments': 'Not enough arguments!']
         ]
         2.0     | [
                 'prefix'              : 'Blocksmith',
-                'general.greeting'    : '%prefix%Hello, %name%!',
+                'general'             : ['greeting': '%prefix%Hello, %name%!'],
                 'not-enough-arguments': '%prefix%You did not specify enough arguments'
         ]
         3.0     | [
                 'prefix'                    : 'Blocksmith',
-                'general.greeting'          : '%prefix%Hello, %name%!',
+                'general'                   : ['greeting': '%prefix%Hello, %name%!'],
                 'error.not-enough-arguments': '%prefix%You did not specify enough arguments'
         ]
     }
