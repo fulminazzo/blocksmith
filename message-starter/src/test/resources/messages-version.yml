@@ -1,0 +1,8 @@
+version: 3.0
+prefix: 'Blocksmith'
+
+general:
+  greeting: '%prefix%Hello, %name%!'
+
+error:
+  not-enough-arguments: '%prefix%You did not specify enough arguments'
