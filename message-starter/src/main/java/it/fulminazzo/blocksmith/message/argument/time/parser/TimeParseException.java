@@ -19,6 +19,16 @@ public final class TimeParseException extends RuntimeException {
     /**
      * Instantiates a new Time parse exception.
      *
+     * @param message the message
+     * @param cause   the cause
+     */
+    public TimeParseException(final @NotNull String message, final @NotNull Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * Instantiates a new Time parse exception.
+     *
      * @param format the format of the message
      * @param args   the arguments
      * @return the time parse exception

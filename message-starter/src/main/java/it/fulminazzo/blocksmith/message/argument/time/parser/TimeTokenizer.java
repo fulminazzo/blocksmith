@@ -57,7 +57,7 @@ final class TimeTokenizer {
             lastToken = commandToken;
             return commandToken;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TimeParseException("Could not read next token", e);
         }
     }
 

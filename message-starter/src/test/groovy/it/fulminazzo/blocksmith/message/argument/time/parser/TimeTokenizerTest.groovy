@@ -61,4 +61,23 @@ class TimeTokenizerTest extends Specification {
         method << ['getLastToken', 'getLastRead']
     }
 
+    def 'test that IOException is rethrown as TimeParseException'() {
+        given:
+        final cause = new IOException('Mock IOException')
+        def stream = Mock(InputStream)
+        stream.read() >> {
+            throw cause
+        }
+
+        and:
+        def tokenizer = new TimeTokenizer(stream)
+
+        when:
+        tokenizer.next()
+
+        then:
+        def e = thrown(TimeParseException)
+        e.cause == cause
+    }
+
 }
