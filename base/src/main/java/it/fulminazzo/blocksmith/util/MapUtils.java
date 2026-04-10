@@ -29,11 +29,11 @@ public final class MapUtils {
      * @return the converted map
      */
     @SuppressWarnings("unchecked")
-    public static @NotNull Map<@Nullable String, @Nullable Object> convertNames(final @NotNull Map<@Nullable String, @Nullable Object> map,
+    public static @NotNull Map<@Nullable String, @Nullable Object> convertNames(final @NotNull Map<@Nullable String, ?> map,
                                                                                 final @NotNull Convention from,
                                                                                 final @NotNull Convention to) {
         Map<@Nullable String, @Nullable Object> converted = new HashMap<>();
-        for (Map.Entry<@Nullable String, @Nullable Object> entry : map.entrySet()) {
+        for (Map.Entry<@Nullable String, ?> entry : map.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
             if (key != null) key = CaseConverter.convert(key, from, to);
