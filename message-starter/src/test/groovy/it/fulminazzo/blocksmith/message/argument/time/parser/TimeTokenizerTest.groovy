@@ -47,4 +47,18 @@ class TimeTokenizerTest extends Specification {
         actual == expected
     }
 
+    def 'test that #method throws IllegalStateException if nothing has been read yet'() {
+        given:
+        def tokenizer = new TimeTokenizer('')
+
+        when:
+        tokenizer."$method"()
+
+        then:
+        thrown(IllegalStateException)
+
+        where:
+        method << ['getLastToken', 'getLastRead']
+    }
+
 }

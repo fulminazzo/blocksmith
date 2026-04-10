@@ -74,6 +74,9 @@ class MessengerTest extends Specification {
         then:
         text == 'Hello, world!'
 
+        and:
+        translator.translate(component.key(), Locale.US) == null
+
         when:
         component = Component.translatable('greeting')
 
@@ -242,23 +245,32 @@ class MessengerTest extends Specification {
         player.locale = Locale.ITALY
 
         when:
-        messenger.sendTitle(player, 'message', 'message')
+        messenger.sendTitle(player, titleCode, subtitleCode)
 
         and:
         def lastTitle = player.lastTitle
 
         then:
-        lastTitle[TitlePart.TITLE] == expected
+        lastTitle[TitlePart.TITLE] == titleCode?.with { expected }
 
         and:
-        lastTitle[TitlePart.SUBTITLE] == expected
+        lastTitle[TitlePart.SUBTITLE] == subtitleCode?.with { expected }
 
         and:
-        lastTitle[TitlePart.TIMES] == Title.Times.times(
+        lastTitle[TitlePart.TIMES] == (titleCode == null && subtitleCode == null)
+                ? null
+                : Title.Times.times(
                 Duration.of(1L, ChronoUnit.SECONDS),
                 Duration.of(2L, ChronoUnit.SECONDS),
                 Duration.of(1L, ChronoUnit.SECONDS)
         )
+
+        where:
+        titleCode | subtitleCode
+        null      | null
+        null      | 'message'
+        'message' | null
+        'message' | 'message'
     }
 
     def 'test that sendActionBar correctly converts and sends message'() {

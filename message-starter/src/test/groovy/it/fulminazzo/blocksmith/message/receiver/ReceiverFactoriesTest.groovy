@@ -88,6 +88,14 @@ class ReceiverFactoriesTest extends Specification {
         locale == user.locale
     }
 
+    def 'test that get throws IllegalArgument exception for invalid receiver type'() {
+        when:
+        ReceiverFactories.get(String, Mock(ServerApplication))
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
     static final class GroovyPlayerReceiver implements Receiver {
         final @NotNull Player internal
 

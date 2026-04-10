@@ -147,6 +147,17 @@ class TimeParserTest extends Specification {
         node == Pair.of('year', 'years')
     }
 
+    def 'test that match throws for unexpected token'() {
+        given:
+        def parser = newMockTimeParser('Hello')
+
+        when:
+        parser.match(TimeToken.CLOSE_BRACE)
+
+        then:
+        thrown(TimeParseException)
+    }
+
     private static TimeParser newMockTimeParser(final @NotNull String input) {
         def parser = new TimeParser(input)
         parser.tokenizer.next()

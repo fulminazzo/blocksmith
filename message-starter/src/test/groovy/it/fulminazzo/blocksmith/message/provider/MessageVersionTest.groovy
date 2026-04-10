@@ -56,4 +56,15 @@ class MessageVersionTest extends Specification {
         ]
     }
 
+    def 'test that migrate of existing migration throws'() {
+        given:
+        def version = new MessageVersion(1.0).migrate(2.0, m -> m)
+
+        when:
+        version.migrate(2.0, m -> m)
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
 }

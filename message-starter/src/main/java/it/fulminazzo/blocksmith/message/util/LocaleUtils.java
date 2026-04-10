@@ -1,5 +1,7 @@
 package it.fulminazzo.blocksmith.message.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -7,6 +9,7 @@ import java.util.Locale;
 /**
  * A collection of utilities to work with {@link Locale}.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LocaleUtils {
 
     /**
