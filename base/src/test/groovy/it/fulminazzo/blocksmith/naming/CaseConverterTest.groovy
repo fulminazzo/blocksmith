@@ -6,6 +6,33 @@ import static it.fulminazzo.blocksmith.naming.Convention.*
 
 class CaseConverterTest extends Specification {
 
+    def 'test that convert #input to #to returns #expected'() {
+        when:
+        def actual = CaseConverter.convert(input, to)
+
+        then:
+        actual == expected
+
+        where:
+        input        | to          || expected
+        // camelCase
+        'helloWorld' | CAMEL_CASE  || 'helloWorld'
+        'hW'         | CAMEL_CASE  || 'hW'
+        ''           | CAMEL_CASE  || ''
+        // kebab-case
+        'helloWorld' | KEBAB_CASE  || 'hello-world'
+        'hW'         | KEBAB_CASE  || 'h-w'
+        ''           | KEBAB_CASE  || ''
+        // snake_case
+        'helloWorld' | SNAKE_CASE  || 'hello_world'
+        'hW'         | SNAKE_CASE  || 'h_w'
+        ''           | SNAKE_CASE  || ''
+        // PascalCase
+        'helloWorld' | PASCAL_CASE || 'HelloWorld'
+        'hW'         | PASCAL_CASE || 'HW'
+        ''           | PASCAL_CASE || ''
+    }
+
     def 'test that convert #input from #from to #to returns #expected'() {
         when:
         def actual = CaseConverter.convert(input, from, to)

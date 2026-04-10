@@ -87,6 +87,8 @@ class ReflectUtilsTest extends Specification {
         where:
         type                                                        || expected
         Mock                                                        || Mock
+        Mock.typeParameters[0]                                      || Number
+        Mock.typeParameters[1]                                      || Object
         listParameterizedType                                       || List
         genericArrayType                                            || Set[]
         Mock.getDeclaredMethod('wildcard').genericReturnType        || Collection
@@ -114,13 +116,16 @@ class ReflectUtilsTest extends Specification {
         actual == expected
 
         where:
-        type                                                        || expected
-        Mock                                                        || "${Mock.canonicalName}"
-        listParameterizedType                                       || "${List.canonicalName}<${String.canonicalName}>"
-        genericArrayType                                            || "${Set.canonicalName}<${Boolean.canonicalName}>[]"
-        Mock.getDeclaredMethod('wildcard').genericReturnType        || "${Collection.canonicalName}<?>"
-        Mock.getDeclaredMethod('wildcardExtends').genericReturnType || "${Collection.canonicalName}<? extends ${List.canonicalName}<${String.canonicalName}>>"
-        Mock.getDeclaredMethod('wildcardSuper').genericReturnType   || "${Collection.canonicalName}<? super ${Collection.canonicalName}<T extends ${Number.canonicalName} & ${Comparable.canonicalName}>>"
+        type                                                            || expected
+        Mock                                                            || "${Mock.canonicalName}"
+        Mock.typeParameters[0]                                          || "T extends ${Number.canonicalName} & ${Comparable.canonicalName}"
+        Mock.typeParameters[1]                                          || "N"
+        listParameterizedType                                           || "${List.canonicalName}<${String.canonicalName}>"
+        genericArrayType                                                || "${Set.canonicalName}<${Boolean.canonicalName}>[]"
+        Mock.getDeclaredMethod('wildcard').genericReturnType            || "${Collection.canonicalName}<?>"
+        Mock.getDeclaredMethod('wildcardExtends').genericReturnType     || "${Collection.canonicalName}<? extends ${List.canonicalName}<${String.canonicalName}>>"
+        Mock.getDeclaredMethod('wildcardSuper').genericReturnType       || "${Collection.canonicalName}<? super ${Collection.canonicalName}<T extends ${Number.canonicalName} & ${Comparable.canonicalName}>>"
+        Mock.getDeclaredMethod('wildcardSuperObject').genericReturnType || "${Collection.canonicalName}<?>"
     }
 
     def 'test that toString does not throws for unknown type'() {
@@ -131,7 +136,7 @@ class ReflectUtilsTest extends Specification {
         thrown(IllegalArgumentException)
     }
 
-    static class Mock<T extends Number & Comparable> {
+    static class Mock<T extends Number & Comparable, N> {
 
         static List<String> parameterizedType() {
             throw new UnsupportedOperationException()
@@ -158,6 +163,10 @@ class ReflectUtilsTest extends Specification {
         }
 
         Collection<? super Collection<T>> wildcardSuper() {
+            throw new UnsupportedOperationException()
+        }
+
+        Collection<? super Object> wildcardSuperObject() {
             throw new UnsupportedOperationException()
         }
 

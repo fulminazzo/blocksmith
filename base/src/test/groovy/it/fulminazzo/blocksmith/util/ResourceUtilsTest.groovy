@@ -38,6 +38,9 @@ class ResourceUtilsTest extends Specification {
         def tmp = new File(extractTestsDirectory, filename)
         def lastUpdate = tmp.exists() ? tmp.lastModified() : 0
 
+        and:
+        sleep(1)
+
         when:
         def file = ResourceUtils.extract(*arguments)
         if (file instanceof Path) file = file.toFile()
