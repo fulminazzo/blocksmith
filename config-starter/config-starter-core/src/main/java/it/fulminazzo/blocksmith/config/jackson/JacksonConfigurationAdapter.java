@@ -27,10 +27,7 @@ import java.util.*;
  */
 @SuppressWarnings("unchecked")
 public final class JacksonConfigurationAdapter implements BaseConfigurationAdapter {
-    /**
-     * The format that will be used to save a timed backup of the configuration.
-     */
-    public static final @NotNull SimpleDateFormat BACKUP_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS");
+    private static final @NotNull SimpleDateFormat backupTimeFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS");
 
     private final @NotNull ObjectMapper mapper;
     private final @NotNull Logger logger;
@@ -94,7 +91,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                     String extension = tmp.substring(tmp.lastIndexOf('.') + 1);
                     File backupFile = new File(file.getParentFile(), String.format("%s-%s.%s.bk",
                             name,
-                            BACKUP_TIME_FORMAT.format(System.currentTimeMillis()),
+                            backupTimeFormat.format(System.currentTimeMillis()),
                             extension
                     ));
                     Files.move(file.toPath(), backupFile.toPath());
