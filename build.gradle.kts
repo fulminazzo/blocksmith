@@ -7,12 +7,16 @@ plugins {
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
+extra["baseModuleName"] = "base"
 extra["testingModuleName"] = "testing"
 
 allprojects {
     apply { plugin("java-library") }
     apply { plugin("groovy") }
     apply { plugin("jacoco-report-aggregation") }
+
+    val baseModuleName: String by rootProject.extra
+    val testingModuleName: String by rootProject.extra
 
     val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
     val mockitoAgent: Configuration by configurations.creating
@@ -31,10 +35,14 @@ allprojects {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
 
+        if (project.name != baseModuleName) api(project(":$baseModuleName"))
+
         testImplementation(rootProject.libs.bundles.annotations)
         testRuntimeOnly(rootProject.libs.junit.platform)
         testAnnotationProcessor(rootProject.libs.lombok)
         testImplementation(rootProject.libs.bundles.test.framework)
+
+        testImplementation(project(":$baseModuleName:$testingModuleName"))
 
         mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
