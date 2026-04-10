@@ -1,5 +1,7 @@
 package it.fulminazzo.blocksmith.util;
 
+import it.fulminazzo.blocksmith.naming.CaseConverter;
+import it.fulminazzo.blocksmith.naming.Convention;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +15,34 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MapUtils {
+
+    /**
+     * Converts the naming convention of the keys to the given one.
+     * <br>
+     * Recursively traverses the map if any sub-map is found.
+     * <br>
+     * <b>WARNING</b>: assumes the internal maps have {@link String} keys.
+     *
+     * @param map  the map
+     * @param from the naming convention of the keys
+     * @param to   the naming convention to convert the keys to
+     * @return the converted map
+     */
+    @SuppressWarnings("unchecked")
+    public static @NotNull Map<@Nullable String, @Nullable Object> convertNames(final @NotNull Map<@Nullable String, @Nullable Object> map,
+                                                                                final @NotNull Convention from,
+                                                                                final @NotNull Convention to) {
+        Map<@Nullable String, @Nullable Object> converted = new HashMap<>();
+        for (Map.Entry<@Nullable String, @Nullable Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if (key != null) key = CaseConverter.convert(key, from, to);
+            if (value instanceof Map<?, ?>)
+                value = convertNames((Map<String, Object>) value, from, to);
+            converted.put(key, value);
+        }
+        return converted;
+    }
 
     /**
      * Converts the given map to a map of string keys and string values.
