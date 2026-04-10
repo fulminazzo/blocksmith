@@ -77,8 +77,7 @@ public final class Migration {
      * @return this object (for method chaining)
      */
     public @NotNull Migration remove(final @NotNull String path) {
-        if (data.remove(path) == null)
-            throw new IllegalArgumentException(String.format("Path '%s' does not exist", path));
+        data.remove(path);
         return this;
     }
 
