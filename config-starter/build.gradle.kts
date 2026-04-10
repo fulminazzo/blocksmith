@@ -7,19 +7,20 @@ dependencies {
 }
 
 allprojects {
-    dependencies {
-        testImplementation(rootProject.libs.slf4j)
-        testImplementation(rootProject.libs.bundles.log4j)
 
+    dependencies {
         if (!project.name.endsWith(testingModuleName))
             testImplementation(project(":$projectName:$projectName-$testingModuleName"))
     }
+
 }
 
 subprojects {
+
     dependencies {
         compileOnly(rootProject.libs.slf4j)
         if (!project.name.endsWith(coreModuleName))
             api(project(":$projectName:$projectName-$coreModuleName"))
     }
+
 }

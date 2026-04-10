@@ -9,7 +9,7 @@ plugins {
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
-extra["baseProjectName"] = "base"
+extra["baseModuleName"] = "base"
 extra["testingModuleName"] = "testing"
 
 allprojects {
@@ -18,8 +18,11 @@ allprojects {
     apply { plugin("jacoco") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
-    val baseProjectName: String by rootProject.extra
+    val baseModuleName: String by rootProject.extra
+    val testingModuleName: String by rootProject.extra
+
     val projectInfoClassName = "ProjectInfo"
+
     val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
     val mockitoAgent: Configuration by configurations.creating
 
@@ -45,12 +48,14 @@ allprojects {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
 
-        if (project.name != baseProjectName) api(project(":$baseProjectName"))
+        if (project.name != baseModuleName) api(project(":$baseModuleName"))
 
         testImplementation(rootProject.libs.bundles.annotations)
         testRuntimeOnly(rootProject.libs.junit.platform)
         testAnnotationProcessor(rootProject.libs.lombok)
         testImplementation(rootProject.libs.bundles.test.framework)
+
+        testImplementation(project(":$baseModuleName:$testingModuleName"))
 
         mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }

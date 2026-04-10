@@ -53,7 +53,7 @@ public final class StringUtils {
         final Map<String, Pattern> quotePatterns = Arrays.stream(quotes)
                 .collect(Collectors.toMap(r -> r, r -> Pattern.compile(r + "$")));
 
-        String current = "";
+        StringBuilder current = new StringBuilder();
         char[] chars = string.toCharArray();
         main:
         for (int i = 0; i < chars.length; i++) {
@@ -61,51 +61,54 @@ public final class StringUtils {
 
             for (String r : quotes) {
                 Pattern p = quotePatterns.get(r);
-                if (p.matcher(current + c).find()) {
-                    String start = current;
+                if (p.matcher(current.toString() + c).find()) {
+                    StringBuilder startBuilder = new StringBuilder(current);
                     for (; i < chars.length; i++) {
-                        start += chars[i];
-                        if (!start.matches(current + r + "$")) {
-                            start = start.substring(0, start.length() - 1);
+                        startBuilder.append(chars[i]);
+                        if (!Pattern.matches(current.toString() + r + "$", startBuilder)) {
+                            startBuilder.setLength(startBuilder.length() - 1);
                             break;
                         }
                     }
-                    start = start.substring(current.length());
-                    String tmp = start;
+                    String start = startBuilder.substring(current.length());
+                    StringBuilder tmpBuilder = new StringBuilder(start);
                     for (; i < chars.length; i++) {
                         c = chars[i];
                         if (c == '\\') {
-                            if (i < chars.length - 1) tmp += chars[++i];
+                            if (i < chars.length - 1) tmpBuilder.append(chars[++i]);
                             continue;
                         }
-                        tmp += c;
-                        if (tmp.endsWith(start)) {
-                            if (!quoted) tmp = tmp.substring(start.length(), tmp.length() - start.length());
+                        tmpBuilder.append(c);
+                        if (tmpBuilder.toString().endsWith(start)) {
+                            if (!quoted) {
+                                tmpBuilder.delete(0, start.length());
+                                tmpBuilder.setLength(tmpBuilder.length() - start.length());
+                            }
                             break;
                         }
                     }
-                    current += tmp;
+                    current.append(tmpBuilder);
                     continue main;
                 }
             }
 
-            if (pattern.matcher(current + c).find()) {
-                String tmp = current;
+            if (pattern.matcher(current.toString() + c).find()) {
+                StringBuilder tmpBuilder = new StringBuilder(current);
                 for (; i < chars.length; i++) {
-                    tmp += chars[i];
-                    if (!tmp.matches(current + regex + "$")) {
+                    tmpBuilder.append(chars[i]);
+                    if (!Pattern.matches(current.toString() + regex + "$", tmpBuilder)) {
                         i--;
                         break;
                     }
                 }
-                strings.add(current);
-                current = "";
+                strings.add(current.toString());
+                current.setLength(0);
                 continue;
             }
 
-            current += c;
+            current.append(c);
         }
-        strings.add(current);
+        strings.add(current.toString());
         return List.copyOf(strings);
     }
 
@@ -120,9 +123,10 @@ public final class StringUtils {
      *                    Supports regular expressions
      * @return the strings
      */
+    @SafeVarargs
     public static @NotNull List<String> split(final @Nullable String string,
                                               final @NotNull String regex,
-                                              final @NotNull Pair<String, String> @NotNull ... parenthesis) {
+                                              final @NotNull Pair<@NotNull String, @NotNull String> @NotNull ... parenthesis) {
         if (string == null) return Collections.emptyList();
         if (string.isEmpty()) return Collections.singletonList("");
         final List<String> strings = new LinkedList<>();
@@ -136,7 +140,7 @@ public final class StringUtils {
                         )
                 ));
 
-        String current = "";
+        StringBuilder current = new StringBuilder();
         char[] chars = string.toCharArray();
         main:
         for (int i = 0; i < chars.length; i++) {
@@ -144,12 +148,12 @@ public final class StringUtils {
             for (Pair<String, String> p : parenthesis) {
                 Pattern openPattern = parenthesisPatterns.get(p).getFirst();
                 Pattern closePattern = parenthesisPatterns.get(p).getSecond();
-                if (openPattern.matcher(current + c).find()) {
+                if (openPattern.matcher(current.toString() + c).find()) {
                     int depth = 1;
-                    current += c;
+                    current.append(c);
                     for (++i; i < chars.length; i++) {
                         c = chars[i];
-                        current += c;
+                        current.append(c);
                         if (openPattern.matcher(current).find()) depth++;
                         else if (closePattern.matcher(current).find()) depth--;
                         if (depth == 0) break;
@@ -158,23 +162,23 @@ public final class StringUtils {
                 }
             }
 
-            if (pattern.matcher(current + c).find()) {
-                String tmp = current;
+            if (pattern.matcher(current.toString() + c).find()) {
+                StringBuilder tmpBuilder = new StringBuilder(current);
                 for (; i < chars.length; i++) {
-                    tmp += chars[i];
-                    if (!tmp.matches(Pattern.quote(current) + regex + "$")) {
+                    tmpBuilder.append(chars[i]);
+                    if (!Pattern.matches(Pattern.quote(current.toString()) + regex + "$", tmpBuilder)) {
                         i--;
                         break;
                     }
                 }
-                strings.add(current);
-                current = "";
+                strings.add(current.toString());
+                current.setLength(0);
                 continue;
             }
 
-            current += c;
+            current.append(c);
         }
-        strings.add(current);
+        strings.add(current.toString());
         return List.copyOf(strings);
     }
 

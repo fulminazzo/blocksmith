@@ -545,7 +545,7 @@ class AbstractExpiringMapTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1000L)
 
         expect:
-        Objects.equals(map, map)
+        AbstractExpiringMap.getMethod('equals', Object).invoke(map, map)
 
         and:
         map.hashCode() == map.hashCode()
