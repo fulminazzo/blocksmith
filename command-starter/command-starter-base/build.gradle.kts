@@ -1,6 +1,4 @@
 dependencies {
-    api(libs.bundles.validation)
-
     api(project(":message-starter"))
     api(project(":scheduler-starter"))
 

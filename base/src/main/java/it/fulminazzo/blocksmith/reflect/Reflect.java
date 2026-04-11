@@ -1,9 +1,6 @@
 package it.fulminazzo.blocksmith.reflect;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,12 +9,14 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A wrapper for Java objects to work with reflections.
  */
 @SuppressWarnings("unchecked")
 @Value
+@EqualsAndHashCode(doNotUseGetters = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Reflect {
     private static final @NotNull Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER = Map.of(
@@ -51,7 +50,7 @@ public class Reflect {
         NUMBERS_CONVERTER.put(Double.class, Number::doubleValue);
     }
 
-    @NotNull Type type;
+    @Nullable Type type;
     @Getter(AccessLevel.NONE)
     Object object;
 
@@ -66,12 +65,22 @@ public class Reflect {
     }
 
     /**
+     * Gets the internal wrapped object type.
+     *
+     * @return the type
+     */
+    public @NotNull Type getType() {
+        if (type == null) throw new ReflectException("Reflect '%s' has null type", this);
+        return type;
+    }
+
+    /**
      * Gets the internal wrapped object Java class.
      *
      * @return the class
      */
     public @NotNull Class<?> getObjectClass() {
-        return ReflectUtils.toClass(type);
+        return ReflectUtils.toClass(getType());
     }
 
     /*
@@ -126,10 +135,7 @@ public class Reflect {
     public @NotNull Reflect toWrapper() {
         if (isPrimitive()) {
             Class<?> newType = PRIMITIVE_TO_WRAPPER.get(getObjectClass());
-            final Object newObject;
-            if (object instanceof Class<?>) newObject = newType;
-            else newObject = cast(newType, object);
-            return new Reflect(newType, newObject);
+            return cast(newType);
         }
         return this;
     }
@@ -142,12 +148,20 @@ public class Reflect {
     public @NotNull Reflect toPrimitive() {
         if (isWrapper()) {
             Class<?> newType = WRAPPER_TO_PRIMITIVE.get(getObjectClass());
-            final Object newObject;
-            if (object instanceof Class<?>) newObject = newType;
-            else newObject = cast(newType, object);
-            return new Reflect(newType, newObject);
+            return cast(newType);
         }
         return this;
+    }
+
+    /**
+     * Casts the internal object to the given type.
+     *
+     * @param type the type
+     * @return the reflect with the new object
+     */
+    public @NotNull Reflect cast(final @NotNull Class<?> type) {
+        if (object instanceof Class<?>) return new Reflect(type, type);
+        else return new Reflect(type, cast(type, object));
     }
 
     /*
@@ -162,7 +176,7 @@ public class Reflect {
      * @throws ReflectException if no method was found or an error occurs while getting the value
      */
     public @NotNull Reflect init(final @Nullable Object @NotNull ... parameters) {
-        Class<?>[] parameterTypes = getClasses(parameters);
+        Class<?>[] parameterTypes = getParameterTypes(parameters);
         Constructor<?> constructor = getConstructor(parameterTypes);
         return init(constructor, parameters);
     }
@@ -204,7 +218,7 @@ public class Reflect {
         return ReflectUtils.findExecutable(
                 getConstructors(),
                 parameterTypes
-        ).orElseThrow(() -> ReflectException.cannotFindConstructor(type, parameterTypes));
+        ).orElseThrow(() -> ReflectException.cannotFindConstructor(getType(), parameterTypes));
     }
 
     /**
@@ -215,7 +229,7 @@ public class Reflect {
      * @throws ReflectException if no constructor was found
      */
     public @NotNull Constructor<?> getConstructor(final @NotNull Predicate<Constructor<?>> predicate) {
-        return getConstructors(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindConstructor(type));
+        return getConstructors(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindConstructor(getType()));
     }
 
     /**
@@ -242,11 +256,21 @@ public class Reflect {
      */
 
     /**
-     * Gets the value of all the instance fields (fields must not be static).
+     * Gets the value of all the non-static fields (not including inherited fields).
      *
      * @return the values of the fields
      */
     public @NotNull List<Reflect> getInstanceFieldValues() {
+        final Class<?> type = getObjectClass();
+        return getFieldValues(f -> f.getDeclaringClass().equals(type) && !Modifier.isStatic(f.getModifiers()));
+    }
+
+    /**
+     * Gets the values of all the non-static fields.
+     *
+     * @return the values of the fields
+     */
+    public @NotNull List<Reflect> getNonStaticFieldValues() {
         return getFieldValues(f -> !Modifier.isStatic(f.getModifiers()));
     }
 
@@ -279,7 +303,7 @@ public class Reflect {
     }
 
     /**
-     * Sets a new value to the instance field with the given name (field must not be static).
+     * Sets a new value to the non-static field with the given name (not including inherited fields).
      *
      * @param name  the name of the field
      * @param value the value of the field
@@ -288,6 +312,18 @@ public class Reflect {
      */
     public @NotNull Reflect setInstance(final @NotNull String name, final Object value) {
         return set(getInstanceField(name), value);
+    }
+
+    /**
+     * Sets a new value to the non-static field with the given name.
+     *
+     * @param name  the name of the field
+     * @param value the value of the field
+     * @return this object (for method chaining)
+     * @throws ReflectException if no field was found or an error occurs while setting the value
+     */
+    public @NotNull Reflect setNonStatic(final @NotNull String name, final Object value) {
+        return set(getNonStaticField(name), value);
     }
 
     /**
@@ -345,7 +381,97 @@ public class Reflect {
     }
 
     /**
-     * Gets the value of the instance field with the given name (field must not be static).
+     * Gets the value of the non-static field with the given name (not including inherited fields).
+     *
+     * @param name   the name of the field
+     * @param orElse the value to return if the field was not found or there were problems while accessing it
+     * @return the value of the field
+     */
+    public @NotNull Reflect getInstance(final @NotNull String name, final Object orElse) {
+        try {
+            return get(getInstanceField(name), orElse);
+        } catch (ReflectException ignored) {
+            return new Reflect(orElse == null ? null : orElse.getClass(), orElse);
+        }
+    }
+
+    /**
+     * Gets the value of the non-static field with the given name.
+     *
+     * @param name   the name of the field
+     * @param orElse the value to return if the field was not found or there were problems while accessing it
+     * @return the value of the field
+     */
+    public @NotNull Reflect getNonStatic(final @NotNull String name, final Object orElse) {
+        try {
+            return get(getNonStaticField(name), orElse);
+        } catch (ReflectException ignored) {
+            return new Reflect(orElse == null ? null : orElse.getClass(), orElse);
+        }
+    }
+
+    /**
+     * Gets the value of the static field with the given name.
+     *
+     * @param name   the name of the field
+     * @param orElse the value to return if the field was not found or there were problems while accessing it
+     * @return the value of the field
+     */
+    public @NotNull Reflect getStatic(final @NotNull String name, final Object orElse) {
+        try {
+            return get(getStaticField(name), orElse);
+        } catch (ReflectException ignored) {
+            return new Reflect(orElse == null ? null : orElse.getClass(), orElse);
+        }
+    }
+
+    /**
+     * Gets the value of the field with the given name.
+     *
+     * @param name   the name of the field
+     * @param orElse the value to return if the field was not found or there were problems while accessing it
+     * @return the value of the field
+     */
+    public @NotNull Reflect get(final @NotNull String name, final Object orElse) {
+        try {
+            return get(getField(name), orElse);
+        } catch (ReflectException ignored) {
+            return new Reflect(orElse == null ? null : orElse.getClass(), orElse);
+        }
+    }
+
+    /**
+     * Gets the value of the first field that matches the predicate.
+     *
+     * @param predicate the predicate
+     * @param orElse    the value to return if the field was not found or there were problems while accessing it
+     * @return the value of the field
+     */
+    public @NotNull Reflect get(final @NotNull Predicate<Field> predicate, final Object orElse) {
+        try {
+            return get(getField(predicate), orElse);
+        } catch (ReflectException ignored) {
+            return new Reflect(orElse == null ? null : orElse.getClass(), orElse);
+        }
+    }
+
+    /**
+     * Gets the value of the given field.
+     *
+     * @param field  the field
+     * @param orElse the value to return if the field was not found or there were problems while accessing it
+     * @return the value of the field
+     */
+    public @NotNull Reflect get(final @NotNull Field field, final Object orElse) {
+        try {
+            return get(field);
+        } catch (ReflectException ignored) {
+            return new Reflect(field.getGenericType(), cast(field.getType(), orElse));
+        }
+    }
+
+    /**
+     * Gets the value of the non-static field with the given name (not including inherited fields).
      *
      * @param name the name of the field
      * @return the value of the field
@@ -353,6 +479,17 @@ public class Reflect {
      */
     public @NotNull Reflect getInstance(final @NotNull String name) {
         return get(getInstanceField(name));
+    }
+
+    /**
+     * Gets the value of the non-static field with the given name.
+     *
+     * @param name the name of the field
+     * @return the value of the field
+     * @throws ReflectException if no field was found or an error occurs while getting the value
+     */
+    public @NotNull Reflect getNonStatic(final @NotNull String name) {
+        return get(getNonStaticField(name));
     }
 
     /**
@@ -385,8 +522,7 @@ public class Reflect {
      * @throws ReflectException if no field was found or an error occurs while getting the value
      */
     public @NotNull Reflect get(final @NotNull Predicate<Field> predicate) {
-        Field field = getField(predicate);
-        return get(field);
+        return get(getField(predicate));
     }
 
     /**
@@ -406,7 +542,7 @@ public class Reflect {
     }
 
     /**
-     * Gets the instance field with the given name (field must not be static).
+     * Gets the non-static field with the given name (not including inherited fields).
      *
      * @param name the name of the field
      * @return the field
@@ -414,9 +550,25 @@ public class Reflect {
      */
     public @NotNull Field getInstanceField(final @NotNull String name) {
         try {
+            final Class<?> type = getObjectClass();
+            return getField(f -> f.getDeclaringClass().equals(type) && !Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
+        } catch (ReflectException e) {
+            throw ReflectException.cannotFindField(getType(), name);
+        }
+    }
+
+    /**
+     * Gets the non-static field with the given name.
+     *
+     * @param name the name of the field
+     * @return the field
+     * @throws ReflectException if no field was found
+     */
+    public @NotNull Field getNonStaticField(final @NotNull String name) {
+        try {
             return getField(f -> !Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
         } catch (ReflectException e) {
-            throw ReflectException.cannotFindField(type, name);
+            throw ReflectException.cannotFindField(getType(), name);
         }
     }
 
@@ -431,7 +583,7 @@ public class Reflect {
         try {
             return getField(f -> Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
         } catch (ReflectException e) {
-            throw ReflectException.cannotFindField(type, name);
+            throw ReflectException.cannotFindField(getType(), name);
         }
     }
 
@@ -446,7 +598,7 @@ public class Reflect {
         try {
             return getField(f -> f.getName().equals(name));
         } catch (ReflectException e) {
-            throw ReflectException.cannotFindField(type, name);
+            throw ReflectException.cannotFindField(getType(), name);
         }
     }
 
@@ -458,15 +610,25 @@ public class Reflect {
      * @throws ReflectException if no field was found
      */
     public @NotNull Field getField(final @NotNull Predicate<Field> predicate) {
-        return getFields(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindField(type));
+        return getFields(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindField(getType()));
     }
 
     /**
-     * Gets all the instance fields (fields not declared as static).
+     * Gets all the non-static fields (not including inherited fields).
      *
      * @return the fields
      */
     public @NotNull List<Field> getInstanceFields() {
+        final Class<?> type = getObjectClass();
+        return getFields(f -> f.getDeclaringClass().equals(type) && !Modifier.isStatic(f.getModifiers()));
+    }
+
+    /**
+     * Gets all the non-static fields.
+     *
+     * @return the static fields
+     */
+    public @NotNull List<Field> getNonStaticFields() {
         return getFields(f -> !Modifier.isStatic(f.getModifiers()));
     }
 
@@ -499,6 +661,10 @@ public class Reflect {
         Class<?> type = getObjectClass();
         while (type != null) {
             fields.addAll(Arrays.asList(type.getDeclaredFields()));
+            Arrays.stream(type.getInterfaces())
+                    .map(Class::getDeclaredFields)
+                    .flatMap(Arrays::stream)
+                    .forEach(fields::add);
             type = type.getSuperclass();
         }
         return fields;
@@ -544,7 +710,7 @@ public class Reflect {
     public @NotNull Reflect invoke(final @Nullable Class<?> returnType,
                                    final @Nullable String name,
                                    final @Nullable Object @NotNull ... parameters) {
-        Class<?>[] parameterTypes = getClasses(parameters);
+        Class<?>[] parameterTypes = getParameterTypes(parameters);
         Method method = getMethod(returnType, name, parameterTypes);
         return invoke(method, parameters);
     }
@@ -579,7 +745,7 @@ public class Reflect {
     }
 
     /**
-     * Gets the instance method with the given parameter types (method must not be static).
+     * Gets the non-static method with the given name, return type and parameter types (not including inherited methods).
      *
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
      * @return the method
@@ -590,10 +756,21 @@ public class Reflect {
     }
 
     /**
+     * Gets the non-static method with the given parameter types.
+     *
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the method
+     * @throws ReflectException if no method was found
+     */
+    public @NotNull Method getNonStaticMethod(final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return getNonStaticMethod(null, parameterTypes);
+    }
+
+    /**
      * Gets the static method with the given parameter types.
      *
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
-     * @return the static method
+     * @return the method
      * @throws ReflectException if no method was found
      */
     public @NotNull Method getStaticMethod(final @Nullable Class<?> @NotNull ... parameterTypes) {
@@ -612,7 +789,7 @@ public class Reflect {
     }
 
     /**
-     * Gets the instance method with the given name and parameter types (method must not be static).
+     * Gets the non-static method with the given name, return type and parameter types (not including inherited methods).
      *
      * @param name           the name (if <code>null</code> any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
@@ -625,11 +802,24 @@ public class Reflect {
     }
 
     /**
+     * Gets the non-static method with the given name and parameter types.
+     *
+     * @param name           the name (if <code>null</code> any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the method
+     * @throws ReflectException if no method was found
+     */
+    public @NotNull Method getNonStaticMethod(final @Nullable String name,
+                                              final @Nullable Class<?> @NotNull ... parameterTypes) {
+        return getNonStaticMethod(null, name, parameterTypes);
+    }
+
+    /**
      * Gets the static method with the given name and parameter types.
      *
      * @param name           the name (if <code>null</code> any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
-     * @return the static method
+     * @return the method
      * @throws ReflectException if no method was found
      */
     public @NotNull Method getStaticMethod(final @Nullable String name,
@@ -651,7 +841,7 @@ public class Reflect {
     }
 
     /**
-     * Gets the instance method with the given name, return type and parameter types (method must not be static).
+     * Gets the non-static method with the given name, return type and parameter types (not including inherited methods).
      *
      * @param returnType     the return type (if <code>null</code> any method found will be accepted)
      * @param name           the name (if <code>null</code> any method found will be accepted)
@@ -662,6 +852,22 @@ public class Reflect {
     public @NotNull Method getInstanceMethod(final @Nullable Class<?> returnType,
                                              final @Nullable String name,
                                              final @Nullable Class<?> @NotNull ... parameterTypes) {
+        final Class<?> type = getObjectClass();
+        return getMethodHelper(m -> m.getDeclaringClass().equals(type) && !Modifier.isStatic(m.getModifiers()), returnType, name, parameterTypes);
+    }
+
+    /**
+     * Gets the non-static method with the given name, return type and parameter types.
+     *
+     * @param returnType     the return type (if <code>null</code> any method found will be accepted)
+     * @param name           the name (if <code>null</code> any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @return the method
+     * @throws ReflectException if no method was found
+     */
+    public @NotNull Method getNonStaticMethod(final @Nullable Class<?> returnType,
+                                              final @Nullable String name,
+                                              final @Nullable Class<?> @NotNull ... parameterTypes) {
         return getMethodHelper(m -> !Modifier.isStatic(m.getModifiers()), returnType, name, parameterTypes);
     }
 
@@ -671,7 +877,7 @@ public class Reflect {
      * @param returnType     the return type (if <code>null</code> any method found will be accepted)
      * @param name           the name (if <code>null</code> any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
-     * @return the static method
+     * @return the method
      * @throws ReflectException if no method was found
      */
     public @NotNull Method getStaticMethod(final @Nullable Class<?> returnType,
@@ -706,7 +912,7 @@ public class Reflect {
                                 validator.test(m)
                 ),
                 parameterTypes
-        ).orElseThrow(() -> ReflectException.cannotFindMethod(type, returnType, name, parameterTypes));
+        ).orElseThrow(() -> ReflectException.cannotFindMethod(getType(), returnType, name, parameterTypes));
     }
 
     /**
@@ -717,22 +923,32 @@ public class Reflect {
      * @throws ReflectException if no method was found
      */
     public @NotNull Method getMethod(final @NotNull Predicate<Method> predicate) {
-        return getMethods(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindMethod(type));
+        return getMethods(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindMethod(getType()));
     }
 
     /**
-     * Gets all the instance methods (methods not declared as static).
+     * Gets all the methods of the internal object (not including inherited methods).
      *
      * @return the methods
      */
     public @NotNull List<Method> getInstanceMethods() {
+        final Class<?> type = getObjectClass();
+        return getMethods(m -> m.getDeclaringClass().equals(type) && !Modifier.isStatic(m.getModifiers()));
+    }
+
+    /**
+     * Gets all the non-static methods.
+     *
+     * @return the methods
+     */
+    public @NotNull List<Method> getNonStaticMethods() {
         return getMethods(m -> !Modifier.isStatic(m.getModifiers()));
     }
 
     /**
      * Gets all the static methods.
      *
-     * @return the static methods
+     * @return the methods
      */
     public @NotNull List<Method> getStaticMethods() {
         return getMethods(m -> Modifier.isStatic(m.getModifiers()));
@@ -757,30 +973,123 @@ public class Reflect {
         List<Method> methods = new ArrayList<>();
         Class<?> type = getObjectClass();
         while (type != null) {
-            List<Method> list = new ArrayList<>(Arrays.asList(type.getDeclaredMethods()));
-            list.sort(Comparator.<Method, Boolean>comparing(m -> Modifier.isStatic(m.getModifiers()))
-                    .thenComparing(Method::getName)
-                    .thenComparing(Method::getParameterCount)
-            );
+            List<Method> list = sortMethods(Arrays.stream(type.getDeclaredMethods())).collect(Collectors.toList());
             methods.addAll(list);
+            sortMethods(Arrays.stream(type.getInterfaces())
+                    .map(Class::getDeclaredMethods)
+                    .flatMap(Arrays::stream))
+                    .forEach(methods::add);
             type = type.getSuperclass();
         }
-        methods.removeIf(m -> m.isSynthetic() || m.isBridge());
+        methods.removeIf(Method::isSynthetic);
         return methods;
     }
+
+    private static @NotNull Stream<Method> sortMethods(final @NotNull Stream<Method> methods) {
+        return methods.sorted(Comparator.<Method, Boolean>comparing(m -> Modifier.isStatic(m.getModifiers()))
+                .thenComparing(Method::getName)
+                .thenComparing(Method::getParameterCount));
+    }
+
+    /*
+     * ENUMS
+     */
+
+    /**
+     * Gets the name of the internal wrapped object assuming it is an instance of {@link Enum}.
+     *
+     * @return the name
+     * @throws ReflectException if the object is not an enum
+     */
+    public @NotNull String name() {
+        return getEnum().name();
+    }
+
+    /**
+     * Gets the associated ordinal of the internal wrapped object assuming it is an instance of {@link Enum}.
+     *
+     * @return the ordinal
+     * @throws ReflectException if the object is not an enum
+     */
+    public int ordinal() {
+        return getEnum().ordinal();
+    }
+
+    /**
+     * Gets the internal wrapped object as an instance of {@link Enum}.
+     *
+     * @param <E> the type of the enum
+     * @return the object
+     * @throws ReflectException if the object is not an enum
+     */
+    public <E extends Enum<E>> E getEnum() {
+        try {
+            return (E) object;
+        } catch (ClassCastException e) {
+            throw new ReflectException("%s is not an enum", object);
+        }
+    }
+
+    /**
+     * Gets the enum corresponding to the given name.
+     *
+     * @param <E>  the type of the enum
+     * @param name the name (case insensitive)
+     * @return the enum (if found)
+     * @throws ReflectException if the wrapped type is not an enum
+     */
+    public <E extends Enum<E>> @NotNull Optional<E> valueOf(final @NotNull String name) {
+        checkEnum();
+        return values().stream()
+                .filter(e -> e.name().equalsIgnoreCase(name))
+                .map(e -> (E) e)
+                .findFirst();
+    }
+
+    /**
+     * Gets the enum values of the internal wrapped enum.
+     *
+     * @param <E> the type of the enum
+     * @return the enum values
+     * @throws ReflectException if the type is not an enum
+     */
+    public <E extends Enum<E>> @NotNull Set<E> values() {
+        checkEnum();
+        E[] values = invoke("values").get();
+        return new HashSet<>(Arrays.asList(values));
+    }
+
+    /**
+     * Gets the internal wrapped type as a Java enum.
+     *
+     * @param <E> the type of the enum
+     * @return the enum class
+     * @throws ReflectException if the type is not an enum
+     */
+    public <E extends Enum<E>> @NotNull Class<E> getEnumClass() {
+        checkEnum();
+        return (Class<E>) getObjectClass();
+    }
+
+    private void checkEnum() {
+        Class<?> type = getObjectClass();
+        if (!Enum.class.isAssignableFrom(type))
+            throw new ReflectException("Type '%s' is not an enum", type);
+    }
+
+    /*
+     * GENERAL
+     */
 
     @Override
     public @NotNull String toString() {
         String objectDeclaration;
         if (object == null) objectDeclaration = "null";
         else objectDeclaration = String.format("%s (type: %s)", object, ReflectUtils.toString(object.getClass()));
-        return String.format("%s(type=%s, object=%s)", getObjectClass().getCanonicalName(), ReflectUtils.toString(type), objectDeclaration);
-    }
-
-    private static Class<?> @NotNull [] getClasses(final @Nullable Object @NotNull ... parameters) {
-        return Arrays.stream(parameters)
-                .map(p -> p == null ? null : p.getClass())
-                .toArray(Class<?>[]::new);
+        return String.format("%s(type=%s, object=%s)", getClass().getCanonicalName(),
+                type == null ? "null" : ReflectUtils.toString(type),
+                objectDeclaration
+        );
     }
 
     /*
@@ -793,10 +1102,8 @@ public class Reflect {
      * @param object the object
      * @return the reflect
      */
-    public static @NotNull Reflect on(final Object object) {
-        if (object instanceof Type) return on((Type) object);
-        else if (object instanceof String) return on((String) object);
-        else return new Reflect(object.getClass(), object);
+    public static @NotNull Reflect on(final @Nullable Object object) {
+        return new Reflect(object == null ? null : object.getClass(), object);
     }
 
     /**
@@ -879,6 +1186,20 @@ public class Reflect {
         } catch (ClassCastException e) {
             throw ReflectException.cannotCast(object, type);
         }
+    }
+
+    /**
+     * Converts the given parameters to an array of classes.
+     * <br>
+     * Any <code>null</code> parameter will have a <code>null</code> class.
+     *
+     * @param parameters the parameters
+     * @return the parameters types
+     */
+    public static @Nullable Class<?> @NotNull [] getParameterTypes(final @Nullable Object @NotNull ... parameters) {
+        return Arrays.stream(parameters)
+                .map(p -> p == null ? null : p.getClass())
+                .toArray(Class<?>[]::new);
     }
 
 }
