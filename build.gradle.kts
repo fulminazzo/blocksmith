@@ -44,6 +44,7 @@ allprojects {
         testImplementation(rootProject.libs.bundles.annotations)
         testAnnotationProcessor(rootProject.libs.lombok)
         testImplementation(rootProject.libs.bundles.test.framework)
+        testAnnotationProcessor(rootProject.libs.lombok)
     }
 
     tasks.test {

@@ -24,12 +24,12 @@ validation = "3.1.1"
 validator = "3.0.0"
 
 spigot = "1.16.5-R0.1-SNAPSHOT"
-folia = "1.20.6-R0.1-SNAPSHOT"
+folia = "1.20.1-R0.1-SNAPSHOT"
 bungeecord = "1.16-R0.2"
 velocity = "3.0.0-SNAPSHOT"
 
 mockbukkit16 = "1.5.2"
-mockbukkit = "3.93.2"
+mockbukkit = "3.43.0"
 
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
