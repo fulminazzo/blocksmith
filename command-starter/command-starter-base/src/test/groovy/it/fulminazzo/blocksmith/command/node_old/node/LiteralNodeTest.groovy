@@ -1,3 +1,4 @@
+package it.fulminazzo.blocksmith.command.node_old.node
 ////file:noinspection unused
 //TODO: update
 //package it.fulminazzo.blocksmith.command.node
