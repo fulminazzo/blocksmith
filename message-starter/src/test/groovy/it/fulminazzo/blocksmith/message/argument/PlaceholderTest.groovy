@@ -31,7 +31,7 @@ class PlaceholderTest extends Specification {
 
     def 'test that apply correctly applies with #placeholder and #value'() {
         given:
-        def expected = 'Hello, Alex!'
+        def expectedString = "Hello, $expected!"
 
         and:
         def component = Component.text('Hello, %name%!')
@@ -43,14 +43,16 @@ class PlaceholderTest extends Specification {
         def actual = p.apply(new MessageParseContext(messenger, Locale.ITALY, component))
 
         then:
-        ComponentUtils.toString(actual) == expected
+        ComponentUtils.toString(actual) == expectedString
 
         where:
-        placeholder            | value
-        'name'                 | 'Alex'
-        Component.text('name') | 'Alex'
-        Component.text('name') | Component.text('Alex')
-        'name'                 | Component.text('Alex')
+        placeholder            | value                  || expected
+        'name'                 | 'Alex'                 || 'Alex'
+        'name'                 | null                   || 'null'
+        Component.text('name') | 'Alex'                 || 'Alex'
+        Component.text('name') | null                   || 'null'
+        Component.text('name') | Component.text('Alex') || 'Alex'
+        'name'                 | Component.text('Alex') || 'Alex'
     }
 
     def 'test that apply correctly applies recursively placeholder'() {
