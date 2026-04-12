@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +28,7 @@ public abstract class CommandNode {
     final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
 
     @Setter
-    @Nullable Object executor; //TODO: proper class
+    @Nullable ExecutionHandler executor;
 
     /**
      * Merges the given node data with the current one.
@@ -51,7 +52,7 @@ public abstract class CommandNode {
      *
      * @return the actual executor of the command, if available
      */
-    public @NotNull Optional<Object> getExecutor() { //TODO: proper class
+    public @NotNull Optional<ExecutionHandler> getExecutor() {
         return Optional.ofNullable(executor);
     }
 
