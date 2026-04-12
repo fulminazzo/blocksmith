@@ -4,7 +4,7 @@ import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext;
 import it.fulminazzo.blocksmith.command.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.util.LocaleUtils;
-import it.fulminazzo.blocksmith.util.ReflectionUtils;
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -122,7 +122,7 @@ public final class ArgumentParsers {
     public static <T> @NotNull ArgumentParser<T> of(final @NotNull Class<T> type) {
         if (Enum.class.isAssignableFrom(type))
             return (ArgumentParser<T>) new EnumArgumentParser<>((Class) type);
-        ArgumentParser<?> parser = parsers.get(ReflectionUtils.toWrapper(type));
+        ArgumentParser<?> parser = parsers.get(Reflect.toWrapper(type));
         if (parser == null)
             throw new IllegalArgumentException(String.format("No default Argument parser supports the type %s. " +
                     "Please provide a custom parser through %s#register", type.getCanonicalName(), ArgumentParsers.class.getSimpleName()));
