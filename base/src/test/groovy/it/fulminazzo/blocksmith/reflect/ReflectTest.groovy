@@ -603,8 +603,8 @@ class ReflectTest extends Specification {
 
         where:
         exception                                                                     || expected
-        new InvocationTargetException(new RuntimeException('Test runtime exception')) || RuntimeException
-        new InvocationTargetException(new Error('Test error'))                        || Error
+        new InvocationTargetException(new RuntimeException('Test runtime exception')) || ReflectException
+        new InvocationTargetException(new Error('Test error'))                        || ReflectException
         new InvocationTargetException(new Exception('Test exception'))                || ReflectException
     }
 
@@ -687,8 +687,8 @@ class ReflectTest extends Specification {
 
         where:
         exception                                                                     || expected
-        new InvocationTargetException(new RuntimeException('Test runtime exception')) || RuntimeException
-        new InvocationTargetException(new Error('Test error'))                        || Error
+        new InvocationTargetException(new RuntimeException('Test runtime exception')) || ReflectException
+        new InvocationTargetException(new Error('Test error'))                        || ReflectException
         new InvocationTargetException(new Exception('Test exception'))                || ReflectException
     }
 
