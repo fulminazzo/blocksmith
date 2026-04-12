@@ -69,20 +69,6 @@ public abstract class CommandNode {
      */
 
     /**
-     * Attempts to fetch a child that matches the given input.
-     * Will prioritize {@link LiteralNode}s.
-     *
-     * @param token the token
-     * @return the child (if found)
-     */
-    public @Nullable CommandNode getChild(final @NotNull String token) {
-        for (CommandNode child : children)
-            if (child instanceof LiteralNode && child.matches(token))
-                return child;
-        return children.stream().filter(c -> c.matches(token)).findFirst().orElse(null);
-    }
-
-    /**
      * Adds a new child to this node.
      *
      * @param child the child
@@ -99,6 +85,33 @@ public abstract class CommandNode {
         child.parent = this;
         return child;
     }
+
+    /**
+     * Attempts to fetch a child that matches the given input.
+     * Will prioritize {@link LiteralNode}s.
+     *
+     * @param token the token
+     * @return the child (if found)
+     */
+    public @Nullable CommandNode getChild(final @NotNull String token) {
+        for (CommandNode child : children)
+            if (child instanceof LiteralNode && child.matches(token))
+                return child;
+        return children.stream().filter(c -> c.matches(token)).findFirst().orElse(null);
+    }
+
+    /**
+     * Gets the first child of this node.
+     *
+     * @return the first child, or <code>null</code> if there are no children
+     */
+    public @Nullable CommandNode getFirstChild() {
+        return !children.isEmpty() ? children.iterator().next() : null;
+    }
+
+    /*
+     * ABSTRACT
+     */
 
     /**
      * Checks if the node matches with the given token.
