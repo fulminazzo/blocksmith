@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Type;
 import java.util.function.Consumer;
 
 /**
@@ -44,7 +45,7 @@ public abstract class CommandSenderWrapper<S> {
      * @param type the type
      * @return <code>true</code> if it does
      */
-    public final boolean extendsType(final @NotNull Class<?> type) {
+    public final boolean extendsType(final @NotNull Type type) {
         return Reflect.on(actualSender).extendsType(type);
     }
 
