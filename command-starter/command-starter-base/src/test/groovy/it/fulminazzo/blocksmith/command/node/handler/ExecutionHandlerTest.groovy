@@ -9,6 +9,7 @@ import it.fulminazzo.blocksmith.command.visitor.execution.ExecutionContext
 import spock.lang.Specification
 
 import java.time.Duration
+import java.util.concurrent.ExecutorService
 
 class ExecutionHandlerTest extends Specification {
     private LiteralNode commandNode
@@ -96,6 +97,37 @@ class ExecutionHandlerTest extends Specification {
         def time = argument.timeSupplier.get()
         time >= 0
         time <= 10_000
+    }
+
+    def 'test that execute with asynchronous set executes the command asynchronously'() {
+        given:
+        def executorService = Mock(ExecutorService)
+        executorService.submit(_ as Runnable) >> { a ->
+            a[0].run()
+        }
+
+        and:
+        handler.setAsync(executorService, Duration.ofSeconds(1L))
+
+        when:
+        handler.execute(commandNode, context)
+
+        then:
+        1 * executor.execute(context)
+
+        when:
+        handler.unsetAsync().execute(commandNode, context)
+
+        then:
+        1 * executor.execute(context)
+    }
+
+    def 'test that setAsync of invalid timeout throws'() {
+        when:
+        handler.setAsync(Mock(ExecutorService), Duration.ofSeconds(-1))
+
+        then:
+        thrown(IllegalArgumentException)
     }
 
 }

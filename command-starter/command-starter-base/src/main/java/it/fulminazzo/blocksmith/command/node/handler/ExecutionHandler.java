@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Handler to actually execute the command upon successful arguments validation.
@@ -30,11 +31,15 @@ public final class ExecutionHandler {
     @ToString.Exclude
     private @Nullable FixedCooldownManager<Object> cooldownManager;
 
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private @Nullable AsyncManager asyncManager;
+
     /**
      * Executes the actual command logic.
      *
      * @param commandNode the literal node containing information about the executing command
-     * @param context the context of execution
+     * @param context     the context of execution
      * @throws CommandExecutionException in case of any errors
      */
     public void execute(final @NotNull LiteralNode commandNode,
@@ -54,8 +59,8 @@ public final class ExecutionHandler {
                 } else cooldownManager.put(id);
             }
         }
-        //TODO: async
-        executor.execute(context);
+        if (asyncManager != null) asyncManager.execute(executor, context);
+        else executor.execute(context);
     }
 
     /**
@@ -67,6 +72,30 @@ public final class ExecutionHandler {
     public @NotNull ExecutionHandler setCooldown(final @Nullable Duration cooldown) {
         if (cooldown == null) cooldownManager = null;
         else cooldownManager = new FixedCooldownManager<>(cooldown);
+        return this;
+    }
+
+    /**
+     * Flags this handler to run the {@link CommandExecutor} asynchronously.
+     *
+     * @param executorService the service to run asynchronous commands on
+     * @param timeout         the timeout
+     * @return this object (for method chaining)
+     */
+    public @NotNull ExecutionHandler setAsync(final @NotNull ExecutorService executorService,
+                                              final @NotNull Duration timeout) {
+        if (timeout.isNegative()) throw new IllegalArgumentException("timeout must be positive or zero");
+        else asyncManager = new AsyncManager(executorService, timeout);
+        return this;
+    }
+
+    /**
+     * Unsets the asynchronous flag.
+     *
+     * @return this object (for method chaining)
+     */
+    public @NotNull ExecutionHandler unsetAsync() {
+        asyncManager = null;
         return this;
     }
 

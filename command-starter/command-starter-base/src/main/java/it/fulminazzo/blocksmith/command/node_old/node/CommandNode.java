@@ -24,32 +24,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //@ToString
 //public abstract class CommandNode implements TabCompletable {
 //
-//    @EqualsAndHashCode.Exclude
-//    @ToString.Exclude
-//    private @Nullable AsyncManager asyncManager;
-//
-//    /**
-//     * Gets the timeout to execute the command asynchronously.
-//     *
-//     * @return the timeout (if given)
-//     */
-//    public @Nullable Duration getAsyncTimeout() {
-//        return asyncManager == null ? null : asyncManager.getTimeout();
-//    }
-//
-//    /**
-//     * Sets the command to run asynchronously.
-//     * <br>
-//     * <b>WARNING</b>: only works if {@link #executionInfo} is defined.
-//     *
-//     * @param timeout the timeout
-//     */
-//    public void setAsync(final @Nullable Duration timeout) {
-//        if (timeout == null) asyncManager = null;
-//        else if (timeout.isNegative()) throw new IllegalArgumentException("timeout must be positive or zero");
-//        else asyncManager = new AsyncManager(timeout);
-//    }
-//
 //    /**
 //     * Gets the first literal node (starting from this node) that represents the actual subcommand.
 //     *
