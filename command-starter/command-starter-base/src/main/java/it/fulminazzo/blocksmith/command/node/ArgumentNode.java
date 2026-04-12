@@ -22,6 +22,7 @@ public class ArgumentNode<T> extends CommandNode {
     final @NotNull Class<T> type;
     final boolean optional;
     @Getter(AccessLevel.NONE)
+    @Setter
     @Nullable String defaultValue;
     boolean greedy;
 
