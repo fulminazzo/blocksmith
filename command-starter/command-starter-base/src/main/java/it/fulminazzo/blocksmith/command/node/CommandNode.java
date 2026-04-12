@@ -24,6 +24,7 @@ public abstract class CommandNode {
     @ToString.Exclude
     @Nullable CommandNode parent;
     @Getter
+    @EqualsAndHashCode.Exclude
     @ToString.Exclude
     final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
 
