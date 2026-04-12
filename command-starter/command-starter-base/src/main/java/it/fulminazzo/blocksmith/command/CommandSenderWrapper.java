@@ -45,7 +45,7 @@ public abstract class CommandSenderWrapper<S> {
      * @param type the type
      * @return <code>true</code> if it does
      */
-    public final boolean extendsType(final @NotNull Type type) {
+    public boolean extendsType(final @NotNull Type type) {
         return Reflect.on(actualSender).extendsType(type);
     }
 
@@ -62,7 +62,7 @@ public abstract class CommandSenderWrapper<S> {
      * @param permissionInfo the permission info
      * @return <code>true</code> if they do
      */
-    public final boolean hasPermission(final @NotNull PermissionInfo permissionInfo) {
+    public boolean hasPermission(final @NotNull PermissionInfo permissionInfo) {
         return permissionInfo.getGrant() == Permission.Grant.ALL || hasPermissionImpl(permissionInfo);
     }
 
