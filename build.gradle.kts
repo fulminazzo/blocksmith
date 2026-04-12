@@ -7,10 +7,25 @@ plugins {
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
+extra["baseModuleName"] = "base"
+extra["testingModuleName"] = "testing"
+
 allprojects {
     apply { plugin("java-library") }
     apply { plugin("groovy") }
     apply { plugin("jacoco-report-aggregation") }
+
+    val baseModuleName: String by rootProject.extra
+    val testingModuleName: String by rootProject.extra
+
+    val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
+    val mockitoAgent: Configuration by configurations.creating
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(11))
+        }
+    }
 
     repositories {
         mavenCentral()
@@ -27,30 +42,52 @@ allprojects {
     dependencies {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
-        testAnnotationProcessor(rootProject.libs.lombok)
 
-        val baseProjectName = "base"
-        if (project.name != baseProjectName) api(project(":$baseProjectName"))
+        if (project.name != baseModuleName) api(project(":$baseModuleName"))
 
         testImplementation(rootProject.libs.bundles.annotations)
-        testImplementation(rootProject.libs.bundles.test.framework)
+        testRuntimeOnly(rootProject.libs.junit.platform)
         testAnnotationProcessor(rootProject.libs.lombok)
+        testImplementation(rootProject.libs.bundles.test.framework)
+
+        testImplementation(project(":$baseModuleName:$testingModuleName"))
+
+        mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
+    }
+
+    tasks.withType<GroovyCompile> {
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = currentJava
+        }
+    }
+
+    tasks.compileTestJava {
+        javaCompiler = javaToolchains.compilerFor {
+            languageVersion = currentJava
+        }
     }
 
     tasks.test {
         useJUnitPlatform()
+        jvmArgs("-javaagent:${mockitoAgent.asPath}")
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = currentJava
+        }
     }
 
-    tasks.compileTestJava {
-        if (project.name.endsWith("-folia")) {
-            sourceCompatibility = JavaVersion.VERSION_21.toString()
-            targetCompatibility = JavaVersion.VERSION_21.toString()
-        } else if (project.name.endsWith("-velocity")) {
-            sourceCompatibility = JavaVersion.VERSION_17.toString()
-            targetCompatibility = JavaVersion.VERSION_17.toString()
-        } else {
-            sourceCompatibility = JavaVersion.VERSION_11.toString()
-            targetCompatibility = JavaVersion.VERSION_11.toString()
+}
+
+/**
+ * TESTING MODULES CONFIGURATION
+ */
+subprojects {
+    val testingModuleName: String by rootProject.extra
+
+    if (project.name.endsWith(testingModuleName)) {
+        apply { plugin("groovy") }
+
+        dependencies {
+            implementation(rootProject.libs.bundles.test.framework)
         }
     }
 
