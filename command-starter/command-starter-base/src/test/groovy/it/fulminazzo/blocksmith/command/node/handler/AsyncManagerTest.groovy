@@ -1,20 +1,22 @@
-package it.fulminazzo.blocksmith.command.node_old.node
-////file:noinspection unused
 //TODO: update
-//package it.fulminazzo.blocksmith.command.node
+////file:noinspection unused
+//package it.fulminazzo.blocksmith.command.node.handler
 //
 //import it.fulminazzo.blocksmith.ApplicationHandle
 //import it.fulminazzo.blocksmith.command.CommandRegistry
 //import it.fulminazzo.blocksmith.command.CommandSenderWrapper
-//import it.fulminazzo.blocksmith.command.execution.CommandExecutionContext
-//import it.fulminazzo.blocksmith.command.execution.CommandExecutionException
+//import it.fulminazzo.blocksmith.command.visitor.execution.ExecutionContext
+//import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException
 //import org.jetbrains.annotations.NotNull
 //import spock.lang.Specification
 //
 //import java.time.Duration
+//import java.util.concurrent.ExecutorService
+//import java.util.concurrent.Executors
 //
 //class AsyncManagerTest extends Specification {
-//    private static final WAIT_TIME = 50
+//    private static final waitTime = 50
+//    private static final ExecutorService executorService = Executors.newCachedThreadPool()
 //
 //    private static volatile boolean executed = false
 //
@@ -23,19 +25,19 @@ package it.fulminazzo.blocksmith.command.node_old.node
 //    private CommandRegistry registry
 //    private CommandSenderWrapper sender
 //
-//    private CommandExecutionContext context
+//    private ExecutionContext context
 //
 //    void setup() {
 //        executed = false
 //
-//        manager = new AsyncManager(Duration.ofSeconds(1))
+//        manager = new AsyncManager(executorService, Duration.ofSeconds(1))
 //
 //        registry = Mock(CommandRegistry)
 //
 //        sender = Mock(CommandSenderWrapper)
 //        sender.id >> UUID.randomUUID()
 //
-//        context = new CommandExecutionContext(
+//        context = new ExecutionContext(
 //                Mock(ApplicationHandle),
 //                registry,
 //                sender
@@ -46,9 +48,13 @@ package it.fulminazzo.blocksmith.command.node_old.node
 //        executed = false
 //    }
 //
+//    void cleanupSpec() {
+//        executorService.shutdown()
+//    }
+//
 //    def 'test that execute does not throw'() {
 //        given:
-//        def executionInfo = getExecutionInfo('execute')
+//        def executionInfo = getExecutor('execute')
 //
 //        when:
 //        def future = manager.execute(executionInfo, context)
@@ -78,7 +84,7 @@ package it.fulminazzo.blocksmith.command.node_old.node
 //
 //    def 'test that #method throws #expected'() {
 //        given:
-//        def executionInfo = getExecutionInfo(method)
+//        def executionInfo = getExecutor(method)
 //
 //        when:
 //        def future = manager.execute(executionInfo, context)
@@ -119,12 +125,12 @@ package it.fulminazzo.blocksmith.command.node_old.node
 //
 //    def 'test that execute re-throws CommandExecutionException on exception'() {
 //        given:
-//        def context = Mock(CommandExecutionContext)
+//        def context = Mock(ExecutionContext)
 //        context.registry >> registry
 //        context.commandSender >> sender
 //
 //        and:
-//        def executionInfo = getExecutionInfo('execute')
+//        def executionInfo = getExecutor('execute')
 //
 //        when:
 //        manager.execute(executionInfo, context).join()
@@ -144,24 +150,24 @@ package it.fulminazzo.blocksmith.command.node_old.node
 //        !contains()
 //    }
 //
-//    private ExecutionInfo getExecutionInfo(final @NotNull String method) {
-//        return new ExecutionInfo(
+//    private boolean contains() {
+//        return manager.pending.contains(sender.id)
+//    }
+//
+//    private static CommandExecutor getExecutor(final @NotNull String method) {
+//        return new CommandExecutor(
 //                AsyncManagerTest,
 //                AsyncManagerTest.getMethod(method)
 //        )
 //    }
 //
-//    private boolean contains() {
-//        return manager.pending.contains(sender.id)
-//    }
-//
 //    static void execute() {
-//        Thread.sleep(WAIT_TIME)
+//        Thread.sleep(waitTime)
 //        executed = true
 //    }
 //
 //    static void internalThrow() {
-//        Thread.sleep(WAIT_TIME)
+//        Thread.sleep(waitTime)
 //        throw new CommandExecutionException('error.unknown')
 //    }
 //
@@ -171,12 +177,12 @@ package it.fulminazzo.blocksmith.command.node_old.node
 //    }
 //
 //    static void otherException() {
-//        Thread.sleep(WAIT_TIME)
+//        Thread.sleep(waitTime)
 //        throw new Exception('API error')
 //    }
 //
 //    static void otherRuntimeException() {
-//        Thread.sleep(WAIT_TIME)
+//        Thread.sleep(waitTime)
 //        throw new RuntimeException('API error')
 //    }
 //
