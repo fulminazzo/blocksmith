@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -17,9 +18,30 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ArgumentParsers {
-    private static final @NotNull Map<@NotNull Class<?>, @NotNull ArgumentParser<?>> parsers = new HashMap<>();
+    private static final @NotNull Map<@NotNull Class<?>, @NotNull ArgumentParser<?>> parsers = new ConcurrentHashMap<>();
+
+    /*
+     * COMPLETIONS
+     */
+
+    private static final @NotNull String TRUE = Boolean.TRUE.toString();
+    private static final @NotNull String FALSE = Boolean.FALSE.toString();
+    private static final @NotNull List<String> booleanCompletions = Arrays.asList(TRUE, FALSE);
+
+    private static final @NotNull List<String> charactersCompletions;
+
+    private static final @NotNull List<String> localeCompletions = Arrays.stream(Locale.getAvailableLocales())
+            .filter(ArgumentParsers::isValidLocale)
+            .map(LocaleUtils::toString)
+            .distinct()
+            .collect(Collectors.toList());
 
     static {
+        charactersCompletions = new ArrayList<>();
+        for (char c = 'a'; c <= 'z'; c++) charactersCompletions.add(String.valueOf(c));
+        for (char c = 'A'; c <= 'Z'; c++) charactersCompletions.add(String.valueOf(c));
+        for (char c = '0'; c <= '9'; c++) charactersCompletions.add(String.valueOf(c));
+
         register(Byte.class, new NumberArgumentParser<>(Byte.MIN_VALUE, Byte.MAX_VALUE, Byte::valueOf));
         register(Short.class, new NumberArgumentParser<>(Short.MIN_VALUE, Short.MAX_VALUE, Short::valueOf));
         register(Integer.class, new NumberArgumentParser<>(Integer.MIN_VALUE, Integer.MAX_VALUE, Integer::valueOf));
@@ -27,8 +49,6 @@ public final class ArgumentParsers {
         register(Float.class, new NumberArgumentParser<>(-Float.MAX_VALUE, Float.MAX_VALUE, Float::valueOf));
         register(Double.class, new NumberArgumentParser<>(-Double.MAX_VALUE, Double.MAX_VALUE, Double::valueOf));
         register(Boolean.class, new ArgumentParser<>() {
-            private final @NotNull String TRUE = Boolean.TRUE.toString();
-            private final @NotNull String FALSE = Boolean.FALSE.toString();
 
             @Override
             public @NotNull Boolean parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
@@ -41,7 +61,7 @@ public final class ArgumentParsers {
 
             @Override
             public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
-                return Arrays.asList(TRUE, FALSE);
+                return booleanCompletions;
             }
 
         });
@@ -57,13 +77,8 @@ public final class ArgumentParsers {
 
             @Override
             public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
-                List<String> completions = new ArrayList<>();
-                if (context.getCurrent().isEmpty()) {
-                    for (char c = 'a'; c <= 'z'; c++) completions.add(String.valueOf(c));
-                    for (char c = 'A'; c <= 'Z'; c++) completions.add(String.valueOf(c));
-                    for (char c = '0'; c <= '9'; c++) completions.add(String.valueOf(c));
-                }
-                return completions;
+                if (context.getCurrent().isEmpty()) return charactersCompletions;
+                return Collections.emptyList();
             }
 
         });
@@ -81,30 +96,19 @@ public final class ArgumentParsers {
 
         });
         register(Locale.class, new ArgumentParser<>() {
-            private final @NotNull List<String> availableLocales = new ArrayList<>();
 
             @Override
             public @NotNull Locale parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
                 String argument = context.getCurrent();
                 Locale locale = LocaleUtils.fromString(argument);
-                if (isValid(locale)) return locale;
+                if (ArgumentParsers.isValidLocale(locale)) return locale;
                 else throw new CommandExecutionException("error.invalid-locale")
                         .arguments(Placeholder.of("argument", argument));
             }
 
             @Override
             public synchronized @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
-                if (availableLocales.isEmpty())
-                    availableLocales.addAll(Arrays.stream(Locale.getAvailableLocales())
-                            .filter(this::isValid)
-                            .map(LocaleUtils::toString)
-                            .distinct()
-                            .collect(Collectors.toList()));
-                return availableLocales;
-            }
-
-            private boolean isValid(final @NotNull Locale locale) {
-                return !locale.getLanguage().isEmpty() && !locale.getCountry().isEmpty();
+                return localeCompletions;
             }
 
         });
@@ -136,9 +140,13 @@ public final class ArgumentParsers {
      * @param type   the java class of the argument
      * @param parser the argument parser
      */
-    public static <T> void register(final @NotNull Class<T> type,
-                                    final @NotNull ArgumentParser<T> parser) {
+    public static <T> void register(final @NotNull Class<T> type, final @NotNull ArgumentParser<T> parser) {
         parsers.put(type, parser);
+    }
+
+
+    private static boolean isValidLocale(final @NotNull Locale locale) {
+        return !locale.getLanguage().isEmpty() && !locale.getCountry().isEmpty();
     }
 
 }
