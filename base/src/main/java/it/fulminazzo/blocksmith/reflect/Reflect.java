@@ -738,7 +738,7 @@ public class Reflect {
             Throwable cause = e.getCause();
             if (cause instanceof RuntimeException) throw (RuntimeException) cause;
             else if (cause instanceof Error) throw (Error) cause;
-            else throw new ReflectException(e, "Could not invoke method %s on %s", method, object);
+            else throw new ReflectException(cause, "Could not invoke method %s on %s", method, object);
         } catch (IllegalAccessException e) {
             throw new ReflectException(e, "Could not invoke method %s on %s", method, object);
         }
