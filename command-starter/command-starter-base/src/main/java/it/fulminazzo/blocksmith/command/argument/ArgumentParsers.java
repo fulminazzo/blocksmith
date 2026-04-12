@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ArgumentParsers {
-    private static final @NotNull Map<Class<?>, ArgumentParser<?>> parsers = new HashMap<>();
+    private static final @NotNull Map<@NotNull Class<?>, @NotNull ArgumentParser<?>> parsers = new HashMap<>();
 
     static {
         register(Byte.class, new NumberArgumentParser<>(Byte.MIN_VALUE, Byte.MAX_VALUE, Byte::valueOf));
@@ -27,8 +27,8 @@ public final class ArgumentParsers {
         register(Float.class, new NumberArgumentParser<>(-Float.MAX_VALUE, Float.MAX_VALUE, Float::valueOf));
         register(Double.class, new NumberArgumentParser<>(-Double.MAX_VALUE, Double.MAX_VALUE, Double::valueOf));
         register(Boolean.class, new ArgumentParser<>() {
-            private final String TRUE = Boolean.TRUE.toString();
-            private final String FALSE = Boolean.FALSE.toString();
+            private final @NotNull String TRUE = Boolean.TRUE.toString();
+            private final @NotNull String FALSE = Boolean.FALSE.toString();
 
             @Override
             public @NotNull Boolean parse(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
@@ -93,7 +93,7 @@ public final class ArgumentParsers {
             }
 
             @Override
-            public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
+            public synchronized @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
                 if (availableLocales.isEmpty())
                     availableLocales.addAll(Arrays.stream(Locale.getAvailableLocales())
                             .filter(this::isValid)
