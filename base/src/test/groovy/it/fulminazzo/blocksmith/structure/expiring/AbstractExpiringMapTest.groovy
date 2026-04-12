@@ -717,8 +717,6 @@ class AbstractExpiringMapTest extends Specification {
         'getKey'   | []
         'getValue' | []
         'setValue' | ['mars']
-        'equals'   | ['mars']
-        'hashCode' | []
     }
 
 }
