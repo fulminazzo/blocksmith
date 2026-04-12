@@ -1,5 +1,7 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.annotation.Confirm;
+import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -25,6 +27,8 @@ public final class LiteralNode extends CommandNode {
     @Setter
     @Nullable CommandInfo commandInfo;
 
+    @Nullable ConfirmationHandler confirmationHandler;
+
     /**
      * Instantiates a new Literal node.
      *
@@ -45,6 +49,18 @@ public final class LiteralNode extends CommandNode {
      */
     public @NotNull Optional<CommandInfo> getCommandInfo() {
         return Optional.ofNullable(commandInfo);
+    }
+
+    /**
+     * Toggles requirements for confirmation to execute this node.
+     *
+     * @param confirmationInfo the confirmation info (<code>null</code> to disable)
+     * @return this object (for method chaining)
+     */
+    public @NotNull LiteralNode setConfirmationInfo(final @Nullable Confirm confirmationInfo) {
+        if (confirmationInfo == null) this.confirmationHandler = null;
+        else this.confirmationHandler = new ConfirmationHandler(confirmationInfo);
+        return this;
     }
 
     @Override
