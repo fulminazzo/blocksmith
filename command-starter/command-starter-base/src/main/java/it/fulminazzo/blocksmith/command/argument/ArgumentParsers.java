@@ -121,7 +121,7 @@ public final class ArgumentParsers {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <T> @NotNull ArgumentParser<T> of(final @NotNull Class<T> type) {
         if (Enum.class.isAssignableFrom(type))
-            return (ArgumentParser<T>) new EnumArgumentParser<>((Class) type);
+            return (ArgumentParser<T>) parsers.computeIfAbsent(type, t -> new EnumArgumentParser<>((Class) t));
         ArgumentParser<?> parser = parsers.get(Reflect.toWrapper(type));
         if (parser == null)
             throw new IllegalArgumentException(String.format("No default Argument parser supports the type %s. " +
