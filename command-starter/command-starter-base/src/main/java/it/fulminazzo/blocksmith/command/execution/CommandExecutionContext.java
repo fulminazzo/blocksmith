@@ -26,8 +26,6 @@
 //    private final @NotNull CommandSenderWrapper<?> commandSender;
 //    @Getter
 //    private final @NotNull List<String> input = new ArrayList<>();
-//    @Getter
-//    private final @NotNull LinkedList<Object> arguments = new LinkedList<>();
 //    private int current;
 //
 //    /**
@@ -116,15 +114,6 @@
 //    public @NotNull CommandExecutionContext advanceCursor() {
 //        current++;
 //        return this;
-//    }
-//
-//    /**
-//     * Adds a new parsed argument to the internal pool.
-//     *
-//     * @param argument the argument
-//     */
-//    public void addParsedArgument(final @Nullable Object argument) {
-//        arguments.add(argument);
 //    }
 //
 //}
