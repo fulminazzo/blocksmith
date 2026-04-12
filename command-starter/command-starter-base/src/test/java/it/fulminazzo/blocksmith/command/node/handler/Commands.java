@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.command.CommandSender;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.ConsoleCommandSender;
 import it.fulminazzo.blocksmith.command.Player;
+import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
@@ -33,6 +34,14 @@ class Commands {
 
     public void broadcast(final @NotNull String message) {
         // broadcast logic
+    }
+
+    public void executionException(final @NotNull String message) throws CommandExecutionException {
+        throw new CommandExecutionException("Execution exception!");
+    }
+
+    public void exception(final @NotNull String message) {
+        throw new IllegalStateException("Commands have not been initialized!");
     }
 
 }

@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.Player
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException
 import it.fulminazzo.blocksmith.command.visitor.execution.ExecutionContext
+import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
@@ -20,7 +21,7 @@ class CommandExecutorTest extends Specification {
         context = Mock(ExecutionContext)
         context.arguments >> arguments
 
-        commands = Mock(Commands)
+        commands = Spy(Commands)
     }
 
     def 'test that execute with #sender and #method works'() {
@@ -74,6 +75,45 @@ class CommandExecutorTest extends Specification {
         new Player('Alex')         | 'sendConsoleOnlyWrapper' || 'error.player-cannot-execute'
         new ConsoleCommandSender() | 'sendPlayerOnly'         || 'error.console-cannot-execute'
         new Player('Alex')         | 'sendConsoleOnly'        || 'error.player-cannot-execute'
+    }
+
+    def 'test that CommandExecutionException during execution is rethrown'() {
+        given:
+        def executor = new CommandExecutor(
+                commands,
+                Commands.getMethod('executionException', String)
+        )
+
+        when:
+        executor.execute(context)
+
+        then:
+        def e = thrown(CommandExecutionException)
+        e.message == 'Execution exception!'
+    }
+
+    def 'test that general Exception during execution is thrown as CommandExecutionException'() {
+        given:
+        def executor = new CommandExecutor(
+                commands,
+                Commands.getMethod('exception', String)
+        )
+
+        when:
+        executor.execute(context)
+
+        then:
+        def e = thrown(CommandExecutionException)
+        e.message == 'error.internal-error'
+
+        and:
+        def arguments = e.arguments
+        arguments.length == 1
+
+        and:
+        def first = arguments[0]
+        first.placeholder == 'message'
+        ComponentUtils.toString(first.replacement) == 'Commands have not been initialized!'
     }
 
 }
