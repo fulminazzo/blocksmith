@@ -46,54 +46,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //    }
 //
 //    /**
-//     * Checks if the execution of the current node tree requires confirmation.
-//     *
-//     * @return <code>true</code> if it does
-//     */
-//    public boolean requiresConfirmation() {
-//        return confirmAnnotation != null;
-//    }
-//
-//    /**
-//     * Enables or disables confirmation for this node.
-//     */
-//    public void setConfirmationInfo(final @Nullable Confirm confirmAnnotation) {
-//        this.confirmAnnotation = confirmAnnotation;
-//    }
-//
-//    /**
-//     * Gets the confirmation timeout (if set).
-//     *
-//     * @return the confirmation timeout
-//     */
-//    public @NotNull Duration getConfirmationTimeout() {
-//        Confirm annotation = getNonNullConfirmationAnnotation();
-//        return Duration.of(annotation.timeout(), annotation.unit().toChronoUnit());
-//    }
-//
-//    private @NotNull Confirm getNonNullConfirmationAnnotation() {
-//        return Objects.requireNonNull(this.confirmAnnotation, "Confirmation annotation not set");
-//    }
-//
-//    /**
-//     * Gets the word required for confirmation.
-//     *
-//     * @return the word
-//     */
-//    public @NotNull String getConfirmWord() {
-//        return getNonNullConfirmationAnnotation().confirmWord();
-//    }
-//
-//    /**
-//     * Gets the cancellation word.
-//     *
-//     * @return the word
-//     */
-//    public @NotNull String getCancelWord() {
-//        return getNonNullConfirmationAnnotation().cancelWord();
-//    }
-//
-//    /**
 //     * Checks if the sender of the current context has permission to execute this node.
 //     *
 //     * @param context the context
