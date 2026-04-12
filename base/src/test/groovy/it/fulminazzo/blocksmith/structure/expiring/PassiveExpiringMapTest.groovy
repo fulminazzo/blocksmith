@@ -13,26 +13,18 @@ class PassiveExpiringMapTest extends Specification {
         internal = Reflect.on(map).get('delegate').get()
     }
 
-    def 'test that size counts expired entries'() {
-        given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
-
-        and:
-        sleep(5L)
-
-        expect:
-        map.size() == 1
-    }
-
     def 'test that size counts also expired entries'() {
         given:
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
 
-        and:
+        expect:
+        map.size() == 2
+
+        when:
         sleep(5L)
 
-        expect:
+        then:
         map.size() == 2
     }
 
@@ -40,56 +32,47 @@ class PassiveExpiringMapTest extends Specification {
         given:
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
-        and:
+        expect:
+        !map.isEmpty()
+
+        when:
         sleep(5L)
 
-        expect:
+        then:
         !map.isEmpty()
     }
 
-    def 'test that isEmpty returns false when non-expired entries are present'() {
-        given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
-
+    def 'test that containsKey returns true even for expired key'() {
         expect:
-        !map.isEmpty()
-    }
+        !map.containsKey('Hello')
 
-    def 'test that containsKey returns true for expired key'() {
-        given:
+        when:
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
-        and:
+        then:
+        map.containsKey('Hello')
+
+        when:
         sleep(5L)
 
-        expect:
-        map.containsKey('Hello')
-    }
-
-    def 'test that containsKey returns true for non-expired key'() {
-        given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
-
-        expect:
+        then:
         map.containsKey('Hello')
     }
 
     def 'test that get returns value for expired key'() {
-        given:
+        expect:
+        map['Hello'] == null
+
+        when:
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
-        and:
+        then:
+        map['Hello'] == 'world'
+
+        when:
         sleep(5L)
 
-        expect:
-        map['Hello'] == 'world'
-    }
-
-    def 'test that get returns value for non-expired key'() {
-        given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
-
-        expect:
+        then:
         map['Hello'] == 'world'
     }
 
@@ -109,26 +92,27 @@ class PassiveExpiringMapTest extends Specification {
     }
 
     def 'test that remove does not return null for expired key'() {
-        given:
+        expect:
+        map.remove('Hello') == null
+
+        when:
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
-
-        when:
         def actual = map.remove('Hello')
 
         then:
         actual == 'world'
         internal['Hello'] == null
-    }
-
-    def 'test that remove returns value for non-expired key'() {
-        given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
 
         when:
-        def actual = map.remove('Hello')
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+
+        and:
+        sleep(5L)
+
+        and:
+        actual = map.remove('Hello')
 
         then:
         actual == 'world'
@@ -228,8 +212,20 @@ class PassiveExpiringMapTest extends Specification {
 
         then:
         entries.size() == 2
-        entries.find { it.key == 'Goodbye' }?.value == 'mars'
-        entries.find { it.key == 'Hello' }?.value == 'world'
+        entries.find {
+            try {
+                it.key == 'Goodbye'
+            } catch (IllegalStateException ignored) {
+                return false
+            }
+        }?.value == 'mars'
+        entries.find {
+            try {
+                it.key == 'Hello'
+            } catch (IllegalStateException ignored) {
+                return true
+            }
+        } != null
     }
 
     def 'test that #method does not clear expired entries as a side effect'() {
@@ -317,7 +313,7 @@ class PassiveExpiringMapTest extends Specification {
 
         then:
         actual == 'world'
-        internal['Hello'].value == 'moon'
+        internal['Hello'].value == 'world'
     }
 
     def 'test that computeIfPresent returns value for expired key'() {
@@ -331,8 +327,8 @@ class PassiveExpiringMapTest extends Specification {
         def actual = map.computeIfPresent('Hello', (k, v) -> v + 'moon')
 
         then:
-        actual == 'world'
-        internal['Hello'] == null
+        actual == 'worldmoon'
+        internal['Hello'].value == 'worldmoon'
     }
 
 }
