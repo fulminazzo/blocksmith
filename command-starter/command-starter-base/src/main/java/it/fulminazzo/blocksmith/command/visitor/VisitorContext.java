@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.command.visitor.context;
+package it.fulminazzo.blocksmith.command.visitor;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

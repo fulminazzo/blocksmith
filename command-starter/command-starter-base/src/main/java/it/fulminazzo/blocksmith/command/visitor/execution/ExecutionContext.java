@@ -1,5 +1,6 @@
-package it.fulminazzo.blocksmith.command.visitor.context;
+package it.fulminazzo.blocksmith.command.visitor.execution;
 
+import it.fulminazzo.blocksmith.command.visitor.VisitorContext;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
