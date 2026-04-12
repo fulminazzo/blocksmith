@@ -141,8 +141,24 @@ public final class ReflectException extends RuntimeException {
         return new ReflectException("Could not find method from the given predicate in type '%s'", type);
     }
 
-    private static @NotNull String formatMessage(final @NotNull String format,
-                                                 final Object @NotNull ... args) {
+    /**
+     * Formats the given message accordingly.
+     * <br>
+     * <ul>
+     *     <li>If an argument is a {@link Type},
+     *     it will be converted with {@link ReflectUtils#toString(Type)};</li>
+     *     <li>If an argument is a {@link Method},
+     *     it will be formatted as <code>&lt;method_name&gt;(&lt;method_parameters&gt;)</code>;</li>
+     *     <li>If an argument is a {@link Constructor},
+     *     it will be formatted as <code>&lt;declaring_class&gt;(&lt;method_parameters&gt;)</code>.</li>
+     * </ul>
+     *
+     * @param format the format of the message
+     * @param args   the arguments
+     * @return the message
+     */
+    public static @NotNull String formatMessage(final @NotNull String format,
+                                                final @Nullable Object @NotNull ... args) {
         for (int i = 0; i < args.length; i++) {
             Object object = args[i];
             if (object instanceof Type) args[i] = ReflectUtils.toString((Type) object);
