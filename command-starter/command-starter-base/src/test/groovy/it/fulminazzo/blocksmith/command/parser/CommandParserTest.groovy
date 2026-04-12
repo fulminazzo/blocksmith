@@ -269,8 +269,7 @@ class CommandParserTest extends Specification {
         type << [
                 CommandParserTest, CommandNotGiven,
                 AliasesNotGiven,
-                AliasesNotInstance, AliasesNotCollection,
-                AliasesPrivate
+                AliasesNotInstance, AliasesNotCollection
         ]
     }
 
@@ -358,8 +357,7 @@ class CommandParserTest extends Specification {
         where:
         type << [
                 CommandNotGiven, AliasesNotGiven,
-                AliasesNotStatic, AliasesNotCollection,
-                AliasesPrivate
+                AliasesNotStatic, AliasesNotCollection
         ]
     }
 
@@ -757,24 +755,6 @@ class CommandParserTest extends Specification {
 
         String getAliases() {
             return 'Hello, world!'
-        }
-
-    }
-
-    @Command(dynamic = true)
-    static final class AliasesPrivate {
-
-        @Command(dynamic = true)
-        static void help() {
-
-        }
-
-        private static List<String> getHelpAliases() {
-            return []
-        }
-
-        private List<String> getAliases() {
-            return []
         }
 
     }

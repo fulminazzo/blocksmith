@@ -6,6 +6,8 @@ import it.fulminazzo.blocksmith.command.node.*;
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
+import it.fulminazzo.blocksmith.reflect.Reflect;
+import it.fulminazzo.blocksmith.reflect.ReflectException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -296,35 +298,31 @@ public final class CommandParser {
         Class<?> moduleType = commandModule.getClass();
         if (!moduleType.isAnnotationPresent(Command.class))
             throw CommandParseException.of("Invalid command module '%s': %s annotation is required", commandModule, Command.class);
+        final Reflect reflect = Reflect.on(commandModule);
 
         Command baseAnnotation = moduleType.getAnnotation(Command.class);
         String baseCommand = baseAnnotation.value().trim();
         if (baseAnnotation.dynamic()) {
             String methodName = "getAliases";
+            final Method aliasesMethod;
             try {
-                Method aliasesMethod = moduleType.getMethod(methodName);
-                if (!Modifier.isStatic(aliasesMethod.getModifiers()) && Collection.class.isAssignableFrom(aliasesMethod.getReturnType())) {
-                    Collection<?> aliases = (Collection<?>) aliasesMethod.invoke(commandModule);
-                    baseCommand = String.format("(%s) ", aliases.stream()
-                            .filter(Objects::nonNull)
-                            .map(Object::toString)
-                            .collect(Collectors.joining("|"))
-                    ) + baseCommand;
-                    baseCommand = baseCommand.trim();
-                } else throw new NoSuchMethodException();
-            } catch (NoSuchMethodException e) {
+                aliasesMethod = reflect.getMethod(m -> m.getName().equals(methodName) &&
+                        m.getParameterCount() == 0 &&
+                        !Modifier.isStatic(m.getModifiers()) &&
+                        Collection.class.isAssignableFrom(m.getReturnType())
+                );
+            } catch (ReflectException e) {
                 throw CommandParseException.of("Invalid command module '%s': required public method '%s' with return type %s was not found",
                         commandModule, methodName, Collection.class
                 );
-            } catch (InvocationTargetException e) {
-                Throwable cause = e.getCause();
-                if (cause instanceof RuntimeException) throw (RuntimeException) cause;
-                else throw new RuntimeException(cause);
-            } catch (IllegalAccessException e) {
-                throw CommandParseException.of("Invalid command module '%s': cannot access method '%s'",
-                        commandModule, methodName
-                );
             }
+            Collection<?> aliases = reflect.invoke(aliasesMethod).get();
+            baseCommand = String.format("(%s) ", aliases.stream()
+                    .filter(Objects::nonNull)
+                    .map(Object::toString)
+                    .collect(Collectors.joining("|"))
+            ) + baseCommand;
+            baseCommand = baseCommand.trim();
         }
         if (baseCommand.isEmpty())
             throw CommandParseException.of("Invalid command module '%s': command cannot be empty", commandModule);
@@ -334,28 +332,27 @@ public final class CommandParser {
 
         List<CommandNode> commands = new ArrayList<>();
 
-        for (Method method : moduleType.getMethods())
-            if (!Modifier.isStatic(method.getModifiers()) && method.isAnnotationPresent(Command.class)) {
-                Command annotation = method.getAnnotation(Command.class);
+        for (Method method : reflect.getMethods(m -> !Modifier.isStatic(m.getModifiers()) && m.isAnnotationPresent(Command.class))) {
+            Command annotation = method.getAnnotation(Command.class);
 
-                String rawCommand = annotation.value().trim();
+            String rawCommand = annotation.value().trim();
 
-                CommandInfo commandInfo = createCommandInfo(method, permissionGroup);
-                if (rawCommand.isEmpty()) {
-                    rawCommand = baseCommand;
-                    commandInfo.merge(baseCommandInfo);
-                } else rawCommand = baseCommand + " " + rawCommand;
-                Duration cooldown = extractCooldown(method);
-                if (cooldown == null) cooldown = baseCooldown;
+            CommandInfo commandInfo = createCommandInfo(method, permissionGroup);
+            if (rawCommand.isEmpty()) {
+                rawCommand = baseCommand;
+                commandInfo.merge(baseCommandInfo);
+            } else rawCommand = baseCommand + " " + rawCommand;
+            Duration cooldown = extractCooldown(method);
+            if (cooldown == null) cooldown = baseCooldown;
 
-                ExecutionHandler executionHandler = prepareExecutionHandler(commandModule, method, cooldown);
-                int parameterIndex = getParameterIndex(method, senderType);
+            ExecutionHandler executionHandler = prepareExecutionHandler(commandModule, method, cooldown);
+            int parameterIndex = getParameterIndex(method, senderType);
 
-                CommandParser parser = new CommandParser(rawCommand, commandInfo, executionHandler, parameterIndex, permissionGroup);
-                CommandNode node = parser.parse();
+            CommandParser parser = new CommandParser(rawCommand, commandInfo, executionHandler, parameterIndex, permissionGroup);
+            CommandNode node = parser.parse();
 
-                commands.add(node);
-            }
+            commands.add(node);
+        }
         return commands;
     }
 
@@ -372,55 +369,49 @@ public final class CommandParser {
                                                              final @NotNull Class<?> senderType,
                                                              final @NotNull String permissionGroup) {
         List<CommandNode> commands = new ArrayList<>();
-        for (Method method : commandsContainer.getMethods())
-            if (Modifier.isStatic(method.getModifiers()) && method.isAnnotationPresent(Command.class)) {
-                Command annotation = method.getAnnotation(Command.class);
+        final Reflect reflect = Reflect.on(commandsContainer);
+        for (Method method : reflect.getMethods(m -> Modifier.isStatic(m.getModifiers()) && m.isAnnotationPresent(Command.class))) {
+            Command annotation = method.getAnnotation(Command.class);
 
-                String rawCommand = annotation.value().trim();
+            String rawCommand = annotation.value().trim();
 
-                if (annotation.dynamic()) {
-                    String methodName = method.getName();
-                    methodName = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
-                    methodName = "get" + methodName + "Aliases";
-                    try {
-                        Method aliasesMethod = commandsContainer.getMethod(methodName);
-                        if (Modifier.isStatic(aliasesMethod.getModifiers()) && Collection.class.isAssignableFrom(aliasesMethod.getReturnType())) {
-                            Collection<?> aliases = (Collection<?>) aliasesMethod.invoke(commandsContainer);
-                            rawCommand = String.format("(%s) ", aliases.stream()
-                                    .filter(Objects::nonNull)
-                                    .map(Object::toString)
-                                    .collect(Collectors.joining("|"))
-                            ) + rawCommand;
-                            rawCommand = rawCommand.trim();
-                        } else throw new NoSuchMethodException();
-                    } catch (NoSuchMethodException e) {
-                        throw CommandParseException.of("Invalid dynamic command method %s: required public static method '%s' with return type %s was not found",
-                                method, methodName, Collection.class
-                        );
-                    } catch (InvocationTargetException e) {
-                        Throwable cause = e.getCause();
-                        if (cause instanceof RuntimeException) throw (RuntimeException) cause;
-                        else throw new RuntimeException(cause);
-                    } catch (IllegalAccessException e) {
-                        throw CommandParseException.of("Invalid dynamic command method %s: cannot access method '%s'",
-                                method, methodName
-                        );
-                    }
+            if (annotation.dynamic()) {
+                String name = method.getName();
+                name = name.substring(0, 1).toUpperCase() + name.substring(1);
+                final String methodName = "get" + name + "Aliases";
+                final Method aliasesMethod;
+                try {
+                    aliasesMethod = reflect.getMethod(m -> m.getName().equals(methodName) &&
+                            m.getParameterCount() == 0 &&
+                            Modifier.isStatic(m.getModifiers()) &&
+                            Collection.class.isAssignableFrom(m.getReturnType()));
+                } catch (ReflectException e) {
+                    throw CommandParseException.of("Invalid dynamic command method %s: required public static method '%s' with return type %s was not found",
+                            method, methodName, Collection.class
+                    );
                 }
-
-                if (rawCommand.isEmpty())
-                    throw CommandParseException.of("Invalid command method %s: command cannot be empty", method);
-
-                CommandInfo commandInfo = createCommandInfo(method, permissionGroup);
-                Duration cooldown = extractCooldown(method);
-                ExecutionHandler executionHandler = prepareExecutionHandler(commandsContainer, method, cooldown);
-                int parameterIndex = getParameterIndex(method, senderType);
-
-                CommandParser parser = new CommandParser(rawCommand, commandInfo, executionHandler, parameterIndex, permissionGroup);
-                CommandNode node = parser.parse();
-
-                commands.add(node);
+                Collection<?> aliases = reflect.invoke(aliasesMethod).get();
+                rawCommand = String.format("(%s) ", aliases.stream()
+                        .filter(Objects::nonNull)
+                        .map(Object::toString)
+                        .collect(Collectors.joining("|"))
+                ) + rawCommand;
+                rawCommand = rawCommand.trim();
             }
+
+            if (rawCommand.isEmpty())
+                throw CommandParseException.of("Invalid command method %s: command cannot be empty", method);
+
+            CommandInfo commandInfo = createCommandInfo(method, permissionGroup);
+            Duration cooldown = extractCooldown(method);
+            ExecutionHandler executionHandler = prepareExecutionHandler(commandsContainer, method, cooldown);
+            int parameterIndex = getParameterIndex(method, senderType);
+
+            CommandParser parser = new CommandParser(rawCommand, commandInfo, executionHandler, parameterIndex, permissionGroup);
+            CommandNode node = parser.parse();
+
+            commands.add(node);
+        }
         return commands;
     }
 
@@ -473,7 +464,7 @@ public final class CommandParser {
      * Creates a new Execution handler from the given method.
      *
      * @param executor the actual executor of the method
-     * @param method the method with the command logic
+     * @param method   the method with the command logic
      * @param cooldown the cooldown extracted for the method
      * @return the execution handler
      */
