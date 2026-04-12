@@ -20,9 +20,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //@EqualsAndHashCode(callSuper = true)
 //@ToString(callSuper = true)
 //public final class LiteralNode extends CommandNode {
-//    private final @NotNull String name;
-//    private final @NotNull Set<String> aliases;
-//    private @Nullable CommandInfo commandInfo;
 //
 //    @Getter(AccessLevel.NONE)
 //    private @Nullable Confirm confirmAnnotation;
@@ -30,18 +27,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //    @EqualsAndHashCode.Exclude
 //    @ToString.Exclude
 //    private final @NotNull PendingActionManager<Object> pendingActionManager = new PendingActionManager<>();
-//
-//    /**
-//     * Instantiates a new Literal node.
-//     *
-//     * @param literals the literals
-//     */
-//    public LiteralNode(final String @NotNull ... literals) {
-//        if (literals.length == 0) throw new IllegalArgumentException("At least one literal must be provided");
-//        this.name = literals[0].trim().toLowerCase();
-//        this.aliases = new HashSet<>();
-//        for (String literal : literals) this.aliases.add(literal.trim().toLowerCase());
-//    }
 //
 //    /**
 //     * Creates a clone of the current node, with the given literals.
@@ -91,16 +76,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //    }
 //
 //    /**
-//     * If this literal represents the final command (or subcommand) of a command route,
-//     * its command information will be available.
-//     *
-//     * @return the command info, if available
-//     */
-//    public @NotNull Optional<CommandInfo> getCommandInfo() {
-//        return Optional.ofNullable(commandInfo);
-//    }
-//
-//    /**
 //     * Gets the word required for confirmation.
 //     *
 //     * @return the word
@@ -129,19 +104,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //                .map(CommandInfo::getPermission)
 //                .map(p -> context.getCommandSender().hasPermission(p))
 //                .orElse(true);
-//    }
-//
-//    @Override
-//    public @NotNull LiteralNode merge(final @NotNull CommandNode node) {
-//        if (node instanceof LiteralNode) {
-//            LiteralNode literalNode = (LiteralNode) node;
-//            aliases.addAll(literalNode.aliases);
-//            literalNode.getCommandInfo().ifPresent(i -> {
-//                if (commandInfo == null) setCommandInfo(i);
-//                else commandInfo.merge(i);
-//            });
-//        }
-//        return (LiteralNode) super.merge(node);
 //    }
 //
 //    @Override
@@ -197,11 +159,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //        if (!hasPermission(context))
 //            throw new CommandExecutionException("error.no-permission")
 //                    .arguments(Placeholder.of("permission", getCommandInfo().orElseThrow().getPermission().getPermission()));
-//    }
-//
-//    @Override
-//    public boolean matches(final @NotNull String token) {
-//        return aliases.contains(token.trim().toLowerCase());
 //    }
 //
 //}
