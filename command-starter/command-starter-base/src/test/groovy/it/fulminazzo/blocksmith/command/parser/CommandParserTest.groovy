@@ -96,7 +96,7 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         and:
-        def target = ArgumentNode.of('target', String, false)
+        def target = ArgumentNode.of('target', Object, false)
         target.executor = new ExecutionHandler(
                 executor,
                 ClanCommand.getMethod('adminInvite', CommandSender, Object)
@@ -131,7 +131,6 @@ class CommandParserTest extends Specification {
                 'command.description.clan.admin.members',
                 new PermissionInfo(null, 'clan.admin.members', Permission.Grant.ALL)
         )
-        members.addChild(target)
         admin = new LiteralNode('admin')
         admin.commandInfo = new CommandInfo(
                 'command.description.clan.admin',
@@ -147,7 +146,7 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         and:
-        target = ArgumentNode.of('target', String, false)
+        target = ArgumentNode.of('target', Object, false)
         target.executor = new ExecutionHandler(
                 executor,
                 ClanCommand.getMethod('adminMembersKick', CommandSender, Object)
@@ -180,6 +179,10 @@ class CommandParserTest extends Specification {
 
         and:
         def edit = new LiteralNode('edit')
+        edit.executor = new ExecutionHandler(
+                executor,
+                ClanCommand.getMethod('adminGuiEdit', CommandSender)
+        )
         edit.commandInfo = new CommandInfo(
                 'command.description.clan.admin.gui.edit',
                 new PermissionInfo(null, 'clan.admin.gui.edit', Permission.Grant.OP)
@@ -195,7 +198,7 @@ class CommandParserTest extends Specification {
                 'command.description.clan.admin',
                 new PermissionInfo(null, 'clan.admin', Permission.Grant.OP)
         )
-        admin.addChild(members)
+        admin.addChild(gui)
         clan = new LiteralNode(*baseAliases)
         clan.commandInfo = new CommandInfo(
                 'command.description.clan',
@@ -208,7 +211,7 @@ class CommandParserTest extends Specification {
         def actual = CommandParser.parseCommands(executor, CommandSender, null)
 
         then:
-        actual.sort { getCommandName(it) } == expected.sort { getCommandName(it) }
+        compareNodes(actual, expected)
     }
 
     def 'test parseCommands of dynamic command'() {
@@ -226,7 +229,7 @@ class CommandParserTest extends Specification {
         def value = ArgumentNode.of('value', double, false)
         value.executor = new ExecutionHandler(
                 executor,
-                ClanCommand.getMethod('execute', CommandSender)
+                DynamicClanCommand.getMethod('execute', CommandSender, double)
         )
         clan.addChild(value)
         expected.add(clan)
@@ -235,7 +238,7 @@ class CommandParserTest extends Specification {
         def verbose = ArgumentNode.of('verbose', boolean, false)
         verbose.executor = new ExecutionHandler(
                 executor,
-                ClanCommand.getMethod('help', CommandSender, boolean)
+                DynamicClanCommand.getMethod('help', CommandSender, boolean)
         )
         def help = new LiteralNode('help')
         help.commandInfo = new CommandInfo(
@@ -255,7 +258,7 @@ class CommandParserTest extends Specification {
         def actual = CommandParser.parseCommands(executor, CommandSender, null)
 
         then:
-        actual.sort { getCommandName(it) } == expected.sort { getCommandName(it) }
+        compareNodes(actual, expected)
     }
 
     def 'test parseCommands throws with #type'() {
@@ -651,6 +654,29 @@ class CommandParserTest extends Specification {
 
         then:
         node == new LiteralNode('test')
+    }
+
+    private static boolean compareNodes(List<CommandNode> actual, List<CommandNode> expected) {
+        actual = actual.sort { getCommandName(it) }
+        expected = expected.sort { getCommandName(it) }
+        assert actual.size() == expected.size()
+        for (def i in 0..expected.size() - 1)
+            compareNodes(actual[i], expected[i])
+        return true
+    }
+
+    private static void compareNodes(final CommandNode actual, final CommandNode expected) {
+        assert actual.toString() == expected.toString()
+        assert actual == expected
+        def actualChildren = actual.children
+        def expectedChildren = expected.children
+        println actual
+        println expected
+        assert actualChildren.size() == expectedChildren.size()
+        println "Found ${expectedChildren.size()} children"
+        if (expectedChildren.isEmpty()) return
+        for (def i in 0..(expectedChildren.size() - 1))
+            compareNodes(actualChildren[i], expectedChildren[i])
     }
 
     private static CommandParser newMockCommandParser(final @NotNull String input) {
