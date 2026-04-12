@@ -243,6 +243,20 @@ public final class Validator {
             throw new IllegalArgumentException(e.getMessage() +
                     ". Please include all the parameters of the method to validate it");
         }
+        Map<String, Set<ConstraintViolation>> violations = validateMethod(method, parameters);
+        if (!violations.isEmpty())
+            throw new ViolationException(violations);
+    }
+
+    /**
+     * Validates the values against the method parameters constraints.
+     *
+     * @param method     the method to get the parameters from
+     * @param parameters the actual values of the parameters
+     * @return the violations (empty if none)
+     */
+    public static @NotNull Map<String, Set<ConstraintViolation>> validateMethod(final @NotNull Method method,
+                                                                                final @Nullable Object @NotNull ... parameters) {
         Parameter[] params = method.getParameters();
         Map<String, Set<ConstraintViolation>> violations = new HashMap<>();
         for (int i = 0; i < params.length; i++) {
@@ -262,8 +276,7 @@ public final class Validator {
                 violations.putAll(tmp);
             }
         }
-        if (!violations.isEmpty())
-            throw new ViolationException(violations);
+        return violations;
     }
 
     /**
