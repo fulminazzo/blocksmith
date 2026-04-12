@@ -19,21 +19,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 // */
 //@Getter
 //public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> {
-//    private double min = -Double.MAX_VALUE;
-//    private double max = Double.MAX_VALUE;
-//
-//    /**
-//     * Instantiates a new Number argument node.
-//     *
-//     * @param name     the name
-//     * @param type     the type
-//     * @param optional the optional
-//     */
-//    NumberArgumentNode(final @NotNull String name,
-//                       final @NotNull Class<N> type,
-//                       final boolean optional) {
-//        super(name, type, optional);
-//    }
 //
 //    @Override
 //    public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
@@ -87,28 +72,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //        else if (type == Long.class) return type.cast((long) value);
 //        else if (type == Float.class) return type.cast((float) value);
 //        else return type.cast(value);
-//    }
-//
-//    /**
-//     * Sets the minimum allowed value.
-//     *
-//     * @param min the value
-//     * @return this object (for method chaining)
-//     */
-//    public @NotNull NumberArgumentNode<N> min(final double min) {
-//        this.min = min;
-//        return this;
-//    }
-//
-//    /**
-//     * Sets the minimum allowed value.
-//     *
-//     * @param max the value
-//     * @return this object (for method chaining)
-//     */
-//    public @NotNull NumberArgumentNode<N> max(final double max) {
-//        this.max = max;
-//        return this;
 //    }
 //
 //}
