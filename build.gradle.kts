@@ -19,11 +19,16 @@ allprojects {
     val testingModuleName: String by rootProject.extra
 
     val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
+    val currentCompiler = javaToolchains.compilerFor { languageVersion = currentJava }
+    val currentLauncher = javaToolchains.launcherFor { languageVersion = currentJava }
+
     val mockitoAgent: Configuration by configurations.creating
+
+    val minJava = JavaLanguageVersion.of(11)
 
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
+            languageVersion.set(minJava)
         }
     }
 
@@ -55,24 +60,23 @@ allprojects {
         mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
 
+    tasks.compileJava {
+        javaCompiler = currentCompiler
+        options.release.set(minJava.asInt())
+    }
+
     tasks.withType<GroovyCompile> {
-        javaLauncher = javaToolchains.launcherFor {
-            languageVersion = currentJava
-        }
+        javaLauncher = currentLauncher
     }
 
     tasks.compileTestJava {
-        javaCompiler = javaToolchains.compilerFor {
-            languageVersion = currentJava
-        }
+        javaCompiler = currentCompiler
     }
 
     tasks.test {
         useJUnitPlatform()
         jvmArgs("-javaagent:${mockitoAgent.asPath}")
-        javaLauncher = javaToolchains.launcherFor {
-            languageVersion = currentJava
-        }
+        javaLauncher = currentLauncher
     }
 
 }
