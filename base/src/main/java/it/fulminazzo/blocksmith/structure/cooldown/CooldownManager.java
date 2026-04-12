@@ -12,32 +12,8 @@ import java.util.Map;
  *
  * @param <E> the type of the entity
  */
-public final class CooldownManager<E> {
+public final class CooldownManager<E> implements ICooldownManager<E> {
     private final @NotNull Map<E, Long> expirations = ExpiringMap.lazy();
-
-    /**
-     * Checks if the entity is on cooldown.
-     *
-     * @param entity the entity
-     * @return <code>true</code> if it is
-     */
-    public boolean isOnCooldown(final @NotNull E entity) {
-        return expirations.containsKey(entity);
-    }
-
-    /**
-     * Gets the remaining time in milliseconds until the entity cooldown expires.
-     *
-     * @param entity the entity
-     * @return the remaining time in milliseconds
-     * @throws IllegalArgumentException if the entity is not on cooldown
-     */
-    public long getRemaining(final @NotNull E entity) {
-        Long expiration = expirations.get(entity);
-        if (expiration == null)
-            throw new IllegalArgumentException(String.format("Entity '%s' is not on cooldown", entity));
-        else return expiration - now();
-    }
 
     /**
      * Puts the entity on cooldown for the given duration.
@@ -64,12 +40,20 @@ public final class CooldownManager<E> {
         return this;
     }
 
-    /**
-     * Removes the entity from the cooldown.
-     *
-     * @param entity the entity
-     * @return this object (for method chaining)
-     */
+    @Override
+    public boolean isOnCooldown(final @NotNull E entity) {
+        return expirations.containsKey(entity);
+    }
+
+    @Override
+    public long getRemaining(final @NotNull E entity) {
+        Long expiration = expirations.get(entity);
+        if (expiration == null)
+            throw new IllegalArgumentException(String.format("Entity '%s' is not on cooldown", entity));
+        else return expiration - now();
+    }
+
+    @Override
     public @NotNull CooldownManager<E> remove(final @NotNull E entity) {
         expirations.remove(entity);
         return this;
