@@ -24,25 +24,8 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 //@ToString(callSuper = true, doNotUseGetters = true)
 //public class ArgumentNode<T> extends CommandNode {
-//    private final @NotNull String name;
-//    private final @NotNull Class<T> type;
-//    private final boolean optional;
-//    @Getter(AccessLevel.NONE)
-//    private @Nullable String defaultValue;
-//    private boolean greedy;
 //
 //    private @Nullable CustomCompletionsProvider customCompletionsProvider;
-//
-//    /**
-//     * Sets the current node to greedy.
-//     *
-//     * @param greedy if <code>true</code>, will take all the remaining input
-//     * @return this object (for method chaining)
-//     */
-//    public @NotNull ArgumentNode<T> setGreedy(final boolean greedy) {
-//        this.greedy = greedy;
-//        return this;
-//    }
 //
 //    /**
 //     * Gets the default value (if given).
@@ -89,11 +72,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //            throw new CommandExecutionException();
 //    }
 //
-//    @Override
-//    public boolean matches(final @NotNull String token) {
-//        return true;
-//    }
-//
 //    /**
 //     * Gets the best argument parser for this node.
 //     *
@@ -101,25 +79,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //     */
 //    protected @NotNull ArgumentParser<T> getArgumentParser() {
 //        return ArgumentParsers.of(type);
-//    }
-//
-//    /**
-//     * Instantiates a new Argument node.
-//     *
-//     * @param <T>      the type of the parameter
-//     * @param name     the name
-//     * @param type     the Java class of the parameter
-//     * @param optional if <code>true</code> the parameter will be non-mandatory
-//     * @return the argument node
-//     */
-//    @SuppressWarnings("unchecked")
-//    public static <T> @NotNull ArgumentNode<T> newNode(final @NotNull String name,
-//                                                       @NotNull Class<?> type,
-//                                                       final boolean optional) {
-//        Class<T> actualType = (Class<T>) ReflectionUtils.toWrapper(type);
-//        if (Number.class.isAssignableFrom(actualType))
-//            return (ArgumentNode<T>) new NumberArgumentNode<>(name, (Class<? extends Number>) actualType, optional);
-//        else return new ArgumentNode<>(name, actualType, optional);
 //    }
 //
 //}
