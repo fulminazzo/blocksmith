@@ -10,11 +10,11 @@ import it.fulminazzo.blocksmith.command.visitor.execution.ExecutionContext;
 import it.fulminazzo.blocksmith.message.argument.Time;
 import it.fulminazzo.blocksmith.structure.cooldown.FixedCooldownManager;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 
@@ -23,7 +23,6 @@ import java.util.concurrent.ExecutorService;
  */
 @EqualsAndHashCode
 @ToString
-@RequiredArgsConstructor
 public final class ExecutionHandler {
     private final @NotNull CommandExecutor executor;
 
@@ -34,6 +33,16 @@ public final class ExecutionHandler {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private @Nullable AsyncManager asyncManager;
+
+    /**
+     * Instantiates a new Execution handler.
+     *
+     * @param executor the instance executing the command method
+     * @param method   the method containing the command logic
+     */
+    public ExecutionHandler(final @NotNull Object executor, final @NotNull Method method) {
+        this.executor = new CommandExecutor(executor, method);
+    }
 
     /**
      * Executes the actual command logic.

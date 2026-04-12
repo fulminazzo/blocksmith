@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException
 import it.fulminazzo.blocksmith.command.visitor.execution.ExecutionContext
+import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 import java.time.Duration
@@ -38,7 +39,8 @@ class ExecutionHandlerTest extends Specification {
         context.commandSender >> sender
 
         executor = Mock(CommandExecutor)
-        handler = new ExecutionHandler(executor)
+        handler = new ExecutionHandler(new Object(), Object.getMethod('equals', Object))
+        Reflect.on(handler).set('executor', executor)
     }
 
     def 'test that execute works'() {
