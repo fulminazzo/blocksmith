@@ -23,15 +23,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //@EqualsAndHashCode
 //@ToString
 //public abstract class CommandNode implements TabCompletable {
-//    @Getter
-//    @EqualsAndHashCode.Exclude
-//    @ToString.Exclude
-//    private @Nullable CommandNode parent;
-//    @Getter
-//    @ToString.Exclude
-//    private final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
-//    @Setter
-//    private @Nullable ExecutionInfo executionInfo;
 //
 //    @EqualsAndHashCode.Exclude
 //    @ToString.Exclude
@@ -120,19 +111,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //    }
 //
 //    /**
-//     * Attempts to fetch a child that matches the given input.
-//     *
-//     * @param token the token
-//     * @return the child (if found)
-//     */
-//    public @Nullable CommandNode getChild(final @NotNull String token) {
-//        for (CommandNode child : children)
-//            if (child instanceof LiteralNode && child.matches(token))
-//                return child;
-//        return children.stream().filter(c -> c.matches(token)).findFirst().orElse(null);
-//    }
-//
-//    /**
 //     * Gets all the {@link ArgumentNode} children that are greedy.
 //     *
 //     * @return the children
@@ -146,24 +124,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //    }
 //
 //    /**
-//     * Adds a new child to this node.
-//     *
-//     * @param child the child
-//     * @return the added child (if it was already present, it might be returned updated)
-//     */
-//    public @NotNull CommandNode addChild(final @NotNull CommandNode child) {
-//        for (CommandNode c : children)
-//            if (child.getClass().equals(c.getClass()) && c.getName().equals(child.getName())) {
-//                c.merge(child);
-//                c.parent = this;
-//                return c;
-//            }
-//        children.add(child);
-//        child.parent = this;
-//        return child;
-//    }
-//
-//    /**
 //     * Gets the permission to execute this node.
 //     *
 //     * @return the permission, if available
@@ -172,37 +132,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //        if (this instanceof LiteralNode) return ((LiteralNode) this).getCommandInfo().map(CommandInfo::getPermission);
 //        else if (parent == null) return Optional.empty();
 //        else return parent.getPermission();
-//    }
-//
-//    /**
-//     * If this node contains execution information, it represents the end of a command route.
-//     * As such, it should be executable with the parsed arguments so far.
-//     *
-//     * @return the execution information, if available
-//     */
-//    public @NotNull Optional<ExecutionInfo> getExecutionInfo() {
-//        return Optional.ofNullable(executionInfo);
-//    }
-//
-//    /**
-//     * Checks if the current node is executable.
-//     *
-//     * @return <code>true</code> if it is
-//     */
-//    public boolean isExecutable() {
-//        return executionInfo != null;
-//    }
-//
-//    /**
-//     * Merges the given node data with the current one.
-//     *
-//     * @param node the node
-//     * @return this node
-//     */
-//    public @NotNull CommandNode merge(final @NotNull CommandNode node) {
-//        node.getChildren().forEach(this::addChild);
-//        if (executionInfo == null) node.getExecutionInfo().ifPresent(this::setExecutionInfo);
-//        return this;
 //    }
 //
 //    /**
@@ -349,21 +278,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //     * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
 //     */
 //    protected abstract void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException;
-//
-//    /**
-//     * Checks if the node matches with the given token.
-//     *
-//     * @param token the token
-//     * @return <code>true</code> if it does
-//     */
-//    public abstract boolean matches(final @NotNull String token);
-//
-//    /**
-//     * Gets the name of this node.
-//     *
-//     * @return the name
-//     */
-//    public abstract @NotNull String getName();
 //
 //    /**
 //     * Gets the associated permission to bypass the cooldown.
