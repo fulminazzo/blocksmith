@@ -167,24 +167,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //        } else internalExecute(context);
 //    }
 //
-//    private void internalExecute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-//        if (cooldownManager != null) {
-//            CommandSenderWrapper<?> sender = context.getCommandSender();
-//            PermissionInfo cooldownPermission = getCooldownBypassPermission(getPermission().orElseThrow());
-//            if (!sender.hasPermission(cooldownPermission)) {
-//                Object id = sender.getId();
-//                if (cooldownManager.isOnCooldown(id)) {
-//                    long time = cooldownManager.getRemainingCooldown(id);
-//                    throw new CommandExecutionException("error.command-on-cooldown")
-//                            .arguments(Time.of("cooldown", time));
-//                } else cooldownManager.putOnCooldown(id);
-//            }
-//        }
-//        final ExecutionInfo executionInfo = getExecutionInfo().orElseThrow();
-//        if (asyncManager != null) asyncManager.execute(executionInfo, context);
-//        else executionInfo.invoke(context);
-//    }
-//
 //    /**
 //     * Returns all the tab completions based on the current context of execution.
 //     *
@@ -253,19 +235,5 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //     * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
 //     */
 //    protected abstract void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException;
-//
-//    /**
-//     * Gets the associated permission to bypass the cooldown.
-//     *
-//     * @param permission the permission
-//     * @return the cooldown bypass permission
-//     */
-//    public static @NotNull PermissionInfo getCooldownBypassPermission(final @NotNull PermissionInfo permission) {
-//        return new PermissionInfo(
-//                permission.getPrefix(),
-//                "bypass.cooldown." + permission.getActualPermission(),
-//                Permission.Grant.NONE // leave the actual check to platforms
-//        );
-//    }
 //
 //}
