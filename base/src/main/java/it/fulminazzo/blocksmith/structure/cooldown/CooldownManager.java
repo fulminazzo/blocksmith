@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.time.Duration;
-import java.util.Map;
 
 /**
  * Keeps track of cooldowns for general entities.
@@ -15,7 +14,7 @@ import java.util.Map;
  */
 @ToString(includeFieldNames = false)
 public final class CooldownManager<E> implements ICooldownManager<E> {
-    private final @NotNull Map<E, Long> expirations = ExpiringMap.lazy();
+    private final @NotNull ExpiringMap<E, Boolean> expirations = ExpiringMap.lazy();
 
     /**
      * Puts the entity on cooldown for the given duration.
@@ -32,13 +31,13 @@ public final class CooldownManager<E> implements ICooldownManager<E> {
      * Puts the entity on cooldown for the given duration in milliseconds.
      *
      * @param entity   the entity
-     * @param cooldown the duration of the cooldown
+     * @param cooldown the duration of the cooldown in milliseconds
      * @return this object (for method chaining)
      */
     public @NotNull CooldownManager<E> put(final @NotNull E entity,
                                            final @Range(from = 1, to = Long.MAX_VALUE) long cooldown) {
         if (cooldown <= 0) throw new IllegalArgumentException("cooldown must be positive");
-        expirations.put(entity, now() + cooldown);
+        expirations.put(entity, true, cooldown);
         return this;
     }
 
@@ -49,20 +48,16 @@ public final class CooldownManager<E> implements ICooldownManager<E> {
 
     @Override
     public long getRemaining(final @NotNull E entity) {
-        Long expiration = expirations.get(entity);
+        Duration expiration = expirations.getTtl(entity);
         if (expiration == null)
             throw new IllegalArgumentException(String.format("Entity '%s' is not on cooldown", entity));
-        else return expiration - now();
+        else return expiration.toMillis();
     }
 
     @Override
     public @NotNull CooldownManager<E> remove(final @NotNull E entity) {
         expirations.remove(entity);
         return this;
-    }
-
-    private static long now() {
-        return System.currentTimeMillis();
     }
 
 }
