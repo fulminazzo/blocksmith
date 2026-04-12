@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.visitor.execution;
 
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.visitor.VisitorContext;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -17,6 +18,15 @@ import java.util.LinkedList;
 @ToString(callSuper = true)
 public class ExecutionContext extends VisitorContext {
     @NotNull LinkedList<Object> arguments = new LinkedList<>();
+
+    /**
+     * Instantiates a new Execution context.
+     *
+     * @param commandSender the command sender
+     */
+    public ExecutionContext(final @NotNull CommandSenderWrapper<?> commandSender) {
+        super(commandSender);
+    }
 
     /**
      * Adds a new argument to the internal pool.
