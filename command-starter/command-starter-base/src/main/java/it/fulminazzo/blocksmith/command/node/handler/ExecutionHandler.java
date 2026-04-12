@@ -109,6 +109,15 @@ public final class ExecutionHandler {
     }
 
     /**
+     * Gets the method containing the command logic.
+     *
+     * @return the method
+     */
+    public @NotNull Method getMethod() {
+        return executor.getMethod();
+    }
+
+    /**
      * Gets the associated permission to bypass the cooldown.
      *
      * @param permission the permission
