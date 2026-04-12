@@ -26,32 +26,7 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //
 //    @EqualsAndHashCode.Exclude
 //    @ToString.Exclude
-//    private @Nullable StaticCooldownManager<Object> cooldownManager;
-//
-//    @EqualsAndHashCode.Exclude
-//    @ToString.Exclude
 //    private @Nullable AsyncManager asyncManager;
-//
-//    /**
-//     * Gets the execution cooldown for the current node.
-//     *
-//     * @return the cooldown
-//     */
-//    protected @Nullable Duration getCooldown() {
-//        return cooldownManager == null ? null : cooldownManager.getCooldown();
-//    }
-//
-//    /**
-//     * Sets an execution cooldown for the current node.
-//     * <br>
-//     * <b>WARNING</b>: only works if {@link #executionInfo} is defined.
-//     *
-//     * @param cooldown the cooldown
-//     */
-//    public void setCooldown(final @Nullable Duration cooldown) {
-//        if (cooldown == null) cooldownManager = null;
-//        else cooldownManager = new StaticCooldownManager<>(cooldown);
-//    }
 //
 //    /**
 //     * Gets the timeout to execute the command asynchronously.
