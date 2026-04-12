@@ -26,12 +26,8 @@ import java.util.concurrent.ExecutorService;
 public final class ExecutionHandler {
     private final @NotNull CommandExecutor executor;
 
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     private @Nullable FixedCooldownManager<Object> cooldownManager;
 
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     private @Nullable AsyncManager asyncManager;
 
     /**
