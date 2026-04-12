@@ -77,7 +77,7 @@ public final class PendingTaskManager<E> {
         Duration ttl = tasks.getTtl(entity);
         if (ttl == null) return Result.NOT_FOUND;
         Runnable task = tasks.remove(entity);
-        if (ttl.toMillis() <= 0) return Result.NOT_FOUND;
+        if (ttl.toMillis() <= 0) return Result.EXPIRED;
         else {
             then.accept(task);
             return Result.SUCCESS;
