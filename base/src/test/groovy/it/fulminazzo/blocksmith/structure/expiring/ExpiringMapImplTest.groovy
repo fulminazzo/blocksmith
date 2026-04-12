@@ -84,7 +84,7 @@ abstract class ExpiringMapImplTest extends Specification {
         sleep(5L)
 
         expect:
-        map.get('Hello') == null
+        map['Hello'] == null
     }
 
     def 'test that get returns value for non-expired key'() {
@@ -92,7 +92,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
 
         expect:
-        map.get('Hello') == 'world'
+        map['Hello'] == 'world'
     }
 
     def 'test that get also clears other expired entries'() {
@@ -104,7 +104,7 @@ abstract class ExpiringMapImplTest extends Specification {
         sleep(5L)
 
         when:
-        map.get('Goodbye')
+        map['Goodbye']
 
         then:
         internal['Hello'] == null
