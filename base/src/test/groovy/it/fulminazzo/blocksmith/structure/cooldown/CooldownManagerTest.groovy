@@ -9,14 +9,13 @@ class CooldownManagerTest extends Specification {
     def 'test that CooldownManager works'() {
         given:
         def manager = new CooldownManager()
-
         def entity = new Object()
 
         expect:
         !manager.isOnCooldown(entity)
 
         when:
-        manager.put(entity, Duration.ofSeconds(-10))
+        manager.put(entity, Duration.ofSeconds(-1))
 
         then:
         thrown(IllegalArgumentException)
@@ -25,20 +24,26 @@ class CooldownManagerTest extends Specification {
         !manager.isOnCooldown(entity)
 
         when:
-        manager.put(entity, Duration.ofSeconds(10))
+        manager.put(entity, Duration.ofSeconds(1))
 
         then:
         manager.isOnCooldown(entity)
 
-        and:
+        when:
         def remaining = manager.getRemaining(entity)
 
         then:
-        remaining <= 10_000
+        remaining <= 1_000
         remaining >= 0
 
         when:
-        manager.remove(entity)
+        sleep(1_000)
+
+        then:
+        !manager.isOnCooldown(entity)
+
+        when:
+        manager.put(entity, 1_000).remove(entity)
 
         then:
         !manager.isOnCooldown(entity)

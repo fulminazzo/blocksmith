@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.structure.cooldown;
 
 import it.fulminazzo.blocksmith.structure.expiring.ExpiringMap;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
@@ -12,6 +13,7 @@ import java.util.Map;
  *
  * @param <E> the type of the entity
  */
+@ToString(includeFieldNames = false)
 public final class CooldownManager<E> implements ICooldownManager<E> {
     private final @NotNull Map<E, Long> expirations = ExpiringMap.lazy();
 
@@ -35,7 +37,7 @@ public final class CooldownManager<E> implements ICooldownManager<E> {
      */
     public @NotNull CooldownManager<E> put(final @NotNull E entity,
                                            final @Range(from = 1, to = Long.MAX_VALUE) long cooldown) {
-        if (cooldown <= 0) throw new IllegalArgumentException("cooldown must be at least 1 milliseconds");
+        if (cooldown <= 0) throw new IllegalArgumentException("cooldown must be positive");
         expirations.put(entity, now() + cooldown);
         return this;
     }
