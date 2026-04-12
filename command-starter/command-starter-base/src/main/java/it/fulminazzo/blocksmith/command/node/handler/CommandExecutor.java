@@ -51,7 +51,7 @@ public class CommandExecutor {
                 if (CommandSenderWrapper.class.isAssignableFrom(parameterType)) {
                     ParameterizedType paramType = (ParameterizedType) method.getGenericParameterTypes()[0];
                     Type actualSenderType = paramType.getActualTypeArguments()[0];
-                    if (actualSenderType instanceof Class<?> && !sender.extendsType((Class<?>) actualSenderType))
+                    if (!sender.extendsType(actualSenderType))
                         throw new CommandExecutionException(sender.isPlayer()
                                 ? "error.player-cannot-execute"
                                 : "error.console-cannot-execute"
