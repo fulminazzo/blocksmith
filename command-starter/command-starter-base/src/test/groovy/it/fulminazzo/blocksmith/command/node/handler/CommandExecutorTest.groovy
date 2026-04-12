@@ -92,11 +92,11 @@ class CommandExecutorTest extends Specification {
         e.message == 'Execution exception!'
     }
 
-    def 'test that general Exception during execution is thrown as CommandExecutionException'() {
+    def 'test that general #exception during execution is thrown as CommandExecutionException'() {
         given:
         def executor = new CommandExecutor(
                 commands,
-                Commands.getMethod('exception', String)
+                Commands.getMethod(exception, String)
         )
 
         when:
@@ -112,8 +112,11 @@ class CommandExecutorTest extends Specification {
 
         and:
         def first = arguments[0]
-        first.placeholder == 'message'
-        ComponentUtils.toString(first.replacement) == 'Commands have not been initialized!'
+        first.placeholder == '%message%'
+        ComponentUtils.toString(first.value) == 'Commands have not been initialized!'
+
+        where:
+        exception << ['exception', 'runtimeException']
     }
 
 }

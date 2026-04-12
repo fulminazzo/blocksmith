@@ -40,8 +40,12 @@ class Commands {
         throw new CommandExecutionException("Execution exception!");
     }
 
-    public void exception(final @NotNull String message) {
-        throw new IllegalStateException("Commands have not been initialized!");
+    public void runtimeException(final @NotNull String message) {
+        throw new RuntimeException("Commands have not been initialized!");
+    }
+
+    public void exception(final @NotNull String message) throws Exception {
+        throw new Exception("Commands have not been initialized!");
     }
 
 }
