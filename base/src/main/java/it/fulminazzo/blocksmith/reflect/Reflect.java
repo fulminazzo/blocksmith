@@ -198,10 +198,7 @@ public class Reflect {
                     constructor.newInstance(ReflectUtils.regroup(constructor.getParameters(), parameters))
             );
         } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) throw (RuntimeException) cause;
-            else if (cause instanceof Error) throw (Error) cause;
-            else throw new ReflectException(e, "Could not get instance from %s", constructor);
+            throw new ReflectException(e.getCause(), "Could not get instance from %s", constructor);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ReflectException(e, "Could not get instance from %s", constructor);
         }
@@ -735,10 +732,7 @@ public class Reflect {
                     )
             );
         } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) throw (RuntimeException) cause;
-            else if (cause instanceof Error) throw (Error) cause;
-            else throw new ReflectException(cause, "Could not invoke method %s on %s", method, object);
+            throw new ReflectException(e.getCause(), "Could not invoke method %s on %s", method, object);
         } catch (IllegalAccessException e) {
             throw new ReflectException(e, "Could not invoke method %s on %s", method, object);
         }
