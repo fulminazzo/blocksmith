@@ -1,72 +1,73 @@
-package it.fulminazzo.blocksmith.command;
-
-import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.velocitypowered.api.command.BrigadierCommand;
-import com.velocitypowered.api.command.CommandManager;
-import com.velocitypowered.api.command.CommandMeta;
-import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.proxy.ProxyServer;
-import it.fulminazzo.blocksmith.ApplicationHandle;
-import it.fulminazzo.blocksmith.command.node.LiteralNode;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-/**
- * Implementation of {@link CommandRegistry} for Velocity platforms.
- */
-final class VelocityCommandRegistry extends BrigadierCommandRegistry<CommandSource> {
-    private final @NotNull CommandManager commandManager;
-    private final @NotNull Map<String, List<String>> registeredAliases = new ConcurrentHashMap<>();
-
-    /**
-     * Instantiates a new Velocity command registry.
-     *
-     * @param application the application that is initializing the registry
-     */
-    public VelocityCommandRegistry(final @NotNull ApplicationHandle application) {
-        super(application);
-        this.commandManager = ((ProxyServer) application.getServer()).getCommandManager();
-    }
-
-    @Override
-    protected @NotNull CommandSenderWrapper<CommandSource> wrapSender(final @NotNull Object executor) {
-        return new VelocityCommandSenderWrapper(application, (CommandSource) executor);
-    }
-
-    @Override
-    protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
-        List<String> aliases = new ArrayList<>(command.getAliases());
-        aliases.remove(commandName);
-        registeredAliases.put(commandName, aliases);
-        super.onRegister(commandName, command);
-    }
-
-    @Override
-    protected void onRegister(final @NotNull String commandName,
-                              final @NotNull LiteralNode command,
-                              final @NotNull LiteralCommandNode<CommandSource> brigadierCommand) {
-        List<String> aliases = new ArrayList<>(command.getAliases());
-        aliases.remove(commandName);
-        CommandMeta meta = commandManager.metaBuilder(commandName)
-                .aliases(aliases.toArray(new String[0]))
-                .build();
-        commandManager.register(meta, new BrigadierCommand(brigadierCommand));
-    }
-
-    @Override
-    protected void onUnregister(final @NotNull String commandName) {
-        commandManager.unregister(commandName);
-        List<String> aliases = registeredAliases.remove(commandName);
-        if (aliases != null) aliases.forEach(commandManager::unregister);
-    }
-
-    @Override
-    protected @NotNull Class<?> getSenderType() {
-        return CommandSource.class;
-    }
-
-}
+//TODO: update
+//package it.fulminazzo.blocksmith.command;
+//
+//import com.mojang.brigadier.tree.LiteralCommandNode;
+//import com.velocitypowered.api.command.BrigadierCommand;
+//import com.velocitypowered.api.command.CommandManager;
+//import com.velocitypowered.api.command.CommandMeta;
+//import com.velocitypowered.api.command.CommandSource;
+//import com.velocitypowered.api.proxy.ProxyServer;
+//import it.fulminazzo.blocksmith.ApplicationHandle;
+//import it.fulminazzo.blocksmith.command.node.LiteralNode;
+//import org.jetbrains.annotations.NotNull;
+//
+//import java.util.ArrayList;
+//import java.util.List;
+//import java.util.Map;
+//import java.util.concurrent.ConcurrentHashMap;
+//
+///**
+// * Implementation of {@link CommandRegistry} for Velocity platforms.
+// */
+//final class VelocityCommandRegistry extends BrigadierCommandRegistry<CommandSource> {
+//    private final @NotNull CommandManager commandManager;
+//    private final @NotNull Map<String, List<String>> registeredAliases = new ConcurrentHashMap<>();
+//
+//    /**
+//     * Instantiates a new Velocity command registry.
+//     *
+//     * @param application the application that is initializing the registry
+//     */
+//    public VelocityCommandRegistry(final @NotNull ApplicationHandle application) {
+//        super(application);
+//        this.commandManager = ((ProxyServer) application.getServer()).getCommandManager();
+//    }
+//
+//    @Override
+//    protected @NotNull CommandSenderWrapper<CommandSource> wrapSender(final @NotNull Object executor) {
+//        return new VelocityCommandSenderWrapper(application, (CommandSource) executor);
+//    }
+//
+//    @Override
+//    protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
+//        List<String> aliases = new ArrayList<>(command.getAliases());
+//        aliases.remove(commandName);
+//        registeredAliases.put(commandName, aliases);
+//        super.onRegister(commandName, command);
+//    }
+//
+//    @Override
+//    protected void onRegister(final @NotNull String commandName,
+//                              final @NotNull LiteralNode command,
+//                              final @NotNull LiteralCommandNode<CommandSource> brigadierCommand) {
+//        List<String> aliases = new ArrayList<>(command.getAliases());
+//        aliases.remove(commandName);
+//        CommandMeta meta = commandManager.metaBuilder(commandName)
+//                .aliases(aliases.toArray(new String[0]))
+//                .build();
+//        commandManager.register(meta, new BrigadierCommand(brigadierCommand));
+//    }
+//
+//    @Override
+//    protected void onUnregister(final @NotNull String commandName) {
+//        commandManager.unregister(commandName);
+//        List<String> aliases = registeredAliases.remove(commandName);
+//        if (aliases != null) aliases.forEach(commandManager::unregister);
+//    }
+//
+//    @Override
+//    protected @NotNull Class<?> getSenderType() {
+//        return CommandSource.class;
+//    }
+//
+//}
