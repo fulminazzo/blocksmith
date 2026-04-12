@@ -16,6 +16,7 @@ class ExpiringMapTest extends Specification {
 
         where:
         method      | arguments                                                            || type
+        'passive'   | []                                                                   || PassiveExpiringMap
         'lazy'      | []                                                                   || LazyExpiringMap
         'scheduled' | [Executors.newSingleThreadScheduledExecutor(), Duration.ofMillis(1)] || ScheduledExpiringMap
     }
