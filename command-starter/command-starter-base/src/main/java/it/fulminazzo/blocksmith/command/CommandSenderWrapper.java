@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.scheduler.Scheduler;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -44,7 +45,7 @@ public abstract class CommandSenderWrapper<S> {
      * @return <code>true</code> if it does
      */
     public final boolean extendsType(final @NotNull Class<?> type) {
-        return type.isAssignableFrom(actualSender.getClass());
+        return Reflect.on(actualSender).extendsType(type);
     }
 
     /**
