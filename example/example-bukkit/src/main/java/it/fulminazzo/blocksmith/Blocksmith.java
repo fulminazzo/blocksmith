@@ -8,7 +8,6 @@ import it.fulminazzo.blocksmith.message.provider.MessageProvider;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.jul.JDK14LoggerAdapter;
 
@@ -78,7 +77,7 @@ public final class Blocksmith extends JavaPlugin implements ServerApplication {
     }
 
     @Override
-    public @NonNull <T> T as(final @NotNull Class<T> type) {
+    public @NotNull <T> T as(final @NotNull Class<T> type) {
         return type.cast(this);
     }
 
