@@ -383,9 +383,15 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
 
     }
 
+    /**
+     * Entry for this map implementations.
+     *
+     * @param <K> the key
+     * @param <V> the value
+     */
     @ToString
     @RequiredArgsConstructor
-    private static final class ExpiringEntryMapEntry<K, V> implements Entry<K, V> {
+    static final class ExpiringEntryMapEntry<K, V> implements Entry<K, V> {
         private final @Nullable K key;
         private final @NotNull ExpiringEntry<V> entry;
 
@@ -410,7 +416,6 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
 
         @Override
         public boolean equals(final @Nullable Object obj) {
-            checkExpired();
             if (obj instanceof Entry<?, ?>) {
                 Entry<?, ?> e = (Entry<?, ?>) obj;
                 return Objects.equals(e.getKey(), key) && Objects.equals(e.getValue(), entry.getValue());
@@ -420,7 +425,6 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
 
         @Override
         public int hashCode() {
-            checkExpired();
             return Objects.hash(key, entry.getValue());
         }
 
