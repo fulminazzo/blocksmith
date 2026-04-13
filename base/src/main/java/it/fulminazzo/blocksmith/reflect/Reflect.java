@@ -75,6 +75,19 @@ public class Reflect {
     }
 
     /**
+     * Because {@link Reflect#on(Type)} sets the type to the given object,
+     * this method will return the actual class of the object.
+     * If the object was a {@link Type}, then {@link Class} will be returned.
+     *
+     * @return the actual class of the object
+     */
+    public @NotNull Class<?> getActualObjectClass() {
+        Type type = getType();
+        if (type.equals(object)) return type.getClass();
+        else return ReflectUtils.toClass(type);
+    }
+
+    /**
      * Gets the internal wrapped object Java class.
      *
      * @return the class
@@ -124,7 +137,10 @@ public class Reflect {
      * @return <code>true</code> if it does
      */
     public boolean extendsType(final @NotNull Type type) {
-        return ReflectUtils.extendsType(getObjectClass(), type);
+        Class<?> clazz = getObjectClass();
+        if (ReflectUtils.extendsType(clazz, type)) return true;
+        Class<?> actualClass = getActualObjectClass();
+        return !clazz.equals(actualClass) && ReflectUtils.extendsType(actualClass, type);
     }
 
     /**
