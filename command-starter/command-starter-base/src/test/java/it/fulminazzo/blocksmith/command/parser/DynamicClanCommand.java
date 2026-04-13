@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.parser;
 
 import it.fulminazzo.blocksmith.command.CommandSender;
 import it.fulminazzo.blocksmith.command.annotation.Command;
+import it.fulminazzo.blocksmith.command.annotation.Cooldown;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 @SuppressWarnings("unused")
 @Command(dynamic = true)
+@Cooldown(10)
 final class DynamicClanCommand {
 
     @Command(value = "<value>")
@@ -22,6 +24,7 @@ final class DynamicClanCommand {
 
     @Command("help <verbose>")
     @Permission(grant = Permission.Grant.ALL)
+    @Cooldown(20)
     public void help(
             final @NotNull CommandSender sender,
             final boolean verbose

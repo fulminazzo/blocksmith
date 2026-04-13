@@ -4,6 +4,7 @@
 package it.fulminazzo.blocksmith.command.parser
 
 import it.fulminazzo.blocksmith.command.CommandSender
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper
 import it.fulminazzo.blocksmith.command.annotation.*
 import it.fulminazzo.blocksmith.command.node.*
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler
@@ -162,7 +163,10 @@ class CommandParserTest extends Specification {
                 'command.description.clan.admin.members.kick',
                 new PermissionInfo(null, 'clan.admin.members.kick', Permission.Grant.OP)
         )
-        kick.addChild(target)
+        kick
+                .setConfirmationInfo(ClanCommand.getMethod('adminMembersKick', CommandSender, Object)
+                        .getAnnotation(Confirm))
+                .addChild(target)
         members = new LiteralNode('members')
         members.commandInfo = new CommandInfo(
                 'command.description.clan.admin.members',
@@ -236,7 +240,7 @@ class CommandParserTest extends Specification {
         value.executor = new ExecutionHandler(
                 executor,
                 DynamicClanCommand.getMethod('execute', CommandSender, double)
-        )
+        ).setCooldown(Duration.ofSeconds(10))
         clan.addChild(value)
         expected.add(clan)
 
@@ -245,7 +249,7 @@ class CommandParserTest extends Specification {
         verbose.executor = new ExecutionHandler(
                 executor,
                 DynamicClanCommand.getMethod('help', CommandSender, boolean)
-        )
+        ).setCooldown(Duration.ofSeconds(20))
         def help = new LiteralNode('help')
         help.commandInfo = new CommandInfo(
                 'command.description.clan.help',
@@ -278,7 +282,8 @@ class CommandParserTest extends Specification {
         type << [
                 CommandParserTest, CommandNotGiven,
                 AliasesNotGiven,
-                AliasesNotInstance, AliasesNotCollection
+                AliasesNotInstance, AliasesNotCollection,
+                AliasesNotEmptyInstance
         ]
     }
 
@@ -334,16 +339,16 @@ class CommandParserTest extends Specification {
         help.commandInfo = new CommandInfo(
                 'command.description.help',
                 new PermissionInfo(
-                        null,
+                        'plugin',
                         'help',
-                        Permission.Grant.OP,
+                        Permission.Grant.NONE,
                         true
                 ),
                 true
         )
         help.executor = new ExecutionHandler(
                 DynamicGeneralCommands,
-                DynamicGeneralCommands.getMethod('help', CommandSender)
+                DynamicGeneralCommands.getMethod('help', CommandSenderWrapper)
         )
 
         and:
@@ -366,7 +371,8 @@ class CommandParserTest extends Specification {
         where:
         type << [
                 CommandNotGiven, AliasesNotGiven,
-                AliasesNotStatic, AliasesNotCollection
+                AliasesNotStatic, AliasesNotCollection,
+                AliasesNotEmpty
         ]
     }
 
@@ -764,10 +770,37 @@ class CommandParserTest extends Specification {
 
     }
 
+    static final class AliasesNotEmpty {
+
+        @Command(dynamic = true)
+        static void help() {
+
+        }
+
+        static List<String> getHelpAliases(String prefix) {
+            return []
+        }
+
+    }
+
     @Command(dynamic = true)
     static final class AliasesNotInstance {
 
         static List<String> getAliases() {
+            return []
+        }
+
+    }
+
+    @Command(dynamic = true)
+    static final class AliasesNotEmptyInstance {
+
+        @Command(dynamic = true)
+        static void help() {
+
+        }
+
+        List<String> getAliases(String prefix) {
             return []
         }
 

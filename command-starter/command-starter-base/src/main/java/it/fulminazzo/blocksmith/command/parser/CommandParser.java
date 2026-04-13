@@ -209,10 +209,7 @@ public final class CommandParser {
         if (!computedPermission.isEmpty()) computedPermission += ".";
         computedPermission += literalNode.getName();
         final CommandInfo computed = computeCurrentCommandInfo();
-        literalNode.getCommandInfo().ifPresentOrElse(
-                i -> i.merge(computed),
-                () -> literalNode.setCommandInfo(computed)
-        );
+        literalNode.setCommandInfo(computed);
         return literalNode;
     }
 
@@ -446,10 +443,7 @@ public final class CommandParser {
      */
     static @NotNull CommandInfo createCommandInfo(final @NotNull AnnotatedElement element,
                                                   final @NotNull String permissionGroup) {
-        final String description;
-        if (element.isAnnotationPresent(Command.class))
-            description = element.getAnnotation(Command.class).description().trim();
-        else description = "";
+        final String description = element.getAnnotation(Command.class).description().trim();
 
         final String permission;
         String group;
