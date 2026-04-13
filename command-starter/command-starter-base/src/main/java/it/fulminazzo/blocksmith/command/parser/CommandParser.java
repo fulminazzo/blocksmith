@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.node.NumberArgumentNode;
+import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier;
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
@@ -188,9 +189,10 @@ public final class CommandParser {
             } else throw parseException("argument '%s' type must be %s or an implementation", argument, Number.class);
         if (parameter.isAnnotationPresent(Tab.class)) {
             Tab tab = parameter.getAnnotation(Tab.class);
-            //TODO: what about these?
-//            CustomCompletionsProvider provider = CustomCompletionsProvider.of(executionHandler.getExecutor(), tab.value());
-//            node.setCustomCompletionsProvider(provider);
+            node.setCompletionsSupplier(CompletionsSupplier.of(
+                    executionHandler.getExecutor(),
+                    tab.value()
+            ));
         }
         tokenizer.next();
         return node;
