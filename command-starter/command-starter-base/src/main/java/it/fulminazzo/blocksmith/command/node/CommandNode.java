@@ -120,10 +120,12 @@ public abstract class CommandNode {
      * Inspects this node with the given visitor.
      *
      * @param <T>     the type of the result
+     * @param <X>     the type of the exception to throw in case of errors during visits
      * @param visitor the visitor
      * @return the result
+     * @throws X the exception thrown in case of visit errors
      */
-    public abstract <T> T accept(final @NotNull Visitor<T> visitor);
+    public abstract <T, X extends Exception> T accept(final @NotNull Visitor<T, X> visitor) throws X;
 
     /**
      * Checks if the node matches with the given token.

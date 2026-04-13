@@ -51,7 +51,7 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
     }
 
     @Override
-    public <T> T accept(final @NotNull Visitor<T> visitor) {
+    public <T, X extends Exception> T accept(final @NotNull Visitor<T, X> visitor) throws X {
         return visitor.visitNumberArgumentNode(this);
     }
 

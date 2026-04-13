@@ -77,7 +77,7 @@ public final class LiteralNode extends CommandNode {
     }
 
     @Override
-    public <T> T accept(final @NotNull Visitor<T> visitor) {
+    public <T, X extends Exception> T accept(final @NotNull Visitor<T, X> visitor) throws X {
         return visitor.visitLiteralNode(this);
     }
 

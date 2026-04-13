@@ -12,9 +12,10 @@ import org.jetbrains.annotations.NotNull;
  * Base implementation of {@link Visitor} with internal information.
  *
  * @param <T> the type of the result
+ * @param <X> the type of the exception to throw in case of errors during visits
  */
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
-public abstract class VisitorImpl<T> implements Visitor<T> {
+public abstract class VisitorImpl<T, X extends Exception> implements Visitor<T, X> {
     @NotNull ApplicationHandle application;
     @Getter
     @NotNull CommandSenderWrapper<?> commandSender;
@@ -45,7 +46,8 @@ public abstract class VisitorImpl<T> implements Visitor<T> {
      *
      * @param node the node
      * @return the result
+     * @throws X the exception thrown in case of visit errors
      */
-    protected abstract T visitCommandNode(final @NotNull CommandNode node);
+    protected abstract T visitCommandNode(final @NotNull CommandNode node) throws X;
 
 }

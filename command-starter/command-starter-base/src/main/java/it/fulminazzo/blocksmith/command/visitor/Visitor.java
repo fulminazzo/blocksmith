@@ -9,31 +9,35 @@ import org.jetbrains.annotations.NotNull;
  * General object to visit {@link it.fulminazzo.blocksmith.command.node.CommandNode} objects.
  *
  * @param <T> the type of the result
+ * @param <X> the type of the exception to throw in case of errors during visits
  */
-public interface Visitor<T> {
+public interface Visitor<T, X extends Exception> {
 
     /**
      * Visits a {@link ArgumentNode}.
      *
      * @param node the node
      * @return the result
+     * @throws X the exception thrown in case of visit errors
      */
-    T visitArgumentNode(final @NotNull ArgumentNode<?> node);
+    T visitArgumentNode(final @NotNull ArgumentNode<?> node) throws X;
 
     /**
      * Visits a {@link NumberArgumentNode}.
      *
      * @param node the node
      * @return the result
+     * @throws X the exception thrown in case of visit errors
      */
-    T visitNumberArgumentNode(final @NotNull NumberArgumentNode<?> node);
+    T visitNumberArgumentNode(final @NotNull NumberArgumentNode<?> node) throws X;
 
     /**
      * Visits a {@link LiteralNode}.
      *
      * @param node the node
      * @return the result
+     * @throws X the exception thrown in case of visit errors
      */
-    T visitLiteralNode(final @NotNull LiteralNode node);
+    T visitLiteralNode(final @NotNull LiteralNode node) throws X;
 
 }

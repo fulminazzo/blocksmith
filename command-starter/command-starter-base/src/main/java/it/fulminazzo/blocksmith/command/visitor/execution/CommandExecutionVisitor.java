@@ -22,7 +22,7 @@ import java.util.LinkedList;
  * A special {@link it.fulminazzo.blocksmith.command.visitor.Visitor} handling command execution.
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class CommandExecutionVisitor extends VisitorImpl<Void> {
+public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExecutionException> {
     @Getter
     @NotNull LinkedList<Object> arguments = new LinkedList<>();
 

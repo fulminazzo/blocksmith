@@ -53,7 +53,7 @@ public class ArgumentNode<T> extends CommandNode {
     }
 
     @Override
-    public <O> O accept(final @NotNull Visitor<O> visitor) {
+    public <O, X extends Exception> O accept(final @NotNull Visitor<O, X> visitor) throws X {
         return visitor.visitArgumentNode(this);
     }
 
