@@ -64,7 +64,7 @@ class AsyncManagerTest extends Specification {
         future.join()
 
         then:
-        noExceptionThrown()
+        0 * visitor.handleCommandExecutionException(_)
 
         and:
         executed
