@@ -46,7 +46,7 @@ final class AsyncManager {
             try {
                 executor.execute(executionVisitor);
                 checkTask.complete(null);
-            } catch (CommandExecutionException e) {
+            } catch (Exception e) {
                 checkTask.completeExceptionally(e);
             }
         });
