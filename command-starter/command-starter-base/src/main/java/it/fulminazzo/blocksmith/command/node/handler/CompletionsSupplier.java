@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.command.node.handler;
 
 import it.fulminazzo.blocksmith.reflect.Reflect;
-import it.fulminazzo.blocksmith.reflect.ReflectUtils;
+import it.fulminazzo.blocksmith.reflect.ReflectException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Value;
@@ -67,9 +67,9 @@ public class CompletionsSupplier implements Supplier<List<String>> {
         if (reflect.extendsType(Type.class)) {
             method = reflect.getMethod(methodDeclaration);
             if (!Modifier.isStatic(method.getModifiers()))
-                throw new IllegalArgumentException(String.format("Invalid method '%s' in type '%s': " +
-                                "completions functions with class executor must be static", methodDeclaration,
-                        ReflectUtils.toString(reflect.getType()))
+                throw new ReflectException("Invalid method %s in type %s: " +
+                        "completions functions with class executor must be static",
+                        method, reflect.getType()
                 );
         } else {
             method = reflect.getMethod(methodDeclaration);
@@ -81,8 +81,9 @@ public class CompletionsSupplier implements Supplier<List<String>> {
         if (Collection.class.isAssignableFrom(method.getReturnType())) {
             return new CompletionsSupplier(requester, method);
         } else
-            throw new IllegalArgumentException(String.format("Invalid method '%s' in type '%s': must return an instance of %s",
-                    method.getName(), ReflectUtils.toString(reflect.getType()), Collection.class.getCanonicalName())
+            throw new ReflectException("Invalid method %s in type %s: " +
+                    "must return an instance of %s",
+                    method, reflect.getType(), Collection.class
             );
     }
 
