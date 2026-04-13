@@ -6,7 +6,6 @@ import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisito
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.argument.Time;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
@@ -25,18 +24,17 @@ final class AsyncManager {
     private final @NotNull Set<Object> pending = ConcurrentHashMap.newKeySet();
 
     private final @NotNull ExecutorService executorService;
-    @Getter
     private final @NotNull Duration timeout;
 
     /**
      * Executes the given {@link CommandExecutor} asynchronously.
      *
-     * @param executionInfo    the execution info
+     * @param executor         the executor
      * @param executionVisitor the execution visitor
      * @return the future with the asynchronous execution
      * @throws CommandExecutionException in case of any error
      */
-    public @NotNull CompletableFuture<Void> execute(final @NotNull CommandExecutor executionInfo,
+    public @NotNull CompletableFuture<Void> execute(final @NotNull CommandExecutor executor,
                                                     final @NotNull CommandExecutionVisitor executionVisitor) throws CommandExecutionException {
         CommandSenderWrapper<?> sender = executionVisitor.getCommandSender();
         Object id = sender.getId();
@@ -46,7 +44,7 @@ final class AsyncManager {
         CompletableFuture<Void> checkTask = new CompletableFuture<>();
         Future<?> actualTask = executorService.submit(() -> {
             try {
-                executionInfo.execute(executionVisitor);
+                executor.execute(executionVisitor);
                 checkTask.complete(null);
             } catch (CommandExecutionException e) {
                 checkTask.completeExceptionally(e);
@@ -67,8 +65,7 @@ final class AsyncManager {
                         if (!(t instanceof CommandExecutionException))
                             t = new CommandExecutionException("error.internal-error", t)
                                     .arguments(Placeholder.of("message", t.getMessage()));
-                        //TODO: update and fix tests
-//                        context.getRegistry().handleCommandExecutionException((CommandExecutionException) t, context);
+                        executionVisitor.handleCommandExecutionException((CommandExecutionException) t);
                     }
                     return v;
                 });
