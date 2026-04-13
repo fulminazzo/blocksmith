@@ -92,6 +92,24 @@ class CommandExecutorTest extends Specification {
         e.message == 'Execution exception!'
     }
 
+    def 'test that general Exception during execution is rethrown as CommandExecutionException'() {
+        given:
+        def executor = new CommandExecutor(
+                commands,
+                Commands.getMethod('executionException', String)
+        )
+
+        and:
+        def visitor = Mock(CommandExecutionVisitor)
+
+        when:
+        executor.execute(visitor)
+
+        then:
+        def e = thrown(CommandExecutionException)
+        e.message == 'error.internal-error'
+    }
+
     def 'test that general #exception during execution is thrown as CommandExecutionException'() {
         given:
         def executor = new CommandExecutor(

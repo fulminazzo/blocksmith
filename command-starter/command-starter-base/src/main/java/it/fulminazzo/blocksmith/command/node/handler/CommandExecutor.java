@@ -71,6 +71,10 @@ public class CommandExecutor {
             if (cause instanceof CommandExecutionException) throw (CommandExecutionException) cause;
             throw new CommandExecutionException("error.internal-error", cause)
                     .arguments(Placeholder.of("message", cause.getMessage()));
+        } catch (Exception e) {
+            if (e instanceof CommandExecutionException) throw e;
+            else throw new CommandExecutionException("error.internal-error", e)
+                    .arguments(Placeholder.of("message", e.getMessage()));
         }
     }
 
