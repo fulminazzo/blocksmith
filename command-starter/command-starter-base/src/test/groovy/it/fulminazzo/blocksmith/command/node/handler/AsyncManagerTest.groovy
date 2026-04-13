@@ -33,6 +33,7 @@ class AsyncManagerTest extends Specification {
 
         visitor = Mock(CommandExecutionVisitor)
         visitor.commandSender >> sender
+        visitor.arguments >> []
     }
 
     void cleanup() {
