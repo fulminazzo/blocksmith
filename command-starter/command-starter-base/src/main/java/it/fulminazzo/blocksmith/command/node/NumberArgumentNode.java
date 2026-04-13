@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -47,6 +48,11 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
     public @NotNull NumberArgumentNode<N> max(final double max) {
         this.max = max;
         return this;
+    }
+
+    @Override
+    public <T> T accept(final @NotNull Visitor<T> visitor) {
+        return visitor.visitNumberArgumentNode(this);
     }
 
 }

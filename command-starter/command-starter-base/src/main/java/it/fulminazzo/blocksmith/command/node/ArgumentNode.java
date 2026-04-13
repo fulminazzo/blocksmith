@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier;
+import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -49,6 +50,11 @@ public class ArgumentNode<T> extends CommandNode {
     public @NotNull ArgumentNode<T> setCompletionsSupplier(final @Nullable CompletionsSupplier completionsSupplier) {
         this.completionsSupplier = completionsSupplier;
         return this;
+    }
+
+    @Override
+    public <O> O accept(final @NotNull Visitor<O> visitor) {
+        return visitor.visitArgumentNode(this);
     }
 
     @Override

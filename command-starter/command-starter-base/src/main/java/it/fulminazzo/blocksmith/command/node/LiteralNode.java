@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command.node;
 import it.fulminazzo.blocksmith.command.annotation.Confirm;
 import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
+import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -74,6 +75,11 @@ public final class LiteralNode extends CommandNode {
             });
         }
         return (LiteralNode) super.merge(node);
+    }
+
+    @Override
+    public <T> T accept(final @NotNull Visitor<T> visitor) {
+        return visitor.visitLiteralNode(this);
     }
 
     @Override

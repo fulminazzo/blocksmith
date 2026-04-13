@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
+import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -114,6 +115,15 @@ public abstract class CommandNode {
     /*
      * ABSTRACT
      */
+
+    /**
+     * Inspects this node with the given visitor.
+     *
+     * @param <T>     the type of the result
+     * @param visitor the visitor
+     * @return the result
+     */
+    public abstract <T> T accept(final @NotNull Visitor<T> visitor);
 
     /**
      * Checks if the node matches with the given token.
