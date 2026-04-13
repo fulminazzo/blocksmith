@@ -105,6 +105,15 @@ public final class ExecutionHandler {
     }
 
     /**
+     * Gets the actual executor of the command method.
+     *
+     * @return the executor
+     */
+    public <T> T getExecutor() {
+        return executor.getExecutor().get();
+    }
+
+    /**
      * Gets the method containing the command logic.
      *
      * @return the method
