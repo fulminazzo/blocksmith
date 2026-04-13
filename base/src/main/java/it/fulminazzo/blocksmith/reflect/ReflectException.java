@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -164,24 +165,30 @@ public final class ReflectException extends RuntimeException {
             if (object instanceof Type) args[i] = ReflectUtils.toString((Type) object);
             else if (object instanceof Method) {
                 Method method = (Method) object;
+                Type returnType = method.getGenericReturnType();
+                if (returnType == null) returnType = method.getReturnType();
                 args[i] = String.format("%s %s(%s)",
-                        ReflectUtils.toString(method.getGenericReturnType()),
+                        ReflectUtils.toString(returnType),
                         method.getName(),
-                        Arrays.stream(method.getGenericParameterTypes())
-                                .map(ReflectUtils::toString)
-                                .collect(Collectors.joining(", "))
+                        getParameterTypes(method)
                 );
             } else if (object instanceof Constructor<?>) {
                 Constructor<?> constructor = (Constructor<?>) object;
                 args[i] = String.format("%s(%s)",
                         constructor.getDeclaringClass().getCanonicalName(),
-                        Arrays.stream(constructor.getGenericParameterTypes())
-                                .map(ReflectUtils::toString)
-                                .collect(Collectors.joining(", "))
+                        getParameterTypes(constructor)
                 );
             }
         }
         return String.format(format, args);
+    }
+
+    private static @NotNull String getParameterTypes(final @NotNull Executable executable) {
+        Type[] parameterTypes = executable.getGenericParameterTypes();
+        if (parameterTypes == null) parameterTypes = executable.getParameterTypes();
+        return Arrays.stream(parameterTypes)
+                .map(ReflectUtils::toString)
+                .collect(Collectors.joining(", "));
     }
 
 }
