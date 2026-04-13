@@ -6,7 +6,7 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException;
-import it.fulminazzo.blocksmith.command.visitor.execution.ExecutionContext;
+import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor;
 import it.fulminazzo.blocksmith.message.argument.Time;
 import it.fulminazzo.blocksmith.structure.cooldown.FixedCooldownManager;
 import lombok.EqualsAndHashCode;
@@ -43,14 +43,14 @@ public final class ExecutionHandler {
     /**
      * Executes the actual command logic.
      *
-     * @param commandNode the literal node containing information about the executing command
-     * @param context     the context of execution
+     * @param commandNode      the literal node containing information about the executing command
+     * @param executionVisitor the execution visitor
      * @throws CommandExecutionException in case of any errors
      */
     public void execute(final @NotNull LiteralNode commandNode,
-                        final @NotNull ExecutionContext context) throws CommandExecutionException {
+                        final @NotNull CommandExecutionVisitor executionVisitor) throws CommandExecutionException {
         if (cooldownManager != null) {
-            CommandSenderWrapper<?> sender = context.getCommandSender();
+            CommandSenderWrapper<?> sender = executionVisitor.getCommandSender();
             PermissionInfo cooldownPermission = getCooldownBypassPermission(commandNode.getCommandInfo()
                     .map(CommandInfo::getPermission)
                     .orElseThrow(() -> new IllegalStateException("Could not get permission from node: " + commandNode))
@@ -64,8 +64,8 @@ public final class ExecutionHandler {
                 } else cooldownManager.put(id);
             }
         }
-        if (asyncManager != null) asyncManager.execute(executor, context);
-        else executor.execute(context);
+        if (asyncManager != null) asyncManager.execute(executor, executionVisitor);
+        else executor.execute(executionVisitor);
     }
 
     /**

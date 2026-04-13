@@ -1,8 +1,8 @@
 package it.fulminazzo.blocksmith.command.node.handler;
 
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
-import it.fulminazzo.blocksmith.command.visitor.execution.ExecutionContext;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException;
+import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.argument.Time;
 import lombok.EqualsAndHashCode;
@@ -31,14 +31,14 @@ final class AsyncManager {
     /**
      * Executes the given {@link CommandExecutor} asynchronously.
      *
-     * @param executionInfo the execution info
-     * @param context       the context
+     * @param executionInfo    the execution info
+     * @param executionVisitor the execution visitor
      * @return the future with the asynchronous execution
      * @throws CommandExecutionException in case of any error
      */
     public @NotNull CompletableFuture<Void> execute(final @NotNull CommandExecutor executionInfo,
-                                                    final @NotNull ExecutionContext context) throws CommandExecutionException {
-        CommandSenderWrapper<?> sender = context.getCommandSender();
+                                                    final @NotNull CommandExecutionVisitor executionVisitor) throws CommandExecutionException {
+        CommandSenderWrapper<?> sender = executionVisitor.getCommandSender();
         Object id = sender.getId();
         if (pending.contains(id)) throw new CommandExecutionException("error.await-pending-operation");
         else pending.add(id);
@@ -46,7 +46,7 @@ final class AsyncManager {
         CompletableFuture<Void> checkTask = new CompletableFuture<>();
         Future<?> actualTask = executorService.submit(() -> {
             try {
-                executionInfo.execute(context);
+                executionInfo.execute(executionVisitor);
                 checkTask.complete(null);
             } catch (CommandExecutionException e) {
                 checkTask.completeExceptionally(e);

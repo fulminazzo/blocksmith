@@ -5,28 +5,28 @@ import it.fulminazzo.blocksmith.command.ConsoleCommandSender
 import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.Player
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException
-import it.fulminazzo.blocksmith.command.visitor.execution.ExecutionContext
+import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 class CommandExecutorTest extends Specification {
 
-    private ExecutionContext context
+    private CommandExecutionVisitor visitor
 
     private Commands commands
 
     void setup() {
         def arguments = new LinkedList(['Hello, world!'])
-        context = Mock(ExecutionContext)
-        context.arguments >> arguments
+        visitor = Mock(CommandExecutionVisitor)
+        visitor.arguments >> arguments
 
         commands = Spy(Commands)
     }
 
     def 'test that execute with #sender and #method works'() {
         given:
-        context.commandSender >> new MockCommandSenderWrapper(sender)
+        visitor.commandSender >> new MockCommandSenderWrapper(sender)
 
         and:
         def executor = new CommandExecutor(
@@ -35,11 +35,11 @@ class CommandExecutorTest extends Specification {
         )
 
         when:
-        executor.execute(context)
+        executor.execute(visitor)
 
         then:
         1 * commands."$method"(*_) >> { a ->
-            assert a == context.arguments
+            assert a == visitor.arguments
         }
 
         where:
@@ -54,7 +54,7 @@ class CommandExecutorTest extends Specification {
 
     def 'test that execute with #sender and #method throws CommandExecutionException with message #expected'() {
         given:
-        context.commandSender >> new MockCommandSenderWrapper(sender)
+        visitor.commandSender >> new MockCommandSenderWrapper(sender)
 
         and:
         def executor = new CommandExecutor(
@@ -63,7 +63,7 @@ class CommandExecutorTest extends Specification {
         )
 
         when:
-        executor.execute(context)
+        executor.execute(visitor)
 
         then:
         def e = thrown(CommandExecutionException)
@@ -85,7 +85,7 @@ class CommandExecutorTest extends Specification {
         )
 
         when:
-        executor.execute(context)
+        executor.execute(visitor)
 
         then:
         def e = thrown(CommandExecutionException)
@@ -100,7 +100,7 @@ class CommandExecutorTest extends Specification {
         )
 
         when:
-        executor.execute(context)
+        executor.execute(visitor)
 
         then:
         def e = thrown(CommandExecutionException)

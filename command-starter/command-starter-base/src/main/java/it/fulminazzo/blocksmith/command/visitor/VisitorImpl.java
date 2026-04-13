@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command.visitor;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 public abstract class VisitorImpl<T> implements Visitor<T> {
     @NotNull ApplicationHandle application;
+    @Getter
     @NotNull CommandSenderWrapper<?> commandSender;
 
     @NotNull CommandInput input;

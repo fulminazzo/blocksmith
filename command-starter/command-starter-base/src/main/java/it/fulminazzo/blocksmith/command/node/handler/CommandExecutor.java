@@ -2,7 +2,7 @@ package it.fulminazzo.blocksmith.command.node.handler;
 
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException;
-import it.fulminazzo.blocksmith.command.visitor.execution.ExecutionContext;
+import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.reflect.ReflectException;
@@ -39,13 +39,13 @@ public class CommandExecutor {
     /**
      * Executes the actual command logic.
      *
-     * @param context the context of execution
+     * @param executionVisitor the execution visitor
      * @throws CommandExecutionException in case of any errors
      */
-    public void execute(final @NotNull ExecutionContext context) throws CommandExecutionException {
-        final CommandSenderWrapper<?> sender = context.getCommandSender();
+    public void execute(final @NotNull CommandExecutionVisitor executionVisitor) throws CommandExecutionException {
+        final CommandSenderWrapper<?> sender = executionVisitor.getCommandSender();
         try {
-            LinkedList<Object> arguments = context.getArguments();
+            LinkedList<Object> arguments = executionVisitor.getArguments();
             if (arguments.size() != method.getParameterCount()) {
                 Class<?> parameterType = method.getParameterTypes()[0];
                 if (CommandSenderWrapper.class.isAssignableFrom(parameterType)) {

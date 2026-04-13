@@ -5,7 +5,7 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException
-import it.fulminazzo.blocksmith.command.visitor.execution.ExecutionContext
+import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor
 import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutorService
 
 class ExecutionHandlerTest extends Specification {
     private LiteralNode commandNode
-    private ExecutionContext context
+    private CommandExecutionVisitor visitor
 
     private CommandExecutor executor
     private ExecutionHandler handler
@@ -35,8 +35,8 @@ class ExecutionHandlerTest extends Specification {
         def sender = Mock(CommandSenderWrapper)
         sender.id >> 0
 
-        context = Mock(ExecutionContext)
-        context.commandSender >> sender
+        visitor = Mock(CommandExecutionVisitor)
+        visitor.commandSender >> sender
 
         executor = Mock(CommandExecutor)
         handler = new ExecutionHandler(new Object(), Object.getMethod('equals', Object))
@@ -48,10 +48,10 @@ class ExecutionHandlerTest extends Specification {
         handler.cooldown = cooldown
 
         when:
-        handler.execute(commandNode, context)
+        handler.execute(commandNode, visitor)
 
         then:
-        1 * executor.execute(context)
+        1 * executor.execute(visitor)
 
         where:
         cooldown << [null, Duration.ofSeconds(1)]
@@ -62,18 +62,18 @@ class ExecutionHandlerTest extends Specification {
         handler.cooldown = Duration.ofSeconds(10)
 
         and:
-        context.commandSender.hasPermission(_ as PermissionInfo) >> { a ->
+        visitor.commandSender.hasPermission(_ as PermissionInfo) >> { a ->
             return a[0].permission == 'blocksmith.bypass.cooldown.command'
         }
 
         and:
-        handler.cooldownManager.put(context.commandSender.id)
+        handler.cooldownManager.put(visitor.commandSender.id)
 
         when:
-        handler.execute(commandNode, context)
+        handler.execute(commandNode, visitor)
 
         then:
-        1 * executor.execute(context)
+        1 * executor.execute(visitor)
     }
 
     def 'test that execute throws CommandExecutionException during cooldown'() {
@@ -81,10 +81,10 @@ class ExecutionHandlerTest extends Specification {
         handler.cooldown = Duration.ofSeconds(10)
 
         and:
-        handler.cooldownManager.put(context.commandSender.id)
+        handler.cooldownManager.put(visitor.commandSender.id)
 
         when:
-        handler.execute(commandNode, context)
+        handler.execute(commandNode, visitor)
 
         then:
         def e = thrown(CommandExecutionException)
@@ -112,16 +112,16 @@ class ExecutionHandlerTest extends Specification {
         handler.setAsync(executorService, Duration.ofSeconds(1L))
 
         when:
-        handler.execute(commandNode, context)
+        handler.execute(commandNode, visitor)
 
         then:
-        1 * executor.execute(context)
+        1 * executor.execute(visitor)
 
         when:
-        handler.unsetAsync().execute(commandNode, context)
+        handler.unsetAsync().execute(commandNode, visitor)
 
         then:
-        1 * executor.execute(context)
+        1 * executor.execute(visitor)
     }
 
     def 'test that setAsync of invalid timeout throws'() {
