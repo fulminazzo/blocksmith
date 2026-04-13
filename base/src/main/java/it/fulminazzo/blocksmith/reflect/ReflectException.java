@@ -165,9 +165,9 @@ public final class ReflectException extends RuntimeException {
             else if (object instanceof Method) {
                 Method method = (Method) object;
                 args[i] = String.format("%s %s(%s)",
-                        ReflectUtils.toString(method.getReturnType()),
+                        ReflectUtils.toString(method.getGenericReturnType()),
                         method.getName(),
-                        Arrays.stream(method.getParameterTypes())
+                        Arrays.stream(method.getGenericParameterTypes())
                                 .map(ReflectUtils::toString)
                                 .collect(Collectors.joining(", "))
                 );
@@ -175,7 +175,7 @@ public final class ReflectException extends RuntimeException {
                 Constructor<?> constructor = (Constructor<?>) object;
                 args[i] = String.format("%s(%s)",
                         constructor.getDeclaringClass().getCanonicalName(),
-                        Arrays.stream(constructor.getParameterTypes())
+                        Arrays.stream(constructor.getGenericParameterTypes())
                                 .map(ReflectUtils::toString)
                                 .collect(Collectors.joining(", "))
                 );
