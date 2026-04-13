@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.visitor;
 
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
+import it.fulminazzo.blocksmith.command.node.CommandNode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -37,5 +38,14 @@ public abstract class VisitorImpl<T> implements Visitor<T> {
 
         this.input = new CommandInput().addInput(commandName).addInput(arguments);
     }
+
+    /**
+     * Visits a general {@link CommandNode}.
+     * Should support visits of implementations.
+     *
+     * @param node the node
+     * @return the result
+     */
+    protected abstract T visitCommandNode(final @NotNull CommandNode node);
 
 }
