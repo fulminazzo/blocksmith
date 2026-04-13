@@ -25,17 +25,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //public abstract class CommandNode implements TabCompletable {
 //
 //    /**
-//     * Gets the first literal node (starting from this node) that represents the actual subcommand.
-//     *
-//     * @return the node (if found)
-//     */
-//    public @Nullable LiteralNode getCommandLiteral() {
-//        if (this instanceof LiteralNode) return (LiteralNode) this;
-//        else if (parent == null) return null;
-//        else return parent.getCommandLiteral();
-//    }
-//
-//    /**
 //     * Gets all the {@link ArgumentNode} children that are greedy.
 //     *
 //     * @return the children

@@ -49,6 +49,27 @@ public abstract class CommandNode {
      */
 
     /**
+     * Gets the node that carries information about the command (description, permission...).
+     * <br>
+     * If this node is a {@link LiteralNode}, itself will be returned.
+     * Otherwise, the {@link #parent} will be checked.
+     * <br>
+     * For example, in the command <code>/clan member &lt;player&gt; promote &lt;rank&gt;</code>,
+     * this method would return:
+     * <ul>
+     *     <li>the node representing <code>promote</code> for <code>promote</code> and <code>&lt;rank&gt;</code>;</li>
+     *     <li>the node representing <code>member</code> for <code>member</code> and <code>&lt;player&gt;</code>;</li>
+     *     <li>the node representing <code>clan</code> for <code>clan</code>.</li>
+     * </ul>
+     *
+     * @return the command node or <code>null</code> if not found (this should never happen on well-formed nodes)
+     */
+    public @Nullable LiteralNode getCommandNode() {
+        if (this instanceof LiteralNode) return (LiteralNode) this;
+        else return parent == null ? null : parent.getCommandNode();
+    }
+
+    /**
      * If this node is executable, it means we reached the end of a command route.
      * As such, it should be executable with the parsed arguments so far.
      *
