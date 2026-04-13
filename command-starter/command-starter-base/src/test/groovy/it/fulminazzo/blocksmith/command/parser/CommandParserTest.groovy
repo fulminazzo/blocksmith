@@ -14,9 +14,15 @@ import org.jetbrains.annotations.Nullable
 import spock.lang.Specification
 
 import java.time.Duration
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class CommandParserTest extends Specification {
+    private static final ExecutorService executorService = Executors.newSingleThreadExecutor()
+
+    void cleanup() {
+        executorService.shutdown()
+    }
 
     def 'test parseCommands returns all commands'() {
         given:
@@ -42,7 +48,7 @@ class CommandParserTest extends Specification {
         name.executor = new ExecutionHandler(
                 executor,
                 ClanCommand.getMethod('getClanInfo', CommandSender, String)
-        ).setAsync(Executors.newSingleThreadExecutor(), Duration.ofSeconds(1))
+        ).setAsync(executorService, Duration.ofSeconds(1))
         def info = new LiteralNode('info', 'information', 'state')
         info.commandInfo = new CommandInfo(
                 'Information command',
@@ -208,7 +214,7 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         when:
-        def actual = CommandParser.parseCommands(executor, CommandSender, null)
+        def actual = CommandParser.parseCommands(executor, CommandSender, null, executorService)
 
         then:
         compareNodes(actual, expected)
@@ -255,7 +261,7 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         when:
-        def actual = CommandParser.parseCommands(executor, CommandSender, null)
+        def actual = CommandParser.parseCommands(executor, CommandSender, null, executorService)
 
         then:
         compareNodes(actual, expected)
@@ -263,7 +269,7 @@ class CommandParserTest extends Specification {
 
     def 'test parseCommands throws with #type'() {
         when:
-        CommandParser.parseCommands(type.getConstructor().newInstance(), CommandSender, null)
+        CommandParser.parseCommands(type.getConstructor().newInstance(), CommandSender, null, executorService)
 
         then:
         thrown(CommandParseException)
@@ -292,7 +298,7 @@ class CommandParserTest extends Specification {
         )
 
         and:
-        def async = ArgumentNode.of('async', String, false)
+        def async = ArgumentNode.of('async', boolean, false)
         async.executor = new ExecutionHandler(
                 GeneralCommands,
                 GeneralCommands.getMethod('reload', boolean)
@@ -316,10 +322,10 @@ class CommandParserTest extends Specification {
         def expected = [help, reload]
 
         when:
-        def actual = CommandParser.parseCommands(GeneralCommands, CommandSender, null)
+        def actual = CommandParser.parseCommands(GeneralCommands, CommandSender, null, executorService)
 
         then:
-        actual.sort { getCommandName(it) } == expected.sort { getCommandName(it) }
+        compareNodes(actual, expected)
     }
 
     def 'test parseAnonymousCommands of dynamic commands'() {
@@ -344,15 +350,15 @@ class CommandParserTest extends Specification {
         def expected = [help]
 
         when:
-        def actual = CommandParser.parseCommands(DynamicGeneralCommands, CommandSender, null)
+        def actual = CommandParser.parseCommands(DynamicGeneralCommands, CommandSender, null, executorService)
 
         then:
-        actual == expected
+        compareNodes(actual, expected)
     }
 
     def 'test that parseAnonymousCommands throws for #type'() {
         when:
-        CommandParser.parseAnonymousCommands(type, CommandSender, null)
+        CommandParser.parseAnonymousCommands(type, CommandSender, null, executorService)
 
         then:
         thrown(CommandParseException)

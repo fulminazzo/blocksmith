@@ -2,7 +2,10 @@ package it.fulminazzo.blocksmith.command.parser;
 
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.annotation.*;
-import it.fulminazzo.blocksmith.command.node.*;
+import it.fulminazzo.blocksmith.command.node.ArgumentNode;
+import it.fulminazzo.blocksmith.command.node.CommandNode;
+import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import it.fulminazzo.blocksmith.command.node.NumberArgumentNode;
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
@@ -11,13 +14,16 @@ import it.fulminazzo.blocksmith.reflect.ReflectException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.*;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -287,13 +293,15 @@ public final class CommandParser {
      * @param commandModule   the command module
      * @param senderType      the type of the sender (to identify methods with sender declared)
      * @param permissionGroup the group to prepend to the commands permissions, if none is given
+     * @param executorService the executor to handle asynchronous executions
      * @return the nodes
      */
     public static @NotNull List<CommandNode> parseCommands(final @NotNull Object commandModule,
                                                            final @NotNull Class<?> senderType,
-                                                           final @NotNull String permissionGroup) {
+                                                           final @NotNull String permissionGroup,
+                                                           final @NotNull ExecutorService executorService) {
         if (commandModule instanceof Class<?>)
-            return parseAnonymousCommands((Class<?>) commandModule, senderType, permissionGroup);
+            return parseAnonymousCommands((Class<?>) commandModule, senderType, permissionGroup, executorService);
 
         Class<?> moduleType = commandModule.getClass();
         if (!moduleType.isAnnotationPresent(Command.class))
@@ -345,7 +353,7 @@ public final class CommandParser {
             Duration cooldown = extractCooldown(method);
             if (cooldown == null) cooldown = baseCooldown;
 
-            ExecutionHandler executionHandler = prepareExecutionHandler(commandModule, method, cooldown);
+            ExecutionHandler executionHandler = prepareExecutionHandler(commandModule, method, cooldown, executorService);
             int parameterIndex = getParameterIndex(method, senderType);
 
             CommandParser parser = new CommandParser(rawCommand, commandInfo, executionHandler, parameterIndex, permissionGroup);
@@ -363,11 +371,13 @@ public final class CommandParser {
      * @param commandsContainer the commands container
      * @param senderType        the type of the sender (to identify methods with sender declared)
      * @param permissionGroup   the group to prepend to the commands permissions, if none is given
+     * @param executorService   the executor to handle asynchronous executions
      * @return the nodes
      */
     static @NotNull List<CommandNode> parseAnonymousCommands(final @NotNull Class<?> commandsContainer,
                                                              final @NotNull Class<?> senderType,
-                                                             final @NotNull String permissionGroup) {
+                                                             final @NotNull String permissionGroup,
+                                                             final @NotNull ExecutorService executorService) {
         List<CommandNode> commands = new ArrayList<>();
         final Reflect reflect = Reflect.on(commandsContainer);
         for (Method method : reflect.getMethods(m -> Modifier.isStatic(m.getModifiers()) && m.isAnnotationPresent(Command.class))) {
@@ -404,7 +414,7 @@ public final class CommandParser {
 
             CommandInfo commandInfo = createCommandInfo(method, permissionGroup);
             Duration cooldown = extractCooldown(method);
-            ExecutionHandler executionHandler = prepareExecutionHandler(commandsContainer, method, cooldown);
+            ExecutionHandler executionHandler = prepareExecutionHandler(commandsContainer, method, cooldown, executorService);
             int parameterIndex = getParameterIndex(method, senderType);
 
             CommandParser parser = new CommandParser(rawCommand, commandInfo, executionHandler, parameterIndex, permissionGroup);
@@ -463,19 +473,21 @@ public final class CommandParser {
     /**
      * Creates a new Execution handler from the given method.
      *
-     * @param executor the actual executor of the method
-     * @param method   the method with the command logic
-     * @param cooldown the cooldown extracted for the method
+     * @param executor        the actual executor of the method
+     * @param method          the method with the command logic
+     * @param cooldown        the cooldown extracted for the method
+     * @param executorService the executor to handle asynchronous executions
      * @return the execution handler
      */
     static @NotNull ExecutionHandler prepareExecutionHandler(final @NotNull Object executor,
                                                              final @NotNull Method method,
-                                                             final @Nullable Duration cooldown) {
+                                                             final @Nullable Duration cooldown,
+                                                             final @NotNull ExecutorService executorService) {
         ExecutionHandler handler = new ExecutionHandler(executor, method).setCooldown(cooldown);
         if (method.isAnnotationPresent(Async.class)) {
             Async asyncAnnotation = method.getAnnotation(Async.class);
             handler.setAsync(
-                    Executors.newSingleThreadExecutor(), //TODO: from parameters
+                    executorService,
                     Duration.of(asyncAnnotation.value(), asyncAnnotation.unit().toChronoUnit())
             );
         }
