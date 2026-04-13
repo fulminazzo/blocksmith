@@ -745,6 +745,18 @@ class ReflectTest extends Specification {
         [Person.canonicalName, Person.classLoader] || new Reflect(Person, Person)
     }
 
+    def 'test that on of(Object) with type returns same as of(Type)'() {
+        given:
+        def type = Person
+
+        when:
+        def actual = Reflect.on((Object) type)
+
+        then:
+        actual.type == type
+        actual.get() == type
+    }
+
     def 'test that on of #arguments throws #expected on class not found'() {
         when:
         Reflect.on(*arguments)

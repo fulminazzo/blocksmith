@@ -1097,7 +1097,8 @@ public class Reflect {
      * @return the reflect
      */
     public static @NotNull Reflect on(final @Nullable Object object) {
-        return new Reflect(object == null ? null : object.getClass(), object);
+        if (object instanceof Type) return on((Type) object);
+        else return new Reflect(object == null ? null : object.getClass(), object);
     }
 
     /**
