@@ -117,4 +117,13 @@ public final class CommandInput {
         return current >= input.size();
     }
 
+    /**
+     * Gets the input, space-separated.
+     *
+     * @return the input
+     */
+    public @NotNull String getRawInput() {
+        return String.join(" ", input);
+    }
+
 }

@@ -23,6 +23,9 @@ class CommandInputTest extends Specification {
             input.advanceCursor()
             count++
         }
+
+        and:
+        input.rawInput == arguments.join(' ')
     }
 
     def 'test that mergeRemaining correctly merges remaining input'() {
