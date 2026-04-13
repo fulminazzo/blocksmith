@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 import java.time.Duration
+import java.util.concurrent.CompletionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -95,7 +96,7 @@ class AsyncManagerTest extends Specification {
 
         and:
         1 * visitor.handleCommandExecutionException(_) >> { a ->
-            a[0].message == expected
+            assert a[0].message == expected
         }
 
         and:
@@ -128,7 +129,32 @@ class AsyncManagerTest extends Specification {
 
         and:
         1 * visitor.handleCommandExecutionException(_) >> { a ->
-            a[0].message == 'error.internal-error'
+            assert a[0].message == 'error.internal-error'
+        }
+
+        and:
+        !contains()
+    }
+
+    def 'test that execute re-throws CommandExecutionException on CompletionException'() {
+        given:
+        def executor = Mock(CommandExecutor)
+        executor.execute(_) >> {
+            throw new CompletionException(new Exception('Unknown error'))
+        }
+
+        when:
+        manager.execute(executor, visitor).join()
+
+        then:
+        noExceptionThrown()
+
+        and:
+        1 * visitor.handleCommandExecutionException(_) >> { a ->
+            assert a[0].message == 'error.internal-error'
+            def cause = a[0].cause
+            assert cause != null
+            assert cause.message == 'Unknown error'
         }
 
         and:
