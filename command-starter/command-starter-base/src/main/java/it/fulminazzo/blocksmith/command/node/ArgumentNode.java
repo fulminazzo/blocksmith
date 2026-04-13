@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -26,6 +27,8 @@ public class ArgumentNode<T> extends CommandNode {
     @Nullable String defaultValue;
     boolean greedy;
 
+    @Nullable CompletionsSupplier completionsSupplier;
+
     /**
      * Sets the current node to greedy.
      *
@@ -34,6 +37,17 @@ public class ArgumentNode<T> extends CommandNode {
      */
     public @NotNull ArgumentNode<T> setGreedy(final boolean greedy) {
         this.greedy = greedy;
+        return this;
+    }
+
+    /**
+     * Toggles the custom completions supplier.
+     *
+     * @param completionsSupplier the completions supplier
+     * @return this object (for method chaining)
+     */
+    public @NotNull ArgumentNode<T> setCompletionsSupplier(final @Nullable CompletionsSupplier completionsSupplier) {
+        this.completionsSupplier = completionsSupplier;
         return this;
     }
 
