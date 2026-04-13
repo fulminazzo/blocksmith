@@ -152,38 +152,6 @@
 //    }
 //
 //    /**
-//     * Handles the given command execution exception.
-//     *
-//     * @param exception the exception
-//     * @param context   the context
-//     */
-//    public void handleCommandExecutionException(final @NotNull CommandExecutionException exception,
-//                                                final @NotNull CommandExecutionContext context) {
-//        String message = exception.getMessage();
-//        if (message.isEmpty()) return;
-//        application.getMessenger().sendMessage(
-//                context.getCommandSender(),
-//                message,
-//                getArguments(exception, context)
-//        );
-//        Throwable cause = exception.getCause();
-//        if (cause != null)
-//            application.getLog().warn("{} while executing command /{}",
-//                    cause.getClass().getCanonicalName(),
-//                    String.join(" ", context.getInput()),
-//                    cause
-//            );
-//    }
-//
-//    private static @NotNull Argument[] getArguments(final @NotNull CommandExecutionException exception,
-//                                                    final @NotNull CommandExecutionContext context) {
-//        Argument[] previous = exception.getArguments();
-//        Argument[] args = Arrays.copyOf(previous, previous.length + 1);
-//        args[previous.length] = Placeholder.of("input", String.join(" ", context.getInput()));
-//        return args;
-//    }
-//
-//    /**
 //     * Obtains the tab completions for the given input.
 //     *
 //     * @param command     the root of the command route

@@ -6,12 +6,15 @@ import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.node.NumberArgumentNode;
 import it.fulminazzo.blocksmith.command.visitor.VisitorImpl;
+import it.fulminazzo.blocksmith.message.argument.Argument;
+import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -61,6 +64,31 @@ public class CommandExecutionVisitor extends VisitorImpl<Void> {
     public @NotNull CommandExecutionVisitor addArgument(final @Nullable Object argument) {
         arguments.add(argument);
         return this;
+    }
+
+    /**
+     * Handles a {@link CommandExecutionException} accordingly
+     *
+     * @param exception the exception
+     */
+    public void handleCommandExecutionException(final @NotNull CommandExecutionException exception) {
+        String message = exception.getMessage();
+        if (message.isEmpty()) return;
+        application.getMessenger().sendMessage(commandSender, message, getArguments(exception));
+        Throwable cause = exception.getCause();
+        if (cause != null)
+            application.getLog().warn("{} while executing command /{}",
+                    cause.getClass().getCanonicalName(),
+                    input.getRawInput(),
+                    cause
+            );
+    }
+
+    private @NotNull Argument[] getArguments(final @NotNull CommandExecutionException exception) {
+        Argument[] previous = exception.getArguments();
+        Argument[] args = Arrays.copyOf(previous, previous.length + 1);
+        args[previous.length] = Placeholder.of("input", input.getRawInput());
+        return args;
     }
 
 }
