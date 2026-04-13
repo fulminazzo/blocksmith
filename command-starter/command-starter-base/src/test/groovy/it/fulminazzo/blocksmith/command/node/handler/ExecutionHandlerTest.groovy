@@ -29,7 +29,7 @@ class ExecutionHandlerTest extends Specification {
                 permission.actualPermission >> 'command'
                 return permission
             }
-            return Optional.of(info)
+            return info
         }
 
         def sender = Mock(CommandSenderWrapper)

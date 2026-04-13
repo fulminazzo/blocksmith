@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -18,8 +17,8 @@ import java.util.Set;
  * Can have multiple aliases.
  */
 @Getter
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
+@ToString(callSuper = true, doNotUseGetters = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public final class LiteralNode extends CommandNode {
     final @NotNull String name;
@@ -43,13 +42,14 @@ public final class LiteralNode extends CommandNode {
     }
 
     /**
-     * If this literal represents the final command (or subcommand) of a command route,
-     * its command information will be available.
+     * Gets the command information.
      *
-     * @return the command info, if available
+     * @return the command info
      */
-    public @NotNull Optional<CommandInfo> getCommandInfo() {
-        return Optional.ofNullable(commandInfo);
+    public @NotNull CommandInfo getCommandInfo() {
+        if (commandInfo == null)
+            throw new IllegalStateException("Literal node not correctly initialized, missing command information: " + this);
+        return commandInfo;
     }
 
     /**
@@ -69,10 +69,9 @@ public final class LiteralNode extends CommandNode {
         if (node instanceof LiteralNode) {
             LiteralNode literalNode = (LiteralNode) node;
             aliases.addAll(literalNode.aliases);
-            literalNode.getCommandInfo().ifPresent(i -> {
-                if (commandInfo == null) setCommandInfo(i);
-                else commandInfo.merge(i);
-            });
+            CommandInfo i = literalNode.getCommandInfo();
+            if (commandInfo == null) setCommandInfo(i);
+            else commandInfo.merge(i);
         }
         return (LiteralNode) super.merge(node);
     }

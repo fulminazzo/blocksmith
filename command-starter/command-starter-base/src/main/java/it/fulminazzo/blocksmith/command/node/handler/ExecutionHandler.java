@@ -3,7 +3,6 @@ package it.fulminazzo.blocksmith.command.node.handler;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
-import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor;
@@ -51,10 +50,7 @@ public final class ExecutionHandler {
                         final @NotNull CommandExecutionVisitor executionVisitor) throws CommandExecutionException {
         if (cooldownManager != null) {
             CommandSenderWrapper<?> sender = executionVisitor.getCommandSender();
-            PermissionInfo cooldownPermission = getCooldownBypassPermission(commandNode.getCommandInfo()
-                    .map(CommandInfo::getPermission)
-                    .orElseThrow(() -> new IllegalStateException("Could not get permission from node: " + commandNode))
-            );
+            PermissionInfo cooldownPermission = getCooldownBypassPermission(commandNode.getCommandInfo().getPermission());
             if (!sender.hasPermission(cooldownPermission)) {
                 Object id = sender.getId();
                 if (cooldownManager.isOnCooldown(id)) {

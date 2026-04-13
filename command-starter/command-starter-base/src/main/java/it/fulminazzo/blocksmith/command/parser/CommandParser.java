@@ -99,7 +99,7 @@ public final class CommandParser {
 
         if (lastLiteral == null) throw parseException("at least one literal must be given to identify the command");
         else {
-            lastLiteral.getCommandInfo().ifPresent(commandInfo::merge);
+            commandInfo.merge(lastLiteral.getCommandInfo());
             lastLiteral.setCommandInfo(commandInfo);
         }
 
