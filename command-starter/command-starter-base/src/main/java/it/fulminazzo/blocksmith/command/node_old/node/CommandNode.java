@@ -36,30 +36,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //    }
 //
 //    /**
-//     * Gets the first child.
-//     *
-//     * @return the child (if found)
-//     */
-//    public @Nullable CommandNode getFirstChild() {
-//        return !children.isEmpty() ? children.iterator().next() : null;
-//    }
-//
-//    /**
-//     * Gets the first child that is a {@link ArgumentNode} and is optional.
-//     *
-//     * @return the child (if found)
-//     */
-//    public @Nullable ArgumentNode<?> getFirstOptionalArgumentNode() {
-//        for (CommandNode child : children)
-//            if (child instanceof ArgumentNode<?>) {
-//                ArgumentNode<?> argumentNode = (ArgumentNode<?>) child;
-//                if (argumentNode.isOptional())
-//                    return argumentNode;
-//            }
-//        return null;
-//    }
-//
-//    /**
 //     * Gets all the {@link ArgumentNode} children that are greedy.
 //     *
 //     * @return the children

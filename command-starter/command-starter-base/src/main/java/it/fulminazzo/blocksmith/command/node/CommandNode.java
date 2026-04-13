@@ -90,11 +90,26 @@ public abstract class CommandNode {
     }
 
     /**
+     * Gets the child that is a {@link ArgumentNode} and is optional.
+     *
+     * @return the first child that matches these criteria or <code>null</code> if not found
+     */
+    public @Nullable ArgumentNode<?> getOptionalArgument() {
+        for (CommandNode child : children)
+            if (child instanceof ArgumentNode<?>) {
+                ArgumentNode<?> argumentNode = (ArgumentNode<?>) child;
+                if (argumentNode.isOptional())
+                    return argumentNode;
+            }
+        return null;
+    }
+
+    /**
      * Attempts to fetch a child that matches the given input.
      * Will prioritize {@link LiteralNode}s.
      *
      * @param token the token
-     * @return the child (if found)
+     * @return the child or <code>null</code> if not found
      */
     public @Nullable CommandNode getChild(final @NotNull String token) {
         for (CommandNode child : children)
@@ -106,7 +121,7 @@ public abstract class CommandNode {
     /**
      * Gets the first child of this node.
      *
-     * @return the first child, or <code>null</code> if there are no children
+     * @return the first child or <code>null</code> if there are no children
      */
     public @Nullable CommandNode getFirstChild() {
         return !children.isEmpty() ? children.iterator().next() : null;
