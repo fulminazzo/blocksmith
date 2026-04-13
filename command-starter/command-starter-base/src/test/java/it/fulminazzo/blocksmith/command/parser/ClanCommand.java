@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.command.CommandSender;
 import it.fulminazzo.blocksmith.command.annotation.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
@@ -55,7 +56,7 @@ final class ClanCommand {
     @Command("admin members kick <target>")
     @Confirm(timeout = 20_000, unit = TimeUnit.MILLISECONDS, confirmWord = "yes", cancelWord = "no")
     public void adminMembersKick(final @NotNull CommandSender sender,
-                                 final @NotNull Object target) {
+                                 final @NotNull @Tab("getMembers") Object target) {
         // something
     }
 
@@ -66,6 +67,10 @@ final class ClanCommand {
 
     public static void ignore(final @NotNull CommandSender sender) {
         // something
+    }
+
+    public @NotNull List<String> getMembers() {
+        return List.of("player1", "player2");
     }
 
 }

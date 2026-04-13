@@ -7,6 +7,7 @@ import it.fulminazzo.blocksmith.command.CommandSender
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper
 import it.fulminazzo.blocksmith.command.annotation.*
 import it.fulminazzo.blocksmith.command.node.*
+import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
@@ -154,6 +155,10 @@ class CommandParserTest extends Specification {
 
         and:
         target = ArgumentNode.of('target', Object, false)
+                .setCompletionsSupplier(new CompletionsSupplier(
+                        executor,
+                        ClanCommand.getMethod('getMembers')
+                ))
         target.executor = new ExecutionHandler(
                 executor,
                 ClanCommand.getMethod('adminMembersKick', CommandSender, Object)
