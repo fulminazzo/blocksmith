@@ -314,6 +314,18 @@ class ArgumentParsersTest extends Specification {
                 .collect { LocaleUtils.toString(it) }.unique()
     }
 
+    def 'test that of function throws IllegalArgumentException if type was not recognized'() {
+        when:
+        ArgumentParsers.of(ArgumentParsersTest)
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.message =~ ".*${ArgumentParsersTest.canonicalName}.+" +
+                "${ArgumentParsers.canonicalName}#" +
+                "${ArgumentParsers.getMethod('register', Class, ArgumentParser).name}" +
+                ".*"
+    }
+
     private Visitor<?, ? extends Exception> prepareVisitor(final @NotNull String argument) {
         def context = Mock(Visitor)
         context.input >> {

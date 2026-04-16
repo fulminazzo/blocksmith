@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.util.LocaleUtils;
 import it.fulminazzo.blocksmith.reflect.Reflect;
+import it.fulminazzo.blocksmith.reflect.ReflectException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -127,8 +128,10 @@ public final class ArgumentParsers {
             return (ArgumentParser<T>) parsers.computeIfAbsent(type, t -> new EnumArgumentParser<>((Class) t));
         ArgumentParser<?> parser = parsers.get(Reflect.toWrapper(type));
         if (parser == null)
-            throw new IllegalArgumentException(String.format("No default Argument parser supports the type %s. " +
-                    "Please provide a custom parser through %s#register", type.getCanonicalName(), ArgumentParsers.class.getSimpleName()));
+            throw new IllegalArgumentException(ReflectException.formatMessage(
+                    "No default Argument parser supports the type %s. Please provide a custom parser through %s#register",
+                    type, ArgumentParsers.class
+            ));
         return (ArgumentParser<T>) parser;
     }
 
