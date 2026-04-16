@@ -1,10 +1,14 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.message.argument.Placeholder;
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Special implementation of {@link ArgumentNode} for {@link Number} arguments.
@@ -48,6 +52,21 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
     public @NotNull NumberArgumentNode<N> max(final double max) {
         this.max = max;
         return this;
+    }
+
+    @Override
+    public @Nullable N parseCurrent(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+        N number = super.parseCurrent(visitor);
+        if (number == null) return null;
+        double value = number.doubleValue();
+        if (value < min || value > max)
+            throw new ArgumentParseException("error.invalid-number")
+                    .arguments(
+                            Placeholder.of("argument", visitor.getInput().getCurrent()),
+                            Placeholder.of("min", Reflect.on(min).cast(getType())),
+                            Placeholder.of("max", Reflect.on(max).cast(getType()))
+                    );
+        return number;
     }
 
     @Override
