@@ -1,12 +1,19 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
+import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
+import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier;
+import it.fulminazzo.blocksmith.command.visitor.CommandInput;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * Represents a dynamic node in a command tree.
@@ -29,6 +36,48 @@ public class ArgumentNode<T> extends CommandNode {
     boolean greedy;
 
     @Nullable CompletionsSupplier completionsSupplier;
+
+    /**
+     * Converts the current input of the {@link Visitor} to an instance of {@link #type}.
+     * <br>
+     * The conversion process uses the following rules:
+     * <ul>
+     *     <li>if the argument is {@link it.fulminazzo.blocksmith.command.annotation.Greedy},
+     *     the entire input is merged in a single one;</li>
+     *     <li>if no input was given and {@link it.fulminazzo.blocksmith.command.annotation.Default}
+     *     was used, then the value of the annotation will be considered as input.
+     *     Otherwise <code>null</code> is returned;</li>
+     *     <li>if {@link it.fulminazzo.blocksmith.command.annotation.Tab} was used to specify custom completions
+     *     and the input is not present in the values,
+     *     it is considered invalid and a {@link ArgumentParseException} is thrown;</li>
+     *     <li>finally, the input is checked against the associated {@link ArgumentParser} which
+     *     will throw {@link ArgumentParseException} if is not valid.</li>
+     * </ul>
+     *
+     * @param visitor the visitor to get the input from
+     * @return the parsed input
+     * @throws ArgumentParseException in case of parsing exceptions
+     */
+    public @Nullable T parseCurrent(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+        final CommandInput input = visitor.getInput();
+        if (isGreedy()) input.mergeRemaining();
+        if (input.isDone()) {
+            if (defaultValue == null) return null;
+            else input.addInput(defaultValue);
+        }
+        final @NotNull ArgumentParser<T> parser = ArgumentParsers.of(type);
+        if (completionsSupplier != null) {
+            String current = input.getCurrent();
+            List<String> completions = completionsSupplier.get();
+            if (completions.stream().noneMatch(c -> c.equalsIgnoreCase(current)))
+                throw new ArgumentParseException("error.invalid-argument")
+                        .arguments(
+                                Placeholder.of("argument", current),
+                                Placeholder.of("expected", String.join(", ", completions))
+                        );
+        }
+        return parser.parse(visitor);
+    }
 
     /**
      * Sets the current node to greedy.

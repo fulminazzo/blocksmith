@@ -27,30 +27,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //
 //    private @Nullable CustomCompletionsProvider customCompletionsProvider;
 //
-//    /**
-//     * Gets the default value (if given).
-//     *
-//     * @param context the current context of action
-//     * @return the default value
-//     * @throws CommandExecutionException in case of parsing errors
-//     */
-//    public @Nullable T getDefaultValue(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-//        return defaultValue == null ? null : parseArgument(context.addInput(defaultValue));
-//    }
-//
-//    private @Nullable T parseArgument(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-//        if (customCompletionsProvider != null) {
-//            String argument = context.getCurrent();
-//            List<String> completions = customCompletionsProvider.getCompletions();
-//            if (completions.stream()
-//                    .noneMatch(c -> c.equalsIgnoreCase(argument)))
-//                throw new CommandExecutionException("error.invalid-argument")
-//                        .arguments(Placeholder.of("argument", argument),
-//                                Placeholder.of("expected", String.join(", ", completions)));
-//        }
-//        return getArgumentParser().parse(context);
-//    }
-//
 //    @Override
 //    public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
 //        if (customCompletionsProvider != null) return customCompletionsProvider.getCompletions();
@@ -61,7 +37,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //
 //    @Override
 //    protected void processInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-//        if (isGreedy()) context.mergeRemainingInput();
 //        context.addParsedArgument(parseArgument(context));
 //    }
 //
