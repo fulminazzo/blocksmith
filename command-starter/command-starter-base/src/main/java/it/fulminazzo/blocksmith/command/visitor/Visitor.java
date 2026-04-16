@@ -40,4 +40,11 @@ public interface Visitor<T, X extends Exception> {
      */
     T visitLiteralNode(final @NotNull LiteralNode node) throws X;
 
+    /**
+     * Gets the input associated with this visitor.
+     *
+     * @return the input
+     */
+    @NotNull CommandInput getInput();
+
 }

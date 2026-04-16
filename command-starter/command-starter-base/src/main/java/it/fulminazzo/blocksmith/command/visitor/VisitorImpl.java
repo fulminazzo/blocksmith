@@ -20,6 +20,7 @@ public abstract class VisitorImpl<T, X extends Exception> implements Visitor<T, 
     @Getter
     @NotNull CommandSenderWrapper<?> commandSender;
 
+    @Getter
     @NotNull CommandInput input;
 
     /**
