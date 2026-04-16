@@ -36,11 +36,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //    }
 //
 //    @Override
-//    protected void processInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-//        context.addParsedArgument(parseArgument(context));
-//    }
-//
-//    @Override
 //    protected void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
 //        if (isGreedy()) context.mergeRemainingInput();
 //        if (!getArgumentParser().validateCompletions(context))

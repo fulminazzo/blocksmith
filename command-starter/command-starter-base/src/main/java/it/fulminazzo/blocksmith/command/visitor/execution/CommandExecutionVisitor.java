@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.visitor.execution;
 
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
+import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
@@ -41,8 +42,14 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
     }
 
     @Override
-    public Void visitArgumentNode(final @NotNull ArgumentNode<?> node) {
-        throw new UnsupportedOperationException(); //TODO: implement
+    public Void visitArgumentNode(final @NotNull ArgumentNode<?> node) throws CommandExecutionException {
+        try {
+            Object argument = node.parseCurrent(this);
+            arguments.add(argument);
+            return visitCommandNode(node);
+        } catch (ArgumentParseException e) {
+            throw new CommandExecutionException(e.getMessage(), e.getCause()).arguments(e.getArguments());
+        }
     }
 
     @Override
