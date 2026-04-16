@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.command.visitor;
 
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
-import it.fulminazzo.blocksmith.command.node.NumberArgumentNode;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,15 +20,6 @@ public interface Visitor<T, X extends Exception> {
      * @throws X the exception thrown in case of visit errors
      */
     T visitArgumentNode(final @NotNull ArgumentNode<?> node) throws X;
-
-    /**
-     * Visits a {@link NumberArgumentNode}.
-     *
-     * @param node the node
-     * @return the result
-     * @throws X the exception thrown in case of visit errors
-     */
-    T visitNumberArgumentNode(final @NotNull NumberArgumentNode<?> node) throws X;
 
     /**
      * Visits a {@link LiteralNode}.

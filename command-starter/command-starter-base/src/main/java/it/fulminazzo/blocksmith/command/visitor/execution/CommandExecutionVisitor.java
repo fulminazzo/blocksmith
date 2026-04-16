@@ -5,7 +5,6 @@ import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
-import it.fulminazzo.blocksmith.command.node.NumberArgumentNode;
 import it.fulminazzo.blocksmith.command.visitor.VisitorImpl;
 import it.fulminazzo.blocksmith.message.argument.Argument;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
@@ -43,11 +42,6 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
 
     @Override
     public Void visitArgumentNode(final @NotNull ArgumentNode<?> node) {
-        throw new UnsupportedOperationException(); //TODO: implement
-    }
-
-    @Override
-    public Void visitNumberArgumentNode(final @NotNull NumberArgumentNode<?> node) {
         throw new UnsupportedOperationException(); //TODO: implement
     }
 
