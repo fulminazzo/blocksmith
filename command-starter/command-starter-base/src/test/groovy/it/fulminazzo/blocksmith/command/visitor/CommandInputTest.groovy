@@ -39,11 +39,37 @@ class CommandInputTest extends Specification {
         and:
         def expected = 'My name is Alex'
 
-        expect:
-        input.mergeRemaining() == expected
+        when:
+        input.mergeRemaining()
+
+        then:
+        input.current == expected
+    }
+
+    def 'test that mergeRemaining does not throw nor edits original input if already advanced to end'() {
+        given:
+        def input = new CommandInput()
+        def reflect = Reflect.on(input)
+        final original = ['Hello', 'world', 'My', 'name', 'is', 'Alex']
+        input.input.addAll(original)
 
         and:
-        input.current == expected
+        reflect.set('current', 6)
+
+        expect:
+        input.done
+
+        when:
+        input.mergeRemaining()
+
+        then:
+        noExceptionThrown()
+
+        and:
+        input.done
+
+        and:
+        reflect.get('input').get() == original
     }
 
     def 'test that setCurrent correctly overwrites the current argument'() {

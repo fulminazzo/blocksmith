@@ -19,16 +19,13 @@ public final class CommandInput {
 
     /**
      * Merges all the remaining input into one space-separated argument (for greedy arguments).
-     *
-     * @return the merged input
      */
-    public @NotNull String mergeRemaining() {
+    public void mergeRemaining() {
+        if (isDone()) return;
         StringBuilder argument = new StringBuilder(getCurrent());
         while (input.size() > current + 1)
             argument.append(" ").append(input.remove(current + 1));
-        String string = argument.toString();
-        input.set(current, string);
-        return string;
+        input.set(current, argument.toString());
     }
 
     /**
