@@ -105,8 +105,8 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
      * @param exception the exception
      */
     public void handleCommandExecutionException(final @NotNull CommandExecutionException exception) {
-        String message = exception.getMessage();
-        application.getMessenger().sendMessage(commandSender, message, getArguments(exception));
+        sendMessage(exception.getMessage(), exception.getArguments());
+        exception.getAdditionalMessages().forEach(this::sendMessage);
         Throwable cause = exception.getCause();
         if (cause != null)
             application.getLog().warn("{} while executing command /{}",
@@ -140,11 +140,10 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
         return null;
     }
 
-    private @NotNull Argument[] getArguments(final @NotNull CommandExecutionException exception) {
-        Argument[] previous = exception.getArguments();
-        Argument[] args = Arrays.copyOf(previous, previous.length + 1);
-        args[previous.length] = Placeholder.of("input", input.getRawInput());
-        return args;
+    private void sendMessage(final @NotNull String message, final @NotNull Argument @NotNull [] arguments) {
+        Argument[] args = Arrays.copyOf(arguments, arguments.length + 1);
+        args[arguments.length] = Placeholder.of("input", input.getRawInput());
+        application.getMessenger().sendMessage(commandSender, message, args);
     }
 
 }
