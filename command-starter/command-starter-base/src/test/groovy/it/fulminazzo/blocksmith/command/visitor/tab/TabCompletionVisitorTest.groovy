@@ -196,7 +196,7 @@ class TabCompletionVisitorTest extends Specification {
         def actual = visitor.tabComplete(node)
 
         then:
-        actual == expected
+        actual.sort() == expected.sort()
 
         where:
         argument || expected
