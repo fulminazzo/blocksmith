@@ -100,13 +100,12 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
     }
 
     /**
-     * Handles a {@link CommandExecutionException} accordingly
+     * Handles a {@link CommandExecutionException} accordingly.
      *
      * @param exception the exception
      */
     public void handleCommandExecutionException(final @NotNull CommandExecutionException exception) {
         String message = exception.getMessage();
-        if (message.isEmpty()) return;
         application.getMessenger().sendMessage(commandSender, message, getArguments(exception));
         Throwable cause = exception.getCause();
         if (cause != null)
