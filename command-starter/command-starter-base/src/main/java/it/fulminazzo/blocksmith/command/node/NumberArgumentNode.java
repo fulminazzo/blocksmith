@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Parameter;
+import java.util.List;
 
 /**
  * Special implementation of {@link ArgumentNode} for {@link Number} arguments.
@@ -70,6 +71,17 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
                             Placeholder.of("max", Reflect.on(max).cast(getType()))
                     );
         return number;
+    }
+
+    @Override
+    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+        List<String> completions = super.getCompletions(visitor);
+        if (getCompletionsSupplier() != null) return completions;
+        completions.removeIf(s -> {
+            double value = Double.parseDouble(s);
+            return value < min || value > max;
+        });
+        return completions;
     }
 
 }
