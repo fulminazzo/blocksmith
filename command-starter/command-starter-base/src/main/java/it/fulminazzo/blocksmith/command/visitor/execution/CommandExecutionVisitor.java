@@ -13,6 +13,7 @@ import it.fulminazzo.blocksmith.command.visitor.VisitorImpl;
 import it.fulminazzo.blocksmith.message.argument.Argument;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.argument.Time;
+import it.fulminazzo.blocksmith.validation.ValidationException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -54,6 +55,19 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
             return visitCommandNode(node);
         } catch (ArgumentParseException e) {
             throw new CommandExecutionException(e.getMessage(), e.getCause()).arguments(e.getArguments());
+        } catch (ValidationException e) {
+            CommandExecutionException exception = new CommandExecutionException("error.invalid-arguments");
+            e.getViolations().values().forEach(s -> s.forEach(v -> {
+                String message = v.getMessage();
+                if (message != null)
+                    exception.additionalMessage(
+                            message,
+                            v.getArguments().entrySet().stream()
+                                    .map(r -> Placeholder.of(r.getKey(), r.getValue()))
+                                    .toArray(Argument[]::new)
+                    );
+            }));
+            throw exception;
         }
     }
 

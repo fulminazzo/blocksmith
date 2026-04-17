@@ -8,6 +8,8 @@ import it.fulminazzo.blocksmith.command.visitor.CommandInput;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.reflect.Reflect;
+import it.fulminazzo.blocksmith.validation.ValidationException;
+import it.fulminazzo.blocksmith.validation.Validator;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -60,8 +62,9 @@ public class ArgumentNode<T> extends CommandNode {
      * @param visitor the visitor to get the input from
      * @return the parsed input
      * @throws ArgumentParseException in case of parsing exceptions
+     * @throws ValidationException    in case of invalid argument
      */
-    public @Nullable T parseCurrent(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+    public @Nullable T parseCurrent(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException, ValidationException {
         final CommandInput input = visitor.getInput();
         if (isGreedy()) input.mergeRemaining();
         if (input.isDone()) {
@@ -73,13 +76,15 @@ public class ArgumentNode<T> extends CommandNode {
             String current = input.getCurrent();
             List<String> completions = completionsSupplier.get();
             if (completions.stream().noneMatch(c -> c.equalsIgnoreCase(current)))
-                throw new ArgumentParseException("error.invalid-argument")
+                throw new ArgumentParseException("error.invalid-argument") //TODO: re-organize
                         .arguments(
                                 Placeholder.of("argument", current),
                                 Placeholder.of("expected", String.join(", ", completions))
                         );
         }
-        return parser.parse(visitor);
+        T value = parser.parse(visitor);
+        Validator.getInstance().validate(parameter, value);
+        return value;
     }
 
     /**

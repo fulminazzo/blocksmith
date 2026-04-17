@@ -3,12 +3,9 @@ package it.fulminazzo.blocksmith.command.node.handler;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor;
-import it.fulminazzo.blocksmith.message.argument.Argument;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.reflect.ReflectException;
-import it.fulminazzo.blocksmith.validation.ConstraintViolation;
-import it.fulminazzo.blocksmith.validation.Validator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Value;
@@ -18,8 +15,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The actual executor of a command.
@@ -72,22 +67,7 @@ public class CommandExecutor {
                     );
             }
             Object[] parameterValues = arguments.toArray();
-            @NotNull Map<String, Set<ConstraintViolation>> violations = Validator.validateMethod(method, parameterValues);
-            if (violations.isEmpty()) executor.invoke(method, parameterValues);
-            else {
-                CommandExecutionException exception = new CommandExecutionException("error.invalid-arguments");
-                violations.values().forEach(s -> s.forEach(v -> {
-                    String message = v.getMessage();
-                    if (message != null)
-                        exception.additionalMessage(
-                                message,
-                                v.getArguments().entrySet().stream()
-                                        .map(e -> Placeholder.of(e.getKey(), e.getValue()))
-                                        .toArray(Argument[]::new)
-                        );
-                }));
-                throw exception;
-            }
+            executor.invoke(method, parameterValues);
         } catch (ReflectException e) {
             Throwable cause = e.getCause();
             if (cause instanceof CommandExecutionException) throw (CommandExecutionException) cause;

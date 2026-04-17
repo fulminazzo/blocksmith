@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.reflect.Reflect;
+import it.fulminazzo.blocksmith.validation.ValidationException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -57,7 +58,7 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
     }
 
     @Override
-    public @Nullable N parseCurrent(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+    public @Nullable N parseCurrent(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException, ValidationException {
         N number = super.parseCurrent(visitor);
         if (number == null) return null;
         double value = number.doubleValue();
