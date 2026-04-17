@@ -50,7 +50,7 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
     public Void visitArgumentNode(final @NotNull ArgumentNode<?> node) throws CommandExecutionException {
         try {
             Object argument = node.parseCurrent(this);
-            arguments.add(argument);
+            addArgument(argument);
             return visitCommandNode(node);
         } catch (ArgumentParseException e) {
             throw new CommandExecutionException(e.getMessage(), e.getCause()).arguments(e.getArguments());
