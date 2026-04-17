@@ -192,7 +192,7 @@ class LiteralNodeTest extends Specification {
         and:
         def parameter = Mock(Parameter)
         parameter.type >> String
-        def second = ArgumentNode.of('command', parameter, false)
+        def second = new MockNode('command')
         second.addChild(child2)
 
         when:
