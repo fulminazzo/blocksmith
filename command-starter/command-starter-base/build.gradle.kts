@@ -1,4 +1,5 @@
 dependencies {
+    api(project(":base:validation"))
     api(project(":message-starter"))
     api(project(":scheduler-starter"))
 
