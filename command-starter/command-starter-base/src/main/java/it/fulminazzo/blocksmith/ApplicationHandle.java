@@ -4,6 +4,8 @@ import it.fulminazzo.blocksmith.message.Messenger;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import java.util.concurrent.ExecutorService;
+
 /**
  * Provides a handle to the underlying application's utilities and metadata.
  */
@@ -15,6 +17,13 @@ public interface ApplicationHandle {
      * @return the messenger
      */
     @NotNull Messenger getMessenger();
+
+    /**
+     * Gets an executor responsible for handling asynchronous tasks.
+     *
+     * @return the executor
+     */
+    @NotNull ExecutorService getExecutor();
 
     /**
      * Gets the SLF4J logger.
