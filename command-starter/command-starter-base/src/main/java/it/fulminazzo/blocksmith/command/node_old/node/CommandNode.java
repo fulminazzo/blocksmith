@@ -48,26 +48,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //        else return parent.getPermission();
 //    }
 //
-//    private void executeOrAwaitConfirmation(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-//        LiteralNode literalNode = getCommandLiteral();
-//        if (literalNode != null && literalNode.requiresConfirmation()) {
-//            Duration confirmationTimeout = literalNode.getConfirmationTimeout();
-//            literalNode.getPendingActionManager().register(
-//                    context.getCommandSender().getId(),
-//                    confirmationTimeout,
-//                    () -> {
-//                        try {
-//                            internalExecute(context);
-//                        } catch (CommandExecutionException e) {
-//                            context.getRegistry().handleCommandExecutionException(e, context);
-//                        }
-//                    }
-//            );
-//            throw new CommandExecutionException("general.await-confirmation")
-//                    .arguments(Time.of("time", confirmationTimeout.toMillis()));
-//        } else internalExecute(context);
-//    }
-//
 //    /**
 //     * Returns all the tab completions based on the current context of execution.
 //     *

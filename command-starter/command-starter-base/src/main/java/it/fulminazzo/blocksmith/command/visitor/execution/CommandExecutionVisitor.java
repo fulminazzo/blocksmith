@@ -7,10 +7,12 @@ import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler;
+import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import it.fulminazzo.blocksmith.command.visitor.VisitorImpl;
 import it.fulminazzo.blocksmith.message.argument.Argument;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
+import it.fulminazzo.blocksmith.message.argument.Time;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -19,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Objects;
 
 /**
  * A special {@link it.fulminazzo.blocksmith.command.visitor.Visitor} handling command execution.
@@ -61,14 +64,14 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
             throw new CommandExecutionException("error.no-permission")
                     .arguments(Placeholder.of("permission", permission.getPermission()));
         ConfirmationHandler confirmationHandler = node.getConfirmationHandler();
-        if (confirmationHandler != null && confirmationHandler.handleExecution(this)) return null;
+        if (confirmationHandler != null && confirmationHandler.checkConfirmationKeywords(this)) return null;
         return visitCommandNode(node);
     }
 
     @Override
     protected Void visitCommandNode(final @NotNull CommandNode node) throws CommandExecutionException {
         if (input.advanceCursor().isDone()) {
-            if (node.isExecutable()); //TODO: handle execution with confirmation
+            if (node.isExecutable()) return handleExecution(node);
             else {
                 ArgumentNode<?> optional = node.getOptionalArgument();
                 if (optional != null) return optional.accept(this);
@@ -78,7 +81,7 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
             final String current = input.getCurrent();
             CommandNode child = node.getChild(current);
             if (child == null) {
-                if (node.isExecutable()); //TODO: handle execution with confirmation
+                if (node.isExecutable()) return handleExecution(node);
                 else throw new CommandExecutionException("error.command-not-found")
                         .arguments(Placeholder.of("argument", current));
             } else return child.accept(this);
@@ -112,6 +115,30 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
                     input.getRawInput(),
                     cause
             );
+    }
+
+    /**
+     * Handles the execution of the given node accordingly.
+     *
+     * @param node the node
+     * @return <code>null</code>
+     * @throws CommandExecutionException if a confirmation is required or the execution failed
+     */
+    Void handleExecution(final @NotNull CommandNode node) throws CommandExecutionException {
+        final ExecutionHandler executionHandler = node.getExecutor()
+                .orElseThrow(() -> new IllegalStateException("No execution handler found for node: " + node));
+        LiteralNode commandNode = Objects.requireNonNull(node.getCommandNode(), "Could not find command node of node: " + node);
+        ConfirmationHandler confirmationHandler = commandNode.getConfirmationHandler();
+        if (confirmationHandler != null) {
+            confirmationHandler.handleExecution(
+                    this,
+                    () -> executionHandler.execute(commandNode, this)
+            );
+            throw new CommandExecutionException("general.await-confirmation")
+                    .arguments(Time.of("time", confirmationHandler.getConfirmationTimeout().toMillis()));
+        }
+        executionHandler.execute(commandNode, this);
+        return null;
     }
 
     private @NotNull Argument[] getArguments(final @NotNull CommandExecutionException exception) {
