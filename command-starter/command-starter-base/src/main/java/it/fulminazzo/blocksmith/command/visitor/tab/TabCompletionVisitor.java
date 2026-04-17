@@ -36,6 +36,16 @@ public final class TabCompletionVisitor extends VisitorImpl<@NotNull List<String
         super(application, commandSender, commandName, arguments);
     }
 
+    /**
+     * Gets the appropriate tab completions for the given node.
+     *
+     * @param node the node
+     * @return the completions
+     */
+    public @NotNull List<String> tabComplete(final @NotNull CommandNode node) {
+        return node.accept(this);
+    }
+
     @Override
     public @NotNull List<String> visitArgumentNode(final @NotNull ArgumentNode<?> node) {
         if (!input.isLast())
