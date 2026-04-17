@@ -102,10 +102,11 @@ class CommandRegistryTest extends Specification {
         )
         admin.addChild(invite)
 
-        def target = new ArgumentNode('target', Object, false)
+        def method = ClanAdminCommand.getMethod('adminInvite', CommandSender, Object)
+        def target = ArgumentNode.of('target', method.parameters[1], false)
         target.executor = new ExecutionHandler(
                 clanAdminExecutor,
-                ClanAdminCommand.getMethod('adminInvite', CommandSender, Object)
+                method
         )
         invite.addChild(target)
 
@@ -127,10 +128,11 @@ class CommandRegistryTest extends Specification {
         )
         members.addChild(kick)
 
-        target = new ArgumentNode('target', Object, false)
+        method = ClanAdminCommand.getMethod('adminMembersKick', CommandSender, Object)
+        target = ArgumentNode.of('target', method.parameters[1], false)
         target.executor = new ExecutionHandler(
                 clanAdminExecutor,
-                ClanAdminCommand.getMethod('adminMembersKick', CommandSender, Object)
+                method
         )
         kick.addChild(target)
 
