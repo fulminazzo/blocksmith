@@ -17,7 +17,8 @@ import java.lang.reflect.Parameter
 class TabCompletionVisitorTest extends Specification {
     private static final CommandSenderWrapper commandSender = new MockCommandSenderWrapper(new CommandSender().addPermissions('blocksmith.universal'))
 
-    private static final Parameter parameter = TabCompletionVisitorTest.getDeclaredMethod('tabComplete', String).parameters[0]
+    private static final Parameter parameter1 = TabCompletionVisitorTest.getDeclaredMethod('tabComplete', String).parameters[0]
+    private static final Parameter parameter2 = TabCompletionVisitorTest.getDeclaredMethod('tabComplete', boolean).parameters[0]
 
     private static volatile String printer
 
@@ -33,16 +34,16 @@ class TabCompletionVisitorTest extends Specification {
         given:
         def node = newLiteral('give')
 
-        def item = ArgumentNode.of('item', parameter, false)
+        def item = ArgumentNode.of('item', parameter1, false)
         node.addChild(item)
 
         def player = newLiteral('player')
         node.addChild(player)
 
-        def playerArg = ArgumentNode.of('player', parameter, false)
+        def playerArg = ArgumentNode.of('player', parameter1, false)
         player.addChild(playerArg)
 
-        item = ArgumentNode.of('item', parameter, false)
+        item = ArgumentNode.of('item', parameter1, false)
         playerArg.addChild(item)
 
         and:
@@ -61,6 +62,7 @@ class TabCompletionVisitorTest extends Specification {
 
         where:
         arguments                                   || expected
+        ['give']                                    || ['give']
         ['give', '']                                || ['player', '<item>']
         ['give', 'p']                               || ['player']
         ['give', 'P']                               || ['player']
@@ -71,16 +73,17 @@ class TabCompletionVisitorTest extends Specification {
         ['give', 'player', 'Alex']                  || ['<player>']
         ['give', 'player', 'Alex', '']              || ['<item>']
         ['give', 'player', 'Alex', 'diamond_sword'] || ['<item>']
+        ['invalid', 'p']                            || []
     }
 
     def 'test that tabComplete of greedy parameter with #arguments returns #expected'() {
         given:
         def node = newLiteral('msg')
 
-        def player = ArgumentNode.of('player', parameter, false)
+        def player = ArgumentNode.of('player', parameter1, false)
         node.addChild(player)
 
-        def message = ArgumentNode.of('message', parameter, false)
+        def message = ArgumentNode.of('message', parameter1, false)
         message.greedy = true
         player.addChild(message)
 
@@ -108,6 +111,124 @@ class TabCompletionVisitorTest extends Specification {
         ['msg', 'Alex', 'Hello,', 'world!', 'Hello,', 'Mars!', ''] || ['<message>']
     }
 
+    def 'test tabComplete with no children'() {
+        given:
+        def node = newLiteral('msg')
+
+        and:
+        def visitor = new TabCompletionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                'msg',
+                'Fulminazzo', 'Hello', 'world'
+        )
+
+        when:
+        def actual = visitor.tabComplete(node)
+
+        then:
+        actual == []
+    }
+
+    def 'test that tabComplete does not continue if sender has no permission'() {
+        given:
+        def node = newLiteral('msg')
+
+        def player = ArgumentNode.of('player', parameter1, false)
+        node.addChild(player)
+
+        and:
+        def commandSender = Mock(CommandSenderWrapper)
+        commandSender.hasPermission(_) >> false
+
+        and:
+        def visitor = new TabCompletionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                'msg',
+        )
+
+        when:
+        def actual = visitor.tabComplete(node)
+
+        then:
+        actual == []
+    }
+
+    def 'test that tabComplete does not continue if argument node is invalid'() {
+        given:
+        def node = ArgumentNode.of('boolean', parameter2, false)
+
+        def player = ArgumentNode.of('player', parameter1, false)
+        node.addChild(player)
+
+        def message = ArgumentNode.of('message', parameter1, false)
+        message.greedy = true
+        player.addChild(message)
+
+        and:
+        def visitor = new TabCompletionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                'invalid',
+                'Fulminazzo', 'Hello', 'world'
+        )
+
+        when:
+        def actual = visitor.tabComplete(node)
+
+        then:
+        actual == []
+    }
+
+    def 'test that tabComplete of argument node does not throw on last'() {
+        given:
+        def node = ArgumentNode.of('boolean', parameter2, false)
+
+        and:
+        def visitor = new TabCompletionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                argument,
+        )
+
+        when:
+        def actual = visitor.tabComplete(node)
+
+        then:
+        actual == expected
+
+        where:
+        argument || expected
+        ''       || ['true', 'false']
+        'fa'     || ['false']
+        'false'  || ['false']
+        'tr'     || ['true']
+        'true'   || ['true']
+    }
+
+    def 'test that tabComplete does not throw if input is done'() {
+        given:
+        def visitor = new TabCompletionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                '',
+        )
+        visitor.input.advanceCursor()
+
+        when:
+        def actual = visitor.tabComplete(node)
+
+        then:
+        actual == []
+
+        where:
+        node << [
+                newLiteral('msg'),
+                ArgumentNode.of('boolean', parameter2, false)
+        ]
+    }
+
     private static final LiteralNode newLiteral(final String... aliases) {
         def node = new LiteralNode(aliases)
         node.commandInfo = new CommandInfo(
@@ -122,6 +243,10 @@ class TabCompletionVisitorTest extends Specification {
     }
 
     static void tabComplete(final String string) {
+        //
+    }
+
+    static void tabComplete(final boolean value) {
         //
     }
 
