@@ -15,12 +15,14 @@ import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 import spock.lang.Specification
 
+import java.lang.reflect.Parameter
 import java.time.Duration
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class CommandParserTest extends Specification {
     private static final ExecutorService executorService = Executors.newSingleThreadExecutor()
+    private static final Parameter parameter = CommandParserTest.getDeclaredMethod('newMockCommandParser', String).parameters[0]
 
     void cleanup() {
         executorService.shutdown()
@@ -45,11 +47,12 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         and:
-        def name = ArgumentNode.of('name', String, true)
+        def method = ClanCommand.getMethod('getClanInfo', CommandSender, String)
+        def name = ArgumentNode.of('name', method.parameters[1], true)
         name.defaultValue = 'self'
         name.executor = new ExecutionHandler(
                 executor,
-                ClanCommand.getMethod('getClanInfo', CommandSender, String)
+                method
         ).setAsync(executorService, Duration.ofSeconds(1))
         def info = new LiteralNode('info', 'information', 'state')
         info.commandInfo = new CommandInfo(
@@ -66,10 +69,11 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         and:
-        def verbose = ArgumentNode.of('verbose', boolean, false)
+        method = ClanCommand.getMethod('help', CommandSender, boolean)
+        def verbose = ArgumentNode.of('verbose', method.parameters[1], false)
         verbose.executor = new ExecutionHandler(
                 executor,
-                ClanCommand.getMethod('help', CommandSender, boolean)
+                method
         )
         def help = new LiteralNode('help')
         help.commandInfo = new CommandInfo(
@@ -104,10 +108,11 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         and:
-        def target = ArgumentNode.of('target', Object, false)
+        method = ClanCommand.getMethod('adminInvite', CommandSender, Object)
+        def target = ArgumentNode.of('target', method.parameters[1], false)
         target.executor = new ExecutionHandler(
                 executor,
-                ClanCommand.getMethod('adminInvite', CommandSender, Object)
+                method
         )
         def invite = new LiteralNode('invite')
         invite.commandInfo = new CommandInfo(
@@ -154,14 +159,15 @@ class CommandParserTest extends Specification {
         expected.add(clan)
 
         and:
-        target = ArgumentNode.of('target', Object, false)
+        method = ClanCommand.getMethod('adminMembersKick', CommandSender, Object)
+        target = ArgumentNode.of('target', method.parameters[1], false)
                 .setCompletionsSupplier(new CompletionsSupplier(
                         executor,
                         ClanCommand.getMethod('getMembers')
                 ))
         target.executor = new ExecutionHandler(
                 executor,
-                ClanCommand.getMethod('adminMembersKick', CommandSender, Object)
+                method
         )
         def kick = new LiteralNode('kick')
         kick.commandInfo = new CommandInfo(
@@ -241,19 +247,21 @@ class CommandParserTest extends Specification {
                 'command.description.clan',
                 new PermissionInfo(null, 'clan', Permission.Grant.OP)
         )
-        def value = ArgumentNode.of('value', double, false)
+        def method = DynamicClanCommand.getMethod('execute', CommandSender, double)
+        def value = ArgumentNode.of('value', method.parameters[1], false)
         value.executor = new ExecutionHandler(
                 executor,
-                DynamicClanCommand.getMethod('execute', CommandSender, double)
+                method
         ).setCooldown(Duration.ofSeconds(10))
         clan.addChild(value)
         expected.add(clan)
 
         and:
-        def verbose = ArgumentNode.of('verbose', boolean, false)
+        method = DynamicClanCommand.getMethod('help', CommandSender, boolean)
+        def verbose = ArgumentNode.of('verbose', method.parameters[1], false)
         verbose.executor = new ExecutionHandler(
                 executor,
-                DynamicClanCommand.getMethod('help', CommandSender, boolean)
+                method
         ).setCooldown(Duration.ofSeconds(20))
         def help = new LiteralNode('help')
         help.commandInfo = new CommandInfo(
@@ -294,10 +302,11 @@ class CommandParserTest extends Specification {
 
     def 'test parseAnonymousCommands returns all commands'() {
         given:
-        def command = ArgumentNode.of('command', String, true)
+        def method = GeneralCommands.getMethod('help', CommandSender, String)
+        def command = ArgumentNode.of('command', method.parameters[1], true)
         command.executor = new ExecutionHandler(
                 GeneralCommands,
-                GeneralCommands.getMethod('help', CommandSender, String)
+                method
         )
 
         def help = new LiteralNode('help')
@@ -308,10 +317,11 @@ class CommandParserTest extends Specification {
         )
 
         and:
-        def async = ArgumentNode.of('async', boolean, false)
+        method = GeneralCommands.getMethod('reload', boolean)
+        def async = ArgumentNode.of('async', method.parameters[0], false)
         async.executor = new ExecutionHandler(
                 GeneralCommands,
-                GeneralCommands.getMethod('reload', boolean)
+                method
         ).setCooldown(Duration.ofSeconds(1))
 
         def plugin = new LiteralNode('plugin')
@@ -392,24 +402,25 @@ class CommandParserTest extends Specification {
         )
 
         and:
+        def method = CommandParserTest.getDeclaredMethod('promote', Object, Object, String, String)
         def executor = new ExecutionHandler(
                 CommandParserTest,
-                CommandParserTest.getDeclaredMethod('promote', Object, Object, String, String)
+                method
         )
 
         and:
-        def reason = ArgumentNode.of('reason', String, true)
+        def reason = ArgumentNode.of('reason', method.parameters[3], true)
         reason.executor = executor
         reason.defaultValue = 'Unknown'
 
-        def rank = ArgumentNode.of('rank', String, false)
+        def rank = ArgumentNode.of('rank', method.parameters[2], false)
         rank.addChild(reason)
 
         def promote = new LiteralNode('promote', 'rankup')
         promote.commandInfo = commandInfo
         promote.addChild(rank)
 
-        def player = ArgumentNode.of('player', Object, false)
+        def player = ArgumentNode.of('player', method.parameters[1], false)
         player.addChild(promote)
 
         def member = new LiteralNode('member')
@@ -520,8 +531,8 @@ class CommandParserTest extends Specification {
 
         where:
         input                 || expected
-        '[test]'              || ArgumentNode.of('test', String, true)
-        '<test>'              || ArgumentNode.of('test', String, false)
+        '[test]'              || ArgumentNode.of('test', parameter, true)
+        '<test>'              || ArgumentNode.of('test', parameter, false)
         '(test|second|third)' || new LiteralNode('test', 'second', 'third')
         'test'                || new LiteralNode('test')
     }
@@ -547,7 +558,7 @@ class CommandParserTest extends Specification {
         def node = parser.parseOptionalArgument()
 
         then:
-        node == ArgumentNode.of('test', String, true)
+        node == ArgumentNode.of('test', parameter, true)
     }
 
     def 'test that parseMandatoryArgument works'() {
@@ -558,7 +569,7 @@ class CommandParserTest extends Specification {
         def node = parser.parseMandatoryArgument()
 
         then:
-        node == ArgumentNode.of('test', String, false)
+        node == ArgumentNode.of('test', parameter, false)
     }
 
     def 'test that parseGeneralArgument correctly parses range argument'() {

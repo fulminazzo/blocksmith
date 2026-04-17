@@ -13,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Parameter;
 import java.util.List;
 
 /**
@@ -21,6 +22,7 @@ import java.util.List;
  *
  * @param <T> the type that the value is converted to
  */
+@SuppressWarnings("unchecked")
 @Getter
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
@@ -28,7 +30,8 @@ import java.util.List;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class ArgumentNode<T> extends CommandNode {
     final @NotNull String name;
-    final @NotNull Class<T> type;
+    @Getter(AccessLevel.NONE)
+    final @NotNull Parameter parameter;
     final boolean optional;
     @Getter(AccessLevel.NONE)
     @Setter
@@ -38,7 +41,7 @@ public class ArgumentNode<T> extends CommandNode {
     @Nullable CompletionsSupplier completionsSupplier;
 
     /**
-     * Converts the current input of the {@link Visitor} to an instance of {@link #type}.
+     * Converts the current input of the {@link Visitor} to an instance of {@link #getType()}.
      * <br>
      * The conversion process uses the following rules:
      * <ul>
@@ -65,7 +68,7 @@ public class ArgumentNode<T> extends CommandNode {
             if (defaultValue == null) return null;
             else input.addInput(defaultValue);
         }
-        final @NotNull ArgumentParser<T> parser = ArgumentParsers.of(type);
+        final @NotNull ArgumentParser<T> parser = ArgumentParsers.of(getType());
         if (completionsSupplier != null) {
             String current = input.getCurrent();
             List<String> completions = completionsSupplier.get();
@@ -101,6 +104,15 @@ public class ArgumentNode<T> extends CommandNode {
         return this;
     }
 
+    /**
+     * Gets the type of the argument.
+     *
+     * @return the Java class
+     */
+    public @NotNull Class<T> getType() {
+        return (Class<T>) Reflect.toWrapper(parameter.getType());
+    }
+
     @Override
     public <O, X extends Exception> O accept(final @NotNull Visitor<O, X> visitor) throws X {
         return visitor.visitArgumentNode(this);
@@ -116,20 +128,20 @@ public class ArgumentNode<T> extends CommandNode {
     /**
      * Instantiates a new Argument node.
      *
-     * @param <T>      the type of the parameter
-     * @param name     the name
-     * @param type     the Java class of the parameter
-     * @param optional if <code>true</code> the parameter will be non-mandatory
+     * @param <T>       the type of the parameter
+     * @param name      the name
+     * @param parameter the parameter that corresponds to the node
+     * @param optional  if <code>true</code> the parameter will be non-mandatory
      * @return the argument node
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("RedundantCast")
     public static <T> @NotNull ArgumentNode<T> of(final @NotNull String name,
-                                                  final @NotNull Class<?> type,
+                                                  final @NotNull Parameter parameter,
                                                   final boolean optional) {
-        Class<T> actualType = (Class<T>) Reflect.toWrapper(type);
+        Class<T> actualType = (Class<T>) Reflect.toWrapper(parameter.getType());
         if (Number.class.isAssignableFrom(actualType))
-            return (ArgumentNode<T>) new NumberArgumentNode<>(name, (Class<? extends Number>) actualType, optional);
-        else return new ArgumentNode<>(name, actualType, optional);
+            return (ArgumentNode<T>) new NumberArgumentNode<>(name, parameter, optional);
+        else return new ArgumentNode<>(name, parameter, optional);
     }
 
 }

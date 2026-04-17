@@ -10,6 +10,8 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Parameter;
+
 /**
  * Special implementation of {@link ArgumentNode} for {@link Number} arguments.
  *
@@ -24,12 +26,12 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
     /**
      * Instantiates a new Number argument node.
      *
-     * @param name     the name of the node
-     * @param type     the Java class of the node
-     * @param optional <code>true</code> if the node may be omitted
+     * @param name      the name of the node
+     * @param parameter the parameter that corresponds to the node
+     * @param optional  <code>true</code> if the node may be omitted
      */
-    NumberArgumentNode(final @NotNull String name, final @NotNull Class<N> type, final boolean optional) {
-        super(name, type, optional);
+    NumberArgumentNode(final @NotNull String name, final @NotNull Parameter parameter, final boolean optional) {
+        super(name, parameter, optional);
     }
 
     /**

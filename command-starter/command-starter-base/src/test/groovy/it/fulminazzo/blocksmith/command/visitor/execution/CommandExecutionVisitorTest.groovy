@@ -50,15 +50,17 @@ class CommandExecutionVisitorTest extends Specification {
 
     def 'test that execute works'() {
         given:
+        final i = method.parameterTypes[0] == CommandSender ? 1 : 0
+
         def say = newLiteral('say', 'yell')
 
         def hello = newLiteral('hello')
         say.addChild(hello)
 
-        def greeting = ArgumentNode.of('greeting', String, false)
+        def greeting = ArgumentNode.of('greeting', method.parameters[i], false)
         hello.addChild(greeting)
 
-        def who = ArgumentNode.of('who', String, true)
+        def who = ArgumentNode.of('who', method.parameters[i + 1], true)
         who.defaultValue = defaultArg
         who.executor = new ExecutionHandler(CommandExecutionVisitorTest, method)
 
@@ -136,9 +138,9 @@ class CommandExecutionVisitorTest extends Specification {
                 '',
                 new PermissionInfo('blocksmith', 'greet', Permission.Grant.ALL)
         )
-        def node = ArgumentNode.of('cooldown', String, false)
+        def node = ArgumentNode.of('cooldown', second.parameters[0], false)
         greet.addChild(node)
-        def who = ArgumentNode.of('who', String, false)
+        def who = ArgumentNode.of('who', second.parameters[1], false)
         who.executor = new ExecutionHandler(CommandExecutionVisitorTest, second)
                 .setCooldown(Duration.ofSeconds(1L))
         node.addChild(who)
@@ -196,9 +198,9 @@ class CommandExecutionVisitorTest extends Specification {
                 '',
                 new PermissionInfo('blocksmith', 'bypassed.greet', Permission.Grant.ALL)
         )
-        def node = ArgumentNode.of('cooldown', String, false)
+        def node = ArgumentNode.of('greeting', second.parameters[0], false)
         greet.addChild(node)
-        def who = ArgumentNode.of('who', String, false)
+        def who = ArgumentNode.of('who', second.parameters[1], false)
         who.executor = new ExecutionHandler(CommandExecutionVisitorTest, second)
                 .setCooldown(Duration.ofSeconds(1L))
         node.addChild(who)
@@ -248,9 +250,9 @@ class CommandExecutionVisitorTest extends Specification {
                 '',
                 new PermissionInfo('blocksmith', 'greet', Permission.Grant.ALL)
         )
-        def node = ArgumentNode.of('greeting', String, false)
+        def node = ArgumentNode.of('greeting', second.parameters[0], false)
         greet.addChild(node)
-        def who = ArgumentNode.of('who', String, false)
+        def who = ArgumentNode.of('who', second.parameters[1], false)
         who.executor = new ExecutionHandler(CommandExecutionVisitorTest, second)
                 .setAsync(executorService, Duration.ofSeconds(1))
         node.addChild(who)
@@ -282,9 +284,9 @@ class CommandExecutionVisitorTest extends Specification {
     def 'test execute with extra arguments'() {
         given:
         def commandNode = newLiteral('greet')
-        def node = ArgumentNode.of('greeting', String, false)
+        def node = ArgumentNode.of('greeting', second.parameters[0], false)
         commandNode.addChild(node)
-        def who = ArgumentNode.of('who', String, false)
+        def who = ArgumentNode.of('who', second.parameters[1], false)
         who.executor = new ExecutionHandler(CommandExecutionVisitorTest, second)
         node.addChild(who)
 
@@ -312,14 +314,15 @@ class CommandExecutionVisitorTest extends Specification {
     def 'test that execute throws CommandExecuteException on invalid parameter'() {
         given:
         def say = newLiteral('say', 'yell')
+        final method = CommandExecutionVisitorTest.getMethod('checkedExecute', String, String)
 
-        def greeting = ArgumentNode.of('greeting', String, false)
+        def greeting = ArgumentNode.of('greeting', method.parameters[0], false)
         say.addChild(greeting)
 
-        def who = ArgumentNode.of('who', String, true)
+        def who = ArgumentNode.of('who', method.parameters[1], true)
         who.executor = new ExecutionHandler(
                 this,
-                CommandExecutionVisitorTest.getMethod('checkedExecute', String, String)
+                method
         )
         greeting.addChild(who)
 
@@ -416,12 +419,13 @@ class CommandExecutionVisitorTest extends Specification {
     def 'test that execute supports greedy argument'() {
         given:
         def node = newLiteral('message')
+        final method = CommandExecutionVisitorTest.getMethod('message', CommandSenderWrapper, String)
 
-        def message = ArgumentNode.of('message', String, false)
+        def message = ArgumentNode.of('message', method.parameters[1], false)
         message.greedy = true
         message.executor = new ExecutionHandler(
                 CommandExecutionVisitorTest,
-                CommandExecutionVisitorTest.getMethod('message', CommandSenderWrapper, String)
+                method
         )
         node.addChild(message)
 
