@@ -76,7 +76,6 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
     @Override
     public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
         List<String> completions = super.getCompletions(visitor);
-        if (getCompletionsSupplier() != null) return completions;
         completions.removeIf(s -> {
             double value = Double.parseDouble(s);
             return value < min || value > max;
