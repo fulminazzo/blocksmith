@@ -59,7 +59,8 @@ public final class ConfirmationHandler implements TabCompletable {
      * Checks the current {@link CommandInput} and, if it's a confirmation request, executes the corresponding action.
      *
      * @param visitor the visitor
-     * @return <code>true</code> if the next argument was either {@link Confirm#confirmWord()} or {@link Confirm#cancelWord()} and the execution was successful, <code>false</code> otherwise
+     * @return <code>true</code> if the next argument was either {@link Confirm#confirmWord()} or {@link Confirm#cancelWord()} and the execution was successful,
+     * <code>false</code> otherwise
      * @throws CommandExecutionException if the execution failed for any reason (e.g. the action was not found)
      */
     public boolean checkConfirmationKeywords(final @NotNull CommandExecutionVisitor visitor) throws CommandExecutionException {
@@ -70,10 +71,10 @@ public final class ConfirmationHandler implements TabCompletable {
         final Object id = visitor.getCommandSender().getId();
 
         final PendingTaskManager.Result result;
-        if (argument.equalsIgnoreCase(confirmationInfo.confirmWord())) {
+        if (argument.equalsIgnoreCase(getConfirmWord())) {
             result = confirmationManager.execute(id);
             if (result == PendingTaskManager.Result.SUCCESS) return true;
-        } else if (argument.equalsIgnoreCase(confirmationInfo.cancelWord())) {
+        } else if (argument.equalsIgnoreCase(getCancelWord())) {
             result = confirmationManager.cancel(id);
             if (result == PendingTaskManager.Result.SUCCESS)
                 throw new CommandExecutionException("success.pending-action-cancelled");
@@ -88,7 +89,25 @@ public final class ConfirmationHandler implements TabCompletable {
 
     @Override
     public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
-        return Arrays.asList(confirmationInfo.confirmWord(), confirmationInfo.cancelWord());
+        return Arrays.asList(getConfirmWord(), getCancelWord());
+    }
+
+    /**
+     * Gets the literal required to confirm the execution.
+     *
+     * @return the confirmation word
+     */
+    public @NotNull String getConfirmWord() {
+        return confirmationInfo.confirmWord();
+    }
+
+    /**
+     * Gets the literal required to cancel the execution.
+     *
+     * @return the cancellation word
+     */
+    public @NotNull String getCancelWord() {
+        return confirmationInfo.cancelWord();
     }
 
     /**
