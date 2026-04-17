@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.annotation.Confirm;
 import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
@@ -9,7 +10,9 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -84,6 +87,18 @@ public final class LiteralNode extends CommandNode {
     @Override
     public boolean matches(final @NotNull String token) {
         return aliases.contains(token.trim().toLowerCase());
+    }
+
+    @Override
+    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+        @NotNull CommandSenderWrapper<?> sender = visitor.getCommandSender();
+        final List<String> completions = new ArrayList<>();
+        if (sender.hasPermission(getCommandInfo().getPermission())) {
+            if (confirmationHandler != null)
+                completions.addAll(confirmationHandler.getCompletions(visitor));
+            completions.addAll(aliases);
+        }
+        return completions;
     }
 
 }
