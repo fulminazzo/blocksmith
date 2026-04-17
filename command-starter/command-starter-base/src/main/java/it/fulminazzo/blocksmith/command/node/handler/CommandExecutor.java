@@ -49,13 +49,16 @@ public class CommandExecutor {
             if (arguments.size() != method.getParameterCount()) {
                 Class<?> parameterType = method.getParameterTypes()[0];
                 if (CommandSenderWrapper.class.isAssignableFrom(parameterType)) {
-                    ParameterizedType paramType = (ParameterizedType) method.getGenericParameterTypes()[0];
-                    Type actualSenderType = paramType.getActualTypeArguments()[0];
-                    if (!sender.extendsType(actualSenderType))
-                        throw new CommandExecutionException(sender.isPlayer()
-                                ? "error.player-cannot-execute"
-                                : "error.console-cannot-execute"
-                        );
+                    Type senderType = method.getGenericParameterTypes()[0];
+                    if (senderType instanceof ParameterizedType) {
+                        ParameterizedType paramType = (ParameterizedType) senderType;
+                        Type actualSenderType = paramType.getActualTypeArguments()[0];
+                        if (!sender.extendsType(actualSenderType))
+                            throw new CommandExecutionException(sender.isPlayer()
+                                    ? "error.player-cannot-execute"
+                                    : "error.console-cannot-execute"
+                            );
+                    }
                     arguments.addFirst(sender);
                 } else if (sender.extendsType(parameterType)) arguments.addFirst(sender.getActualSender());
                 else throw new CommandExecutionException(sender.isPlayer()
