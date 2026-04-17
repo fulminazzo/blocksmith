@@ -142,7 +142,7 @@ public abstract class CommandRegistry {
                            final String @NotNull ... arguments) {
         CommandExecutionVisitor visitor = new CommandExecutionVisitor(
                 application,
-                wrapSender(executor),
+                getWrappedSender(executor),
                 commandName,
                 arguments
         );
@@ -168,11 +168,16 @@ public abstract class CommandRegistry {
                                                 final String @NotNull ... arguments) {
         TabCompletionVisitor visitor = new TabCompletionVisitor(
                 application,
-                wrapSender(executor),
+                getWrappedSender(executor),
                 commandName,
                 arguments
         );
         return visitor.tabComplete(command);
+    }
+
+    private @NotNull CommandSenderWrapper<?> getWrappedSender(final @NotNull Object executor) {
+        if (executor instanceof CommandSenderWrapper) return (CommandSenderWrapper<?>) executor;
+        else return wrapSender(executor);
     }
 
     /**
