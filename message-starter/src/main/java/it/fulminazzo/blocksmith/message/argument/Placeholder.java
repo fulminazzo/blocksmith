@@ -3,7 +3,10 @@ package it.fulminazzo.blocksmith.message.argument;
 import it.fulminazzo.blocksmith.message.MessageParseContext;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import org.jetbrains.annotations.NotNull;
@@ -14,13 +17,16 @@ import org.jetbrains.annotations.Nullable;
  * A placeholder is defined as a string between two percentage signs:
  * <code>Hello, %name%!</code> -> <code>Hello, Alex!</code>
  */
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Placeholder implements Argument {
     private static final String PLACEHOLDER_START = "%";
     private static final String PLACEHOLDER_END = "%";
 
-    private final @NotNull String placeholder;
-    private final @NotNull Component value;
+    @NotNull String placeholder;
+    @NotNull Component value;
 
     @Override
     public @NotNull Component apply(final @NotNull MessageParseContext context) {

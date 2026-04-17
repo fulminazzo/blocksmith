@@ -5,7 +5,10 @@ import it.fulminazzo.blocksmith.message.argument.time.node.TimeNode;
 import it.fulminazzo.blocksmith.message.argument.time.parser.TimeParser;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,11 +18,14 @@ import java.util.function.Supplier;
  * Represents a timed placeholder replacement.
  * Replaces the given placeholder with the time based on the supplier.
  */
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Time implements Argument {
-    private final @NotNull String placeholder;
-    private final @NotNull String timeFormat;
-    private final @NotNull Supplier<Long> timeSupplier;
+    @NotNull String placeholder;
+    @NotNull String timeFormat;
+    @NotNull Supplier<Long> timeSupplier;
 
     @Override
     public @NotNull Component apply(final @NotNull MessageParseContext context) {
