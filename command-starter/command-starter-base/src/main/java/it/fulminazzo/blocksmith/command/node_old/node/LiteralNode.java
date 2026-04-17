@@ -45,27 +45,9 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //        return clone;
 //    }
 //
-//    /**
-//     * Checks if the sender of the current context has permission to execute this node.
-//     *
-//     * @param context the context
-//     * @return <code>true</code> if they do
-//     */
-//    boolean hasPermission(final @NotNull CommandExecutionContext context) {
-//        return getCommandInfo()
-//                .map(CommandInfo::getPermission)
-//                .map(p -> context.getCommandSender().hasPermission(p))
-//                .orElse(true);
-//    }
-//
 //    @Override
 //    public @NotNull List<String> getCompletions(final @NotNull CommandExecutionContext context) {
 //        return hasPermission(context) ? new ArrayList<>(aliases) : Collections.emptyList();
-//    }
-//
-//    @Override
-//    protected void processInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-//        checkPermission(context);
 //    }
 //
 //    @Override
@@ -82,12 +64,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //    @Override
 //    protected void validateTabCompleteInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
 //        checkPermission(context);
-//    }
-//
-//    private void checkPermission(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-//        if (!hasPermission(context))
-//            throw new CommandExecutionException("error.no-permission")
-//                    .arguments(Placeholder.of("permission", getCommandInfo().orElseThrow().getPermission().getPermission()));
 //    }
 //
 //}

@@ -6,6 +6,8 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler;
+import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import it.fulminazzo.blocksmith.command.visitor.VisitorImpl;
 import it.fulminazzo.blocksmith.message.argument.Argument;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
@@ -53,8 +55,14 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
     }
 
     @Override
-    public Void visitLiteralNode(final @NotNull LiteralNode node) {
-        throw new UnsupportedOperationException(); //TODO: implement
+    public Void visitLiteralNode(final @NotNull LiteralNode node) throws CommandExecutionException {
+        PermissionInfo permission = node.getCommandInfo().getPermission();
+        if (!commandSender.hasPermission(permission))
+            throw new CommandExecutionException("error.no-permission")
+                    .arguments(Placeholder.of("permission", permission.getPermission()));
+        ConfirmationHandler confirmationHandler = node.getConfirmationHandler();
+        if (confirmationHandler != null && confirmationHandler.handleExecution(this)) return null;
+        return visitCommandNode(node);
     }
 
     @Override
