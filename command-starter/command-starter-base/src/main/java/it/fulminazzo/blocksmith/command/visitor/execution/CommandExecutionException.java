@@ -1,12 +1,11 @@
 package it.fulminazzo.blocksmith.command.visitor.execution;
 
 import it.fulminazzo.blocksmith.message.argument.Argument;
+import lombok.Getter;
 import lombok.experimental.StandardException;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * An exception thrown during execution of command nodes.
@@ -14,6 +13,21 @@ import java.util.List;
 @StandardException
 public final class CommandExecutionException extends Exception {
     private final @NotNull List<Argument> arguments = new ArrayList<>();
+    @Getter
+    private final @NotNull Map<String, Argument[]> additionalMessages = new HashMap<>();
+
+    /**
+     * Adds another message to be sent when this exception is thrown.
+     *
+     * @param message   the message
+     * @param arguments the arguments (applied to the message)
+     * @return this object (for method chaining)
+     */
+    public @NotNull CommandExecutionException additionalMessage(final @NotNull String message,
+                                                                final @NotNull Argument @NotNull ... arguments) {
+        additionalMessages.put(message, arguments);
+        return this;
+    }
 
     /**
      * Adds new arguments to the final message.
@@ -21,7 +35,7 @@ public final class CommandExecutionException extends Exception {
      * @param arguments the arguments
      * @return this object (for method chaining)
      */
-    public @NotNull CommandExecutionException arguments(final Argument @NotNull ... arguments) {
+    public @NotNull CommandExecutionException arguments(final @NotNull Argument @NotNull ... arguments) {
         this.arguments.addAll(Arrays.asList(arguments));
         return this;
     }
