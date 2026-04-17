@@ -5,16 +5,18 @@ import it.fulminazzo.blocksmith.command.visitor.CommandInput;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.structure.task.PendingTaskManager;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Handles any required confirmation for commands execution.
  */
-@Value
-public class ConfirmationHandler {
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public final class ConfirmationHandler {
     @NotNull Confirm confirmationInfo;
 
     @EqualsAndHashCode.Exclude
