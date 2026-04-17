@@ -2,12 +2,18 @@ package it.fulminazzo.blocksmith.command.node.handler;
 
 import it.fulminazzo.blocksmith.command.annotation.Confirm;
 import it.fulminazzo.blocksmith.command.visitor.CommandInput;
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException;
+import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor;
+import it.fulminazzo.blocksmith.function.RunnableException;
 import it.fulminazzo.blocksmith.structure.task.PendingTaskManager;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
+
+import java.time.Duration;
 
 /**
  * Handles any required confirmation for commands execution.
@@ -24,14 +30,35 @@ public final class ConfirmationHandler {
     @NotNull PendingTaskManager<Object> confirmationManager = new PendingTaskManager<>();
 
     /**
+     * Handles the execution of the given function, registering a confirmation task
+     * for the sender to confirm.
+     *
+     * @param visitor         the visitor
+     * @param executeFunction the function to execute
+     */
+    public void handleExecution(final @NotNull CommandExecutionVisitor visitor,
+                                final @NotNull RunnableException<CommandExecutionException> executeFunction) {
+        confirmationManager.register(
+                visitor.getCommandSender().getId(),
+                getConfirmationTimeout(),
+                () -> {
+                    try {
+                        executeFunction.run();
+                    } catch (CommandExecutionException e) {
+                        visitor.handleCommandExecutionException(e);
+                    }
+                }
+        );
+    }
+
+    /**
      * Checks the current {@link CommandInput} and, if it's a confirmation request, executes the corresponding action.
      *
      * @param visitor the visitor
-     * @return <code>true</code> if the next argument was either {@link Confirm#confirmWord()} or {@link Confirm#cancelWord()}
-     * and the execution was successful, <code>false</code> otherwise
+     * @return <code>true</code> if the next argument was either {@link Confirm#confirmWord()} or {@link Confirm#cancelWord()} and the execution was successful, <code>false</code> otherwise
      * @throws CommandExecutionException if the execution failed for any reason (e.g. the action was not found)
      */
-    public boolean handleExecution(final @NotNull Visitor<?, ?> visitor) throws CommandExecutionException {
+    public boolean checkConfirmationKeywords(final @NotNull CommandExecutionVisitor visitor) throws CommandExecutionException {
         final CommandInput input = visitor.getInput();
         if (input.isLast()) return false;
         String argument = input.peek();
@@ -40,7 +67,6 @@ public final class ConfirmationHandler {
 
         final PendingTaskManager.Result result;
         if (argument.equalsIgnoreCase(confirmationInfo.confirmWord())) {
-            //TODO: what about CommandExecutionException during execution?
             result = confirmationManager.execute(id);
             if (result == PendingTaskManager.Result.SUCCESS) return true;
         } else if (argument.equalsIgnoreCase(confirmationInfo.cancelWord())) {
@@ -57,5 +83,14 @@ public final class ConfirmationHandler {
     }
 
     //TODO: handle tab completion
+
+    /**
+     * Gets the confirmation timeout.
+     *
+     * @return the confirmation timeout
+     */
+    public @NotNull Duration getConfirmationTimeout() {
+        return Duration.of(confirmationInfo.timeout(), confirmationInfo.unit().toChronoUnit());
+    }
 
 }
