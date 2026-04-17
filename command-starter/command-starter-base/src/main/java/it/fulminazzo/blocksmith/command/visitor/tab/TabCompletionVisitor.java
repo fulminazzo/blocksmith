@@ -8,6 +8,7 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.visitor.VisitorImpl;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,8 +41,13 @@ public final class TabCompletionVisitor extends VisitorImpl<@NotNull List<String
 
     @Override
     public @NotNull List<String> visitLiteralNode(final @NotNull LiteralNode node) {
-        //TODO: implement
-        throw new UnsupportedOperationException();
+        if (!input.isLast()) {
+            if (!node.getAliases().contains(input.getCurrent().toLowerCase()) ||
+                    commandSender.hasPermission(node.getCommandInfo().getPermission()))
+                return Collections.emptyList();
+            input.advanceCursor();
+        }
+        return visitCommandNode(node);
     }
 
     @Override
