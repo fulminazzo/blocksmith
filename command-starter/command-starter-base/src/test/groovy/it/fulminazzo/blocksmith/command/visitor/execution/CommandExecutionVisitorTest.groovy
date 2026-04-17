@@ -84,7 +84,7 @@ class CommandExecutionVisitorTest extends Specification {
         printer == null
 
         when:
-        say.accept(visitor)
+        visitor.execute(say)
 
         then:
         noExceptionThrown()
@@ -124,7 +124,7 @@ class CommandExecutionVisitorTest extends Specification {
         )
 
         when:
-        node.accept(visitor)
+        visitor.execute(node)
 
         then:
         def e = thrown(CommandExecutionException)
@@ -157,7 +157,7 @@ class CommandExecutionVisitorTest extends Specification {
         printer == null
 
         when:
-        greet.accept(visitor)
+        visitor.execute(greet)
 
         then:
         noExceptionThrown()
@@ -174,7 +174,7 @@ class CommandExecutionVisitorTest extends Specification {
         )
 
         and:
-        greet.accept(visitor)
+        visitor.execute(greet)
 
         then:
         def e = thrown(CommandExecutionException)
@@ -217,7 +217,7 @@ class CommandExecutionVisitorTest extends Specification {
         printer == null
 
         when:
-        greet.accept(visitor)
+        visitor.execute(greet)
 
         then:
         noExceptionThrown()
@@ -234,7 +234,7 @@ class CommandExecutionVisitorTest extends Specification {
         )
 
         and:
-        greet.accept(visitor)
+        visitor.execute(greet)
 
         then:
         noExceptionThrown()
@@ -269,7 +269,7 @@ class CommandExecutionVisitorTest extends Specification {
         printer == null
 
         when:
-        greet.accept(visitor)
+        visitor.execute(greet)
 
         and:
         sleep(200)
@@ -302,7 +302,7 @@ class CommandExecutionVisitorTest extends Specification {
         printer == null
 
         when:
-        node.accept(visitor)
+        visitor.execute(node)
 
         then:
         noExceptionThrown()
@@ -335,7 +335,7 @@ class CommandExecutionVisitorTest extends Specification {
         )
 
         when:
-        say.accept(visitor)
+        visitor.execute(say)
 
         then:
         def e = thrown(CommandExecutionException)
@@ -375,7 +375,7 @@ class CommandExecutionVisitorTest extends Specification {
         )
 
         when:
-        node.accept(visitor)
+        visitor.execute(node)
 
         then:
         def e = thrown(CommandExecutionException)
@@ -398,7 +398,7 @@ class CommandExecutionVisitorTest extends Specification {
         )
 
         when:
-        node.accept(visitor)
+        visitor.execute(node)
 
         then:
         def e = thrown(CommandExecutionException)
@@ -441,7 +441,7 @@ class CommandExecutionVisitorTest extends Specification {
         printer == null
 
         when:
-        node.accept(visitor)
+        visitor.execute(node)
 
         then:
         noExceptionThrown()
@@ -469,7 +469,7 @@ class CommandExecutionVisitorTest extends Specification {
         printer == null
 
         when:
-        node.accept(visitor)
+        visitor.execute(node)
 
         then:
         noExceptionThrown()
@@ -499,7 +499,7 @@ class CommandExecutionVisitorTest extends Specification {
         )
 
         when:
-        node.accept(visitor)
+        visitor.execute(node)
 
         then:
         def e = thrown(CommandExecutionException)

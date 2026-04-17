@@ -47,6 +47,16 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
         super(application, commandSender, commandName, arguments);
     }
 
+    /**
+     * Executes the given node based on the provided arguments.
+     *
+     * @param node the node
+     * @throws CommandExecutionException in case of any errors
+     */
+    public void execute(final @NotNull CommandNode node) throws CommandExecutionException {
+        node.accept(this);
+    }
+
     @Override
     public Void visitArgumentNode(final @NotNull ArgumentNode<?> node) throws CommandExecutionException {
         try {
