@@ -40,7 +40,7 @@ class BrigadierParserTest extends Specification {
         def parser = new BrigadierParser(delegate)
 
         when:
-        def node = parser.parse(root)
+        def node = parser.parse(root.name, root)
 
         then:
         (node instanceof LiteralCommandNode)
@@ -97,7 +97,7 @@ class BrigadierParserTest extends Specification {
         def parser = new BrigadierParser(delegate)
 
         when:
-        def node = parser.parse(root)
+        def node = parser.parse(root.name, root)
 
         then:
         def children = node.children

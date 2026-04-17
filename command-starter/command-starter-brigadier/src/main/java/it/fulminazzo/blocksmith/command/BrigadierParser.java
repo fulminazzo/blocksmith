@@ -30,11 +30,12 @@ final class BrigadierParser<S> {
     /**
      * Converts the given Blocksmith command node to a Brigadier command node.
      *
-     * @param node the blocksmith command node
+     * @param commandName the command name
+     * @param node        the blocksmith command node
      * @return the brigadier command node
      */
-    public @NotNull LiteralCommandNode<S> parse(final @NotNull LiteralNode node) {
-        LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder.literal(node.getName());
+    public @NotNull LiteralCommandNode<S> parse(final @NotNull String commandName, final @NotNull LiteralNode node) {
+        LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder.literal(commandName);
         checkRequiresConfirmation(node, builder, node);
         return parseChildren(node, builder, node).build();
     }
