@@ -15,6 +15,8 @@ import it.fulminazzo.blocksmith.message.argument.Argument
 import it.fulminazzo.blocksmith.message.argument.Placeholder
 import it.fulminazzo.blocksmith.message.argument.Time
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
+import it.fulminazzo.blocksmith.validation.ConstraintViolation
+import it.fulminazzo.blocksmith.validation.ValidationException
 import it.fulminazzo.blocksmith.validation.annotation.Matches
 import org.jetbrains.annotations.NotNull
 import org.slf4j.Logger
@@ -734,6 +736,52 @@ class CommandExecutionVisitorTest extends Specification {
                 'command Hello world',
                 cause
         )
+    }
+
+    def 'test that visitArgumentNode does not add null message on ValidationException'() {
+        given:
+        def node = Mock(ArgumentNode)
+        node.parseCurrent(_) >> {
+            throw new ValidationException(
+                    this,
+                    ['first': [new ConstraintViolation(this, null, 'exception', [:])].toSet()]
+            )
+        }
+
+        and:
+        def visitor = new CommandExecutionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                'test'
+        )
+
+        when:
+        visitor.visitArgumentNode(node)
+
+        then:
+        def e = thrown(CommandExecutionException)
+        e.message == 'error.invalid-arguments'
+
+        and:
+        e.additionalMessages.isEmpty()
+    }
+
+    def 'test that handleExecution throws if no executor is specified'() {
+        given:
+        def node = newLiteral('test')
+
+        and:
+        def visitor = new CommandExecutionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                'test'
+        )
+
+        when:
+        visitor.handleExecution(node)
+
+        then:
+        thrown(IllegalStateException)
     }
 
     private static final LiteralNode newLiteral(final String... aliases) {
