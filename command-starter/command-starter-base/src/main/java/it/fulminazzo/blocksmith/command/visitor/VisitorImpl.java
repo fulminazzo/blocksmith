@@ -14,13 +14,12 @@ import org.jetbrains.annotations.NotNull;
  * @param <T> the type of the result
  * @param <X> the type of the exception to throw in case of errors during visits
  */
+@Getter
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 public abstract class VisitorImpl<T, X extends Exception> implements Visitor<T, X> {
     @NotNull ApplicationHandle application;
-    @Getter
     @NotNull CommandSenderWrapper<?> commandSender;
 
-    @Getter
     @NotNull CommandInput input;
 
     /**

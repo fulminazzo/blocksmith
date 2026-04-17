@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.visitor;
 
+import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
@@ -44,5 +45,12 @@ public interface Visitor<T, X extends Exception> {
      * @return the input
      */
     @NotNull CommandInput getInput();
+
+    /**
+     * Gets the application that requested this visitor.
+     *
+     * @return the application
+     */
+    @NotNull ApplicationHandle getApplication();
 
 }
