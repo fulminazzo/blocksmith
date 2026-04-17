@@ -10,6 +10,7 @@ import it.fulminazzo.blocksmith.command.visitor.VisitorImpl;
 import it.fulminazzo.blocksmith.validation.ValidationException;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,7 +63,7 @@ public final class TabCompletionVisitor extends VisitorImpl<@NotNull List<String
     public @NotNull List<String> visitLiteralNode(final @NotNull LiteralNode node) {
         if (!input.isLast()) {
             if (!node.getAliases().contains(input.getCurrent().toLowerCase()) ||
-                    commandSender.hasPermission(node.getCommandInfo().getPermission()))
+                    !commandSender.hasPermission(node.getCommandInfo().getPermission()))
                 return Collections.emptyList();
             input.advanceCursor();
         }
@@ -72,7 +73,10 @@ public final class TabCompletionVisitor extends VisitorImpl<@NotNull List<String
     @Override
     protected @NotNull List<String> visitCommandNode(final @NotNull CommandNode node) {
         if (input.isLast()) {
-            return filterCompletions(node.getCompletions(this));
+            return filterCompletions(node.getChildren().stream()
+                    .map(c -> c.getCompletions(this))
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList()));
         } else {
             final String current = input.getCurrent();
             CommandNode child = node.getChild(current);
