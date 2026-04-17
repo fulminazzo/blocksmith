@@ -49,24 +49,23 @@ public final class TabCompletionVisitor extends VisitorImpl<@NotNull List<String
 
     @Override
     public @NotNull List<String> visitArgumentNode(final @NotNull ArgumentNode<?> node) {
-        if (!input.isLast())
-            try {
-                node.parseCurrent(this);
-                input.advanceCursor();
-            } catch (ArgumentParseException | ValidationException e) {
-                return Collections.emptyList();
-            }
+        if (input.isLast()) return filterCompletions(node.getCompletions(this));
+        try {
+            node.parseCurrent(this);
+            input.advanceCursor();
+        } catch (ArgumentParseException | ValidationException e) {
+            return Collections.emptyList();
+        }
         return visitCommandNode(node);
     }
 
     @Override
     public @NotNull List<String> visitLiteralNode(final @NotNull LiteralNode node) {
-        if (!input.isLast()) {
-            if (!node.getAliases().contains(input.getCurrent().toLowerCase()) ||
-                    !commandSender.hasPermission(node.getCommandInfo().getPermission()))
-                return Collections.emptyList();
-            input.advanceCursor();
-        }
+        if (!node.getAliases().contains(input.getCurrent().toLowerCase()) ||
+                !commandSender.hasPermission(node.getCommandInfo().getPermission()))
+            return Collections.emptyList();
+        if (input.isLast()) return filterCompletions(node.getCompletions(this));
+        input.advanceCursor();
         return visitCommandNode(node);
     }
 
@@ -78,6 +77,11 @@ public final class TabCompletionVisitor extends VisitorImpl<@NotNull List<String
                     .flatMap(Collection::stream)
                     .collect(Collectors.toList()));
         } else {
+            if (input.isDone()) {
+                if (node instanceof ArgumentNode<?> && ((ArgumentNode<?>) node).isGreedy())
+                    return node.getCompletions(this);
+                else return Collections.emptyList();
+            }
             final String current = input.getCurrent();
             CommandNode child = node.getChild(current);
             if (child == null) return Collections.emptyList();
