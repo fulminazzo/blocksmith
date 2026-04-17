@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Parameter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents a dynamic node in a command tree.
@@ -65,13 +66,12 @@ public class ArgumentNode<T> extends CommandNode {
      * @throws ValidationException    in case of invalid argument
      */
     public @Nullable T parseCurrent(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException, ValidationException {
+        handleGreedy(visitor);
         final CommandInput input = visitor.getInput();
-        if (isGreedy()) input.mergeRemaining();
         if (input.isDone()) {
             if (defaultValue == null) return null;
             else input.addInput(defaultValue);
         }
-        final @NotNull ArgumentParser<T> parser = ArgumentParsers.of(getType());
         if (completionsSupplier != null) {
             String current = input.getCurrent();
             List<String> completions = completionsSupplier.get();
@@ -82,6 +82,7 @@ public class ArgumentNode<T> extends CommandNode {
                                 Placeholder.of("expected", String.join(", ", completions))
                         );
         }
+        final @NotNull ArgumentParser<T> parser = getParser();
         T value = parser.parse(visitor);
         Validator.getInstance().validate(parameter, value);
         return value;
@@ -128,6 +129,23 @@ public class ArgumentNode<T> extends CommandNode {
         // the actual validation is delegated to the parsers,
         // so they can deliver proper error messages
         return true;
+    }
+
+    @Override
+    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+        handleGreedy(visitor);
+        if (completionsSupplier != null) return completionsSupplier.get();
+        else return getParser().getCompletions(visitor).stream()
+                .map(c -> c.replace("%name%", getName()))
+                .collect(Collectors.toList());
+    }
+
+    private void handleGreedy(final @NotNull Visitor<?, ?> visitor) {
+        if (isGreedy()) visitor.getInput().mergeRemaining();
+    }
+
+    private @NotNull ArgumentParser<T> getParser() {
+        return ArgumentParsers.of(getType());
     }
 
     /**
