@@ -48,44 +48,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //        else return parent.getPermission();
 //    }
 //
-//    /**
-//     * Walks the children to construct the best command route that matches the given input.
-//     *
-//     * @param context the context
-//     * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
-//     */
-//    public void execute(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-//        processInput(context);
-//        handleRemainingInput(context);
-//    }
-//
-//    /**
-//     * Handles the remaining input from the context.
-//     *
-//     * @param context the context
-//     * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
-//     */
-//    void handleRemainingInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
-//        if (context.advanceCursor().isDone()) {
-//            if (isExecutable()) executeOrAwaitConfirmation(context);
-//            else {
-//                ArgumentNode<?> optional = getFirstOptionalArgumentNode();
-//                if (optional != null) {
-//                    context.addParsedArgument(optional.getDefaultValue(context));
-//                    optional.handleRemainingInput(context);
-//                } else throw new CommandExecutionException("error.not-enough-arguments");
-//            }
-//        } else {
-//            String current = context.getCurrent();
-//            CommandNode child = getChild(current);
-//            if (child == null) {
-//                if (isExecutable()) executeOrAwaitConfirmation(context);
-//                else throw new CommandExecutionException("error.command-not-found")
-//                        .arguments(Placeholder.of("argument", current));
-//            } else child.execute(context);
-//        }
-//    }
-//
 //    private void executeOrAwaitConfirmation(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
 //        LiteralNode literalNode = getCommandLiteral();
 //        if (literalNode != null && literalNode.requiresConfirmation()) {
@@ -157,15 +119,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //                    .collect(Collectors.toList());
 //        else return finalCompletions;
 //    }
-//
-//    /**
-//     * Validates and processes the current input of the context during execution.
-//     * After execution, if an argument was parsed, it will be available through {@link CommandExecutionContext#getArguments()}.
-//     *
-//     * @param context the context
-//     * @throws CommandExecutionException in case of any error (the message should contain the message code for translations)
-//     */
-//    protected abstract void processInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException;
 //
 //    /**
 //     * Validates the current input of the context during tab completion.

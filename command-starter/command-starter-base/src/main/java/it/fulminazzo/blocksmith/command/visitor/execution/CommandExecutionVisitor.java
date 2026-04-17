@@ -66,8 +66,23 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
     }
 
     @Override
-    protected Void visitCommandNode(final @NotNull CommandNode node) {
-        throw new UnsupportedOperationException(); //TODO: implement
+    protected Void visitCommandNode(final @NotNull CommandNode node) throws CommandExecutionException {
+        if (input.advanceCursor().isDone()) {
+            if (node.isExecutable()); //TODO: handle execution with confirmation
+            else {
+                ArgumentNode<?> optional = node.getOptionalArgument();
+                if (optional != null) return optional.accept(this);
+                else throw new CommandExecutionException("error.not-enough-arguments");
+            }
+        } else {
+            final String current = input.getCurrent();
+            CommandNode child = node.getChild(current);
+            if (child == null) {
+                if (node.isExecutable()); //TODO: handle execution with confirmation
+                else throw new CommandExecutionException("error.command-not-found")
+                        .arguments(Placeholder.of("argument", current));
+            } else return child.accept(this);
+        }
     }
 
     /**
