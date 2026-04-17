@@ -28,6 +28,31 @@ class CommandInputTest extends Specification {
         input.rawInput == arguments.join(' ')
     }
 
+    def 'test that CommandInput correctly re-arranges quoted inputs'() {
+        given:
+        def input = new CommandInput()
+                .addInput(input1)
+                .addInput(input2)
+
+        expect:
+        input.input[0] == 'Hello, world!'
+
+        where:
+        input1                | input2
+        ['"Hello, world!"']   | []
+        ['"Hello, world!"']   | ['"Goodbye, Mars!"']
+        []                    | ['"Hello, world!"']
+        []                    | ['"Hello, world!"', '"Goodbye, Mars!"']
+        ['"Hello,']           | ['world!"']
+        ['"Hello,']           | ['world!"', '"Goodbye, Mars!"']
+        ['\'Hello, world!\''] | []
+        ['\'Hello, world!\''] | ['\'Goodbye, Mars!\'']
+        []                    | ['\'Hello, world!\'']
+        []                    | ['\'Hello, world!\'', '\'Goodbye, Mars!\'']
+        ['\'Hello,']          | ['world!\'']
+        ['\'Hello,']          | ['world!\'', '\'Goodbye, Mars!\'']
+    }
+
     def 'test that mergeRemaining correctly merges remaining input'() {
         given:
         def input = new CommandInput()
