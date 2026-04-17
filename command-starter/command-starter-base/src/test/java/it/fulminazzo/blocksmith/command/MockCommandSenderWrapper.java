@@ -5,10 +5,13 @@ import it.fulminazzo.blocksmith.ServerApplication;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import it.fulminazzo.blocksmith.message.Messenger;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+
+import java.util.concurrent.ExecutorService;
 
 /**
  * A Command sender wrapper for testing purposes.
@@ -51,6 +54,11 @@ public final class MockCommandSenderWrapper extends CommandSenderWrapper<Command
                     }
 
                 });
+            }
+
+            @Override
+            public @NotNull ExecutorService getExecutor() {
+                throw new UnsupportedOperationException();
             }
 
             @Override
