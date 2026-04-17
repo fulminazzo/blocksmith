@@ -124,7 +124,7 @@ public class ArgumentNode<T> extends CommandNode {
      */
     @SuppressWarnings("unchecked")
     public static <T> @NotNull ArgumentNode<T> of(final @NotNull String name,
-                                                  @NotNull Class<?> type,
+                                                  final @NotNull Class<?> type,
                                                   final boolean optional) {
         Class<T> actualType = (Class<T>) Reflect.toWrapper(type);
         if (Number.class.isAssignableFrom(actualType))
