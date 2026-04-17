@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.TabCompletable;
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import lombok.*;
@@ -19,7 +20,7 @@ import java.util.TreeSet;
 @EqualsAndHashCode
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public abstract class CommandNode {
+public abstract class CommandNode implements TabCompletable {
     @Getter
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
