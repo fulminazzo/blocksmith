@@ -67,7 +67,7 @@ public final class ConfirmationHandler implements TabCompletable {
         if (input.isLast()) return false;
         String argument = input.peek();
 
-        final Object id = visitor.getCommandSender();
+        final Object id = visitor.getCommandSender().getId();
 
         final PendingTaskManager.Result result;
         if (argument.equalsIgnoreCase(confirmationInfo.confirmWord())) {
