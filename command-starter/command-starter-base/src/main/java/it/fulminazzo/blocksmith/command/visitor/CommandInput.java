@@ -1,5 +1,7 @@
 package it.fulminazzo.blocksmith.command.visitor;
 
+import it.fulminazzo.blocksmith.util.StringUtils;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
@@ -7,12 +9,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Holds the input of a user upon execution of a command.
  */
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+@ToString
 public final class CommandInput {
+    private static final @NotNull String delimiter = " ";
+
     final @NotNull List<String> input = new ArrayList<>();
 
     int current;
@@ -24,7 +30,7 @@ public final class CommandInput {
         if (isDone()) return;
         StringBuilder argument = new StringBuilder(getCurrent());
         while (input.size() > current + 1)
-            argument.append(" ").append(input.remove(current + 1));
+            argument.append(delimiter).append(input.remove(current + 1));
         input.set(current, argument.toString());
     }
 
@@ -45,7 +51,12 @@ public final class CommandInput {
      * @return this object (for method chaining)
      */
     public @NotNull CommandInput addInput(final @NotNull Collection<String> input) {
-        this.input.addAll(input);
+        if (input.isEmpty()) return this;
+        String raw = getRawInput();
+        if (!raw.isEmpty()) raw += delimiter;
+        raw += String.join(delimiter, input);
+        this.input.clear();
+        this.input.addAll(StringUtils.split(raw, delimiter, false, "'", "\""));
         return this;
     }
 
@@ -120,7 +131,9 @@ public final class CommandInput {
      * @return the input
      */
     public @NotNull String getRawInput() {
-        return String.join(" ", input);
+        return input.stream()
+                .map(s -> s.contains(delimiter) ? String.format("\"%s\"", s) : s)
+                .collect(Collectors.joining(delimiter));
     }
 
 }
