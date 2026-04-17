@@ -1,20 +1,16 @@
 package it.fulminazzo.blocksmith.command;
 
-import it.fulminazzo.blocksmith.ApplicationHandle;
-import it.fulminazzo.blocksmith.ServerApplication;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import it.fulminazzo.blocksmith.message.Messenger;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 
 @Slf4j
 final class MockCommandRegistry extends CommandRegistry {
@@ -22,60 +18,11 @@ final class MockCommandRegistry extends CommandRegistry {
     private final @NotNull Map<String, CommandInfo> registeredCommands = new ConcurrentHashMap<>();
 
     public MockCommandRegistry() {
-        this(new Messenger(new ServerApplication() {
-
-            @Override
-            public @NonNull <S> S server() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public @NonNull <T> T as(@NotNull Class<T> type) {
-                return type.cast(this);
-            }
-
-            @Override
-            public @NotNull Logger logger() {
-                return log;
-            }
-
-            @Override
-            public @NotNull String getName() {
-                return "blocksmith";
-            }
-
-        }), log);
+        super(new MockApplicationHandle());
     }
 
     public MockCommandRegistry(final @NotNull Messenger messenger, final @NotNull Logger logger) {
-        super(new ApplicationHandle() {
-
-            @Override
-            public @NotNull Messenger getMessenger() {
-                return messenger;
-            }
-
-            @Override
-            public @NotNull ExecutorService getExecutor() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public @NotNull Logger getLog() {
-                return logger;
-            }
-
-            @Override
-            public @NotNull Object getServer() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public @NotNull String getName() {
-                return "blocksmith";
-            }
-
-        });
+        super(new MockApplicationHandle(messenger, logger));
     }
 
     @SuppressWarnings("unchecked")
