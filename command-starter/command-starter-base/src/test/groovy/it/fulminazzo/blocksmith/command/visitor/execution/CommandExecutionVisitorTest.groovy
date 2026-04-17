@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command.visitor.execution
 
 import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.*
+import it.fulminazzo.blocksmith.command.annotation.Confirm
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.LiteralNode
@@ -174,6 +175,91 @@ class CommandExecutionVisitorTest extends Specification {
         then:
         def e = thrown(CommandExecutionException)
         e.message == 'error.not-enough-arguments'
+    }
+
+    def 'test execute with confirmation'() {
+        given:
+        final method = CommandExecutionVisitorTest.getDeclaredMethod('execute')
+        final annotation = method.getAnnotation(Confirm)
+
+        and:
+        def delete = newLiteral('delete')
+        delete.executor = new ExecutionHandler(
+                CommandExecutionVisitorTest,
+                method
+        )
+        delete.setConfirmationInfo(annotation)
+
+        when:
+        printer = null
+        def visitor = new CommandExecutionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                'delete'
+        )
+
+        and:
+        visitor.execute(delete)
+
+        then:
+        def e = thrown(CommandExecutionException)
+        e.message == 'general.await-confirmation'
+
+        and:
+        printer == null
+
+        when:
+        visitor = new CommandExecutionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                'delete',
+                annotation.confirmWord()
+        )
+
+        and:
+        visitor.execute(delete)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        printer == 'Hello, world!'
+
+        when:
+        printer = null
+        visitor = new CommandExecutionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                'delete'
+        )
+
+        and:
+        visitor.execute(delete)
+
+        then:
+        e = thrown(CommandExecutionException)
+        e.message == 'general.await-confirmation'
+
+        and:
+        printer == null
+
+        when:
+        visitor = new CommandExecutionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                'delete',
+                annotation.cancelWord()
+        )
+
+        and:
+        visitor.execute(delete)
+
+        then:
+        e = thrown(CommandExecutionException)
+        e.message == 'success.pending-action-cancelled'
+
+        and:
+        printer == null
     }
 
     def 'test execute with cooldown'() {
@@ -680,6 +766,11 @@ class CommandExecutionVisitorTest extends Specification {
 
     static void execute(final int number) {
         //
+    }
+
+    @Confirm(timeout = 15000)
+    static void execute() {
+        printer = 'Hello, world!'
     }
 
     void checkedExecute(final @NotNull String greeting,
