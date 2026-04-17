@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A special {@link it.fulminazzo.blocksmith.command.visitor.Visitor} handling tab completion.
@@ -60,8 +61,25 @@ public final class TabCompletionVisitor extends VisitorImpl<@NotNull List<String
 
     @Override
     protected @NotNull List<String> visitCommandNode(final @NotNull CommandNode node) {
-        //TODO: implement
-        throw new UnsupportedOperationException();
+        if (input.isLast()) {
+            return filterCompletions(node.getCompletions(this));
+        } else {
+            final String current = input.getCurrent();
+            CommandNode child = node.getChild(current);
+            if (child == null) return Collections.emptyList();
+            else return child.accept(this);
+        }
+    }
+
+    private @NotNull List<String> filterCompletions(final @NotNull List<String> completions) {
+        List<String> filtered = completions.stream()
+                .filter(c -> c.toLowerCase().startsWith(input.getCurrent().toLowerCase()))
+                .collect(Collectors.toList());
+        if (filtered.isEmpty())
+            return completions.stream()
+                    .filter(c -> c.startsWith("<"))
+                    .collect(Collectors.toList());
+        else return filtered;
     }
 
 }
