@@ -1,7 +1,9 @@
 package it.fulminazzo.blocksmith.command.node.handler;
 
+import it.fulminazzo.blocksmith.command.TabCompletable;
 import it.fulminazzo.blocksmith.command.annotation.Confirm;
 import it.fulminazzo.blocksmith.command.visitor.CommandInput;
+import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor;
 import it.fulminazzo.blocksmith.function.RunnableException;
@@ -14,6 +16,8 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Handles any required confirmation for commands execution.
@@ -22,7 +26,7 @@ import java.time.Duration;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public final class ConfirmationHandler {
+public final class ConfirmationHandler implements TabCompletable {
     @NotNull Confirm confirmationInfo;
 
     @EqualsAndHashCode.Exclude
@@ -82,7 +86,10 @@ public final class ConfirmationHandler {
             throw new CommandExecutionException("error.pending-action-expired");
     }
 
-    //TODO: handle tab completion
+    @Override
+    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+        return Arrays.asList(confirmationInfo.confirmWord(), confirmationInfo.cancelWord());
+    }
 
     /**
      * Gets the confirmation timeout.
