@@ -2,21 +2,21 @@
 package it.fulminazzo.blocksmith.command.visitor.execution
 
 import it.fulminazzo.blocksmith.ApplicationHandle
-import it.fulminazzo.blocksmith.command.CommandSender
-import it.fulminazzo.blocksmith.command.CommandSenderWrapper
-import it.fulminazzo.blocksmith.command.ConsoleCommandSender
-import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
-import it.fulminazzo.blocksmith.command.Player
+import it.fulminazzo.blocksmith.command.*
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
+import it.fulminazzo.blocksmith.message.Messenger
+import it.fulminazzo.blocksmith.message.argument.Argument
+import it.fulminazzo.blocksmith.message.argument.Placeholder
 import it.fulminazzo.blocksmith.message.argument.Time
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import it.fulminazzo.blocksmith.validation.annotation.Matches
 import org.jetbrains.annotations.NotNull
+import org.slf4j.Logger
 import spock.lang.Specification
 
 import java.lang.reflect.Method
@@ -110,6 +110,51 @@ class CommandExecutionVisitorTest extends Specification {
         second | false       | 'Alex'     || null
         second | true        | 'Alex'     || 'Steve'
         second | true        | 'Alex'     || null
+    }
+
+    def 'test that execute throws if missing permission'() {
+        given:
+        def literal = newLiteral('test')
+
+        and:
+        def commandSender = Mock(CommandSenderWrapper)
+        commandSender.hasPermission(_) >> false
+
+        and:
+        def visitor = new CommandExecutionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                'test'
+        )
+
+        when:
+        visitor.execute(literal)
+
+        then:
+        def e = thrown(CommandExecutionException)
+        e.message == 'error.no-permission'
+    }
+
+    def 'test that execute throws for invalid argument'() {
+        given:
+        def argument = ArgumentNode.of(
+                'number',
+                CommandExecutionVisitorTest.getDeclaredMethod('execute', int).parameters[0],
+                false
+        )
+
+        and:
+        def visitor = new CommandExecutionVisitor(
+                Mock(ApplicationHandle),
+                commandSender,
+                'invalid'
+        )
+
+        when:
+        visitor.execute(argument)
+
+        then:
+        def e = thrown(CommandExecutionException)
     }
 
     def 'test that execute throws on non-executable node'() {
@@ -511,6 +556,100 @@ class CommandExecutionVisitorTest extends Specification {
         CommandExecutionVisitorTest.getMethod('playerOnly', Player)                | new ConsoleCommandSender() || 'error.console-cannot-execute'
     }
 
+    def 'test that handleCommandExecutionException sends messages and does not throw'() {
+        given:
+        final p1 = Placeholder.of('p1', 'who')
+        final p2 = Placeholder.of('p2', 'me')
+
+        and:
+        def exception = new CommandExecutionException('Hello')
+                .arguments(p1)
+                .additionalMessage('world', p2)
+
+        and:
+        def messenger = Mock(Messenger)
+
+        and:
+        def application = Mock(ApplicationHandle)
+        application.messenger >> messenger
+
+        and:
+        def visitor = new CommandExecutionVisitor(
+                application,
+                commandSender,
+                'command',
+                'Hello', 'world'
+        )
+
+        when:
+        visitor.handleCommandExecutionException(exception)
+
+        then:
+        1 * messenger.sendMessage(commandSender, 'Hello', _) >> { a ->
+            Argument[] args = a[2]
+            assert args.length == 2
+
+            def arg = args[1]
+            assert arg.placeholder == '%input%'
+            assert ComponentUtils.toString(arg.value) == 'command Hello world'
+
+            assert args[0] == p1
+        }
+
+        and:
+        1 * messenger.sendMessage(commandSender, 'world', _) >> { a ->
+            Argument[] args = a[2]
+            assert args.length == 2
+
+            def arg = args[1]
+            assert arg.placeholder == '%input%'
+            assert ComponentUtils.toString(arg.value) == 'command Hello world'
+
+            assert args[0] == p2
+        }
+    }
+
+    def 'test that handleCommandExecutionException logs on existing cause'() {
+        given:
+        final cause = new IllegalArgumentException('Mock exception')
+
+        and:
+        def exception = new CommandExecutionException('error.internal-error', cause)
+
+        and:
+        def messenger = Mock(Messenger)
+
+        and:
+        def logger = Mock(Logger)
+
+        and:
+        def application = Mock(ApplicationHandle)
+        application.messenger >> messenger
+        application.log >> logger
+
+        and:
+        def visitor = new CommandExecutionVisitor(
+                application,
+                commandSender,
+                'command',
+                'Hello', 'world'
+        )
+
+        when:
+        visitor.handleCommandExecutionException(exception)
+
+        then:
+        1 * messenger.sendMessage(commandSender, exception.message, _)
+
+        and:
+        1 * logger.warn(
+                '{} while executing command /{}',
+                cause.class.canonicalName,
+                'command Hello world',
+                cause
+        )
+    }
+
     private static final LiteralNode newLiteral(final String... aliases) {
         def node = new LiteralNode(aliases)
         node.commandInfo = new CommandInfo(
@@ -537,6 +676,10 @@ class CommandExecutionVisitorTest extends Specification {
     static void execute(final @NotNull String greeting,
                         final @NotNull String who) {
         printer = "$greeting, $who!"
+    }
+
+    static void execute(final int number) {
+        //
     }
 
     void checkedExecute(final @NotNull String greeting,
