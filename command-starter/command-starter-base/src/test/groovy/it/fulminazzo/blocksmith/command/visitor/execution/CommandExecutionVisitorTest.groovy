@@ -15,6 +15,7 @@ import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.message.argument.Time
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
+import it.fulminazzo.blocksmith.validation.annotation.Matches
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
@@ -335,8 +336,27 @@ class CommandExecutionVisitorTest extends Specification {
 
         then:
         def e = thrown(CommandExecutionException)
-        e.message == 'error.invalid-name'
-        ComponentUtils.toString(e.arguments[0].value) == '!@#$%^&*()_+'
+        e.message == 'error.invalid-arguments'
+
+        and:
+        def messages = e.additionalMessages
+        messages.size() == 1
+
+        and:
+        def message = 'error.invalid-name'
+        def arguments = messages[message]
+        arguments != null
+        arguments.length == 2
+
+        and:
+        def first = arguments[0]
+        first.placeholder == '%expected%'
+        ComponentUtils.toString(first.value) == '^[A-Za-z]+$'
+
+        and:
+        def second = arguments[1]
+        second.placeholder == '%value%'
+        ComponentUtils.toString(second.value) == '!@#$%^&*()_+'
     }
 
     def 'test that execute throws on unknown command'() {
@@ -516,11 +536,10 @@ class CommandExecutionVisitorTest extends Specification {
     }
 
     void checkedExecute(final @NotNull String greeting,
-                        //TODO: reintroduce
-                        /*final @NotNull @Pattern(
-                                regexp = '^[A-Za-z]+$',
+                        final @NotNull @Matches(
+                                value = '^[A-Za-z]+$',
                                 message = 'error.invalid-name'
-                        )*/ String who) {
+                        ) String who) {
         printer = "$greeting, $who!"
     }
 
