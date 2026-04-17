@@ -66,29 +66,6 @@ package it.fulminazzo.blocksmith.command.node_old.node;//TODO: update
 //    @Override
 //    protected void processInput(final @NotNull CommandExecutionContext context) throws CommandExecutionException {
 //        checkPermission(context);
-//        if (requiresConfirmation() && !context.isLast()) {
-//            String argument = context.peek();
-//
-//            final Object id = context.getCommandSender().getId();
-//            final PendingActionManager.Result result;
-//            final String message;
-//            if (argument.equalsIgnoreCase(getConfirmWord())) {
-//                result = pendingActionManager.execute(id);
-//                message = "";
-//            } else if (argument.equalsIgnoreCase(getCancelWord())) {
-//                result = pendingActionManager.cancel(id);
-//                message = "success.pending-action-cancelled";
-//            } else {
-//                result = null;
-//                message = null;
-//            }
-//
-//            if (result == PendingActionManager.Result.NOT_FOUND)
-//                throw new CommandExecutionException("error.no-pending-action");
-//            else if (result == PendingActionManager.Result.EXPIRED)
-//                throw new CommandExecutionException("error.pending-action-expired");
-//            else if (result != null) throw new CommandExecutionException(message);
-//        }
 //    }
 //
 //    @Override
