@@ -3,12 +3,12 @@ package it.fulminazzo.blocksmith.command;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import it.fulminazzo.blocksmith.message.Messenger;
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,38 +25,16 @@ final class MockCommandRegistry extends CommandRegistry {
         super(new MockApplicationHandle(messenger, logger));
     }
 
-    @SuppressWarnings("unchecked")
     public @NotNull Map<String, LiteralNode> getCommands() {
-        try {
-            Class<?> clazz = CommandRegistry.class;
-            Field field = clazz.getDeclaredField("commands");
-            field.setAccessible(true);
-            return (Map<String, LiteralNode>) field.get(this);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return Reflect.on(this).get("commands").get();
     }
 
     public void setState(final @NotNull State state) {
-        try {
-            Class<?> clazz = CommandRegistry.class;
-            Field field = clazz.getDeclaredField("state");
-            field.setAccessible(true);
-            field.set(this, state);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        Reflect.on(this).set("state", state);
     }
 
     public State getState() {
-        try {
-            Class<?> clazz = CommandRegistry.class;
-            Field field = clazz.getDeclaredField("state");
-            field.setAccessible(true);
-            return (State) field.get(this);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return Reflect.on(this).get("state").get();
     }
 
     @Override
