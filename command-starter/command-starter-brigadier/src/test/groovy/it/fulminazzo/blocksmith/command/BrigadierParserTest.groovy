@@ -8,9 +8,12 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import com.mojang.brigadier.tree.ArgumentCommandNode
 import com.mojang.brigadier.tree.LiteralCommandNode
 import it.fulminazzo.blocksmith.command.annotation.Confirm
+import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier
+import it.fulminazzo.blocksmith.command.node.info.CommandInfo
+import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
@@ -20,7 +23,12 @@ class BrigadierParserTest extends Specification {
 
     def 'test parse of full node'() {
         given:
+        def sender = Mock(CommandSenderWrapper)
+        sender.actualSender >> new Object()
+
+        and:
         def delegate = Mock(CommandRegistry)
+        delegate.wrapSender(_) >> sender
 
         and:
         def expectedTargets = ['player', 'receiver', 'target']
@@ -29,6 +37,10 @@ class BrigadierParserTest extends Specification {
         def root = new LiteralNode('message')
 
         def targetNode = new LiteralNode(*expectedTargets)
+        targetNode.commandInfo = new CommandInfo(
+                'description',
+                new PermissionInfo(null, 'permission', Permission.Grant.ALL)
+        )
         root.addChild(targetNode)
 
         def playerNode = newArgumentNode('player', Object)
@@ -78,6 +90,17 @@ class BrigadierParserTest extends Specification {
             assert message.type.type == StringArgumentType.StringType.GREEDY_PHRASE
             assert message.customSuggestions == null
         }
+
+        and:
+        def target = targetLiterals[0]
+        def requirement = target.requirement
+        requirement != null
+
+        when:
+        requirement.test(sender.actualSender)
+
+        then:
+        1 * sender.hasPermission(_)
     }
 
     def 'test parse of confirmation node'() {
