@@ -15,6 +15,7 @@ public final class CommandSenderWrapperReceiverFactory extends AbstractReceiverF
 
     @Override
     public @NotNull ReceiverFactory setup(final @NotNull ServerApplication application) {
+        super.setup(application);
         this.application = application;
         return this;
     }
