@@ -57,10 +57,11 @@ public class MultiArgumentParser<T> implements ArgumentParser<T> {
     public @Nullable T parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
         final List<Object> parsed = new ArrayList<>();
         final CommandInput input = visitor.getInput();
-        for (ArgumentParser<?> parser : parsers) {
+        for (int i = 0; i < parsers.size(); i++) {
             if (input.isDone()) throw new ArgumentParseException("error.not-enough-arguments");
+            ArgumentParser<?> parser = parsers.get(i);
             parsed.add(parser.parse(visitor));
-            input.advanceCursor();
+            if (i != parsers.size() - 1) input.advanceCursor();
         }
         return constructor.apply(parsed);
     }
@@ -68,14 +69,15 @@ public class MultiArgumentParser<T> implements ArgumentParser<T> {
     @Override
     public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
         final CommandInput input = visitor.getInput();
-        for (ArgumentParser<?> parser : parsers) {
+        for (int i = 0; i < parsers.size(); i++) {
+            ArgumentParser<?> parser = parsers.get(i);
             if (input.isLast()) return parser.getCompletions(visitor);
             try {
                 parser.parse(visitor);
             } catch (ArgumentParseException e) {
                 break;
             }
-            input.advanceCursor();
+            if (i != parsers.size() - 1) input.advanceCursor();
         }
         return Collections.emptyList();
     }
