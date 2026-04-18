@@ -4,6 +4,8 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import it.fulminazzo.blocksmith.reflect.Reflect;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -13,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Contains custom {@link ArgumentType} associated with Java types.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ArgumentTypes {
     private static final @NotNull Map<Class<?>, ArgumentType<?>> converters = new ConcurrentHashMap<>();
 
