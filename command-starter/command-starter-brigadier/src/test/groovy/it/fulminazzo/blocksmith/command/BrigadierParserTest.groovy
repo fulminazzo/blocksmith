@@ -233,9 +233,11 @@ class BrigadierParserTest extends Specification {
         (child.type instanceof BoolArgumentType)
 
         where:
-        input                  || args
-        'argument Hello '      || ['Hello', '']
-        'argument Hello world' || ['Hello', 'world']
+        input                   || args
+        'argument Hello '       || ['Hello', '']
+        '/argument Hello '      || ['Hello', '']
+        'argument Hello world'  || ['Hello', 'world']
+        '/argument Hello world' || ['Hello', 'world']
     }
 
     def 'test that executes calls on delegate with root node'() {
@@ -245,7 +247,6 @@ class BrigadierParserTest extends Specification {
 
         and:
         def source = new Object()
-        def input = 'Hello, world! How are you?'
         def context = mockContext(source, input)
 
         and:
@@ -264,6 +265,12 @@ class BrigadierParserTest extends Specification {
                 'Hello,',
                 'world! How are you?'.split(' ')
         )
+
+        where:
+        input << [
+                'Hello, world! How are you?',
+                '/Hello, world! How are you?'
+        ]
     }
 
     def 'test that getArgumentType of #node returns #expected'() {

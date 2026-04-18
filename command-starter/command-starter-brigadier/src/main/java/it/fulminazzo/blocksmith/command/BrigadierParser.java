@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.*;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
@@ -110,7 +111,7 @@ final class BrigadierParser<S> {
             argumentBuilder = RequiredArgumentBuilder.<S, T>argument(node.getName(), (ArgumentType<T>) StringArgumentType.string())
                     .suggests(((c, b) -> {
                         S source = c.getSource();
-                        String input = c.getInput();
+                        String input = getInput(c);
                         String[] split = input.split(" ");
                         if (input.endsWith(" ")) {
                             split = Arrays.copyOf(split, split.length + 1);
@@ -140,7 +141,7 @@ final class BrigadierParser<S> {
     @NotNull Command<S> executes(final @NotNull LiteralNode root) {
         return c -> {
             S source = c.getSource();
-            String[] input = c.getInput().split(" ");
+            String[] input = getInput(c).split(" ");
             delegate.execute(
                     root,
                     source,
@@ -196,6 +197,12 @@ final class BrigadierParser<S> {
         else if (type.equals(Long.class))
             return (ArgumentType<T>) LongArgumentType.longArg((long) node.getMin(), (long) node.getMax());
         else return (ArgumentType<T>) IntegerArgumentType.integer((int) node.getMin(), (int) node.getMax());
+    }
+
+    private static <S> @NotNull String getInput(final  @NotNull CommandContext<S> context) {
+        String input = context.getInput();
+        if (input.startsWith("/")) input = input.substring(1);
+        return input;
     }
 
 }
