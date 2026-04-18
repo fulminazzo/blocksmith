@@ -43,8 +43,7 @@ include("command-starter")
 include("command-starter:command-starter-base")
 include("command-starter:command-starter-brigadier")
 
-//TODO: re-include
-//include("command-starter:command-starter-bukkit")
+include("command-starter:command-starter-bukkit")
 include("command-starter:command-starter-bungeecord")
 include("command-starter:command-starter-velocity")
 
