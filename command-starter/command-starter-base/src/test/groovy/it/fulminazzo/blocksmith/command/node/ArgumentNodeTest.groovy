@@ -31,7 +31,7 @@ class ArgumentNodeTest extends Specification {
         def visitor = Mock(Visitor)
         visitor.input >> {
             def input = new CommandInput()
-            input.addInput(expected)
+            input.addInput(expected.contains(' ') ? "'$expected'" : expected)
             return input
         }
 
@@ -42,7 +42,7 @@ class ArgumentNodeTest extends Specification {
         value == expected
 
         where:
-        expected << ['yes', 'no']
+        expected << ['yes', 'no', 'Hello, world!']
     }
 
     def 'test that parseCurrent throws ArgumentParseException if input does not match custom supplier completions'() {
@@ -96,7 +96,7 @@ class ArgumentNodeTest extends Specification {
         def visitor = Mock(Visitor)
         visitor.input >> {
             def input = new CommandInput()
-            input.addInput('#!@$%^&*')
+            input.addInput('#@$%^&*')
             return input
         }
 
@@ -250,14 +250,14 @@ class ArgumentNodeTest extends Specification {
      */
 
     private List<String> completions() {
-        return ['yes', 'no']
+        return ['yes', 'no', 'Hello, world!']
     }
 
     private void execute(boolean value) {
         // test method
     }
 
-    private void execute(@Matches('[^!#]+') String value) {
+    private void execute(@Matches('[^#@]+') String value) {
         // test method
     }
 

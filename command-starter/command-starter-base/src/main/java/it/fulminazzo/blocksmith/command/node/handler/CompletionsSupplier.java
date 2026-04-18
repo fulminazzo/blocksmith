@@ -37,10 +37,21 @@ public class CompletionsSupplier implements Supplier<List<String>> {
 
     @Override
     public @NotNull List<String> get() {
+        return getUnquoted().stream()
+                .map(s -> s.contains(" ") ? "\"" + s + "\"" : s)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets the completions.
+     * If a completion contains a white space, it will not be quoted.
+     *
+     * @return the completions
+     */
+    public @NotNull List<String> getUnquoted() {
         Collection<?> completions = executor.invoke(method).get();
         return completions.stream()
                 .map(o -> o == null ? "null" : o.toString())
-                .map(s -> s.contains(" ") ? "\"" + s + "\"" : s)
                 .collect(Collectors.toList());
     }
 

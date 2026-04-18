@@ -74,7 +74,7 @@ public class ArgumentNode<T> extends CommandNode {
         }
         if (completionsSupplier != null) {
             String current = input.getCurrent();
-            List<String> completions = completionsSupplier.get();
+            List<String> completions = completionsSupplier.getUnquoted();
             if (completions.stream().noneMatch(c -> c.equalsIgnoreCase(current)))
                 throw new ArgumentParseException("error.invalid-argument") //TODO: re-organize
                         .arguments(
