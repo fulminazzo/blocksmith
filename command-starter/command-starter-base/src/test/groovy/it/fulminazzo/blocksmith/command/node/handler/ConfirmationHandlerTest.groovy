@@ -8,6 +8,7 @@ import it.fulminazzo.blocksmith.command.visitor.CommandInput
 import it.fulminazzo.blocksmith.command.visitor.Visitor
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor
+import it.fulminazzo.blocksmith.reflect.Reflect
 import it.fulminazzo.blocksmith.structure.task.PendingTaskManager
 import spock.lang.Specification
 
@@ -57,7 +58,7 @@ class ConfirmationHandlerTest extends Specification {
         noExceptionThrown()
 
         when:
-        input.input.clear()
+        Reflect.on(input).get('input').invoke('clear')
         input.addInput('delete', 'confirm')
 
         and:
