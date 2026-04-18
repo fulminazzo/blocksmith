@@ -40,6 +40,7 @@ public class CompletionsSupplier implements Supplier<List<String>> {
         Collection<?> completions = executor.invoke(method).get();
         return completions.stream()
                 .map(o -> o == null ? "null" : o.toString())
+                .map(s -> s.contains(" ") ? "\"" + s + "\"" : s)
                 .collect(Collectors.toList());
     }
 

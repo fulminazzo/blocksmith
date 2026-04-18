@@ -23,7 +23,7 @@ class CompletionsSupplierTest extends Specification {
         def actual = supplier.get()
 
         then:
-        actual == ['first', 'null', 'third']
+        actual == ['first', 'null', 'third', '"fourth completion"']
     }
 
     def 'test that get throws Exception'() {
@@ -107,7 +107,7 @@ class CompletionsSupplierTest extends Specification {
     }
 
     List<String> valid() {
-        return ['first', null, 'third']
+        return ['first', null, 'third', 'fourth completion']
     }
 
     List<?> exception() {
