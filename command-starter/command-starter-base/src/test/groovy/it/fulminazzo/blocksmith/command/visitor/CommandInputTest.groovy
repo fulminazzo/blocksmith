@@ -81,7 +81,7 @@ class CommandInputTest extends Specification {
     def 'test that mergeRemaining correctly merges remaining input'() {
         given:
         def input = new CommandInput()
-        input.input.addAll(['Hello,', 'world', 'My', 'name', 'is', 'Alex'])
+        getInput(input).addAll(['Hello,', 'world', 'My', 'name', 'is', 'Alex'])
 
         and:
         Reflect.on(input).set('current', 2)
@@ -101,7 +101,7 @@ class CommandInputTest extends Specification {
         def input = new CommandInput()
         def reflect = Reflect.on(input)
         final original = ['Hello,', 'world', 'My', 'name', 'is', 'Alex']
-        input.input.addAll(original)
+        getInput(input).addAll(original)
 
         and:
         reflect.set('current', 6)
@@ -125,7 +125,7 @@ class CommandInputTest extends Specification {
     def 'test that setCurrent correctly overwrites the current argument'() {
         given:
         def input = new CommandInput()
-        input.input.addAll(['Hello'])
+        getInput(input).addAll(['Hello'])
 
         and:
         input.current = 'world'
@@ -137,7 +137,7 @@ class CommandInputTest extends Specification {
     def 'test that peek works'() {
         given:
         def input = new CommandInput()
-        input.input.addAll(['Hello,', 'world'])
+        getInput(input).addAll(['Hello,', 'world'])
 
         expect:
         input.peek() == 'world'
@@ -148,16 +148,40 @@ class CommandInputTest extends Specification {
         def input = new CommandInput()
 
         when:
-        input.input.add('Hello')
+        getInput(input).add('Hello')
 
         then:
         input.last
 
         when:
-        input.input.add('Hello')
+        getInput(input).add('Hello')
 
         then:
         !input.last
+    }
+
+    def 'test that getCurrent of #input returns #expected'() {
+        given:
+        def commandInput = new CommandInput()
+
+        and:
+        getInput(commandInput).add(input)
+
+        expect:
+        commandInput.current == expected
+
+        where:
+        input               || expected
+        'Hello, world!'     || 'Hello, world!'
+        '"Hello, world!"'   || 'Hello, world!'
+        '\'Hello, world!\'' || 'Hello, world!'
+        ''                  || ''
+        '"'                 || '"'
+        '"a'                || '"a'
+        '""'                || ''
+        '\''                || '\''
+        '\'a'               || '\'a'
+        '\'\''              || ''
     }
 
     def 'test toString works'() {
@@ -169,6 +193,10 @@ class CommandInputTest extends Specification {
 
         then:
         noExceptionThrown()
+    }
+
+    private static List<String> getInput(final CommandInput input) {
+        return Reflect.on(input).get('input').get()
     }
 
 }
