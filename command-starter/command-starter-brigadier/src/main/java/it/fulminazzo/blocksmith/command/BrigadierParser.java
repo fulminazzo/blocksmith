@@ -36,7 +36,7 @@ final class BrigadierParser<S> {
      * @return the brigadier command node
      */
     public @NotNull LiteralCommandNode<S> parse(final @NotNull String commandName, final @NotNull LiteralNode node) {
-        LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder.literal(commandName);
+        LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder.<S>literal(commandName).executes(executes(node));
         checkRequiresConfirmation(node, builder, node);
         return parseChildren(node, builder, node).build();
     }
