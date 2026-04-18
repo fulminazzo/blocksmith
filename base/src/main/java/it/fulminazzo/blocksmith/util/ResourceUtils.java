@@ -358,7 +358,7 @@ public final class ResourceUtils {
             jarFile.stream()
                     .filter(e -> !e.isDirectory())
                     .map(ZipEntry::getName)
-                    .filter(n -> entryPrefix == null || n.startsWith(entryPrefix + "/"))
+                    .filter(n -> entryPrefix == null || n.startsWith(entryPrefix))
                     .filter(filter)
                     .forEach(results::add);
         }
