@@ -15,9 +15,10 @@ import java.util.stream.Collectors;
  * Holds the input of a user upon execution of a command.
  */
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-@ToString
+@ToString(doNotUseGetters = true)
 public final class CommandInput {
     private static final @NotNull String delimiter = " ";
+    private static final @NotNull String @NotNull [] quotes = new String[]{"\"", "'"};
 
     final @NotNull List<String> input = new ArrayList<>();
 
@@ -52,11 +53,12 @@ public final class CommandInput {
      */
     public @NotNull CommandInput addInput(final @NotNull Collection<String> input) {
         if (input.isEmpty()) return this;
-        String raw = getRawInput();
-        if (!raw.isEmpty()) raw += delimiter;
-        raw += String.join(delimiter, input);
+        String current = getRawInput();
+        if (!current.isEmpty()) current += delimiter;
+        String rawInput = String.join(delimiter, input);
+        current += rawInput;
         this.input.clear();
-        this.input.addAll(StringUtils.split(raw, delimiter, false, "'", "\""));
+        this.input.addAll(StringUtils.split(current, delimiter, true, "'", "\""));
         return this;
     }
 
@@ -95,7 +97,7 @@ public final class CommandInput {
      * @return the current argument
      */
     public @NotNull String getCurrent() {
-        return input.get(current);
+        return unquote(input.get(current));
     }
 
     /**
@@ -104,7 +106,7 @@ public final class CommandInput {
      * @return the next argument
      */
     public @NotNull String peek() {
-        return input.get(current + 1);
+        return unquote(input.get(current + 1));
     }
 
     /**
@@ -131,9 +133,23 @@ public final class CommandInput {
      * @return the input
      */
     public @NotNull String getRawInput() {
-        return input.stream()
-                .map(s -> s.contains(delimiter) ? String.format("\"%s\"", s) : s)
-                .collect(Collectors.joining(delimiter));
+        return String.join(delimiter, input);
+    }
+
+    /**
+     * Gets the total input.
+     *
+     * @return the input
+     */
+    public @NotNull List<String> getInput() {
+        return input.stream().map(CommandInput::unquote).collect(Collectors.toUnmodifiableList());
+    }
+
+    private static @NotNull String unquote(final @NotNull String string) {
+        for (String q : quotes)
+            if (string.startsWith(q) && string.endsWith(q) && string.length() > 1)
+                return string.substring(1, string.length() - 1);
+        return string;
     }
 
 }
