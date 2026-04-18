@@ -7,7 +7,7 @@ class CommandInputTest extends Specification {
 
     def 'test that CommandInput correctly returns all arguments'() {
         given:
-        def arguments = ['Hello', 'world', 'My', 'name', 'is', 'Alex']
+        def arguments = ['Hello,', 'world', 'My', 'name', 'is', 'Alex']
 
         and:
         def input = new CommandInput().addInput(*arguments)
@@ -35,28 +35,53 @@ class CommandInputTest extends Specification {
                 .addInput(input2)
 
         expect:
-        input.input[0] == 'Hello, world!'
+        input.input == expected
 
         where:
-        input1                | input2
-        ['"Hello, world!"']   | []
-        ['"Hello, world!"']   | ['"Goodbye, Mars!"']
-        []                    | ['"Hello, world!"']
-        []                    | ['"Hello, world!"', '"Goodbye, Mars!"']
-        ['"Hello,']           | ['world!"']
-        ['"Hello,']           | ['world!"', '"Goodbye, Mars!"']
-        ['\'Hello, world!\''] | []
-        ['\'Hello, world!\''] | ['\'Goodbye, Mars!\'']
-        []                    | ['\'Hello, world!\'']
-        []                    | ['\'Hello, world!\'', '\'Goodbye, Mars!\'']
-        ['\'Hello,']          | ['world!\'']
-        ['\'Hello,']          | ['world!\'', '\'Goodbye, Mars!\'']
+        input1                   | input2                                            || expected
+        []                       | []                                                || []
+        ['"Hello, world!"']      | []                                                || ['Hello, world!']
+        ['"Hello,', 'world!"']   | []                                                || ['Hello, world!']
+        ['"Hello, world!"']      | ['"Goodbye, Mars!"']                              || ['Hello, world!', 'Goodbye, Mars!']
+        ['"Hello,', 'world!"']   | ['"Goodbye,', 'Mars!"']                           || ['Hello, world!', 'Goodbye, Mars!']
+        []                       | ['"Hello, world!"']                               || ['Hello, world!']
+        []                       | ['"Hello,', 'world!"']                            || ['Hello, world!']
+        []                       | ['"Hello, world!"', '"Goodbye, Mars!"']           || ['Hello, world!', 'Goodbye, Mars!']
+        []                       | ['"Hello,', 'world!"', '"Goodbye,', 'Mars!"']     || ['Hello, world!', 'Goodbye, Mars!']
+        ['"Hello,']              | ['world!"']                                       || ['Hello, world!']
+        ['"Hello,']              | ['world!"', '"Goodbye, Mars!"']                   || ['Hello, world!', 'Goodbye, Mars!']
+        ['"Hello,']              | ['world!"', '"Goodbye,', 'Mars!"']                || ['Hello, world!', 'Goodbye, Mars!']
+        ['\'Hello, world!\'']    | []                                                || ['Hello, world!']
+        ['\'Hello,', 'world!\''] | []                                                || ['Hello, world!']
+        ['\'Hello, world!\'']    | ['\'Goodbye, Mars!\'']                            || ['Hello, world!', 'Goodbye, Mars!']
+        ['\'Hello,', 'world!\''] | ['\'Goodbye, Mars!\'']                            || ['Hello, world!', 'Goodbye, Mars!']
+        ['\'Hello, world!\'']    | ['\'Goodbye,', 'Mars!\'']                         || ['Hello, world!', 'Goodbye, Mars!']
+        ['\'Hello,', 'world!\''] | ['\'Goodbye,', 'Mars!\'']                         || ['Hello, world!', 'Goodbye, Mars!']
+        []                       | ['\'Hello, world!\'']                             || ['Hello, world!']
+        []                       | ['\'Hello,', 'world!\'']                          || ['Hello, world!']
+        []                       | ['\'Hello, world!\'', '\'Goodbye, Mars!\'']       || ['Hello, world!', 'Goodbye, Mars!']
+        []                       | ['\'Hello,', 'world!\'', '\'Goodbye,', 'Mars!\''] || ['Hello, world!', 'Goodbye, Mars!']
+        ['\'Hello,']             | ['world!\'']                                      || ['Hello, world!']
+        ['\'Hello,']             | ['world!\'', '\'Goodbye, Mars!\'']                || ['Hello, world!', 'Goodbye, Mars!']
+        ['\'Hello,']             | ['world!\'', '\'Goodbye,', 'Mars!\'']             || ['Hello, world!', 'Goodbye, Mars!']
+    }
+
+    def 'test that CommandInput correctly adds quoted input'() {
+        given:
+        def input = new CommandInput()
+                .addInput('msg')
+                .addInput('\'The').addInput('Diamond').addInput('Player\'')
+                .addInput('"Hello,').addInput('friend!"')
+                .addInput('CHAT')
+
+        expect:
+        input.input == ['msg', 'The Diamond Player', 'Hello, friend!', 'CHAT']
     }
 
     def 'test that mergeRemaining correctly merges remaining input'() {
         given:
         def input = new CommandInput()
-        input.input.addAll(['Hello', 'world', 'My', 'name', 'is', 'Alex'])
+        input.input.addAll(['Hello,', 'world', 'My', 'name', 'is', 'Alex'])
 
         and:
         Reflect.on(input).set('current', 2)
@@ -75,7 +100,7 @@ class CommandInputTest extends Specification {
         given:
         def input = new CommandInput()
         def reflect = Reflect.on(input)
-        final original = ['Hello', 'world', 'My', 'name', 'is', 'Alex']
+        final original = ['Hello,', 'world', 'My', 'name', 'is', 'Alex']
         input.input.addAll(original)
 
         and:
@@ -112,7 +137,7 @@ class CommandInputTest extends Specification {
     def 'test that peek works'() {
         given:
         def input = new CommandInput()
-        input.input.addAll(['Hello', 'world'])
+        input.input.addAll(['Hello,', 'world'])
 
         expect:
         input.peek() == 'world'
@@ -133,6 +158,17 @@ class CommandInputTest extends Specification {
 
         then:
         !input.last
+    }
+
+    def 'test toString works'() {
+        given:
+        def input = new CommandInput()
+
+        when:
+        input.toString()
+
+        then:
+        noExceptionThrown()
     }
 
 }
