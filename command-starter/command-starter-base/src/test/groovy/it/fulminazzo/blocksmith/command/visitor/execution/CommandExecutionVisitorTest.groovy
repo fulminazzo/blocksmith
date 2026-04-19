@@ -157,7 +157,7 @@ class CommandExecutionVisitorTest extends Specification {
         visitor.execute(argument)
 
         then:
-        def e = thrown(CommandExecutionException)
+        thrown(CommandExecutionException)
     }
 
     def 'test that execute throws on non-executable node'() {

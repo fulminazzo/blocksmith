@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
  * An exception thrown when the parsing of a command fails.
  */
 public final class CommandParseException extends RuntimeException {
+    private static final long serialVersionUID = -1603713945729751154L;
 
     /**
      * Instantiates a new Command parse exception.

@@ -16,7 +16,7 @@ class VelocityCommandRegistryFactoryTest extends Specification {
 
     private ApplicationHandle application
 
-    private Visitor<?, ?> visitor
+    private Visitor<?, ? extends Exception> visitor
 
     void setup() {
         final player1 = Mock(Player)

@@ -4,7 +4,6 @@ import it.fulminazzo.blocksmith.command.CommandSender;
 import it.fulminazzo.blocksmith.command.ConsoleCommandSender;
 import it.fulminazzo.blocksmith.command.MockApplicationHandle;
 import it.fulminazzo.blocksmith.command.Player;
-import lombok.Value;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
@@ -41,26 +40,24 @@ public class CommandSenderReceiverFactory extends AbstractReceiverFactory {
         return CommandSender.class.isAssignableFrom(receiverType);
     }
 
-    @Value
-    public static class CommandSenderReceiver implements Receiver {
-        @NotNull CommandSender sender;
+    public record CommandSenderReceiver(@NotNull CommandSender sender) implements Receiver {
 
-        @Override
-        public @NotNull Audience toAudience() {
-            throw new UnsupportedOperationException();
+            @Override
+            public @NotNull Audience toAudience() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public @NotNull Locale getLocale() {
+                throw new UnsupportedOperationException();
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public @NonNull <R> R internal() {
+                return (R) sender;
+            }
+
         }
-
-        @Override
-        public @NotNull Locale getLocale() {
-            throw new UnsupportedOperationException();
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public @NonNull <R> R getInternal() {
-            return (R) sender;
-        }
-
-    }
 
 }

@@ -12,6 +12,8 @@ import java.util.*;
  */
 @StandardException
 public final class CommandExecutionException extends Exception {
+    private static final long serialVersionUID = 5460537445633897473L;
+
     private final @NotNull List<Argument> arguments = new ArrayList<>();
     @Getter
     private final @NotNull Map<String, Argument[]> additionalMessages = new HashMap<>();

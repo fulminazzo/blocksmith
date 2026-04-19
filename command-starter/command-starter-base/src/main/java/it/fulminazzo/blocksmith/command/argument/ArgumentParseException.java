@@ -13,6 +13,8 @@ import java.util.List;
  */
 @StandardException
 public final class ArgumentParseException extends Exception {
+    private static final long serialVersionUID = 3979898718778768057L;
+
     private final @NotNull List<Argument> arguments = new ArrayList<>();
 
     /**
