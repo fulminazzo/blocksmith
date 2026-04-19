@@ -338,10 +338,10 @@ class ValidatorTest extends Specification {
         'afterCalendar'          | null
         'afterCalendar'          | Calendar.instance.add(Calendar.SECOND, 3)
         'afterTemporal'          | null
-        'afterTemporal'          | Instant.now().plusSeconds(3)
-        'afterTemporal'          | LocalTime.now().plusSeconds(3)
+        'afterTemporal'          | Instant.now().plusSeconds(10)
+        'afterTemporal'          | LocalTime.now().plusSeconds(10)
         'afterTemporal'          | LocalDate.now().plusDays(1)
-        'afterTemporal'          | LocalDateTime.now().plusSeconds(3)
+        'afterTemporal'          | LocalDateTime.now().plusSeconds(10)
         // AfterOrNow
         'afterOrNowDate'         | null
         'afterOrNowDate'         | { new Date(new Date().getTime()) }
@@ -351,23 +351,23 @@ class ValidatorTest extends Specification {
         'afterOrNowCalendar'     | { Calendar.instance.add(Calendar.SECOND, 3) }
         'afterOrNowTemporal'     | null
         'afterOrNowTemporal'     | { Instant.now() }
-        'afterOrNowTemporal'     | { Instant.now().plusSeconds(3) }
+        'afterOrNowTemporal'     | { Instant.now().plusSeconds(10) }
         'afterOrNowTemporal'     | { LocalTime.now() }
-        'afterOrNowTemporal'     | { LocalTime.now().plusSeconds(3) }
+        'afterOrNowTemporal'     | { LocalTime.now().plusSeconds(10) }
         'afterOrNowTemporal'     | { LocalDate.now() }
         'afterOrNowTemporal'     | { LocalDate.now().plusDays(1) }
         'afterOrNowTemporal'     | { LocalDateTime.now() }
-        'afterOrNowTemporal'     | { LocalDateTime.now().plusSeconds(3) }
+        'afterOrNowTemporal'     | { LocalDateTime.now().plusSeconds(10) }
         // Before
         'beforeDate'             | null
         'beforeDate'             | new Date(new Date().getTime() - 2000)
         'beforeCalendar'         | null
         'beforeCalendar'         | Calendar.instance.add(Calendar.SECOND, -2)
         'beforeTemporal'         | null
-        'beforeTemporal'         | Instant.now().minusSeconds(3)
-        'beforeTemporal'         | LocalTime.now().minusSeconds(3)
+        'beforeTemporal'         | Instant.now().minusSeconds(10)
+        'beforeTemporal'         | LocalTime.now().minusSeconds(10)
         'beforeTemporal'         | LocalDate.now().minusDays(1)
-        'beforeTemporal'         | LocalDateTime.now().minusSeconds(3)
+        'beforeTemporal'         | LocalDateTime.now().minusSeconds(10)
         // BeforeOrNow
         'beforeOrNowDate'        | null
         'beforeOrNowDate'        | { new Date(new Date().getTime()) }
@@ -377,13 +377,13 @@ class ValidatorTest extends Specification {
         'beforeOrNowCalendar'    | { Calendar.instance.add(Calendar.SECOND, -2) }
         'beforeOrNowTemporal'    | null
         'beforeOrNowTemporal'    | { Instant.now() }
-        'beforeOrNowTemporal'    | { Instant.now().minusSeconds(2) }
+        'beforeOrNowTemporal'    | { Instant.now().minusSeconds(10) }
         'beforeOrNowTemporal'    | { LocalTime.now() }
-        'beforeOrNowTemporal'    | { LocalTime.now().minusSeconds(2) }
+        'beforeOrNowTemporal'    | { LocalTime.now().minusSeconds(10) }
         'beforeOrNowTemporal'    | { LocalDate.now() }
         'beforeOrNowTemporal'    | { LocalDate.now().minusDays(1) }
         'beforeOrNowTemporal'    | { LocalDateTime.now() }
-        'beforeOrNowTemporal'    | { LocalDateTime.now().minusSeconds(2) }
+        'beforeOrNowTemporal'    | { LocalDateTime.now().minusSeconds(10) }
     }
 
     def 'test that validate of field #fieldName and value #value throws'() {
