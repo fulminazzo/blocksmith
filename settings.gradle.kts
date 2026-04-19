@@ -10,7 +10,7 @@ include(
     "base:testing"
 )
 
-// config
+// config-starter
 include(
     "config-starter",
     "config-starter:config-starter-core",

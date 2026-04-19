@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.validation.annotation;
 
 import it.fulminazzo.blocksmith.validation.Constraint;
+import it.fulminazzo.blocksmith.validation.ValidationMessages;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.*;
@@ -8,7 +9,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a {@link CharSequence} parameter or type that represents an email.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Matches("[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}")
 @Constraint
@@ -24,7 +25,7 @@ public @interface Email {
      *
      * @return the message
      */
-    @NotNull String message() default "error.validation.invalid-email";
+    @NotNull String message() default ValidationMessages.REQUIRED_EMAIL;
 
     /**
      * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.

@@ -60,7 +60,7 @@ public enum ConfigurationFormat {
      * Checks if the file name matches the current format.
      *
      * @param fileName the file name
-     * @return <code>true</code> if it matches
+     * @return {@code true} if it matches
      */
     public boolean matches(final @NotNull String fileName) {
         return fileName.endsWith("." + fileExtension);

@@ -26,7 +26,7 @@ public final class ArgumentNode extends TimeNode {
     /**
      * Sets the current argument as optional.
      *
-     * @param optional if <code>true</code>, will not show when time is <code>0</code>
+     * @param optional if {@code true}, will not show when time is {@code 0}
      * @return this object (for method chaining)
      */
     public @NotNull ArgumentNode setOptional(final boolean optional) {

@@ -259,10 +259,10 @@ abstract class ConfigurationAdapterTest extends Specification {
     }
 
     /**
-     * Special case for properties tests that do not support <code>null</code>
+     * Special case for properties tests that do not support {@code null}
      * under any circumstance.
      *
-     * @return <code>true</code> if the test is for the properties configuration adapter
+     * @return {@code true} if the test is for the properties configuration adapter
      */
     protected boolean isProperties() {
         return false
@@ -272,7 +272,7 @@ abstract class ConfigurationAdapterTest extends Specification {
      * Special case for TOML tests that do not support automatic indentation
      * of array.
      *
-     * @return <code>true</code> if the test is for the toml configuration adapter
+     * @return {@code true} if the test is for the toml configuration adapter
      */
     protected boolean isToml() {
         return false

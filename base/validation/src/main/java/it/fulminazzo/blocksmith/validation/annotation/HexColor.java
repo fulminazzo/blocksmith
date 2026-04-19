@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.validation.annotation;
 
 import it.fulminazzo.blocksmith.validation.Constraint;
+import it.fulminazzo.blocksmith.validation.ValidationMessages;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.*;
@@ -8,7 +9,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a {@link CharSequence} parameter or type that is a valid HEX color.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Matches("#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})")
 @Constraint
@@ -24,7 +25,7 @@ public @interface HexColor {
      *
      * @return the message
      */
-    @NotNull String message() default "error.validation.invalid-hex-color";
+    @NotNull String message() default ValidationMessages.REQUIRED_HEX_COLOR;
 
     /**
      * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
