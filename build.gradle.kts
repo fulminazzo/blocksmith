@@ -14,8 +14,6 @@ allprojects {
     apply { plugin("groovy") }
     apply { plugin("jacoco-report-aggregation") }
 
-    val testingModuleName: String by rootProject.extra
-
     val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
     val mockitoAgent: Configuration by configurations.creating
 

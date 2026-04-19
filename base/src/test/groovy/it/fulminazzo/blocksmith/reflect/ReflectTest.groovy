@@ -10,20 +10,20 @@ class ReflectTest extends Specification {
     private static final Constructor<?> constructor = Person.getDeclaredConstructor(String, Integer)
 
     private static final Field ENTITIES_DEFAULT_NAME = Entity.getDeclaredField('ENTITIES_DEFAULT_NAME')
-    private static final Field DEFAULT_NAME = NamedEntity.getDeclaredField('DEFAULT_NAME')
-    private static final Field DEFAULT_AGE = Person.getDeclaredField('DEFAULT_AGE')
+    private static final Field DEFAULT_NAME = NamedEntity.getDeclaredField('defaultName')
+    private static final Field DEFAULT_AGE = Person.getDeclaredField('defaultAge')
     private static final Field name = NamedEntity.getDeclaredField('name')
     private static final Field age = Person.getDeclaredField('age')
 
     private static final Method getUniqueId = Entity.getDeclaredMethod('getUniqueId')
     private static final Method interfaceGetName = Entity.getDeclaredMethod('getName')
-    private static final Method getDEFAULT_NAME = NamedEntity.getDeclaredMethod('getDEFAULT_NAME')
-    private static final Method getDEFAULT_AGE = Person.getDeclaredMethod('getDEFAULT_AGE')
+    private static final Method getDefaultName = NamedEntity.getDeclaredMethod('getDefaultName')
+    private static final Method getDefaultAge = Person.getDeclaredMethod('getDefaultAge')
     private static final Method getName = NamedEntity.getDeclaredMethod('getName')
     private static final Method getAge = Person.getDeclaredMethod('getAge')
 
-    private static final Method setDEFAULT_NAME = NamedEntity.getDeclaredMethod('setDEFAULT_NAME', String)
-    private static final Method setDEFAULT_AGE = Person.getDeclaredMethod('setDEFAULT_AGE', Integer)
+    private static final Method setDefaultName = NamedEntity.getDeclaredMethod('setDefaultName', String)
+    private static final Method setDefaultAge = Person.getDeclaredMethod('setDefaultAge', Integer)
     private static final Method setName = NamedEntity.getDeclaredMethod('setName', String)
     private static final Method setAge = Person.getDeclaredMethod('setAge', Integer)
 
@@ -401,12 +401,12 @@ class ReflectTest extends Specification {
         'invoke'                  | [getUniqueId.name]                                                                     || new Reflect(uuidValue.class, uuidValue)
         'invoke'                  | [getUniqueId.returnType, getUniqueId.name, [].toArray()]                               || new Reflect(uuidValue.class, uuidValue)
         'invoke'                  | [getUniqueId.returnType, getUniqueId.name]                                             || new Reflect(uuidValue.class, uuidValue)
-        'invoke'                  | [getDEFAULT_NAME.name, [].toArray()]                                                   || new Reflect(DEFAULT_NAME.get(null).class, DEFAULT_NAME.get(null))
-        'invoke'                  | [getDEFAULT_NAME.name]                                                                 || new Reflect(DEFAULT_NAME.get(null).class, DEFAULT_NAME.get(null))
-        'invoke'                  | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name, [].toArray()]                       || new Reflect(DEFAULT_NAME.get(null).class, DEFAULT_NAME.get(null))
-        'invoke'                  | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name]                                     || new Reflect(DEFAULT_NAME.get(null).class, DEFAULT_NAME.get(null))
-        'invoke'                  | [setDEFAULT_NAME.name, [DEFAULT_NAME.get(null)].toArray()]                             || new Reflect(void, null)
-        'invoke'                  | [setDEFAULT_NAME.returnType, setDEFAULT_NAME.name, [DEFAULT_NAME.get(null)].toArray()] || new Reflect(void, null)
+        'invoke'                  | [getDefaultName.name, [].toArray()]                                                    || new Reflect(DEFAULT_NAME.get(null).class, DEFAULT_NAME.get(null))
+        'invoke'                  | [getDefaultName.name]                                                                  || new Reflect(DEFAULT_NAME.get(null).class, DEFAULT_NAME.get(null))
+        'invoke'                  | [getDefaultName.returnType, getDefaultName.name, [].toArray()]                         || new Reflect(DEFAULT_NAME.get(null).class, DEFAULT_NAME.get(null))
+        'invoke'                  | [getDefaultName.returnType, getDefaultName.name]                                       || new Reflect(DEFAULT_NAME.get(null).class, DEFAULT_NAME.get(null))
+        'invoke'                  | [setDefaultName.name, [DEFAULT_NAME.get(null)].toArray()]                             || new Reflect(void, null)
+        'invoke'                  | [setDefaultName.returnType, setDefaultName.name, [DEFAULT_NAME.get(null)].toArray()] || new Reflect(void, null)
         'invoke'                  | [getName.name, [].toArray()]                                                           || new Reflect(nameValue.class, nameValue)
         'invoke'                  | [getName.name]                                                                         || new Reflect(nameValue.class, nameValue)
         'invoke'                  | [getName.returnType, getName.name, [].toArray()]                                       || new Reflect(nameValue.class, nameValue)
@@ -414,12 +414,12 @@ class ReflectTest extends Specification {
         'invoke'                  | [[nameValue].toArray()]                                                                || new Reflect(void, null)
         'invoke'                  | [setName.name, [nameValue].toArray()]                                                  || new Reflect(void, null)
         'invoke'                  | [setName.returnType, setName.name, [nameValue].toArray()]                              || new Reflect(void, null)
-        'invoke'                  | [getDEFAULT_AGE.name, [].toArray()]                                                    || new Reflect(DEFAULT_AGE.get(null).class, DEFAULT_AGE.get(null))
-        'invoke'                  | [getDEFAULT_AGE.name]                                                                  || new Reflect(DEFAULT_AGE.get(null).class, DEFAULT_AGE.get(null))
-        'invoke'                  | [getDEFAULT_AGE.returnType, getDEFAULT_AGE.name, [].toArray()]                         || new Reflect(DEFAULT_AGE.get(null).class, DEFAULT_AGE.get(null))
-        'invoke'                  | [getDEFAULT_AGE.returnType, getDEFAULT_AGE.name]                                       || new Reflect(DEFAULT_AGE.get(null).class, DEFAULT_AGE.get(null))
-        'invoke'                  | [setDEFAULT_AGE.name, [DEFAULT_AGE.get(null)].toArray()]                               || new Reflect(void, null)
-        'invoke'                  | [setDEFAULT_AGE.returnType, setDEFAULT_AGE.name, [DEFAULT_AGE.get(null)].toArray()]    || new Reflect(void, null)
+        'invoke'                  | [getDefaultAge.name, [].toArray()]                                                     || new Reflect(DEFAULT_AGE.get(null).class, DEFAULT_AGE.get(null))
+        'invoke'                  | [getDefaultAge.name]                                                                   || new Reflect(DEFAULT_AGE.get(null).class, DEFAULT_AGE.get(null))
+        'invoke'                  | [getDefaultAge.returnType, getDefaultAge.name, [].toArray()]                           || new Reflect(DEFAULT_AGE.get(null).class, DEFAULT_AGE.get(null))
+        'invoke'                  | [getDefaultAge.returnType, getDefaultAge.name]                                         || new Reflect(DEFAULT_AGE.get(null).class, DEFAULT_AGE.get(null))
+        'invoke'                  | [setDefaultAge.name, [DEFAULT_AGE.get(null)].toArray()]                               || new Reflect(void, null)
+        'invoke'                  | [setDefaultAge.returnType, setDefaultAge.name, [DEFAULT_AGE.get(null)].toArray()]    || new Reflect(void, null)
         'invoke'                  | [getAge.name, [].toArray()]                                                            || new Reflect(ageValue.class, ageValue)
         'invoke'                  | [getAge.name]                                                                          || new Reflect(ageValue.class, ageValue)
         'invoke'                  | [getAge.returnType, getAge.name, [].toArray()]                                         || new Reflect(ageValue.class, ageValue)
@@ -456,31 +456,31 @@ class ReflectTest extends Specification {
         'getNonStaticMethod'      | [setAge.name, setAge.parameterTypes]                                                   || setAge
         'getNonStaticMethod'      | [setAge.returnType, setAge.name, setAge.parameterTypes]                                || setAge
         'getNonStaticMethod'      | []                                                                                     || getAge
-        'getStaticMethod'         | [getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes]                                 || getDEFAULT_NAME
-        'getStaticMethod'         | [getDEFAULT_NAME.name]                                                                 || getDEFAULT_NAME
-        'getStaticMethod'         | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes]     || getDEFAULT_NAME
-        'getStaticMethod'         | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name]                                     || getDEFAULT_NAME
-        'getStaticMethod'         | [setDEFAULT_NAME.parameterTypes]                                                       || setDEFAULT_NAME
-        'getStaticMethod'         | [setDEFAULT_NAME.name, setDEFAULT_NAME.parameterTypes]                                 || setDEFAULT_NAME
-        'getStaticMethod'         | [setDEFAULT_NAME.returnType, setDEFAULT_NAME.name, setDEFAULT_NAME.parameterTypes]     || setDEFAULT_NAME
-        'getStaticMethod'         | [getDEFAULT_AGE.name, getDEFAULT_AGE.parameterTypes]                                   || getDEFAULT_AGE
-        'getStaticMethod'         | [getDEFAULT_AGE.name]                                                                  || getDEFAULT_AGE
-        'getStaticMethod'         | [getDEFAULT_AGE.returnType, getDEFAULT_AGE.name, getDEFAULT_AGE.parameterTypes]        || getDEFAULT_AGE
-        'getStaticMethod'         | [getDEFAULT_AGE.returnType, getDEFAULT_AGE.name]                                       || getDEFAULT_AGE
-        'getStaticMethod'         | [setDEFAULT_AGE.parameterTypes]                                                        || setDEFAULT_AGE
-        'getStaticMethod'         | [setDEFAULT_AGE.name, setDEFAULT_AGE.parameterTypes]                                   || setDEFAULT_AGE
-        'getStaticMethod'         | [setDEFAULT_AGE.returnType, setDEFAULT_AGE.name, setDEFAULT_AGE.parameterTypes]        || setDEFAULT_AGE
-        'getStaticMethod'         | []                                                                                     || getDEFAULT_AGE
+        'getStaticMethod'         | [getDefaultName.name, getDefaultName.parameterTypes]                                   || getDefaultName
+        'getStaticMethod'         | [getDefaultName.name]                                                                  || getDefaultName
+        'getStaticMethod'         | [getDefaultName.returnType, getDefaultName.name, getDefaultName.parameterTypes]        || getDefaultName
+        'getStaticMethod'         | [getDefaultName.returnType, getDefaultName.name]                                       || getDefaultName
+        'getStaticMethod'         | [setDefaultName.parameterTypes]                                                       || setDefaultName
+        'getStaticMethod'         | [setDefaultName.name, setDefaultName.parameterTypes]                                 || setDefaultName
+        'getStaticMethod'         | [setDefaultName.returnType, setDefaultName.name, setDefaultName.parameterTypes]     || setDefaultName
+        'getStaticMethod'         | [getDefaultAge.name, getDefaultAge.parameterTypes]                                     || getDefaultAge
+        'getStaticMethod'         | [getDefaultAge.name]                                                                   || getDefaultAge
+        'getStaticMethod'         | [getDefaultAge.returnType, getDefaultAge.name, getDefaultAge.parameterTypes]           || getDefaultAge
+        'getStaticMethod'         | [getDefaultAge.returnType, getDefaultAge.name]                                         || getDefaultAge
+        'getStaticMethod'         | [setDefaultAge.parameterTypes]                                                        || setDefaultAge
+        'getStaticMethod'         | [setDefaultAge.name, setDefaultAge.parameterTypes]                                   || setDefaultAge
+        'getStaticMethod'         | [setDefaultAge.returnType, setDefaultAge.name, setDefaultAge.parameterTypes]        || setDefaultAge
+        'getStaticMethod'         | []                                                                                     || getDefaultAge
         'getMethod'               | [getUniqueId.name, getUniqueId.parameterTypes]                                         || getUniqueId
         'getMethod'               | [getUniqueId.name]                                                                     || getUniqueId
         'getMethod'               | [getUniqueId.returnType, getUniqueId.name, getUniqueId.parameterTypes]                 || getUniqueId
         'getMethod'               | [getUniqueId.returnType, getUniqueId.name]                                             || getUniqueId
-        'getMethod'               | [getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes]                                 || getDEFAULT_NAME
-        'getMethod'               | [getDEFAULT_NAME.name]                                                                 || getDEFAULT_NAME
-        'getMethod'               | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes]     || getDEFAULT_NAME
-        'getMethod'               | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name]                                     || getDEFAULT_NAME
-        'getMethod'               | [setDEFAULT_NAME.name, setDEFAULT_NAME.parameterTypes]                                 || setDEFAULT_NAME
-        'getMethod'               | [setDEFAULT_NAME.returnType, setDEFAULT_NAME.name, setDEFAULT_NAME.parameterTypes]     || setDEFAULT_NAME
+        'getMethod'               | [getDefaultName.name, getDefaultName.parameterTypes]                                   || getDefaultName
+        'getMethod'               | [getDefaultName.name]                                                                  || getDefaultName
+        'getMethod'               | [getDefaultName.returnType, getDefaultName.name, getDefaultName.parameterTypes]        || getDefaultName
+        'getMethod'               | [getDefaultName.returnType, getDefaultName.name]                                       || getDefaultName
+        'getMethod'               | [setDefaultName.name, setDefaultName.parameterTypes]                                 || setDefaultName
+        'getMethod'               | [setDefaultName.returnType, setDefaultName.name, setDefaultName.parameterTypes]     || setDefaultName
         'getMethod'               | [getName.name, getName.parameterTypes]                                                 || getName
         'getMethod'               | [getName.name]                                                                         || getName
         'getMethod'               | [getName.returnType, getName.name, getName.parameterTypes]                             || getName
@@ -488,12 +488,12 @@ class ReflectTest extends Specification {
         'getMethod'               | [setName.parameterTypes]                                                               || setName
         'getMethod'               | [setName.name, setName.parameterTypes]                                                 || setName
         'getMethod'               | [setName.returnType, setName.name, setName.parameterTypes]                             || setName
-        'getMethod'               | [getDEFAULT_AGE.name, getDEFAULT_AGE.parameterTypes]                                   || getDEFAULT_AGE
-        'getMethod'               | [getDEFAULT_AGE.name]                                                                  || getDEFAULT_AGE
-        'getMethod'               | [getDEFAULT_AGE.returnType, getDEFAULT_AGE.name, getDEFAULT_AGE.parameterTypes]        || getDEFAULT_AGE
-        'getMethod'               | [getDEFAULT_AGE.returnType, getDEFAULT_AGE.name]                                       || getDEFAULT_AGE
-        'getMethod'               | [setDEFAULT_AGE.name, setDEFAULT_AGE.parameterTypes]                                   || setDEFAULT_AGE
-        'getMethod'               | [setDEFAULT_AGE.returnType, setDEFAULT_AGE.name, setDEFAULT_AGE.parameterTypes]        || setDEFAULT_AGE
+        'getMethod'               | [getDefaultAge.name, getDefaultAge.parameterTypes]                                     || getDefaultAge
+        'getMethod'               | [getDefaultAge.name]                                                                   || getDefaultAge
+        'getMethod'               | [getDefaultAge.returnType, getDefaultAge.name, getDefaultAge.parameterTypes]           || getDefaultAge
+        'getMethod'               | [getDefaultAge.returnType, getDefaultAge.name]                                         || getDefaultAge
+        'getMethod'               | [setDefaultAge.name, setDefaultAge.parameterTypes]                                   || setDefaultAge
+        'getMethod'               | [setDefaultAge.returnType, setDefaultAge.name, setDefaultAge.parameterTypes]        || setDefaultAge
         'getMethod'               | [getAge.name, getAge.parameterTypes]                                                   || getAge
         'getMethod'               | [getAge.name]                                                                          || getAge
         'getMethod'               | [getAge.returnType, getAge.name, getAge.parameterTypes]                                || getAge
@@ -514,22 +514,22 @@ class ReflectTest extends Specification {
                  interfaceGetName, getUniqueId,
                  *objectMethods.findAll { !Modifier.isStatic(it.modifiers) }]
         'getStaticMethods'        | []                                                                                     ||
-                [getDEFAULT_AGE, setDEFAULT_AGE, getDEFAULT_NAME, setDEFAULT_NAME, *objectMethods.findAll { Modifier.isStatic(it.modifiers) }]
+                [getDefaultAge, setDefaultAge, getDefaultName, setDefaultName, *objectMethods.findAll { Modifier.isStatic(it.modifiers) }]
         'getMethods'              | [((Predicate<Field>) (f) -> false)]                                                    || []
         'getMethods'              | [((Predicate<Field>) (f) -> f.declaringClass == Entity)]                               ||
                 [interfaceGetName, getUniqueId]
         'getMethods'              | [((Predicate<Field>) (f) -> f.declaringClass == NamedEntity)]                          ||
-                [namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDEFAULT_NAME, setDEFAULT_NAME]
+                [namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDefaultName, setDefaultName]
         'getMethods'              | [((Predicate<Field>) (f) -> f.declaringClass == Person)]                               ||
-                [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString, getDEFAULT_AGE, setDEFAULT_AGE]
+                [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString, getDefaultAge, setDefaultAge]
         'getMethods'              | [((Predicate<Field>) (f) -> true)]                                                     ||
-                [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString, getDEFAULT_AGE, setDEFAULT_AGE,
-                 namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDEFAULT_NAME, setDEFAULT_NAME,
+                [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString, getDefaultAge, setDefaultAge,
+                 namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDefaultName, setDefaultName,
                  interfaceGetName, getUniqueId,
                  *objectMethods]
         'getMethods'              | []                                                                                     ||
-                [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString, getDEFAULT_AGE, setDEFAULT_AGE,
-                 namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDEFAULT_NAME, setDEFAULT_NAME,
+                [personCanEqual, personEquals, getAge, personHashCode, setAge, personToString, getDefaultAge, setDefaultAge,
+                 namedEntityCanEqual, namedEntityEquals, getName, namedEntityHashCode, setName, namedEntityToString, getDefaultName, setDefaultName,
                  interfaceGetName, getUniqueId,
                  *objectMethods]
     }
@@ -543,80 +543,80 @@ class ReflectTest extends Specification {
         e.message == expected.message
 
         where:
-        method               | arguments                                                                          || expected
+        method               | arguments                                                                       || expected
         // init
-        'init'               | []                                                                                 || ReflectException.cannotFindConstructor(Person, new Class[0])
-        'init'               | [21, null, 'Camilla']                                                              || ReflectException.cannotFindConstructor(Person, Integer, null, String)
+        'init'               | []                                                                              || ReflectException.cannotFindConstructor(Person, new Class[0])
+        'init'               | [21, null, 'Camilla']                                                           || ReflectException.cannotFindConstructor(Person, Integer, null, String)
         // getConstructor
-        'getConstructor'     | []                                                                                 || ReflectException.cannotFindConstructor(Person, new Class[0])
-        'getConstructor'     | [Integer, String]                                                                  || ReflectException.cannotFindConstructor(Person, Integer, String)
-        'getConstructor'     | [((Predicate<Field>) (f) -> false)]                                                || ReflectException.cannotFindConstructor(Person)
+        'getConstructor'     | []                                                                              || ReflectException.cannotFindConstructor(Person, new Class[0])
+        'getConstructor'     | [Integer, String]                                                               || ReflectException.cannotFindConstructor(Person, Integer, String)
+        'getConstructor'     | [((Predicate<Field>) (f) -> false)]                                             || ReflectException.cannotFindConstructor(Person)
         // get
-        'getInstance'        | [DEFAULT_NAME.name]                                                                || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
-        'getInstance'        | [DEFAULT_AGE.name]                                                                 || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
-        'getInstance'        | [name.name]                                                                        || ReflectException.cannotFindField(Person, name.name)
-        'getInstance'        | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'getNonStatic'       | [DEFAULT_NAME.name]                                                                || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
-        'getNonStatic'       | [DEFAULT_AGE.name]                                                                 || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
-        'getNonStatic'       | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'getStatic'          | [name.name]                                                                        || ReflectException.cannotFindField(Person, name.name)
-        'getStatic'          | [age.name]                                                                         || ReflectException.cannotFindField(Person, age.name)
-        'getStatic'          | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'get'                | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'get'                | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'get'                | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'get'                | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'get'                | [((Predicate<Field>) (f) -> f.declaringClass == String)]                           || ReflectException.cannotFindField(Person)
+        'getInstance'        | [DEFAULT_NAME.name]                                                             || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
+        'getInstance'        | [DEFAULT_AGE.name]                                                              || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
+        'getInstance'        | [name.name]                                                                     || ReflectException.cannotFindField(Person, name.name)
+        'getInstance'        | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'getNonStatic'       | [DEFAULT_NAME.name]                                                             || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
+        'getNonStatic'       | [DEFAULT_AGE.name]                                                              || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
+        'getNonStatic'       | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'getStatic'          | [name.name]                                                                     || ReflectException.cannotFindField(Person, name.name)
+        'getStatic'          | [age.name]                                                                      || ReflectException.cannotFindField(Person, age.name)
+        'getStatic'          | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'get'                | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'get'                | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'get'                | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'get'                | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'get'                | [((Predicate<Field>) (f) -> f.declaringClass == String)]                        || ReflectException.cannotFindField(Person)
         // getField
-        'getInstanceField'   | [DEFAULT_NAME.name]                                                                || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
-        'getInstanceField'   | [DEFAULT_AGE.name]                                                                 || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
-        'getInstanceField'   | [name.name]                                                                        || ReflectException.cannotFindField(Person, name.name)
-        'getInstanceField'   | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'getNonStaticField'  | [DEFAULT_NAME.name]                                                                || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
-        'getNonStaticField'  | [DEFAULT_AGE.name]                                                                 || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
-        'getNonStaticField'  | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'getStaticField'     | [name.name]                                                                        || ReflectException.cannotFindField(Person, name.name)
-        'getStaticField'     | [age.name]                                                                         || ReflectException.cannotFindField(Person, age.name)
-        'getStaticField'     | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'getField'           | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'getField'           | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'getField'           | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'getField'           | ['notExisting']                                                                    || ReflectException.cannotFindField(Person, 'notExisting')
-        'getField'           | [((Predicate<Field>) (f) -> f.declaringClass == String)]                           || ReflectException.cannotFindField(Person)
-        'getField'           | [((Predicate<Field>) (f) -> false)]                                                || ReflectException.cannotFindField(Person)
+        'getInstanceField'   | [DEFAULT_NAME.name]                                                             || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
+        'getInstanceField'   | [DEFAULT_AGE.name]                                                              || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
+        'getInstanceField'   | [name.name]                                                                     || ReflectException.cannotFindField(Person, name.name)
+        'getInstanceField'   | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'getNonStaticField'  | [DEFAULT_NAME.name]                                                             || ReflectException.cannotFindField(Person, DEFAULT_NAME.name)
+        'getNonStaticField'  | [DEFAULT_AGE.name]                                                              || ReflectException.cannotFindField(Person, DEFAULT_AGE.name)
+        'getNonStaticField'  | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'getStaticField'     | [name.name]                                                                     || ReflectException.cannotFindField(Person, name.name)
+        'getStaticField'     | [age.name]                                                                      || ReflectException.cannotFindField(Person, age.name)
+        'getStaticField'     | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'getField'           | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'getField'           | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'getField'           | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'getField'           | ['notExisting']                                                                 || ReflectException.cannotFindField(Person, 'notExisting')
+        'getField'           | [((Predicate<Field>) (f) -> f.declaringClass == String)]                        || ReflectException.cannotFindField(Person)
+        'getField'           | [((Predicate<Field>) (f) -> false)]                                             || ReflectException.cannotFindField(Person)
         // invoke
-        'invoke'             | [['Hello, world!', null, new Object()].toArray()]                                  || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
-        'invoke'             | ['notExisting', ['Hello, world!', null, new Object()].toArray()]                   || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
-        'invoke'             | [boolean, 'notExisting', ['Hello, world!', null, new Object()].toArray()]          || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
+        'invoke'             | [['Hello, world!', null, new Object()].toArray()]                               || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
+        'invoke'             | ['notExisting', ['Hello, world!', null, new Object()].toArray()]                || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
+        'invoke'             | [boolean, 'notExisting', ['Hello, world!', null, new Object()].toArray()]       || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
         // getMethod
-        'getInstanceMethod'  | [getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes]                             || ReflectException.cannotFindMethod(Person, null, getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes)
-        'getInstanceMethod'  | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes] || ReflectException.cannotFindMethod(Person, getDEFAULT_NAME.returnType, getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes)
-        'getInstanceMethod'  | [getName.name, getName.parameterTypes]                                             || ReflectException.cannotFindMethod(Person, null, getName.name, getName.parameterTypes)
-        'getInstanceMethod'  | [getName.returnType, getName.name, getName.parameterTypes]                         || ReflectException.cannotFindMethod(Person, getName.returnType, getName.name, getName.parameterTypes)
-        'getInstanceMethod'  | [[String, null, Object].toArray(new Class[3])]                                     || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
-        'getInstanceMethod'  | ['notExisting', [String, null, Object].toArray(new Class[3])]                      || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
-        'getInstanceMethod'  | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]             || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
-        'getNonStaticMethod' | [getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes]                             || ReflectException.cannotFindMethod(Person, null, getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes)
-        'getNonStaticMethod' | [getDEFAULT_NAME.returnType, getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes] || ReflectException.cannotFindMethod(Person, getDEFAULT_NAME.returnType, getDEFAULT_NAME.name, getDEFAULT_NAME.parameterTypes)
-        'getNonStaticMethod' | [[String, null, Object].toArray(new Class[3])]                                     || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
-        'getNonStaticMethod' | ['notExisting', [String, null, Object].toArray(new Class[3])]                      || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
-        'getNonStaticMethod' | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]             || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
-        'getStaticMethod'    | [getName.name, getName.parameterTypes]                                             || ReflectException.cannotFindMethod(Person, null, getName.name, getName.parameterTypes)
-        'getStaticMethod'    | [getName.returnType, getName.name, getName.parameterTypes]                         || ReflectException.cannotFindMethod(Person, getName.returnType, getName.name, getName.parameterTypes)
-        'getStaticMethod'    | [[String, null, Object].toArray(new Class[3])]                                     || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
-        'getStaticMethod'    | ['notExisting', [String, null, Object].toArray(new Class[3])]                      || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
-        'getStaticMethod'    | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]             || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
-        'getMethod'          | [[String, null, Object].toArray(new Class[3])]                                     || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
-        'getMethod'          | ['notExisting', [String, null, Object].toArray(new Class[3])]                      || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
-        'getMethod'          | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]             || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
-        'getMethod'          | [((Predicate<Field>) (f) -> false)]                                                || ReflectException.cannotFindMethod(Person)
+        'getInstanceMethod'  | [getDefaultName.name, getDefaultName.parameterTypes]                            || ReflectException.cannotFindMethod(Person, null, getDefaultName.name, getDefaultName.parameterTypes)
+        'getInstanceMethod'  | [getDefaultName.returnType, getDefaultName.name, getDefaultName.parameterTypes] || ReflectException.cannotFindMethod(Person, getDefaultName.returnType, getDefaultName.name, getDefaultName.parameterTypes)
+        'getInstanceMethod'  | [getName.name, getName.parameterTypes]                                          || ReflectException.cannotFindMethod(Person, null, getName.name, getName.parameterTypes)
+        'getInstanceMethod'  | [getName.returnType, getName.name, getName.parameterTypes]                      || ReflectException.cannotFindMethod(Person, getName.returnType, getName.name, getName.parameterTypes)
+        'getInstanceMethod'  | [[String, null, Object].toArray(new Class[3])]                                  || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
+        'getInstanceMethod'  | ['notExisting', [String, null, Object].toArray(new Class[3])]                   || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
+        'getInstanceMethod'  | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]          || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
+        'getNonStaticMethod' | [getDefaultName.name, getDefaultName.parameterTypes]                            || ReflectException.cannotFindMethod(Person, null, getDefaultName.name, getDefaultName.parameterTypes)
+        'getNonStaticMethod' | [getDefaultName.returnType, getDefaultName.name, getDefaultName.parameterTypes] || ReflectException.cannotFindMethod(Person, getDefaultName.returnType, getDefaultName.name, getDefaultName.parameterTypes)
+        'getNonStaticMethod' | [[String, null, Object].toArray(new Class[3])]                                  || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
+        'getNonStaticMethod' | ['notExisting', [String, null, Object].toArray(new Class[3])]                   || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
+        'getNonStaticMethod' | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]          || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
+        'getStaticMethod'    | [getName.name, getName.parameterTypes]                                          || ReflectException.cannotFindMethod(Person, null, getName.name, getName.parameterTypes)
+        'getStaticMethod'    | [getName.returnType, getName.name, getName.parameterTypes]                      || ReflectException.cannotFindMethod(Person, getName.returnType, getName.name, getName.parameterTypes)
+        'getStaticMethod'    | [[String, null, Object].toArray(new Class[3])]                                  || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
+        'getStaticMethod'    | ['notExisting', [String, null, Object].toArray(new Class[3])]                   || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
+        'getStaticMethod'    | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]          || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
+        'getMethod'          | [[String, null, Object].toArray(new Class[3])]                                  || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
+        'getMethod'          | ['notExisting', [String, null, Object].toArray(new Class[3])]                   || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
+        'getMethod'          | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]          || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
+        'getMethod'          | [((Predicate<Field>) (f) -> false)]                                             || ReflectException.cannotFindMethod(Person)
         // enum
-        'name'               | []                                                                                 || new ReflectException('%s is not an enum', new Person(nameValue, ageValue))
-        'ordinal'            | []                                                                                 || new ReflectException('%s is not an enum', new Person(nameValue, ageValue))
-        'getEnum'            | []                                                                                 || new ReflectException('%s is not an enum', new Person(nameValue, ageValue))
-        'valueOf'            | ['invalid']                                                                        || new ReflectException('Type \'%s\' is not an enum', Person)
-        'values'             | []                                                                                 || new ReflectException('Type \'%s\' is not an enum', Person)
-        'getEnumClass'       | []                                                                                 || new ReflectException('Type \'%s\' is not an enum', Person)
+        'name'               | []                                                                              || new ReflectException('%s is not an enum', new Person(nameValue, ageValue))
+        'ordinal'            | []                                                                              || new ReflectException('%s is not an enum', new Person(nameValue, ageValue))
+        'getEnum'            | []                                                                              || new ReflectException('%s is not an enum', new Person(nameValue, ageValue))
+        'valueOf'            | ['invalid']                                                                     || new ReflectException('Type \'%s\' is not an enum', Person)
+        'values'             | []                                                                              || new ReflectException('Type \'%s\' is not an enum', Person)
+        'getEnumClass'       | []                                                                              || new ReflectException('Type \'%s\' is not an enum', Person)
     }
 
     def 'test that init with #exception throws #expected'() {
