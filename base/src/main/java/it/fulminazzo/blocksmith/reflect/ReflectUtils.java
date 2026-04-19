@@ -93,7 +93,7 @@ public final class ReflectUtils {
      *
      * @param clazz the class
      * @param type  the type
-     * @return <code>true</code> if it does
+     * @return {@code true} if it does
      */
     static boolean extendsType(final @NotNull Class<?> clazz, final @NotNull Type type) {
         Class<?> current = clazz;
@@ -116,7 +116,7 @@ public final class ReflectUtils {
      *               Because of this, the {@link WildcardType}, {@link TypeVariable}
      *               and {@link GenericArrayType} should never be encountered.
      * @param target the target type
-     * @return <code>true</code> if they match
+     * @return {@code true} if they match
      */
     static boolean typeMatches(final @NotNull Type source, final @NotNull Type target) {
         return scoreTypeMatching(source, target).isPresent();

@@ -103,7 +103,7 @@ public class Reflect {
     /**
      * Checks if the type is primitive.
      *
-     * @return <code>true</code> if it is
+     * @return {@code true} if it is
      */
     public boolean isPrimitive() {
         return PRIMITIVE_TO_WRAPPER.containsKey(getObjectClass());
@@ -112,7 +112,7 @@ public class Reflect {
     /**
      * Checks if the type is a Java wrapper type.
      *
-     * @return <code>true</code> if it is
+     * @return {@code true} if it is
      */
     public boolean isWrapper() {
         return WRAPPER_TO_PRIMITIVE.containsKey(getObjectClass());
@@ -122,7 +122,7 @@ public class Reflect {
      * Checks if the type is a base Java type.
      * A base type is a primitive, wrapper or {@link String}.
      *
-     * @return <code>true</code> if it is
+     * @return {@code true} if it is
      */
     public boolean isBaseType() {
         return isPrimitive() || isWrapper() || getObjectClass().equals(String.class);
@@ -134,7 +134,7 @@ public class Reflect {
      * <b>WARNING</b>: will not check for generic types correctness
      *
      * @param type the type to check
-     * @return <code>true</code> if it does
+     * @return {@code true} if it does
      */
     public boolean extendsType(final @NotNull Type type) {
         Class<?> clazz = getObjectClass();
@@ -701,7 +701,7 @@ public class Reflect {
     /**
      * Invokes the method with the given name and parameters.
      *
-     * @param name       the name (if <code>null</code> any method found will be accepted)
+     * @param name       the name (if {@code null} any method found will be accepted)
      * @param parameters the parameters
      * @return the returned value
      * @throws ReflectException if no method was found or an error occurs while getting the value
@@ -714,8 +714,8 @@ public class Reflect {
     /**
      * Invokes the method with the given name, return type and parameters.
      *
-     * @param returnType the return type (if <code>null</code> any method found will be accepted)
-     * @param name       the name (if <code>null</code> any method found will be accepted)
+     * @param returnType the return type (if {@code null} any method found will be accepted)
+     * @param name       the name (if {@code null} any method found will be accepted)
      * @param parameters the parameters
      * @return the returned value
      * @throws ReflectException if no method was found or an error occurs while getting the value
@@ -757,7 +757,7 @@ public class Reflect {
     /**
      * Gets the non-static method with the given name, return type and parameter types (not including inherited methods).
      *
-     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
@@ -768,7 +768,7 @@ public class Reflect {
     /**
      * Gets the non-static method with the given parameter types.
      *
-     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
@@ -779,7 +779,7 @@ public class Reflect {
     /**
      * Gets the static method with the given parameter types.
      *
-     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
@@ -790,7 +790,7 @@ public class Reflect {
     /**
      * Gets the method with the given parameter types.
      *
-     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
@@ -801,8 +801,8 @@ public class Reflect {
     /**
      * Gets the non-static method with the given name, return type and parameter types (not including inherited methods).
      *
-     * @param name           the name (if <code>null</code> any method found will be accepted)
-     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @param name           the name (if {@code null} any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
@@ -814,8 +814,8 @@ public class Reflect {
     /**
      * Gets the non-static method with the given name and parameter types.
      *
-     * @param name           the name (if <code>null</code> any method found will be accepted)
-     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @param name           the name (if {@code null} any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
@@ -827,8 +827,8 @@ public class Reflect {
     /**
      * Gets the static method with the given name and parameter types.
      *
-     * @param name           the name (if <code>null</code> any method found will be accepted)
-     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @param name           the name (if {@code null} any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
@@ -840,8 +840,8 @@ public class Reflect {
     /**
      * Gets the method with the given name and parameter types.
      *
-     * @param name           the name (if <code>null</code> any method found will be accepted)
-     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @param name           the name (if {@code null} any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
@@ -853,9 +853,9 @@ public class Reflect {
     /**
      * Gets the non-static method with the given name, return type and parameter types (not including inherited methods).
      *
-     * @param returnType     the return type (if <code>null</code> any method found will be accepted)
-     * @param name           the name (if <code>null</code> any method found will be accepted)
-     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @param returnType     the return type (if {@code null} any method found will be accepted)
+     * @param name           the name (if {@code null} any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
@@ -869,9 +869,9 @@ public class Reflect {
     /**
      * Gets the non-static method with the given name, return type and parameter types.
      *
-     * @param returnType     the return type (if <code>null</code> any method found will be accepted)
-     * @param name           the name (if <code>null</code> any method found will be accepted)
-     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @param returnType     the return type (if {@code null} any method found will be accepted)
+     * @param name           the name (if {@code null} any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
@@ -884,9 +884,9 @@ public class Reflect {
     /**
      * Gets the static method with the given name, return type and parameter types.
      *
-     * @param returnType     the return type (if <code>null</code> any method found will be accepted)
-     * @param name           the name (if <code>null</code> any method found will be accepted)
-     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @param returnType     the return type (if {@code null} any method found will be accepted)
+     * @param name           the name (if {@code null} any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
@@ -899,9 +899,9 @@ public class Reflect {
     /**
      * Gets the method with the given name, return type and parameter types.
      *
-     * @param returnType     the return type (if <code>null</code> any method found will be accepted)
-     * @param name           the name (if <code>null</code> any method found will be accepted)
-     * @param parameterTypes the parameter types (if a type is <code>null</code>, it will be considered as wildcard)
+     * @param returnType     the return type (if {@code null} any method found will be accepted)
+     * @param name           the name (if {@code null} any method found will be accepted)
+     * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
@@ -1202,7 +1202,7 @@ public class Reflect {
     /**
      * Converts the given parameters to an array of classes.
      * <br>
-     * Any <code>null</code> parameter will have a <code>null</code> class.
+     * Any {@code null} parameter will have a {@code null} class.
      *
      * @param parameters the parameters
      * @return the parameters types
