@@ -72,7 +72,7 @@ public final class NightConfigUtils {
      * Gets the comment value, indented for each line.
      *
      * @param comment the comment
-     * @return the comment value (<code>null</code> if empty or only white spaces)
+     * @return the comment value ({@code null} if empty or only white spaces)
      */
     static @Nullable String getCommentValue(final @NotNull Comment comment) {
         String commentText = String.join("\n", CommentUtils.getText(comment));

@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.validation.annotation;
 
 import it.fulminazzo.blocksmith.validation.Constraint;
-import it.fulminazzo.blocksmith.validation.annotation.Matches;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.*;
@@ -9,7 +8,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a {@link CharSequence} parameter or type that represents a UUID.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
 @Constraint

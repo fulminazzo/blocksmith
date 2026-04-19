@@ -7,9 +7,9 @@ import java.lang.annotation.*;
  * These annotations are the only ones checked and validated from {@link Validator},
  * so, when creating custom constraints, it is <b>mandatory</b> to annotate it as a constraint.
  * <br>
- * The validator will search for the <code>message()</code> and <code>exceptionMessage()</code>
+ * The validator will search for the {@code message()} and {@code exceptionMessage()}
  * methods to construct a {@link ConstraintViolation}. If those are not given, default values
- * will be used (<code>null</code> for message).
+ * will be used ({@code null} for the message).
  * <br>
  * Any other non-static method of the annotation will be used to define the values
  * of the constraint which will be available through {@link ConstraintViolation#getArguments()}.

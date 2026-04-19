@@ -1,6 +1,8 @@
 package it.fulminazzo.blocksmith.util;
 
 import it.fulminazzo.blocksmith.structure.Pair;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,6 +13,7 @@ import java.util.stream.Collectors;
 /**
  * A collection of utilities to work with strings.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StringUtils {
 
     /**
@@ -35,7 +38,7 @@ public final class StringUtils {
      *
      * @param string the string
      * @param regex  the expression to use for splitting
-     * @param quoted if <code>true</code>, the found quotes will be prepended and appended to the results (if present)
+     * @param quoted if {@code true}, the found quotes will be prepended and appended to the results (if present)
      * @param quotes if any of these "quotes" are met during splitting,
      *               if the expression is found before the same quote is met,
      *               the string will not be split (useful for splitting quoted arguments).

@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.validation.annotation;
 
 import it.fulminazzo.blocksmith.validation.Constraint;
+import it.fulminazzo.blocksmith.validation.ValidationMessages;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.*;
@@ -17,7 +18,7 @@ import java.lang.annotation.*;
  *     {@link java.time.Instant}, {@link java.time.LocalTime} or {@link java.time.LocalDate}.</li>
  * </ul>
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Constraint
 @Documented
@@ -32,7 +33,7 @@ public @interface After {
      *
      * @return the message
      */
-    @NotNull String message() default "error.validation.not-after";
+    @NotNull String message() default ValidationMessages.REQUIRED_AFTER_NOW;
 
     /**
      * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
