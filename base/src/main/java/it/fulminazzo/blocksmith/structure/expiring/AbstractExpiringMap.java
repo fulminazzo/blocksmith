@@ -218,7 +218,7 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
         putAllHelper(map);
     }
 
-    private <EK extends K, EV extends V> void putAllHelper(final @NotNull ExpiringMap<EK, EV> map) {
+    private <K1 extends K, E1 extends V> void putAllHelper(final @NotNull ExpiringMap<K1, E1> map) {
         map.forEach((k, v) -> {
             Duration ttl = map.getTtl(k);
             if (ttl != null) put(k, v, ttl);
