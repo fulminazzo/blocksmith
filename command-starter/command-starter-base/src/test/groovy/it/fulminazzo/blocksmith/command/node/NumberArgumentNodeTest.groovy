@@ -3,12 +3,13 @@ package it.fulminazzo.blocksmith.command.node
 
 import it.fulminazzo.blocksmith.command.argument.ArgumentParseException
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser
+import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
 import it.fulminazzo.blocksmith.command.visitor.Visitor
 import spock.lang.Specification
 
 class NumberArgumentNodeTest extends Specification {
-    private NumberArgumentNode<?> node = newArgumentNode(int)
+    private NumberArgumentNode<? extends Number> node = newArgumentNode(int)
             .min(2)
             .max(8)
 
@@ -76,6 +77,23 @@ class NumberArgumentNodeTest extends Specification {
         number << [-1, 0, 1, 9, 10, 21, 1024]
     }
 
+
+    def 'test that getCompletions allows for custom completions'() {
+        given:
+        def visitor = Mock(Visitor)
+        visitor.input >> new CommandInput().addInput('')
+
+        and:
+        def supplier = Mock(CompletionsSupplier)
+        supplier.get() >> ['PI']
+        node.completionsSupplier = supplier
+
+        when:
+        def completions = node.getCompletions(visitor)
+
+        then:
+        completions == ['PI']
+    }
 
     def 'test that getCompletions removes invalid numbers'() {
         given:

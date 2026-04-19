@@ -77,8 +77,20 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
     public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
         List<String> completions = super.getCompletions(visitor);
         completions.removeIf(s -> {
-            double value = Double.parseDouble(s);
-            return value < min || value > max;
+            try {
+                double value = Double.parseDouble(s);
+                return value < min || value > max;
+            } catch (NumberFormatException e) {
+                /*
+                 * this is a rare case, but if the completions supply some special kind of number,
+                 * which is not a double but the user provided a custom parser for it,
+                 * we should allow it to exist.
+                 *
+                 * For example, imagine a custom Argument Parser for the constant "PI".
+                 * When typing "PI" this would allow the option to exist.
+                 */
+                return false;
+            }
         });
         return completions;
     }
