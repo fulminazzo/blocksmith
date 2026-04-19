@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
  * An exception thrown by {@link Reflect} on errors.
  */
 public final class ReflectException extends RuntimeException {
+    private static final long serialVersionUID = 5743949200733944293L;
 
     /**
      * Instantiates a new Reflect exception.
