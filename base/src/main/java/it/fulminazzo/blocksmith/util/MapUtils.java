@@ -77,7 +77,7 @@ public final class MapUtils {
 
     /**
      * Flattens a nested {@link Map} into a single-level map using dot-notation keys.
-     * Keys <b>must not</b> be <code>null</code>.
+     * Keys <b>must not</b> be {@code null}.
      * <p>
      * Nested maps are recursively traversed, with each level's key appended to the
      * parent key separated by a dot. For example, a nested structure such as:
@@ -117,7 +117,7 @@ public final class MapUtils {
 
     /**
      * Recomputes the key-values of the given map to remove any dot-notation key.
-     * Keys <b>must not</b> be <code>null</code>.
+     * Keys <b>must not</b> be {@code null}.
      * <br>
      * For example, a structure such as:
      * <pre>{@code
@@ -167,10 +167,10 @@ public final class MapUtils {
     /**
      * Expands the collections contained in the given map.
      * Collections are either {@link Collection} instances or array objects.
-     * Keys <b>must not</b> be <code>null</code>.
+     * Keys <b>must not</b> be {@code null}.
      * <br>
      * Each element of the collection is put in the map in the format
-     * <code>&lt;keyPrefix&gt;[&lt;index&gt;]</code> where <code>&lt;index&gt;</code>
+     * {@code <keyPrefix>[<index>]} where {@code <index>}
      * is the index of the element.
      *
      * @param map the map to expand
@@ -194,10 +194,10 @@ public final class MapUtils {
 
     /**
      * Each element of the collection is put in the map in the format
-     * <code>&lt;keyPrefix&gt;[&lt;index&gt;]</code> where <code>&lt;index&gt;</code>
+     * {@code <keyPrefix>[<index>]} where {@code <index>}
      * is the index of the element.
      * If an element is a {@link Collection}, then its elements will be
-     * put instead (with the format <code>&lt;keyPrefix&gt;[&lt;indexOfCollection&gt;][&lt;indexOfElement&gt;]</code>).
+     * put instead (with the format {@code <keyPrefix>[<indexOfCollection>][<indexOfElement>]}).
      *
      * @param expanded   the map to put the elements into
      * @param collection the collection to get elements from
@@ -240,7 +240,7 @@ public final class MapUtils {
 
     /**
      * Converts the given map to a map of {@link String} as keys.
-     * Keys that are <code>null</code> are ignored.
+     * Keys that are {@code null} are ignored.
      *
      * @param map the map
      * @return the converted map

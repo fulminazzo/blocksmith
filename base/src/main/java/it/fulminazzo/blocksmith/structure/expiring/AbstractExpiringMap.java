@@ -29,7 +29,7 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
      * Gets the expiring entry associated with a key.
      *
      * @param key the key
-     * @return the expiring entry (or <code>null</code> if not found)
+     * @return the expiring entry (or {@code null} if not found)
      */
     protected abstract @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key);
 
@@ -348,7 +348,7 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
         /**
          * Checks if the current entry never expires.
          *
-         * @return <code>true</code> if it does not
+         * @return {@code true} if it does not
          */
         public boolean neverExpires() {
             return expireTime == NEVER_EXPIRE;
@@ -357,7 +357,7 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
         /**
          * Checks if the current entry is expired.
          *
-         * @return <code>true</code> if it is
+         * @return {@code true} if it is
          */
         public boolean isExpired() {
             return expireTime <= now();
