@@ -304,7 +304,7 @@ public final class CommandParser {
 
         Class<?> moduleType = commandModule.getClass();
         if (!moduleType.isAnnotationPresent(Command.class))
-            throw CommandParseException.of("Invalid command module '%s': %s annotation is required", commandModule, Command.class);
+            throw CommandParseException.of("Invalid command module '%s': %s annotation is required", moduleType, Command.class);
         final Reflect reflect = Reflect.on(commandModule);
 
         Command baseAnnotation = moduleType.getAnnotation(Command.class);
