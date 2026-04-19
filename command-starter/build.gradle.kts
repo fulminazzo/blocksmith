@@ -1,11 +1,8 @@
-val projectName: String = project.name
-
 subprojects {
     dependencies {
-        api(project(":$projectName"))
+        val baseProject = rootProject.projects.commandStarter.commandStarterBase
+        if (project.path != baseProject.path) api(baseProject)
 
-        val baseProjectName = "$projectName-base"
-        if (project.name != baseProjectName)
-            api(project(":$projectName:$baseProjectName"))
+        project.parent?.let { api(it) }
     }
 }

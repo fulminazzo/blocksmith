@@ -1,7 +1,7 @@
 dependencies {
-    api(project(":base:validation"))
-    api(project(":message-starter"))
-    api(project(":scheduler-starter"))
+    api(projects.base.validation)
+    api(projects.messageStarter)
+    api(projects.schedulerStarter)
 
     testImplementation(libs.bundles.log4j)
 }

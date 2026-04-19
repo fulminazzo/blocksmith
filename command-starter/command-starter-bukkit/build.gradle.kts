@@ -1,9 +1,9 @@
 dependencies {
-    api(project(":message-starter:message-starter-bukkit"))
-    api(project(":scheduler-starter:scheduler-starter-bukkit"))
-    api(project(":scheduler-starter:scheduler-starter-folia"))
+    api(projects.messageStarter.messageStarterBukkit)
+    api(projects.schedulerStarter.schedulerStarterBukkit)
+    api(projects.schedulerStarter.schedulerStarterFolia)
 
-    api(project(":command-starter:command-starter-brigadier"))
+    api(projects.commandStarter.commandStarterBrigadier)
 
     compileOnly(libs.spigot)
     compileOnly(libs.brigadier)

@@ -1,8 +1,8 @@
 dependencies {
-    api(project(":message-starter:message-starter-velocity"))
-    api(project(":scheduler-starter:scheduler-starter-velocity"))
+    api(projects.messageStarter.messageStarterVelocity)
+    api(projects.schedulerStarter.schedulerStarterVelocity)
 
-    api(project(":command-starter:command-starter-brigadier"))
+    api(projects.commandStarter.commandStarterBrigadier)
 
     compileOnly(libs.velocity)
 

@@ -1,6 +1,6 @@
 dependencies {
-    api(project(":message-starter:message-starter-bungeecord"))
-    api(project(":scheduler-starter:scheduler-starter-bungeecord"))
+    api(projects.messageStarter.messageStarterBungeecord)
+    api(projects.schedulerStarter.schedulerStarterBungeecord)
 
     compileOnly(libs.bungeecord)
 
