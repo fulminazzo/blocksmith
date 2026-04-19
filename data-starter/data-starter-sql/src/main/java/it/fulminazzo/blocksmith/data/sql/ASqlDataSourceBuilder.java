@@ -94,7 +94,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
     /**
      * Sets the maximum number of concurrent connections.
      * <br>
-     * Default: <code>20</code>
+     * Default: {@code 20}
      *
      * @param maximumPoolSize the maximum pool size
      * @return this object (for method chaining)
@@ -114,7 +114,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
     /**
      * Sets the minimum idle connections.
      * <br>
-     * Default: <code>5</code>
+     * Default: {@code 5}
      *
      * @param minimumIdle the minimum idle
      * @return this object (for method chaining)
@@ -134,7 +134,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
     /**
      * Sets the connections timeout.
      * <br>
-     * Default: <code>30000</code> (30 seconds)
+     * Default: {@code 30000} (30 seconds)
      *
      * @param connectionTimeout the connection timeout
      * @return this object (for method chaining)
@@ -154,7 +154,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
     /**
      * Sets the idle timeout for connections.
      * <br>
-     * Default: <code>600000</code> (10 minutes)
+     * Default: {@code 600000} (10 minutes)
      *
      * @param idleTimeout the idle timeout
      * @return this object (for method chaining)
@@ -174,7 +174,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
     /**
      * Sets the maximum lifetime of a connection.
      * <br>
-     * Default: <code>1800000</code> (30 minutes)
+     * Default: {@code 1800000} (30 minutes)
      *
      * @param maxLifetime the max lifetime
      * @return this object (for method chaining)

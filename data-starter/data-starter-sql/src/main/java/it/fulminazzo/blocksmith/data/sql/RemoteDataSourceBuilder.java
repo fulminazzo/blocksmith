@@ -75,7 +75,7 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
     /**
      * Sets the host to connect to.
      * <br>
-     * Default: <code>127.0.0.1</code>
+     * Default: {@code 127.0.0.1}
      *
      * @param host the host
      * @return this object (for method chaining)

@@ -290,7 +290,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
      * Checks if a entity with the given id exists in the repository.
      *
      * @param id the entity id
-     * @return <code>true</code> if it does
+     * @return {@code true} if it does
      */
     abstract boolean exists(final @NotNull Long id)
 

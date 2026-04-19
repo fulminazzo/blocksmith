@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * Will use the specified {@link #databaseName} and {@link #collectionName} to build
  * the namespace where the entries will be stored.
  * <br>
- * Given an <code>ID</code>, the key format will be:
+ * Given an {@code ID}, the key format will be:
  * `&lt;databaseName&gt;:&lt;collectionName&gt;:&lt;ID&gt;`
  *
  * @param <T>  the type of the entities
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class RedisQueryEngine<T, ID> implements QueryEngine<T, ID> {
-    private static final @NotNull String separator = ":";
+    private static final @NotNull String SEPARATOR = ":";
 
     private final @NotNull StatefulRedisConnection<String, String> connection;
     private final @NotNull EntityMapper<T, ID> entityMapper;
@@ -140,7 +140,7 @@ public final class RedisQueryEngine<T, ID> implements QueryEngine<T, ID> {
      * @return the id
      */
     public @NotNull String getId(final @NotNull ID id) {
-        return databaseName + separator + collectionName + separator + id;
+        return databaseName + SEPARATOR + collectionName + SEPARATOR + id;
     }
 
 }

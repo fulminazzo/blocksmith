@@ -16,7 +16,7 @@ public interface IDatabaseType {
      * Gets the identifier of this type in a JDBC url.
      * <br>
      * The jdbc url will be built with the following format:
-     * <code>jdbc:&lt;name&gt;://&lt;host&gt;:&lt;port&gt;/&lt;database_name&gt;</code>
+     * {@code jdbc:<name>://<host>:<port>/<database_name>}
      *
      * @return the jdbc name
      */

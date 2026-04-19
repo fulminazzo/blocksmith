@@ -105,7 +105,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
      *
      * @param ids the ids
      * @return the data
-     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY AND ELEMENTS NOT <code>null</code>
+     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY AND ELEMENTS NOT {@code null}
      */
     @Deprecated
     protected abstract @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids);
@@ -133,7 +133,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
      *
      * @param entities the entities
      * @return the saved entities (in case values are changed)
-     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY AND ELEMENTS NOT <code>null</code>
+     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY AND ELEMENTS NOT {@code null}
      */
     @Deprecated
     protected abstract @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities);
@@ -150,7 +150,7 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
      *
      * @param ids the ids
      * @return nothing
-     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY AND ELEMENTS NOT <code>null</code>
+     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY AND ELEMENTS NOT {@code null}
      */
     @Deprecated
     protected abstract @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids);

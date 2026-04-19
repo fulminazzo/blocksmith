@@ -144,7 +144,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
     /**
      * Enables or disables lowercase names in the database.
      * <br>
-     * Default: <code>true</code>
+     * Default: {@code true}
      *
      * @param value the value
      * @return this object (for method chaining)

@@ -47,7 +47,7 @@ public interface Repository<T, ID> {
      * Checks if an entity with the associated id exists.
      *
      * @param id the id
-     * @return <code>true</code> if it does
+     * @return {@code true} if it does
      */
     @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id);
 
