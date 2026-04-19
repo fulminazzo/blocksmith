@@ -8,10 +8,40 @@ import it.fulminazzo.blocksmith.command.visitor.CommandInput
 import it.fulminazzo.blocksmith.command.visitor.Visitor
 import spock.lang.Specification
 
+import java.lang.reflect.Parameter
+
 class NumberArgumentNodeTest extends Specification {
     private NumberArgumentNode<? extends Number> node = newArgumentNode(int)
             .min(2)
             .max(8)
+
+    def 'test that initialize with #type sets min and max to #min and #max'() {
+        given:
+        def parameter = Mock(Parameter)
+        parameter.type >> type
+
+        when:
+        def node = new NumberArgumentNode('number', parameter, false)
+
+        then:
+        node.min == min
+        node.max == max
+
+        where:
+        type    || min               | max
+        byte    || Byte.MIN_VALUE    | Byte.MAX_VALUE
+        Byte    || Byte.MIN_VALUE    | Byte.MAX_VALUE
+        short   || Short.MIN_VALUE   | Short.MAX_VALUE
+        Short   || Short.MIN_VALUE   | Short.MAX_VALUE
+        int     || Integer.MIN_VALUE | Integer.MAX_VALUE
+        Integer || Integer.MIN_VALUE | Integer.MAX_VALUE
+        long    || Long.MIN_VALUE    | Long.MAX_VALUE
+        Long    || Long.MIN_VALUE    | Long.MAX_VALUE
+        float   || -Float.MAX_VALUE  | Float.MAX_VALUE
+        Float   || -Float.MAX_VALUE  | Float.MAX_VALUE
+        double  || -Double.MAX_VALUE | Double.MAX_VALUE
+        Double  || -Double.MAX_VALUE | Double.MAX_VALUE
+    }
 
     /*
      * parseCurrent

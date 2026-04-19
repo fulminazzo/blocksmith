@@ -22,8 +22,8 @@ import java.util.List;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> {
-    double min = -Double.MAX_VALUE;
-    double max = Double.MAX_VALUE;
+    double min;
+    double max;
 
     /**
      * Instantiates a new Number argument node.
@@ -34,6 +34,26 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
      */
     NumberArgumentNode(final @NotNull String name, final @NotNull Parameter parameter, final boolean optional) {
         super(name, parameter, optional);
+        Class<N> type = getType();
+        if (type.equals(Byte.class)) {
+            min = Byte.MIN_VALUE;
+            max = Byte.MAX_VALUE;
+        } else if (type.equals(Short.class)) {
+            min = Short.MIN_VALUE;
+            max = Short.MAX_VALUE;
+        } else if (type.equals(Integer.class)) {
+            min = Integer.MIN_VALUE;
+            max = Integer.MAX_VALUE;
+        } else if (type.equals(Long.class)) {
+            min = Long.MIN_VALUE;
+            max = Long.MAX_VALUE;
+        } else if (type.equals(Float.class)) {
+            min = -Float.MAX_VALUE;
+            max = Float.MAX_VALUE;
+        } else {
+            min = -Double.MAX_VALUE;
+            max = Double.MAX_VALUE;
+        }
     }
 
     /**
