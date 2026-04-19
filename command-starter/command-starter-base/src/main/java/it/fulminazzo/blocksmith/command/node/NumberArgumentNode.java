@@ -30,7 +30,7 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
      *
      * @param name      the name of the node
      * @param parameter the parameter that corresponds to the node
-     * @param optional  <code>true</code> if the node may be omitted
+     * @param optional  {@code true} if the node may be omitted
      */
     NumberArgumentNode(final @NotNull String name, final @NotNull Parameter parameter, final boolean optional) {
         super(name, parameter, optional);

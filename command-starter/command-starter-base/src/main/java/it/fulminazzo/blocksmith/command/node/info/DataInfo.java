@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 abstract class DataInfo<I extends DataInfo<I>> {
     /**
-     * If <code>true</code>, the data of this object was automatically computed.
+     * If {@code true}, the data of this object was automatically computed.
      */
     @Getter(AccessLevel.PROTECTED)
     @Setter(AccessLevel.PROTECTED)

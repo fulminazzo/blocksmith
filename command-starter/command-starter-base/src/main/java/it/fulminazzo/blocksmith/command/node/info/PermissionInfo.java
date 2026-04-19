@@ -37,7 +37,7 @@ public final class PermissionInfo extends DataInfo<PermissionInfo> {
      * @param prefix       the prefix to prepend to the permission
      * @param permission   the permission
      * @param grant        who the permission is granted to
-     * @param autoComputed if <code>true</code>, will mark the permission as automatically computed,
+     * @param autoComputed if {@code true}, will mark the permission as automatically computed,
      *                     meaning it was not provided by the user, but was instead retrieved from the command route
      * @deprecated FOR INTERNAL USE ONLY
      */

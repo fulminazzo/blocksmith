@@ -30,7 +30,7 @@ public final class CommandInfo extends DataInfo<CommandInfo> {
      *
      * @param description  the description
      * @param permission   the permission
-     * @param autoComputed if <code>true</code>, will mark the permission as automatically computed,
+     * @param autoComputed if {@code true}, will mark the permission as automatically computed,
      *                     meaning it was not provided by the user, but was instead retrieved from the command route
      * @deprecated FOR INTERNAL USE ONLY
      */

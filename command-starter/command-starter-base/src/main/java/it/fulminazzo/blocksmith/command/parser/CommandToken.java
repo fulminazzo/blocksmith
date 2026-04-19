@@ -38,7 +38,7 @@ enum CommandToken {
      * Checks if the current token matches with the given one.
      *
      * @param token the token
-     * @return <code>true</code> if it does
+     * @return {@code true} if it does
      */
     public boolean matches(final @NotNull String token) {
         return token.matches(regex);
@@ -48,7 +48,7 @@ enum CommandToken {
      * Attempts to get the best token from the given raw string.
      *
      * @param raw the string
-     * @return the token (or <code>null</code> if not found)
+     * @return the token (or {@code null} if not found)
      */
     public static @Nullable CommandToken getToken(final @NotNull String raw) {
         for (CommandToken commandToken : values()) {

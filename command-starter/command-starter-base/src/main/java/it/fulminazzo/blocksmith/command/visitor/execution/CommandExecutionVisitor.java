@@ -144,7 +144,7 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
      * Handles the execution of the given node accordingly.
      *
      * @param node the node
-     * @return <code>null</code>
+     * @return nothing (but is used in {@link #visitCommandNode(CommandNode)} to close the method call)
      * @throws CommandExecutionException if a confirmation is required or the execution failed
      */
     Void handleExecution(final @NotNull CommandNode node) throws CommandExecutionException {

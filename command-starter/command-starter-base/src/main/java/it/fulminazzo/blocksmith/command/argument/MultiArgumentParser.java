@@ -16,8 +16,8 @@ import java.util.function.Function;
  * An example of usage is for Minecraft block positions.
  * These objects are defined from three coordinates (x, y and z).
  * With default parsers, the developer should either request three {@link Double}s in their command method
- * or request a string argument that will be parsed (for example <code>&lt;x&gt;:&lt;y&gt;:&lt;z&gt;</code>
- * or quoted <code>"&lt;x&gt; &lt;y&gt; &lt;z&gt;"</code>).
+ * or request a string argument that will be parsed (for example {@code <x>:<y>:<z>}
+ * or quoted {@code "<x> <y> <z>"}).
  * <br>
  * An alternative could be to create a new {@link MultiArgumentParser} for the position Java type,
  * and require three {@link Double}s.

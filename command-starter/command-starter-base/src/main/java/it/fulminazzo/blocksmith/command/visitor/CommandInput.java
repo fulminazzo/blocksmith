@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @ToString(doNotUseGetters = true)
 public final class CommandInput {
-    private static final @NotNull String delimiter = " ";
-    private static final @NotNull String @NotNull [] quotes = new String[]{"\"", "'"};
+    private static final @NotNull String DELIMITER = " ";
+    private static final @NotNull String @NotNull [] QUOTES = new String[]{"\"", "'"};
 
     final @NotNull List<String> input = new ArrayList<>();
 
@@ -31,7 +31,7 @@ public final class CommandInput {
         if (isDone()) return;
         StringBuilder argument = new StringBuilder(getCurrent());
         while (input.size() > current + 1)
-            argument.append(delimiter).append(input.remove(current + 1));
+            argument.append(DELIMITER).append(input.remove(current + 1));
         input.set(current, argument.toString());
     }
 
@@ -54,11 +54,11 @@ public final class CommandInput {
     public @NotNull CommandInput addInput(final @NotNull Collection<String> input) {
         if (input.isEmpty()) return this;
         String current = getRawInput();
-        if (!current.isEmpty()) current += delimiter;
-        String rawInput = String.join(delimiter, input);
+        if (!current.isEmpty()) current += DELIMITER;
+        String rawInput = String.join(DELIMITER, input);
         current += rawInput;
         this.input.clear();
-        this.input.addAll(StringUtils.split(current, delimiter, true, "'", "\""));
+        this.input.addAll(StringUtils.split(current, DELIMITER, true, "'", "\""));
         return this;
     }
 
@@ -112,7 +112,7 @@ public final class CommandInput {
     /**
      * Checks if the cursor has reached the final argument.
      *
-     * @return <code>true</code> if it has
+     * @return {@code true} if it has
      */
     public boolean isLast() {
         return current == input.size() - 1;
@@ -121,7 +121,7 @@ public final class CommandInput {
     /**
      * Checks if the cursor has reached read all the available arguments.
      *
-     * @return <code>true</code> if it has
+     * @return {@code true} if it has
      */
     public boolean isDone() {
         return current >= input.size();
@@ -133,7 +133,7 @@ public final class CommandInput {
      * @return the input
      */
     public @NotNull String getRawInput() {
-        return String.join(delimiter, input);
+        return String.join(DELIMITER, input);
     }
 
     /**
@@ -146,7 +146,7 @@ public final class CommandInput {
     }
 
     private static @NotNull String unquote(final @NotNull String string) {
-        for (String q : quotes)
+        for (String q : QUOTES)
             if (string.startsWith(q) && string.endsWith(q) && string.length() > 1)
                 return string.substring(1, string.length() - 1);
         return string;

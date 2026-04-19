@@ -52,7 +52,7 @@ public class ArgumentNode<T> extends CommandNode {
      *     the entire input is merged in a single one;</li>
      *     <li>if no input was given and {@link it.fulminazzo.blocksmith.command.annotation.Default}
      *     was used, then the value of the annotation will be considered as input.
-     *     Otherwise <code>null</code> is returned;</li>
+     *     Otherwise {@code null} is returned;</li>
      *     <li>if {@link it.fulminazzo.blocksmith.command.annotation.Tab} was used to specify custom completions
      *     and the input is not present in the values,
      *     it is considered invalid and a {@link ArgumentParseException} is thrown;</li>
@@ -91,7 +91,7 @@ public class ArgumentNode<T> extends CommandNode {
     /**
      * Sets the current node to greedy.
      *
-     * @param greedy if <code>true</code>, will take all the remaining input
+     * @param greedy if {@code true}, will take all the remaining input
      * @return this object (for method chaining)
      */
     public @NotNull ArgumentNode<T> setGreedy(final boolean greedy) {
@@ -154,7 +154,7 @@ public class ArgumentNode<T> extends CommandNode {
      * @param <T>       the type of the parameter
      * @param name      the name
      * @param parameter the parameter that corresponds to the node
-     * @param optional  if <code>true</code> the parameter will be non-mandatory
+     * @param optional  if {@code true} the parameter will be non-mandatory
      * @return the argument node
      */
     @SuppressWarnings("RedundantCast")

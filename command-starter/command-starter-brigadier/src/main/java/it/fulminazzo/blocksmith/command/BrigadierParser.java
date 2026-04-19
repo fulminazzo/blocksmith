@@ -167,7 +167,7 @@ final class BrigadierParser<S> {
      * @param <T>  the type of the argument
      * @param <A>  the Java type
      * @param node the argument node
-     * @return the argument type (or <code>null</code> if not found)
+     * @return the argument type (or {@code null} if not found)
      */
     static <T, A> @Nullable ArgumentType<T> getArgumentType(final @NotNull ArgumentNode<A> node) {
         if (node.isGreedy()) return (ArgumentType<T>) StringArgumentType.greedyString();

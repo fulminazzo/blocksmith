@@ -59,7 +59,7 @@ public final class LiteralNode extends CommandNode {
     /**
      * Toggles requirements for confirmation to execute this node.
      *
-     * @param confirmationInfo the confirmation info (<code>null</code> to disable)
+     * @param confirmationInfo the confirmation info ({@code null} to disable)
      * @return this object (for method chaining)
      */
     public @NotNull LiteralNode setConfirmationInfo(final @Nullable Confirm confirmationInfo) {

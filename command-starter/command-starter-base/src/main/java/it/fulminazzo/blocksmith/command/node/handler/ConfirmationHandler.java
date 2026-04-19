@@ -59,9 +59,10 @@ public final class ConfirmationHandler implements TabCompletable {
      * Checks the current {@link CommandInput} and, if it's a confirmation request, executes the corresponding action.
      *
      * @param visitor the visitor
-     * @return <code>true</code> if the next argument was either {@link Confirm#confirmWord()} or {@link Confirm#cancelWord()} and the execution was successful,
-     * <code>false</code> otherwise
-     * @throws CommandExecutionException if the execution failed for any reason (e.g. the action was not found)
+     * @return {@code true} if the next argument was either {@link Confirm#confirmWord()}
+     * or {@link Confirm#cancelWord()} and the execution was successful,
+     * {@code false} otherwise
+     * @throws CommandExecutionException if the execution failed for any reason (e.g., the action was not found)
      */
     public boolean checkConfirmationKeywords(final @NotNull CommandExecutionVisitor visitor) throws CommandExecutionException {
         final CommandInput input = visitor.getInput();

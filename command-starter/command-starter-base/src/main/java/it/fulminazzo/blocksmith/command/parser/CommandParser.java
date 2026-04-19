@@ -42,11 +42,15 @@ public final class CommandParser {
 
     private final int startIndex;
     private int parameterIndex;
-    // Signals that an optional argument has been reached;
-    // therefore, all the following nodes must be optional arguments.
+    /**
+     * Signals that an optional argument has been reached;
+     * therefore, all the following nodes must be optional arguments.
+     */
     private @Nullable String optionalArgument;
-    // Signals that a greedy argument has been reached;
-    // therefore, nothing else can be specified.
+    /**
+     * Signals that a greedy argument has been reached;
+     * therefore, nothing else can be specified.
+     */
     private @Nullable String greedyArgument;
 
     private final @NotNull String permissionGroup;
@@ -164,7 +168,7 @@ public final class CommandParser {
     /**
      * GENERAL_ARGUMENT := {@link CommandToken#LITERAL}
      *
-     * @param optional if <code>true</code>, the argument will be marked as optional
+     * @param optional if {@code true}, the argument will be marked as optional
      * @return the node
      */
     @NotNull CommandNode parseGeneralArgument(final boolean optional) {

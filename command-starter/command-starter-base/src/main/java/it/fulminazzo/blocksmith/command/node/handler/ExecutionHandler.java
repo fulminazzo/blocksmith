@@ -67,7 +67,7 @@ public final class ExecutionHandler {
     /**
      * Sets a time to wait before executing the command again.
      *
-     * @param cooldown the cooldown (<code>null</code> to disable)
+     * @param cooldown the cooldown ({@code null} to disable)
      * @return this object (for method chaining)
      */
     public @NotNull ExecutionHandler setCooldown(final @Nullable Duration cooldown) {

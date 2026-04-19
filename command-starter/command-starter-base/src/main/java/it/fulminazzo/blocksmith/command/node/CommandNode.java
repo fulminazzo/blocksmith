@@ -52,15 +52,15 @@ public abstract class CommandNode implements TabCompletable {
      * If this node is a {@link LiteralNode}, itself will be returned.
      * Otherwise, the {@link #parent} will be checked.
      * <br>
-     * For example, in the command <code>/clan member &lt;player&gt; promote &lt;rank&gt;</code>,
+     * For example, in the command {@code /clan member <player> promote <rank>},
      * this method would return:
      * <ul>
-     *     <li>the node representing <code>promote</code> for <code>promote</code> and <code>&lt;rank&gt;</code>;</li>
-     *     <li>the node representing <code>member</code> for <code>member</code> and <code>&lt;player&gt;</code>;</li>
-     *     <li>the node representing <code>clan</code> for <code>clan</code>.</li>
+     *     <li>the node representing {@code promote} for {@code promote} and {@code <rank>};</li>
+     *     <li>the node representing {@code member} for {@code member} and {@code <player>};</li>
+     *     <li>the node representing {@code clan} for {@code clan}.</li>
      * </ul>
      *
-     * @return the command node or <code>null</code> if not found (this should never happen on well-formed nodes)
+     * @return the command node or {@code null} if not found (this should never happen on well-formed nodes)
      */
     public @Nullable LiteralNode getCommandNode() {
         if (this instanceof LiteralNode) return (LiteralNode) this;
@@ -80,7 +80,7 @@ public abstract class CommandNode implements TabCompletable {
     /**
      * Checks if the node is executable.
      *
-     * @return <code>true</code> if it is
+     * @return {@code true} if it is
      */
     public boolean isExecutable() {
         return executor != null;
@@ -111,7 +111,7 @@ public abstract class CommandNode implements TabCompletable {
     /**
      * Gets the child that is a {@link ArgumentNode} and is optional.
      *
-     * @return the first child that matches these criteria or <code>null</code> if not found
+     * @return the first child that matches these criteria or {@code null} if not found
      */
     public @Nullable ArgumentNode<?> getOptionalArgument() {
         for (CommandNode child : children)
@@ -128,7 +128,7 @@ public abstract class CommandNode implements TabCompletable {
      * Will prioritize {@link LiteralNode}s.
      *
      * @param token the token
-     * @return the child or <code>null</code> if not found
+     * @return the child or {@code null} if not found
      */
     public @Nullable CommandNode getChild(final @NotNull String token) {
         for (CommandNode child : children)
@@ -140,7 +140,7 @@ public abstract class CommandNode implements TabCompletable {
     /**
      * Gets the first child of this node.
      *
-     * @return the first child or <code>null</code> if there are no children
+     * @return the first child or {@code null} if there are no children
      */
     public @Nullable CommandNode getFirstChild() {
         return !children.isEmpty() ? children.iterator().next() : null;
@@ -165,7 +165,7 @@ public abstract class CommandNode implements TabCompletable {
      * Checks if the node matches with the given token.
      *
      * @param token the token
-     * @return <code>true</code> if it does
+     * @return {@code true} if it does
      */
     public abstract boolean matches(final @NotNull String token);
 

@@ -43,7 +43,7 @@ public abstract class CommandSenderWrapper<S> {
      * Checks if the actual sender extends the given Java class.
      *
      * @param type the type
-     * @return <code>true</code> if it does
+     * @return {@code true} if it does
      */
     public boolean extendsType(final @NotNull Type type) {
         return Reflect.on(actualSender).extendsType(type);
@@ -60,7 +60,7 @@ public abstract class CommandSenderWrapper<S> {
      * Checks if the sender has the given permission.
      *
      * @param permissionInfo the permission info
-     * @return <code>true</code> if they do
+     * @return {@code true} if they do
      */
     public boolean hasPermission(final @NotNull PermissionInfo permissionInfo) {
         return permissionInfo.getGrant() == Permission.Grant.ALL || hasPermissionImpl(permissionInfo);
@@ -72,14 +72,14 @@ public abstract class CommandSenderWrapper<S> {
      * Does NOT check if the permission is for {@link Permission.Grant#ALL}.
      *
      * @param permissionInfo the permission info
-     * @return <code>true</code> if they have the permission
+     * @return {@code true} if they have the permission
      */
     protected abstract boolean hasPermissionImpl(final @NotNull PermissionInfo permissionInfo);
 
     /**
      * Checks if the internal sender are a player.
      *
-     * @return <code>true</code> if they are
+     * @return {@code true} if they are
      */
     public abstract boolean isPlayer();
 
