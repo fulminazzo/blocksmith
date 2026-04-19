@@ -5,9 +5,9 @@ plugins {
 dependencies {
     implementation(libs.slf4j.jdk)
 
-    implementation(project(":config-starter:config-starter-yaml"))
-    implementation(project(":message-starter:message-starter-bukkit"))
-    implementation(project(":message-starter:message-starter-translation"))
+    implementation(projects.configStarter.configStarterYaml)
+    implementation(projects.messageStarter.messageStarterBukkit)
+    implementation(projects.messageStarter.messageStarterTranslation)
 
     compileOnly(libs.spigot)
 
