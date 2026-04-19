@@ -14,6 +14,8 @@ allprojects {
     apply { plugin("groovy") }
     apply { plugin("jacoco-report-aggregation") }
 
+    val testingModuleName: String by rootProject.extra
+
     val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
     val mockitoAgent: Configuration by configurations.creating
 
@@ -31,10 +33,14 @@ allprojects {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
 
+        if (project != rootProject.projects.base) api(rootProject.projects.base)
+
         testImplementation(rootProject.libs.bundles.annotations)
         testRuntimeOnly(rootProject.libs.junit.platform)
         testAnnotationProcessor(rootProject.libs.lombok)
         testImplementation(rootProject.libs.bundles.test.framework)
+
+        testImplementation(rootProject.projects.base.testing)
 
         mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
@@ -78,7 +84,11 @@ subprojects {
 }
 
 dependencies {
-    subprojects.forEach { implementation(project(it.path)) }
+    val testingModuleName: String by rootProject.extra
+
+    subprojects
+        .filter { !it.name.endsWith("-$testingModuleName") }
+        .forEach { implementation(it) }
 }
 
 tasks.testCodeCoverageReport {
