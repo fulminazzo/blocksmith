@@ -46,7 +46,7 @@ public interface TaskFactory {
      * Checks if the current factory supports the provided owner type.
      *
      * @param ownerType the owner type
-     * @return <code>true</code> if it does
+     * @return {@code true} if it does
      */
     boolean supportsOwner(final @NotNull Class<?> ownerType);
 

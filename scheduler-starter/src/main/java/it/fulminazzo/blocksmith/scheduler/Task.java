@@ -15,7 +15,7 @@ public interface Task {
     /**
      * Checks if the task has been canceled forcibly before completing execution.
      *
-     * @return <code>true</code> if it has
+     * @return {@code true} if it has
      */
     boolean isCancelled();
 
@@ -29,7 +29,7 @@ public interface Task {
     /**
      * Checks if the task is asynchronous.
      *
-     * @return <code>true</code> if it is
+     * @return {@code true} if it is
      */
     boolean isAsync();
 
