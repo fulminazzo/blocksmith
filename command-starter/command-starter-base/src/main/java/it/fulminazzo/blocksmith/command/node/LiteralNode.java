@@ -48,6 +48,7 @@ public final class LiteralNode extends CommandNode {
      * Gets the command information.
      *
      * @return the command info
+     * @throws IllegalStateException if the command information was never set (use {@link #setCommandInfo(CommandInfo)})
      */
     public @NotNull CommandInfo getCommandInfo() {
         if (commandInfo == null)
