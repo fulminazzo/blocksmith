@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
  * An exception thrown by {@link Mapper} implementations.
  */
 public final class MapperException extends RuntimeException {
+    private static final long serialVersionUID = -6706326718229573159L;
 
     /**
      * Instantiates a new Mapper exception.

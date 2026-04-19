@@ -8,6 +8,7 @@ import it.fulminazzo.blocksmith.data.redis.RedisDataSource
 import it.fulminazzo.blocksmith.data.redis.RedisRepositorySettings
 import it.fulminazzo.blocksmith.data.sql.SqlDataSource
 import it.fulminazzo.blocksmith.data.sql.SqlRepositorySettings
+import org.jooq.Record
 import org.jooq.SQLDialect
 import org.jooq.TableField
 import org.jooq.impl.DSL
@@ -81,7 +82,7 @@ class CachedDataSourceTest extends Specification {
                                 .withTtl(Duration.ofMinutes(30)),
                         new SqlRepositorySettings()
                                 .withTable(table)
-                                .withIdColumn(field as TableField<?, ?>)
+                                .withIdColumn(field as TableField<? extends Record, ?>)
                 )
         )
 
@@ -140,7 +141,7 @@ class CachedDataSourceTest extends Specification {
                                         .withTtl(Duration.ofMinutes(30)),
                                 new SqlRepositorySettings()
                                         .withTable(table)
-                                        .withIdColumn(field as TableField<?, ?>)
+                                        .withIdColumn(field as TableField<? extends Record, ?>)
                         )
                 )
         )

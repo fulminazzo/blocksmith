@@ -9,6 +9,7 @@ import it.fulminazzo.blocksmith.data.redis.RedisDataSource
 import it.fulminazzo.blocksmith.data.redis.RedisRepositorySettings
 import it.fulminazzo.blocksmith.data.sql.SqlDataSource
 import it.fulminazzo.blocksmith.data.sql.SqlRepositorySettings
+import org.jooq.Record
 import org.jooq.SQLDialect
 import org.jooq.Table
 import org.jooq.TableField
@@ -34,8 +35,8 @@ class CachedRepositoryBuilderTest extends Specification {
     private static RedisDataSource redisDataSource
     private static MemoryDataSource memoryDataSource
 
-    private static Table<?> table
-    private static TableField<?, ?> idColumn
+    private static Table<? extends Record> table
+    private static TableField<? extends Record, ?> idColumn
 
     void setupSpec() {
         server = new RedisServer(serverPort)
@@ -65,7 +66,7 @@ class CachedRepositoryBuilderTest extends Specification {
                 .constraints(constraint('PK_TEST').primaryKey('ID'))
                 .execute()
         table = dsl.meta().getTables('TEST')[0]
-        idColumn = table.field('ID') as TableField<?, ?>
+        idColumn = table.field('ID') as TableField<? extends Record, ?>
     }
 
     void cleanupSpec() {

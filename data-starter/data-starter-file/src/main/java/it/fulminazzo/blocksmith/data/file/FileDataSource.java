@@ -14,7 +14,7 @@ import java.util.function.Function;
 /**
  * Implementation of {@link RepositoryDataSource} for file-based repositories.
  * <br>
- * Persists data to the file system using a configurable file format (YAML, JSON, etc).
+ * Persists data to the file system using a configurable file format (YAML, JSON, etc.).
  * Each entity is stored in a separate file named after its ID.
  * <br>
  * Examples:

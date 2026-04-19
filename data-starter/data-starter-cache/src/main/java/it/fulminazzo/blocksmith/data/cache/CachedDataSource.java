@@ -16,8 +16,8 @@ import java.util.function.Function;
  * Every query to the main repository will be passed to a cache that will be
  * updated accordingly.
  * <br>
- * The following examples will utilize a <b>SQL</b> as main repository (with the support of the
- * <a href="https://www.jooq.org/doc/latest/manual/code-generation/codegen-execution/codegen-gradle/">jOOQ generator plugin</a>
+ * The following examples will use a <b>SQL</b> as the main repository (with the support of the
+ * <a href="https://www.jooq.org/doc/latest/manual/code-generation/codegen-execution/codegen-gradle/">jOOQ generator plugin</a>)
  * and <b>Redis</b> as cache.
  * <ul>
  *     <li>creation:

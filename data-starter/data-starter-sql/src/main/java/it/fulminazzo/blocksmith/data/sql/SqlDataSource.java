@@ -6,7 +6,6 @@ import it.fulminazzo.blocksmith.data.RepositoryDataSource;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
-import org.jooq.Record;
 import org.jooq.impl.DSL;
 
 import java.io.File;

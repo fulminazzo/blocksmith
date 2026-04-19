@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.Users
 import org.jooq.DSLContext
+import org.jooq.Record
 import org.jooq.SQLDialect
 import org.jooq.Table
 import org.jooq.impl.DSL
@@ -27,7 +28,7 @@ class SqlQueryEngineTest extends Specification {
     private static HikariDataSource dataSource
     private static DSLContext dsl
 
-    private static Table<?> table
+    private static Table<? extends Record> table
 
     private static SqlQueryEngine<?, ?, ?> queryEngine
 

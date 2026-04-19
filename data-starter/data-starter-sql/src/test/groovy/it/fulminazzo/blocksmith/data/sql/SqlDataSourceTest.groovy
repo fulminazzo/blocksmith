@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.pool.HikariPool
 import it.fulminazzo.blocksmith.data.User
 import org.jetbrains.annotations.NotNull
+import org.jooq.Record
 import org.jooq.SQLDialect
 import org.jooq.TableField
 import org.jooq.impl.DSL
@@ -73,7 +74,7 @@ class SqlDataSourceTest extends Specification {
                 User,
                 new SqlRepositorySettings()
                         .withTable(table)
-                        .withIdColumn(field as TableField<?, ?>)
+                        .withIdColumn(field as TableField<? extends Record, ?>)
         )
 
         then:

@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutionException
 
 class AbstractRepositoryTest extends Specification {
 
-    private AbstractRepository<Cat, String, ?> repository
+    private AbstractRepository<Cat, String, ? extends QueryEngine<Cat, String>> repository
 
     void setup() {
         repository = new MockRepository()

@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  *                 .build();
  *          }</pre>
  *     </li>
- *     <li>file based database:
+ *     <li>file-based database:
  *          <pre>{@code
  *          SqlDataSource dataSource = SqlDataSource.builder()
  *                 .database("test")
