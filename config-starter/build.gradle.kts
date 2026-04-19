@@ -1,7 +1,3 @@
-val projectName: String = project.name
-val coreModuleName = "core"
-val testingModuleName: String by rootProject.extra
-
 dependencies {
     compileOnly(libs.slf4j)
 }
