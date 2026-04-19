@@ -36,10 +36,13 @@ public final class Validator {
                 .register(AssertFalse.class, new BooleanConstraintValidator(o -> !o))
                 .register(AssertTrue.class, new BooleanConstraintValidator(o -> o))
                 .registerSupplier(Max.class, a -> new NumberDurationConstraintValidator(o -> o <= a.value()))
+                .registerSupplier(MaxChar.class, a -> new CharacterConstraintValidator(o -> o <= a.value()))
                 .register(Negative.class, new NumberDurationConstraintValidator(o -> o < 0))
                 .registerSupplier(Min.class, a -> new NumberDurationConstraintValidator(o -> o >= a.value()))
+                .registerSupplier(MinChar.class, a -> new CharacterConstraintValidator(o -> o >= a.value()))
                 .register(Positive.class, new NumberDurationConstraintValidator(o -> o > 0))
                 .registerSupplier(Range.class, a -> new NumberDurationConstraintValidator(o -> o >= a.min() && o <= a.max()))
+                .registerSupplier(RangeChar.class, a -> new CharacterConstraintValidator(o -> o >= a.min() && o <= a.max()))
                 .registerSupplier(Size.class, a -> new ConstraintValidatorImpl(o -> {
                     if (o == null) return true;
                     Number size;
@@ -232,12 +235,29 @@ public final class Validator {
      */
     public static void validateMethod(final @Nullable Object @NotNull ... parameters) throws ViolationException {
         StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[2];
-        Method method = Reflect.on(stackTrace.getClassName())
-                .getMethod(stackTrace.getMethodName(), Reflect.getParameterTypes(parameters));
+        final Method method;
+        try {
+            method = Reflect.on(stackTrace.getClassName())
+                    .getMethod(stackTrace.getMethodName(), Reflect.getParameterTypes(parameters));
+        } catch (ReflectException e) {
+            throw new IllegalArgumentException(e.getMessage() +
+                    ". Please include all the parameters of the method to validate it");
+        }
+        Map<String, Set<ConstraintViolation>> violations = validateMethod(method, parameters);
+        if (!violations.isEmpty())
+            throw new ViolationException(violations);
+    }
+
+    /**
+     * Validates the values against the method parameters constraints.
+     *
+     * @param method     the method to get the parameters from
+     * @param parameters the actual values of the parameters
+     * @return the violations (empty if none)
+     */
+    public static @NotNull Map<String, Set<ConstraintViolation>> validateMethod(final @NotNull Method method,
+                                                                                final @Nullable Object @NotNull ... parameters) {
         Parameter[] params = method.getParameters();
-        if (params.length != parameters.length)
-            throw new IllegalArgumentException("Method parameters do not match with the given number of parameters. " +
-                    "Please include all the parameters of the method to validate it");
         Map<String, Set<ConstraintViolation>> violations = new HashMap<>();
         for (int i = 0; i < params.length; i++) {
             Parameter parameter = params[i];
@@ -256,8 +276,7 @@ public final class Validator {
                 violations.putAll(tmp);
             }
         }
-        if (!violations.isEmpty())
-            throw new ViolationException(violations);
+        return violations;
     }
 
     /**

@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
  * An exception thrown by {@link Reflect} on errors.
  */
 public final class ReflectException extends RuntimeException {
+    private static final long serialVersionUID = 5743949200733944293L;
 
     /**
      * Instantiates a new Reflect exception.
@@ -20,7 +22,7 @@ public final class ReflectException extends RuntimeException {
      * @param format the format of the message
      * @param args   the arguments to format
      */
-    ReflectException(final @NotNull String format, final Object @NotNull ... args) {
+    public ReflectException(final @NotNull String format, final Object @NotNull ... args) {
         super(formatMessage(format, args));
     }
 
@@ -31,7 +33,7 @@ public final class ReflectException extends RuntimeException {
      * @param format the format of the message
      * @param args   the arguments to format
      */
-    ReflectException(final @NotNull Throwable cause, final @NotNull String format, final Object @NotNull ... args) {
+    public ReflectException(final @NotNull Throwable cause, final @NotNull String format, final Object @NotNull ... args) {
         super(formatMessage(format, args), cause);
     }
 
@@ -141,31 +143,53 @@ public final class ReflectException extends RuntimeException {
         return new ReflectException("Could not find method from the given predicate in type '%s'", type);
     }
 
-    private static @NotNull String formatMessage(final @NotNull String format,
-                                                 final Object @NotNull ... args) {
+    /**
+     * Formats the given message accordingly.
+     * <br>
+     * <ul>
+     *     <li>If an argument is a {@link Type},
+     *     it will be converted with {@link ReflectUtils#toString(Type)};</li>
+     *     <li>If an argument is a {@link Method},
+     *     it will be formatted as <code>&lt;method_name&gt;(&lt;method_parameters&gt;)</code>;</li>
+     *     <li>If an argument is a {@link Constructor},
+     *     it will be formatted as <code>&lt;declaring_class&gt;(&lt;method_parameters&gt;)</code>.</li>
+     * </ul>
+     *
+     * @param format the format of the message
+     * @param args   the arguments
+     * @return the message
+     */
+    public static @NotNull String formatMessage(final @NotNull String format,
+                                                final @Nullable Object @NotNull ... args) {
         for (int i = 0; i < args.length; i++) {
             Object object = args[i];
             if (object instanceof Type) args[i] = ReflectUtils.toString((Type) object);
             else if (object instanceof Method) {
                 Method method = (Method) object;
+                Type returnType = method.getGenericReturnType();
+                if (returnType == null) returnType = method.getReturnType();
                 args[i] = String.format("%s %s(%s)",
-                        ReflectUtils.toString(method.getReturnType()),
+                        ReflectUtils.toString(returnType),
                         method.getName(),
-                        Arrays.stream(method.getParameterTypes())
-                                .map(ReflectUtils::toString)
-                                .collect(Collectors.joining(", "))
+                        getParameterTypes(method)
                 );
             } else if (object instanceof Constructor<?>) {
                 Constructor<?> constructor = (Constructor<?>) object;
                 args[i] = String.format("%s(%s)",
                         constructor.getDeclaringClass().getCanonicalName(),
-                        Arrays.stream(constructor.getParameterTypes())
-                                .map(ReflectUtils::toString)
-                                .collect(Collectors.joining(", "))
+                        getParameterTypes(constructor)
                 );
             }
         }
         return String.format(format, args);
+    }
+
+    private static @NotNull String getParameterTypes(final @NotNull Executable executable) {
+        Type[] parameterTypes = executable.getGenericParameterTypes();
+        if (parameterTypes == null) parameterTypes = executable.getParameterTypes();
+        return Arrays.stream(parameterTypes)
+                .map(ReflectUtils::toString)
+                .collect(Collectors.joining(", "));
     }
 
 }

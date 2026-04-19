@@ -53,8 +53,8 @@ class PairTest extends Specification {
 
     def 'test that compareTo of #first and #second returns #expected'() {
         expect:
-        first.compareTo(second) == expected
-        second.compareTo(first) == -expected
+        first <=> second == expected
+        second <=> first == -expected
 
         where:
         first                  | second               || expected
@@ -69,7 +69,7 @@ class PairTest extends Specification {
 
     def 'test that compareTo throws IllegalArgumentException for #first and #second'() {
         when:
-        first.compareTo(second)
+        first <=> second
 
         then:
         thrown(IllegalArgumentException)

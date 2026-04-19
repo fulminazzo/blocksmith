@@ -9,6 +9,7 @@ import java.util.function.BiFunction
 import java.util.function.Function
 
 class AbstractExpiringMapTest extends Specification {
+    private static final long ttl = 200L
 
     private static final Function<? super String, ? extends String> function = { k -> 'world' }
     private static final BiFunction<? super String, ? super String, ? extends String> bifunction = { (k, v) -> 'moon' }
@@ -23,7 +24,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that put updates if not present'() {
         when:
-        def actual = map.put('Hello', 'moon', 10L)
+        def actual = map.put('Hello', 'moon', ttl)
 
         then:
         def entry = internal['Hello']
@@ -36,10 +37,10 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that put updates if present'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
 
         when:
-        def actual = map.put('Hello', 'moon', 10L)
+        def actual = map.put('Hello', 'moon', ttl)
 
         then:
         def entry = internal['Hello']
@@ -52,7 +53,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that containsValue of #value returns #expected'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
 
         when:
         def actual = map.containsValue(value)
@@ -68,7 +69,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that putIfAbsent updates if not present'() {
         when:
-        def actual = map.putIfAbsent('Hello', 'moon', 10L)
+        def actual = map.putIfAbsent('Hello', 'moon', ttl)
 
         then:
         def entry = internal['Hello']
@@ -79,10 +80,10 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that putIfAbsent does not update if present'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
 
         when:
-        def actual = map.putIfAbsent('Hello', 'moon', 10L)
+        def actual = map.putIfAbsent('Hello', 'moon', ttl)
 
         then:
         def entry = internal['Hello']
@@ -93,12 +94,12 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that replace correctly replaces with time to live'() {
         given:
-        def previous = new AbstractExpiringMap.ExpiringEntry<>('mars', 10L)
+        def previous = new AbstractExpiringMap.ExpiringEntry<>('mars', ttl)
         def previousTime = previous.expireTime
         internal['Hello'] = previous
 
         when:
-        def actual = map.replace('Hello', 'mars', 'world', 20L)
+        def actual = map.replace('Hello', 'mars', 'world', ttl * 2)
 
         then:
         actual
@@ -109,16 +110,16 @@ class AbstractExpiringMapTest extends Specification {
         entry.value == previous.value
         entry.value == 'world'
         entry.expireTime == previous.expireTime
-        entry.expireTime - previousTime >= 10L
+        entry.expireTime - previousTime >= ttl
     }
 
     def 'test that replace of #key and #oldValue does not replace'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>(null, 10L)
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
+        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>(null, ttl)
 
         when:
-        def actual = map.replace(key, oldValue, 'world', 10L)
+        def actual = map.replace(key, oldValue, 'world', ttl)
 
         then:
         !actual
@@ -132,7 +133,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that replace without TTL correctly replaces'() {
         given:
-        def previous = new AbstractExpiringMap.ExpiringEntry<>('mars', 10L)
+        def previous = new AbstractExpiringMap.ExpiringEntry<>('mars', ttl)
         internal['Hello'] = previous
 
         when:
@@ -151,8 +152,8 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that replace without TTL of #key and #oldValue does not replace'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>(null, 10L)
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
+        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>(null, ttl)
 
         when:
         def actual = map.replace(key, oldValue, 'world')
@@ -169,7 +170,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that replace without TTL and old value correctly replaces'() {
         given:
-        def previous = new AbstractExpiringMap.ExpiringEntry<>('mars', 10L)
+        def previous = new AbstractExpiringMap.ExpiringEntry<>('mars', ttl)
         internal['Hello'] = previous
 
         when:
@@ -188,7 +189,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that replace without TTL of #key does not replace'() {
         given:
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>(null, 10L)
+        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>(null, ttl)
 
         when:
         def actual = map.replace(key, 'world')
@@ -202,7 +203,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that computeIfAbsent updates if not present'() {
         when:
-        def actual = map.computeIfAbsent('Hello', k -> 'moon', 10L)
+        def actual = map.computeIfAbsent('Hello', k -> 'moon', ttl)
 
         then:
         def entry = internal['Hello']
@@ -213,10 +214,10 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that computeIfAbsent does not update if present'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
 
         when:
-        def actual = map.computeIfAbsent('Hello', k -> 'moon', 10L)
+        def actual = map.computeIfAbsent('Hello', k -> 'moon', ttl)
 
         then:
         def entry = internal['Hello']
@@ -227,7 +228,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that computeIfPresent updates if present'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
 
         when:
         def actual = map.computeIfPresent('Hello', (k, v) -> v + 'moon')
@@ -251,7 +252,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that compute correctly adds new value'() {
         when:
-        def actual = map.compute('Hello', (k, v) -> 'world', 10L)
+        def actual = map.compute('Hello', (k, v) -> 'world', ttl)
 
         then:
         actual == null
@@ -264,17 +265,17 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that compute correctly updates existing value'() {
         given:
-        def previous = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+        def previous = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
         internal['Hello'] = previous
 
         when:
-        def actual = map.compute('Hello', (k, v) -> v + 'moon', 20L)
+        def actual = map.compute('Hello', (k, v) -> v + 'moon', ttl * 2)
 
         then:
         def entry = internal['Hello']
         entry != null
         entry.value == 'worldmoon'
-        entry.expireTime - previous.expireTime >= 10L
+        entry.expireTime - previous.expireTime >= ttl
 
         and:
         actual == previous.value
@@ -282,11 +283,11 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that compute correctly removes existing value'() {
         given:
-        def previous = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+        def previous = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
         internal['Hello'] = previous
 
         when:
-        def actual = map.compute('Hello', (k, v) -> null, 10L)
+        def actual = map.compute('Hello', (k, v) -> null, ttl)
 
         then:
         def entry = internal['Hello']
@@ -298,7 +299,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that merge correctly adds new value'() {
         when:
-        def actual = map.merge('Hello', 'world', (k, v) -> 'world', 10L)
+        def actual = map.merge('Hello', 'world', (k, v) -> 'world', ttl)
 
         then:
         actual == 'world'
@@ -311,17 +312,17 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that merge correctly updates existing value'() {
         given:
-        def previous = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+        def previous = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
         internal['Hello'] = previous
 
         when:
-        def actual = map.merge('Hello', 'world', (k, v) -> v + 'moon', 20L)
+        def actual = map.merge('Hello', 'world', (k, v) -> v + 'moon', ttl * 2)
 
         then:
         def entry = internal['Hello']
         entry != null
         entry.value == 'worldmoon'
-        entry.expireTime - previous.expireTime >= 10L
+        entry.expireTime - previous.expireTime >= ttl
 
         and:
         actual == 'worldmoon'
@@ -329,11 +330,11 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that merge correctly removes existing value'() {
         given:
-        def previous = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+        def previous = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
         internal['Hello'] = previous
 
         when:
-        def actual = map.merge('Hello', 'world', (k, v) -> null, 10L)
+        def actual = map.merge('Hello', 'world', (k, v) -> null, ttl)
 
         then:
         def entry = internal['Hello']
@@ -345,7 +346,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that merge does not throw for not existing'() {
         when:
-        def actual = map.merge('Hello', null, (k, v) -> null, 10L)
+        def actual = map.merge('Hello', null, (k, v) -> null, ttl)
 
         then:
         def entry = internal['Hello']
@@ -363,7 +364,7 @@ class AbstractExpiringMapTest extends Specification {
         def now = System.currentTimeMillis()
 
         when:
-        this.map.putAll(map, 10L)
+        this.map.putAll(map, ttl)
 
         then:
         def first = internal['Hello']
@@ -381,7 +382,7 @@ class AbstractExpiringMapTest extends Specification {
     def 'test that putAll without TTL adds every non-expired key'() {
         given:
         def map = Mock(ExpiringMap)
-        map.getTtl(_) >> { a -> a[0] == 'Hello' ? Duration.ofMillis(10L) : null }
+        map.getTtl(_) >> { a -> a[0] == 'Hello' ? Duration.ofMillis(ttl) : null }
         map.forEach(_) >> { a ->
             BiConsumer consumer = a[0]
             consumer.accept('Hello', 'world')
@@ -403,8 +404,8 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that entrySet returns all entries'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 2000L)
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', ttl * 2)
+        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', ttl)
 
         when:
         def entries = map.entrySet()
@@ -435,7 +436,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that getTtl of existing returns correct value'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
 
         when:
         def duration = map.getTtl('Hello')
@@ -445,8 +446,8 @@ class AbstractExpiringMapTest extends Specification {
 
         and:
         def millis = duration.toMillis()
-        millis >= 9L
-        millis <= 10L
+        millis >= ttl * 0.9
+        millis <= ttl
     }
 
     def 'test that getTtl of non-existing returns null'() {
@@ -459,7 +460,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that getTtl of non-existing throws NoSuchElementException'() {
         when:
-        map.renew('Hello', 1L)
+        map.renew('Hello', ttl)
 
         then:
         thrown(NoSuchElementException)
@@ -467,19 +468,19 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that renew correctly applies new time-to-live'() {
         given:
-        def entry = new AbstractExpiringMap.ExpiringEntry<>('world', 10L)
+        def entry = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
         internal['Hello'] = entry
 
         and:
         def now = System.currentTimeMillis()
 
         when:
-        map.renew('Hello', 20L)
+        map.renew('Hello', ttl * 2)
 
         then:
         def millis = entry.expireTime - now
-        millis >= 19L
-        millis <= 21L
+        millis >= ttl * 2 * 0.9
+        millis <= ttl * 2 * 1.1
     }
 
     def 'test that #method(#arguments) throws invalid TTL exception'() {
@@ -508,7 +509,7 @@ class AbstractExpiringMapTest extends Specification {
         def matchCount = 0
 
         and:
-        map.getTtl('Goodbye') >> Duration.ofMillis(1337)
+        map.getTtl('Goodbye') >> Duration.ofMillis(ttl)
 
         when:
         map."$method"(*arguments)
@@ -523,26 +524,26 @@ class AbstractExpiringMapTest extends Specification {
         where:
         method            | arguments                                               || expectedMethod    | expectedArguments
         'put'             | ['Hello', 'world']                                      || 'put'             | ['Hello', 'world', AbstractExpiringMap.NEVER_EXPIRE]
-        'put'             | ['Hello', 'world', Duration.ofMillis(1337)]             || 'put'             | ['Hello', 'world', 1337L]
+        'put'             | ['Hello', 'world', Duration.ofMillis(ttl)]             || 'put'             | ['Hello', 'world', ttl]
         'putIfAbsent'     | ['Hello', 'world']                                      || 'putIfAbsent'     | ['Hello', 'world', AbstractExpiringMap.NEVER_EXPIRE]
-        'putIfAbsent'     | ['Hello', 'world', Duration.ofMillis(1337)]             || 'putIfAbsent'     | ['Hello', 'world', 1337L]
-        'replace'         | ['Hello', 'world', 'moon', Duration.ofMillis(1337)]     || 'replace'         | ['Hello', 'world', 'moon', 1337L]
+        'putIfAbsent'     | ['Hello', 'world', Duration.ofMillis(ttl)]             || 'putIfAbsent'     | ['Hello', 'world', ttl]
+        'replace'         | ['Hello', 'world', 'moon', Duration.ofMillis(ttl)]     || 'replace'         | ['Hello', 'world', 'moon', ttl]
         'computeIfAbsent' | ['Hello', function]                                     || 'computeIfAbsent' | ['Hello', function, AbstractExpiringMap.NEVER_EXPIRE]
-        'computeIfAbsent' | ['Hello', function, Duration.ofMillis(1337)]            || 'computeIfAbsent' | ['Hello', function, 1337L]
+        'computeIfAbsent' | ['Hello', function, Duration.ofMillis(ttl)]            || 'computeIfAbsent' | ['Hello', function, ttl]
         'compute'         | ['Hello', bifunction]                                   || 'compute'         | ['Hello', bifunction, AbstractExpiringMap.NEVER_EXPIRE]
-        'compute'         | ['Goodbye', bifunction]                                 || 'compute'         | ['Goodbye', bifunction, 1337L]
-        'compute'         | ['Hello', bifunction, Duration.ofMillis(1337)]          || 'compute'         | ['Hello', bifunction, 1337L]
+        'compute'         | ['Goodbye', bifunction]                                 || 'compute'         | ['Goodbye', bifunction, ttl]
+        'compute'         | ['Hello', bifunction, Duration.ofMillis(ttl)]          || 'compute'         | ['Hello', bifunction, ttl]
         'merge'           | ['Hello', 'world', bifunction]                          || 'merge'           | ['Hello', 'world', bifunction, AbstractExpiringMap.NEVER_EXPIRE]
-        'merge'           | ['Goodbye', 'world', bifunction]                        || 'merge'           | ['Goodbye', 'world', bifunction, 1337L]
-        'merge'           | ['Hello', 'world', bifunction, Duration.ofMillis(1337)] || 'merge'           | ['Hello', 'world', bifunction, 1337L]
+        'merge'           | ['Goodbye', 'world', bifunction]                        || 'merge'           | ['Goodbye', 'world', bifunction, ttl]
+        'merge'           | ['Hello', 'world', bifunction, Duration.ofMillis(ttl)] || 'merge'           | ['Hello', 'world', bifunction, ttl]
         'putAll'          | [[:]]                                                   || 'putAll'          | [[:], AbstractExpiringMap.NEVER_EXPIRE]
-        'putAll'          | [[:], Duration.ofMillis(1337)]                          || 'putAll'          | [[:], 1337]
-        'renew'           | ['Hello', Duration.ofMillis(1337)]                      || 'renew'           | ['Hello', 1337L]
+        'putAll'          | [[:], Duration.ofMillis(ttl)]                          || 'putAll'          | [[:], ttl]
+        'renew'           | ['Hello', Duration.ofMillis(ttl)]                      || 'renew'           | ['Hello', ttl]
     }
 
     def 'test that map is equal to self'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1000L)
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
 
         expect:
         AbstractExpiringMap.getMethod('equals', Object).invoke(map, map)
@@ -557,7 +558,7 @@ class AbstractExpiringMapTest extends Specification {
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 1L)
 
         and:
-        sleep(5L)
+        sleepTtl()
 
         when:
         def actual = Objects.equals(map, object)
@@ -586,13 +587,13 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that toString correctly prints expired entries'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1000L)
+        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 1L)
         internal['Ciao'] = new AbstractExpiringMap.ExpiringEntry<>('moon', AbstractExpiringMap.NEVER_EXPIRE)
-        internal['Bye'] = new AbstractExpiringMap.ExpiringEntry<>(null, 1500L)
+        internal['Bye'] = new AbstractExpiringMap.ExpiringEntry<>(null, ttl)
 
         and:
-        sleep(5L)
+        sleepTtl()
 
         when:
         def string = map.toString()
@@ -609,7 +610,7 @@ class AbstractExpiringMapTest extends Specification {
         given:
         def entry = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
                 'Hello',
-                new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
+                new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
         )
 
         expect:
@@ -632,7 +633,7 @@ class AbstractExpiringMapTest extends Specification {
         given:
         def first = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
                 'Hello',
-                new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
+                new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
         )
 
         and:
@@ -646,7 +647,7 @@ class AbstractExpiringMapTest extends Specification {
         given:
         def entry = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
                 'Hello',
-                new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
+                new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
         )
 
         expect:
@@ -665,13 +666,13 @@ class AbstractExpiringMapTest extends Specification {
         given:
         def first = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
                 'Hello',
-                new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
+                new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
         )
 
         and:
         def second = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
                 'Hello',
-                new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
+                new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
         )
 
         expect:
@@ -682,7 +683,7 @@ class AbstractExpiringMapTest extends Specification {
         given:
         def entry = new AbstractExpiringMap.ExpiringEntryMapEntry<>(
                 'Hello',
-                new AbstractExpiringMap.ExpiringEntry<>('world', 10000L)
+                new AbstractExpiringMap.ExpiringEntry<>('world', ttl)
         )
 
         expect:
@@ -717,8 +718,10 @@ class AbstractExpiringMapTest extends Specification {
         'getKey'   | []
         'getValue' | []
         'setValue' | ['mars']
-        'equals'   | ['mars']
-        'hashCode' | []
+    }
+
+    private static void sleepTtl() {
+        sleep(ttl / 2 as long)
     }
 
 }
