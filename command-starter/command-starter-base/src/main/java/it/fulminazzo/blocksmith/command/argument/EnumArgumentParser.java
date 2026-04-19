@@ -5,10 +5,7 @@ import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A dynamic {@link ArgumentParser} for enum types.
@@ -28,7 +25,7 @@ final class EnumArgumentParser<E extends Enum<E>> implements ArgumentParser<E> {
     @SuppressWarnings("unchecked")
     public EnumArgumentParser(final @NotNull Class<E> type) {
         this.enumTypeName = type.getSimpleName();
-        this.values = new HashMap<>();
+        this.values = new TreeMap<>();
         Reflect.on(type).values().forEach(e -> values.put(e.name().toLowerCase(), (E) e));
     }
 

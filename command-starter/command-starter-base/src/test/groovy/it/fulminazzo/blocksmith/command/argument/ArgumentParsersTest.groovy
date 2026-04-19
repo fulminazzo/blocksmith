@@ -196,7 +196,7 @@ class ArgumentParsersTest extends Specification {
         def actual = parser.getCompletions(context)
 
         then:
-        actual.sort() == expected.sort()
+        actual == expected
 
         where:
         type      | argument          || expected
@@ -299,10 +299,10 @@ class ArgumentParsersTest extends Specification {
         // STRING
         String    | ''                || ['<%name%>']
         // ENUM
-        TimeUnit  | ''                || TimeUnit.values().collect { it.toString().toLowerCase() }
-        TimeUnit  | 'n'               || TimeUnit.values().collect { it.toString().toLowerCase() }
-        TimeUnit  | 'nanoseconds'     || TimeUnit.values().collect { it.toString().toLowerCase() }
-        TimeUnit  | 'NANOSECONDS'     || TimeUnit.values().collect { it.toString().toLowerCase() }
+        TimeUnit  | ''                || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
+        TimeUnit  | 'n'               || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
+        TimeUnit  | 'nanoseconds'     || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
+        TimeUnit  | 'NANOSECONDS'     || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
         // LOCALE
         Locale    | ''                || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
                 .collect { LocaleUtils.toString(it) }.unique()
