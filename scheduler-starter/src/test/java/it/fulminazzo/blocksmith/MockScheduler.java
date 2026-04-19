@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MockScheduler {
-    public static @NotNull MockScheduler INSTANCE = new MockScheduler();
+    public static final @NotNull MockScheduler INSTANCE = new MockScheduler();
 
     private final @NotNull ScheduledExecutorService asyncExecutor = Executors.newSingleThreadScheduledExecutor();
     private final @NotNull Map<Long, Object> tasks = new ConcurrentHashMap<>();
@@ -58,10 +58,8 @@ public final class MockScheduler {
 
     public boolean isCancelled(final long id) {
         Object task = tasks.get(id);
-        if (task instanceof ScheduledFuture) {
-            ScheduledFuture<?> future = ((ScheduledFuture<?>) task);
+        if (task instanceof ScheduledFuture<?> future)
             return future.isCancelled() || future.isDone();
-        }
         return task == null;
     }
 

@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":scheduler-starter:scheduler-starter-bukkit"))
+    api(projects.schedulerStarter.schedulerStarterBukkit)
 
     compileOnly(libs.folia)
 
