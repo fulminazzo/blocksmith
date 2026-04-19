@@ -6,7 +6,7 @@ import com.electronwill.nightconfig.core.serde.ObjectSerializer
 import it.fulminazzo.blocksmith.config.Comment
 import spock.lang.Specification
 
-class ConfigUtilsTest extends Specification {
+class NightConfigUtilsTest extends Specification {
 
     def 'test that fixPropertyNamesAndRemoveNull correctly updates names and overrides nulls'() {
         given:
@@ -28,7 +28,7 @@ class ConfigUtilsTest extends Specification {
         actual.set('sub', sub)
 
         when:
-        ConfigUtils.fixPropertyNames(actual)
+        NightConfigUtils.fixPropertyNames(actual)
 
         then:
         actual == expected
@@ -45,6 +45,8 @@ class ConfigUtilsTest extends Specification {
         expected.set('version', 1.0d)
         expected.setComment('players', ' This comment is multiline\n Hope it will work!')
         expected.set('players', 2)
+        expected.setComment('data', ' This should not be searched')
+        expected.set('data', null)
         expected.set('allowed', null)
         expected.set('current', null)
 
@@ -81,7 +83,7 @@ class ConfigUtilsTest extends Specification {
         reference.current = reference
 
         when:
-        ConfigUtils.setComments(reference, config)
+        NightConfigUtils.setComments(reference, config)
 
         then:
         checkEquals(config, expected)
@@ -111,7 +113,7 @@ class ConfigUtilsTest extends Specification {
         comment.value() >> new String[]{value}
 
         when:
-        def actual = ConfigUtils.getCommentValue(comment)
+        def actual = NightConfigUtils.getCommentValue(comment)
 
         then:
         actual == expected

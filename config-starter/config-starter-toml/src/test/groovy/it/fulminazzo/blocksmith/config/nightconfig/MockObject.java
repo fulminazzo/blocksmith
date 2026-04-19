@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -20,6 +22,9 @@ public class MockObject {
     @Comment("This comment is multiline\n" +
             "Hope it will work!")
     int players = 2;
+
+    @Comment("This should not be searched")
+    Object data;
 
     @Comment("")
     Boolean allowed = null;

@@ -1,7 +1,7 @@
 dependencies {
     api(libs.jackson.json)
 
-    api(project(":base:validation"))
+    api(projects.base.validation)
 
-    api(project.parent!!)
+    project.parent?.let { api(it) }
 }

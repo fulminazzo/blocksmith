@@ -1,6 +1,5 @@
 package it.fulminazzo.blocksmith.config.jackson
 
-
 import spock.lang.Specification
 
 class NonNullKeyMapDeserializerTest extends Specification {

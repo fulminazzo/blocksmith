@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.reflect;
 
 import lombok.*;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @ToString(callSuper = true)

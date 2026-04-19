@@ -16,10 +16,10 @@ tasks.compileJava {
 dependencies {
     implementation(libs.bundles.log4j)
 
-    implementation(project(":config-starter:config-starter-yaml"))
-    implementation(project(":config-starter:config-starter-data"))
+    implementation(projects.configStarter.configStarterYaml)
+    implementation(projects.configStarter.configStarterData)
 
-    implementation(project(":data-starter:data-starter-all"))
+    implementation(projects.dataStarter.dataStarterAll)
 
     jooqGenerator(libs.h2)
     implementation(libs.mariadb)
@@ -37,7 +37,7 @@ tasks.shadowJar {
 }
 
 jooq {
-    version.set(libs.versions.jooq.asProvider().orNull!!)
+    version.set(libs.versions.jooq.asProvider().get())
     configurations {
         create("main") {
             jooqConfiguration.apply {

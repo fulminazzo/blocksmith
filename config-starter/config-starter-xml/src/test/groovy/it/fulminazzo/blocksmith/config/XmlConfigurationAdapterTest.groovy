@@ -1,50 +1,36 @@
 package it.fulminazzo.blocksmith.config
 
 import groovy.util.logging.Slf4j
-import spock.lang.Specification
 
 @Slf4j
-class XmlConfigurationAdapterTest extends MigrationConfigurationAdapterTest {
+class XmlConfigurationAdapterTest extends ConfigurationAdapterTest {
 
-    def 'test that load correctly loads file'() {
-        given:
-        def file = getFile('load')
-
-        and:
-        def adapter = getAdapter()
-
+    def 'test that loadComments with invalid data throws IOException'() {
         when:
-        def actual = adapter.load(file, MockConfig)
+        adapter.loadComments('Hello, world')
 
         then:
-        noExceptionThrown()
-
-        and:
-        actual == new MockConfig(
-                false,
-                'Blocksmith',
-                null,
-                ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0, null)
-        )
+        thrown(IOException)
     }
 
-    def 'test that store correctly saves file'() {
-        given:
-        def file = getFile('store')
-        if (file.exists()) file.delete()
+    @Override
+    protected boolean supportsNull() {
+        return true
+    }
 
-        and:
-        def adapter = getAdapter()
+    @Override
+    protected File getFile(final String name) {
+        return new File("build/resources/test/${name}.xml")
+    }
 
-        when:
-        adapter.store(file, new MockConfig())
+    @Override
+    protected BaseConfigurationAdapter getAdapter() {
+        return new XmlConfigurationAdapter(log)
+    }
 
-        then:
-        noExceptionThrown()
-
-        and:
-        file.readLines() == [
+    @Override
+    protected List<String> getExpectedStoreLines() {
+        return [
                 '<MockConfig>',
                 '  <!-- Example comment -->',
                 '  <CommentsEnabled>true</CommentsEnabled>',
@@ -65,34 +51,6 @@ class XmlConfigurationAdapterTest extends MigrationConfigurationAdapterTest {
                 '  </Internal>',
                 '</MockConfig>'
         ]
-    }
-
-    def 'test that PascalCaseStrategy converts #string to #expected'() {
-        given:
-        def strategy = new XmlConfigurationAdapter.PascalCaseStrategy()
-
-        when:
-        def actual = strategy.translate(string)
-
-        then:
-        actual == expected
-
-        where:
-        string       || expected
-        ''           || ''
-        'field_name' || 'FieldName'
-        'field-name' || 'FieldName'
-        'field.name' || 'FieldName'
-        'FieldName'  || 'FieldName'
-        'fieldName'  || 'FieldName'
-    }
-
-    File getFile(final String name) {
-        return new File("build/resources/test/${name}.xml")
-    }
-
-    BaseConfigurationAdapter getAdapter() {
-        return new XmlConfigurationAdapter(log)
     }
 
 }

@@ -1,0 +1,11 @@
+# Server settings of the application.
+# Set these accordingly!
+server:
+  host: 'localhost'
+  port: 8080
+
+# Name of the application
+name: 'blocksmith'
+authors: ['Fulminazzo']
+
+last-update: ~

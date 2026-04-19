@@ -1,50 +1,36 @@
 package it.fulminazzo.blocksmith.config
 
 import groovy.util.logging.Slf4j
-import spock.lang.Specification
 
 @Slf4j
-class YamlConfigurationAdapterTest extends MigrationConfigurationAdapterTest {
+class YamlConfigurationAdapterTest extends ConfigurationAdapterTest {
 
-    def 'test that load correctly loads file'() {
-        given:
-        def file = getFile('load')
-
-        and:
-        def adapter = getAdapter()
-
+    def 'test that loadComments does not throw for non-root node'() {
         when:
-        def actual = adapter.load(file, MockConfig)
+        def actual = adapter.loadComments('\"string\"')
 
         then:
-        noExceptionThrown()
-
-        and:
-        actual == new MockConfig(
-                false,
-                'Blocksmith',
-                null,
-                ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0, null)
-        )
+        actual == [:]
     }
 
-    def 'test that store correctly saves file'() {
-        given:
-        def file = getFile('store')
-        if (file.exists()) file.delete()
+    @Override
+    protected boolean supportsNull() {
+        return true
+    }
 
-        and:
-        def adapter = getAdapter()
+    @Override
+    protected File getFile(final String name) {
+        return new File("build/resources/test/${name}.yml")
+    }
 
-        when:
-        adapter.store(file, new MockConfig())
+    @Override
+    protected BaseConfigurationAdapter getAdapter() {
+        return new YamlConfigurationAdapter(log)
+    }
 
-        then:
-        noExceptionThrown()
-
-        and:
-        file.readLines() == [
+    @Override
+    protected List<String> getExpectedStoreLines() {
+        return [
                 '# Example comment',
                 'comments-enabled: true',
                 '# This comment should be',
@@ -62,14 +48,6 @@ class YamlConfigurationAdapterTest extends MigrationConfigurationAdapterTest {
                 '  version: 1.0',
                 '  verified: null'
         ]
-    }
-
-    File getFile(final String name) {
-        return new File("build/resources/test/${name}.yml")
-    }
-
-    BaseConfigurationAdapter getAdapter() {
-        return new YamlConfigurationAdapter(log)
     }
 
 }

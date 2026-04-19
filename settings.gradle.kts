@@ -1,43 +1,51 @@
 rootProject.name = "blocksmith"
 
-include("base")
-include("base:validation")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-include("base:testing")
+// base
+include(
+    "base",
+    "base:validation",
 
+    "base:testing"
+)
 
+// config-starter
+include(
+    "config-starter",
+    "config-starter:config-starter-core",
+
+    "config-starter:config-starter-json",
+    "config-starter:config-starter-properties",
+    "config-starter:config-starter-toml",
+    "config-starter:config-starter-xml",
+    "config-starter:config-starter-yaml",
+
+    "config-starter:config-starter-all",
+
+    "config-starter:config-starter-testing",
+    "config-starter:config-starter-generator"
+)
+
+// data-starter
+include(
+    "data-starter",
+    "data-starter:data-starter-base",
+    "data-starter:data-starter-testing",
+
+    "data-starter:data-starter-mapper",
+    "data-starter:data-starter-mapper:data-starter-mapper-json",
+
+    "data-starter:data-starter-file",
+    "data-starter:data-starter-memory",
+    "data-starter:data-starter-mongo",
+    "data-starter:data-starter-redis",
+    "data-starter:data-starter-sql",
+
+    "data-starter:data-starter-cache",
+
+    "data-starter:data-starter-all"
+)
+
+// example
 include("example")
-
-
-include("config-starter")
-include("config-starter:config-starter-core")
-
-include("config-starter:config-starter-json")
-include("config-starter:config-starter-properties")
-include("config-starter:config-starter-toml")
-include("config-starter:config-starter-xml")
-include("config-starter:config-starter-yaml")
-include("config-starter:config-starter-data")
-
-include("config-starter:config-starter-all")
-
-include("config-starter:config-starter-testing")
-
-
-include("data-starter")
-include("data-starter:data-starter-base")
-include("data-starter:data-starter-testing")
-
-include("data-starter:data-starter-mapper")
-include("data-starter:data-starter-mapper:data-starter-mapper-json")
-
-include("data-starter:data-starter-file")
-include("data-starter:data-starter-memory")
-include("data-starter:data-starter-mongo")
-include("data-starter:data-starter-redis")
-include("data-starter:data-starter-sql")
-
-include("data-starter:data-starter-cache")
-
-include("data-starter:data-starter-all")
-

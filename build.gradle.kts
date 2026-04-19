@@ -9,7 +9,6 @@ plugins {
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
-extra["baseProjectName"] = "base"
 extra["testingModuleName"] = "testing"
 
 allprojects {
@@ -18,8 +17,10 @@ allprojects {
     apply { plugin("jacoco") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
-    val baseProjectName: String by rootProject.extra
+    val testingModuleName: String by rootProject.extra
+
     val projectInfoClassName = "ProjectInfo"
+
     val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
     val mockitoAgent: Configuration by configurations.creating
 
@@ -37,12 +38,14 @@ allprojects {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
 
-        if (project.name != baseProjectName) api(project(":$baseProjectName"))
+        if (project.path != rootProject.projects.base.path) api(rootProject.projects.base)
 
         testImplementation(rootProject.libs.bundles.annotations)
         testRuntimeOnly(rootProject.libs.junit.platform)
         testAnnotationProcessor(rootProject.libs.lombok)
         testImplementation(rootProject.libs.bundles.test.framework)
+
+        testImplementation(rootProject.projects.base.testing)
 
         mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
@@ -109,7 +112,7 @@ dependencies {
 
     subprojects
         .filter { !it.name.endsWith("-$testingModuleName") }
-        .forEach { implementation(project(it.path)) }
+        .forEach { implementation(it) }
 }
 
 tasks.testCodeCoverageReport {

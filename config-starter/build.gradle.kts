@@ -7,19 +7,21 @@ dependencies {
 }
 
 allprojects {
-    dependencies {
-        testImplementation(rootProject.libs.slf4j)
-        testImplementation(rootProject.libs.bundles.log4j)
 
-        if (!project.name.endsWith(testingModuleName))
-            testImplementation(project(":$projectName:$projectName-$testingModuleName"))
+    dependencies {
+        val testingModule = rootProject.projects.configStarter.configStarterTesting
+        if (project.path != testingModule.path) testImplementation(testingModule)
     }
+
 }
 
 subprojects {
+
     dependencies {
         compileOnly(rootProject.libs.slf4j)
-        if (!project.name.endsWith(coreModuleName))
-            api(project(":$projectName:$projectName-$coreModuleName"))
+
+        val coreModule = rootProject.projects.configStarter.configStarterCore
+        if (project.path != coreModule.path) api(coreModule)
     }
+
 }

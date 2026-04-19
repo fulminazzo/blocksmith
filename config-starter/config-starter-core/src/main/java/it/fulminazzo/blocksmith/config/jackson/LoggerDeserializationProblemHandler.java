@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import it.fulminazzo.blocksmith.config.ConfigVersion;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,7 +33,7 @@ final class LoggerDeserializationProblemHandler extends DeserializationProblemHa
                                          final @NotNull String propertyName) throws IOException {
         // when the JSON contains a property not present in the bean
         String path = JacksonUtils.getCurrentPath(parser);
-        if (!propertyName.equalsIgnoreCase("version"))
+        if (!propertyName.equalsIgnoreCase(ConfigVersion.PROPERTY_NAME))
             logger.warn("Ignoring unrecognized property '{}' (path: '{}')", propertyName, path);
         parser.skipChildren();
         return true;
