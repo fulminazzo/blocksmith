@@ -44,7 +44,7 @@ public abstract class CommandRegistry {
         }
         for (String name : nodes.keySet()) {
             LiteralNode node = nodes.get(name);
-            commands.put(name, node);
+            commands.merge(node.getName(), node, LiteralNode::merge);
             registerSingle(name, node);
         }
         return this;
