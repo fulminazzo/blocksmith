@@ -91,6 +91,28 @@ class ReflectTest extends Specification {
         Object    || false
     }
 
+    def 'test that extendsType works'() {
+        given:
+        def reflect = new Reflect(object.getClass(), object)
+
+        when:
+        def actual = reflect.extendsType(superType)
+
+        then:
+        actual == expected
+
+        where:
+        object         | superType || expected
+        10.toInteger() | Integer   || true
+        10.toInteger() | Double    || false
+        10.toInteger() | Number    || true
+        10.toInteger() | Object    || true
+        10d            | Integer   || false
+        10d            | Double    || true
+        10d            | Number    || true
+        10d            | Object    || true
+    }
+
     def 'test that #type extendsType #superType returns #expected'() {
         given:
         def reflect = new Reflect(type, type)
@@ -104,11 +126,23 @@ class ReflectTest extends Specification {
         where:
         type        | superType   || expected
         Person      | NamedEntity || true
+        Person      | Class       || true
+        Person      | Type        || true
         NamedEntity | Person      || false
+        NamedEntity | Class       || true
+        NamedEntity | Type        || true
         int         | Integer     || true
+        int         | Class       || true
+        int         | Type        || true
         int         | Number      || true
+        int         | Class       || true
+        int         | Type        || true
         Integer     | int         || true
+        Integer     | Class       || true
+        Integer     | Type        || true
         Number      | int         || false
+        Number      | Class       || true
+        Number      | Type        || true
     }
 
     def 'test that cast toWrapper of #type to #object returns #expected'() {
@@ -603,8 +637,8 @@ class ReflectTest extends Specification {
 
         where:
         exception                                                                     || expected
-        new InvocationTargetException(new RuntimeException('Test runtime exception')) || RuntimeException
-        new InvocationTargetException(new Error('Test error'))                        || Error
+        new InvocationTargetException(new RuntimeException('Test runtime exception')) || ReflectException
+        new InvocationTargetException(new Error('Test error'))                        || ReflectException
         new InvocationTargetException(new Exception('Test exception'))                || ReflectException
     }
 
@@ -687,8 +721,8 @@ class ReflectTest extends Specification {
 
         where:
         exception                                                                     || expected
-        new InvocationTargetException(new RuntimeException('Test runtime exception')) || RuntimeException
-        new InvocationTargetException(new Error('Test error'))                        || Error
+        new InvocationTargetException(new RuntimeException('Test runtime exception')) || ReflectException
+        new InvocationTargetException(new Error('Test error'))                        || ReflectException
         new InvocationTargetException(new Exception('Test exception'))                || ReflectException
     }
 
@@ -743,6 +777,18 @@ class ReflectTest extends Specification {
         [Person]                                   || new Reflect(Person, Person)
         [Person.canonicalName]                     || new Reflect(Person, Person)
         [Person.canonicalName, Person.classLoader] || new Reflect(Person, Person)
+    }
+
+    def 'test that on of(Object) with type returns same as of(Type)'() {
+        given:
+        def type = Person
+
+        when:
+        def actual = Reflect.on((Object) type)
+
+        then:
+        actual.type == type
+        actual.get() == type
     }
 
     def 'test that on of #arguments throws #expected on class not found'() {

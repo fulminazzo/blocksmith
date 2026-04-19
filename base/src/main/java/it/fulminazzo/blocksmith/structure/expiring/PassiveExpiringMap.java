@@ -1,20 +1,24 @@
 package it.fulminazzo.blocksmith.structure.expiring;
 
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * A no-op implementation of {@link AbstractExpiringMap} that never checks for expiration.
- * Intended for testing purposes only.
+ * Implementation of {@link ExpiringMap} with no removal of the entities.
+ * <br>
+ * <b>WARNING</b>: removal is delegated to the user.
  *
- * @param <K> the type of the keys
- * @param <V> the type of the values
+ * @param <K> the type of the key
+ * @param <V> the type of the value
  */
-public class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
+@RequiredArgsConstructor
+final class PassiveExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     protected @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
@@ -23,7 +27,6 @@ public class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     public int size() {
-        clearExpired();
         return delegate.size();
     }
 
@@ -33,25 +36,25 @@ public class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
     }
 
     @Override
-    public boolean containsKey(final @Nullable Object key) {
-        return delegate.containsKey(key);
+    public boolean containsKey(final Object key) {
+        return getExpiring(key) != null;
     }
 
     @Override
-    public @Nullable V get(final @Nullable Object key) {
+    public V get(final Object key) {
         ExpiringEntry<V> entry = getExpiring(key);
         return entry == null ? null : entry.getValue();
     }
 
     @Override
-    public @Nullable V remove(final @Nullable Object key) {
-        ExpiringEntry<V> removed = delegate.remove(key);
-        return removed == null ? null : removed.getValue();
+    public V remove(final Object key) {
+        ExpiringEntry<V> entry = delegate.remove(key);
+        return entry == null ? null : entry.getValue();
     }
 
     @Override
     public @NotNull Set<K> keySet() {
-        return delegate.keySet();
+        return new HashSet<>(delegate.keySet());
     }
 
     @Override
@@ -59,6 +62,13 @@ public class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
         return delegate.values().stream()
                 .map(ExpiringEntry::getValue)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public @NotNull Set<Entry<K, V>> entrySet() {
+        return delegate.entrySet().stream()
+                .map(e -> new ExpiringEntryMapEntry<>(e.getKey(), e.getValue()))
+                .collect(Collectors.toSet());
     }
 
 }

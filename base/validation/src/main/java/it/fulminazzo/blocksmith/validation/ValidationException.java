@@ -11,6 +11,8 @@ import java.util.Set;
  * An exception thrown when validation fails.
  */
 public final class ValidationException extends Exception {
+    private static final long serialVersionUID = -4425591507230226127L;
+
     @Getter
     private final @Nullable Object object;
     @Getter

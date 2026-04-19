@@ -4,9 +4,7 @@ import it.fulminazzo.blocksmith.validation.annotation.Alphabetical;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import it.fulminazzo.blocksmith.validation.annotation.NotEmpty;
 import it.fulminazzo.blocksmith.validation.annotation.Range;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
@@ -30,12 +28,23 @@ final class Person {
         System.out.println("updated name because: " + reason);
     }
 
+    void invalidSetName(final @Alphabetical @NonNull String name,
+                        final @NotEmpty @NonNull String reason) {
+        Validator.validateMethod(name);
+        this.name = name;
+        System.out.println("updated name because: " + reason);
+    }
+
     @Value
     static class School {
 
         @Alphabetical
         @NonNull
         String name;
+
+        @EqualsAndHashCode.Exclude
+        @ToString.Exclude
+        School referenceSchool = this;
 
     }
 

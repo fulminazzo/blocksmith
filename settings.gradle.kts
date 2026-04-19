@@ -1,25 +1,31 @@
 rootProject.name = "blocksmith"
 
-include("base")
-include("base:validation")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-include("base:testing")
+// base
+include(
+    "base",
+    "base:validation",
 
+    "base:testing"
+)
 
+// config
+include(
+    "config-starter",
+    "config-starter:config-starter-core",
+
+    "config-starter:config-starter-json",
+    "config-starter:config-starter-properties",
+    "config-starter:config-starter-toml",
+    "config-starter:config-starter-xml",
+    "config-starter:config-starter-yaml",
+
+    "config-starter:config-starter-all",
+
+    "config-starter:config-starter-testing",
+    "config-starter:config-starter-generator"
+)
+
+// example
 include("example")
-
-
-include("config-starter")
-include("config-starter:config-starter-core")
-
-include("config-starter:config-starter-json")
-include("config-starter:config-starter-properties")
-include("config-starter:config-starter-toml")
-include("config-starter:config-starter-xml")
-include("config-starter:config-starter-yaml")
-
-include("config-starter:config-starter-all")
-
-include("config-starter:config-starter-testing")
-include("config-starter:config-starter-generator")
-

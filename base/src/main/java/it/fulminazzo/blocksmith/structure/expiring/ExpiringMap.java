@@ -330,6 +330,20 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
     @NotNull String toString();
 
     /**
+     * Initializes a new passive ExpirationMap.
+     * <br>
+     * The key-value pairs will persist in memory <b>FOREVER</b>,
+     * until the user <b>manually</b> removes them.
+     *
+     * @param <K> the type of the keys
+     * @param <V> the type of the values
+     * @return the map
+     */
+    static <K, V> @NotNull ExpiringMap<K, V> passive() {
+        return new PassiveExpiringMap<>();
+    }
+
+    /**
      * Initializes a new lazy ExpirationMap.
      * <br>
      * The key-value pairs will persist in memory until an operation has been done

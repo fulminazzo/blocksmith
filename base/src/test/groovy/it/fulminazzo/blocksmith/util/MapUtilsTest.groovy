@@ -2,7 +2,40 @@ package it.fulminazzo.blocksmith.util
 
 import spock.lang.Specification
 
+import static it.fulminazzo.blocksmith.naming.Convention.*
+
 class MapUtilsTest extends Specification {
+
+    def 'test that convertNames of #map, #from and #to returns #expected'() {
+        when:
+        def actual = MapUtils.convertNames(map, from, to)
+
+        then:
+        actual == expected
+
+        where:
+        map                                                      | from        | to          || expected
+        // camelCase
+        ['helloWorld': 1.0, 'internalMap': ['subValue': 2.0]]    | CAMEL_CASE  | CAMEL_CASE  || ['helloWorld': 1.0, 'internalMap': ['subValue': 2.0]]
+        ['hello-world': 1.0, 'internal-map': ['sub-value': 2.0]] | KEBAB_CASE  | CAMEL_CASE  || ['helloWorld': 1.0, 'internalMap': ['subValue': 2.0]]
+        ['hello_world': 1.0, 'internal_map': ['sub_value': 2.0]] | SNAKE_CASE  | CAMEL_CASE  || ['helloWorld': 1.0, 'internalMap': ['subValue': 2.0]]
+        ['HelloWorld': 1.0, 'InternalMap': ['SubValue': 2.0]]    | PASCAL_CASE | CAMEL_CASE  || ['helloWorld': 1.0, 'internalMap': ['subValue': 2.0]]
+        // kebab-case
+        ['helloWorld': 1.0, 'internalMap': ['subValue': 2.0]]    | CAMEL_CASE  | KEBAB_CASE  || ['hello-world': 1.0, 'internal-map': ['sub-value': 2.0]]
+        ['hello-world': 1.0, 'internal-map': ['sub-value': 2.0]] | KEBAB_CASE  | KEBAB_CASE  || ['hello-world': 1.0, 'internal-map': ['sub-value': 2.0]]
+        ['hello_world': 1.0, 'internal_map': ['sub_value': 2.0]] | SNAKE_CASE  | KEBAB_CASE  || ['hello-world': 1.0, 'internal-map': ['sub-value': 2.0]]
+        ['HelloWorld': 1.0, 'InternalMap': ['SubValue': 2.0]]    | PASCAL_CASE | KEBAB_CASE  || ['hello-world': 1.0, 'internal-map': ['sub-value': 2.0]]
+        // snake_case
+        ['helloWorld': 1.0, 'internalMap': ['subValue': 2.0]]    | CAMEL_CASE  | SNAKE_CASE  || ['hello_world': 1.0, 'internal_map': ['sub_value': 2.0]]
+        ['hello-world': 1.0, 'internal-map': ['sub-value': 2.0]] | KEBAB_CASE  | SNAKE_CASE  || ['hello_world': 1.0, 'internal_map': ['sub_value': 2.0]]
+        ['hello_world': 1.0, 'internal_map': ['sub_value': 2.0]] | SNAKE_CASE  | SNAKE_CASE  || ['hello_world': 1.0, 'internal_map': ['sub_value': 2.0]]
+        ['HelloWorld': 1.0, 'InternalMap': ['SubValue': 2.0]]    | PASCAL_CASE | SNAKE_CASE  || ['hello_world': 1.0, 'internal_map': ['sub_value': 2.0]]
+        // PascalCase
+        ['helloWorld': 1.0, 'internalMap': ['subValue': 2.0]]    | CAMEL_CASE  | PASCAL_CASE || ['HelloWorld': 1.0, 'InternalMap': ['SubValue': 2.0]]
+        ['hello-world': 1.0, 'internal-map': ['sub-value': 2.0]] | KEBAB_CASE  | PASCAL_CASE || ['HelloWorld': 1.0, 'InternalMap': ['SubValue': 2.0]]
+        ['hello_world': 1.0, 'internal_map': ['sub_value': 2.0]] | SNAKE_CASE  | PASCAL_CASE || ['HelloWorld': 1.0, 'InternalMap': ['SubValue': 2.0]]
+        ['HelloWorld': 1.0, 'InternalMap': ['SubValue': 2.0]]    | PASCAL_CASE | PASCAL_CASE || ['HelloWorld': 1.0, 'InternalMap': ['SubValue': 2.0]]
+    }
 
     def 'test that stringify works'() {
         given:

@@ -1,37 +1,45 @@
 [versions]
+# PLUGINS
 buildconfig = "6.0.9"
 shadow = "9.1.0"
 
+# ANNOTATIONS
 lombok = "1.18.44"
 jetbrains_annotations = "26.1.0"
 
-java_parser = "3.28.0"
-
-spock_core = "2.4-groovy-5.0"
-mockito = "5.23.0"
-
+# LOGGING
 slf4j = "2.0.17"
 log4j = "2.25.4"
 
+# TESTING
+spock_core = "2.4-groovy-5.0"
+mockito = "5.23.0"
+
+# DATA FORMATS
 jackson = "2.21.2"
 night_config = "3.8.4"
 
+# PROJECT
+java_parser = "3.28.0"
+
 [libraries]
+# ANNOTATIONS
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jetbrains_annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains_annotations" }
 
-junit_platform = { module = "org.junit.platform:junit-platform-launcher" }
-
-java_parser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "java_parser" }
-
-spock_core = { module = "org.spockframework:spock-core", version.ref = "spock_core" }
-mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
-
+# LOGGING
 slf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 log4j_api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
 log4j_core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
 log4j_slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
 
+# TESTING
+junit_platform = { module = "org.junit.platform:junit-platform-launcher" }
+
+spock_core = { module = "org.spockframework:spock-core", version.ref = "spock_core" }
+mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+
+# DATA FORMATS
 jackson_json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 jackson_yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 jackson_toml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-toml", version.ref = "jackson" }
@@ -40,13 +48,20 @@ jackson_properties = { module = "com.fasterxml.jackson.dataformat:jackson-datafo
 
 night_config_toml = { module = "com.electronwill.night-config:toml", version.ref = "night_config" }
 
+# PROJECT
+java_parser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "java_parser" }
+
 [bundles]
+# ANNOTATIONS
 annotations = ["lombok", "jetbrains_annotations"]
 
-test_framework = ["spock_core", "mockito"]
-
+# LOGGING
 log4j = ["log4j_api", "log4j_core", "log4j_slf4j"]
 
+# TESTING
+test_framework = ["spock_core", "mockito"]
+
+# DATA FORMATS
 toml = ["jackson_toml", "night_config_toml"]
 
 [plugins]
