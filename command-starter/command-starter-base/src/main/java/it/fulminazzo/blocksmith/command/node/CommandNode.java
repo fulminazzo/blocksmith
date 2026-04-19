@@ -8,10 +8,7 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Represents a node in a command tree.
@@ -28,7 +25,7 @@ public abstract class CommandNode implements TabCompletable {
     @Getter
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    final @NotNull Set<CommandNode> children = new TreeSet<>(Comparator.comparing(CommandNode::getName));
+    final @NotNull Set<CommandNode> children = Collections.synchronizedSet(new TreeSet<>(Comparator.comparing(CommandNode::getName)));
 
     @Setter
     @Nullable ExecutionHandler executor;
