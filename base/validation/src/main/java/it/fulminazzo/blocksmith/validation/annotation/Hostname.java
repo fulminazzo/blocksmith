@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a {@link CharSequence} parameter or type that represents a hostname.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Matches("(?!-)[a-zA-Z0-9\\-]{1,63}(?<!-)(\\.([a-zA-Z0-9\\-]{1,63}(?<!-)))*")
 @Constraint

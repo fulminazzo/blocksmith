@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a {@link CharSequence} parameter or type only made of alphabet characters or digits.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Matches("[A-Za-z0-9]+")
 @Constraint

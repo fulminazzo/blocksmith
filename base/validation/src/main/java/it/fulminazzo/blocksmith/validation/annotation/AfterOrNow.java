@@ -18,7 +18,7 @@ import java.lang.annotation.*;
  *     {@link java.time.Instant}, {@link java.time.LocalTime} or {@link java.time.LocalDate}.</li>
  * </ul>
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Constraint
 @Documented

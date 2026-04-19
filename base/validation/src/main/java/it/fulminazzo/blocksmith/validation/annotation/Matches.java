@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a {@link CharSequence} parameter or type that must match the given regular expression.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Constraint
 @Documented

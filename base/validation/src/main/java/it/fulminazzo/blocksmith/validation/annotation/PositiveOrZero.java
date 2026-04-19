@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a numeric parameter or type that must positive or at most zero.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Min(0)
 @Constraint

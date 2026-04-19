@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a {@link CharSequence} parameter or type that represents an IPv6.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Matches("(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(([0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4})?::(([0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4})?)")
 @Constraint

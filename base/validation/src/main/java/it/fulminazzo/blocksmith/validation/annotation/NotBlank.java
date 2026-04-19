@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a {@link CharSequence} parameter or type that must not be blank.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Matches(".*[^ \\r\\n\\t]+.*")
 @Constraint

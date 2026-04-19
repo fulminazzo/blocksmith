@@ -11,7 +11,7 @@ import java.lang.annotation.*;
  * <br>
  * Also supports {@link java.time.Duration}, where the milliseconds are compared.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Max(0)
 @Constraint

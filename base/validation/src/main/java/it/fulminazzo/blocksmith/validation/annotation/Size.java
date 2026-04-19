@@ -9,10 +9,10 @@ import java.lang.annotation.*;
 /**
  * Identifies a general parameter or type that has a length or size.
  * Supported types are {@link CharSequence}, arrays, {@link java.util.Collection} instances,
- * {@link java.util.Map} instances and anything with either a <code>length()</code>
- * or <code>size()</code> method.
+ * {@link java.util.Map} instances and anything with either a {@code length()}
+ * or {@code size()} method.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Constraint
 @Documented

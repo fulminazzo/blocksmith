@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * <br>
  * Each message code supports different <b>placeholders</b> which will be replaced by some value
  * (read the documentation of an entry to understand which one).
- * Placeholders are expected to be in the form <code>%&lt;placeholder&gt;%</code>.
+ * Placeholders are expected to be in the form {@code %<placeholder>%}.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ValidationMessages {
@@ -28,7 +28,7 @@ public final class ValidationMessages {
     public static final @NotNull String INVALID_TYPE = "error.validation.invalid-type";
 
     /**
-     * The annotation expected the value to be <b>not</b> <code>null</code>.
+     * The annotation expected the value to be <b>not</b> {@code null}.
      * <br>
      * Placeholders:
      * <ul>
@@ -38,7 +38,7 @@ public final class ValidationMessages {
     public static final @NotNull String REQUIRED_NOT_NULL = "error.validation.not-null";
 
     /**
-     * The annotation expected the value to be <code>true</code>.
+     * The annotation expected the value to be {@code true}.
      * <br>
      * Placeholders:
      * <ul>
@@ -48,7 +48,7 @@ public final class ValidationMessages {
     public static final @NotNull String REQUIRED_TRUE = "error.validation.required-true";
 
     /**
-     * The annotation expected the value to be <code>false</code>.
+     * The annotation expected the value to be {@code false}.
      * <br>
      * Placeholders:
      * <ul>
@@ -94,7 +94,7 @@ public final class ValidationMessages {
 
     /**
      * The annotation expected the value to be a <b>negative number</b> or <b>duration</b>.
-     * <code>0</code> is <b>not</b> allowed.
+     * {@code 0} is <b>not</b> allowed.
      * <br>
      * Placeholders:
      * <ul>
@@ -105,7 +105,7 @@ public final class ValidationMessages {
 
     /**
      * The annotation expected the value to be a <b>negative number</b> or <b>duration</b>.
-     * <code>0</code> is allowed.
+     * {@code 0} is allowed.
      * <br>
      * Placeholders:
      * <ul>
@@ -116,7 +116,7 @@ public final class ValidationMessages {
 
     /**
      * The annotation expected the value to be a <b>positive number</b> or <b>duration</b>.
-     * <code>0</code> is <b>not</b> allowed.
+     * {@code 0} is <b>not</b> allowed.
      * <br>
      * Placeholders:
      * <ul>
@@ -127,7 +127,7 @@ public final class ValidationMessages {
 
     /**
      * The annotation expected the value to be a <b>positive number</b> or <b>duration</b>.
-     * <code>0</code> is allowed.
+     * {@code 0} is allowed.
      * <br>
      * Placeholders:
      * <ul>
@@ -139,8 +139,8 @@ public final class ValidationMessages {
     /**
      * The annotation expected the value to be a <b>number</b> or <b>duration</b>
      * that represents a networking <b>port</b>.
-     * A port is a number between <code>1</code> and <code>65535</code>.
-     * <code>0</code> is <b>not</b> allowed.
+     * A port is a number between {@code 1} and {@code 65535}.
+     * {@code 0} is <b>not</b> allowed.
      * <br>
      * Placeholders:
      * <ul>
@@ -264,7 +264,7 @@ public final class ValidationMessages {
      * The annotation expected the value to be a <b>string</b> (or characters sequence)
      * that represents an <b>identifier</b>.
      * An identifier supports the <b>Java variable naming convention</b>
-     * (one lowercase alphabetical character or <code>_</code>
+     * (one lowercase alphabetical character or {@code _}
      * followed by any number of alphabetical, digit or underscore characters).
      * <br>
      * Placeholders:
@@ -321,7 +321,7 @@ public final class ValidationMessages {
 
     /**
      * The annotation expected the value <b>length</b> to be greater than a number and less than another number.
-     * The length of the object is calculated using either a <code>length()</code> or <code>size()</code> method
+     * The length of the object is calculated using either a {@code length()} or {@code size()} method
      * (so strings, arrays, collections and maps are allowed).
      * <br>
      * Placeholders:

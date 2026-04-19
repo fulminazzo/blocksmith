@@ -7,9 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.*;
 
 /**
- * Identifies a parameter or type that must be <code>true</code>.
+ * Identifies a parameter or type that must be {@code true}.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Constraint
 @Documented
