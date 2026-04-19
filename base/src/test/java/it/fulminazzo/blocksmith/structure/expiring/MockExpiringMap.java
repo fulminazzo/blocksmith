@@ -38,9 +38,8 @@ public class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public @Nullable V get(final @Nullable Object key) {
-        ExpiringEntry<V> entry = getExpiring((K) key);
+        ExpiringEntry<V> entry = getExpiring(key);
         return entry == null ? null : entry.getValue();
     }
 

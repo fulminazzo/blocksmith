@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.structure.task;
 
 import it.fulminazzo.blocksmith.structure.expiring.ExpiringMap;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
@@ -12,6 +13,7 @@ import java.util.function.Consumer;
  *
  * @param <E> the type of the owner of the task
  */
+@EqualsAndHashCode
 public final class PendingTaskManager<E> {
     private final @NotNull ExpiringMap<E, Runnable> tasks = ExpiringMap.passive();
 

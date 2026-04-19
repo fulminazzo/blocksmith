@@ -75,6 +75,19 @@ public class Reflect {
     }
 
     /**
+     * Because {@link Reflect#on(Type)} sets the type to the given object,
+     * this method will return the actual class of the object.
+     * If the object was a {@link Type}, then {@link Class} will be returned.
+     *
+     * @return the actual class of the object
+     */
+    public @NotNull Class<?> getActualObjectClass() {
+        Type type = getType();
+        if (type.equals(object)) return type.getClass();
+        else return ReflectUtils.toClass(type);
+    }
+
+    /**
      * Gets the internal wrapped object Java class.
      *
      * @return the class
@@ -124,7 +137,10 @@ public class Reflect {
      * @return <code>true</code> if it does
      */
     public boolean extendsType(final @NotNull Type type) {
-        return ReflectUtils.extendsType(getObjectClass(), type);
+        Class<?> clazz = getObjectClass();
+        if (ReflectUtils.extendsType(clazz, type)) return true;
+        Class<?> actualClass = getActualObjectClass();
+        return !clazz.equals(actualClass) && ReflectUtils.extendsType(actualClass, type);
     }
 
     /**
@@ -198,10 +214,7 @@ public class Reflect {
                     constructor.newInstance(ReflectUtils.regroup(constructor.getParameters(), parameters))
             );
         } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) throw (RuntimeException) cause;
-            else if (cause instanceof Error) throw (Error) cause;
-            else throw new ReflectException(e, "Could not get instance from %s", constructor);
+            throw new ReflectException(e.getCause(), "Could not get instance from %s", constructor);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ReflectException(e, "Could not get instance from %s", constructor);
         }
@@ -735,10 +748,7 @@ public class Reflect {
                     )
             );
         } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) throw (RuntimeException) cause;
-            else if (cause instanceof Error) throw (Error) cause;
-            else throw new ReflectException(e, "Could not invoke method %s on %s", method, object);
+            throw new ReflectException(e.getCause(), "Could not invoke method %s on %s", method, object);
         } catch (IllegalAccessException e) {
             throw new ReflectException(e, "Could not invoke method %s on %s", method, object);
         }
@@ -1103,7 +1113,8 @@ public class Reflect {
      * @return the reflect
      */
     public static @NotNull Reflect on(final @Nullable Object object) {
-        return new Reflect(object == null ? null : object.getClass(), object);
+        if (object instanceof Type) return on((Type) object);
+        else return new Reflect(object == null ? null : object.getClass(), object);
     }
 
     /**
