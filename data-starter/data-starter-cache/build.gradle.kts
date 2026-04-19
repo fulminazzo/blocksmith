@@ -1,8 +1,8 @@
 dependencies {
-    api(project(":data-starter:data-starter-memory"))
+    api(projects.dataStarter.dataStarterMemory)
 
-    testImplementation(project(":data-starter:data-starter-redis"))
-    testImplementation(project(":data-starter:data-starter-sql"))
+    testImplementation(projects.dataStarter.dataStarterRedis)
+    testImplementation(projects.dataStarter.dataStarterSql)
 
     testImplementation(libs.bundles.log4j)
 

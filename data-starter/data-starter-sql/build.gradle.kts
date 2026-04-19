@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":base:validation"))
+    api(projects.base.validation)
 
     api(libs.jooq)
     api(libs.hikaricp)

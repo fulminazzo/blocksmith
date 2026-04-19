@@ -1,3 +1,3 @@
 dependencies {
-    api(project(":base:testing"))
+    api(projects.base.testing)
 }

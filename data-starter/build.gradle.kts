@@ -1,20 +1,17 @@
-val projectName: String = project.name
-val testingModuleName: String by rootProject.extra
-
 allprojects {
+
     dependencies {
-        if (!project.name.endsWith(testingModuleName))
-            testImplementation(project(":$projectName:$projectName-$testingModuleName"))
+        val testingModule = rootProject.projects.dataStarter.dataStarterTesting
+        if (project.path != testingModule.path) testImplementation(testingModule)
     }
+
 }
 
 subprojects {
+
     dependencies {
-        api(project(":$projectName"))
-
-        val baseProjectName = "base"
-        if (!project.name.endsWith(baseProjectName))
-            api(project(":$projectName:$projectName-$baseProjectName"))
-
+        val baseModule = rootProject.projects.dataStarter.dataStarterBase
+        if (project.path != baseModule.path) api(baseModule)
     }
+
 }

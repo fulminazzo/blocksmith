@@ -1,8 +1,8 @@
 dependencies {
     compileOnly(libs.slf4j)
 
-    api(project(":config-starter"))
+    api(projects.configStarter)
 
     testImplementation(libs.slf4j)
-    testImplementation(project(":config-starter:config-starter-json"))
+    testImplementation(projects.configStarter.configStarterJson)
 }
