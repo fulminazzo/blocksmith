@@ -20,7 +20,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         expect:
         map.size() == 0
@@ -32,7 +32,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         expect:
         map.size() == 1
@@ -43,7 +43,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         expect:
         map.isEmpty()
@@ -62,7 +62,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         expect:
         !map.containsKey('Hello')
@@ -81,7 +81,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         expect:
         map['Hello'] == null
@@ -101,7 +101,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         when:
         map['Goodbye']
@@ -115,7 +115,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         when:
         def actual = map.remove('Hello')
@@ -143,7 +143,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         when:
         map.remove('Goodbye')
@@ -157,7 +157,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         expect:
         map.keySet().isEmpty()
@@ -169,7 +169,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         when:
         def keys = map.keySet()
@@ -184,7 +184,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         expect:
         map.values().isEmpty()
@@ -196,7 +196,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         when:
         def values = map.values()
@@ -211,7 +211,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         expect:
         map.entrySet().isEmpty()
@@ -223,7 +223,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         when:
         def entries = map.entrySet()
@@ -239,7 +239,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         when:
         map."$method"(*arguments)
@@ -264,7 +264,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         when:
         def previous = map.put('Hello', 'moon', 10000L)
@@ -281,7 +281,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         when:
         def actual = map.putIfAbsent('Hello', 'moon', 10000L)
@@ -296,7 +296,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         when:
         def actual = map.replace('Hello', 'moon')
@@ -311,7 +311,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         when:
         def actual = map.computeIfAbsent('Hello', k -> 'moon', 10000L)
@@ -326,7 +326,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
 
         and:
-        sleep(5L)
+        sleep(20L)
 
         when:
         def actual = map.computeIfPresent('Hello', (k, v) -> v + 'moon')
