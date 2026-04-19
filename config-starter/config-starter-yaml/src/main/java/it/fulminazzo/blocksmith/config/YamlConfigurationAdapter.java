@@ -76,22 +76,22 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
         return ConfigUtils.checkMap(delegate.load(data, type), yamlNamingConvention, ConfigUtils.javaNamingConvention);
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         return ConfigUtils.checkMap(delegate.load(file, type), yamlNamingConvention, ConfigUtils.javaNamingConvention);
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
+    public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
         return ConfigUtils.checkMap(delegate.load(stream, type), yamlNamingConvention, ConfigUtils.javaNamingConvention);
     }
 
     @Override
-    public @NotNull <T> String serialize(final @NotNull T configuration) throws IOException {
+    public <T> @NotNull String serialize(final @NotNull T configuration) throws IOException {
         return delegate.serialize(ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention));
     }
 

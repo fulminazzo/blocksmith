@@ -140,7 +140,7 @@ public interface BaseConfigurationAdapter {
     /**
      * Attempts to load the configuration to the specified type.
      * <br>
-     * <b>WARNING:</b> requires the class to have a <b>no arguments constructor</b>.
+     * <b>WARNING:</b> requires the class to have a <b>no argument constructor</b>.
      *
      * @param <T>  the type of the configuration
      * @param data the raw data
@@ -153,7 +153,7 @@ public interface BaseConfigurationAdapter {
     /**
      * Attempts to load the configuration file to the specified type.
      * <br>
-     * <b>WARNING:</b> requires the class to have a <b>no arguments constructor</b>.
+     * <b>WARNING:</b> requires the class to have a <b>no argument constructor</b>.
      *
      * @param <T>  the type of the configuration
      * @param file the file
@@ -166,7 +166,7 @@ public interface BaseConfigurationAdapter {
     /**
      * Attempts to load the configuration to the specified type.
      * <br>
-     * <b>WARNING:</b> requires the class to have a <b>no arguments constructor</b>.
+     * <b>WARNING:</b> requires the class to have a <b>no argument constructor</b>.
      *
      * @param <T>    the type of the configuration
      * @param stream the stream of data to load from
@@ -179,7 +179,7 @@ public interface BaseConfigurationAdapter {
     /**
      * Attempts to load the configuration to the specified type from a resource of the current classloader.
      * <br>
-     * <b>WARNING:</b> requires the class to have a <b>no arguments constructor</b>.
+     * <b>WARNING:</b> requires the class to have a <b>no argument constructor</b>.
      *
      * @param <T>      the type of the configuration
      * @param resource the resource name
@@ -224,7 +224,7 @@ public interface BaseConfigurationAdapter {
     /**
      * Tries to find the specified resource in the specified directory.
      * If it was found, it will be loaded.
-     * If it was not found, will lookup the current classloader for the resource
+     * If it was not found, will look up the current classloader for the resource
      * and extract it to the specified directory before loading it.
      *
      * @param <T>       the type of the configuration
