@@ -150,9 +150,9 @@ public final class ReflectException extends RuntimeException {
      *     <li>If an argument is a {@link Type},
      *     it will be converted with {@link ReflectUtils#toString(Type)};</li>
      *     <li>If an argument is a {@link Method},
-     *     it will be formatted as <code>&lt;method_name&gt;(&lt;method_parameters&gt;)</code>;</li>
+     *     it will be formatted as {@code <method_name>(<method_parameters>)};</li>
      *     <li>If an argument is a {@link Constructor},
-     *     it will be formatted as <code>&lt;declaring_class&gt;(&lt;method_parameters&gt;)</code>.</li>
+     *     it will be formatted as {@code <declaring_class>(<method_parameters>)}.</li>
      * </ul>
      *
      * @param format the format of the message

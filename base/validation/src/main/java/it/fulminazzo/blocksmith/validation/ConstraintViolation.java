@@ -41,10 +41,12 @@ public class ConstraintViolation {
      */
     static @NotNull ConstraintViolation invalidType(final Object value,
                                                     final @NotNull String expectedTypeNames) {
-        return new ConstraintViolation(value,
-                "error.validation.invalid-type",
+        return new ConstraintViolation(
+                value,
+                ValidationMessages.INVALID_TYPE,
                 String.format("Expected %s but got '%s'", expectedTypeNames, value),
-                Map.of("value", value, "expected", expectedTypeNames));
+                Map.of("value", value, "expected", expectedTypeNames)
+        );
     }
 
     /**
@@ -64,8 +66,9 @@ public class ConstraintViolation {
         if (message != null) message = message.replace("%value%", printObject(value));
 
         @NotNull Map<String, Object> values = constraintInfo.getValues();
-        for (String key : values.keySet()) {
-            Object v = values.get(key);
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            final String key = entry.getKey();
+            final Object v = entry.getValue();
             argumentsMap.put(key, v);
             if (message != null) message = message.replace("%" + key + "%", printObject(v));
         }
@@ -77,11 +80,10 @@ public class ConstraintViolation {
     }
 
     private static String printObject(final Object value) {
-        return value == null
-                ? "null" :
-                value.getClass().isArray()
-                        ? Reflect.on(Arrays.class).invoke("toString", value).get()
-                        : value.toString();
+        if (value == null) return "null";
+        else return value.getClass().isArray()
+                ? Reflect.on(Arrays.class).invoke("toString", value).get()
+                : value.toString();
     }
 
 }

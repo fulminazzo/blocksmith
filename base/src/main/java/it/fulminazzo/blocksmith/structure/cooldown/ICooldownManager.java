@@ -13,7 +13,7 @@ public interface ICooldownManager<E> {
      * Checks if the entity is on cooldown.
      *
      * @param entity the entity
-     * @return <code>true</code> if it is
+     * @return {@code true} if it is
      */
     boolean isOnCooldown(final @NotNull E entity);
 

@@ -17,8 +17,6 @@ allprojects {
     apply { plugin("jacoco") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
-    val testingModuleName: String by rootProject.extra
-
     val projectInfoClassName = "ProjectInfo"
 
     val currentJava = JavaLanguageVersion.of(Runtime.version().feature())

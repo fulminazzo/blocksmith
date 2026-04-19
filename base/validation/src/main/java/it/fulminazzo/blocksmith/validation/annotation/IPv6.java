@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.validation.annotation;
 
 import it.fulminazzo.blocksmith.validation.Constraint;
+import it.fulminazzo.blocksmith.validation.ValidationMessages;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.*;
@@ -8,7 +9,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a {@link CharSequence} parameter or type that represents an IPv6.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Matches("(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(([0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4})?::(([0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4})?)")
 @Constraint
@@ -24,7 +25,7 @@ public @interface IPv6 {
      *
      * @return the message
      */
-    @NotNull String message() default "error.validation.invalid-ipv6";
+    @NotNull String message() default ValidationMessages.REQUIRED_IPV6;
 
     /**
      * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.

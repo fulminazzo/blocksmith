@@ -11,7 +11,7 @@ public interface ConstraintValidator {
      * Checks that the given object is of the expected types.
      *
      * @param value the value
-     * @return <code>true</code> if it is, <code>false</code> otherwise
+     * @return {@code true} if it is, {@code false} otherwise
      */
     boolean matches(final Object value);
 
@@ -26,7 +26,7 @@ public interface ConstraintValidator {
      * Validates the given object.
      *
      * @param value the value
-     * @return <code>true</code> if the value is valid, <code>false</code> otherwise
+     * @return {@code true} if the value is valid, {@code false} otherwise
      */
     boolean isValid(final Object value);
 

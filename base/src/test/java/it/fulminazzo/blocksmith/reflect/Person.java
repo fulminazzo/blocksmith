@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 public final class Person extends NamedEntity {
     @Getter
     @Setter
-    static Integer DEFAULT_AGE = 18;
+    static Integer defaultAge = 18;
 
     private @Nullable Integer age;
 

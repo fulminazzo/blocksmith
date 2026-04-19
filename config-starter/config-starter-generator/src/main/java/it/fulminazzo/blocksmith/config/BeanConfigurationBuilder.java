@@ -55,8 +55,8 @@ public class BeanConfigurationBuilder {
             IntegerLiteralExpr.class, LongLiteralExpr.class, DoubleLiteralExpr.class
     );
 
-    private static final @NotNull String defaultJavaPackage = "java.lang";
-    private static final @NotNull String genericsFormat = "<%s>";
+    private static final @NotNull String DEFAULT_JAVA_PACKAGE = "java.lang";
+    private static final @NotNull String GENERICS_FORMAT = "<%s>";
     private static final @NotNull Class<?> nullClass = Object.class;
 
     private static final @NotNull String[] lombokGetterAnnotations = Stream.of(
@@ -112,7 +112,7 @@ public class BeanConfigurationBuilder {
     }
 
     /**
-     * Parses the <code>version</code> property separately.
+     * Parses the {@code version} property separately.
      * Only works if a <b>non-null number</b> was specified.
      *
      * @param version the version
@@ -183,7 +183,7 @@ public class BeanConfigurationBuilder {
     }
 
     /**
-     * Parses simple values such as <code>null</code>, primitives, wrappers,
+     * Parses simple values such as {@code null}, primitives, wrappers,
      * {@link String}s or {@link java.util.Collection}s.
      * Generates {@link Comment} annotation, getter and setter for the field.
      *
@@ -275,7 +275,7 @@ public class BeanConfigurationBuilder {
     /**
      * Gets the initializer value for the given value.
      * <br>
-     * For example, for strings the initializer is <code>"value"</code>.
+     * For example, for strings the initializer is {@code "value"}.
      * <br>
      * If collections are given, they are imported and initialized properly.
      *
@@ -316,13 +316,13 @@ public class BeanConfigurationBuilder {
      *
      * @param field       the field declaration
      * @param annotations the annotation names
-     * @return <code>true</code> if at least one is
+     * @return {@code true} if at least one is
      */
     boolean isAnnotationPresent(final @NotNull FieldDeclaration field,
                                 final @NotNull String @NotNull ... annotations) {
         for (String name : annotations) {
-            if (root.isAnnotationPresent(name)) return true;
-            else if (field.isAnnotationPresent(name)) return true;
+            if (root.isAnnotationPresent(name) || field.isAnnotationPresent(name))
+                return true;
         }
         return false;
     }
@@ -332,7 +332,7 @@ public class BeanConfigurationBuilder {
      * If the import belongs to defaultJavaPackage,
      * then nothing is done (as already imported by default).
      *
-     * @param value the value to get the type from (if <code>null</code>, nothing is done)
+     * @param value the value to get the type from (if {@code null}, nothing is done)
      */
     void addImport(final @Nullable Object value) {
         addImport(getTypeFromObject(value));
@@ -351,13 +351,13 @@ public class BeanConfigurationBuilder {
 
     /**
      * Adds an import to the imports list.
-     * If the import belongs to {@link #defaultJavaPackage},
+     * If the import belongs to {@link #DEFAULT_JAVA_PACKAGE},
      * then nothing is done (as already imported by default).
      *
      * @param classCanonicalName the canonical name of the class to add
      */
     void addImport(final @NotNull String classCanonicalName) {
-        if (!classCanonicalName.startsWith(defaultJavaPackage))
+        if (!classCanonicalName.startsWith(DEFAULT_JAVA_PACKAGE))
             imports.computeIfAbsent(
                     classCanonicalName,
                     c -> new ImportDeclaration(c, false, false)
@@ -378,7 +378,7 @@ public class BeanConfigurationBuilder {
             if (collection instanceof List) typeName = List.class.getCanonicalName();
             else if (collection instanceof Set) typeName = Set.class.getCanonicalName();
             else typeName = object.getClass().getCanonicalName();
-            typeName += String.format(genericsFormat, guessCollectionGenericType(collection));
+            typeName += String.format(GENERICS_FORMAT, guessCollectionGenericType(collection));
             typeName = parseGenericTypesImports(typeName);
             return typeName.substring(typeName.lastIndexOf('.') + 1);
         } else return getTypeFromObject(object).getSimpleName();
@@ -398,7 +398,7 @@ public class BeanConfigurationBuilder {
             String type = parseGenericTypesImports(types.get(i));
             types.set(i, type.substring(type.lastIndexOf('.') + 1));
         }
-        return baseType + String.format(genericsFormat, String.join(", ", types));
+        return baseType + String.format(GENERICS_FORMAT, String.join(", ", types));
     }
 
     /**
@@ -464,7 +464,7 @@ public class BeanConfigurationBuilder {
 
     /**
      * Converts the given value to a class.
-     * If the value is <code>null</code>, {@link Object} is returned.
+     * If the value is {@code null}, {@link Object} is returned.
      *
      * @param value the value
      * @return the class
@@ -518,7 +518,7 @@ public class BeanConfigurationBuilder {
         final Set<String> typeNames = new LinkedHashSet<>();
         if (type == null) return typeNames;
         String typeName = type.getCanonicalName();
-        if (type.getTypeParameters().length == 1) typeName += String.format(genericsFormat, base.getSimpleName());
+        if (type.getTypeParameters().length == 1) typeName += String.format(GENERICS_FORMAT, base.getSimpleName());
         typeNames.add(typeName);
         if (type.equals(Object.class)) return typeNames;
         typeNames.addAll(getBasicTypeNames(type.getSuperclass(), base));
@@ -540,7 +540,7 @@ public class BeanConfigurationBuilder {
         final Set<String> typeNames = new LinkedHashSet<>();
         if (type == null || type.equals(Object.class)) return typeNames;
         String typeName = type.getCanonicalName();
-        if (type.getTypeParameters().length == 1) typeName += String.format(genericsFormat, genericType);
+        if (type.getTypeParameters().length == 1) typeName += String.format(GENERICS_FORMAT, genericType);
         typeNames.add(typeName);
         typeNames.addAll(getCollectionTypeNames(type.getSuperclass(), genericType));
         for (Class<?> interfaceType : type.getInterfaces())
@@ -597,7 +597,7 @@ public class BeanConfigurationBuilder {
     /**
      * {@link DefaultPrettyPrinterVisitor} override with our custom rules.
      */
-    final static class BlocksmithVisitor extends DefaultPrettyPrinterVisitor {
+    static final class BlocksmithVisitor extends DefaultPrettyPrinterVisitor {
 
         /**
          * Instantiates a new Blocksmith visitor.

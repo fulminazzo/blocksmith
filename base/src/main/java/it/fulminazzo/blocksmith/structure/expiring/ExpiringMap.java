@@ -88,7 +88,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param oldValue the old value
      * @param newValue the new value
      * @param ttl      the time-to-live (after which it will expire)
-     * @return <code>true</code> if the replacement was successful, <code>false</code> if no element matching the pair was found
+     * @return {@code true} if the replacement was successful, {@code false} if no element matching the pair was found
      */
     boolean replace(final @Nullable K key,
                     final @Nullable V oldValue,
@@ -102,7 +102,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param oldValue the old value
      * @param newValue the new value
      * @param ttl      the time-to-live (after which it will expire) in milliseconds
-     * @return <code>true</code> if the replacement was successful, <code>false</code> if no element matching the pair was found
+     * @return {@code true} if the replacement was successful, {@code false} if no element matching the pair was found
      */
     boolean replace(final @Nullable K key,
                     final @Nullable V oldValue,
@@ -116,8 +116,8 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param key      the key
      * @param oldValue the old value
      * @param newValue the new value
-     * @return <code>true</code> if the replacement was successful,
-     * <code>false</code> if no element matching the pair was found
+     * @return {@code true} if the replacement was successful,
+     * {@code false} if no element matching the pair was found
      */
     @Override
     boolean replace(final @Nullable K key, final @Nullable V oldValue, final @Nullable V newValue);
@@ -176,7 +176,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      *
      * @param key               the key
      * @param remappingFunction the function to get the new value from
-     * @return the value of the map if present, otherwise <code>null</code>
+     * @return the value of the map if present, otherwise {@code null}
      */
     @Override
     @Nullable V computeIfPresent(final @Nullable K key, final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction);
@@ -293,7 +293,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * Gets the remaining time-to-live of the element with the given key.
      *
      * @param key the key
-     * @return the TTL (<code>null</code> if not present)
+     * @return the TTL ({@code null} if not present)
      */
     @Nullable Duration getTtl(final @Nullable K key);
 
@@ -318,11 +318,11 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
     /**
      * Prints out the contents of this map.
      * <br>
-     * Entries will be printed in the format <code>&lt;key&gt;=&lt;value&gt;</code>.
+     * Entries will be printed in the format {@code <key>=<value>}.
      * <br>
-     * If an entry is <b>never expiring</b>, it will be printed as <code>&lt;key&gt;=&lt;value&gt; (!)</code>.
+     * If an entry is <b>never expiring</b>, it will be printed as {@code <key>=<value> (!)}.
      * <br>
-     * If an entry is <b>expired</b> but not yet removed, it will be printed as <code>&lt;key&gt;=&lt;value&gt; (*)</code>.
+     * If an entry is <b>expired</b> but not yet removed, it will be printed as {@code <key>=<value> (*)}.
      *
      * @return the string representation of this map
      */
