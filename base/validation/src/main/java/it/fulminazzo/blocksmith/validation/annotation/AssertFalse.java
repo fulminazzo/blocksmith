@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.validation.annotation;
 
 import it.fulminazzo.blocksmith.validation.Constraint;
+import it.fulminazzo.blocksmith.validation.ValidationMessages;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.*;
@@ -23,7 +24,7 @@ public @interface AssertFalse {
      *
      * @return the message
      */
-    @NotNull String message() default "error.validation.required-false";
+    @NotNull String message() default ValidationMessages.REQUIRED_FALSE;
 
     /**
      * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
