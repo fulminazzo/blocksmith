@@ -400,6 +400,8 @@ public final class CommandParser {
                     );
                 }
                 Collection<?> aliases = reflect.invoke(aliasesMethod).get();
+                if (aliases.isEmpty())
+                    throw CommandParseException.of("Invalid dynamic command method %s: aliases cannot be empty", method);
                 rawCommand = String.format("(%s) ", aliases.stream()
                         .filter(Objects::nonNull)
                         .map(Object::toString)

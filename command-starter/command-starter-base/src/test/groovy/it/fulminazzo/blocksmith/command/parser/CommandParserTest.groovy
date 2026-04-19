@@ -387,7 +387,7 @@ class CommandParserTest extends Specification {
         type << [
                 CommandNotGiven, AliasesNotGiven,
                 AliasesNotStatic, AliasesNotCollection,
-                AliasesNotEmpty
+                AliasesNotEmptyParameters, AliasesNotEmpty
         ]
     }
 
@@ -786,6 +786,19 @@ class CommandParserTest extends Specification {
 
     }
 
+    static final class AliasesNotEmptyParameters {
+
+        @Command(dynamic = true)
+        static void help() {
+
+        }
+
+        static List<String> getHelpAliases(final String prefix) {
+            return []
+        }
+
+    }
+
     static final class AliasesNotEmpty {
 
         @Command(dynamic = true)
@@ -793,7 +806,7 @@ class CommandParserTest extends Specification {
 
         }
 
-        static List<String> getHelpAliases(String prefix) {
+        static List<String> getHelpAliases() {
             return []
         }
 
