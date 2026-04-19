@@ -49,7 +49,7 @@ class ReceiverFactoriesTest extends Specification {
             }
 
             @Override
-            @NotNull <R> Receiver create(final @NotNull R receiver) {
+            <R> @NotNull Receiver create(final @NotNull R receiver) {
                 return new GroovyPlayerReceiver((Player) receiver)
             }
 
@@ -110,19 +110,19 @@ class ReceiverFactoriesTest extends Specification {
                 @Override
                 <T> void sendTitlePart(final @NotNull TitlePart<T> part,
                                        final @NotNull T value) {
-                    internal.getLastTitle().put(part, value);
+                    internal.getLastTitle().put(part, value)
                 }
 
                 @Override
                 void sendMessage(final @NotNull Identity source,
                                  final @NotNull Component message,
                                  final @NotNull MessageType type) {
-                    internal.setLastMessage(message);
+                    internal.setLastMessage(message)
                 }
 
                 @Override
                 void sendActionBar(final @NotNull Component message) {
-                    internal.setLastMessage(message);
+                    internal.setLastMessage(message)
                 }
 
             }
@@ -131,6 +131,11 @@ class ReceiverFactoriesTest extends Specification {
         @Override
         @NotNull Locale getLocale() {
             return internal.locale
+        }
+
+        @Override
+        <R> @NotNull R internal() {
+            return (R) internal;
         }
 
     }

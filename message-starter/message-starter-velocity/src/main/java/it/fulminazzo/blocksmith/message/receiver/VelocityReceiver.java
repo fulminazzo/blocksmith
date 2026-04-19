@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Locale;
 
@@ -23,6 +24,12 @@ final class VelocityReceiver implements Receiver {
     public @NotNull Locale getLocale() {
         if (internal instanceof Player) return ((Player) internal).getPlayerSettings().getLocale();
         else return Locale.getDefault();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public @NonNull <R> R internal() {
+        return (R) internal;
     }
 
 }

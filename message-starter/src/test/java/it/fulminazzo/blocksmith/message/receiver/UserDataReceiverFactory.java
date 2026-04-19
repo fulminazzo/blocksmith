@@ -22,7 +22,7 @@ public final class UserDataReceiverFactory implements ReceiverFactory {
     }
 
     @Override
-    public @NotNull <R> Receiver create(final @NotNull R receiver) {
+    public <R> @NotNull Receiver create(final @NotNull R receiver) {
         return new Receiver() {
 
             @Override
@@ -36,7 +36,7 @@ public final class UserDataReceiverFactory implements ReceiverFactory {
             }
 
             @Override
-            public @NotNull <T> T getInternal() {
+            public <T> @NotNull T internal() {
                 throw new UnsupportedOperationException();
             }
 

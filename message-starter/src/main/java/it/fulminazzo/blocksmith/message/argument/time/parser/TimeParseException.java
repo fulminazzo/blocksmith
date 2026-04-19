@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
  * An exception thrown when the parsing of a time format fails.
  */
 public final class TimeParseException extends RuntimeException {
+    private static final long serialVersionUID = -3914578836770463315L;
 
     /**
      * Instantiates a new Time parse exception.

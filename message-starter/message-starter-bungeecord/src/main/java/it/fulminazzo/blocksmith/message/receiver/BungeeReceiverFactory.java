@@ -34,7 +34,7 @@ public final class BungeeReceiverFactory extends AbstractReceiverFactory {
     }
 
     @Override
-    protected @NotNull <R> Receiver createImpl(final @NotNull R receiver) {
+    protected <R> @NotNull Receiver createImpl(final @NotNull R receiver) {
         return new BungeeReceiver(adventure, (CommandSender) receiver);
     }
 
