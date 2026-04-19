@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Target({ElementType.METHOD})
 public @interface Async {
 
-    long value() default 0;
+    long value() default 30;
 
     @NotNull TimeUnit unit() default TimeUnit.SECONDS;
 
