@@ -31,6 +31,9 @@ class AsyncManagerTest extends Specification {
 
         sender = Mock(CommandSenderWrapper)
         sender.id >> UUID.randomUUID()
+        sender.sync { _ } >> { a ->
+            a[0].accept(sender)
+        }
 
         visitor = Mock(CommandExecutionVisitor)
         visitor.commandSender >> sender

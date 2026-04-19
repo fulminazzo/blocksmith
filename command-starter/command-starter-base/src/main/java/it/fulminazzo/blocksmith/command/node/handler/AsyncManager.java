@@ -64,7 +64,10 @@ final class AsyncManager {
                         if (!(t instanceof CommandExecutionException))
                             t = new CommandExecutionException("error.internal-error", t)
                                     .arguments(Placeholder.of("message", t.getMessage()));
-                        executionVisitor.handleCommandExecutionException((CommandExecutionException) t);
+                        CommandExecutionException commandExecutionException = (CommandExecutionException) t;
+                        executionVisitor.getCommandSender().sync(s ->
+                                executionVisitor.handleCommandExecutionException(commandExecutionException)
+                        );
                     }
                     return v;
                 });
