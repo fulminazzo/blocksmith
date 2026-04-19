@@ -33,7 +33,7 @@ allprojects {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
 
-        if (project != rootProject.projects.base) api(rootProject.projects.base)
+        if (project.path != rootProject.projects.base.path) api(rootProject.projects.base)
 
         testImplementation(rootProject.libs.bundles.annotations)
         testRuntimeOnly(rootProject.libs.junit.platform)
