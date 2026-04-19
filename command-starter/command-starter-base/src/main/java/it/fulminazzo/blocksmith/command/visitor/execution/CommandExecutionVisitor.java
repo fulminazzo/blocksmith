@@ -133,7 +133,7 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
         exception.getAdditionalMessages().forEach(this::sendMessage);
         Throwable cause = exception.getCause();
         if (cause != null)
-            application.getLog().warn("{} while executing command /{}",
+            application.logger().warn("{} while executing command /{}",
                     cause.getClass().getCanonicalName(),
                     input.getRawInput(),
                     cause

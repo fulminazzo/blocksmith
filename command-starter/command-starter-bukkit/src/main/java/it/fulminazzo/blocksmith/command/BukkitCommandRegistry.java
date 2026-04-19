@@ -35,7 +35,7 @@ class BukkitCommandRegistry extends CommandRegistry {
      */
     public BukkitCommandRegistry(final @NotNull ApplicationHandle application) {
         super(application);
-        this.server = (Server) application.getServer();
+        this.server = application.server();
 
         Reflect reflect = Reflect.on(server).get(f -> SimpleCommandMap.class.isAssignableFrom(f.getType()));
         this.commandMap = reflect.get();

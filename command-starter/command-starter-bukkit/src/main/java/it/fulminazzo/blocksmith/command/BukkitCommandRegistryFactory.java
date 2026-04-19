@@ -28,7 +28,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
 
             @Override
             public @NonNull Player parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
-                Server server = (Server) visitor.getApplication().getServer();
+                Server server = visitor.getApplication().server();
                 CommandSender sender = (CommandSender) visitor.getCommandSender().getActualSender();
                 String argument = visitor.getInput().getCurrent();
                 Player player = server.getPlayer(argument);
@@ -44,7 +44,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
 
             @Override
             public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
-                Server server = (Server) visitor.getApplication().getServer();
+                Server server = visitor.getApplication().server();
                 CommandSender sender = (CommandSender) visitor.getCommandSender().getActualSender();
                 final Collection<Player> players = new ArrayList<>(server.getOnlinePlayers());
                 if (sender instanceof Player) {
@@ -60,7 +60,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
 
             @Override
             public @NotNull World parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
-                Server server = (Server) visitor.getApplication().getServer();
+                Server server = visitor.getApplication().server();
                 String argument = visitor.getInput().getCurrent();
                 World world = server.getWorld(argument);
                 if (world != null) return world;
@@ -70,7 +70,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
 
             @Override
             public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
-                Server server = (Server) visitor.getApplication().getServer();
+                Server server = visitor.getApplication().server();
                 return server.getWorlds().stream().map(World::getName).collect(Collectors.toList());
             }
 
@@ -83,7 +83,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
 
     @Override
     public @NotNull CommandRegistry newRegistry(final @NotNull ApplicationHandle application) {
-        return NMSUtils.getCommandDispatcher((Server) application.getServer())
+        return NMSUtils.getCommandDispatcher(application.server())
                 .map(d -> new BrigadierBukkitCommandRegistry<>(application, d))
                 .map(r -> (CommandRegistry) r)
                 .orElse(new BukkitCommandRegistry(application));

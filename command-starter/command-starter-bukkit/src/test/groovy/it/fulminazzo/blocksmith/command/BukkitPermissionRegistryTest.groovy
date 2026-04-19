@@ -3,11 +3,10 @@ package it.fulminazzo.blocksmith.command
 import be.seeseemelk.mockbukkit.MockBukkit
 import groovy.util.logging.Slf4j
 import it.fulminazzo.blocksmith.ApplicationHandle
-import it.fulminazzo.blocksmith.ServerApplication
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
-import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.LiteralNode
+import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.message.Messenger
 import org.bukkit.Bukkit
@@ -27,9 +26,9 @@ class BukkitPermissionRegistryTest extends Specification {
         MockBukkit.mock()
 
         application = Mock(ApplicationHandle)
-        application.server >> Bukkit.server
-        application.log >> log
-        application.messenger >> new Messenger(Mock(ServerApplication))
+        application.server() >> Bukkit.server
+        application.logger() >> log
+        application.messenger >> new Messenger(application)
         application.name >> 'blocksmith'
 
         registry = new BukkitPermissionRegistry(application)

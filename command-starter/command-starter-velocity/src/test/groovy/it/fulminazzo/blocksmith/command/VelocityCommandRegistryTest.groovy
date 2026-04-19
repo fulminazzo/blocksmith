@@ -7,7 +7,6 @@ import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.proxy.ProxyServer
 import groovy.util.logging.Slf4j
 import it.fulminazzo.blocksmith.ApplicationHandle
-import it.fulminazzo.blocksmith.ServerApplication
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
@@ -38,10 +37,9 @@ class VelocityCommandRegistryTest extends Specification {
         def proxy = Mock(ProxyServer)
         proxy.commandManager >> commandManager
 
-        application = Mock(ApplicationHandle, additionalInterfaces: [ServerApplication])
-        application.log() >> log
-        application.server >> proxy
-        application.log >> log
+        application = Mock(ApplicationHandle)
+        application.server() >> proxy
+        application.logger() >> log
         application.messenger >> new Messenger(application)
         application.name >> 'blocksmith'
 

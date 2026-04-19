@@ -32,7 +32,7 @@ final class BukkitPermissionRegistry {
      * @param application the application that is initializing the registry
      */
     public BukkitPermissionRegistry(final @NotNull ApplicationHandle application) {
-        this.pluginManager = ((Server) application.getServer()).getPluginManager();
+        this.pluginManager = ((Server) application.server()).getPluginManager();
     }
 
     /**

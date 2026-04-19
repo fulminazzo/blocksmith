@@ -22,7 +22,7 @@ public final class BungeeCommandRegistryFactory implements CommandRegistryFactor
 
             @Override
             public @NotNull ProxiedPlayer parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
-                ProxyServer server = (ProxyServer) visitor.getApplication().getServer();
+                ProxyServer server = visitor.getApplication().server();
                 String argument = visitor.getInput().getCurrent();
                 ProxiedPlayer player = server.getPlayer(argument);
                 if (player != null) return player;
@@ -32,7 +32,7 @@ public final class BungeeCommandRegistryFactory implements CommandRegistryFactor
 
             @Override
             public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
-                ProxyServer server = (ProxyServer) visitor.getApplication().getServer();
+                ProxyServer server = visitor.getApplication().server();
                 return server.getPlayers().stream()
                         .map(ProxiedPlayer::getName)
                         .collect(Collectors.toList());
@@ -43,7 +43,7 @@ public final class BungeeCommandRegistryFactory implements CommandRegistryFactor
 
             @Override
             public @NotNull ServerInfo parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
-                ProxyServer server = (ProxyServer) visitor.getApplication().getServer();
+                ProxyServer server = visitor.getApplication().server();
                 String argument = visitor.getInput().getCurrent();
                 ServerInfo serverInfo = server.getServerInfo(argument);
                 if (serverInfo != null) return serverInfo;
@@ -53,7 +53,7 @@ public final class BungeeCommandRegistryFactory implements CommandRegistryFactor
 
             @Override
             public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
-                ProxyServer server = (ProxyServer) visitor.getApplication().getServer();
+                ProxyServer server = visitor.getApplication().server();
                 return new ArrayList<>(server.getServers().keySet());
             }
 

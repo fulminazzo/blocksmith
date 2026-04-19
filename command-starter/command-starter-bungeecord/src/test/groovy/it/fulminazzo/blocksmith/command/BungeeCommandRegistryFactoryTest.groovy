@@ -46,7 +46,10 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         }
 
         application = Mock(Plugin, additionalInterfaces: [ApplicationHandle]) as ApplicationHandle
-        application.server >> server
+        application.proxy >> server
+        application.server() >> {
+            return application.proxy
+        }
 
         def input = new CommandInput()
         visitor = Mock(Visitor)
@@ -79,11 +82,11 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         where:
         type          | argument  || expected
         // PLAYER
-        ProxiedPlayer | 'Alex'    || { a -> a.server.getPlayer('Alex') }
-        ProxiedPlayer | 'Camilla' || { a -> a.server.getPlayer('Camilla') }
+        ProxiedPlayer | 'Alex'    || { a -> a.server().getPlayer('Alex') }
+        ProxiedPlayer | 'Camilla' || { a -> a.server().getPlayer('Camilla') }
         // SERVER
-        ServerInfo    | 'Lobby'   || { a -> a.server.getServerInfo('Lobby') }
-        ServerInfo    | 'Bedwars' || { a -> a.server.getServerInfo('Bedwars') }
+        ServerInfo    | 'Lobby'   || { a -> a.server().getServerInfo('Lobby') }
+        ServerInfo    | 'Bedwars' || { a -> a.server().getServerInfo('Bedwars') }
     }
 
     def 'test that parse of parser for #type throws exception with #expected message with #argument'() {

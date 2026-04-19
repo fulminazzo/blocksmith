@@ -24,7 +24,7 @@ final class OfflinePlayerArgumentParser implements ArgumentParser<OfflinePlayer>
     @SuppressWarnings("deprecation")
     @Override
     public @NonNull OfflinePlayer parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
-        Server server = (Server) visitor.getApplication().getServer();
+        Server server = visitor.getApplication().server();
         String argument = visitor.getInput().getCurrent();
         if (getNames(visitor.getApplication()).stream().anyMatch(argument::equalsIgnoreCase))
             return server.getOfflinePlayer(argument);
@@ -38,7 +38,7 @@ final class OfflinePlayerArgumentParser implements ArgumentParser<OfflinePlayer>
     }
 
     private @NotNull Set<String> getNames(final @NotNull ApplicationHandle application) {
-        Server server = (Server) application.getServer();
+        Server server = application.server();
         if (names.isEmpty()) {
             names.add("<player>");
             Scheduler.schedule(application, t -> {

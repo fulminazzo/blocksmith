@@ -44,6 +44,9 @@ class BukkitCommandRegistryFactoryTest extends Specification {
     void setup() {
         application = Mock(Plugin, additionalInterfaces: [ApplicationHandle]) as ApplicationHandle
         application.server >> Bukkit.server
+        application.server() >> {
+            return application.server
+        }
 
         def player = Mock(Player)
         player.location >> new Location(null, 1, 0, 6)
@@ -156,16 +159,16 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         where:
         type          | argument       || expected
         // PLAYER
-        Player        | 'Alex'         || { a -> a.server.getPlayer('Alex') }
-        Player        | 'Camilla'      || { a -> a.server.getPlayer('Camilla') }
+        Player        | 'Alex'         || { a -> a.server().getPlayer('Alex') }
+        Player        | 'Camilla'      || { a -> a.server().getPlayer('Camilla') }
         // OFFLINE PLAYER
-        OfflinePlayer | 'Alex'         || { a -> a.server.getOfflinePlayer('Alex') }
-        OfflinePlayer | 'Camilla'      || { a -> a.server.getOfflinePlayer('Camilla') }
-        OfflinePlayer | 'Steve'        || { a -> a.server.getOfflinePlayer('Steve') }
-        OfflinePlayer | 'Michael'      || { a -> a.server.getOfflinePlayer('Michael') }
+        OfflinePlayer | 'Alex'         || { a -> a.server().getOfflinePlayer('Alex') }
+        OfflinePlayer | 'Camilla'      || { a -> a.server().getOfflinePlayer('Camilla') }
+        OfflinePlayer | 'Steve'        || { a -> a.server().getOfflinePlayer('Steve') }
+        OfflinePlayer | 'Michael'      || { a -> a.server().getOfflinePlayer('Michael') }
         // WORLD
-        World         | 'world'        || { a -> a.server.getWorld('world') }
-        World         | 'world_nether' || { a -> a.server.getWorld('world_nether') }
+        World         | 'world'        || { a -> a.server().getWorld('world') }
+        World         | 'world_nether' || { a -> a.server().getWorld('world_nether') }
         // LOCATION
         Location      | '1 2 3'        || { a -> new Location(null, 1, 2, 3) }
         //TODO: re-introduce

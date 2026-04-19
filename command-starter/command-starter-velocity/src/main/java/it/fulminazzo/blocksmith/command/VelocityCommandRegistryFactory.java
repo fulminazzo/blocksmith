@@ -22,7 +22,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
 
             @Override
             public @NotNull Player parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
-                ProxyServer server = (ProxyServer) visitor.getApplication().getServer();
+                ProxyServer server = visitor.getApplication().server();
                 String argument = visitor.getInput().getCurrent();
                 return server.getPlayer(argument).orElseThrow(() -> new ArgumentParseException("error.player-not-found")
                         .arguments(Placeholder.of("player", argument)));
@@ -30,7 +30,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
 
             @Override
             public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
-                ProxyServer server = (ProxyServer) visitor.getApplication().getServer();
+                ProxyServer server = visitor.getApplication().server();
                 return server.getAllPlayers().stream()
                         .map(Player::getUsername)
                         .collect(Collectors.toList());
@@ -41,7 +41,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
 
             @Override
             public @NotNull RegisteredServer parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
-                ProxyServer server = (ProxyServer) visitor.getApplication().getServer();
+                ProxyServer server = visitor.getApplication().server();
                 String argument = visitor.getInput().getCurrent();
                 return server.getServer(argument).orElseThrow(() -> new ArgumentParseException("error.server-not-found")
                         .arguments(Placeholder.of("server", argument)));
@@ -49,7 +49,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
 
             @Override
             public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
-                ProxyServer server = (ProxyServer) visitor.getApplication().getServer();
+                ProxyServer server = visitor.getApplication().server();
                 return server.getAllServers().stream()
                         .map(RegisteredServer::getServerInfo)
                         .map(ServerInfo::getName)

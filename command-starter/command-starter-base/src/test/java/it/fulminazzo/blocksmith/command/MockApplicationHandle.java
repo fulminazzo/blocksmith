@@ -32,11 +32,6 @@ public class MockApplicationHandle implements ApplicationHandle, ServerApplicati
     }
 
     @Override
-    public @NotNull Object getServer() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public @NonNull <S> S server() {
         throw new UnsupportedOperationException();
     }

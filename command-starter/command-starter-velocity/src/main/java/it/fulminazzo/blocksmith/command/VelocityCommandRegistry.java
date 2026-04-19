@@ -29,7 +29,7 @@ final class VelocityCommandRegistry extends BrigadierCommandRegistry<CommandSour
      */
     public VelocityCommandRegistry(final @NotNull ApplicationHandle application) {
         super(application);
-        this.commandManager = ((ProxyServer) application.getServer()).getCommandManager();
+        this.commandManager = ((ProxyServer) application.server()).getCommandManager();
     }
 
     @Override

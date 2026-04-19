@@ -50,7 +50,7 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         }
 
         application = Mock(ApplicationHandle)
-        application.server >> server
+        application.server() >> server
 
         def input = new CommandInput()
         visitor = Mock(Visitor)
@@ -83,11 +83,11 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         where:
         type             | argument  || expected
         // PLAYER
-        Player           | 'Alex'    || { a -> a.server.getPlayer('Alex').get() }
-        Player           | 'Camilla' || { a -> a.server.getPlayer('Camilla').get() }
+        Player           | 'Alex'    || { a -> a.server().getPlayer('Alex').get() }
+        Player           | 'Camilla' || { a -> a.server().getPlayer('Camilla').get() }
         // SERVER
-        RegisteredServer | 'Lobby'   || { a -> a.server.getServer('Lobby').get() }
-        RegisteredServer | 'Bedwars' || { a -> a.server.getServer('Bedwars').get() }
+        RegisteredServer | 'Lobby'   || { a -> a.server().getServer('Lobby').get() }
+        RegisteredServer | 'Bedwars' || { a -> a.server().getServer('Bedwars').get() }
     }
 
     def 'test that parse of parser for #type throws exception with #expected message with #argument'() {

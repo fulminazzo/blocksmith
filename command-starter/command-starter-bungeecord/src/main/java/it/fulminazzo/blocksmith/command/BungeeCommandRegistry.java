@@ -30,7 +30,7 @@ final class BungeeCommandRegistry extends CommandRegistry {
     public BungeeCommandRegistry(final @NotNull ApplicationHandle application) {
         super(application);
         this.plugin = (Plugin) application;
-        this.pluginManager = ((ProxyServer) application.getServer()).getPluginManager();
+        this.pluginManager = ((ProxyServer) application.server()).getPluginManager();
     }
 
     @Override

@@ -2,10 +2,9 @@ package it.fulminazzo.blocksmith.command
 
 import groovy.util.logging.Slf4j
 import it.fulminazzo.blocksmith.ApplicationHandle
-import it.fulminazzo.blocksmith.ServerApplication
 import it.fulminazzo.blocksmith.command.annotation.Permission
-import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.LiteralNode
+import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.message.Messenger
 import net.md_5.bungee.api.CommandSender
@@ -29,10 +28,12 @@ class BungeeCommandRegistryTest extends Specification {
         def proxy = Mock(ProxyServer)
         proxy.pluginManager >> pluginManager
 
-        application = Mock(Plugin, additionalInterfaces: [ApplicationHandle, ServerApplication])
-        application.getLog() >> log
-        application.server >> proxy
-        application.log >> log
+        application = Mock(Plugin, additionalInterfaces: [ApplicationHandle]) as ApplicationHandle
+        application.proxy >> proxy
+        application.server() >> {
+            return application.proxy
+        }
+        application.logger() >> log
         application.messenger >> new Messenger(application)
         application.name >> 'blocksmith'
 

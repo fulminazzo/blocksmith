@@ -713,7 +713,7 @@ class CommandExecutionVisitorTest extends Specification {
         and:
         def application = Mock(ApplicationHandle)
         application.messenger >> messenger
-        application.log >> logger
+        application.logger() >> logger
 
         and:
         def visitor = new CommandExecutionVisitor(
