@@ -1,49 +1,66 @@
 rootProject.name = "blocksmith"
 
-include("base")
-include("base:validation")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-include("base:testing")
+// base
+include(
+    "base",
+    "base:validation",
 
+    "base:testing"
+)
 
-include("example")
-include("example:example-bukkit")
+// config
+include(
+    "config-starter",
+    "config-starter:config-starter-core",
 
+    "config-starter:config-starter-json",
+    "config-starter:config-starter-properties",
+    "config-starter:config-starter-toml",
+    "config-starter:config-starter-xml",
+    "config-starter:config-starter-yaml",
 
-include("config-starter")
-include("config-starter:config-starter-core")
+    "config-starter:config-starter-all",
 
-include("config-starter:config-starter-json")
-include("config-starter:config-starter-properties")
-include("config-starter:config-starter-toml")
-include("config-starter:config-starter-xml")
-include("config-starter:config-starter-yaml")
+    "config-starter:config-starter-testing",
+    "config-starter:config-starter-generator"
+)
 
-include("config-starter:config-starter-all")
+// message-starter
+include(
+    "message-starter",
+    "message-starter:message-starter-translation",
 
-include("config-starter:config-starter-testing")
-include("config-starter:config-starter-generator")
+    "message-starter:message-starter-bukkit",
+    "message-starter:message-starter-bungeecord",
+    "message-starter:message-starter-velocity"
+)
 
+// scheduler-starter
+include(
+    "scheduler-starter",
 
-include("message-starter")
-include("message-starter:message-starter-translation")
+    "scheduler-starter:scheduler-starter-bukkit",
+    "scheduler-starter:scheduler-starter-folia",
+    "scheduler-starter:scheduler-starter-bungeecord",
+    "scheduler-starter:scheduler-starter-velocity"
+)
 
-include("message-starter:message-starter-bukkit")
-include("message-starter:message-starter-bungeecord")
-include("message-starter:message-starter-velocity")
+// command-starter
+include(
+    "command-starter",
+    "command-starter:command-starter-base",
+    "command-starter:command-starter-brigadier",
 
-include("scheduler-starter")
+    "command-starter:command-starter-bukkit",
+    "command-starter:command-starter-bungeecord",
+    "command-starter:command-starter-velocity"
+)
 
-include("scheduler-starter:scheduler-starter-bukkit")
-include("scheduler-starter:scheduler-starter-folia")
-include("scheduler-starter:scheduler-starter-bungeecord")
-include("scheduler-starter:scheduler-starter-velocity")
+// example
+include(
+    "example",
 
-include("command-starter")
-include("command-starter:command-starter-base")
-include("command-starter:command-starter-brigadier")
-
-include("command-starter:command-starter-bukkit")
-include("command-starter:command-starter-bungeecord")
-include("command-starter:command-starter-velocity")
-
+    "example:example-bukkit"
+)

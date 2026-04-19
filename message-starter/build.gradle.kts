@@ -1,5 +1,3 @@
-val projectName: String = project.name
-
 allprojects {
     dependencies {
         api(rootProject.libs.bundles.adventure.text)
@@ -8,13 +6,13 @@ allprojects {
 
 subprojects {
     dependencies {
-        api(project(":$projectName"))
+        project.parent?.let { api(it) }
     }
 }
 
 dependencies {
     api(libs.slf4j)
-    api(project(":config-starter"))
+    api(projects.configStarter)
 
-    testImplementation(project(":config-starter:config-starter-yaml"))
+    testImplementation(projects.configStarter.configStarterYaml)
 }
