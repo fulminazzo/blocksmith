@@ -14,7 +14,7 @@ import java.util.function.Function;
 /**
  * Identifies a configuration version along with migrations to update previous versions.
  * <br>
- * Configuration objects can be specified with a <code>static</code> field that
+ * Configuration objects can be specified with a {@code static} field that
  * represents their current version.
  * Each migration must specify the version it refers to.
  * <br>

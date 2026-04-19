@@ -18,7 +18,7 @@ import java.util.Set;
 
 /**
  * A special type of {@link MapDeserializer} that will remove
- * any <code>null</code> key from the deserialization result.
+ * any {@code null} key from the deserialization result.
  * <br>
  * Works in pair with {@link LoggerDeserializationProblemHandler} to prevent
  * deserialization errors.
@@ -65,7 +65,7 @@ final class NonNullKeyMapDeserializer extends MapDeserializer {
     }
 
     /**
-     * Removes any <code>null</code> key from the given map.
+     * Removes any {@code null} key from the given map.
      *
      * @param map the map
      * @return the given map (without the key)

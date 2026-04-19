@@ -18,7 +18,7 @@ public @interface Comment {
     /**
      * The text of the comment.
      * If on JDK < 15, it is possible to specify new lines as
-     * elements of the array (or using the newline character <code>\n</code>).
+     * elements of the array (or using the newline character {@code \n}).
      *
      * @return the text
      */
