@@ -10,6 +10,44 @@ import java.util.stream.Stream;
 
 /**
  * A parser for time formats.
+ * <br>
+ * The following grammar describes the accepted format:
+ *
+ * <pre>{@code
+ * FORMAT               := EXPRESSION*
+ *
+ * EXPRESSION           := OPTIONAL_ARGUMENT
+ *                       | ALWAYS_SHOWN_ARGUMENT
+ *                       | TEXT
+ *
+ * OPTIONAL_ARGUMENT    := '[' GENERAL_ARGUMENT ']'
+ *
+ * ALWAYS_SHOWN_ARGUMENT := '(' GENERAL_ARGUMENT ')'
+ *
+ * GENERAL_ARGUMENT     := '!'? (UNIT_PLACEHOLDER | SINGULAR_AND_PLURAL | TEXT)*
+ *                         (must contain exactly one UNIT_PLACEHOLDER)
+ *
+ * UNIT_PLACEHOLDER     := '%' UNIT_NAME '%'
+ *
+ * SINGULAR_AND_PLURAL  := '{' TEXT '|' TEXT '}'
+ *
+ * TEXT                 := <any sequence of characters not matching a token>
+ * }</pre>
+ *
+ * <p>Within a <code>GENERAL_ARGUMENT</code>:</p>
+ * <ul>
+ *   <li>a leading <code>!</code> marks the argument as full (always show the full unit,
+ *   for example <code>61 seconds</code> rather than <code>1 second</code>);</li>
+ *   <li><code>UNIT_NAME</code> must belong to {@link ArgumentNode.TimeUnit};</li>
+ *   <li><code>{singular|plural}</code> is replaced at render time based on the value of the unit;</li>
+ *   <li>exactly one <code>UNIT_PLACEHOLDER</code> must appear; zero or more than one is an error.</li>
+ * </ul>
+ *
+ * <p>Example formats:</p>
+ * <ul>
+ *   <li><code>[%hours%{hour|hours}] [%minutes%{minute|minutes}] (%seconds%{second|seconds})</code></li>
+ *   <li><code>(!%days%{day|days} )(!%hours%h )(!%minutes%m )(%seconds%s)</code></li>
+ * </ul>
  */
 public final class TimeParser {
     private final @NotNull String timeFormat;
