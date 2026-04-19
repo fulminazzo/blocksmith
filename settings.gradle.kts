@@ -1,14 +1,20 @@
 rootProject.name = "blocksmith"
 
-include("base")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-include("base:testing")
+// base
+include(
+    "base",
 
+    "base:testing"
+)
 
-include("scheduler-starter")
+// scheduler-starter
+include(
+    "scheduler-starter",
 
-include("scheduler-starter:scheduler-starter-bukkit")
-include("scheduler-starter:scheduler-starter-folia")
-include("scheduler-starter:scheduler-starter-bungeecord")
-include("scheduler-starter:scheduler-starter-velocity")
-
+    "scheduler-starter:scheduler-starter-bukkit",
+    "scheduler-starter:scheduler-starter-folia",
+    "scheduler-starter:scheduler-starter-bungeecord",
+    "scheduler-starter:scheduler-starter-velocity"
+)
