@@ -69,7 +69,7 @@ public final class PermissionInfo extends DataInfo<PermissionInfo> {
      * @return the permission
      */
     public @NotNull String getPermission() {
-        return (prefix == null ? "" : prefix + ".") + actualPermission;
+        return actualPermission.isEmpty() ? "" : (prefix == null ? "" : prefix + ".") + actualPermission;
     }
 
 }

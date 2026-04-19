@@ -85,6 +85,8 @@ class PermissionInfoTest extends Specification {
         prefix       | permission           || expected
         null         | 'command.permission' || 'command.permission'
         'blocksmith' | 'command.permission' || 'blocksmith.command.permission'
+        null         | ''                   || ''
+        'blocksmith' | ''                   || ''
     }
 
 }
