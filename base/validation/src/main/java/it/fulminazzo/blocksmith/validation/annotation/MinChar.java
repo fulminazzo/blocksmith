@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.validation.annotation;
 
 import it.fulminazzo.blocksmith.validation.Constraint;
+import it.fulminazzo.blocksmith.validation.ValidationMessages;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.*;
@@ -8,7 +9,7 @@ import java.lang.annotation.*;
 /**
  * Identifies a character parameter or type that must be greater than or equal to the given value.
  * <br>
- * Accepts <code>null</code> values.
+ * Accepts {@code null} values.
  */
 @Constraint
 @Documented
@@ -30,7 +31,7 @@ public @interface MinChar {
      *
      * @return the message
      */
-    @NotNull String message() default "error.validation.character-too-small";
+    @NotNull String message() default ValidationMessages.CHARACTER_TOO_SMALL;
 
     /**
      * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public abstract class NamedEntity implements Entity {
     @Getter
     @Setter
-    static String DEFAULT_NAME = "John";
+    static String defaultName = "John";
 
     private @Nullable String name;
 
