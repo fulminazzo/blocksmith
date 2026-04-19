@@ -31,7 +31,7 @@ public final class VelocityReceiverFactory extends AbstractReceiverFactory {
     }
 
     @Override
-    protected @NotNull <R> Receiver createImpl(final @NotNull R receiver) {
+    protected <R> @NotNull Receiver createImpl(final @NotNull R receiver) {
         return new VelocityReceiver((CommandSource) receiver);
     }
 

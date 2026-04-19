@@ -77,7 +77,7 @@ public final class Blocksmith extends JavaPlugin implements ServerApplication {
     }
 
     @Override
-    public @NotNull <T> T as(final @NotNull Class<T> type) {
+    public <T> @NotNull T as(final @NotNull Class<T> type) {
         return type.cast(this);
     }
 

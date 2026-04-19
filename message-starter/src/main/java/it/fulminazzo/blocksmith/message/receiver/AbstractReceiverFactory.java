@@ -30,7 +30,7 @@ abstract class AbstractReceiverFactory implements ReceiverFactory {
      * Gets all the receivers of the platform.
      * In Minecraft servers it will include all the players and the console.
      * <br>
-     * <b>WARNING</b>: will not check if the factory has been setup correctly.
+     * <b>WARNING</b>: will not check if the factory has been set up correctly.
      *
      * @return the receivers
      * @deprecated FOR INTERNAL USE ONLY
@@ -39,7 +39,7 @@ abstract class AbstractReceiverFactory implements ReceiverFactory {
     protected abstract @NotNull Collection<Receiver> getAllReceiversImpl();
 
     @Override
-    public @NotNull <R> Receiver create(final @NotNull R receiver) {
+    public <R> @NotNull Receiver create(final @NotNull R receiver) {
         if (isInitialized()) return createImpl(receiver);
         else throw notInitializedException();
     }
@@ -47,7 +47,7 @@ abstract class AbstractReceiverFactory implements ReceiverFactory {
     /**
      * Creates a new Receiver from the given one.
      * <br>
-     * <b>WARNING</b>: will not check if the factory has been setup correctly.
+     * <b>WARNING</b>: will not check if the factory has been set up correctly.
      *
      * @param <R>      the type of the receiver
      * @param receiver the receiver
@@ -66,7 +66,7 @@ abstract class AbstractReceiverFactory implements ReceiverFactory {
     /**
      * Checks if the current factory supports the given receiver type.
      * <br>
-     * <b>WARNING</b>: will not check if the factory has been setup correctly.
+     * <b>WARNING</b>: will not check if the factory has been set up correctly.
      *
      * @param receiverType the receiver type
      * @return <code>true</code> if it does

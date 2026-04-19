@@ -8,13 +8,13 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Locale;
 
 @RequiredArgsConstructor
 final class BukkitReceiver implements Receiver {
     private final @NotNull BukkitAudiences adventure;
-    @Getter
     private final @NotNull CommandSender internal;
 
     @Override
@@ -27,6 +27,12 @@ final class BukkitReceiver implements Receiver {
     public @NotNull Locale getLocale() {
         if (internal instanceof Player) return LocaleUtils.fromString(((Player) internal).getLocale());
         else return Locale.getDefault();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public @NonNull <R> R internal() {
+        return (R) internal;
     }
 
 }

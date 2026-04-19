@@ -11,6 +11,8 @@ import java.util.Locale;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public final class MessageNotFoundException extends Exception {
+    private static final long serialVersionUID = 554883217523102581L;
+
     @NotNull String path;
     @NotNull Locale locale;
 

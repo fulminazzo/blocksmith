@@ -20,7 +20,7 @@ public class PlayerReceiverFactory implements ReceiverFactory {
     }
 
     @Override
-    public @NotNull <R> Receiver create(final @NotNull R receiver) {
+    public <R> @NotNull Receiver create(final @NotNull R receiver) {
         return new PlayerReceiver((Player) receiver);
     }
 

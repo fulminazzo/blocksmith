@@ -32,7 +32,7 @@ public final class ReceiverFactories {
             }
 
             @Override
-            public @NotNull <R> Receiver create(final @NotNull R receiver) {
+            public <R> @NotNull Receiver create(final @NotNull R receiver) {
                 return (Receiver) receiver;
             }
 
@@ -56,7 +56,7 @@ public final class ReceiverFactories {
         return getFactories(application).stream()
                 .map(ReceiverFactory::getAllReceivers)
                 .flatMap(Collection::stream)
-                .filter(r -> seen.add(r.getInternal()))
+                .filter(r -> seen.add(r.internal()))
                 .collect(Collectors.toSet());
     }
 

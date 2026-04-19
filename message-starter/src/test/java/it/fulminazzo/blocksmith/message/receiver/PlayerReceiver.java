@@ -1,8 +1,6 @@
 package it.fulminazzo.blocksmith.message.receiver;
 
 import it.fulminazzo.blocksmith.message.Player;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
@@ -12,10 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-@RequiredArgsConstructor
-final class PlayerReceiver implements Receiver {
-    @Getter
-    private final @NotNull Player internal;
+record PlayerReceiver(@NotNull Player internal) implements Receiver {
 
     @Override
     public @NotNull Audience toAudience() {

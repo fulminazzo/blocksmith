@@ -53,12 +53,14 @@ class AbstractReceiverFactoryTest extends Specification {
     final static class MockReceiverFactory extends AbstractReceiverFactory {
 
         @Override
-        protected @NotNull Collection<Receiver> getAllReceiversImpl() {
+        protected @NotNull
+        Collection<Receiver> getAllReceiversImpl() {
             throw new UnsupportedOperationException()
         }
 
         @Override
-        protected @NotNull <R> Receiver createImpl(final @NotNull R receiver) {
+        @NotNull
+        protected <R> Receiver createImpl(@NotNull R receiver) {
             throw new UnsupportedOperationException()
         }
 
