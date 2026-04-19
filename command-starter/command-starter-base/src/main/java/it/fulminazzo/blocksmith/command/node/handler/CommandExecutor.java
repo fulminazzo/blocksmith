@@ -71,8 +71,10 @@ public class CommandExecutor {
         } catch (ReflectException e) {
             Throwable cause = e.getCause();
             if (cause instanceof CommandExecutionException) throw (CommandExecutionException) cause;
+            String message = cause.getMessage();
+            if (message == null) message = "Unknown";
             throw new CommandExecutionException("error.internal-error", cause)
-                    .arguments(Placeholder.of("message", cause.getMessage()));
+                    .arguments(Placeholder.of("message", message));
         } catch (Exception e) {
             if (e instanceof CommandExecutionException) throw e;
             else throw new CommandExecutionException("error.internal-error", e)

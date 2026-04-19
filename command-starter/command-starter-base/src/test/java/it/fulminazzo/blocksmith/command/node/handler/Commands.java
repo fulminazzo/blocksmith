@@ -48,4 +48,8 @@ class Commands {
         throw new Exception("Commands have not been initialized!");
     }
 
+    public void unknown(final @NotNull String message) {
+        throw new RuntimeException();
+    }
+
 }

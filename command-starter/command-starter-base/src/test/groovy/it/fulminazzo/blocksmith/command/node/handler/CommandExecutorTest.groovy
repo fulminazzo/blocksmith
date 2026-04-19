@@ -131,10 +131,13 @@ class CommandExecutorTest extends Specification {
         and:
         def first = arguments[0]
         first.placeholder == '%message%'
-        ComponentUtils.toString(first.value) == 'Commands have not been initialized!'
+        ComponentUtils.toString(first.value) == message
 
         where:
-        exception << ['exception', 'runtimeException']
+        exception          || message
+        'exception'        || 'Commands have not been initialized!'
+        'runtimeException' || 'Commands have not been initialized!'
+        'unknown'          || 'Unknown'
     }
 
 }
