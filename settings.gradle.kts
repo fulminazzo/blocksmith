@@ -1,5 +1,10 @@
 rootProject.name = "blocksmith"
 
-include("base")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-include("base:testing")
+// base
+include(
+    "base",
+
+    "base:testing"
+)

@@ -7,7 +7,6 @@ plugins {
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
-extra["baseModuleName"] = "base"
 extra["testingModuleName"] = "testing"
 
 allprojects {
@@ -15,7 +14,6 @@ allprojects {
     apply { plugin("groovy") }
     apply { plugin("jacoco-report-aggregation") }
 
-    val baseModuleName: String by rootProject.extra
     val testingModuleName: String by rootProject.extra
 
     val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
@@ -35,14 +33,14 @@ allprojects {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
 
-        if (project.name != baseModuleName) api(project(":$baseModuleName"))
+        if (project != rootProject.projects.base) api(rootProject.projects.base)
 
         testImplementation(rootProject.libs.bundles.annotations)
         testRuntimeOnly(rootProject.libs.junit.platform)
         testAnnotationProcessor(rootProject.libs.lombok)
         testImplementation(rootProject.libs.bundles.test.framework)
 
-        testImplementation(project(":$baseModuleName:$testingModuleName"))
+        testImplementation(rootProject.projects.base.testing)
 
         mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
@@ -86,7 +84,11 @@ subprojects {
 }
 
 dependencies {
-    subprojects.forEach { implementation(project(it.path)) }
+    val testingModuleName: String by rootProject.extra
+
+    subprojects
+        .filter { !it.name.endsWith("-$testingModuleName") }
+        .forEach { implementation(it) }
 }
 
 tasks.testCodeCoverageReport {
