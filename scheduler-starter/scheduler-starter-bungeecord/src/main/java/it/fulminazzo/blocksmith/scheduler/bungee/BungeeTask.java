@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.scheduler.bungee;
 
 import it.fulminazzo.blocksmith.scheduler.Task;
 import lombok.Setter;
-import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
