@@ -23,6 +23,26 @@ import java.util.function.Supplier;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Time implements Argument {
+    /**
+     * This is the default <b>message code</b> used to format a given time.
+     * The code represents an entry translatable with a {@link it.fulminazzo.blocksmith.message.provider.MessageProvider}
+     * to an actual format to allow for easier customization from the end user.
+     * <br>
+     * The supported format includes:
+     * <ul>
+     *     <li>{@code [<some_text>%unit%<some_other_text>{singular|plural}<some_other_text>]} to display
+     *     the time in the given unit if greater than {@code 0}.
+     *     For example, {@code [%seconds% {secs|sec}]} will display
+     *     {@code 3000} as {@code 3 secs} and {@code 1000} as {@code 1 sec};</li>
+     *     <li>{@code (<some_text>%unit%<some_other_text>{singular|plural}<some_other_text>)} to <b>always</b>
+     *     display the time in the given unit, regardless if it is {@code 0};</li>
+     *     <li>{@code !} to signal to report the full time unit.
+     *     For example, {@code [!%seconds%]} (but works with {@code ( )} as well) of {@code 62000}
+     *     will print {@code 62} rather than {@code 2}.</li>
+     * </ul>
+     */
+    public static final @NotNull String DEFAULT_FORMAT = "general.time-format";
+
     @NotNull String placeholder;
     @NotNull String timeFormat;
     @NotNull Supplier<Long> timeSupplier;
@@ -43,7 +63,7 @@ public final class Time implements Argument {
     /**
      * Creates a new Time argument.
      * The placeholder will default to "<i>%time%</i>".
-     * The format will be the message code "<i>general.time-format</i>".
+     * The format will be the message code {@link #DEFAULT_FORMAT}.
      *
      * @param time the time
      * @return the time argument
@@ -55,9 +75,9 @@ public final class Time implements Argument {
     /**
      * Creates a new Time argument.
      * The placeholder will default to "<i>%time%</i>".
-     * The format will be the message code "<i>general.time-format</i>".
+     * The format will be the message code {@link #DEFAULT_FORMAT}.
      *
-     * @param timeSupplier the function to obtain the time
+     * @param timeSupplier the function to get the time
      * @return the time argument
      */
     public static @NotNull Time of(final @NotNull Supplier<Long> timeSupplier) {
@@ -66,7 +86,7 @@ public final class Time implements Argument {
 
     /**
      * Creates a new Time argument.
-     * The format will be the message code "<i>general.time-format</i>".
+     * The format will be the message code {@link #DEFAULT_FORMAT}.
      *
      * @param placeholder the placeholder (without percentages)
      * @param time        the time
@@ -79,7 +99,7 @@ public final class Time implements Argument {
 
     /**
      * Creates a new Time argument.
-     * The format will be the message code "<i>general.time-format</i>".
+     * The format will be the message code {@link #DEFAULT_FORMAT}.
      *
      * @param placeholder the placeholder (without percentages)
      * @param time        the time
@@ -92,10 +112,10 @@ public final class Time implements Argument {
 
     /**
      * Creates a new Time argument.
-     * The format will be the message code "<i>general.time-format</i>".
+     * The format will be the message code {@link #DEFAULT_FORMAT}.
      *
      * @param placeholder  the placeholder (without percentages)
-     * @param timeSupplier the function to obtain the time
+     * @param timeSupplier the function to get the time
      * @return the time argument
      */
     public static @NotNull Time of(final @NotNull Component placeholder,
@@ -105,15 +125,15 @@ public final class Time implements Argument {
 
     /**
      * Creates a new Time argument.
-     * The format will be the message code "<i>general.time-format</i>".
+     * The format will be the message code {@link #DEFAULT_FORMAT}.
      *
      * @param placeholder  the placeholder (without percentages)
-     * @param timeSupplier the function to obtain the time
+     * @param timeSupplier the function to get the time
      * @return the time argument
      */
     public static @NotNull Time of(final @NotNull String placeholder,
                                    final @NotNull Supplier<Long> timeSupplier) {
-        return of(placeholder, "general.time-format", timeSupplier);
+        return of(placeholder, DEFAULT_FORMAT, timeSupplier);
     }
 
     /**
@@ -187,7 +207,7 @@ public final class Time implements Argument {
      * @param timeFormat   the format to display the time to.
      *                     During application, the argument will try to fetch it from the {@link it.fulminazzo.blocksmith.message.Messenger}
      *                     of the current context of action (meaning message codes are supported)
-     * @param timeSupplier the function to obtain the time
+     * @param timeSupplier the function to get the time
      * @return the time argument
      */
     public static @NotNull Time of(final @NotNull Component placeholder,
@@ -203,7 +223,7 @@ public final class Time implements Argument {
      * @param timeFormat   the format to display the time to.
      *                     During application, the argument will try to fetch it from the {@link it.fulminazzo.blocksmith.message.Messenger}
      *                     of the current context of action (meaning message codes are supported)
-     * @param timeSupplier the function to obtain the time
+     * @param timeSupplier the function to get the time
      * @return the time argument
      */
     public static @NotNull Time of(final @NotNull Component placeholder,
@@ -219,7 +239,7 @@ public final class Time implements Argument {
      * @param timeFormat   the format to display the time to.
      *                     During application, the argument will try to fetch it from the {@link it.fulminazzo.blocksmith.message.Messenger}
      *                     of the current context of action (meaning message codes are supported)
-     * @param timeSupplier the function to obtain the time
+     * @param timeSupplier the function to get the time
      * @return the time argument
      */
     public static @NotNull Time of(final @NotNull String placeholder,
@@ -235,7 +255,7 @@ public final class Time implements Argument {
      * @param timeFormat   the format to display the time to.
      *                     During application, the argument will try to fetch it from the {@link it.fulminazzo.blocksmith.message.Messenger}
      *                     of the current context of action (meaning message codes are supported)
-     * @param timeSupplier the function to obtain the time
+     * @param timeSupplier the function to get the time
      * @return the time argument
      */
     public static @NotNull Time of(final @NotNull String placeholder,
