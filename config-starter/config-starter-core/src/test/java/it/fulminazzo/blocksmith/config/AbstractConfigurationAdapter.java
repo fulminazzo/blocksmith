@@ -16,17 +16,17 @@ abstract class AbstractConfigurationAdapter implements BaseConfigurationAdapter 
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull String data, final @NotNull Class<T> type) {
+    public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull File file, final @NotNull Class<T> type) {
+    public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public @NotNull <T> T load(final @NotNull InputStream stream, final @NotNull Class<T> type) {
+    public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) {
         throw new UnsupportedOperationException();
     }
 

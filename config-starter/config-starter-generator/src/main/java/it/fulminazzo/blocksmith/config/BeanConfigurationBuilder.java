@@ -511,7 +511,7 @@ public class BeanConfigurationBuilder {
      *
      * @param type the class to get the types of
      * @param base the type to get the types of
-     * @return the types names
+     * @return the name of the types
      */
     private static @NotNull Set<String> getBasicTypeNames(final @Nullable Class<?> type,
                                                           final @NotNull Class<?> base) {
@@ -533,7 +533,7 @@ public class BeanConfigurationBuilder {
      *
      * @param type        the class to get the types of
      * @param genericType the generic type
-     * @return the types names
+     * @return the name of the types
      */
     private static @NotNull Set<String> getCollectionTypeNames(final @Nullable Class<?> type,
                                                                final @NotNull String genericType) {
