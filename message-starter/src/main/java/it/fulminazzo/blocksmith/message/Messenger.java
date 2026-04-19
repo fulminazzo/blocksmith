@@ -32,6 +32,8 @@ import java.util.function.BiConsumer;
  */
 @RequiredArgsConstructor
 public final class Messenger {
+    private static final @NotNull String PREFIX_CODE = "prefix";
+
     private final @NotNull ServerApplication application;
 
     private @Nullable Translator translator;
@@ -41,9 +43,9 @@ public final class Messenger {
      * If this method is used, translations will be available through the
      * Adventure default translation system.
      * <br>
-     * Assuming the messenger has access to <code>greeting: 'Hello, world!'</code>
+     * Assuming the messenger has access to {@code greeting: 'Hello, world!'}
      * and the {@link #application} name is "blocksmith",
-     * <code>Component.translatable("blocksmith.greeting")</code> will
+     * {@code Component.translatable("blocksmith.greeting")} will
      * return "Hello, world!".
      *
      * @return this object (for method chaining)
@@ -267,10 +269,10 @@ public final class Messenger {
         for (Argument argument : arguments)
             message = argument.apply(new MessageParseContext(this, locale, message));
 
-        if (!messageCode.equals("prefix")) {
-            Component prefix = getComponentOrNull("prefix", locale);
+        if (!messageCode.equals(PREFIX_CODE)) {
+            Component prefix = getComponentOrNull(PREFIX_CODE, locale);
             if (prefix == null) prefix = Component.empty();
-            message = Placeholder.of("prefix", prefix)
+            message = Placeholder.of(PREFIX_CODE, prefix)
                     .apply(new MessageParseContext(this, locale, message));
         }
 

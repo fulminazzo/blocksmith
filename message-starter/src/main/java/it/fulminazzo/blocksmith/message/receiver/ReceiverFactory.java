@@ -41,7 +41,7 @@ public interface ReceiverFactory {
      * Checks if the current factory supports the given receiver type.
      *
      * @param receiverType the receiver type
-     * @return <code>true</code> if it does
+     * @return {@code true} if it does
      */
     boolean supports(final @NotNull Class<?> receiverType);
 

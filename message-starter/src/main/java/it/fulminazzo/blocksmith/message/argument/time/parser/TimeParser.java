@@ -34,19 +34,19 @@ import java.util.stream.Stream;
  * TEXT                 := <any sequence of characters not matching a token>
  * }</pre>
  *
- * <p>Within a <code>GENERAL_ARGUMENT</code>:</p>
+ * <p>Within a {@code GENERAL_ARGUMENT}:</p>
  * <ul>
- *   <li>a leading <code>!</code> marks the argument as full (always show the full unit,
- *   for example <code>61 seconds</code> rather than <code>1 second</code>);</li>
- *   <li><code>UNIT_NAME</code> must belong to {@link ArgumentNode.TimeUnit};</li>
- *   <li><code>{singular|plural}</code> is replaced at render time based on the value of the unit;</li>
- *   <li>exactly one <code>UNIT_PLACEHOLDER</code> must appear; zero or more than one is an error.</li>
+ *   <li>a leading {@code !} marks the argument as full (always show the full unit,
+ *   for example {@code 61 seconds} rather than {@code 1 second});</li>
+ *   <li>{@code UNIT_NAME} must belong to {@link ArgumentNode.TimeUnit};</li>
+ *   <li>{@code {singular|plural}} is replaced at render time based on the value of the unit;</li>
+ *   <li>exactly one {@code UNIT_PLACEHOLDER} must appear; zero or more than one is an error.</li>
  * </ul>
  *
  * <p>Example formats:</p>
  * <ul>
- *   <li><code>[%hours%{hour|hours}] [%minutes%{minute|minutes}] (%seconds%{second|seconds})</code></li>
- *   <li><code>(!%days%{day|days} )(!%hours%h )(!%minutes%m )(%seconds%s)</code></li>
+ *   <li>{@code [%hours%{hour|hours}] [%minutes%{minute|minutes}] (%seconds%{second|seconds})}</li>
+ *   <li>{@code (!%days%{day|days} )(!%hours%h )(!%minutes%m )(%seconds%s)}</li>
  * </ul>
  */
 public final class TimeParser {

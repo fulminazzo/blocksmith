@@ -18,41 +18,48 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ComponentUtils {
-    private static final @NotNull MiniMessage mini = MiniMessage.miniMessage();
-    private static final @NotNull Map<String, String> chatCodes = new HashMap<>() {{
-        put("0", "<black>");
-        put("1", "<dark_blue>");
-        put("2", "<dark_green>");
-        put("3", "<dark_aqua>");
-        put("4", "<dark_red>");
-        put("5", "<dark_purple>");
-        put("6", "<gold>");
-        put("7", "<gray>");
-        put("8", "<dark_gray>");
-        put("9", "<blue>");
-        put("a", "<green>");
-        put("b", "<aqua>");
-        put("c", "<red>");
-        put("d", "<light_purple>");
-        put("e", "<yellow>");
-        put("f", "<white>");
-        put("k", "<obfuscated>");
-        put("l", "<bold>");
-        put("m", "<strikethrough>");
-        put("n", "<underlined>");
-        put("o", "<italic>");
-        put("r", "<reset>");
-    }};
-    private static final @NotNull Pattern legacyChatCodesRegex = Pattern.compile("[&§]([" +
-            chatCodes.keySet().stream()
-                    .map(c -> c + c.toUpperCase())
-                    .collect(Collectors.joining()) +
-            "])"
-    );
-    private static final @NotNull Pattern ampersandHexCodeRegex = Pattern.compile("&(#[0-9a-fA-F]{6})");
-    private static final @NotNull Pattern sectionSignHexCodeRegex = Pattern.compile("§x((?:§[0-9a-fA-F]){6})");
+    private static final @NotNull MiniMessage MINI = MiniMessage.miniMessage();
+    private static final @NotNull Map<String, String> CHAT_CODES;
+    private static final @NotNull Pattern LEGACY_CHAT_CODES_REGEX;
+    private static final @NotNull Pattern AMPERSAND_HEX_CODE_REGEX = Pattern.compile("&(#[0-9a-fA-F]{6})");
+    private static final @NotNull Pattern SECTION_SIGN_HEX_CODE_REGEX = Pattern.compile("§x((?:§[0-9a-fA-F]){6})");
 
-    private static final char tagStart = '<', tagEnd = '>', escapeChar = '\\';
+    private static final char TAG_START = '<';
+    private static final char TAG_END = '>';
+    private static final char ESCAPE_CHAR = '\\';
+
+    static {
+        CHAT_CODES = new HashMap<>();
+        CHAT_CODES.put("0", "<black>");
+        CHAT_CODES.put("1", "<dark_blue>");
+        CHAT_CODES.put("2", "<dark_green>");
+        CHAT_CODES.put("3", "<dark_aqua>");
+        CHAT_CODES.put("4", "<dark_red>");
+        CHAT_CODES.put("5", "<dark_purple>");
+        CHAT_CODES.put("6", "<gold>");
+        CHAT_CODES.put("7", "<gray>");
+        CHAT_CODES.put("8", "<dark_gray>");
+        CHAT_CODES.put("9", "<blue>");
+        CHAT_CODES.put("a", "<green>");
+        CHAT_CODES.put("b", "<aqua>");
+        CHAT_CODES.put("c", "<red>");
+        CHAT_CODES.put("d", "<light_purple>");
+        CHAT_CODES.put("e", "<yellow>");
+        CHAT_CODES.put("f", "<white>");
+        CHAT_CODES.put("k", "<obfuscated>");
+        CHAT_CODES.put("l", "<bold>");
+        CHAT_CODES.put("m", "<strikethrough>");
+        CHAT_CODES.put("n", "<underlined>");
+        CHAT_CODES.put("o", "<italic>");
+        CHAT_CODES.put("r", "<reset>");
+
+        LEGACY_CHAT_CODES_REGEX = Pattern.compile("[&§]([" +
+                CHAT_CODES.keySet().stream()
+                        .map(c -> c + c.toUpperCase())
+                        .collect(Collectors.joining()) +
+                "])"
+        );
+    }
 
     /**
      * Truncates the component text while maintaining any previous styling.
@@ -60,7 +67,7 @@ public final class ComponentUtils {
      * the whole component is returned.
      *
      * @param component the component
-     * @param length the final length of the component
+     * @param length    the final length of the component
      * @return the component
      */
     public static @NotNull Component truncate(final @NotNull Component component,
@@ -88,23 +95,24 @@ public final class ComponentUtils {
 
         final StringBuilder builder = new StringBuilder();
         final char[] rawComponent = toString(component).toCharArray();
-        int curr = 0, tags = 0;
+        int curr = 0;
+        int tags = 0;
         boolean escaped = false;
         for (int i = 0; i < rawComponent.length; i++) {
             char c = rawComponent[i];
-            if (!escaped && c == tagStart) {
+            if (!escaped && c == TAG_START) {
                 builder.append(c);
-                while (++i < rawComponent.length && ((c = rawComponent[i]) != tagEnd || tags > 0 || escaped)) {
-                    if (c == tagStart) tags++;
-                    else if (c == tagEnd) tags--;
-                    escaped = c == escapeChar;
+                while (++i < rawComponent.length && ((c = rawComponent[i]) != TAG_END || tags > 0 || escaped)) {
+                    if (c == TAG_START) tags++;
+                    else if (c == TAG_END) tags--;
+                    escaped = c == ESCAPE_CHAR;
                     builder.append(c);
                 }
                 if (i < rawComponent.length) builder.append(c);
             } else {
                 if (curr >= to) break;
                 else if (curr >= from) builder.append(c);
-                escaped = c == escapeChar;
+                escaped = c == ESCAPE_CHAR;
                 curr++;
             }
         }
@@ -119,32 +127,33 @@ public final class ComponentUtils {
      * <br>
      * For example, in
      * <br>
-     * <code>Hello &lt;rainbow&gt;world&lt;/rainbow&gt;, isn't
-     * &lt;blue&gt;&lt;u&gt;&lt;click:open_url:'https://docs.papermc.io/adventure/minimessage/'&gt;
+     * {@code Hello <rainbow>world</rainbow>, isn't
+     * <blue><u><click:open_url:'https://docs.papermc.io/adventure/minimessage/'>
      * MiniMessage
-     * &lt;/click&gt;&lt;/u&gt;&lt;/blue&gt; fun?</code>
+     * </click></u></blue> fun?}
      * <br>
      * the length is <i>35</i> as the real text is
      * <br>
-     * <code>Hello world, isn't MiniMessage fun?</code>
+     * {@code Hello world, isn't MiniMessage fun?}
      *
      * @param component the component
      * @return the length
      */
     public static int actualLength(final @NotNull Component component) {
         final char[] rawComponent = toString(component).toCharArray();
-        int length = 0, tags = 0;
+        int length = 0;
+        int tags = 0;
         boolean escaped = false;
         for (int i = 0; i < rawComponent.length; i++) {
             char c = rawComponent[i];
-            if (!escaped && c == tagStart) {
-                while (++i < rawComponent.length && ((c = rawComponent[i]) != tagEnd || tags > 0 || escaped)) {
-                    if (c == tagStart) tags++;
-                    else if (c == tagEnd) tags--;
-                    escaped = c == escapeChar;
+            if (!escaped && c == TAG_START) {
+                while (++i < rawComponent.length && ((c = rawComponent[i]) != TAG_END || tags > 0 || escaped)) {
+                    if (c == TAG_START) tags++;
+                    else if (c == TAG_END) tags--;
+                    escaped = c == ESCAPE_CHAR;
                 }
             } else {
-                escaped = c == escapeChar;
+                escaped = c == ESCAPE_CHAR;
                 length++;
             }
         }
@@ -160,7 +169,7 @@ public final class ComponentUtils {
      * @return the component
      */
     public static @NotNull Component toComponent(final @NotNull String string) {
-        return mini.deserialize(legacyToMini(string));
+        return MINI.deserialize(legacyToMini(string));
     }
 
     /**
@@ -171,24 +180,24 @@ public final class ComponentUtils {
      * @return the string
      */
     public static @NotNull String toString(final @NotNull Component component) {
-        return mini.serialize(component);
+        return MINI.serialize(component);
     }
 
     private static @NotNull String legacyToMini(@NotNull String message) {
-        Matcher matcher = ampersandHexCodeRegex.matcher(message);
+        Matcher matcher = AMPERSAND_HEX_CODE_REGEX.matcher(message);
         while (matcher.find())
             message = message.replace(matcher.group(), String.format("<%s>", matcher.group(1)));
 
-        matcher = sectionSignHexCodeRegex.matcher(message);
+        matcher = SECTION_SIGN_HEX_CODE_REGEX.matcher(message);
         while (matcher.find())
             message = message.replace(
                     matcher.group(),
                     String.format("<%s>", "#" + matcher.group(1).replace("§", ""))
             );
 
-        matcher = legacyChatCodesRegex.matcher(message);
+        matcher = LEGACY_CHAT_CODES_REGEX.matcher(message);
         while (matcher.find())
-            message = message.replace(matcher.group(), chatCodes.get(matcher.group(1).toLowerCase()));
+            message = message.replace(matcher.group(), CHAT_CODES.get(matcher.group(1).toLowerCase()));
 
         return message;
     }

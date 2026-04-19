@@ -69,7 +69,7 @@ abstract class AbstractReceiverFactory implements ReceiverFactory {
      * <b>WARNING</b>: will not check if the factory has been set up correctly.
      *
      * @param receiverType the receiver type
-     * @return <code>true</code> if it does
+     * @return {@code true} if it does
      * @deprecated FOR INTERNAL USE ONLY
      */
     @Deprecated

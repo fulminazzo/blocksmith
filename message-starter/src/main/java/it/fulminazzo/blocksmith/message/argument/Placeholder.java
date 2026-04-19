@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Represents a placeholder replacement.
  * A placeholder is defined as a string between two percentage signs:
- * <code>Hello, %name%!</code> -> <code>Hello, Alex!</code>
+ * {@code Hello, %name%!} -> {@code Hello, Alex!}
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
