@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.argument
 
 import it.fulminazzo.blocksmith.command.argument.dto.Coordinate
 import it.fulminazzo.blocksmith.command.argument.dto.Position
+import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
 import it.fulminazzo.blocksmith.command.visitor.Visitor
 import it.fulminazzo.blocksmith.message.util.LocaleUtils
@@ -26,97 +27,104 @@ class ArgumentParsersTest extends Specification {
         actual == expected
 
         where:
-        type       | argument                              || expected
+        type          | argument                              || expected
         // BYTE
-        byte       | 1                                     || 1
-        byte       | -1                                    || -1
-        byte       | Byte.MIN_VALUE                        || Byte.MIN_VALUE
-        byte       | Byte.MAX_VALUE                        || Byte.MAX_VALUE
+        byte          | 1                                     || 1
+        byte          | -1                                    || -1
+        byte          | Byte.MIN_VALUE                        || Byte.MIN_VALUE
+        byte          | Byte.MAX_VALUE                        || Byte.MAX_VALUE
         // BYTE WRAPPER
-        Byte       | 1                                     || 1
-        Byte       | -1                                    || -1
-        Byte       | Byte.MIN_VALUE                        || Byte.MIN_VALUE
-        Byte       | Byte.MAX_VALUE                        || Byte.MAX_VALUE
+        Byte          | 1                                     || 1
+        Byte          | -1                                    || -1
+        Byte          | Byte.MIN_VALUE                        || Byte.MIN_VALUE
+        Byte          | Byte.MAX_VALUE                        || Byte.MAX_VALUE
         // SHORT
-        short      | 1                                     || 1
-        short      | -1                                    || -1
-        short      | Short.MIN_VALUE                       || Short.MIN_VALUE
-        short      | Short.MAX_VALUE                       || Short.MAX_VALUE
+        short         | 1                                     || 1
+        short         | -1                                    || -1
+        short         | Short.MIN_VALUE                       || Short.MIN_VALUE
+        short         | Short.MAX_VALUE                       || Short.MAX_VALUE
         // SHORT WRAPPER
-        Short      | 1                                     || 1
-        Short      | -1                                    || -1
-        Short      | Short.MIN_VALUE                       || Short.MIN_VALUE
-        Short      | Short.MAX_VALUE                       || Short.MAX_VALUE
+        Short         | 1                                     || 1
+        Short         | -1                                    || -1
+        Short         | Short.MIN_VALUE                       || Short.MIN_VALUE
+        Short         | Short.MAX_VALUE                       || Short.MAX_VALUE
         // INTEGER
-        int        | 1                                     || 1
-        int        | -1                                    || -1
-        int        | Integer.MIN_VALUE                     || Integer.MIN_VALUE
-        int        | Integer.MAX_VALUE                     || Integer.MAX_VALUE
+        int           | 1                                     || 1
+        int           | -1                                    || -1
+        int           | Integer.MIN_VALUE                     || Integer.MIN_VALUE
+        int           | Integer.MAX_VALUE                     || Integer.MAX_VALUE
         // INTEGER WRAPPER
-        Integer    | 1                                     || 1
-        Integer    | -1                                    || -1
-        Integer    | Integer.MIN_VALUE                     || Integer.MIN_VALUE
-        Integer    | Integer.MAX_VALUE                     || Integer.MAX_VALUE
+        Integer       | 1                                     || 1
+        Integer       | -1                                    || -1
+        Integer       | Integer.MIN_VALUE                     || Integer.MIN_VALUE
+        Integer       | Integer.MAX_VALUE                     || Integer.MAX_VALUE
         // LONG
-        long       | 1                                     || 1
-        long       | -1                                    || -1
-        long       | Long.MIN_VALUE                        || Long.MIN_VALUE
-        long       | Long.MAX_VALUE                        || Long.MAX_VALUE
+        long          | 1                                     || 1
+        long          | -1                                    || -1
+        long          | Long.MIN_VALUE                        || Long.MIN_VALUE
+        long          | Long.MAX_VALUE                        || Long.MAX_VALUE
         // LONG WRAPPER
-        Long       | 1                                     || 1
-        Long       | -1                                    || -1
-        Long       | Long.MIN_VALUE                        || Long.MIN_VALUE
-        Long       | Long.MAX_VALUE                        || Long.MAX_VALUE
+        Long          | 1                                     || 1
+        Long          | -1                                    || -1
+        Long          | Long.MIN_VALUE                        || Long.MIN_VALUE
+        Long          | Long.MAX_VALUE                        || Long.MAX_VALUE
         // FLOAT
-        float      | 1                                     || 1
-        float      | -1                                    || -1
-        float      | -Float.MAX_VALUE                      || -Float.MAX_VALUE
-        float      | Float.MAX_VALUE                       || Float.MAX_VALUE
+        float         | 1                                     || 1
+        float         | -1                                    || -1
+        float         | -Float.MAX_VALUE                      || -Float.MAX_VALUE
+        float         | Float.MAX_VALUE                       || Float.MAX_VALUE
         // FLOAT WRAPPER
-        Float      | 1                                     || 1
-        Float      | -1                                    || -1
-        Float      | -Float.MAX_VALUE                      || -Float.MAX_VALUE
-        Float      | Float.MAX_VALUE                       || Float.MAX_VALUE
+        Float         | 1                                     || 1
+        Float         | -1                                    || -1
+        Float         | -Float.MAX_VALUE                      || -Float.MAX_VALUE
+        Float         | Float.MAX_VALUE                       || Float.MAX_VALUE
         // DOUBLE
-        double     | 1                                     || 1
-        double     | -1                                    || -1
-        double     | -Double.MAX_VALUE                     || -Double.MAX_VALUE
-        double     | Double.MAX_VALUE                      || Double.MAX_VALUE
+        double        | 1                                     || 1
+        double        | -1                                    || -1
+        double        | -Double.MAX_VALUE                     || -Double.MAX_VALUE
+        double        | Double.MAX_VALUE                      || Double.MAX_VALUE
         // DOUBLE WRAPPER
-        Double     | 1                                     || 1
-        Double     | -1                                    || -1
-        Double     | -Double.MAX_VALUE                     || -Double.MAX_VALUE
-        Double     | Double.MAX_VALUE                      || Double.MAX_VALUE
+        Double        | 1                                     || 1
+        Double        | -1                                    || -1
+        Double        | -Double.MAX_VALUE                     || -Double.MAX_VALUE
+        Double        | Double.MAX_VALUE                      || Double.MAX_VALUE
         // BOOLEAN
-        boolean    | true                                  || true
-        boolean    | false                                 || false
+        boolean       | true                                  || true
+        boolean       | false                                 || false
         // BOOLEAN WRAPPER
-        Boolean    | true                                  || true
-        Boolean    | false                                 || false
+        Boolean       | true                                  || true
+        Boolean       | false                                 || false
         // CHARACTER
-        char       | 'a'                                   || 'a' as Character
+        char          | 'a'                                   || 'a' as Character
         // CHARACTER WRAPPER
-        Character  | 'a'                                   || 'a' as Character
+        Character     | 'a'                                   || 'a' as Character
         // STRING
-        String     | 'Hello!'                              || 'Hello!'
+        String        | 'Hello!'                              || 'Hello!'
         // ENUM
-        TimeUnit   | 'nanoseconds'                         || TimeUnit.NANOSECONDS
-        TimeUnit   | 'Microseconds'                        || TimeUnit.MICROSECONDS
-        TimeUnit   | 'MILLISECONDS'                        || TimeUnit.MILLISECONDS
-        TimeUnit   | 'secondS'                             || TimeUnit.SECONDS
-        TimeUnit   | 'MiNuTeS'                             || TimeUnit.MINUTES
-        TimeUnit   | 'HOURs'                               || TimeUnit.HOURS
-        TimeUnit   | 'DayS'                                || TimeUnit.DAYS
+        TimeUnit      | 'nanoseconds'                         || TimeUnit.NANOSECONDS
+        TimeUnit      | 'Microseconds'                        || TimeUnit.MICROSECONDS
+        TimeUnit      | 'MILLISECONDS'                        || TimeUnit.MILLISECONDS
+        TimeUnit      | 'secondS'                             || TimeUnit.SECONDS
+        TimeUnit      | 'MiNuTeS'                             || TimeUnit.MINUTES
+        TimeUnit      | 'HOURs'                               || TimeUnit.HOURS
+        TimeUnit      | 'DayS'                                || TimeUnit.DAYS
         // LOCALE
-        Locale     | 'en_us'                               || Locale.US
-        Locale     | 'it_it'                               || Locale.ITALY
+        Locale        | 'en_us'                               || Locale.US
+        Locale        | 'it_it'                               || Locale.ITALY
         // COORDINATE
-        Coordinate | '1'                                   || new Coordinate(1)
-        Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}2"  || new Coordinate(2, true)
-        Coordinate | '-3'                                  || new Coordinate(-3)
-        Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}-4" || new Coordinate(-4, true)
+        Coordinate    | '1'                                   || new Coordinate(1)
+        Coordinate    | "${Coordinate.RELATIVE_IDENTIFIER}2"  || new Coordinate(2, true)
+        Coordinate    | '-3'                                  || new Coordinate(-3)
+        Coordinate    | "${Coordinate.RELATIVE_IDENTIFIER}-4" || new Coordinate(-4, true)
         // POSITION
-        Position   | '1 ~2 ~-3'                            || new Position(
+        Position      | '1 ~2 ~-3'                            || new Position(
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )
+        // WORLD POSITION
+        WorldPosition | 'world 1 ~2 ~-3'                      || new WorldPosition(
+                'world',
                 new Coordinate(1),
                 new Coordinate(2, true),
                 new Coordinate(-3, true)
@@ -212,140 +220,151 @@ class ArgumentParsersTest extends Specification {
         actual == expected
 
         where:
-        type       | argument                                                || expected
+        type          | argument                                                || expected
         // BYTE
-        byte       | ''                                                      || (0..9).collect { "$it".toString() }
-        byte       | 1                                                       || (0..9).collect { "1$it".toString() }
-        byte       | -1                                                      || (0..9).collect { "-1$it".toString() }
-        byte       | Byte.MIN_VALUE                                          || []
-        byte       | Byte.MAX_VALUE                                          || []
-        byte       | 'a'                                                     || []
+        byte          | ''                                                      || (0..9).collect { "$it".toString() }
+        byte          | 1                                                       || (0..9).collect { "1$it".toString() }
+        byte          | -1                                                      || (0..9).collect { "-1$it".toString() }
+        byte          | Byte.MIN_VALUE                                          || []
+        byte          | Byte.MAX_VALUE                                          || []
+        byte          | 'a'                                                     || []
         // BYTE WRAPPER
-        Byte       | ''                                                      || (0..9).collect { "$it".toString() }
-        Byte       | 1                                                       || (0..9).collect { "1$it".toString() }
-        Byte       | -1                                                      || (0..9).collect { "-1$it".toString() }
-        Byte       | Byte.MIN_VALUE                                          || []
-        Byte       | Byte.MAX_VALUE                                          || []
-        Byte       | 'a'                                                     || []
+        Byte          | ''                                                      || (0..9).collect { "$it".toString() }
+        Byte          | 1                                                       || (0..9).collect { "1$it".toString() }
+        Byte          | -1                                                      || (0..9).collect { "-1$it".toString() }
+        Byte          | Byte.MIN_VALUE                                          || []
+        Byte          | Byte.MAX_VALUE                                          || []
+        Byte          | 'a'                                                     || []
         // SHORT
-        short      | ''                                                      || (0..9).collect { "$it".toString() }
-        short      | 1                                                       || (0..9).collect { "1$it".toString() }
-        short      | -1                                                      || (0..9).collect { "-1$it".toString() }
-        short      | Short.MIN_VALUE                                         || []
-        short      | Short.MAX_VALUE                                         || []
-        short      | 'a'                                                     || []
+        short         | ''                                                      || (0..9).collect { "$it".toString() }
+        short         | 1                                                       || (0..9).collect { "1$it".toString() }
+        short         | -1                                                      || (0..9).collect { "-1$it".toString() }
+        short         | Short.MIN_VALUE                                         || []
+        short         | Short.MAX_VALUE                                         || []
+        short         | 'a'                                                     || []
         // SHORT WRAPPER
-        Short      | ''                                                      || (0..9).collect { "$it".toString() }
-        Short      | 1                                                       || (0..9).collect { "1$it".toString() }
-        Short      | -1                                                      || (0..9).collect { "-1$it".toString() }
-        Short      | Short.MIN_VALUE                                         || []
-        Short      | Short.MAX_VALUE                                         || []
-        Short      | 'a'                                                     || []
+        Short         | ''                                                      || (0..9).collect { "$it".toString() }
+        Short         | 1                                                       || (0..9).collect { "1$it".toString() }
+        Short         | -1                                                      || (0..9).collect { "-1$it".toString() }
+        Short         | Short.MIN_VALUE                                         || []
+        Short         | Short.MAX_VALUE                                         || []
+        Short         | 'a'                                                     || []
         // INTEGER
-        int        | ''                                                      || (0..9).collect { "$it".toString() }
-        int        | 1                                                       || (0..9).collect { "1$it".toString() }
-        int        | -1                                                      || (0..9).collect { "-1$it".toString() }
-        int        | Integer.MIN_VALUE                                       || []
-        int        | Integer.MAX_VALUE                                       || []
-        int        | 'a'                                                     || []
+        int           | ''                                                      || (0..9).collect { "$it".toString() }
+        int           | 1                                                       || (0..9).collect { "1$it".toString() }
+        int           | -1                                                      || (0..9).collect { "-1$it".toString() }
+        int           | Integer.MIN_VALUE                                       || []
+        int           | Integer.MAX_VALUE                                       || []
+        int           | 'a'                                                     || []
         // INTEGER WRAPPER
-        Integer    | ''                                                      || (0..9).collect { "$it".toString() }
-        Integer    | 1                                                       || (0..9).collect { "1$it".toString() }
-        Integer    | -1                                                      || (0..9).collect { "-1$it".toString() }
-        Integer    | Integer.MIN_VALUE                                       || []
-        Integer    | Integer.MAX_VALUE                                       || []
-        Integer    | 'a'                                                     || []
+        Integer       | ''                                                      || (0..9).collect { "$it".toString() }
+        Integer       | 1                                                       || (0..9).collect { "1$it".toString() }
+        Integer       | -1                                                      || (0..9).collect { "-1$it".toString() }
+        Integer       | Integer.MIN_VALUE                                       || []
+        Integer       | Integer.MAX_VALUE                                       || []
+        Integer       | 'a'                                                     || []
         // LONG
-        long       | ''                                                      || (0..9).collect { "$it".toString() }
-        long       | 1                                                       || (0..9).collect { "1$it".toString() }
-        long       | -1                                                      || (0..9).collect { "-1$it".toString() }
-        long       | Long.MIN_VALUE                                          || []
-        long       | Long.MAX_VALUE                                          || []
-        long       | 'a'                                                     || []
+        long          | ''                                                      || (0..9).collect { "$it".toString() }
+        long          | 1                                                       || (0..9).collect { "1$it".toString() }
+        long          | -1                                                      || (0..9).collect { "-1$it".toString() }
+        long          | Long.MIN_VALUE                                          || []
+        long          | Long.MAX_VALUE                                          || []
+        long          | 'a'                                                     || []
         // LONG WRAPPER
-        Long       | ''                                                      || (0..9).collect { "$it".toString() }
-        Long       | 1                                                       || (0..9).collect { "1$it".toString() }
-        Long       | -1                                                      || (0..9).collect { "-1$it".toString() }
-        Long       | Long.MIN_VALUE                                          || []
-        Long       | Long.MAX_VALUE                                          || []
-        Long       | 'a'                                                     || []
+        Long          | ''                                                      || (0..9).collect { "$it".toString() }
+        Long          | 1                                                       || (0..9).collect { "1$it".toString() }
+        Long          | -1                                                      || (0..9).collect { "-1$it".toString() }
+        Long          | Long.MIN_VALUE                                          || []
+        Long          | Long.MAX_VALUE                                          || []
+        Long          | 'a'                                                     || []
         // FLOAT
-        float      | ''                                                      || (0..9).collect { "$it".toString() }
-        float      | 1                                                       || (0..9).collect { "1$it".toString() }
-        float      | -1                                                      || (0..9).collect { "-1$it".toString() }
-        float      | -Float.MAX_VALUE                                        || []
-        float      | Float.MAX_VALUE                                         || []
-        float      | 'a'                                                     || []
+        float         | ''                                                      || (0..9).collect { "$it".toString() }
+        float         | 1                                                       || (0..9).collect { "1$it".toString() }
+        float         | -1                                                      || (0..9).collect { "-1$it".toString() }
+        float         | -Float.MAX_VALUE                                        || []
+        float         | Float.MAX_VALUE                                         || []
+        float         | 'a'                                                     || []
         // FLOAT WRAPPER
-        Float      | ''                                                      || (0..9).collect { "$it".toString() }
-        Float      | 1                                                       || (0..9).collect { "1$it".toString() }
-        Float      | -1                                                      || (0..9).collect { "-1$it".toString() }
-        Float      | -Float.MAX_VALUE                                        || []
-        Float      | Float.MAX_VALUE                                         || []
-        Float      | 'a'                                                     || []
+        Float         | ''                                                      || (0..9).collect { "$it".toString() }
+        Float         | 1                                                       || (0..9).collect { "1$it".toString() }
+        Float         | -1                                                      || (0..9).collect { "-1$it".toString() }
+        Float         | -Float.MAX_VALUE                                        || []
+        Float         | Float.MAX_VALUE                                         || []
+        Float         | 'a'                                                     || []
         // DOUBLE
-        double     | ''                                                      || (0..9).collect { "$it".toString() }
-        double     | 1                                                       || (0..9).collect { "1$it".toString() }
-        double     | -1                                                      || (0..9).collect { "-1$it".toString() }
-        double     | -Double.MAX_VALUE                                       || []
-        double     | Double.MAX_VALUE                                        || []
-        double     | 'a'                                                     || []
+        double        | ''                                                      || (0..9).collect { "$it".toString() }
+        double        | 1                                                       || (0..9).collect { "1$it".toString() }
+        double        | -1                                                      || (0..9).collect { "-1$it".toString() }
+        double        | -Double.MAX_VALUE                                       || []
+        double        | Double.MAX_VALUE                                        || []
+        double        | 'a'                                                     || []
         // DOUBLE WRAPPER
-        Double     | ''                                                      || (0..9).collect { "$it".toString() }
-        Double     | 1                                                       || (0..9).collect { "1$it".toString() }
-        Double     | -1                                                      || (0..9).collect { "-1$it".toString() }
-        Double     | -Double.MAX_VALUE                                       || []
-        Double     | Double.MAX_VALUE                                        || []
-        Double     | 'a'                                                     || []
+        Double        | ''                                                      || (0..9).collect { "$it".toString() }
+        Double        | 1                                                       || (0..9).collect { "1$it".toString() }
+        Double        | -1                                                      || (0..9).collect { "-1$it".toString() }
+        Double        | -Double.MAX_VALUE                                       || []
+        Double        | Double.MAX_VALUE                                        || []
+        Double        | 'a'                                                     || []
         // BOOLEAN
-        boolean    | ''                                                      || ['true', 'false']
+        boolean       | ''                                                      || ['true', 'false']
         // BOOLEAN WRAPPER
-        Boolean    | ''                                                      || ['true', 'false']
+        Boolean       | ''                                                      || ['true', 'false']
         // CHARACTER
-        char       | ''                                                      || ('a'..'z') + ('A'..'Z') + ('0'..'9')
-        char       | 'a'                                                     || []
-        char       | 'ab'                                                    || []
+        char          | ''                                                      || ('a'..'z') + ('A'..'Z') + ('0'..'9')
+        char          | 'a'                                                     || []
+        char          | 'ab'                                                    || []
         // CHARACTER WRAPPER
-        Character  | ''                                                      || ('a'..'z') + ('A'..'Z') + ('0'..'9')
-        Character  | 'a'                                                     || []
-        Character  | 'ab'                                                    || []
+        Character     | ''                                                      || ('a'..'z') + ('A'..'Z') + ('0'..'9')
+        Character     | 'a'                                                     || []
+        Character     | 'ab'                                                    || []
         // STRING
-        String     | ''                                                      || ['<%name%>']
+        String        | ''                                                      || ['<%name%>']
         // ENUM
-        TimeUnit   | ''                                                      || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
-        TimeUnit   | 'n'                                                     || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
-        TimeUnit   | 'nanoseconds'                                           || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
-        TimeUnit   | 'NANOSECONDS'                                           || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
+        TimeUnit      | ''                                                      || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
+        TimeUnit      | 'n'                                                     || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
+        TimeUnit      | 'nanoseconds'                                           || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
+        TimeUnit      | 'NANOSECONDS'                                           || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
         // LOCALE
-        Locale     | ''                                                      || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
+        Locale        | ''                                                      || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
                 .collect { LocaleUtils.toString(it) }.unique()
-        Locale     | 'it'                                                    || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
+        Locale        | 'it'                                                    || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
                 .collect { LocaleUtils.toString(it) }.unique()
-        Locale     | 'it_it'                                                 || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
+        Locale        | 'it_it'                                                 || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
                 .collect { LocaleUtils.toString(it) }.unique()
-        Locale     | 'non_existent'                                          || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
+        Locale        | 'non_existent'                                          || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
                 .collect { LocaleUtils.toString(it) }.unique()
         // COORDINATE
-        Coordinate | ''                                                      || [Coordinate.RELATIVE_IDENTIFIER]
-        Coordinate | 1                                                       || (0..9).collect { "1$it".toString() }
-        Coordinate | -1                                                      || (0..9).collect { "-1$it".toString() }
-        Coordinate | -Double.MAX_VALUE                                       || []
-        Coordinate | Double.MAX_VALUE                                        || []
-        Coordinate | 'a'                                                     || []
-        Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}"                     || (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}$it".toString() }
-        Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}1"                    || (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}1$it".toString() }
-        Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}-1"                   || (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}-1$it".toString() }
-        Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}-${Double.MAX_VALUE}" || []
-        Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}${Double.MAX_VALUE}"  || []
-        Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}a"                    || []
+        Coordinate    | ''                                                      || [Coordinate.RELATIVE_IDENTIFIER]
+        Coordinate    | 1                                                       || (0..9).collect { "1$it".toString() }
+        Coordinate    | -1                                                      || (0..9).collect { "-1$it".toString() }
+        Coordinate    | -Double.MAX_VALUE                                       || []
+        Coordinate    | Double.MAX_VALUE                                        || []
+        Coordinate    | 'a'                                                     || []
+        Coordinate    | "${Coordinate.RELATIVE_IDENTIFIER}"                     || (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}$it".toString() }
+        Coordinate    | "${Coordinate.RELATIVE_IDENTIFIER}1"                    || (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}1$it".toString() }
+        Coordinate    | "${Coordinate.RELATIVE_IDENTIFIER}-1"                   || (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}-1$it".toString() }
+        Coordinate    | "${Coordinate.RELATIVE_IDENTIFIER}-${Double.MAX_VALUE}" || []
+        Coordinate    | "${Coordinate.RELATIVE_IDENTIFIER}${Double.MAX_VALUE}"  || []
+        Coordinate    | "${Coordinate.RELATIVE_IDENTIFIER}a"                    || []
         // POSITION
-        Position   | ''                                                      || [Coordinate.RELATIVE_IDENTIFIER]
-        Position   | '1'                                                     || (0..9).collect { "1$it".toString() }
-        Position   | '1 '                                                    || [Coordinate.RELATIVE_IDENTIFIER]
-        Position   | '1 ~2'                                                  ||
+        Position      | ''                                                      || [Coordinate.RELATIVE_IDENTIFIER]
+        Position      | '1'                                                     || (0..9).collect { "1$it".toString() }
+        Position      | '1 '                                                    || [Coordinate.RELATIVE_IDENTIFIER]
+        Position      | '1 ~2'                                                  ||
                 (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}2$it".toString() }
-        Position   | '1 ~2 '                                                 || [Coordinate.RELATIVE_IDENTIFIER]
-        Position   | '1 ~2 ~-3'                                              ||
+        Position      | '1 ~2 '                                                 || [Coordinate.RELATIVE_IDENTIFIER]
+        Position      | '1 ~2 ~-3'                                              ||
+                (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}-3$it".toString() }
+        // WORLD POSITION
+        WorldPosition | ''                                                      || ['<world>']
+        WorldPosition | 'world'                                                 || ['<world>']
+        WorldPosition | 'world '                                                || [Coordinate.RELATIVE_IDENTIFIER]
+        WorldPosition | 'world 1'                                               || (0..9).collect { "1$it".toString() }
+        WorldPosition | 'world 1 '                                              || [Coordinate.RELATIVE_IDENTIFIER]
+        WorldPosition | 'world 1 ~2'                                            ||
+                (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}2$it".toString() }
+        WorldPosition | 'world 1 ~2 '                                           || [Coordinate.RELATIVE_IDENTIFIER]
+        WorldPosition | 'world 1 ~2 ~-3'                                        ||
                 (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}-3$it".toString() }
     }
 
