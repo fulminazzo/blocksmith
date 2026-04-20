@@ -7,6 +7,7 @@ import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import it.fulminazzo.blocksmith.ApplicationHandle;
+import it.fulminazzo.blocksmith.command.argument.dto.Position;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.reflect.ReflectException;
@@ -30,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
 
     static {
-        ArgumentTypes.register(Location.class, getPositionArgumentType());
+        ArgumentTypes.register(Position.class, getPositionArgumentType());
     }
 
     /**
