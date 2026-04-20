@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.argument.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Value;
 
 /**
@@ -8,6 +9,7 @@ import lombok.Value;
  * If the coordinate is relative, it will be prefixed with a tilde (~).
  */
 @Value
+@AllArgsConstructor
 public class Coordinate {
     /**
      * Identifies a relative coordinate.
@@ -16,6 +18,15 @@ public class Coordinate {
 
     double value;
     boolean relative;
+
+    /**
+     * Instantiates a new Coordinate.
+     *
+     * @param value the value
+     */
+    public Coordinate(double value) {
+        this(value, false);
+    }
 
     @Override
     public String toString() {
