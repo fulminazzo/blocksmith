@@ -37,11 +37,6 @@ public class MockApplicationHandle implements ApplicationHandle, ServerApplicati
     }
 
     @Override
-    public @NonNull <T> T as(@NotNull Class<T> type) {
-        return type.cast(this);
-    }
-
-    @Override
     public @NotNull Logger logger() {
         return log;
     }
