@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.argument;
 
 import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.argument.dto.Coordinate;
+import it.fulminazzo.blocksmith.command.argument.dto.Position;
 import it.fulminazzo.blocksmith.command.visitor.CommandInput;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
@@ -153,6 +154,10 @@ public final class ArgumentParsers {
             }
 
         });
+        register(Position.class, new MultiArgumentParser<>(
+                l -> new Position((Coordinate) l.get(0), (Coordinate) l.get(1), (Coordinate) l.get(2)),
+                Coordinate.class, Coordinate.class, Coordinate.class
+        ));
     }
 
     /**

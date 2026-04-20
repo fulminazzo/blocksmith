@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.argument
 
 import it.fulminazzo.blocksmith.command.argument.dto.Coordinate
+import it.fulminazzo.blocksmith.command.argument.dto.Position
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
 import it.fulminazzo.blocksmith.command.visitor.Visitor
 import it.fulminazzo.blocksmith.message.util.LocaleUtils
@@ -25,95 +26,101 @@ class ArgumentParsersTest extends Specification {
         actual == expected
 
         where:
-        type       | argument                             || expected
+        type       | argument                              || expected
         // BYTE
-        byte       | 1                                    || 1
-        byte       | -1                                   || -1
-        byte       | Byte.MIN_VALUE                       || Byte.MIN_VALUE
-        byte       | Byte.MAX_VALUE                       || Byte.MAX_VALUE
+        byte       | 1                                     || 1
+        byte       | -1                                    || -1
+        byte       | Byte.MIN_VALUE                        || Byte.MIN_VALUE
+        byte       | Byte.MAX_VALUE                        || Byte.MAX_VALUE
         // BYTE WRAPPER
-        Byte       | 1                                    || 1
-        Byte       | -1                                   || -1
-        Byte       | Byte.MIN_VALUE                       || Byte.MIN_VALUE
-        Byte       | Byte.MAX_VALUE                       || Byte.MAX_VALUE
+        Byte       | 1                                     || 1
+        Byte       | -1                                    || -1
+        Byte       | Byte.MIN_VALUE                        || Byte.MIN_VALUE
+        Byte       | Byte.MAX_VALUE                        || Byte.MAX_VALUE
         // SHORT
-        short      | 1                                    || 1
-        short      | -1                                   || -1
-        short      | Short.MIN_VALUE                      || Short.MIN_VALUE
-        short      | Short.MAX_VALUE                      || Short.MAX_VALUE
+        short      | 1                                     || 1
+        short      | -1                                    || -1
+        short      | Short.MIN_VALUE                       || Short.MIN_VALUE
+        short      | Short.MAX_VALUE                       || Short.MAX_VALUE
         // SHORT WRAPPER
-        Short      | 1                                    || 1
-        Short      | -1                                   || -1
-        Short      | Short.MIN_VALUE                      || Short.MIN_VALUE
-        Short      | Short.MAX_VALUE                      || Short.MAX_VALUE
+        Short      | 1                                     || 1
+        Short      | -1                                    || -1
+        Short      | Short.MIN_VALUE                       || Short.MIN_VALUE
+        Short      | Short.MAX_VALUE                       || Short.MAX_VALUE
         // INTEGER
-        int        | 1                                    || 1
-        int        | -1                                   || -1
-        int        | Integer.MIN_VALUE                    || Integer.MIN_VALUE
-        int        | Integer.MAX_VALUE                    || Integer.MAX_VALUE
+        int        | 1                                     || 1
+        int        | -1                                    || -1
+        int        | Integer.MIN_VALUE                     || Integer.MIN_VALUE
+        int        | Integer.MAX_VALUE                     || Integer.MAX_VALUE
         // INTEGER WRAPPER
-        Integer    | 1                                    || 1
-        Integer    | -1                                   || -1
-        Integer    | Integer.MIN_VALUE                    || Integer.MIN_VALUE
-        Integer    | Integer.MAX_VALUE                    || Integer.MAX_VALUE
+        Integer    | 1                                     || 1
+        Integer    | -1                                    || -1
+        Integer    | Integer.MIN_VALUE                     || Integer.MIN_VALUE
+        Integer    | Integer.MAX_VALUE                     || Integer.MAX_VALUE
         // LONG
-        long       | 1                                    || 1
-        long       | -1                                   || -1
-        long       | Long.MIN_VALUE                       || Long.MIN_VALUE
-        long       | Long.MAX_VALUE                       || Long.MAX_VALUE
+        long       | 1                                     || 1
+        long       | -1                                    || -1
+        long       | Long.MIN_VALUE                        || Long.MIN_VALUE
+        long       | Long.MAX_VALUE                        || Long.MAX_VALUE
         // LONG WRAPPER
-        Long       | 1                                    || 1
-        Long       | -1                                   || -1
-        Long       | Long.MIN_VALUE                       || Long.MIN_VALUE
-        Long       | Long.MAX_VALUE                       || Long.MAX_VALUE
+        Long       | 1                                     || 1
+        Long       | -1                                    || -1
+        Long       | Long.MIN_VALUE                        || Long.MIN_VALUE
+        Long       | Long.MAX_VALUE                        || Long.MAX_VALUE
         // FLOAT
-        float      | 1                                    || 1
-        float      | -1                                   || -1
-        float      | -Float.MAX_VALUE                     || -Float.MAX_VALUE
-        float      | Float.MAX_VALUE                      || Float.MAX_VALUE
+        float      | 1                                     || 1
+        float      | -1                                    || -1
+        float      | -Float.MAX_VALUE                      || -Float.MAX_VALUE
+        float      | Float.MAX_VALUE                       || Float.MAX_VALUE
         // FLOAT WRAPPER
-        Float      | 1                                    || 1
-        Float      | -1                                   || -1
-        Float      | -Float.MAX_VALUE                     || -Float.MAX_VALUE
-        Float      | Float.MAX_VALUE                      || Float.MAX_VALUE
+        Float      | 1                                     || 1
+        Float      | -1                                    || -1
+        Float      | -Float.MAX_VALUE                      || -Float.MAX_VALUE
+        Float      | Float.MAX_VALUE                       || Float.MAX_VALUE
         // DOUBLE
-        double     | 1                                    || 1
-        double     | -1                                   || -1
-        double     | -Double.MAX_VALUE                    || -Double.MAX_VALUE
-        double     | Double.MAX_VALUE                     || Double.MAX_VALUE
+        double     | 1                                     || 1
+        double     | -1                                    || -1
+        double     | -Double.MAX_VALUE                     || -Double.MAX_VALUE
+        double     | Double.MAX_VALUE                      || Double.MAX_VALUE
         // DOUBLE WRAPPER
-        Double     | 1                                    || 1
-        Double     | -1                                   || -1
-        Double     | -Double.MAX_VALUE                    || -Double.MAX_VALUE
-        Double     | Double.MAX_VALUE                     || Double.MAX_VALUE
+        Double     | 1                                     || 1
+        Double     | -1                                    || -1
+        Double     | -Double.MAX_VALUE                     || -Double.MAX_VALUE
+        Double     | Double.MAX_VALUE                      || Double.MAX_VALUE
         // BOOLEAN
-        boolean    | true                                 || true
-        boolean    | false                                || false
+        boolean    | true                                  || true
+        boolean    | false                                 || false
         // BOOLEAN WRAPPER
-        Boolean    | true                                 || true
-        Boolean    | false                                || false
+        Boolean    | true                                  || true
+        Boolean    | false                                 || false
         // CHARACTER
-        char       | 'a'                                  || 'a' as Character
+        char       | 'a'                                   || 'a' as Character
         // CHARACTER WRAPPER
-        Character  | 'a'                                  || 'a' as Character
+        Character  | 'a'                                   || 'a' as Character
         // STRING
-        String     | 'Hello!'                             || 'Hello!'
+        String     | 'Hello!'                              || 'Hello!'
         // ENUM
-        TimeUnit   | 'nanoseconds'                        || TimeUnit.NANOSECONDS
-        TimeUnit   | 'Microseconds'                       || TimeUnit.MICROSECONDS
-        TimeUnit   | 'MILLISECONDS'                       || TimeUnit.MILLISECONDS
-        TimeUnit   | 'secondS'                            || TimeUnit.SECONDS
-        TimeUnit   | 'MiNuTeS'                            || TimeUnit.MINUTES
-        TimeUnit   | 'HOURs'                              || TimeUnit.HOURS
-        TimeUnit   | 'DayS'                               || TimeUnit.DAYS
+        TimeUnit   | 'nanoseconds'                         || TimeUnit.NANOSECONDS
+        TimeUnit   | 'Microseconds'                        || TimeUnit.MICROSECONDS
+        TimeUnit   | 'MILLISECONDS'                        || TimeUnit.MILLISECONDS
+        TimeUnit   | 'secondS'                             || TimeUnit.SECONDS
+        TimeUnit   | 'MiNuTeS'                             || TimeUnit.MINUTES
+        TimeUnit   | 'HOURs'                               || TimeUnit.HOURS
+        TimeUnit   | 'DayS'                                || TimeUnit.DAYS
         // LOCALE
-        Locale     | 'en_us'                              || Locale.US
-        Locale     | 'it_it'                              || Locale.ITALY
+        Locale     | 'en_us'                               || Locale.US
+        Locale     | 'it_it'                               || Locale.ITALY
         // COORDINATE
-        Coordinate | '1'                                  || new Coordinate(1)
-        Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}2" || new Coordinate(2, true)
-        Coordinate | '-3'                                 || new Coordinate(-3)
+        Coordinate | '1'                                   || new Coordinate(1)
+        Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}2"  || new Coordinate(2, true)
+        Coordinate | '-3'                                  || new Coordinate(-3)
         Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}-4" || new Coordinate(-4, true)
+        // POSITION
+        Position   | '1 ~2 ~-3'                            || new Position(
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )
     }
 
     def 'test that parse of parser for #type throws exception with #expected message with #argument'() {
@@ -331,6 +338,15 @@ class ArgumentParsersTest extends Specification {
         Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}-${Double.MAX_VALUE}" || []
         Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}${Double.MAX_VALUE}"  || []
         Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}a"                    || []
+        // POSITION
+        Position   | ''                                                      || [Coordinate.RELATIVE_IDENTIFIER]
+        Position   | '1'                                                     || (0..9).collect { "1$it".toString() }
+        Position   | '1 '                                                    || [Coordinate.RELATIVE_IDENTIFIER]
+        Position   | '1 ~2'                                                  ||
+                (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}2$it".toString() }
+        Position   | '1 ~2 '                                                 || [Coordinate.RELATIVE_IDENTIFIER]
+        Position   | '1 ~2 ~-3'                                              ||
+                (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}-3$it".toString() }
     }
 
     def 'test that of function throws IllegalArgumentException if type was not recognized'() {
