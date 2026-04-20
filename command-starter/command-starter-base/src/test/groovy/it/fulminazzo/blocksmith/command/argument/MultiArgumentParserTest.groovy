@@ -25,7 +25,7 @@ class MultiArgumentParserTest extends Specification {
 
     def 'test that initializing MultiArgumentParser with no types throws'() {
         when:
-        new MultiArgumentParser<>((l) -> null)
+        new MultiArgumentParser<>((l) -> null, new Class<?>[0])
 
         then:
         thrown(IllegalArgumentException)
