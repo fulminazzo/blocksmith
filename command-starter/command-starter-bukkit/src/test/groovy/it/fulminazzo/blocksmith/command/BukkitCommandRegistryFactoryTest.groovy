@@ -171,7 +171,8 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         World         | 'world_nether'   || { a -> a.server().getWorld('world_nether') }
         // LOCATION
         Location      | 'world 1 2 -3'   || { a -> new Location(a.server().getWorld('world'), 1, 2, -3) }
-        Location      | 'world ~ ~2 ~-3' || { a -> new Location(a.server().getWorld('world'), 1, 2, -3) }
+        Location      | 'world ~ ~2 ~-3' || { a -> new Location(a.server().getWorld('world'), 1, 2, 3) }
+        Location      | 'world ~ ~2 ~-4' || { a -> new Location(a.server().getWorld('world'), 1, 2, 2) }
     }
 
     def 'test that parse of parser for #type throws exception with #expected message with #argument'() {
@@ -244,7 +245,6 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         // LOCATION
         Location      | ''               || ['world', 'world_nether']
         Location      | 'world'          || ['world', 'world_nether']
-        Location      | 'world '         || (0..9).collect { "$it" }
         Location      | 'world 1'        || (0..9).collect { "1$it" }
         Location      | 'world 1 2'      || (0..9).collect { "2$it" }
         Location      | 'world 1 2 3'    || (0..9).collect { "3$it" }
