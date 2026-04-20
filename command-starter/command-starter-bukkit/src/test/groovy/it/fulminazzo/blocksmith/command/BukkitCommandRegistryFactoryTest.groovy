@@ -6,6 +6,9 @@ import be.seeseemelk.mockbukkit.entity.OfflinePlayerMock
 import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.argument.ArgumentParseException
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
+import it.fulminazzo.blocksmith.command.argument.dto.Coordinate
+import it.fulminazzo.blocksmith.command.argument.dto.Position
+import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
 import it.fulminazzo.blocksmith.command.visitor.Visitor
 import it.fulminazzo.blocksmith.reflect.ReflectException
@@ -29,7 +32,12 @@ class BukkitCommandRegistryFactoryTest extends Specification {
 
         ServerMock server = Bukkit.server as ServerMock
 
-        server.addPlayer('Alex')
+        server.addPlayer('Alex').setLocation(new Location(
+                server.getWorld('world'),
+                0,
+                0,
+                6
+        ))
         server.addPlayer('Camilla')
         server.playerList.addOfflinePlayer(new OfflinePlayerMock('Steve'))
         server.playerList.addOfflinePlayer(new OfflinePlayerMock('Michael'))
@@ -250,6 +258,79 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         Location      | 'world 1 2 3'    || (0..9).collect { "3$it" }
         Location      | 'world ~ ~2 ~-3' || (0..9).collect { "~-3$it" }
         Location      | 'world a'        || []
+    }
+
+    def 'test that convert of #position to Location with #sender returns #expected'() {
+        given:
+        def args = []
+        if (sender != null) {
+            def s = sender(application)
+            args.add(s instanceof CommandSender
+                    ? new BukkitCommandSenderWrapper(application, s)
+                    : s
+            )
+        }
+
+        when:
+        def actual = position.as(Location, *args)
+
+        then:
+        actual == expected(application)
+
+        where:
+        position                         | sender                                || expected
+        new Position(
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | null                                  ||
+                { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
+        new Position(
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> 'invalid' }                    ||
+                { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
+        new Position(
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> a.server().consoleSender }     ||
+                { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
+        new Position(
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> a.server().getPlayer('Alex') } ||
+                { a -> new Location(a.server().getWorld('world'), 1, 2, 3) }
+        new WorldPosition(
+                'world',
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | null                                  ||
+                { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
+        new WorldPosition(
+                'world',
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> 'invalid' }                    ||
+                { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
+        new WorldPosition(
+                'world',
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> a.server().consoleSender }     ||
+                { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
+        new WorldPosition(
+                'world',
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> a.server().getPlayer('Alex') } ||
+                { a -> new Location(a.server().getWorld('world'), 1, 2, 3) }
     }
 
     private Visitor<?, ? extends Exception> newVisitor(final CommandSender sender) {
