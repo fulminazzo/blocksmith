@@ -92,7 +92,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             List<World> worlds = Bukkit.getWorlds();
             if (!worlds.isEmpty()) start = worlds.get(0).getSpawnLocation();
             start = getStartLocation(start, a);
-            return buildLocation(null, p.getX(), p.getY(), p.getZ(), start);
+            return buildLocation(start.getWorld(), p.getX(), p.getY(), p.getZ(), start);
         });
         Convertible.register(WorldPosition.class, Location.class, (p, a) -> {
             World world = Bukkit.getWorld(p.getWorld());
