@@ -112,6 +112,7 @@ class ArgumentParsersTest extends Specification {
         Locale        | 'en_us'                               || Locale.US
         Locale        | 'it_it'                               || Locale.ITALY
         // COORDINATE
+        Coordinate    | '~'                                   || new Coordinate(0, true)
         Coordinate    | '1'                                   || new Coordinate(1)
         Coordinate    | "${Coordinate.RELATIVE_IDENTIFIER}2"  || new Coordinate(2, true)
         Coordinate    | '-3'                                  || new Coordinate(-3)

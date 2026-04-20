@@ -131,8 +131,11 @@ public final class ArgumentParsers {
                 String rawArgument = input.getCurrent();
                 final String relativeIdentifier = Coordinate.RELATIVE_IDENTIFIER;
                 boolean isRelative = rawArgument.startsWith(relativeIdentifier);
-                if (isRelative) input.setCurrent(rawArgument.substring(relativeIdentifier.length()));
-                double value = Objects.requireNonNull(valueParser.parse(visitor));
+                if (isRelative) {
+                    rawArgument = rawArgument.substring(relativeIdentifier.length());
+                    input.setCurrent(rawArgument);
+                }
+                double value = rawArgument.isEmpty() ? 0 : Objects.requireNonNull(valueParser.parse(visitor));
                 return new Coordinate(value, isRelative);
             }
 
