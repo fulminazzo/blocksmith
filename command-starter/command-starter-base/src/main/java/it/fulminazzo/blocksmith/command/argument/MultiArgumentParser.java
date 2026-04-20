@@ -7,9 +7,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * A special {@link ArgumentParser} supporting multiple arguments to instantiate one single type.
@@ -43,15 +45,28 @@ public class MultiArgumentParser<T> implements ArgumentParser<T> {
      */
     public MultiArgumentParser(final @NotNull Function<@NotNull List<Object>, @Nullable T> constructor,
                                final @NotNull Class<?> @NotNull ... argumentTypes) {
+        this(constructor, Stream.of(argumentTypes).map(ArgumentParsers::of).toArray(ArgumentParser[]::new));
+    }
+
+    /**
+     * Instantiates a new Multi argument parser.
+     *
+     * @param constructor     the function to create a new instance of the object.
+     *                        The list will contain the parsed arguments
+     *                        (and its size will be defined by the given argument types).
+     *                        No check on the types is required (assuming the correct ones
+     *                        were given in the argument types).
+     * @param argumentParsers the parsers for the Java types
+     */
+    public MultiArgumentParser(final @NotNull Function<@NotNull List<Object>, @Nullable T> constructor,
+                               final @NotNull ArgumentParser<?> @NotNull ... argumentParsers) {
         this.constructor = constructor;
-        if (argumentTypes.length == 0)
+        if (argumentParsers.length == 0)
             throw new IllegalArgumentException(String.format(
                     "Could not create %s: at least one argument type must be given",
                     getClass().getSimpleName()
             ));
-        this.parsers = new ArrayList<>();
-        for (final Class<?> type : argumentTypes)
-            parsers.add(ArgumentParsers.of(type));
+        this.parsers = Arrays.asList(argumentParsers);
     }
 
     @Override
