@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node.handler;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.TabCompletable;
 import it.fulminazzo.blocksmith.command.annotation.Confirm;
 import it.fulminazzo.blocksmith.command.visitor.CommandInput;
@@ -78,14 +79,14 @@ public final class ConfirmationHandler implements TabCompletable {
         } else if (argument.equalsIgnoreCase(getCancelWord())) {
             result = confirmationManager.cancel(id);
             if (result == PendingTaskManager.Result.SUCCESS)
-                throw new CommandExecutionException("success.pending-action-cancelled");
+                throw new CommandExecutionException(CommandMessages.PENDING_ACTION_CANCELLED);
         } else return false;
 
         if (result == PendingTaskManager.Result.NOT_FOUND)
-            throw new CommandExecutionException("error.no-pending-action");
+            throw new CommandExecutionException(CommandMessages.NO_PENDING_ACTION);
         else
             // should only be expired at this point
-            throw new CommandExecutionException("error.pending-action-expired");
+            throw new CommandExecutionException(CommandMessages.PENDING_ACTION_EXPIRED);
     }
 
     @Override

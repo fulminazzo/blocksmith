@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.argument;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.visitor.CommandInput;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +59,7 @@ public class MultiArgumentParser<T> implements ArgumentParser<T> {
         final List<Object> parsed = new ArrayList<>();
         final CommandInput input = visitor.getInput();
         for (int i = 0; i < parsers.size(); i++) {
-            if (input.isDone()) throw new ArgumentParseException("error.not-enough-arguments");
+            if (input.isDone()) throw new ArgumentParseException(CommandMessages.NOT_ENOUGH_ARGUMENTS);
             ArgumentParser<?> parser = parsers.get(i);
             parsed.add(parser.parse(visitor));
             if (i != parsers.size() - 1) input.advanceCursor();

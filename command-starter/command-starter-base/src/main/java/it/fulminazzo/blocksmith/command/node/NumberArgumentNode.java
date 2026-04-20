@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
@@ -84,7 +85,7 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
         if (number == null) return null;
         double value = number.doubleValue();
         if (value < min || value > max)
-            throw new ArgumentParseException("error.invalid-number")
+            throw new ArgumentParseException(CommandMessages.INVALID_NUMBER)
                     .arguments(
                             Placeholder.of("argument", visitor.getInput().getCurrent()),
                             Placeholder.of("min", Reflect.on(min).cast(getType())),

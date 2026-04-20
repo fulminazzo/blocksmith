@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.argument;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.util.LocaleUtils;
@@ -58,7 +59,8 @@ public final class ArgumentParsers {
                 if (rawArgument.equalsIgnoreCase(TRUE)) return true;
                 else if (rawArgument.equalsIgnoreCase(FALSE)) return false;
                 else
-                    throw new ArgumentParseException("error.invalid-boolean").arguments(Placeholder.of("argument", rawArgument));
+                    throw new ArgumentParseException(CommandMessages.INVALID_BOOLEAN)
+                            .arguments(Placeholder.of("argument", rawArgument));
             }
 
             @Override
@@ -74,7 +76,8 @@ public final class ArgumentParsers {
                 String rawArgument = visitor.getInput().getCurrent();
                 if (rawArgument.length() == 1) return rawArgument.charAt(0);
                 else
-                    throw new ArgumentParseException("error.invalid-character").arguments(Placeholder.of("argument", rawArgument));
+                    throw new ArgumentParseException(CommandMessages.INVALID_CHARACTER)
+                            .arguments(Placeholder.of("argument", rawArgument));
             }
 
             @Override
@@ -104,7 +107,7 @@ public final class ArgumentParsers {
                 String argument = visitor.getInput().getCurrent();
                 Locale locale = LocaleUtils.fromString(argument);
                 if (ArgumentParsers.isValidLocale(locale)) return locale;
-                else throw new ArgumentParseException("error.invalid-locale")
+                else throw new ArgumentParseException(CommandMessages.INVALID_LOCALE)
                         .arguments(Placeholder.of("argument", argument));
             }
 

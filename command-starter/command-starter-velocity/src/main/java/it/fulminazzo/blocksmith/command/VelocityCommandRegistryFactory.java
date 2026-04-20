@@ -24,7 +24,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
             public @NotNull Player parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
                 ProxyServer server = visitor.getApplication().server();
                 String argument = visitor.getInput().getCurrent();
-                return server.getPlayer(argument).orElseThrow(() -> new ArgumentParseException("error.player-not-found")
+                return server.getPlayer(argument).orElseThrow(() -> new ArgumentParseException(CommandMessages.PLAYER_NOT_FOUND)
                         .arguments(Placeholder.of("player", argument)));
             }
 
@@ -43,7 +43,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
             public @NotNull RegisteredServer parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
                 ProxyServer server = visitor.getApplication().server();
                 String argument = visitor.getInput().getCurrent();
-                return server.getServer(argument).orElseThrow(() -> new ArgumentParseException("error.server-not-found")
+                return server.getServer(argument).orElseThrow(() -> new ArgumentParseException(CommandMessages.SERVER_NOT_FOUND)
                         .arguments(Placeholder.of("server", argument)));
             }
 

@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
@@ -76,7 +77,7 @@ public class ArgumentNode<T> extends CommandNode {
             String current = input.getCurrent();
             List<String> completions = completionsSupplier.getUnquoted();
             if (completions.stream().noneMatch(c -> c.equalsIgnoreCase(current)))
-                throw new ArgumentParseException("error.invalid-argument") //TODO: re-organize
+                throw new ArgumentParseException(CommandMessages.UNRECOGNIZED_ARGOMENT)
                         .arguments(
                                 Placeholder.of("argument", current),
                                 Placeholder.of("expected", String.join(", ", completions))

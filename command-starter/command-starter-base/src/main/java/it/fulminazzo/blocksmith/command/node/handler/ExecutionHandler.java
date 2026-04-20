@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node.handler;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
@@ -55,7 +56,7 @@ public final class ExecutionHandler {
                 Object id = sender.getId();
                 if (cooldownManager.isOnCooldown(id)) {
                     long time = cooldownManager.getRemaining(id);
-                    throw new CommandExecutionException("error.command-on-cooldown")
+                    throw new CommandExecutionException(CommandMessages.COMMAND_ON_COOLDOWN)
                             .arguments(Time.of("cooldown", time));
                 } else cooldownManager.put(id);
             }

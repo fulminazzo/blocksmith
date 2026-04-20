@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node.handler;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor;
@@ -38,7 +39,7 @@ final class AsyncManager {
                                                     final @NotNull CommandExecutionVisitor executionVisitor) throws CommandExecutionException {
         CommandSenderWrapper<?> sender = executionVisitor.getCommandSender();
         Object id = sender.getId();
-        if (pending.contains(id)) throw new CommandExecutionException("error.await-pending-operation");
+        if (pending.contains(id)) throw new CommandExecutionException(CommandMessages.AWAIT_PENDING_OPERATION);
         else pending.add(id);
 
         CompletableFuture<Void> checkTask = new CompletableFuture<>();
@@ -58,11 +59,11 @@ final class AsyncManager {
                     actualTask.cancel(true);
                     if (t instanceof CompletionException) t = t.getCause();
                     else if (t instanceof TimeoutException)
-                        t = new CommandExecutionException("error.operation-timeout")
+                        t = new CommandExecutionException(CommandMessages.OPERATION_TIMEOUT)
                                 .arguments(Time.of(timeout.toMillis()));
                     if (t != null) {
                         if (!(t instanceof CommandExecutionException))
-                            t = new CommandExecutionException("error.internal-error", t)
+                            t = new CommandExecutionException(CommandMessages.INTERNAL_ERROR, t)
                                     .arguments(Placeholder.of("message", t.getMessage()));
                         CommandExecutionException commandExecutionException = (CommandExecutionException) t;
                         executionVisitor.getCommandSender().sync(s ->

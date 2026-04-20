@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.argument;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import lombok.Getter;
@@ -29,7 +30,7 @@ public final class NumberArgumentParser<N extends Number> implements ArgumentPar
         try {
             return parser.apply(rawArgument);
         } catch (NumberFormatException e) {
-            throw new ArgumentParseException("error.invalid-number")
+            throw new ArgumentParseException(CommandMessages.INVALID_NUMBER)
                     .arguments(
                             Placeholder.of("argument", rawArgument),
                             Placeholder.of("min", min),

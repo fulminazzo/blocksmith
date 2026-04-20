@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.argument;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.reflect.Reflect;
@@ -34,7 +35,7 @@ final class EnumArgumentParser<E extends Enum<E>> implements ArgumentParser<E> {
         final String rawArgument = visitor.getInput().getCurrent();
         E value = values.get(rawArgument.toLowerCase());
         if (value == null)
-            throw new ArgumentParseException("error.enum-not-found")
+            throw new ArgumentParseException(CommandMessages.INVALID_ENUM)
                     .arguments(
                             Placeholder.of("argument", rawArgument),
                             Placeholder.of("name", enumTypeName)

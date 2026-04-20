@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.visitor.execution;
 
 import it.fulminazzo.blocksmith.ApplicationHandle;
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
@@ -66,7 +67,7 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
         } catch (ArgumentParseException e) {
             throw new CommandExecutionException(e.getMessage(), e.getCause()).arguments(e.getArguments());
         } catch (ValidationException e) {
-            CommandExecutionException exception = new CommandExecutionException("error.invalid-arguments");
+            CommandExecutionException exception = new CommandExecutionException(CommandMessages.INVALID_ARGUMENTS);
             e.getViolations().values().forEach(s -> s.forEach(v -> {
                 String message = v.getMessage();
                 if (message != null)
@@ -85,7 +86,7 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
     public Void visitLiteralNode(final @NotNull LiteralNode node) throws CommandExecutionException {
         PermissionInfo permission = node.getCommandInfo().getPermission();
         if (!commandSender.hasPermission(permission))
-            throw new CommandExecutionException("error.no-permission")
+            throw new CommandExecutionException(CommandMessages.NO_PERMISSION)
                     .arguments(Placeholder.of("permission", permission.getPermission()));
         ConfirmationHandler confirmationHandler = node.getConfirmationHandler();
         if (confirmationHandler != null && confirmationHandler.checkConfirmationKeywords(this)) return null;
@@ -99,14 +100,14 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
             else {
                 ArgumentNode<?> optional = node.getOptionalArgument();
                 if (optional != null) return optional.accept(this);
-                else throw new CommandExecutionException("error.not-enough-arguments");
+                else throw new CommandExecutionException(CommandMessages.NOT_ENOUGH_ARGUMENTS);
             }
         } else {
             final String current = input.getCurrent();
             CommandNode child = node.getChild(current);
             if (child == null) {
                 if (node.isExecutable()) return handleExecution(node);
-                else throw new CommandExecutionException("error.command-not-found")
+                else throw new CommandExecutionException(CommandMessages.COMMAND_NOT_FOUND)
                         .arguments(Placeholder.of("argument", current));
             } else return child.accept(this);
         }
@@ -157,8 +158,8 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
                     this,
                     () -> executionHandler.execute(commandNode, this)
             );
-            throw new CommandExecutionException("general.await-confirmation")
-                    .arguments(Time.of("time", confirmationHandler.getConfirmationTimeout().toMillis()));
+            throw new CommandExecutionException(CommandMessages.AWAIT_CONFIRMATION)
+                    .arguments(Time.of(confirmationHandler.getConfirmationTimeout().toMillis()));
         }
         executionHandler.execute(commandNode, this);
         return null;

@@ -26,7 +26,7 @@ public final class BungeeCommandRegistryFactory implements CommandRegistryFactor
                 String argument = visitor.getInput().getCurrent();
                 ProxiedPlayer player = server.getPlayer(argument);
                 if (player != null) return player;
-                else throw new ArgumentParseException("error.player-not-found")
+                else throw new ArgumentParseException(CommandMessages.PLAYER_NOT_FOUND)
                         .arguments(Placeholder.of("player", argument));
             }
 
@@ -47,7 +47,7 @@ public final class BungeeCommandRegistryFactory implements CommandRegistryFactor
                 String argument = visitor.getInput().getCurrent();
                 ServerInfo serverInfo = server.getServerInfo(argument);
                 if (serverInfo != null) return serverInfo;
-                else throw new ArgumentParseException("error.server-not-found")
+                else throw new ArgumentParseException(CommandMessages.SERVER_NOT_FOUND)
                         .arguments(Placeholder.of("server", argument));
             }
 

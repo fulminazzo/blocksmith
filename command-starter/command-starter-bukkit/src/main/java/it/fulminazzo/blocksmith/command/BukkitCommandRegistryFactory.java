@@ -38,7 +38,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
                         if (senderPlayer.canSee(player)) return player;
                     } else return player;
                 }
-                throw new ArgumentParseException("error.player-not-found")
+                throw new ArgumentParseException(CommandMessages.PLAYER_NOT_FOUND)
                         .arguments(Placeholder.of("player", argument));
             }
 
@@ -64,7 +64,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
                 String argument = visitor.getInput().getCurrent();
                 World world = server.getWorld(argument);
                 if (world != null) return world;
-                else throw new ArgumentParseException("error.world-not-found")
+                else throw new ArgumentParseException(CommandMessages.WORLD_NOT_FOUND)
                         .arguments(Placeholder.of("world", argument));
             }
 

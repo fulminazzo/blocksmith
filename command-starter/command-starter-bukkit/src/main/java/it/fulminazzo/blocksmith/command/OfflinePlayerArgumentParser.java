@@ -28,7 +28,7 @@ final class OfflinePlayerArgumentParser implements ArgumentParser<OfflinePlayer>
         String argument = visitor.getInput().getCurrent();
         if (getNames(visitor.getApplication()).stream().anyMatch(argument::equalsIgnoreCase))
             return server.getOfflinePlayer(argument);
-        else throw new ArgumentParseException("error.player-not-found")
+        else throw new ArgumentParseException(CommandMessages.PLAYER_NOT_FOUND)
                 .arguments(Placeholder.of("player", argument));
     }
 

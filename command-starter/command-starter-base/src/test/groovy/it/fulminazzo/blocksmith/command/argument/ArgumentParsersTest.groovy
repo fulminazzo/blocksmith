@@ -175,9 +175,9 @@ class ArgumentParsersTest extends Specification {
         Character | ''             || 'error.invalid-character'
         Character | 'ab'           || 'error.invalid-character'
         // ENUM
-        TimeUnit  | 'day'          || 'error.enum-not-found'
-        TimeUnit  | 'weeks'        || 'error.enum-not-found'
-        TimeUnit  | 'months'       || 'error.enum-not-found'
+        TimeUnit  | 'day'          || 'error.invalid-enum'
+        TimeUnit  | 'weeks'        || 'error.invalid-enum'
+        TimeUnit  | 'months'       || 'error.invalid-enum'
         // LOCALE
         Locale    | ''             || 'error.invalid-locale'
         Locale    | 'it'           || 'error.invalid-locale'
