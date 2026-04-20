@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * Holds all the supported argument parsers.
@@ -30,17 +29,20 @@ public final class ArgumentParsers {
 
     private static final @NotNull List<String> charactersCompletions;
 
-    private static final @NotNull List<String> localeCompletions = Arrays.stream(Locale.getAvailableLocales())
-            .filter(ArgumentParsers::isValidLocale)
-            .map(LocaleUtils::toString)
-            .distinct()
-            .collect(Collectors.toList());
+    private static final @NotNull List<String> localeCompletions;
 
     static {
         charactersCompletions = new ArrayList<>();
         for (char c = 'a'; c <= 'z'; c++) charactersCompletions.add(String.valueOf(c));
         for (char c = 'A'; c <= 'Z'; c++) charactersCompletions.add(String.valueOf(c));
         for (char c = '0'; c <= '9'; c++) charactersCompletions.add(String.valueOf(c));
+
+        localeCompletions = new ArrayList<>();
+        Arrays.stream(Locale.getAvailableLocales())
+                .filter(ArgumentParsers::isValidLocale)
+                .map(LocaleUtils::toString)
+                .distinct()
+                .forEach(localeCompletions::add);
 
         register(Byte.class, new NumberArgumentParser<>(Byte.MIN_VALUE, Byte.MAX_VALUE, Byte::valueOf));
         register(Short.class, new NumberArgumentParser<>(Short.MIN_VALUE, Short.MAX_VALUE, Short::valueOf));
@@ -107,7 +109,7 @@ public final class ArgumentParsers {
             }
 
             @Override
-            public synchronized @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
                 return localeCompletions;
             }
 
