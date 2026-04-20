@@ -20,22 +20,22 @@ public final class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
     /**
      * Instantiates a new Delegate argument parser.
      *
-     * @param delegateType the Java type of the delegate argument
      * @param converter    the function to convert the parsed object to the desired type
+     * @param delegateType the Java type of the delegate argument
      */
-    public DelegateArgumentParser(final @NotNull Class<F> delegateType,
-                                  final @NotNull Function<@Nullable F, @Nullable T> converter) {
-        this(ArgumentParsers.of(delegateType), converter);
+    public DelegateArgumentParser(final @NotNull Function<@Nullable F, @Nullable T> converter,
+                                  final @NotNull Class<F> delegateType) {
+        this(converter, ArgumentParsers.of(delegateType));
     }
 
     /**
      * Instantiates a new Delegate argument parser.
      *
-     * @param delegate  the parser delegated of parsing
      * @param converter the function to convert the parsed object to the desired type
+     * @param delegate  the parser delegated of parsing
      */
-    public DelegateArgumentParser(final @NotNull ArgumentParser<F> delegate,
-                                  final @NotNull Function<@Nullable F, @Nullable T> converter) {
+    public DelegateArgumentParser(final @NotNull Function<@Nullable F, @Nullable T> converter,
+                                  final @NotNull ArgumentParser<F> delegate) {
         this.delegate = delegate;
         this.converter = converter;
     }

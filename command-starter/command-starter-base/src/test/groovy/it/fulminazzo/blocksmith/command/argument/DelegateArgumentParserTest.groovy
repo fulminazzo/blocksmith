@@ -16,7 +16,7 @@ class DelegateArgumentParserTest extends Specification {
         }
 
         and:
-        def parser = new DelegateArgumentParser(String, (s) -> "$s")
+        def parser = new DelegateArgumentParser((s) -> "$s", String)
 
         when:
         def actual = parser.parse(visitor)
@@ -31,7 +31,7 @@ class DelegateArgumentParserTest extends Specification {
         def delegate = Mock(ArgumentParser)
 
         and:
-        def parser = new DelegateArgumentParser(delegate, (f) -> null)
+        def parser = new DelegateArgumentParser((f) -> null, delegate)
 
         and:
         def visitor = Mock(Visitor)
