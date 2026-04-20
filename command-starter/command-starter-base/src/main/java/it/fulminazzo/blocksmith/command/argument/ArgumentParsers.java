@@ -11,7 +11,6 @@ import it.fulminazzo.blocksmith.reflect.ReflectException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -125,14 +124,14 @@ public final class ArgumentParsers {
             private final @NotNull ArgumentParser<Double> valueParser = of(Double.class);
 
             @Override
-            public @Nullable Coordinate parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+            public @NotNull Coordinate parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
                 final CommandInput input = visitor.getInput();
                 String rawArgument = input.getCurrent();
-                boolean isRelative = rawArgument.startsWith(Coordinate.RELATIVE_IDENTIFIER);
-                if (isRelative) input.setCurrent(rawArgument.substring(Coordinate.RELATIVE_IDENTIFIER.length()));
-                Double value = valueParser.parse(visitor);
-                if (value == null) return null;
-                else return new Coordinate(value, isRelative);
+                final String relativeIdentifier = Coordinate.RELATIVE_IDENTIFIER;
+                boolean isRelative = rawArgument.startsWith(relativeIdentifier);
+                if (isRelative) input.setCurrent(rawArgument.substring(relativeIdentifier.length()));
+                double value = Objects.requireNonNull(valueParser.parse(visitor));
+                return new Coordinate(value, isRelative);
             }
 
             @Override
