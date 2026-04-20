@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * A special {@link ArgumentParser} that delegates the parsing to another parser.
@@ -15,7 +15,7 @@ import java.util.function.Function;
  */
 public final class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
     private final @NotNull ArgumentParser<F> delegate;
-    private final @NotNull Function<@Nullable F, @Nullable T> converter;
+    private final @NotNull BiFunction<@NotNull Visitor<?, ?>, @Nullable F, @Nullable T> converter;
 
     /**
      * Instantiates a new Delegate argument parser.
@@ -23,7 +23,7 @@ public final class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
      * @param converter    the function to convert the parsed object to the desired type
      * @param delegateType the Java type of the delegate argument
      */
-    public DelegateArgumentParser(final @NotNull Function<@Nullable F, @Nullable T> converter,
+    public DelegateArgumentParser(final @NotNull BiFunction<@NotNull Visitor<?, ?>, @Nullable F, @Nullable T> converter,
                                   final @NotNull Class<F> delegateType) {
         this(converter, ArgumentParsers.of(delegateType));
     }
@@ -34,7 +34,7 @@ public final class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
      * @param converter the function to convert the parsed object to the desired type
      * @param delegate  the parser delegated of parsing
      */
-    public DelegateArgumentParser(final @NotNull Function<@Nullable F, @Nullable T> converter,
+    public DelegateArgumentParser(final @NotNull BiFunction<@NotNull Visitor<?, ?>, @Nullable F, @Nullable T> converter,
                                   final @NotNull ArgumentParser<F> delegate) {
         this.delegate = delegate;
         this.converter = converter;
@@ -42,7 +42,7 @@ public final class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
 
     @Override
     public @Nullable T parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
-        return converter.apply(delegate.parse(visitor));
+        return converter.apply(visitor, delegate.parse(visitor));
     }
 
     @Override
