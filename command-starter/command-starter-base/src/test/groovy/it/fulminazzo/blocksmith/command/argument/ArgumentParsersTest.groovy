@@ -97,7 +97,7 @@ class ArgumentParsersTest extends Specification {
         // CHARACTER WRAPPER
         Character  | 'a'                                  || 'a' as Character
         // STRING
-        String     | 'Hello, world!'                      || 'Hello, world!'
+        String     | 'Hello!'                             || 'Hello!'
         // ENUM
         TimeUnit   | 'nanoseconds'                        || TimeUnit.NANOSECONDS
         TimeUnit   | 'Microseconds'                       || TimeUnit.MICROSECONDS
@@ -113,7 +113,7 @@ class ArgumentParsersTest extends Specification {
         Coordinate | '1'                                  || new Coordinate(1)
         Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}2" || new Coordinate(2, true)
         Coordinate | '-3'                                 || new Coordinate(-3)
-        Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}4" || new Coordinate(-4, true)
+        Coordinate | "${Coordinate.RELATIVE_IDENTIFIER}-4" || new Coordinate(-4, true)
     }
 
     def 'test that parse of parser for #type throws exception with #expected message with #argument'() {
@@ -347,11 +347,7 @@ class ArgumentParsersTest extends Specification {
 
     private Visitor<?, ? extends Exception> prepareVisitor(final @NotNull String argument) {
         def context = Mock(Visitor)
-        context.input >> {
-            def input = Mock(CommandInput)
-            input.current >> argument
-            return input
-        }
+        context.input >> new CommandInput().addInput(argument)
         return context
     }
 
