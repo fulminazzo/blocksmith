@@ -108,7 +108,7 @@ public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExec
             if (child == null) {
                 if (node.isExecutable()) return handleExecution(node);
                 else throw new CommandExecutionException(CommandMessages.COMMAND_NOT_FOUND)
-                        .arguments(Placeholder.of("argument", current));
+                        .arguments(Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, current));
             } else return child.accept(this);
         }
     }

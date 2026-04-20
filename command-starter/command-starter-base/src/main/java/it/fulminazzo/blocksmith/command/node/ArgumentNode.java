@@ -79,7 +79,7 @@ public class ArgumentNode<T> extends CommandNode {
             if (completions.stream().noneMatch(c -> c.equalsIgnoreCase(current)))
                 throw new ArgumentParseException(CommandMessages.UNRECOGNIZED_ARGOMENT)
                         .arguments(
-                                Placeholder.of("argument", current),
+                                Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, current),
                                 Placeholder.of("expected", String.join(", ", completions))
                         );
         }

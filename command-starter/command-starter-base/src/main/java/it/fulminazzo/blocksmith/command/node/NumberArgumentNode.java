@@ -7,6 +7,7 @@ import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.validation.ValidationException;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +23,7 @@ import java.util.List;
  */
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@EqualsAndHashCode(callSuper = true)
 public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> {
     double min;
     double max;
@@ -87,7 +89,7 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
         if (value < min || value > max)
             throw new ArgumentParseException(CommandMessages.INVALID_NUMBER)
                     .arguments(
-                            Placeholder.of("argument", visitor.getInput().getCurrent()),
+                            Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, visitor.getInput().getCurrent()),
                             Placeholder.of("min", Reflect.on(min).cast(getType())),
                             Placeholder.of("max", Reflect.on(max).cast(getType()))
                     );

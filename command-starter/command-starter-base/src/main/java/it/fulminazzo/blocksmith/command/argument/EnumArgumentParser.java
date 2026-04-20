@@ -37,7 +37,7 @@ final class EnumArgumentParser<E extends Enum<E>> implements ArgumentParser<E> {
         if (value == null)
             throw new ArgumentParseException(CommandMessages.INVALID_ENUM)
                     .arguments(
-                            Placeholder.of("argument", rawArgument),
+                            Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, rawArgument),
                             Placeholder.of("name", enumTypeName)
                     );
         else return value;

@@ -35,7 +35,7 @@ public final class CommandMessages {
      * <br>
      * Placeholders:
      * <ul>
-     *     <li><b>argument</b>: the unrecognized command.</li>
+     *     <li>{@link #ARGUMENT_PLACEHOLDER}: the unrecognized command.</li>
      * </ul>
      */
     public static final @NotNull String COMMAND_NOT_FOUND = "error.command-not-found";
@@ -90,7 +90,7 @@ public final class CommandMessages {
      * <br>
      * Placeholders:
      * <ul>
-     *     <li><b>argument</b>: the given invalid value;</li>
+     *     <li>{@link #ARGUMENT_PLACEHOLDER}: the given invalid value;</li>
      *     <li><b>min</b>: the minimum allowed value;</li>
      *     <li><b>max</b>: the maximum allowed value.</li>
      * </ul>
@@ -102,7 +102,7 @@ public final class CommandMessages {
      * <br>
      * Placeholders:
      * <ul>
-     *     <li><b>argument</b>: the given invalid value.</li>
+     *     <li>{@link #ARGUMENT_PLACEHOLDER}: the given invalid value.</li>
      * </ul>
      */
     public static final @NotNull String INVALID_CHARACTER = "error.invalid-character";
@@ -112,7 +112,7 @@ public final class CommandMessages {
      * <br>
      * Placeholders:
      * <ul>
-     *     <li><b>argument</b>: the given invalid value.</li>
+     *     <li>{@link #ARGUMENT_PLACEHOLDER}: the given invalid value.</li>
      * </ul>
      */
     public static final @NotNull String INVALID_BOOLEAN = "error.invalid-boolean";
@@ -122,7 +122,7 @@ public final class CommandMessages {
      * <br>
      * Placeholders:
      * <ul>
-     *     <li><b>argument</b>: the given invalid value.</li>
+     *     <li>{@link #ARGUMENT_PLACEHOLDER}: the given invalid value.</li>
      * </ul>
      */
     public static final @NotNull String INVALID_LOCALE = "error.invalid-locale";
@@ -132,7 +132,7 @@ public final class CommandMessages {
      * <br>
      * Placeholders:
      * <ul>
-     *     <li><b>argument</b>: the given invalid value.</li>
+     *     <li>{@link #ARGUMENT_PLACEHOLDER}: the given invalid value.</li>
      * </ul>
      */
     public static final @NotNull String INVALID_ENUM = "error.invalid-enum";
@@ -150,7 +150,7 @@ public final class CommandMessages {
      * <br>
      * Placeholders:
      * <ul>
-     *     <li><b>argument</b>: the given invalid value;</li>
+     *     <li>{@link #ARGUMENT_PLACEHOLDER}: the given invalid value;</li>
      *     <li><b>expected</b>: the expected values (specified through the annotation).</li>
      * </ul>
      */
@@ -226,5 +226,11 @@ public final class CommandMessages {
      * </ul>
      */
     public static final @NotNull String INTERNAL_ERROR = "error.internal-error";
+
+
+    /**
+     * The placeholder used throughout the messages to replace the current argument.
+     */
+    public static final @NotNull String ARGUMENT_PLACEHOLDER = "argument";
 
 }

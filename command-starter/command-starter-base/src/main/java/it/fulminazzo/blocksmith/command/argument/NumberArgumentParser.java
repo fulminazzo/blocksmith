@@ -32,7 +32,7 @@ public final class NumberArgumentParser<N extends Number> implements ArgumentPar
         } catch (NumberFormatException e) {
             throw new ArgumentParseException(CommandMessages.INVALID_NUMBER)
                     .arguments(
-                            Placeholder.of("argument", rawArgument),
+                            Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, rawArgument),
                             Placeholder.of("min", min),
                             Placeholder.of("max", max)
                     );

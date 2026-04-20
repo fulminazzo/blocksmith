@@ -60,7 +60,7 @@ public final class ArgumentParsers {
                 else if (rawArgument.equalsIgnoreCase(FALSE)) return false;
                 else
                     throw new ArgumentParseException(CommandMessages.INVALID_BOOLEAN)
-                            .arguments(Placeholder.of("argument", rawArgument));
+                            .arguments(Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, rawArgument));
             }
 
             @Override
@@ -77,7 +77,7 @@ public final class ArgumentParsers {
                 if (rawArgument.length() == 1) return rawArgument.charAt(0);
                 else
                     throw new ArgumentParseException(CommandMessages.INVALID_CHARACTER)
-                            .arguments(Placeholder.of("argument", rawArgument));
+                            .arguments(Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, rawArgument));
             }
 
             @Override
@@ -108,7 +108,7 @@ public final class ArgumentParsers {
                 Locale locale = LocaleUtils.fromString(argument);
                 if (ArgumentParsers.isValidLocale(locale)) return locale;
                 else throw new ArgumentParseException(CommandMessages.INVALID_LOCALE)
-                        .arguments(Placeholder.of("argument", argument));
+                        .arguments(Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, argument));
             }
 
             @Override
@@ -132,12 +132,11 @@ public final class ArgumentParsers {
         if (Enum.class.isAssignableFrom(type))
             return (ArgumentParser<T>) parsers.computeIfAbsent(type, t -> new EnumArgumentParser<>((Class) t));
         ArgumentParser<?> parser = parsers.get(Reflect.toWrapper(type));
-        if (parser == null)
-            throw new IllegalArgumentException(ReflectException.formatMessage(
-                    "No default Argument parser supports the type %s. Please provide a custom parser through %s#register",
-                    type, ArgumentParsers.class
-            ));
-        return (ArgumentParser<T>) parser;
+        if (parser != null) return (ArgumentParser<T>) parser;
+        else throw new IllegalArgumentException(ReflectException.formatMessage(
+                "No default Argument parser supports the type %s. Please provide a custom parser through %s#register",
+                type, ArgumentParsers.class
+        ));
     }
 
     /**
