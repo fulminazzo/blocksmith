@@ -1,19 +1,18 @@
 package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.ApplicationHandle;
-import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
-import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
-import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
-import it.fulminazzo.blocksmith.command.argument.MultiArgumentParser;
+import it.fulminazzo.blocksmith.command.argument.*;
+import it.fulminazzo.blocksmith.command.argument.dto.Coordinate;
+import it.fulminazzo.blocksmith.command.argument.dto.Position;
+import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.conversion.Convertible;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Server;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -75,10 +74,32 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             }
 
         });
-        ArgumentParsers.register(Location.class, new MultiArgumentParser<>(
-                l -> new Location(null, (double) l.get(0), (double) l.get(1), (double) l.get(2)),
-                Double.class, Double.class, Double.class
+        ArgumentParsers.register(WorldPosition.class, new MultiArgumentParser<>(
+                l -> {
+                    World world = (World) l.get(0);
+                    Position position = (Position) l.get(1);
+                    return new WorldPosition(world.getName(), position.getX(), position.getY(), position.getZ());
+                },
+                World.class, Position.class
         ));
+        ArgumentParsers.register(Location.class, new DelegateArgumentParser<>(
+                (v, p) -> p.as(Location.class, v.getCommandSender()),
+                WorldPosition.class
+        ));
+
+        Convertible.register(Position.class, Location.class, (p, a) -> {
+            Location start = new Location(null, 0, 0, 0);
+            List<World> worlds = Bukkit.getWorlds();
+            if (!worlds.isEmpty()) start = worlds.get(0).getSpawnLocation();
+            start = getStartLocation(start, a);
+            return buildLocation(null, p.getX(), p.getY(), p.getZ(), start);
+        });
+        Convertible.register(WorldPosition.class, Location.class, (p, a) -> {
+            World world = Bukkit.getWorld(p.getWorld());
+            Location start = world.getSpawnLocation();
+            start = getStartLocation(start, a);
+            return buildLocation(world, p.getX(), p.getY(), p.getZ(), start);
+        });
     }
 
     @Override
@@ -87,6 +108,30 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
                 .map(d -> new BrigadierBukkitCommandRegistry<>(application, d))
                 .map(r -> (CommandRegistry) r)
                 .orElse(new BukkitCommandRegistry(application));
+    }
+
+    private static Location buildLocation(final @Nullable World world,
+                                          final @NotNull Coordinate x,
+                                          final @NotNull Coordinate y,
+                                          final @NotNull Coordinate z,
+                                          final @NotNull Location start) {
+        return new Location(
+                world,
+                (x.isRelative() ? start.getX() : 0) + x.getValue(),
+                (y.isRelative() ? start.getY() : 0) + y.getValue(),
+                (z.isRelative() ? start.getZ() : 0) + z.getValue()
+        );
+    }
+
+    private static Location getStartLocation(final @NotNull Location start, final @Nullable Object @NotNull ... args) {
+        if (args.length > 0 && args[0] instanceof CommandSenderWrapper<?>) {
+            CommandSenderWrapper<?> sender = (CommandSenderWrapper<?>) args[0];
+            if (sender.isPlayer()) {
+                Player player = (Player) sender.getActualSender();
+                return player.getLocation();
+            }
+        }
+        return start;
     }
 
 }

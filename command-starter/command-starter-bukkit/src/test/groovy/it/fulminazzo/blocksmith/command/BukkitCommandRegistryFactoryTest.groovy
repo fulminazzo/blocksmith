@@ -157,22 +157,21 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         actual == expected(application)
 
         where:
-        type          | argument       || expected
+        type          | argument         || expected
         // PLAYER
-        Player        | 'Alex'         || { a -> a.server().getPlayer('Alex') }
-        Player        | 'Camilla'      || { a -> a.server().getPlayer('Camilla') }
+        Player        | 'Alex'           || { a -> a.server().getPlayer('Alex') }
+        Player        | 'Camilla'        || { a -> a.server().getPlayer('Camilla') }
         // OFFLINE PLAYER
-        OfflinePlayer | 'Alex'         || { a -> a.server().getOfflinePlayer('Alex') }
-        OfflinePlayer | 'Camilla'      || { a -> a.server().getOfflinePlayer('Camilla') }
-        OfflinePlayer | 'Steve'        || { a -> a.server().getOfflinePlayer('Steve') }
-        OfflinePlayer | 'Michael'      || { a -> a.server().getOfflinePlayer('Michael') }
+        OfflinePlayer | 'Alex'           || { a -> a.server().getOfflinePlayer('Alex') }
+        OfflinePlayer | 'Camilla'        || { a -> a.server().getOfflinePlayer('Camilla') }
+        OfflinePlayer | 'Steve'          || { a -> a.server().getOfflinePlayer('Steve') }
+        OfflinePlayer | 'Michael'        || { a -> a.server().getOfflinePlayer('Michael') }
         // WORLD
-        World         | 'world'        || { a -> a.server().getWorld('world') }
-        World         | 'world_nether' || { a -> a.server().getWorld('world_nether') }
+        World         | 'world'          || { a -> a.server().getWorld('world') }
+        World         | 'world_nether'   || { a -> a.server().getWorld('world_nether') }
         // LOCATION
-        Location      | '1 2 3'        || { a -> new Location(null, 1, 2, 3) }
-        //TODO: re-introduce
-//        Location      | '~ ~2 ~-3'     || { a -> new Location(null, 1, 2, 3) }
+        Location      | 'world 1 2 -3'   || { a -> new Location(a.server().getWorld('world'), 1, 2, -3) }
+        Location      | 'world ~ ~2 ~-3' || { a -> new Location(a.server().getWorld('world'), 1, 2, -3) }
     }
 
     def 'test that parse of parser for #type throws exception with #expected message with #argument'() {
@@ -202,14 +201,6 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         World         | 'm'             || 'error.world-not-found'
         World         | 'M'             || 'error.world-not-found'
         World         | 'world_the_end' || 'error.world-not-found'
-        // LOCATION
-        Location      | ''              || 'error.invalid-number'
-        Location      | '1'             || 'error.not-enough-arguments'
-        Location      | '1 2'           || 'error.not-enough-arguments'
-        Location      | '1 2 a'         || 'error.invalid-number'
-        //TODO: re-introduce
-//        Location      | '~ ~2 a'        || 'error.invalid-number'
-        Location      | 'a'             || 'error.invalid-number'
     }
 
     def 'test that completions of parser for #type return #expected with #argument'() {
@@ -224,40 +215,41 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         actual.sort() == expected.sort()
 
         where:
-        type          | argument        || expected
+        type          | argument         || expected
         // PLAYER
-        Player        | ''              || ['Alex', 'Camilla']
-        Player        | 'A'             || ['Alex', 'Camilla']
-        Player        | 'Alex'          || ['Alex', 'Camilla']
-        Player        | 'C'             || ['Alex', 'Camilla']
-        Player        | 'Camilla'       || ['Alex', 'Camilla']
-        Player        | 'c'             || ['Alex', 'Camilla']
-        Player        | 'steve'         || ['Alex', 'Camilla']
+        Player        | ''               || ['Alex', 'Camilla']
+        Player        | 'A'              || ['Alex', 'Camilla']
+        Player        | 'Alex'           || ['Alex', 'Camilla']
+        Player        | 'C'              || ['Alex', 'Camilla']
+        Player        | 'Camilla'        || ['Alex', 'Camilla']
+        Player        | 'c'              || ['Alex', 'Camilla']
+        Player        | 'steve'          || ['Alex', 'Camilla']
         // OFFLINE PLAYER
-        OfflinePlayer | ''              || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer | 'A'             || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer | 'Alex'          || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer | 'C'             || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer | 'Camilla'       || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer | 'c'             || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer | 'steve'         || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer | 'Jake'          || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer | ''               || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer | 'A'              || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer | 'Alex'           || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer | 'C'              || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer | 'Camilla'        || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer | 'c'              || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer | 'steve'          || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer | 'Jake'           || ['Alex', 'Camilla', 'Steve', 'Michael']
         // WORLD
-        World         | ''              || ['world', 'world_nether']
-        World         | 'l'             || ['world', 'world_nether']
-        World         | 'world'         || ['world', 'world_nether']
-        World         | 'm'             || ['world', 'world_nether']
-        World         | 'world_nether'  || ['world', 'world_nether']
-        World         | 'M'             || ['world', 'world_nether']
-        World         | 'world_the_end' || ['world', 'world_nether']
+        World         | ''               || ['world', 'world_nether']
+        World         | 'l'              || ['world', 'world_nether']
+        World         | 'world'          || ['world', 'world_nether']
+        World         | 'm'              || ['world', 'world_nether']
+        World         | 'world_nether'   || ['world', 'world_nether']
+        World         | 'M'              || ['world', 'world_nether']
+        World         | 'world_the_end'  || ['world', 'world_nether']
         // LOCATION
-        Location      | ''              || (0..9).collect { "$it" }
-        Location      | '1'             || (0..9).collect { "1$it" }
-        Location      | '1 2'           || (0..9).collect { "2$it" }
-        Location      | '1 2 3'         || (0..9).collect { "3$it" }
-        //TODO: re-introduce
-//        Location      | '~ ~2 ~-3'      || ['<x> <y> <z>']
-        Location      | 'a'             || []
+        Location      | ''               || ['world', 'world_nether']
+        Location      | 'world'          || ['world', 'world_nether']
+        Location      | 'world '         || (0..9).collect { "$it" }
+        Location      | 'world 1'        || (0..9).collect { "1$it" }
+        Location      | 'world 1 2'      || (0..9).collect { "2$it" }
+        Location      | 'world 1 2 3'    || (0..9).collect { "3$it" }
+        Location      | 'world ~ ~2 ~-3' || (0..9).collect { "~-3$it" }
+        Location      | 'world a'        || []
     }
 
     private Visitor<?, ? extends Exception> newVisitor(final CommandSender sender) {
