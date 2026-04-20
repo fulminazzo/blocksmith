@@ -9,6 +9,7 @@ import com.mojang.brigadier.tree.RootCommandNode;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.reflect.Reflect;
+import it.fulminazzo.blocksmith.reflect.ReflectException;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -150,7 +151,7 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
             Constructor<?> constructor = positionArgumentType.getDeclaredConstructor();
             return (ArgumentType<?>) constructor.newInstance();
         } catch (Exception e) {
-            throw new RuntimeException(String.format("Could not create Position %s", ArgumentType.class.getSimpleName()), e);
+            throw new ReflectException(e, "Could not create Position %s", ArgumentType.class.getSimpleName());
         }
     }
 
