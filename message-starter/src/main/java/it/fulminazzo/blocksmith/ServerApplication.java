@@ -1,12 +1,13 @@
 package it.fulminazzo.blocksmith;
 
+import it.fulminazzo.blocksmith.conversion.Convertible;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 /**
  * Identifies an application bound to a server.
  */
-public interface ServerApplication {
+public interface ServerApplication extends Convertible {
 
     /**
      * Gets the server that the application is running on.
@@ -15,15 +16,6 @@ public interface ServerApplication {
      * @return the server
      */
     <S> @NotNull S server();
-
-    /**
-     * Returns the application as an instance of the given type.
-     *
-     * @param <T>  the type of the cast
-     * @param type the type
-     * @return the cast application
-     */
-    <T> @NotNull T as(final @NotNull Class<T> type);
 
     /**
      * Gets the logger associated with the application.
