@@ -217,7 +217,7 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         def parser = ArgumentParsers.of(type)
 
         when:
-        visitor.input.addInput(argument.split(' '))
+        visitor.input.addInput(argument)
         def actual = parser.getCompletions(visitor)
 
         then:
@@ -253,7 +253,7 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         // LOCATION
         Location      | ''               || ['world', 'world_nether']
         Location      | 'world'          || ['world', 'world_nether']
-        Location      | 'world '         || (0..9).collect { "1$it" }
+        Location      | 'world '         || [Coordinate.RELATIVE_IDENTIFIER]
         Location      | 'world 1'        || (0..9).collect { "1$it" }
         Location      | 'world 1 2'      || (0..9).collect { "2$it" }
         Location      | 'world 1 2 3'    || (0..9).collect { "3$it" }
