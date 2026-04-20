@@ -144,7 +144,7 @@ public final class ArgumentParsers {
                 final CommandInput input = visitor.getInput();
                 final String current = input.getCurrent();
                 final String relativeIdentifier = Coordinate.RELATIVE_IDENTIFIER;
-                if (current.isEmpty()) return List.of(relativeIdentifier);
+                if (current.isEmpty()) return Collections.singletonList(relativeIdentifier);
                 if (current.startsWith(relativeIdentifier)) {
                     input.setCurrent(current.substring(relativeIdentifier.length()));
                     List<String> completions = valueParser.getCompletions(visitor);
