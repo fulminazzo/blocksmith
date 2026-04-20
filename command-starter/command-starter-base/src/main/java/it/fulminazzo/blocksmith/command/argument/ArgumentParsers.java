@@ -1,6 +1,8 @@
 package it.fulminazzo.blocksmith.command.argument;
 
 import it.fulminazzo.blocksmith.command.CommandMessages;
+import it.fulminazzo.blocksmith.command.argument.dto.Coordinate;
+import it.fulminazzo.blocksmith.command.visitor.CommandInput;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.util.LocaleUtils;
@@ -9,9 +11,11 @@ import it.fulminazzo.blocksmith.reflect.ReflectException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Holds all the supported argument parsers.
@@ -114,6 +118,39 @@ public final class ArgumentParsers {
             @Override
             public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
                 return localeCompletions;
+            }
+
+        });
+        register(Coordinate.class, new ArgumentParser<>() {
+            private final @NotNull ArgumentParser<Double> valueParser = of(Double.class);
+
+            @Override
+            public @Nullable Coordinate parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+                final CommandInput input = visitor.getInput();
+                String rawArgument = input.getCurrent();
+                boolean isRelative = rawArgument.startsWith(Coordinate.RELATIVE_IDENTIFIER);
+                if (isRelative) input.setCurrent(rawArgument.substring(Coordinate.RELATIVE_IDENTIFIER.length()));
+                Double value = valueParser.parse(visitor);
+                if (value == null) return null;
+                else return new Coordinate(value, isRelative);
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+                final CommandInput input = visitor.getInput();
+                final String current = input.getCurrent();
+                final String relativeIdentifier = Coordinate.RELATIVE_IDENTIFIER;
+                if (current.isEmpty()) return List.of(relativeIdentifier);
+                if (current.startsWith(relativeIdentifier)) {
+                    input.setCurrent(current.substring(relativeIdentifier.length()));
+                    List<String> completions = valueParser.getCompletions(visitor);
+                    input.setCurrent(current);
+                    return completions.isEmpty()
+                            ? completions
+                            : completions.stream()
+                              .map(c -> relativeIdentifier + c)
+                              .collect(Collectors.toList());
+                } else return valueParser.getCompletions(visitor);
             }
 
         });
