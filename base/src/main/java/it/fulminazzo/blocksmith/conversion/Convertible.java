@@ -16,6 +16,8 @@ public interface Convertible {
      *
      * @param <T>  the type to convert to
      * @param type the type to convert to
+     * @param args any argument that might be useful for the conversion.
+     *             Converters should <b>not</b> always assume the presence of these arguments.
      * @return the converted object
      */
     @SuppressWarnings("unchecked")
