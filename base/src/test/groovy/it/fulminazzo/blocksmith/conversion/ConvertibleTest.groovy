@@ -18,7 +18,7 @@ class ConvertibleTest extends Specification {
 
     def 'step 2: test that convert with converter returns correct result'() {
         given:
-        Convertible.register(Person, String, (a, p) -> p.toString())
+        Convertible.register(Person, String, (p, a) -> p.toString())
 
         when:
         def actual = convertible.as(String)
