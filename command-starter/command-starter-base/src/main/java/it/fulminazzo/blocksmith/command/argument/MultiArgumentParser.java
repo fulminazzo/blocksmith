@@ -87,7 +87,8 @@ public class MultiArgumentParser<T> implements ArgumentParser<T> {
         final CommandInput input = visitor.getInput();
         for (int i = 0; i < parsers.size(); i++) {
             ArgumentParser<?> parser = parsers.get(i);
-            if (input.isLast()) return parser.getCompletions(visitor);
+            if (input.isLast() || parser instanceof MultiArgumentParser<?>)
+                return parser.getCompletions(visitor);
             try {
                 parser.parse(visitor);
             } catch (ArgumentParseException e) {
