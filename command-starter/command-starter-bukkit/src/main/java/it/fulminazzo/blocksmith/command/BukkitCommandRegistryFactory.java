@@ -124,12 +124,18 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
     }
 
     private static Location getStartLocation(final @NotNull Location start, final @Nullable Object @NotNull ... args) {
-        if (args.length > 0 && args[0] instanceof CommandSenderWrapper<?>) {
-            CommandSenderWrapper<?> sender = (CommandSenderWrapper<?>) args[0];
-            if (sender.isPlayer()) {
-                Player player = (Player) sender.getActualSender();
-                return player.getLocation();
-            }
+        if (args.length > 0) {
+            Object arg = args[0];
+            if (arg instanceof CommandSenderWrapper<?>) {
+                CommandSenderWrapper<?> sender = (CommandSenderWrapper<?>) arg;
+                if (sender.isPlayer()) {
+                    Player player = (Player) sender.getActualSender();
+                    return player.getLocation();
+                }
+            } else if (arg instanceof Location) return (Location) arg;
+            else if (arg instanceof World) return ((World) arg).getSpawnLocation();
+            else if (arg instanceof String) return Bukkit.getWorld((String) arg).getSpawnLocation();
+            else if (arg instanceof Player) return ((Player) arg).getLocation();
         }
         return start;
     }
