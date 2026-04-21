@@ -279,58 +279,110 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         actual == expected(application)
 
         where:
-        position                         | sender                                || expected
+        position                         | sender                                                       || expected
         new Position(
                 new Coordinate(1),
                 new Coordinate(2, true),
                 new Coordinate(-3, true)
-        )                                | null                                  ||
+        )                                | null                                                         ||
                 { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
         new Position(
                 new Coordinate(1),
                 new Coordinate(2, true),
                 new Coordinate(-3, true)
-        )                                | { a -> 'invalid' }                    ||
+        )                                | { a -> 'world' }                                             ||
                 { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
         new Position(
                 new Coordinate(1),
                 new Coordinate(2, true),
                 new Coordinate(-3, true)
-        )                                | { a -> a.server().consoleSender }     ||
+        )                                | { a -> a.server().getWorld('world') }                        ||
                 { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
         new Position(
                 new Coordinate(1),
                 new Coordinate(2, true),
                 new Coordinate(-3, true)
-        )                                | { a -> a.server().getPlayer('Alex') } ||
+        )                                | { a -> a.server().getPlayer('Alex') }                        ||
+                { a -> new Location(a.server().getWorld('world'), 1.0, 2.0, 3.0) }
+        new Position(
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> new Location(a.server().getWorld('world'), 2, 3, 4) } ||
+                { a -> new Location(a.server().getWorld('world'), 1.0, 5.0, 1.0) }
+        new Position(
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> new Object() }                                        ||
+                { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
+        new Position(
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> a.server().consoleSender }                            ||
+                { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
+        new Position(
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> a.server().getPlayer('Alex') }                        ||
                 { a -> new Location(a.server().getWorld('world'), 1, 2, 3) }
         new WorldPosition(
                 'world',
                 new Coordinate(1),
                 new Coordinate(2, true),
                 new Coordinate(-3, true)
-        )                                | null                                  ||
+        )                                | null                                                         ||
                 { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
         new WorldPosition(
                 'world',
                 new Coordinate(1),
                 new Coordinate(2, true),
                 new Coordinate(-3, true)
-        )                                | { a -> 'invalid' }                    ||
+        )                                | { a -> 'world' }                                             ||
                 { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
         new WorldPosition(
                 'world',
                 new Coordinate(1),
                 new Coordinate(2, true),
                 new Coordinate(-3, true)
-        )                                | { a -> a.server().consoleSender }     ||
+        )                                | { a -> a.server().getWorld('world') }                        ||
                 { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
         new WorldPosition(
                 'world',
                 new Coordinate(1),
                 new Coordinate(2, true),
                 new Coordinate(-3, true)
-        )                                | { a -> a.server().getPlayer('Alex') } ||
+        )                                | { a -> a.server().getPlayer('Alex') }                        ||
+                { a -> new Location(a.server().getWorld('world'), 1.0, 2.0, 3.0) }
+        new WorldPosition(
+                'world',
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> new Location(a.server().getWorld('world'), 2, 3, 4) } ||
+                { a -> new Location(a.server().getWorld('world'), 1.0, 5.0, 1.0) }
+        new WorldPosition(
+                'world',
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> new Object() }                                        ||
+                { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
+        new WorldPosition(
+                'world',
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> a.server().consoleSender }                            ||
+                { a -> new Location(a.server().getWorld('world'), 1, 7.0, -3) }
+        new WorldPosition(
+                'world',
+                new Coordinate(1),
+                new Coordinate(2, true),
+                new Coordinate(-3, true)
+        )                                | { a -> a.server().getPlayer('Alex') }                        ||
                 { a -> new Location(a.server().getWorld('world'), 1, 2, 3) }
     }
 

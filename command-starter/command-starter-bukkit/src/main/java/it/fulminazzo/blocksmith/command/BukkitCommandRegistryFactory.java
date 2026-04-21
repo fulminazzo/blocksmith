@@ -123,7 +123,8 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
         );
     }
 
-    private static Location getStartLocation(final @NotNull Location start, final @Nullable Object @NotNull ... args) {
+    private static @NotNull Location getStartLocation(final @NotNull Location start,
+                                                      final @Nullable Object @NotNull ... args) {
         if (args.length > 0) {
             Object arg = args[0];
             if (arg instanceof CommandSenderWrapper<?>) {
