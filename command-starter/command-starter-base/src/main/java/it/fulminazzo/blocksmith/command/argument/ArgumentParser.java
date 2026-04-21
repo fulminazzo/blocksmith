@@ -21,6 +21,7 @@ public interface ArgumentParser<T> extends TabCompletable {
     default boolean tryAdvanceCursor(final @NotNull Visitor<?, ?> visitor) {
         try {
             parse(visitor);
+            visitor.getInput().advanceCursor();
             return true;
         } catch (ArgumentParseException e) {
             return false;
