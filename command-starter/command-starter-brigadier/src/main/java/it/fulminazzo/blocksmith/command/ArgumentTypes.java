@@ -1,6 +1,8 @@
 package it.fulminazzo.blocksmith.command;
 
-import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -18,12 +20,6 @@ public final class ArgumentTypes {
     private static final @NotNull Map<Class<?>, ArgumentType<?>> converters = new ConcurrentHashMap<>();
 
     static {
-        register(Byte.class, IntegerArgumentType.integer(Byte.MIN_VALUE, Byte.MAX_VALUE));
-        register(Short.class, IntegerArgumentType.integer(Short.MIN_VALUE, Short.MAX_VALUE));
-        register(Integer.class, IntegerArgumentType.integer());
-        register(Long.class, LongArgumentType.longArg());
-        register(Float.class, FloatArgumentType.floatArg());
-        register(Double.class, DoubleArgumentType.doubleArg());
         register(Boolean.class, BoolArgumentType.bool());
         register(String.class, StringArgumentType.string());
     }
