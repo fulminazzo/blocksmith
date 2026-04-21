@@ -3,14 +3,10 @@ package it.fulminazzo.blocksmith.command.argument;
 import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.visitor.CommandInput;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -30,9 +26,8 @@ import java.util.stream.Stream;
  *
  * @param <T> the type of the Java object
  */
-public class MultiArgumentParser<T> implements ArgumentParser<T> {
+public class MultiArgumentParser<T> implements ArgumentParser<T>, Iterable<ArgumentParser<?>> {
     protected final @NotNull Function<@NotNull List<Object>, @Nullable T> constructor;
-    @Getter
     protected final @NotNull List<@NotNull ArgumentParser<?>> parsers;
 
     /**
@@ -111,6 +106,11 @@ public class MultiArgumentParser<T> implements ArgumentParser<T> {
             if (i != parsers.size() - 1) input.advanceCursor();
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public @NotNull Iterator<ArgumentParser<?>> iterator() {
+        return parsers.iterator();
     }
 
 }
