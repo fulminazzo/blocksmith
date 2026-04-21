@@ -9,6 +9,10 @@ import com.mojang.brigadier.tree.ArgumentCommandNode
 import com.mojang.brigadier.tree.LiteralCommandNode
 import it.fulminazzo.blocksmith.command.annotation.Confirm
 import it.fulminazzo.blocksmith.command.annotation.Permission
+import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
+import it.fulminazzo.blocksmith.command.argument.DelegateArgumentParser
+import it.fulminazzo.blocksmith.command.argument.MultiArgumentParser
+import it.fulminazzo.blocksmith.command.argument.dto.Position
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier
@@ -169,6 +173,33 @@ class BrigadierParserTest extends Specification {
         (child.type instanceof BoolArgumentType)
     }
 
+    def 'test parseChild of MultiArgumentParser argument type'() {
+        given:
+        def delegate = Mock(CommandRegistry)
+        def node = newArgumentNode('argument', Position)
+
+        and:
+        def builder = LiteralArgumentBuilder.literal('sentinel')
+
+        and:
+        def parser = new BrigadierParser(delegate)
+
+        when:
+        parser.parseChild(new LiteralNode('sentinel'), builder, node)
+
+        and:
+        def arguments = builder.arguments
+
+        then:
+        arguments.size() == 1
+
+        and:
+        def argument = arguments[0]
+        (argument instanceof ArgumentCommandNode)
+        argument.name == 'argument'
+        (argument.type instanceof StringArgumentType)
+    }
+
     def 'test parseChild of unknown argument type'() {
         given:
         def delegate = Mock(CommandRegistry)
@@ -271,6 +302,124 @@ class BrigadierParserTest extends Specification {
                 'Hello, world! How are you?',
                 '/Hello, world! How are you?'
         ]
+    }
+
+    def 'test that generateArgumentNodeBuilder of DelegateArgumentParser delegates to internal parser'() {
+        given:
+        def delegate = Mock(CommandRegistry)
+
+        and:
+        def root = Mock(LiteralNode)
+        def node = Mock(ArgumentNode)
+        node.name >> 'node'
+        node.children >> []
+        SuggestionProvider<?> provider = (s, b) -> b
+
+        and:
+        def argumentParser = Mock(DelegateArgumentParser)
+        argumentParser.delegate >> ArgumentParsers.of(Position)
+
+        and:
+        def parser = new BrigadierParser(delegate)
+
+        when:
+        def builder = parser.generateArgumentNodeBuilder(
+                root,
+                node,
+                argumentParser,
+                provider
+        )
+
+        then:
+        builder.command != null
+
+        and:
+        builder.suggestionsProvider == provider
+    }
+
+    def 'test that generateArgumentNodeBuilder of MultiArgumentParser adds in correct order arguments'() {
+        given:
+        def delegate = Mock(CommandRegistry)
+
+        and:
+        def root = Mock(LiteralNode)
+        def node = Mock(ArgumentNode)
+        node.name >> 'node'
+        node.children >> []
+        SuggestionProvider<?> provider = (s, b) -> b
+
+        and:
+        def argumentParser = Mock(MultiArgumentParser)
+        argumentParser.iterator() >> [
+                ArgumentParsers.of(Integer),
+                ArgumentParsers.of(Boolean),
+                ArgumentParsers.of(String)
+        ].iterator()
+
+        and:
+        def parser = new BrigadierParser(delegate)
+
+        when:
+        def builder = parser.generateArgumentNodeBuilder(
+                root,
+                node,
+                argumentParser,
+                provider
+        )
+
+        then:
+        builder.command != null
+        (builder.type instanceof IntegerArgumentType)
+
+        and:
+        def args1 = builder.arguments
+        args1.size() == 1
+
+        and:
+        def bool = args1[0] as ArgumentCommandNode<?, ?>
+        bool.command != null
+        (bool.type instanceof BoolArgumentType)
+
+        and:
+        def args2 = bool.children
+        args2.size() == 1
+
+        and:
+        def str = args2[0] as ArgumentCommandNode<?, ?>
+        str.command != null
+        (str.type instanceof StringArgumentType)
+    }
+
+    def 'test that generateArgumentNodeBuilder of #type works'() {
+        given:
+        def delegate = Mock(CommandRegistry)
+
+        and:
+        def root = Mock(LiteralNode)
+        def node = Mock(ArgumentNode)
+        node.name >> 'node'
+        node.children >> []
+        SuggestionProvider<?> provider = (s, b) -> b
+
+        and:
+        def parser = new BrigadierParser(delegate)
+
+        when:
+        def builder = parser.generateArgumentNodeBuilder(
+                root,
+                node,
+                ArgumentParsers.of(type),
+                provider
+        )
+
+        then:
+        builder.command != null
+
+        and:
+        type == int || builder.suggestionsProvider == provider
+
+        where:
+        type << [int, Position]
     }
 
     def 'test that getArgumentType of #node returns #expected'() {
