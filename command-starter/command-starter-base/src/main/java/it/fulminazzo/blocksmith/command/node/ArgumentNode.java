@@ -58,7 +58,15 @@ public class ArgumentNode<T> extends CommandNode {
             if (defaultValue == null) return false;
             else input.addInput(defaultValue);
         }
-        return getParser().tryAdvanceCursor(visitor);
+        CommandInput snapshot = input.snapshot();
+        if (getParser().tryAdvanceCursor(visitor) && !input.isDone())
+            // there is something else to read,
+            // we should advance cursor
+            return true;
+        else {
+            input.restore(snapshot);
+            return false;
+        }
     }
 
     /**
