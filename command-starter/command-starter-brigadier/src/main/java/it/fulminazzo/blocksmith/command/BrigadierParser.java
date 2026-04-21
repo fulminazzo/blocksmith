@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.Stack;
 
 /**
  * A parser for converting Blocksmith commands into Brigadiers.
@@ -111,49 +111,84 @@ final class BrigadierParser<S> {
                         final @NotNull ArgumentBuilder<S, ?> builder,
                         final @NotNull ArgumentNode<?> node) {
         ArgumentType<T> type = getArgumentType(node);
-        final RequiredArgumentBuilder<S, T> argumentBuilder;
-        if (type != null) argumentBuilder = RequiredArgumentBuilder.argument(node.getName(), type);
-        else argumentBuilder = generateArgumentNodeBuilder(node.getName(), node.getParser(), (c, b) -> {
-            S source = c.getSource();
-            String input = getInput(c);
-            String[] split = input.split(" ");
-            if (input.endsWith(" ")) {
-                split = Arrays.copyOf(split, split.length + 1);
-                split[split.length - 1] = "";
-            }
-            delegate.tabComplete(
+        if (type != null) {
+            final RequiredArgumentBuilder<S, T> argumentBuilder = RequiredArgumentBuilder.argument(node.getName(), type);
+            builder.then(parseChildren(
                     root,
-                    source,
-                    split[0],
-                    Arrays.copyOfRange(split, 1, split.length)
-            ).forEach(b::suggest);
-            return b.buildFuture();
-        });
-        builder.then(parseChildren(
-                root,
-                argumentBuilder.executes(executes(root)),
-                node
-        ));
+                    argumentBuilder.executes(executes(root)),
+                    node
+            ));
+        } else {
+            @NotNull RequiredArgumentBuilder<S, T> argumentBuilder = generateArgumentNodeBuilder(
+                    root,
+                    node,
+                    node.getParser(),
+                    (c, b) -> {
+                        S source = c.getSource();
+                        String input = getInput(c);
+                        String[] split = input.split(" ");
+                        if (input.endsWith(" ")) {
+                            split = Arrays.copyOf(split, split.length + 1);
+                            split[split.length - 1] = "";
+                        }
+                        delegate.tabComplete(
+                                root,
+                                source,
+                                split[0],
+                                Arrays.copyOfRange(split, 1, split.length)
+                        ).forEach(b::suggest);
+                        return b.buildFuture();
+                    }
+            );
+            if (!(node.getParser() instanceof MultiArgumentParser<?>))
+                argumentBuilder = parseChildren(
+                        root,
+                        argumentBuilder.executes(executes(root)),
+                        node
+                );
+            builder.then(argumentBuilder);
+        }
+
     }
 
-    private <T> @NotNull RequiredArgumentBuilder<S, T> generateArgumentNodeBuilder(final @NotNull String name,
-                                                                                   final @NotNull ArgumentParser<?> argumentParser,
-                                                                                   final @NotNull SuggestionProvider<S> suggestionProvider) {
+    /**
+     * Generates the argument node builder for the given argument parser.
+     * If the parser is a {@link MultiArgumentParser}, it generates a chain of {@link RequiredArgumentBuilder}s.
+     *
+     * @param <T>                the type of the derived {@link ArgumentType}
+     * @param root               the blocksmith node that originated the conversion
+     * @param node               the blocksmith node
+     * @param argumentParser     the argument parser
+     * @param suggestionProvider the function to provide suggestions (only if the associated type is a {@link StringArgumentType}
+     * @return the first {@link RequiredArgumentBuilder} of the chain
+     */
+    <T> @NotNull RequiredArgumentBuilder<S, T> generateArgumentNodeBuilder(final @NotNull LiteralNode root,
+                                                                           final @NotNull ArgumentNode<?> node,
+                                                                           final @NotNull ArgumentParser<?> argumentParser,
+                                                                           final @NotNull SuggestionProvider<S> suggestionProvider) {
         if (argumentParser instanceof DelegateArgumentParser<?, ?>)
-            return generateArgumentNodeBuilder(name, ((DelegateArgumentParser<?, ?>) argumentParser).getDelegate(), suggestionProvider);
+            return generateArgumentNodeBuilder(root, node, ((DelegateArgumentParser<?, ?>) argumentParser).getDelegate(), suggestionProvider);
         else if (argumentParser instanceof MultiArgumentParser<?>) {
             MultiArgumentParser<?> parser = (MultiArgumentParser<?>) argumentParser;
-            RequiredArgumentBuilder<S, T> argumentBuilder = null;
-            for (ArgumentParser<?> p : parser) {
-                RequiredArgumentBuilder<S, T> tmp = generateArgumentNodeBuilder(name, p, suggestionProvider);
-                if (argumentBuilder != null) argumentBuilder.then(tmp);
-                argumentBuilder = tmp;
+            final Stack<RequiredArgumentBuilder<S, T>> stack = new Stack<>();
+            for (ArgumentParser<?> p : parser)
+                stack.push(generateArgumentNodeBuilder(root, node, p, suggestionProvider));
+            RequiredArgumentBuilder<S, T> builder = parseChildren(root, stack.pop(), node);
+            while (!stack.isEmpty()) {
+                RequiredArgumentBuilder<S, T> tmp = stack.pop();
+                tmp.then(builder);
+                builder = tmp;
             }
-            // on well-formed MultiArgumentParsers this should be impossible
-            return Objects.requireNonNull(argumentBuilder);
-        } else return RequiredArgumentBuilder
-                .<S, T>argument(name, getArgumentType(ArgumentParsers.type(argumentParser)))
-                .suggests(suggestionProvider);
+            return builder;
+        } else {
+            ArgumentType<T> argumentType = getArgumentType(ArgumentParsers.type(argumentParser));
+            final RequiredArgumentBuilder<S, T> builder;
+            if (argumentType != null) builder = RequiredArgumentBuilder.argument(node.getName(), argumentType);
+            else builder = RequiredArgumentBuilder
+                    .<S, T>argument(node.getName(), (ArgumentType<T>) StringArgumentType.string())
+                    .suggests(suggestionProvider);
+            return builder.executes(executes(root));
+        }
     }
 
     /**
@@ -226,11 +261,13 @@ final class BrigadierParser<S> {
     /**
      * Converts the given Java type to a Brigadier argument type.
      *
+     * @param <T>  the type parameter
+     * @param <A>  the type parameter
+     * @param type the type
+     * @return the argument type (or {@code null} if not found)
      */
-    static <T, A> @NotNull ArgumentType<T> getArgumentType(final @NotNull Class<A> type) {
-        return ArgumentTypes.get(type)
-                .map(a -> (ArgumentType<T>) a)
-                .orElse((ArgumentType<T>) StringArgumentType.string());
+    static <T, A> @Nullable ArgumentType<T> getArgumentType(final @NotNull Class<A> type) {
+        return (ArgumentType<T>) ArgumentTypes.get(type).orElse(null);
     }
 
     private static <S> @NotNull String getInput(final @NotNull CommandContext<S> context) {
