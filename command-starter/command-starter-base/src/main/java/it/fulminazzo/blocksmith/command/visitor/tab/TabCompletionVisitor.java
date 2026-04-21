@@ -70,11 +70,7 @@ public final class TabCompletionVisitor extends VisitorImpl<@NotNull List<String
                     .flatMap(Collection::stream)
                     .collect(Collectors.toList()));
         } else {
-            if (input.isDone()) {
-                if (node instanceof ArgumentNode<?> && ((ArgumentNode<?>) node).isGreedy())
-                    return node.getCompletions(this);
-                else return Collections.emptyList();
-            }
+            if (input.isDone()) return node.getCompletions(this);
             final String current = input.getCurrent();
             CommandNode child = node.getChild(current);
             if (child == null) return Collections.emptyList();
