@@ -9,6 +9,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
+import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.argument.DelegateArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.MultiArgumentParser;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
@@ -150,7 +151,8 @@ final class BrigadierParser<S> {
             }
             // on well-formed MultiArgumentParsers this should be impossible
             return Objects.requireNonNull(argumentBuilder);
-        } else return RequiredArgumentBuilder.<S, T>argument(name, (ArgumentType<T>) StringArgumentType.string())
+        } else return RequiredArgumentBuilder
+                .<S, T>argument(name, getArgumentType(ArgumentParsers.type(argumentParser)))
                 .suggests(suggestionProvider);
     }
 
@@ -219,6 +221,16 @@ final class BrigadierParser<S> {
         else if (type.equals(Long.class))
             return (ArgumentType<T>) LongArgumentType.longArg((long) node.getMin(), (long) node.getMax());
         else return (ArgumentType<T>) IntegerArgumentType.integer((int) node.getMin(), (int) node.getMax());
+    }
+
+    /**
+     * Converts the given Java type to a Brigadier argument type.
+     *
+     */
+    static <T, A> @NotNull ArgumentType<T> getArgumentType(final @NotNull Class<A> type) {
+        return ArgumentTypes.get(type)
+                .map(a -> (ArgumentType<T>) a)
+                .orElse((ArgumentType<T>) StringArgumentType.string());
     }
 
     private static <S> @NotNull String getInput(final @NotNull CommandContext<S> context) {
