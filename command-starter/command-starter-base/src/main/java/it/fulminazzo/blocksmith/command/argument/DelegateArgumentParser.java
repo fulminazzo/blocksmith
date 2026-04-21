@@ -41,6 +41,11 @@ public final class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
     }
 
     @Override
+    public boolean tryAdvanceCursor(final @NotNull Visitor<?, ?> visitor) {
+        return delegate.tryAdvanceCursor(visitor);
+    }
+
+    @Override
     public @Nullable T parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
         return converter.apply(delegate.parse(visitor));
     }
