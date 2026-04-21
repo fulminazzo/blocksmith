@@ -37,17 +37,21 @@ class ArgumentNodeTest extends Specification {
         actual == expected
 
         where:
-        arguments          | greedy | defaultValue || expected
-        []                 | false  | null         || false
-        []                 | true   | null         || false
-        []                 | false  | 'tmp'        || true
-        []                 | true   | 'tmp'        || true
-        ['']               | false  | null         || true
-        ['']               | true   | null         || true
-        ['Hello']          | false  | null         || true
-        ['Hello']          | true   | null         || true
-        ['Hello', 'world'] | false  | null         || true
-        ['Hello', 'world'] | true   | null         || true
+        arguments               | greedy | defaultValue || expected
+        []                      | false  | null         || false
+        []                      | true   | null         || false
+        []                      | false  | 'tmp'        || false
+        []                      | true   | 'tmp'        || false
+        ['']                    | false  | null         || false
+        ['']                    | true   | null         || false
+        ['Hello']               | false  | null         || false
+        ['Hello']               | true   | null         || false
+        ['Hello', 'world']      | false  | null         || true
+        ['Hello', 'world']      | true   | null         || false
+        ['Hello', 'world', '']  | false  | null         || true
+        ['Hello', 'world', '']  | true   | null         || false
+        ['Hello', 'world', '!'] | false  | null         || true
+        ['Hello', 'world', '!'] | true   | null         || false
     }
 
     /*
