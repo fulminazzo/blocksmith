@@ -70,6 +70,18 @@ public class MultiArgumentParser<T> implements ArgumentParser<T> {
     }
 
     @Override
+    public boolean tryAdvanceCursor(final @NotNull Visitor<?, ?> visitor) {
+        final CommandInput input = visitor.getInput();
+        CommandInput snapshot = input.snapshot();
+        for (ArgumentParser<?> parser : parsers)
+            if (input.isDone() || !parser.tryAdvanceCursor(visitor)) {
+                input.restore(snapshot);
+                return false;
+            }
+        return true;
+    }
+
+    @Override
     public @Nullable T parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
         final List<Object> parsed = new ArrayList<>();
         final CommandInput input = visitor.getInput();

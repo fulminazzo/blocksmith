@@ -31,6 +31,32 @@ class MultiArgumentParserTest extends Specification {
         thrown(IllegalArgumentException)
     }
 
+    def 'test that tryAdvanceCursor works'() {
+        given:
+        input.addInput(arguments)
+
+        when:
+        def actual = parser.tryAdvanceCursor(visitor)
+
+        then:
+        actual == expected
+
+        where:
+        arguments                                              || expected
+        []                                                     || false
+        ['']                                                   || false
+        ['1']                                                  || false
+        ['a']                                                  || false
+        ['1', '']                                              || false
+        ['1', '2']                                             || false
+        ['1', '2', '']                                         || false
+        ['1', '2', '3']                                        || true
+        ['1', '2', '3', '']                                    || true
+        ['1', '2', '3', 'Hello']                               || true
+        ['1', '2', '3', 'Hello', 'world!']                     || true
+        ['1', '2', '3', 'Hello', 'world!', 'Goodbye', 'mars!'] || true
+    }
+
     def 'test that parse works'() {
         given:
         input.addInput(arguments)

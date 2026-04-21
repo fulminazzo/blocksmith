@@ -25,6 +25,29 @@ public final class CommandInput {
     int current;
 
     /**
+     * Creates a copy of the current command input (for later restore).
+     *
+     * @return the command input
+     */
+    public @NotNull CommandInput snapshot() {
+        CommandInput snapshot = new CommandInput();
+        snapshot.input.addAll(input);
+        snapshot.current = current;
+        return snapshot;
+    }
+
+    /**
+     * Restores the input and current cursor from the given snapshot.
+     *
+     * @param snapshot the snapshot
+     */
+    public void restore(final @NotNull CommandInput snapshot) {
+        input.clear();
+        input.addAll(snapshot.input);
+        current = snapshot.current;
+    }
+
+    /**
      * Merges all the remaining input into one space-separated argument (for greedy arguments).
      */
     public void mergeRemaining() {

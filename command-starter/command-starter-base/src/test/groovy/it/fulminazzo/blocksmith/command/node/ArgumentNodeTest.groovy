@@ -15,6 +15,42 @@ import java.lang.reflect.Parameter
 class ArgumentNodeTest extends Specification {
 
     /*
+     * tryAdvanceCursor
+     */
+
+    def 'test that tryAdvanceCursor of #arguments and #defaultValue returns #expected'() {
+        given:
+        def node = newArgumentNode(String)
+        node.greedy = greedy
+        node.defaultValue = defaultValue
+
+        and:
+        def visitor = Mock(Visitor)
+        def input = new CommandInput()
+        input.addInput(*arguments)
+        visitor.input >> input
+
+        when:
+        def actual = node.tryAdvanceCursor(visitor)
+
+        then:
+        actual == expected
+
+        where:
+        arguments          | greedy | defaultValue || expected
+        []                 | false  | null         || false
+        []                 | true   | null         || false
+        []                 | false  | 'tmp'        || true
+        []                 | true   | 'tmp'        || true
+        ['']               | false  | null         || true
+        ['']               | true   | null         || true
+        ['Hello']          | false  | null         || true
+        ['Hello']          | true   | null         || true
+        ['Hello', 'world'] | false  | null         || true
+        ['Hello', 'world'] | true   | null         || true
+    }
+
+    /*
      * parseCurrent
      */
 

@@ -6,10 +6,13 @@ import it.fulminazzo.blocksmith.command.CommandSender
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper
 import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.annotation.Permission
+import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
+import it.fulminazzo.blocksmith.command.argument.MultiArgumentParser
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
+import it.fulminazzo.blocksmith.structure.Pair
 import spock.lang.Specification
 
 import java.lang.reflect.Parameter
@@ -207,26 +210,45 @@ class TabCompletionVisitorTest extends Specification {
         'true'   || ['true']
     }
 
-    def 'test that tabComplete does not throw if input is done'() {
+    def 'test that tabComplete works for MultiArgumentParser'() {
         given:
+        ArgumentParsers.register(Pair, new MultiArgumentParser<>(
+                (l) -> new Pair<>(l[0], l[1]),
+                String, Boolean
+        ))
+
+        and:
         def visitor = new TabCompletionVisitor(
                 Mock(ApplicationHandle),
                 commandSender,
-                '',
+                'say'
         )
-        visitor.input.advanceCursor()
+        visitor.input.addInput(argument).advanceCursor()
+
+        and:
+        def parameter = Mock(Parameter)
+        parameter.type >> Pair
+
+        and:
+        def node = ArgumentNode.of('pair', parameter, false)
 
         when:
-        def actual = visitor.tabComplete(node)
+        def completions = visitor.visitArgumentNode(node)
 
         then:
-        actual == []
+        completions == expected
 
         where:
-        node << [
-                newLiteral('msg'),
-                ArgumentNode.of('boolean', parameter2, false)
-        ]
+        argument          || expected
+        ''                || ['<pair>']
+        's'               || ['<pair>']
+        'string '         || [true.toString(), false.toString()]
+        'string tr'       || [true.toString()]
+        'string fa'       || [false.toString()]
+        'string invalid'  || []
+        'string true '    || []
+        'string false '   || []
+        'string invalid ' || []
     }
 
     private static final LiteralNode newLiteral(final String... aliases) {

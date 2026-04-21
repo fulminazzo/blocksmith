@@ -45,6 +45,23 @@ public class ArgumentNode<T> extends CommandNode {
     @Nullable CompletionsSupplier completionsSupplier;
 
     /**
+     * Attempts to advance the visitor cursor past this node token(s).
+     * Intended exclusively for tab-completion purposes.
+     *
+     * @param visitor the visitor to get the input from
+     * @return {@code true} if the cursor was correctly advanced, {@code false} otherwise
+     */
+    public boolean tryAdvanceCursor(final @NotNull Visitor<?, ?> visitor) {
+        handleGreedy(visitor);
+        final CommandInput input = visitor.getInput();
+        if (input.isDone()) {
+            if (defaultValue == null) return false;
+            else input.addInput(defaultValue);
+        }
+        return getParser().tryAdvanceCursor(visitor);
+    }
+
+    /**
      * Converts the current input of the {@link Visitor} to an instance of {@link #getType()}.
      * <br>
      * The conversion process uses the following rules:

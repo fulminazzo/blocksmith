@@ -2,12 +2,10 @@ package it.fulminazzo.blocksmith.command.visitor.tab;
 
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
-import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.visitor.VisitorImpl;
-import it.fulminazzo.blocksmith.validation.ValidationException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -49,14 +47,9 @@ public final class TabCompletionVisitor extends VisitorImpl<@NotNull List<String
 
     @Override
     public @NotNull List<String> visitArgumentNode(final @NotNull ArgumentNode<?> node) {
-        if (input.isLast()) return filterCompletions(node.getCompletions(this));
-        try {
-            node.parseCurrent(this);
-            input.advanceCursor();
-        } catch (ArgumentParseException | ValidationException e) {
-            return Collections.emptyList();
-        }
-        return visitCommandNode(node);
+        if (input.isLast() || !node.tryAdvanceCursor(this))
+            return filterCompletions(node.getCompletions(this));
+        else return visitCommandNode(node);
     }
 
     @Override
