@@ -133,10 +133,10 @@ public final class ArgumentParsers {
                 boolean isRelative = rawArgument.startsWith(relativeIdentifier);
                 if (isRelative) {
                     rawArgument = rawArgument.substring(relativeIdentifier.length());
+                    if (rawArgument.isEmpty()) rawArgument = "0";
                     input.setCurrent(rawArgument);
                 }
-                double value = rawArgument.isEmpty() ? 0 : Objects.requireNonNull(valueParser.parse(visitor));
-                return new Coordinate(value, isRelative);
+                return new Coordinate(Objects.requireNonNull(valueParser.parse(visitor)), isRelative);
             }
 
             @Override
