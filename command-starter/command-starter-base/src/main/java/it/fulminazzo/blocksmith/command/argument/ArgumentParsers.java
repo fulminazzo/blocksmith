@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Holds all the supported argument parsers.
  */
+@SuppressWarnings("unchecked")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ArgumentParsers {
     private static final @NotNull Map<@NotNull Class<?>, @NotNull ArgumentParser<?>> parsers = new ConcurrentHashMap<>();
@@ -185,13 +186,13 @@ public final class ArgumentParsers {
 
     /**
      * Gets the most appropriate argument parser for the given type.
-     * Throws {@link IllegalArgumentException} if not found.
      *
      * @param <T>  the type of the argument
      * @param type the Java class of the argument
      * @return the argument parser
+     * @throws IllegalArgumentException if no parser is found
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"rawtypes"})
     public static <T> @NotNull ArgumentParser<T> of(final @NotNull Class<T> type) {
         if (Enum.class.isAssignableFrom(type))
             return (ArgumentParser<T>) parsers.computeIfAbsent(type, t -> new EnumArgumentParser<>((Class) t));
@@ -201,6 +202,24 @@ public final class ArgumentParsers {
                 "No default Argument parser supports the type %s. Please provide a custom parser through %s#register",
                 type, ArgumentParsers.class
         ));
+    }
+
+    /**
+     * Retrieves the Java type associated with the given argument parser.
+     *
+     * @param parser the argument parser
+     * @param <T>    the type of the argument
+     * @return the Java class of the argument
+     * @throws IllegalArgumentException if the parser is not registered yet
+     */
+    public static <T> @NotNull Class<T> type(final @NotNull ArgumentParser<T> parser) {
+        return (Class<T>) parsers.entrySet().stream()
+                .filter(e -> e.getValue().equals(parser))
+                .map(Map.Entry::getKey)
+                .findFirst().orElseThrow(() -> new IllegalArgumentException(ReflectException.formatMessage(
+                        "Argument parser has not been registered yet. Please use %s#register",
+                        ArgumentParsers.class
+                )));
     }
 
     /**

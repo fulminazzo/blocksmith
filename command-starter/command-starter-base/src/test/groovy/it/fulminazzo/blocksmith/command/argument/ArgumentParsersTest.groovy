@@ -9,6 +9,7 @@ import it.fulminazzo.blocksmith.message.util.LocaleUtils
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
+import java.util.Map.Entry
 import java.util.concurrent.TimeUnit
 
 class ArgumentParsersTest extends Specification {
@@ -377,6 +378,27 @@ class ArgumentParsersTest extends Specification {
         def e = thrown(IllegalArgumentException)
         e.message =~ ".*${ArgumentParsersTest.canonicalName}.+" +
                 "${ArgumentParsers.canonicalName}#" +
+                "${ArgumentParsers.getMethod('register', Class, ArgumentParser).name}" +
+                ".*"
+    }
+
+    def 'test that type returns correct type'() {
+        given:
+        Map<Class<?>, ArgumentParser<?>> parsers = ArgumentParsers.parsers
+
+        expect:
+        for (Entry<Class<?>, ArgumentParser<?>> e : parsers.entrySet()) {
+            assert e.key == ArgumentParsers.type(e.value)
+        }
+    }
+
+    def 'test that type throws IllegalArgumentException if parser was not recognized'() {
+        when:
+        ArgumentParsers.type(Mock(ArgumentParser))
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.message =~ "${ArgumentParsers.canonicalName}#" +
                 "${ArgumentParsers.getMethod('register', Class, ArgumentParser).name}" +
                 ".*"
     }
