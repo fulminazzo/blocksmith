@@ -9,9 +9,14 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.message.Messenger
+import it.fulminazzo.blocksmith.reflect.Reflect
 import org.bukkit.Bukkit
+import org.bukkit.Server
 import org.bukkit.command.Command
+import org.bukkit.command.CommandSender
+import org.bukkit.command.SimpleCommandMap
 import org.bukkit.permissions.PermissionDefault
+import org.bukkit.plugin.PluginManager
 import spock.lang.Specification
 
 import java.lang.reflect.Parameter
@@ -186,6 +191,84 @@ class BukkitCommandRegistryTest extends Specification {
 
         then:
         noExceptionThrown()
+    }
+
+    def 'test that updateCommands works if syncCommands method is available'() {
+        given:
+        def server = Spy(CraftServer, additionalInterfaces: [Server])
+        Reflect.on(server).set('map', new SimpleCommandMap(server))
+        server.pluginManager >> Mock(PluginManager)
+
+        and:
+        def application = Mock(ApplicationHandle)
+        application.server() >> server
+
+        and:
+        def registry = new BukkitCommandRegistry(application)
+
+        when:
+        registry.updateCommands()
+
+        then:
+        noExceptionThrown()
+
+        and:
+        1 * server.syncCommands()
+    }
+
+    def 'test that wrapSender instantiates a new Bukkit CommandSenderWrapper'() {
+        given:
+        def sender = Mock(CommandSender)
+
+        when:
+        def wrapped = registry.wrapSender(sender)
+
+        then:
+        (wrapped instanceof BukkitCommandSenderWrapper)
+        wrapped.actualSender == sender
+    }
+
+    def 'test that sender type is correct'() {
+        expect:
+        registry.senderType == CommandSender
+    }
+
+    def 'test that BukkitCommand delegates #method to #expected'() {
+        given:
+        def registry = Mock(BukkitCommandRegistry)
+
+        and:
+        def node = new LiteralNode('test')
+        node.commandInfo = new CommandInfo(
+                'test.description',
+                new PermissionInfo(null, 'test.permission', Permission.Grant.NONE)
+        )
+        def sender = Mock(CommandSender)
+        def args = ['first', 'second', 'third'].toArray(String[]::new)
+
+        and:
+        def command = new BukkitCommandRegistry.BukkitCommand(registry, 'test', node)
+
+        when:
+        command."$method"(sender, 'test', args)
+
+        then:
+        1 * registry."$expected"(node, sender, 'test', args)
+
+        where:
+        method        || expected
+        'execute'     || 'execute'
+        'tabComplete' || 'tabComplete'
+    }
+
+    private static class CraftServer {
+        private SimpleCommandMap map
+
+        @SuppressWarnings('unused')
+        void syncCommands() {
+
+        }
+
     }
 
 }
