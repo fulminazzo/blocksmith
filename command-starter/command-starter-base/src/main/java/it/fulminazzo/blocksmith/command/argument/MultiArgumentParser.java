@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command.argument;
 import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.visitor.CommandInput;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +32,7 @@ import java.util.stream.Stream;
  */
 public class MultiArgumentParser<T> implements ArgumentParser<T> {
     protected final @NotNull Function<@NotNull List<Object>, @Nullable T> constructor;
+    @Getter
     protected final @NotNull List<@NotNull ArgumentParser<?>> parsers;
 
     /**

@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.argument;
 
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,6 +15,7 @@ import java.util.function.BiFunction;
  * @param <T> the type of the Java object
  */
 public final class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
+    @Getter
     private final @NotNull ArgumentParser<F> delegate;
     private final @NotNull BiFunction<@NotNull Visitor<?, ?>, @Nullable F, @Nullable T> converter;
 
