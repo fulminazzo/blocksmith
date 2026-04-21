@@ -6,7 +6,11 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
+import it.fulminazzo.blocksmith.command.argument.DelegateArgumentParser;
+import it.fulminazzo.blocksmith.command.argument.MultiArgumentParser;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
@@ -17,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * A parser for converting Blocksmith commands into Brigadiers.
@@ -107,29 +112,46 @@ final class BrigadierParser<S> {
         ArgumentType<T> type = getArgumentType(node);
         final RequiredArgumentBuilder<S, T> argumentBuilder;
         if (type != null) argumentBuilder = RequiredArgumentBuilder.argument(node.getName(), type);
-        else
-            argumentBuilder = RequiredArgumentBuilder.<S, T>argument(node.getName(), (ArgumentType<T>) StringArgumentType.string())
-                    .suggests(((c, b) -> {
-                        S source = c.getSource();
-                        String input = getInput(c);
-                        String[] split = input.split(" ");
-                        if (input.endsWith(" ")) {
-                            split = Arrays.copyOf(split, split.length + 1);
-                            split[split.length - 1] = "";
-                        }
-                        delegate.tabComplete(
-                                root,
-                                source,
-                                split[0],
-                                Arrays.copyOfRange(split, 1, split.length)
-                        ).forEach(b::suggest);
-                        return b.buildFuture();
-                    }));
+        else argumentBuilder = generateArgumentNodeBuilder(node.getName(), node.getParser(), (c, b) -> {
+            S source = c.getSource();
+            String input = getInput(c);
+            String[] split = input.split(" ");
+            if (input.endsWith(" ")) {
+                split = Arrays.copyOf(split, split.length + 1);
+                split[split.length - 1] = "";
+            }
+            delegate.tabComplete(
+                    root,
+                    source,
+                    split[0],
+                    Arrays.copyOfRange(split, 1, split.length)
+            ).forEach(b::suggest);
+            return b.buildFuture();
+        });
         builder.then(parseChildren(
                 root,
                 argumentBuilder.executes(executes(root)),
                 node
         ));
+    }
+
+    private <T> @NotNull RequiredArgumentBuilder<S, T> generateArgumentNodeBuilder(final @NotNull String name,
+                                                                                   final @NotNull ArgumentParser<?> argumentParser,
+                                                                                   final @NotNull SuggestionProvider<S> suggestionProvider) {
+        if (argumentParser instanceof DelegateArgumentParser<?, ?>)
+            return generateArgumentNodeBuilder(name, ((DelegateArgumentParser<?, ?>) argumentParser).getDelegate(), suggestionProvider);
+        else if (argumentParser instanceof MultiArgumentParser<?>) {
+            MultiArgumentParser<?> parser = (MultiArgumentParser<?>) argumentParser;
+            RequiredArgumentBuilder<S, T> argumentBuilder = null;
+            for (ArgumentParser<?> p : parser) {
+                RequiredArgumentBuilder<S, T> tmp = generateArgumentNodeBuilder(name, p, suggestionProvider);
+                if (argumentBuilder != null) argumentBuilder.then(tmp);
+                argumentBuilder = tmp;
+            }
+            // on well-formed MultiArgumentParsers this should be impossible
+            return Objects.requireNonNull(argumentBuilder);
+        } else return RequiredArgumentBuilder.<S, T>argument(name, (ArgumentType<T>) StringArgumentType.string())
+                .suggests(suggestionProvider);
     }
 
     /**
@@ -199,7 +221,7 @@ final class BrigadierParser<S> {
         else return (ArgumentType<T>) IntegerArgumentType.integer((int) node.getMin(), (int) node.getMax());
     }
 
-    private static <S> @NotNull String getInput(final  @NotNull CommandContext<S> context) {
+    private static <S> @NotNull String getInput(final @NotNull CommandContext<S> context) {
         String input = context.getInput();
         if (input.startsWith("/")) input = input.substring(1);
         return input;
