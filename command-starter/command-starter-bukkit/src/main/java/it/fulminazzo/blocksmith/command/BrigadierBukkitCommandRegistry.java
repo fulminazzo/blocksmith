@@ -11,7 +11,6 @@ import it.fulminazzo.blocksmith.command.argument.dto.Position;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.reflect.ReflectException;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +18,6 @@ import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Constructor;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -81,7 +79,7 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
                     .build());
         }
 
-        updateCommands();
+        updateClientCommands();
     }
 
     @Override
@@ -95,7 +93,7 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
 
         if (NMSUtils.getServerVersion() < BRIDGE_VERSION) super.onUnregister(commandName);
 
-        updateCommands();
+        updateClientCommands();
     }
 
     private void injectIntoBrigadier(final @NotNull String name,
@@ -130,20 +128,16 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
         root.get("literals").invoke("remove", name);
     }
 
-    private void updateCommands() {
+    private void updateClientCommands() {
         for (Player player : server.getOnlinePlayers())
             player.updateCommands();
     }
 
     private @NotNull RootCommandNode<S> getRoot() {
-        Optional<?> liveDispatcher = NMSUtils.getCommandDispatcher(server);
-        if (liveDispatcher.isPresent()) {
-            try {
-                return ((CommandDispatcher<S>) liveDispatcher.get()).getRoot();
-            } catch (ClassCastException ignored) {
-            }
-        }
-        return cachedRoot;
+        return NMSUtils.getCommandDispatcher(server)
+                .map(d -> (CommandDispatcher<S>) d)
+                .map(CommandDispatcher::getRoot)
+                .orElse(cachedRoot);
     }
 
     private static @NotNull ArgumentType<?> getPositionArgumentType() {

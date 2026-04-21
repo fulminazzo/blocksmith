@@ -193,7 +193,7 @@ class BukkitCommandRegistryTest extends Specification {
         noExceptionThrown()
     }
 
-    def 'test that updateCommands works if syncCommands method is available'() {
+    def 'test that updateClientCommands works if syncCommands method is available'() {
         given:
         def server = Spy(CraftServer, additionalInterfaces: [Server])
         Reflect.on(server).set('map', new SimpleCommandMap(server))
@@ -207,7 +207,7 @@ class BukkitCommandRegistryTest extends Specification {
         def registry = new BukkitCommandRegistry(application)
 
         when:
-        registry.updateCommands()
+        registry.updateClientCommands()
 
         then:
         noExceptionThrown()

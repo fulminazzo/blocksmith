@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.reflect.Reflect;
+import it.fulminazzo.blocksmith.reflect.ReflectException;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -10,7 +11,6 @@ import org.bukkit.command.SimpleCommandMap;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,7 +52,7 @@ class BukkitCommandRegistry extends CommandRegistry {
     @Override
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
         registerInCommandMap(commandName, command);
-        updateCommands();
+        updateClientCommands();
     }
 
     /**
@@ -79,7 +79,7 @@ class BukkitCommandRegistry extends CommandRegistry {
             removeOrRestoreCommand(command.getName());
             command.getAliases().forEach(this::removeOrRestoreCommand);
         }
-        updateCommands();
+        updateClientCommands();
     }
 
     /**
@@ -113,12 +113,11 @@ class BukkitCommandRegistry extends CommandRegistry {
         return CommandSender.class;
     }
 
-    private void updateCommands() {
+    private void updateClientCommands() {
         try {
-            Method syncCommands = server.getClass().getDeclaredMethod("syncCommands");
-            syncCommands.setAccessible(true);
-            syncCommands.invoke(server);
-        } catch (Exception ignored) {
+            Reflect.on(server).invoke("syncCommands");
+        } catch (ReflectException ignored) {
+            // legacy version where syncCommands() is not available
         }
     }
 
