@@ -19,7 +19,9 @@ class ArgumentParsersTest extends Specification {
         def parser = ArgumentParsers.of(type)
 
         and:
-        def arg = argument instanceof Number ? new BigDecimal(argument).toPlainString() : argument.toString()
+        def arg = argument instanceof BigInteger
+                ? new BigDecimal(argument as BigInteger).toPlainString()
+                : argument.toString()
 
         when:
         def actual = parser.parse(prepareVisitor(arg))
@@ -101,6 +103,8 @@ class ArgumentParsersTest extends Specification {
         Character     | 'a'                                   || 'a' as Character
         // STRING
         String        | 'Hello!'                              || 'Hello!'
+        // OBJECT
+        Object        | 'Hello!'                              || 'Hello!'
         // ENUM
         TimeUnit      | 'nanoseconds'                         || TimeUnit.NANOSECONDS
         TimeUnit      | 'Microseconds'                        || TimeUnit.MICROSECONDS
@@ -321,6 +325,8 @@ class ArgumentParsersTest extends Specification {
         Character     | 'ab'                                                    || []
         // STRING
         String        | ''                                                      || ['<%name%>']
+        // OBJECT
+        Object        | ''                                                      || ['<%name%>']
         // ENUM
         TimeUnit      | ''                                                      || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
         TimeUnit      | 'n'                                                     || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
@@ -328,13 +334,13 @@ class ArgumentParsersTest extends Specification {
         TimeUnit      | 'NANOSECONDS'                                           || TimeUnit.values().collect { it.toString().toLowerCase() }.sort()
         // LOCALE
         Locale        | ''                                                      || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
-                .collect { LocaleUtils.toString(it) }.unique()
+                .collect { LocaleUtils.toString(it as Locale) }.unique()
         Locale        | 'it'                                                    || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
-                .collect { LocaleUtils.toString(it) }.unique()
+                .collect { LocaleUtils.toString(it as Locale) }.unique()
         Locale        | 'it_it'                                                 || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
-                .collect { LocaleUtils.toString(it) }.unique()
+                .collect { LocaleUtils.toString(it as Locale) }.unique()
         Locale        | 'non_existent'                                          || Locale.availableLocales.findAll { !it.language.empty && !it.country.empty }
-                .collect { LocaleUtils.toString(it) }.unique()
+                .collect { LocaleUtils.toString(it as Locale) }.unique()
         // COORDINATE
         Coordinate    | ''                                                      || [Coordinate.RELATIVE_IDENTIFIER]
         Coordinate    | 1                                                       || (0..9).collect { "1$it".toString() }

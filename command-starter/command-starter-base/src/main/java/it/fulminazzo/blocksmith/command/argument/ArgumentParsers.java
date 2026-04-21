@@ -106,6 +106,19 @@ public final class ArgumentParsers {
             }
 
         });
+        register(Object.class, new ArgumentParser<>() {
+
+            @Override
+            public @NotNull Object parse(final @NotNull Visitor<?, ?> visitor) {
+                return visitor.getInput().getCurrent();
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+                return Collections.singletonList("<%name%>");
+            }
+
+        });
         register(Locale.class, new ArgumentParser<>() {
 
             @Override
