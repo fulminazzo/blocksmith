@@ -5,6 +5,42 @@ import spock.lang.Specification
 
 class CommandInputTest extends Specification {
 
+    def 'test that snapshot system works'() {
+        given:
+        def rawInput = ['Hello,', 'world', 'My', 'name', 'is', 'Alex']
+
+        and:
+        def input = new CommandInput()
+                .addInput(rawInput)
+                .advanceCursor()
+                .advanceCursor()
+
+        and:
+        def snapshot = input.snapshot()
+
+        when:
+        input.addInput('goodbye', 'mars').advanceCursor().advanceCursor()
+
+        then:
+        input.current == 'is'
+        input.input == [*rawInput, 'goodbye', 'mars']
+
+        and:
+        snapshot.current == 'My'
+        snapshot.input == rawInput
+
+        when:
+        input.restore(snapshot)
+
+        then:
+        input.current == 'My'
+        input.input == rawInput
+
+        and:
+        snapshot.current == 'My'
+        snapshot.input == rawInput
+    }
+
     def 'test that CommandInput correctly returns all arguments'() {
         given:
         def arguments = ['Hello,', 'world', 'My', 'name', 'is', 'Alex']
