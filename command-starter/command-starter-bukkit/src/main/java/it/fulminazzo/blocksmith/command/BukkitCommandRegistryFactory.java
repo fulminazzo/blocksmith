@@ -136,7 +136,6 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             } else if (arg instanceof Location) return (Location) arg;
             else if (arg instanceof World) return ((World) arg).getSpawnLocation();
             else if (arg instanceof String) return Bukkit.getWorld((String) arg).getSpawnLocation();
-            else if (arg instanceof Player) return ((Player) arg).getLocation();
         }
         return start;
     }
