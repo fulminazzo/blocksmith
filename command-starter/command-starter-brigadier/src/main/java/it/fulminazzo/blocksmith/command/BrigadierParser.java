@@ -267,7 +267,15 @@ final class BrigadierParser<S> {
      * @return the argument type (or {@code null} if not found)
      */
     static <T, A> @Nullable ArgumentType<T> getArgumentType(final @NotNull Class<A> type) {
-        return (ArgumentType<T>) ArgumentTypes.get(type).orElse(null);
+        if (type.equals(Byte.class))
+            return (ArgumentType<T>) IntegerArgumentType.integer(Byte.MIN_VALUE, Byte.MAX_VALUE);
+        else if (type.equals(Short.class))
+            return (ArgumentType<T>) IntegerArgumentType.integer(Short.MIN_VALUE, Short.MAX_VALUE);
+        else if (type.equals(Integer.class)) return (ArgumentType<T>) IntegerArgumentType.integer();
+        else if (type.equals(Long.class)) return (ArgumentType<T>) LongArgumentType.longArg();
+        else if (type.equals(Float.class)) return (ArgumentType<T>) FloatArgumentType.floatArg();
+        else if (type.equals(Double.class)) return (ArgumentType<T>) DoubleArgumentType.doubleArg();
+        else return (ArgumentType<T>) ArgumentTypes.get(type).orElse(null);
     }
 
     private static <S> @NotNull String getInput(final @NotNull CommandContext<S> context) {

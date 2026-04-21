@@ -295,6 +295,26 @@ class BrigadierParserTest extends Specification {
         newArgumentNode('object', Object)                  || null
     }
 
+    def 'test that getArgumentType of #type returns #expected'() {
+        when:
+        def actual = BrigadierParser.getArgumentType(type)
+
+        then:
+        actual == null ? expected == null : actual.class == expected
+
+        where:
+        type    || expected
+        Byte    || IntegerArgumentType
+        Short   || IntegerArgumentType
+        Integer || IntegerArgumentType
+        Long    || LongArgumentType
+        Float   || FloatArgumentType
+        Double  || DoubleArgumentType
+        Boolean || BoolArgumentType
+        String  || StringArgumentType
+        Object  || null
+    }
+
     def 'test that getArgumentType of node with custom completions supplier returns null'() {
         given:
         def node = newArgumentNode('string', String)
