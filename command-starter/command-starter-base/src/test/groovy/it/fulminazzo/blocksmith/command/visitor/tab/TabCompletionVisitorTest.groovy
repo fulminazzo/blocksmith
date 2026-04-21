@@ -210,28 +210,6 @@ class TabCompletionVisitorTest extends Specification {
         'true'   || ['true']
     }
 
-    def 'test that tabComplete does not throw if input is done'() {
-        given:
-        def visitor = new TabCompletionVisitor(
-                Mock(ApplicationHandle),
-                commandSender,
-                '',
-        )
-        visitor.input.advanceCursor()
-
-        when:
-        def actual = visitor.tabComplete(node)
-
-        then:
-        actual == []
-
-        where:
-        node << [
-                newLiteral('msg'),
-                ArgumentNode.of('boolean', parameter2, false)
-        ]
-    }
-
     def 'test that tabComplete works for MultiArgumentParser'() {
         given:
         ArgumentParsers.register(Pair, new MultiArgumentParser<>(

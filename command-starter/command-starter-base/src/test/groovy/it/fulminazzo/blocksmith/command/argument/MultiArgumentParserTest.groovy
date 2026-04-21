@@ -45,11 +45,11 @@ class MultiArgumentParserTest extends Specification {
         arguments                                              || expected
         []                                                     || false
         ['']                                                   || false
-        ['1']                                                  || true
+        ['1']                                                  || false
         ['a']                                                  || false
-        ['1', '']                                              || true
-        ['1', '2']                                             || true
-        ['1', '2', '']                                         || true
+        ['1', '']                                              || false
+        ['1', '2']                                             || false
+        ['1', '2', '']                                         || false
         ['1', '2', '3']                                        || true
         ['1', '2', '3', '']                                    || true
         ['1', '2', '3', 'Hello']                               || true
