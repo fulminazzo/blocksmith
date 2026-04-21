@@ -129,6 +129,15 @@ public class ArgumentNode<T> extends CommandNode {
     }
 
     /**
+     * Gets the {@link ArgumentParser} associated with the node type.
+     *
+     * @return the argument parser
+     */
+    public @NotNull ArgumentParser<T> getParser() {
+        return ArgumentParsers.of(getType());
+    }
+
+    /**
      * Gets the type of the argument.
      *
      * @return the Java class
@@ -160,10 +169,6 @@ public class ArgumentNode<T> extends CommandNode {
 
     private void handleGreedy(final @NotNull Visitor<?, ?> visitor) {
         if (isGreedy()) visitor.getInput().mergeRemaining();
-    }
-
-    private @NotNull ArgumentParser<T> getParser() {
-        return ArgumentParsers.of(getType());
     }
 
     /**
