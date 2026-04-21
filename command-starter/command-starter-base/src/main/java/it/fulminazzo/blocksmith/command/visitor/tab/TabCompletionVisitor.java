@@ -54,7 +54,7 @@ public final class TabCompletionVisitor extends VisitorImpl<@NotNull List<String
 
     @Override
     public @NotNull List<String> visitLiteralNode(final @NotNull LiteralNode node) {
-        if (!input.isDone() && !node.getAliases().contains(input.getCurrent().toLowerCase()) ||
+        if (!node.getAliases().contains(input.getCurrent().toLowerCase()) ||
                 !commandSender.hasPermission(node.getCommandInfo().getPermission()))
             return Collections.emptyList();
         if (input.isLast()) return filterCompletions(node.getCompletions(this));
@@ -70,7 +70,6 @@ public final class TabCompletionVisitor extends VisitorImpl<@NotNull List<String
                     .flatMap(Collection::stream)
                     .collect(Collectors.toList()));
         } else {
-            if (input.isDone()) return node.getCompletions(this);
             final String current = input.getCurrent();
             CommandNode child = node.getChild(current);
             if (child == null) return Collections.emptyList();
