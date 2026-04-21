@@ -9,6 +9,7 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.message.Messenger
+import it.fulminazzo.blocksmith.reflect.Reflect
 import org.bukkit.Bukkit
 import org.bukkit.permissions.PermissionDefault
 import spock.lang.Specification
@@ -93,6 +94,34 @@ class BukkitPermissionRegistryTest extends Specification {
         previousPermissions['help'] == previousPermission
     }
 
+    def 'test that onRegister does not overwrite previous BukkitPermission'() {
+        given:
+        def previousPermission = new BukkitPermissionRegistry.BukkitPermission(
+                new PermissionInfo(null, 'help', Permission.Grant.ALL),
+                []
+        )
+
+        and:
+        def pluginManager = Bukkit.server.pluginManager
+        pluginManager.addPermission(previousPermission)
+
+        and:
+        def node = new LiteralNode('help', '?')
+        node.commandInfo = new CommandInfo(
+                'command.description.help',
+                new PermissionInfo(null, 'help', Permission.Grant.ALL)
+        )
+
+        when:
+        registry.registerPermission(node)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        registry.previousPermissions.isEmpty()
+    }
+
     def 'test that onUnregister removes command permissions and restores previous permissions'() {
         given:
         def previousPermission = new org.bukkit.permissions.Permission(
@@ -105,7 +134,11 @@ class BukkitPermissionRegistryTest extends Specification {
         def pluginManager = Bukkit.server.pluginManager
         pluginManager.addPermission(new BukkitPermissionRegistry.BukkitPermission(
                 new PermissionInfo(null, 'help', Permission.Grant.ALL),
-                ['help.plugin']
+                ['help.plugin', 'help.child']
+        ))
+        pluginManager.addPermission(new BukkitPermissionRegistry.BukkitPermission(
+                new PermissionInfo(null, 'help.child', Permission.Grant.ALL),
+                []
         ))
         def otherPermission = new org.bukkit.permissions.Permission('help.plugin')
         pluginManager.addPermission(otherPermission)
@@ -121,12 +154,36 @@ class BukkitPermissionRegistryTest extends Specification {
         helpPermission == previousPermission
 
         and:
+        def helpChildPermission = pluginManager.getPermission('help.child')
+        helpChildPermission == null
+
+        and:
         def helpPluginPermission = pluginManager.getPermission('help.plugin')
         helpPluginPermission == otherPermission
 
         and:
         def previousPermissions = registry.previousPermissions
         previousPermissions.isEmpty()
+    }
+
+    def 'test that onUnregister of null for #type does not throw'() {
+        given:
+        def reflect = Reflect.on(registry)
+
+        and:
+        def object = type.cast(null)
+
+        when:
+        reflect.invoke(
+                reflect.getMethod('unregisterPermission', type),
+                object as Object
+        )
+
+        then:
+        noExceptionThrown()
+
+        where:
+        type << [String, org.bukkit.permissions.Permission]
     }
 
     def 'test that getPermissionDefault converts #grant to #expected'() {

@@ -54,7 +54,7 @@ class TabCompletionVisitorTest extends Specification {
                 Mock(ApplicationHandle),
                 commandSender,
                 arguments[0],
-                *arguments.subList(1, arguments.size())
+                *(arguments.empty ? [] : arguments.subList(1, arguments.size()))
         )
 
         when:
@@ -65,6 +65,7 @@ class TabCompletionVisitorTest extends Specification {
 
         where:
         arguments                                   || expected
+        []                                          || []
         ['give']                                    || ['give']
         ['give', '']                                || ['player', '<item>']
         ['give', 'p']                               || ['player']

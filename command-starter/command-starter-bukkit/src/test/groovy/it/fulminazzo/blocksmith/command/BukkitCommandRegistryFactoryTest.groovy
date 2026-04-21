@@ -93,6 +93,26 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         actual == server.getPlayer('Camilla')
     }
 
+    def 'test parse of parser for Player with console sender does not throw if found'() {
+        given:
+        def parser = ArgumentParsers.of(Player)
+        def argument = 'Camilla'
+
+        and:
+        def server = Bukkit.server
+        def sender = server.getConsoleSender()
+
+        and:
+        def visitor = newVisitor(sender)
+
+        when:
+        visitor.input.addInput(argument)
+        def actual = parser.parse(visitor)
+
+        then:
+        actual == server.getPlayer('Camilla')
+    }
+
     def 'test parse of parser for Player with Player sender that can see = #canSee and #argument throws'() {
         given:
         def parser = ArgumentParsers.of(Player)
@@ -151,6 +171,25 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         canSee || expected
         false  || ['Alex']
         true   || ['Alex', 'Camilla']
+    }
+
+    def 'test that completions of parser for Player returns all players when console sender'() {
+        given:
+        def parser = ArgumentParsers.of(Player)
+
+        and:
+        def server = Bukkit.server as ServerMock
+        def sender = server.getConsoleSender()
+
+        and:
+        def visitor = newVisitor(sender)
+
+        when:
+        visitor.input.addInput('')
+        def actual = parser.getCompletions(visitor)
+
+        then:
+        actual == ['Alex', 'Camilla']
     }
 
     def 'test that parse of parser for #type returns #expected with #argument'() {

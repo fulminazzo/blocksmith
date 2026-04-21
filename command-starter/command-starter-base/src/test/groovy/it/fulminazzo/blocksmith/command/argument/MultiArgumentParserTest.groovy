@@ -143,4 +143,20 @@ class MultiArgumentParserTest extends Specification {
         ['1', '1', '34', '4'] || []
     }
 
+    def 'test that iterator returns all parsers'() {
+        given:
+        def parsers = (1..20).collect { Mock(ArgumentParser) }
+
+        and:
+        def parser = new MultiArgumentParser((l) -> null, *parsers)
+
+        expect:
+        def count = 0
+        for (def p : parser) {
+            assert p in parsers
+            count++
+        }
+        assert count == parsers.size()
+    }
+
 }

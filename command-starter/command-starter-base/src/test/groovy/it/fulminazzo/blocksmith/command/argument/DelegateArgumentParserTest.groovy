@@ -26,7 +26,7 @@ class DelegateArgumentParserTest extends Specification {
         (actual instanceof GString)
     }
 
-    def 'test that getCompletions delegates to delegate'() {
+    def 'test that #method delegates to delegate'() {
         given:
         def delegate = Mock(ArgumentParser)
 
@@ -37,10 +37,13 @@ class DelegateArgumentParserTest extends Specification {
         def visitor = Mock(Visitor)
 
         when:
-        parser.getCompletions(visitor)
+        parser."$method"(visitor)
 
         then:
-        1 * delegate.getCompletions(visitor)
+        1 * delegate."$method"(visitor)
+
+        where:
+        method << ['tryAdvanceCursor', 'getCompletions']
     }
 
 }
