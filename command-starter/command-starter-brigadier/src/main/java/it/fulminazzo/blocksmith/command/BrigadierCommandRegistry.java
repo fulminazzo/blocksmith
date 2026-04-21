@@ -19,7 +19,7 @@ abstract class BrigadierCommandRegistry<S> extends CommandRegistry {
      *
      * @param application the application
      */
-    public BrigadierCommandRegistry(final @NotNull ApplicationHandle application) {
+    protected BrigadierCommandRegistry(final @NotNull ApplicationHandle application) {
         super(application);
     }
 

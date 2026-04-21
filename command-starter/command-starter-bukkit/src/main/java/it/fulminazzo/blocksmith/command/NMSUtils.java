@@ -1,6 +1,8 @@
 package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.reflect.Reflect;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +17,7 @@ import java.util.regex.Pattern;
 /**
  * A collection of utilities to work with NMS.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class NMSUtils {
     private static final @NotNull String COMMAND_DISPATCHER_CLASS = "com.mojang.brigadier.CommandDispatcher";
 

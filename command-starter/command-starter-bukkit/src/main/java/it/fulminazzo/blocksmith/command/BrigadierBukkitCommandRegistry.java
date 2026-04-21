@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
-import java.lang.reflect.Constructor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -142,10 +141,8 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
 
     private static @NotNull ArgumentType<?> getPositionArgumentType() {
         try {
-            Class<?> positionArgumentType = getPositionArgumentTypeClass();
-            Constructor<?> constructor = positionArgumentType.getDeclaredConstructor();
-            return (ArgumentType<?>) constructor.newInstance();
-        } catch (Exception e) {
+            return Reflect.on(getPositionArgumentTypeClass()).init().get();
+        } catch (ClassNotFoundException e) {
             throw new ReflectException(e, "Could not create Position %s", ArgumentType.class.getSimpleName());
         }
     }
