@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -26,7 +27,25 @@ public final class UsageVisitor implements Visitor<@NotNull String, RuntimeExcep
 
     @Override
     public @NotNull String visitCommandNode(final @NotNull CommandNode node) {
-        throw new UnsupportedOperationException(); //TODO:
+        final UsageStyle style = UsageStyle.get();
+        final StringBuilder usage = new StringBuilder();
+        CommandNode current = node;
+        Set<CommandNode> children;
+        while (!(children = current.getChildren()).isEmpty()) {
+            if (children.size() == 1) {
+                current = children.stream().findFirst().orElseThrow();
+                usage.append(" ").append(current.accept(singleUsageVisitor));
+            } else {
+                usage.append(" ").append(children.stream()
+                        .map(c -> c.accept(singleUsageVisitor))
+                        .collect(Collectors.joining(
+                                UsageStyle.colorize(style.getSeparator(), style.getPunctuationColor())
+                        ))
+                );
+                break;
+            }
+        }
+        return usage.toString();
     }
 
     /**
@@ -36,13 +55,13 @@ public final class UsageVisitor implements Visitor<@NotNull String, RuntimeExcep
      * @return the usage of the parents
      */
     @NotNull String visitParentNode(final @NotNull CommandNode node) {
-        StringBuilder parentUsage = new StringBuilder();
+        final StringBuilder usage = new StringBuilder();
         CommandNode parent = node.getParent();
         while (parent != null) {
-            parentUsage.insert(0, parent.accept(singleUsageVisitor) + " ");
+            usage.insert(0, parent.accept(singleUsageVisitor) + " ");
             parent = parent.getParent();
         }
-        return parentUsage.toString();
+        return usage.toString();
     }
 
     /**
