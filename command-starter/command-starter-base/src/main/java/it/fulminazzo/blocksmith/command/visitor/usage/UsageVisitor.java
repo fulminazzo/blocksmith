@@ -8,16 +8,50 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Collectors;
 
-public class UsageVisitor {
+/**
+ * A visitor for generating the usage of a {@link it.fulminazzo.blocksmith.command.node.CommandNode}.
+ */
+public final class UsageVisitor implements Visitor<@NotNull String, RuntimeException> {
+    private final @NotNull Visitor<@NotNull String, RuntimeException> singleUsageVisitor = new SimpleUsageVisitor();
 
+    @Override
+    public @NotNull String visitArgumentNode(final @NotNull ArgumentNode<?> node) {
+        throw new UnsupportedOperationException(); //TODO:
+    }
+
+    @Override
+    public @NotNull String visitLiteralNode(final @NotNull LiteralNode node) {
+        throw new UnsupportedOperationException(); //TODO:
+    }
+
+    @Override
+    public @NotNull String visitCommandNode(final @NotNull CommandNode node) {
+        throw new UnsupportedOperationException(); //TODO:
+    }
+
+    /**
+     * Visits the parent nodes of a node and returns the usage of the parents.
+     *
+     * @param node the node
+     * @return the usage of the parents
+     */
+    @NotNull String visitParentNode(final @NotNull CommandNode node) {
+        StringBuilder parentUsage = new StringBuilder();
+        CommandNode parent = node.getParent();
+        while (parent != null) {
+            parentUsage.insert(0, parent.accept(singleUsageVisitor) + " ");
+            parent = parent.getParent();
+        }
+        return parentUsage.toString();
+    }
 
     /**
      * A basic visitor for generating the usage literal of a single node.
      */
-    static final class SimpleUsageVisitor implements Visitor<String, RuntimeException> {
+    static final class SimpleUsageVisitor implements Visitor<@NotNull String, RuntimeException> {
 
         @Override
-        public String visitArgumentNode(final @NotNull ArgumentNode<?> node) {
+        public @NotNull String visitArgumentNode(final @NotNull ArgumentNode<?> node) {
             UsageStyle style = UsageStyle.get();
             Class<?> type = node.getType();
             final String format = node.isOptional()
@@ -33,7 +67,7 @@ public class UsageVisitor {
         }
 
         @Override
-        public String visitLiteralNode(final @NotNull LiteralNode node) {
+        public @NotNull String visitLiteralNode(final @NotNull LiteralNode node) {
             UsageStyle style = UsageStyle.get();
             return node.getAliases().stream()
                     .map(a -> UsageStyle.colorize(a, style.getLiteralColor()))
