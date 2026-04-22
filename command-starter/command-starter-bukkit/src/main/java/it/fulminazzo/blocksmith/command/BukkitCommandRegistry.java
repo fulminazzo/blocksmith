@@ -50,12 +50,6 @@ class BukkitCommandRegistry extends CommandRegistry {
         return new BukkitCommandSenderWrapper(application, (CommandSender) executor);
     }
 
-    @Override
-    protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
-        registerInCommandMap(commandName, command);
-        updateClientCommands();
-    }
-
     /**
      * Registers the command in the Bukkit command map.
      *
@@ -73,6 +67,12 @@ class BukkitCommandRegistry extends CommandRegistry {
     }
 
     @Override
+    protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
+        registerInCommandMap(commandName, command);
+        updateClientCommands();
+    }
+
+    @Override
     protected void onUnregister(final @NotNull String commandName) {
         Command command = knownCommands.remove(getBukkitPrefix() + commandName);
         if (command != null) {
@@ -81,6 +81,11 @@ class BukkitCommandRegistry extends CommandRegistry {
             command.getAliases().forEach(this::removeOrRestoreCommand);
         }
         updateClientCommands();
+    }
+
+    @Override
+    protected @NotNull Class<?> getSenderType() {
+        return CommandSender.class;
     }
 
     /**
@@ -107,11 +112,6 @@ class BukkitCommandRegistry extends CommandRegistry {
             }
         }
         knownCommands.remove(getBukkitPrefix() + alias);
-    }
-
-    @Override
-    protected @NotNull Class<?> getSenderType() {
-        return CommandSender.class;
     }
 
     private void updateClientCommands() {
