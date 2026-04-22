@@ -50,6 +50,12 @@ public final class UsageStyle {
             "%s" + colorize("]", PUNCTUATION_COLOR_PLACEHOLDER);
 
     /*
+     * ARGUMENT
+     */
+
+    private @NotNull String greedyArgumentFormat = "%s...";
+
+    /*
      * COMMON
      */
 
@@ -170,7 +176,7 @@ public final class UsageStyle {
      */
 
     /**
-     * Gets the format of am optional {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     * Gets the format of an optional {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
      * The format uses the Java default format syntax (so {@code %s} will be replaced by the argument name).
      *
      * @return the format
@@ -201,6 +207,34 @@ public final class UsageStyle {
      */
     public @NotNull UsageStyle optionalArgumentFormat(final @NotNull String format) {
         this.optionalArgumentFormat = format;
+        return this;
+    }
+
+    /*
+     * ARGUMENT
+     */
+
+    /**
+     * Gets the format of a greedy {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     * The format uses the Java default format syntax (so {@code %s} will be replaced by the argument name).
+     *
+     * @return the format
+     */
+    public @NotNull String getGreedyArgumentFormat() {
+        return greedyArgumentFormat.replace(PUNCTUATION_COLOR_PLACEHOLDER, getPunctuationColor());
+    }
+
+    /**
+     * Sets the format of a greedy {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     * The format uses the Java default format syntax (so {@code %s} will be replaced by the argument name).
+     * If the special placeholder {@link  #PUNCTUATION_COLOR_PLACEHOLDER} is used,
+     * it will be replaced by the current {@link #getPunctuationColor()} color.
+     *
+     * @param format the format
+     * @return this object (for method chaining)
+     */
+    public @NotNull UsageStyle greedyArgumentFormat(final @NotNull String format) {
+        this.greedyArgumentFormat = format;
         return this;
     }
 
