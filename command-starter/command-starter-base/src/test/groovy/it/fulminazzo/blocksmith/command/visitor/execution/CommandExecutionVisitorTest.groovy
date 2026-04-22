@@ -611,9 +611,11 @@ class CommandExecutionVisitorTest extends Specification {
         printer == "Hello from $sender.name!"
 
         where:
-        method                                                                     | sender
-        CommandExecutionVisitorTest.getMethod('consoleOnly', ConsoleCommandSender) | new ConsoleCommandSender()
-        CommandExecutionVisitorTest.getMethod('playerOnly', Player)                | new Player('Alex')
+        method                                                                          | sender
+        CommandExecutionVisitorTest.getMethod('consoleOnly', ConsoleCommandSender)      | new ConsoleCommandSender()
+        CommandExecutionVisitorTest.getMethod('consoleOnlyTyped', CommandSenderWrapper) | new ConsoleCommandSender()
+        CommandExecutionVisitorTest.getMethod('playerOnly', Player)                     | new Player('Alex')
+        CommandExecutionVisitorTest.getMethod('playerOnlyTyped', CommandSenderWrapper)  | new Player('Alex')
     }
 
     def 'test that execute of #method from #sender throws CommandExecutionException with #message'() {
@@ -639,9 +641,11 @@ class CommandExecutionVisitorTest extends Specification {
         e.message == message
 
         where:
-        method                                                                     | sender                     || message
-        CommandExecutionVisitorTest.getMethod('consoleOnly', ConsoleCommandSender) | new Player('Alex')         || 'error.player-cannot-execute'
-        CommandExecutionVisitorTest.getMethod('playerOnly', Player)                | new ConsoleCommandSender() || 'error.console-cannot-execute'
+        method                                                                          | sender                     || message
+        CommandExecutionVisitorTest.getMethod('consoleOnly', ConsoleCommandSender)      | new Player('Alex')         || 'error.player-cannot-execute'
+        CommandExecutionVisitorTest.getMethod('consoleOnlyTyped', CommandSenderWrapper) | new Player('Alex')         || 'error.player-cannot-execute'
+        CommandExecutionVisitorTest.getMethod('playerOnly', Player)                     | new ConsoleCommandSender() || 'error.console-cannot-execute'
+        CommandExecutionVisitorTest.getMethod('playerOnlyTyped', CommandSenderWrapper)  | new ConsoleCommandSender() || 'error.console-cannot-execute'
     }
 
     def 'test that handleCommandExecutionException sends messages and does not throw'() {
@@ -838,7 +842,15 @@ class CommandExecutionVisitorTest extends Specification {
         printer = "Hello from $sender.name!"
     }
 
+    static void consoleOnlyTyped(final @NotNull CommandSenderWrapper<ConsoleCommandSender> sender) {
+        printer = "Hello from $sender.name!"
+    }
+
     static void playerOnly(final @NotNull Player sender) {
+        printer = "Hello from $sender.name!"
+    }
+
+    static void playerOnlyTyped(final @NotNull CommandSenderWrapper<Player> sender) {
         printer = "Hello from $sender.name!"
     }
 
