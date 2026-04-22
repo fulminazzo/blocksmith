@@ -1,8 +1,10 @@
 package it.fulminazzo.blocksmith.command.node
 
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler
+import it.fulminazzo.blocksmith.command.visitor.usage.UsageVisitor
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
+import org.mockito.Mockito
 import spock.lang.Specification
 
 import java.lang.reflect.Method
@@ -101,6 +103,26 @@ class CommandNodeTest extends Specification {
 
         then:
         node.children.size() == sizeBefore
+    }
+
+    def 'test that getUsage calls on UsageVisitor'() {
+        given:
+        def mock = Mockito.mockStatic(UsageVisitor)
+
+        and:
+        def node = Mock(CommandNode)
+        node.usage >> {
+            callRealMethod()
+        }
+
+        when:
+        node.usage
+
+        then:
+        mock.verify({ UsageVisitor.generateUsage(node) })
+
+        cleanup:
+        mock.close()
     }
 
     def 'test that getCommandNode returns itself when node is a LiteralNode'() {
