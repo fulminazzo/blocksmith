@@ -5,7 +5,7 @@ import it.fulminazzo.blocksmith.command.CommandSenderWrapper
 import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
 import it.fulminazzo.blocksmith.command.annotation.Confirm
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
-import it.fulminazzo.blocksmith.command.visitor.Visitor
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor
 import it.fulminazzo.blocksmith.reflect.Reflect
@@ -176,7 +176,7 @@ class ConfirmationHandlerTest extends Specification {
         def handler = new ConfirmationHandler(confirmationInfo)
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
 
         expect:
         handler.getCompletions(visitor).sort() == ['yes', 'no'].sort()

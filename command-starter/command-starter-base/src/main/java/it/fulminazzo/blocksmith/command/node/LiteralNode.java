@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.annotation.Confirm;
 import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -91,7 +92,7 @@ public final class LiteralNode extends CommandNode {
     }
 
     @Override
-    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+    public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
         @NotNull CommandSenderWrapper<?> sender = visitor.getCommandSender();
         final List<String> completions = new ArrayList<>();
         if (sender.hasPermission(getCommandInfo().getPermission())) {

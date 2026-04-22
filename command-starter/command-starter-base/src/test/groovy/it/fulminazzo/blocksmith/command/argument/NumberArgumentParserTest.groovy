@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.command.argument
 
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
-import it.fulminazzo.blocksmith.command.visitor.Visitor
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import it.fulminazzo.blocksmith.message.argument.Placeholder
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
@@ -52,8 +52,8 @@ class NumberArgumentParserTest extends Specification {
         "$Integer.MIN_VALUE" || []
     }
 
-    private Visitor<?, ? extends Exception> prepareVisitor(final @NotNull String argument) {
-        def context = Mock(Visitor)
+    private InputVisitor<?, ? extends Exception> prepareVisitor(final @NotNull String argument) {
+        def context = Mock(InputVisitor)
         context.input >> {
             def input = Mock(CommandInput)
             input.current >> argument

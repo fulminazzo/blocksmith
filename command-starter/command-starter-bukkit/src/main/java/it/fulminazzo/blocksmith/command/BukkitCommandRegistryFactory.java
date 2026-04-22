@@ -5,7 +5,7 @@ import it.fulminazzo.blocksmith.command.argument.*;
 import it.fulminazzo.blocksmith.command.argument.dto.Coordinate;
 import it.fulminazzo.blocksmith.command.argument.dto.Position;
 import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition;
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.conversion.Convertible;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import org.bukkit.*;
@@ -25,7 +25,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
         ArgumentParsers.register(Player.class, new ArgumentParser<>() {
 
             @Override
-            public @NotNull Player parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+            public @NotNull Player parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
                 Server server = visitor.getApplication().server();
                 CommandSender sender = (CommandSender) visitor.getCommandSender().getActualSender();
                 String argument = visitor.getInput().getCurrent();
@@ -41,7 +41,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             }
 
             @Override
-            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
                 Server server = visitor.getApplication().server();
                 CommandSender sender = (CommandSender) visitor.getCommandSender().getActualSender();
                 final Collection<Player> players = new ArrayList<>(server.getOnlinePlayers());
@@ -57,7 +57,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
         ArgumentParsers.register(World.class, new ArgumentParser<>() {
 
             @Override
-            public @NotNull World parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+            public @NotNull World parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
                 Server server = visitor.getApplication().server();
                 String argument = visitor.getInput().getCurrent();
                 World world = server.getWorld(argument);
@@ -67,7 +67,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             }
 
             @Override
-            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
                 Server server = visitor.getApplication().server();
                 return server.getWorlds().stream().map(World::getName).collect(Collectors.toList());
             }

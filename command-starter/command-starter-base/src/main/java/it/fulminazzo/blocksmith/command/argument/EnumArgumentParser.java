@@ -1,12 +1,15 @@
 package it.fulminazzo.blocksmith.command.argument;
 
 import it.fulminazzo.blocksmith.command.CommandMessages;
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * A dynamic {@link ArgumentParser} for enum types.
@@ -31,7 +34,7 @@ final class EnumArgumentParser<E extends Enum<E>> implements ArgumentParser<E> {
     }
 
     @Override
-    public @NotNull E parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+    public @NotNull E parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
         final String rawArgument = visitor.getInput().getCurrent();
         E value = values.get(rawArgument.toLowerCase());
         if (value == null)
@@ -44,7 +47,7 @@ final class EnumArgumentParser<E extends Enum<E>> implements ArgumentParser<E> {
     }
 
     @Override
-    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+    public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
         return new ArrayList<>(values.keySet());
     }
 

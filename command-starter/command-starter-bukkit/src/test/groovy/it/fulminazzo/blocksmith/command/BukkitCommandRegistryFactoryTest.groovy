@@ -10,7 +10,7 @@ import it.fulminazzo.blocksmith.command.argument.dto.Coordinate
 import it.fulminazzo.blocksmith.command.argument.dto.Position
 import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
-import it.fulminazzo.blocksmith.command.visitor.Visitor
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import it.fulminazzo.blocksmith.reflect.ReflectException
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -25,7 +25,7 @@ class BukkitCommandRegistryFactoryTest extends Specification {
 
     private ApplicationHandle application
 
-    private Visitor<?, ? extends Exception> visitor
+    private InputVisitor<?, ? extends Exception> visitor
 
     void setupSpec() {
         MockBukkit.mock()
@@ -425,9 +425,9 @@ class BukkitCommandRegistryFactoryTest extends Specification {
                 { a -> new Location(a.server().getWorld('world'), 1, 2, 3) }
     }
 
-    private Visitor<?, ? extends Exception> newVisitor(final CommandSender sender) {
+    private InputVisitor<?, ? extends Exception> newVisitor(final CommandSender sender) {
         def input = new CommandInput()
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.application >> application
         visitor.input >> input
         visitor.commandSender >> new BukkitCommandSenderWrapper(application, sender)

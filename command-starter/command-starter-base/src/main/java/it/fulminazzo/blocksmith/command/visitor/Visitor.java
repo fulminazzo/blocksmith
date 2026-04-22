@@ -1,7 +1,5 @@
 package it.fulminazzo.blocksmith.command.visitor;
 
-import it.fulminazzo.blocksmith.ApplicationHandle;
-import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import org.jetbrains.annotations.NotNull;
@@ -31,26 +29,5 @@ public interface Visitor<T, X extends Exception> {
      * @throws X the exception thrown in case of visit errors
      */
     T visitLiteralNode(final @NotNull LiteralNode node) throws X;
-
-    /**
-     * Gets the command sender associated with this visitor.
-     *
-     * @return the command sender
-     */
-    @NotNull CommandSenderWrapper<?> getCommandSender();
-
-    /**
-     * Gets the input associated with this visitor.
-     *
-     * @return the input
-     */
-    @NotNull CommandInput getInput();
-
-    /**
-     * Gets the application that requested this visitor.
-     *
-     * @return the application
-     */
-    @NotNull ApplicationHandle getApplication();
 
 }

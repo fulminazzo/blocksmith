@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier;
 import it.fulminazzo.blocksmith.command.visitor.CommandInput;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.reflect.Reflect;
@@ -51,7 +52,7 @@ public class ArgumentNode<T> extends CommandNode {
      * @param visitor the visitor to get the input from
      * @return {@code true} if the cursor was correctly advanced, {@code false} otherwise
      */
-    public boolean tryAdvanceCursor(final @NotNull Visitor<?, ?> visitor) {
+    public boolean tryAdvanceCursor(final @NotNull InputVisitor<?, ?> visitor) {
         handleGreedy(visitor);
         final CommandInput input = visitor.getInput();
         if (input.isDone()) {
@@ -91,7 +92,7 @@ public class ArgumentNode<T> extends CommandNode {
      * @throws ArgumentParseException in case of parsing exceptions
      * @throws ValidationException    in case of invalid argument
      */
-    public @Nullable T parseCurrent(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException, ValidationException {
+    public @Nullable T parseCurrent(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException, ValidationException {
         handleGreedy(visitor);
         final CommandInput input = visitor.getInput();
         if (input.isDone()) {
@@ -167,7 +168,7 @@ public class ArgumentNode<T> extends CommandNode {
     }
 
     @Override
-    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+    public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
         handleGreedy(visitor);
         if (completionsSupplier != null) return completionsSupplier.get();
         else return getParser().getCompletions(visitor).stream()
@@ -175,7 +176,7 @@ public class ArgumentNode<T> extends CommandNode {
                 .collect(Collectors.toList());
     }
 
-    private void handleGreedy(final @NotNull Visitor<?, ?> visitor) {
+    private void handleGreedy(final @NotNull InputVisitor<?, ?> visitor) {
         if (isGreedy()) visitor.getInput().mergeRemaining();
     }
 

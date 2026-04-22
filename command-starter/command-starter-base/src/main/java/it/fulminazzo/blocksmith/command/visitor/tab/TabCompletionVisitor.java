@@ -5,7 +5,7 @@ import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
-import it.fulminazzo.blocksmith.command.visitor.VisitorImpl;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitorImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * <br>
  * Uses {@link RuntimeException} as exception because it should never actually throw anything.
  */
-public final class TabCompletionVisitor extends VisitorImpl<@NotNull List<String>, RuntimeException> {
+public final class TabCompletionVisitor extends InputVisitorImpl<@NotNull List<String>, RuntimeException> {
 
     /**
      * Instantiates a new Tab completion visitor.

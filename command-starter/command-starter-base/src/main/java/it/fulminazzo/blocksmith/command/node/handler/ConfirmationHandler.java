@@ -4,7 +4,7 @@ import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.TabCompletable;
 import it.fulminazzo.blocksmith.command.annotation.Confirm;
 import it.fulminazzo.blocksmith.command.visitor.CommandInput;
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException;
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor;
 import it.fulminazzo.blocksmith.function.RunnableException;
@@ -90,7 +90,7 @@ public final class ConfirmationHandler implements TabCompletable {
     }
 
     @Override
-    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+    public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
         return Arrays.asList(getConfirmWord(), getCancelWord());
     }
 

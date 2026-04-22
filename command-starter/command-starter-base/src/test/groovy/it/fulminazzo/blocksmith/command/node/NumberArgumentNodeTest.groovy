@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParseException
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser
 import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import it.fulminazzo.blocksmith.command.visitor.Visitor
 import spock.lang.Specification
 
@@ -49,7 +50,7 @@ class NumberArgumentNodeTest extends Specification {
 
     def 'test that parseCurrent correctly parses #expected'() {
         given:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.input >> {
             def input = new CommandInput()
             input.addInput(expected.toString())
@@ -78,7 +79,7 @@ class NumberArgumentNodeTest extends Specification {
         }
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.input >> new CommandInput()
 
         when:
@@ -90,7 +91,7 @@ class NumberArgumentNodeTest extends Specification {
 
     def 'test that parseCurrent throws for #number'() {
         given:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.input >> {
             def input = new CommandInput()
             input.addInput(number.toString())
@@ -110,7 +111,7 @@ class NumberArgumentNodeTest extends Specification {
 
     def 'test that getCompletions allows for custom completions'() {
         given:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.input >> new CommandInput().addInput('')
 
         and:
@@ -127,7 +128,7 @@ class NumberArgumentNodeTest extends Specification {
 
     def 'test that getCompletions removes invalid numbers'() {
         given:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.input >> new CommandInput().addInput('')
 
         when:

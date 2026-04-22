@@ -7,6 +7,7 @@ import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import it.fulminazzo.blocksmith.command.visitor.Visitor
 import spock.lang.Specification
 
@@ -241,7 +242,7 @@ class LiteralNodeTest extends Specification {
         }
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.commandSender >> sender
 
         when:

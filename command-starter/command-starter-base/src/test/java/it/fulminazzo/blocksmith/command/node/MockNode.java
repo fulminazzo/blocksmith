@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -25,7 +26,7 @@ public class MockNode extends CommandNode implements Cloneable {
     }
 
     @Override
-    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+    public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
         throw new UnsupportedOperationException();
     }
 

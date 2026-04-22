@@ -8,7 +8,7 @@ import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +21,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
         ArgumentParsers.register(Player.class, new ArgumentParser<>() {
 
             @Override
-            public @NotNull Player parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+            public @NotNull Player parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
                 ProxyServer server = visitor.getApplication().server();
                 String argument = visitor.getInput().getCurrent();
                 return server.getPlayer(argument).orElseThrow(() -> new ArgumentParseException(CommandMessages.PLAYER_NOT_FOUND)
@@ -29,7 +29,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
             }
 
             @Override
-            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
                 ProxyServer server = visitor.getApplication().server();
                 return server.getAllPlayers().stream()
                         .map(Player::getUsername)
@@ -40,7 +40,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
         ArgumentParsers.register(RegisteredServer.class, new ArgumentParser<>() {
 
             @Override
-            public @NotNull RegisteredServer parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+            public @NotNull RegisteredServer parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
                 ProxyServer server = visitor.getApplication().server();
                 String argument = visitor.getInput().getCurrent();
                 return server.getServer(argument).orElseThrow(() -> new ArgumentParseException(CommandMessages.SERVER_NOT_FOUND)
@@ -48,7 +48,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
             }
 
             @Override
-            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
                 ProxyServer server = visitor.getApplication().server();
                 return server.getAllServers().stream()
                         .map(RegisteredServer::getServerInfo)

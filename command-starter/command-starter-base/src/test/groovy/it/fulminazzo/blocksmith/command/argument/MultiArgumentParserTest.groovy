@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.command.argument
 
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
-import it.fulminazzo.blocksmith.command.visitor.Visitor
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import spock.lang.Specification
 
 class MultiArgumentParserTest extends Specification {
@@ -10,7 +10,7 @@ class MultiArgumentParserTest extends Specification {
     private ArgumentParser<Position> parser
 
     private CommandInput input
-    private Visitor<?, ? extends Exception> visitor
+    private InputVisitor<?, ? extends Exception> visitor
 
     void setup() {
         parser = new MultiArgumentParser<>(
@@ -19,7 +19,7 @@ class MultiArgumentParserTest extends Specification {
         )
 
         input = new CommandInput()
-        visitor = Mock(Visitor)
+        visitor = Mock(InputVisitor)
         visitor.input >> input
     }
 

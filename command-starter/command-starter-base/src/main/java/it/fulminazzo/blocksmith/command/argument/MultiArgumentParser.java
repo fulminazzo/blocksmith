@@ -2,7 +2,7 @@ package it.fulminazzo.blocksmith.command.argument;
 
 import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.visitor.CommandInput;
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,7 +67,7 @@ public class MultiArgumentParser<T> implements ArgumentParser<T>, Iterable<Argum
     }
 
     @Override
-    public boolean tryAdvanceCursor(final @NotNull Visitor<?, ?> visitor) {
+    public boolean tryAdvanceCursor(final @NotNull InputVisitor<?, ?> visitor) {
         final CommandInput input = visitor.getInput();
         CommandInput snapshot = input.snapshot();
         for (ArgumentParser<?> parser : parsers)
@@ -79,7 +79,7 @@ public class MultiArgumentParser<T> implements ArgumentParser<T>, Iterable<Argum
     }
 
     @Override
-    public @Nullable T parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+    public @Nullable T parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
         final List<Object> parsed = new ArrayList<>();
         final CommandInput input = visitor.getInput();
         for (int i = 0; i < parsers.size(); i++) {
@@ -92,7 +92,7 @@ public class MultiArgumentParser<T> implements ArgumentParser<T>, Iterable<Argum
     }
 
     @Override
-    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+    public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
         final CommandInput input = visitor.getInput();
         for (int i = 0; i < parsers.size(); i++) {
             ArgumentParser<?> parser = parsers.get(i);

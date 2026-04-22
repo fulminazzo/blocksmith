@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.command.argument;
 
 import it.fulminazzo.blocksmith.command.CommandMessages;
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public final class NumberArgumentParser<N extends Number> implements ArgumentPar
     private final @NotNull Function<String, N> parser;
 
     @Override
-    public @Nullable N parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+    public @Nullable N parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
         String rawArgument = visitor.getInput().getCurrent();
         try {
             return parser.apply(rawArgument);
@@ -40,7 +40,7 @@ public final class NumberArgumentParser<N extends Number> implements ArgumentPar
     }
 
     @Override
-    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+    public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
         String argument = visitor.getInput().getCurrent();
         List<String> completions = new ArrayList<>();
         if (argument.isEmpty() || isValid(argument))

@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.command;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.scheduler.Scheduler;
 import org.bukkit.OfflinePlayer;
@@ -22,7 +22,7 @@ final class OfflinePlayerArgumentParser implements ArgumentParser<OfflinePlayer>
 
     @SuppressWarnings("deprecation")
     @Override
-    public @NotNull OfflinePlayer parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+    public @NotNull OfflinePlayer parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
         Server server = visitor.getApplication().server();
         String argument = visitor.getInput().getCurrent();
         if (getNames(visitor.getApplication()).stream().anyMatch(argument::equalsIgnoreCase))
@@ -32,7 +32,7 @@ final class OfflinePlayerArgumentParser implements ArgumentParser<OfflinePlayer>
     }
 
     @Override
-    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+    public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
         return new ArrayList<>(getNames(visitor.getApplication()));
     }
 

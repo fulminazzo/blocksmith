@@ -4,7 +4,7 @@ import it.fulminazzo.blocksmith.command.argument.dto.Coordinate
 import it.fulminazzo.blocksmith.command.argument.dto.Position
 import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
-import it.fulminazzo.blocksmith.command.visitor.Visitor
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import it.fulminazzo.blocksmith.message.util.LocaleUtils
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
@@ -409,8 +409,8 @@ class ArgumentParsersTest extends Specification {
                 ".*"
     }
 
-    private Visitor<?, ? extends Exception> prepareVisitor(final @NotNull String argument) {
-        def context = Mock(Visitor)
+    private InputVisitor<?, ? extends Exception> prepareVisitor(final @NotNull String argument) {
+        def context = Mock(InputVisitor)
         context.input >> new CommandInput().addInput(argument)
         return context
     }

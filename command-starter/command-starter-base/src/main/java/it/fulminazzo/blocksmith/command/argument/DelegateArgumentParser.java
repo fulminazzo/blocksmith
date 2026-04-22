@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.command.argument;
 
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +17,7 @@ import java.util.function.BiFunction;
 public final class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
     @Getter
     private final @NotNull ArgumentParser<F> delegate;
-    private final @NotNull BiFunction<@NotNull Visitor<?, ?>, @Nullable F, @Nullable T> converter;
+    private final @NotNull BiFunction<@NotNull InputVisitor<?, ?>, @Nullable F, @Nullable T> converter;
 
     /**
      * Instantiates a new Delegate argument parser.
@@ -25,7 +25,7 @@ public final class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
      * @param converter    the function to convert the parsed object to the desired type
      * @param delegateType the Java type of the delegate argument
      */
-    public DelegateArgumentParser(final @NotNull BiFunction<@NotNull Visitor<?, ?>, @Nullable F, @Nullable T> converter,
+    public DelegateArgumentParser(final @NotNull BiFunction<@NotNull InputVisitor<?, ?>, @Nullable F, @Nullable T> converter,
                                   final @NotNull Class<F> delegateType) {
         this(converter, ArgumentParsers.of(delegateType));
     }
@@ -36,24 +36,24 @@ public final class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
      * @param converter the function to convert the parsed object to the desired type
      * @param delegate  the parser delegated of parsing
      */
-    public DelegateArgumentParser(final @NotNull BiFunction<@NotNull Visitor<?, ?>, @Nullable F, @Nullable T> converter,
+    public DelegateArgumentParser(final @NotNull BiFunction<@NotNull InputVisitor<?, ?>, @Nullable F, @Nullable T> converter,
                                   final @NotNull ArgumentParser<F> delegate) {
         this.delegate = delegate;
         this.converter = converter;
     }
 
     @Override
-    public boolean tryAdvanceCursor(final @NotNull Visitor<?, ?> visitor) {
+    public boolean tryAdvanceCursor(final @NotNull InputVisitor<?, ?> visitor) {
         return delegate.tryAdvanceCursor(visitor);
     }
 
     @Override
-    public @Nullable T parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+    public @Nullable T parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
         return converter.apply(visitor, delegate.parse(visitor));
     }
 
     @Override
-    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+    public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
         return delegate.getCompletions(visitor);
     }
 

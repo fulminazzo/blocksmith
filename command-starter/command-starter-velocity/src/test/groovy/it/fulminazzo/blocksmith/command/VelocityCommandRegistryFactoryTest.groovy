@@ -9,14 +9,14 @@ import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.argument.ArgumentParseException
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
-import it.fulminazzo.blocksmith.command.visitor.Visitor
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import spock.lang.Specification
 
 class VelocityCommandRegistryFactoryTest extends Specification {
 
     private ApplicationHandle application
 
-    private Visitor<?, ? extends Exception> visitor
+    private InputVisitor<?, ? extends Exception> visitor
 
     void setup() {
         final player1 = Mock(Player)
@@ -53,7 +53,7 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         application.server() >> server
 
         def input = new CommandInput()
-        visitor = Mock(Visitor)
+        visitor = Mock(InputVisitor)
         visitor.application >> application
         visitor.input >> input
         visitor.commandSender >> new VelocityCommandSenderWrapper(application, Mock(CommandSource))

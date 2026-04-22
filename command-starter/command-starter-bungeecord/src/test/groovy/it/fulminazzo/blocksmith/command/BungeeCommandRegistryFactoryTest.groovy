@@ -5,7 +5,7 @@ import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.argument.ArgumentParseException
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
-import it.fulminazzo.blocksmith.command.visitor.Visitor
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import net.md_5.bungee.api.CommandSender
 import net.md_5.bungee.api.ProxyServer
 import net.md_5.bungee.api.config.ServerInfo
@@ -18,7 +18,7 @@ class BungeeCommandRegistryFactoryTest extends Specification {
 
     private ApplicationHandle application
 
-    private Visitor<?, ? extends Exception> visitor
+    private InputVisitor<?, ? extends Exception> visitor
 
     void setup() {
         final player1 = Mock(ProxiedPlayer)
@@ -52,7 +52,7 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         }
 
         def input = new CommandInput()
-        visitor = Mock(Visitor)
+        visitor = Mock(InputVisitor)
         visitor.application >> application
         visitor.input >> input
         visitor.commandSender >> new BungeeCommandSenderWrapper(application, Mock(CommandSender))

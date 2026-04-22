@@ -5,7 +5,7 @@ import it.fulminazzo.blocksmith.command.argument.dto.Coordinate;
 import it.fulminazzo.blocksmith.command.argument.dto.Position;
 import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition;
 import it.fulminazzo.blocksmith.command.visitor.CommandInput;
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.util.LocaleUtils;
 import it.fulminazzo.blocksmith.reflect.Reflect;
@@ -60,7 +60,7 @@ public final class ArgumentParsers {
         register(Boolean.class, new ArgumentParser<>() {
 
             @Override
-            public @NotNull Boolean parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+            public @NotNull Boolean parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
                 String rawArgument = visitor.getInput().getCurrent();
                 if (rawArgument.equalsIgnoreCase(TRUE)) return true;
                 else if (rawArgument.equalsIgnoreCase(FALSE)) return false;
@@ -70,7 +70,7 @@ public final class ArgumentParsers {
             }
 
             @Override
-            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
                 return booleanCompletions;
             }
 
@@ -78,7 +78,7 @@ public final class ArgumentParsers {
         register(Character.class, new ArgumentParser<>() {
 
             @Override
-            public @NotNull Character parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+            public @NotNull Character parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
                 String rawArgument = visitor.getInput().getCurrent();
                 if (rawArgument.length() == 1) return rawArgument.charAt(0);
                 else
@@ -87,7 +87,7 @@ public final class ArgumentParsers {
             }
 
             @Override
-            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
                 if (visitor.getInput().getCurrent().isEmpty()) return charactersCompletions;
                 return Collections.emptyList();
             }
@@ -96,12 +96,12 @@ public final class ArgumentParsers {
         register(String.class, new ArgumentParser<>() {
 
             @Override
-            public @NotNull String parse(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull String parse(final @NotNull InputVisitor<?, ?> visitor) {
                 return visitor.getInput().getCurrent();
             }
 
             @Override
-            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
                 return Collections.singletonList("<%name%>");
             }
 
@@ -109,12 +109,12 @@ public final class ArgumentParsers {
         register(Object.class, new ArgumentParser<>() {
 
             @Override
-            public @NotNull Object parse(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull Object parse(final @NotNull InputVisitor<?, ?> visitor) {
                 return visitor.getInput().getCurrent();
             }
 
             @Override
-            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
                 return Collections.singletonList("<%name%>");
             }
 
@@ -122,7 +122,7 @@ public final class ArgumentParsers {
         register(Locale.class, new ArgumentParser<>() {
 
             @Override
-            public @NotNull Locale parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+            public @NotNull Locale parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
                 String argument = visitor.getInput().getCurrent();
                 Locale locale = LocaleUtils.fromString(argument);
                 if (ArgumentParsers.isValidLocale(locale)) return locale;
@@ -131,7 +131,7 @@ public final class ArgumentParsers {
             }
 
             @Override
-            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
                 return localeCompletions;
             }
 
@@ -140,7 +140,7 @@ public final class ArgumentParsers {
             private final @NotNull ArgumentParser<Double> valueParser = of(Double.class);
 
             @Override
-            public @NotNull Coordinate parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+            public @NotNull Coordinate parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
                 final CommandInput input = visitor.getInput();
                 String rawArgument = input.getCurrent();
                 final String relativeIdentifier = Coordinate.RELATIVE_IDENTIFIER;
@@ -154,7 +154,7 @@ public final class ArgumentParsers {
             }
 
             @Override
-            public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
                 final CommandInput input = visitor.getInput();
                 final String current = input.getCurrent();
                 final String relativeIdentifier = Coordinate.RELATIVE_IDENTIFIER;
@@ -184,12 +184,12 @@ public final class ArgumentParsers {
                 new ArgumentParser<>() {
 
                     @Override
-                    public @NotNull String parse(final @NotNull Visitor<?, ?> visitor) {
+                    public @NotNull String parse(final @NotNull InputVisitor<?, ?> visitor) {
                         return visitor.getInput().getCurrent();
                     }
 
                     @Override
-                    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+                    public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
                         return List.of("<world>");
                     }
 

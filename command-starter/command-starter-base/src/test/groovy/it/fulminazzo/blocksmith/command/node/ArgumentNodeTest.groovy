@@ -5,7 +5,7 @@ package it.fulminazzo.blocksmith.command.node
 import it.fulminazzo.blocksmith.command.argument.ArgumentParseException
 import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
-import it.fulminazzo.blocksmith.command.visitor.Visitor
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import it.fulminazzo.blocksmith.validation.ValidationException
 import it.fulminazzo.blocksmith.validation.annotation.Matches
 import spock.lang.Specification
@@ -25,7 +25,7 @@ class ArgumentNodeTest extends Specification {
         node.defaultValue = defaultValue
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         def input = new CommandInput()
         input.addInput(*arguments)
         visitor.input >> input
@@ -68,7 +68,7 @@ class ArgumentNodeTest extends Specification {
         node.completionsSupplier = supplier
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.input >> {
             def input = new CommandInput()
             input.addInput(expected.contains(' ') ? "'$expected'" : expected)
@@ -95,7 +95,7 @@ class ArgumentNodeTest extends Specification {
         node.completionsSupplier = supplier
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.input >> {
             def input = new CommandInput()
             input.addInput('invalid')
@@ -115,7 +115,7 @@ class ArgumentNodeTest extends Specification {
         if (defaultValue != null) node.defaultValue = defaultValue.toString()
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.input >> new CommandInput()
 
         when:
@@ -133,7 +133,7 @@ class ArgumentNodeTest extends Specification {
         def node = newArgumentNode(String)
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.input >> {
             def input = new CommandInput()
             input.addInput('#@$%^&*')
@@ -157,7 +157,7 @@ class ArgumentNodeTest extends Specification {
         input.addInput('Hello', 'world')
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.input >> input
 
         when:
@@ -172,7 +172,7 @@ class ArgumentNodeTest extends Specification {
         def node = newArgumentNode(boolean)
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
         visitor.input >> {
             def input = new CommandInput()
             input.addInput(expected.toString())
@@ -200,7 +200,7 @@ class ArgumentNodeTest extends Specification {
         def node = newArgumentNode(boolean)
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
 
         when:
         node.accept(visitor)
@@ -219,7 +219,7 @@ class ArgumentNodeTest extends Specification {
         node.completionsSupplier = supplier
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
 
         expect:
         node.getCompletions(visitor).sort() == supplier.get().sort()
@@ -230,7 +230,7 @@ class ArgumentNodeTest extends Specification {
         def node = newArgumentNode(boolean)
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
 
         expect:
         node.getCompletions(visitor).sort() == ['true', 'false'].sort()
@@ -241,7 +241,7 @@ class ArgumentNodeTest extends Specification {
         def node = newArgumentNode(String)
 
         and:
-        def visitor = Mock(Visitor)
+        def visitor = Mock(InputVisitor)
 
         expect:
         node.getCompletions(visitor) == ['<argument>']

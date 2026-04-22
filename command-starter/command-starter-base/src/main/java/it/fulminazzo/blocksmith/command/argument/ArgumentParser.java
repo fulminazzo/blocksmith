@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.command.argument;
 
 import it.fulminazzo.blocksmith.command.TabCompletable;
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +18,7 @@ public interface ArgumentParser<T> extends TabCompletable {
      * @param visitor the current visitor
      * @return {@code true} if the current input was validated and the cursor was advanced, {@code false} otherwise
      */
-    default boolean tryAdvanceCursor(final @NotNull Visitor<?, ?> visitor) {
+    default boolean tryAdvanceCursor(final @NotNull InputVisitor<?, ?> visitor) {
         try {
             parse(visitor);
             visitor.getInput().advanceCursor();
@@ -35,6 +35,6 @@ public interface ArgumentParser<T> extends TabCompletable {
      * @return the object
      * @throws ArgumentParseException in case of parsing errors
      */
-    @Nullable T parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException;
+    @Nullable T parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException;
 
 }

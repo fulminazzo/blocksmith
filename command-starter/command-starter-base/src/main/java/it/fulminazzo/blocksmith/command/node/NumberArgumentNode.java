@@ -2,7 +2,7 @@ package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.validation.ValidationException;
@@ -82,7 +82,7 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
     }
 
     @Override
-    public @Nullable N parseCurrent(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException, ValidationException {
+    public @Nullable N parseCurrent(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException, ValidationException {
         N number = super.parseCurrent(visitor);
         if (number == null) return null;
         double value = number.doubleValue();
@@ -97,7 +97,7 @@ public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> 
     }
 
     @Override
-    public @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor) {
+    public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
         List<String> completions = super.getCompletions(visitor);
         completions.removeIf(s -> {
             try {

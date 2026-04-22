@@ -10,7 +10,7 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler;
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
-import it.fulminazzo.blocksmith.command.visitor.VisitorImpl;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitorImpl;
 import it.fulminazzo.blocksmith.message.argument.Argument;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.argument.Time;
@@ -29,7 +29,7 @@ import java.util.Objects;
  * A special {@link it.fulminazzo.blocksmith.command.visitor.Visitor} handling command execution.
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public final class CommandExecutionVisitor extends VisitorImpl<Void, CommandExecutionException> {
+public final class CommandExecutionVisitor extends InputVisitorImpl<Void, CommandExecutionException> {
     @Getter
     @NotNull LinkedList<Object> arguments = new LinkedList<>();
 

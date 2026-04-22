@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
-import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -17,6 +17,6 @@ public interface TabCompletable {
      * @param visitor the visitor requesting the completions
      * @return the completions
      */
-    @NotNull List<String> getCompletions(final @NotNull Visitor<?, ?> visitor);
+    @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor);
 
 }
