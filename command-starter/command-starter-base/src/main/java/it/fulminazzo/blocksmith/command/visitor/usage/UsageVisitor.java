@@ -4,6 +4,8 @@ import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -12,7 +14,10 @@ import java.util.stream.Collectors;
 /**
  * A visitor for generating the usage of a {@link it.fulminazzo.blocksmith.command.node.CommandNode}.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UsageVisitor implements Visitor<@NotNull String, RuntimeException> {
+    private static final @NotNull UsageVisitor INSTANCE = new UsageVisitor();
+
     private static final @NotNull String COMMAND_START = "/";
 
     private final @NotNull Visitor<@NotNull String, RuntimeException> singleUsageVisitor = new SimpleUsageVisitor();
@@ -78,6 +83,16 @@ public final class UsageVisitor implements Visitor<@NotNull String, RuntimeExcep
             }
         }
         return usage.toString();
+    }
+
+    /**
+     * Generates the usage of the given command node.
+     *
+     * @param node the command node
+     * @return the usage of the command node
+     */
+    public static @NotNull String generateUsage(final @NotNull CommandNode node) {
+        return INSTANCE.visitCommandNode(node);
     }
 
     /**
