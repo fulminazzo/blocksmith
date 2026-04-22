@@ -1,11 +1,16 @@
 package it.fulminazzo.blocksmith.command.visitor.usage;
 
+import it.fulminazzo.blocksmith.command.argument.dto.Coordinate;
+import it.fulminazzo.blocksmith.command.argument.dto.Position;
+import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,10 +22,21 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UsageStyle {
+    private static final @NotNull Map<Class<?>, String> DEFAULT_ARGUMENT_COLORS;
+
+    private static final @NotNull String DEFAULT_NUMBER_COLOR = "light_purple";
+    private static final @NotNull String DEFAULT_BOOLEAN_COLOR = "green";
+    private static final @NotNull String DEFAULT_CHAR_SEQUENCE_COLOR = "white";
+    private static final @NotNull String DEFAULT_LOCALE_COLOR = "blue";
+    public static final @NotNull String DEFAULT_POSITION_COLOR = "dark_green";
+    public static final @NotNull String DEFAULT_PLAYER_COLOR = "gold";
+    public static final @NotNull String DEFAULT_SERVER_COLOR = "dark_aqua";
+
     private static final @NotNull String PUNCTUATION_COLOR_PLACEHOLDER = "<punctuation>";
-    private static final @NotNull Map<Class<?>, String> ARGUMENT_COLORS;
 
     private static @NotNull UsageStyle instance = new UsageStyle();
+
+    private final @NotNull Map<Class<?>, String> argumentColors = new HashMap<>();
 
     /*
      * COMMON
@@ -60,7 +76,21 @@ public final class UsageStyle {
     private @NotNull String greedyArgumentFormat = "%s...";
 
     static {
-        ARGUMENT_COLORS = new ConcurrentHashMap<>();
+        DEFAULT_ARGUMENT_COLORS = new ConcurrentHashMap<>();
+        registerDefaultArgumentColor(Byte.class, DEFAULT_NUMBER_COLOR);
+        registerDefaultArgumentColor(Short.class, DEFAULT_NUMBER_COLOR);
+        registerDefaultArgumentColor(Integer.class, DEFAULT_NUMBER_COLOR);
+        registerDefaultArgumentColor(Long.class, DEFAULT_NUMBER_COLOR);
+        registerDefaultArgumentColor(Float.class, DEFAULT_NUMBER_COLOR);
+        registerDefaultArgumentColor(Double.class, DEFAULT_NUMBER_COLOR);
+        registerDefaultArgumentColor(Boolean.class, DEFAULT_BOOLEAN_COLOR);
+        registerDefaultArgumentColor(Character.class, DEFAULT_CHAR_SEQUENCE_COLOR);
+        registerDefaultArgumentColor(String.class, DEFAULT_CHAR_SEQUENCE_COLOR);
+        registerDefaultArgumentColor(Object.class, DEFAULT_CHAR_SEQUENCE_COLOR);
+        registerDefaultArgumentColor(Locale.class, DEFAULT_LOCALE_COLOR);
+        registerDefaultArgumentColor(Coordinate.class, DEFAULT_POSITION_COLOR);
+        registerDefaultArgumentColor(Position.class, DEFAULT_POSITION_COLOR);
+        registerDefaultArgumentColor(WorldPosition.class, DEFAULT_POSITION_COLOR);
     }
 
     /*
@@ -159,7 +189,7 @@ public final class UsageStyle {
      * @return the color
      */
     public @NotNull String getArgumentColor(final @NotNull Class<?> type) {
-        return ARGUMENT_COLORS.getOrDefault(type, getDefaultArgumentColor());
+        return getArgumentColorOrDefault(type, getDefaultArgumentColor());
     }
 
     /**
@@ -207,13 +237,13 @@ public final class UsageStyle {
      * {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
      * <br>
      * First, it will search for a specific color from the given type.
-     * If it fails, it defaults to {@link #getDefaultArgumentColor()}.
+     * If it fails, it defaults to {@link #getDefaultOptionalArgumentColor()}.
      *
      * @param type the type of the argument
      * @return the color
      */
     public @NotNull String getOptionalArgumentColor(final @NotNull Class<?> type) {
-        return ARGUMENT_COLORS.getOrDefault(type, getDefaultOptionalArgumentColor());
+        return getArgumentColorOrDefault(type, getDefaultOptionalArgumentColor());
     }
 
     /**
@@ -268,8 +298,8 @@ public final class UsageStyle {
      * @return this object (for method chaining)
      */
     public @NotNull UsageStyle setArgumentColor(final @NotNull Class<?> type, final @Nullable String color) {
-        if (color != null) ARGUMENT_COLORS.put(type, color);
-        else ARGUMENT_COLORS.remove(type);
+        if (color != null) argumentColors.put(type, color);
+        else argumentColors.remove(type);
         return this;
     }
 
@@ -298,6 +328,10 @@ public final class UsageStyle {
     }
 
 
+    private @NotNull String getArgumentColorOrDefault(final @NotNull Class<?> type, final @NotNull String defaultColor) {
+        return argumentColors.getOrDefault(type, DEFAULT_ARGUMENT_COLORS.getOrDefault(type, defaultColor));
+    }
+
     /**
      * Resets the styling to its default values.
      *
@@ -306,6 +340,19 @@ public final class UsageStyle {
     public @NotNull UsageStyle defaults() {
         instance = new UsageStyle();
         return instance;
+    }
+
+    /**
+     * Registers a new default argument color for the given type.
+     * <br>
+     * <b>WARNING</b>: this change is <b>global</b>. It <b>cannot</b> be reverted.
+     *
+     * @param type  the type of the argument
+     * @param color the color (parsed through the
+     *              <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
+     */
+    public static void registerDefaultArgumentColor(final @NotNull Class<?> type, final @NotNull String color) {
+        DEFAULT_ARGUMENT_COLORS.put(type, color);
     }
 
     /**

@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
+import it.fulminazzo.blocksmith.command.visitor.usage.UsageStyle;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -39,6 +40,7 @@ public final class BungeeCommandRegistryFactory implements CommandRegistryFactor
             }
 
         });
+        UsageStyle.registerDefaultArgumentColor(ProxiedPlayer.class, UsageStyle.DEFAULT_PLAYER_COLOR);
         ArgumentParsers.register(ServerInfo.class, new ArgumentParser<>() {
 
             @Override
@@ -58,6 +60,7 @@ public final class BungeeCommandRegistryFactory implements CommandRegistryFactor
             }
 
         });
+        UsageStyle.registerDefaultArgumentColor(ServerInfo.class, UsageStyle.DEFAULT_SERVER_COLOR);
     }
 
     @Override
