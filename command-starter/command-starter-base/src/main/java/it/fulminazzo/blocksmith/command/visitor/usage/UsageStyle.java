@@ -128,4 +128,17 @@ public final class UsageStyle {
         return instance;
     }
 
+    /**
+     * Applies the given color to the text, following the
+     * <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>.
+     * Effectively, it adds enclosing color tags around the text.
+     *
+     * @param text the text
+     * @param color the color
+     * @return the formatted text
+     */
+    static @NotNull String colorize(final @NotNull String text, final @NotNull String color) {
+        return String.format("<%1$s>%2$s</%1$s>", color, text);
+    }
+
 }
