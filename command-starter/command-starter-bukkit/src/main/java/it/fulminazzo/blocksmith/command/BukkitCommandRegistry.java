@@ -135,7 +135,7 @@ class BukkitCommandRegistry extends CommandRegistry {
         public BukkitCommand(final @NotNull String commandName, final @NotNull LiteralNode command) {
             super(commandName,
                     command.getCommandInfo().getDescription(),
-                    "", //TODO: usage
+                    command.getUsage(),
                     command.getAliases().stream()
                             .filter(a -> !a.equals(commandName))
                             .collect(Collectors.toList())
