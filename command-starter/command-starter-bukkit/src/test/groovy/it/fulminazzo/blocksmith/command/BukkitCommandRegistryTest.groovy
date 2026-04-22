@@ -233,6 +233,27 @@ class BukkitCommandRegistryTest extends Specification {
         registry.senderType == CommandSender
     }
 
+    def 'test that getUsage of BukkitCommand returns correct usage'() {
+        given:
+        def registry = Mock(BukkitCommandRegistry)
+
+        and:
+        def node = new LiteralNode('hello')
+        node.commandInfo = new CommandInfo(
+                'hello.description',
+                new PermissionInfo(null, 'hello.permission', Permission.Grant.NONE)
+        )
+
+        and:
+        def command = new BukkitCommandRegistry.BukkitCommand(registry, 'hello', node)
+
+        when:
+        def usage = command.usage
+
+        then:
+        usage == '§c/hello'
+    }
+
     def 'test that BukkitCommand delegates #method to #expected'() {
         given:
         def registry = Mock(BukkitCommandRegistry)
