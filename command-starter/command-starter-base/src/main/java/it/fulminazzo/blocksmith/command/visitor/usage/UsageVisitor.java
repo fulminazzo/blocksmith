@@ -27,6 +27,32 @@ public final class UsageVisitor implements Visitor<@NotNull String, RuntimeExcep
 
     @Override
     public @NotNull String visitCommandNode(final @NotNull CommandNode node) {
+        return visitChildren(node);
+    }
+
+    /**
+     * Visits the parent nodes of a node and returns the usage of the parents.
+     *
+     * @param node the node
+     * @return the usage of the parents
+     */
+    @NotNull String visitParentNode(final @NotNull CommandNode node) {
+        final StringBuilder usage = new StringBuilder();
+        CommandNode parent = node.getParent();
+        while (parent != null) {
+            usage.insert(0, parent.accept(singleUsageVisitor) + " ");
+            parent = parent.getParent();
+        }
+        return usage.toString();
+    }
+
+    /**
+     * Visits the children of a node and returns the usages of the children.
+     *
+     * @param node the node
+     * @return the usages of the children
+     */
+    @NotNull String visitChildren(final @NotNull CommandNode node) {
         final UsageStyle style = UsageStyle.get();
         final StringBuilder usage = new StringBuilder();
         CommandNode current = node;
@@ -44,22 +70,6 @@ public final class UsageVisitor implements Visitor<@NotNull String, RuntimeExcep
                 );
                 break;
             }
-        }
-        return usage.toString();
-    }
-
-    /**
-     * Visits the parent nodes of a node and returns the usage of the parents.
-     *
-     * @param node the node
-     * @return the usage of the parents
-     */
-    @NotNull String visitParentNode(final @NotNull CommandNode node) {
-        final StringBuilder usage = new StringBuilder();
-        CommandNode parent = node.getParent();
-        while (parent != null) {
-            usage.insert(0, parent.accept(singleUsageVisitor) + " ");
-            parent = parent.getParent();
         }
         return usage.toString();
     }

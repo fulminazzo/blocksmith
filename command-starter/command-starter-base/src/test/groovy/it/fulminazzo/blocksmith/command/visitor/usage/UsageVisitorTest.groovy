@@ -10,7 +10,7 @@ import spock.lang.Specification
 import java.lang.reflect.Parameter
 
 class UsageVisitorTest extends Specification {
-    private static final Parameter PARAMETER = Visitor.getMethod('visitCommandNode', CommandNode).parameters[0]
+    private static final Parameter PARAMETER = Visitor.getMethod('visitChildren', CommandNode).parameters[0]
 
     private static final Visitor<String, ? extends Exception> SINGLE_VISITOR = new UsageVisitor.SimpleUsageVisitor()
     private static final List<CommandNode> TEST_NODES = [
@@ -33,10 +33,10 @@ class UsageVisitorTest extends Specification {
     }
 
     /*
-     * visitCommandNode
+     * visitChildren
      */
 
-    def 'test visitCommandNode with recursive children'() {
+    def 'test visitChildren with recursive children'() {
         given:
         def node = Mock(CommandNode)
         node.children >> [
@@ -44,7 +44,7 @@ class UsageVisitorTest extends Specification {
         ].toSet()
 
         when:
-        def usage = visitor.visitCommandNode(node)
+        def usage = visitor.visitChildren(node)
 
         then:
         usage == expected
@@ -69,20 +69,20 @@ class UsageVisitorTest extends Specification {
                 " ${TEST_NODES_USAGES[TEST_NODES[0]]} ${TEST_NODES_USAGES[TEST_NODES[2]]}<dark_gray>|</dark_gray>${TEST_NODES_USAGES[TEST_NODES[1]]}"
     }
 
-    def 'test that visitCommandNode of multiple children returns all the children then stops'() {
+    def 'test that visitChildren of multiple children returns all the children then stops'() {
         given:
         def node = Mock(CommandNode)
         node.children >> TEST_NODES.toSet().sort { a, b -> a.name <=> b.name }
 
         when:
-        def usage = visitor.visitCommandNode(node)
+        def usage = visitor.visitChildren(node)
 
         then:
         usage == ' ' + TEST_NODES_USAGES.values()
                 .join('<dark_gray>|</dark_gray>')
     }
 
-    def 'test that visitCommandNode of one child returns its usage'() {
+    def 'test that visitChildren of one child returns its usage'() {
         given:
         def node = Mock(CommandNode)
         node.children >> [
@@ -90,7 +90,7 @@ class UsageVisitorTest extends Specification {
         ].toSet()
 
         when:
-        def usage = visitor.visitCommandNode(node)
+        def usage = visitor.visitChildren(node)
 
         then:
         usage == ' ' + TEST_NODES_USAGES[child]
@@ -99,13 +99,13 @@ class UsageVisitorTest extends Specification {
         child << TEST_NODES
     }
 
-    def 'test that visitCommandNode with no children returns empty'() {
+    def 'test that visitChildren with no children returns empty'() {
         given:
         def node = Mock(CommandNode)
         node.children >> [].toSet()
 
         when:
-        def usage = visitor.visitCommandNode(node)
+        def usage = visitor.visitChildren(node)
 
         then:
         usage == ''
