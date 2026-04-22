@@ -254,7 +254,7 @@ public final class UsageStyle {
      */
     public @NotNull UsageStyle defaults() {
         instance = new UsageStyle();
-        return this;
+        return instance;
     }
 
     /**
