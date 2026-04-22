@@ -42,6 +42,14 @@ public final class UsageStyle {
             "%s" + colorize(">", PUNCTUATION_COLOR_PLACEHOLDER);
 
     /*
+     * OPTIONAL ARGUMENT
+     */
+
+    private @NotNull String defaultOptionalArgumentColor = "aqua";
+    private @NotNull String optionalArgumentFormat = colorize("[", PUNCTUATION_COLOR_PLACEHOLDER) +
+            "%s" + colorize("]", PUNCTUATION_COLOR_PLACEHOLDER);
+
+    /*
      * COMMON
      */
 
@@ -154,6 +162,45 @@ public final class UsageStyle {
      */
     public @NotNull UsageStyle argumentFormat(final @NotNull String format) {
         this.argumentFormat = format;
+        return this;
+    }
+
+    /*
+     * OPTIONAL ARGUMENT
+     */
+
+    /**
+     * Gets the format of am optional {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     * The format uses the Java default format syntax (so {@code %s} will be replaced by the argument name).
+     *
+     * @return the format
+     */
+    public @NotNull String getOptionalArgumentFormat() {
+        return optionalArgumentFormat.replace(PUNCTUATION_COLOR_PLACEHOLDER, getPunctuationColor());
+    }
+
+    /**
+     * Sets the default color for displaying the name of an optional {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     *
+     * @param color the color (parsed through the <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
+     * @return this object (for method chaining)
+     */
+    public @NotNull UsageStyle defaultOptionalArgumentColor(final @NotNull String color) {
+        this.defaultOptionalArgumentColor = color;
+        return this;
+    }
+
+    /**
+     * Sets the format of an optional {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     * The format uses the Java default format syntax (so {@code %s} will be replaced by the argument name).
+     * If the special placeholder {@link  #PUNCTUATION_COLOR_PLACEHOLDER} is used,
+     * it will be replaced by the current {@link #getPunctuationColor()} color.
+     *
+     * @param format the format
+     * @return this object (for method chaining)
+     */
+    public @NotNull UsageStyle optionalArgumentFormat(final @NotNull String format) {
+        this.optionalArgumentFormat = format;
         return this;
     }
 
