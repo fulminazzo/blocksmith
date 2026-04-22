@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.visitor;
 
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
+import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,5 +30,18 @@ public interface Visitor<T, X extends Exception> {
      * @throws X the exception thrown in case of visit errors
      */
     T visitLiteralNode(final @NotNull LiteralNode node) throws X;
+
+    /**
+     * Visits a general {@link CommandNode}.
+     * <br>
+     * <b>WARNING</b>: implementations should <b>never</b> use this method directly.
+     * It should instead act as support for common logic between the other visitor methods.
+     *
+     * @param node the node
+     * @return the result
+     * @throws X the exception thrown in case of visit errors
+     */
+    T visitCommandNode(final @NotNull CommandNode node) throws X;
+
 
 }
