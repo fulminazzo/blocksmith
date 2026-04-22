@@ -37,7 +37,10 @@ class BukkitCommandRegistryTest extends Specification {
         application = Mock(ApplicationHandle)
         application.server() >> Bukkit.server
         application.logger() >> log
-        application.messenger >> new Messenger(application)
+        application.messenger >> {
+            def messenger = Mock(Messenger)
+            return messenger
+        }
         application.name >> 'blocksmith'
 
         registry = new BukkitCommandRegistry(application)
@@ -139,7 +142,7 @@ class BukkitCommandRegistryTest extends Specification {
                 'command.description.help',
                 new PermissionInfo(null, 'help', Permission.Grant.ALL)
         )
-        def command = new BukkitCommandRegistry.BukkitCommand(registry, 'help', node)
+        def command = BukkitCommandRegistry.BukkitCommand.of(registry, 'help', node)
         command.permission = 'help'
 
         and:
@@ -240,6 +243,7 @@ class BukkitCommandRegistryTest extends Specification {
     def 'test that getUsage of BukkitCommand returns correct usage'() {
         given:
         def registry = Mock(BukkitCommandRegistry)
+        Reflect.on(registry).set('application', application)
 
         and:
         def node = new LiteralNode('hello')
@@ -249,7 +253,7 @@ class BukkitCommandRegistryTest extends Specification {
         )
 
         and:
-        def command = new BukkitCommandRegistry.BukkitCommand(registry, 'hello', node)
+        def command = BukkitCommandRegistry.BukkitCommand.of(registry, 'hello', node)
 
         when:
         def usage = command.usage
@@ -261,6 +265,7 @@ class BukkitCommandRegistryTest extends Specification {
     def 'test that BukkitCommand delegates #method to #expected'() {
         given:
         def registry = Mock(BukkitCommandRegistry)
+        Reflect.on(registry).set('application', application)
 
         and:
         def node = new LiteralNode('test')
@@ -272,7 +277,7 @@ class BukkitCommandRegistryTest extends Specification {
         def args = ['first', 'second', 'third'].toArray(String[]::new)
 
         and:
-        def command = new BukkitCommandRegistry.BukkitCommand(registry, 'test', node)
+        def command = BukkitCommandRegistry.BukkitCommand.of(registry, 'test', node)
 
         when:
         command."$method"(sender, 'test', args)
