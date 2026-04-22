@@ -13,6 +13,14 @@ class UsageVisitorTest extends Specification {
     private static final UsageStyle USAGE_STYLE = UsageStyle.get()
     private static final Parameter PARAMETER = Visitor.getMethod('visitCommandNode', CommandNode).parameters[0]
 
+    private static final String NODE_SEPARATOR = UsageStyle.colorize(USAGE_STYLE.separator, USAGE_STYLE.punctuationColor)
+    private static final String LITERAL_SEPARATOR = UsageStyle.colorize(USAGE_STYLE.literalSeparator, USAGE_STYLE.literalSeparatorColor)
+    private static final String OPEN_BRACKET = UsageStyle.colorize('[', USAGE_STYLE.punctuationColor)
+    private static final String CLOSE_BRACKET = UsageStyle.colorize(']', USAGE_STYLE.punctuationColor)
+    private static final String LESS_THAN = UsageStyle.colorize('<', USAGE_STYLE.punctuationColor)
+    private static final String GREATER_THAN = UsageStyle.colorize('>', USAGE_STYLE.punctuationColor)
+    private static final String SLASH = UsageStyle.colorize('/', USAGE_STYLE.literalColor)
+
     private static final Visitor<String, ? extends Exception> SINGLE_VISITOR = new UsageVisitor.SimpleUsageVisitor()
     private static final List<CommandNode> TEST_NODES = [
             new LiteralNode('message', 'msg', 'm'),
@@ -70,61 +78,43 @@ class UsageVisitorTest extends Specification {
         kick.addChild(reason)
 
         and:
-        def separator = "<${USAGE_STYLE.punctuationColor}>|</${USAGE_STYLE.punctuationColor}>"
-        def openBracket = "<${USAGE_STYLE.punctuationColor}>[</${USAGE_STYLE.punctuationColor}>"
-        def closeBracket = "<${USAGE_STYLE.punctuationColor}>]</${USAGE_STYLE.punctuationColor}>"
-        def lessThan = "<${USAGE_STYLE.punctuationColor}><</${USAGE_STYLE.punctuationColor}>"
-        def greaterThan = "<${USAGE_STYLE.punctuationColor}>></${USAGE_STYLE.punctuationColor}>"
-        def slash = "<${USAGE_STYLE.literalColor}>/</${USAGE_STYLE.literalColor}>"
+        def lit = { String s -> UsageStyle.colorize(s, USAGE_STYLE.literalColor) }
+        def arg = { String s -> UsageStyle.colorize(s, USAGE_STYLE.defaultArgumentColor) }
+        def optArg = { String s -> UsageStyle.colorize(s, USAGE_STYLE.defaultOptionalArgumentColor) }
+        def greedy = { String s -> String.format(USAGE_STYLE.greedyArgumentFormat, s) }
 
         and:
-        def clanUsage = "${slash}" +
-                "<${USAGE_STYLE.literalColor}>clan</${USAGE_STYLE.literalColor}>" + separator +
-                "<${USAGE_STYLE.literalColor}>gang</${USAGE_STYLE.literalColor}>" + separator +
-                "<${USAGE_STYLE.literalColor}>team</${USAGE_STYLE.literalColor}>"
-
-        and:
-        def playerUsage = "<${USAGE_STYLE.literalColor}>player</${USAGE_STYLE.literalColor}> " +
-                lessThan +
-                "<${USAGE_STYLE.defaultArgumentColor}>player</${USAGE_STYLE.defaultArgumentColor}>" +
-                greaterThan
-
-        and:
-        def helpUsage = "<${USAGE_STYLE.literalColor}>?</${USAGE_STYLE.literalColor}>" + separator +
-                "<${USAGE_STYLE.literalColor}>help</${USAGE_STYLE.literalColor}>"
+        def clanUsage = "${SLASH}${lit('clan')}${LITERAL_SEPARATOR}${lit('gang')}${LITERAL_SEPARATOR}${lit('team')}"
+        def playerUsage = "${lit('player')} ${LESS_THAN}${arg('player')}${GREATER_THAN}"
+        def helpUsage = "${lit('?')}${LITERAL_SEPARATOR}${lit('help')}"
 
         expect:
-        invite.accept(visitor) == "${clanUsage} ${playerUsage} " +
-                "<${USAGE_STYLE.literalColor}>invite</${USAGE_STYLE.literalColor}>"
+        invite.accept(visitor) == "${clanUsage} ${playerUsage} ${lit('invite')}"
 
         and:
-        kick.accept(visitor) == "${clanUsage} ${playerUsage} " +
-                "<${USAGE_STYLE.literalColor}>kick</${USAGE_STYLE.literalColor}> " +
-                "$lessThan<${USAGE_STYLE.defaultArgumentColor}>reason...</${USAGE_STYLE.defaultArgumentColor}>$greaterThan"
+        kick.accept(visitor) == "${clanUsage} ${playerUsage} ${lit('kick')} " +
+                "${LESS_THAN}${arg(greedy('reason'))}${GREATER_THAN}"
 
         and:
-        promote.accept(visitor) == "${clanUsage} ${playerUsage} <${USAGE_STYLE.literalColor}>promote</${USAGE_STYLE.literalColor}> " +
-                "$openBracket<${USAGE_STYLE.defaultOptionalArgumentColor}>rank</${USAGE_STYLE.defaultOptionalArgumentColor}>$closeBracket"
+        promote.accept(visitor) == "${clanUsage} ${playerUsage} ${lit('promote')} " +
+                "${OPEN_BRACKET}${optArg('rank')}${CLOSE_BRACKET}"
 
         and:
-        demote.accept(visitor) == "${clanUsage} ${playerUsage} <${USAGE_STYLE.literalColor}>demote</${USAGE_STYLE.literalColor}> " +
-                "$openBracket<${USAGE_STYLE.defaultOptionalArgumentColor}>rank</${USAGE_STYLE.defaultOptionalArgumentColor}>$closeBracket$separator" +
-                "$openBracket<${USAGE_STYLE.defaultOptionalArgumentColor}>reason...</${USAGE_STYLE.defaultOptionalArgumentColor}>$closeBracket"
+        demote.accept(visitor) == "${clanUsage} ${playerUsage} ${lit('demote')} " +
+                "${OPEN_BRACKET}${optArg('rank')}${CLOSE_BRACKET}${NODE_SEPARATOR}" +
+                "${OPEN_BRACKET}${optArg(greedy('reason'))}${CLOSE_BRACKET}"
 
         and:
         player.accept(visitor) == "${clanUsage} ${playerUsage} " +
-                "<${USAGE_STYLE.literalColor}>demote</${USAGE_STYLE.literalColor}>$separator" +
-                "<${USAGE_STYLE.literalColor}>invite</${USAGE_STYLE.literalColor}>$separator" +
-                "<${USAGE_STYLE.literalColor}>kick</${USAGE_STYLE.literalColor}>$separator" +
-                "<${USAGE_STYLE.literalColor}>promote</${USAGE_STYLE.literalColor}>"
+                "${lit('demote')}${NODE_SEPARATOR}${lit('invite')}${NODE_SEPARATOR}" +
+                "${lit('kick')}${NODE_SEPARATOR}${lit('promote')}"
 
         and:
         help.accept(visitor) == "${clanUsage} ${helpUsage}"
 
         and:
-        clan.accept(visitor) == "${clanUsage} ${helpUsage}$separator" +
-                "$lessThan<${USAGE_STYLE.defaultArgumentColor}>name</${USAGE_STYLE.defaultArgumentColor}>$greaterThan$separator" +
-                "<${USAGE_STYLE.literalColor}>player</${USAGE_STYLE.literalColor}>"
+        clan.accept(visitor) == "${clanUsage} ${helpUsage}${NODE_SEPARATOR}" +
+                "${LESS_THAN}${arg('name')}${GREATER_THAN}${NODE_SEPARATOR}${lit('player')}"
     }
 
     def 'test that visit#type delegates to visitCommandNode'() {
@@ -181,7 +171,7 @@ class UsageVisitorTest extends Specification {
             child1.addChild(child3)
             return child1
         })                                 ||
-                " ${TEST_NODES_USAGES[TEST_NODES[0]]} ${TEST_NODES_USAGES[TEST_NODES[2]]}<dark_gray>|</dark_gray>${TEST_NODES_USAGES[TEST_NODES[1]]}"
+                " ${TEST_NODES_USAGES[TEST_NODES[0]]} ${TEST_NODES_USAGES[TEST_NODES[2]]}${NODE_SEPARATOR}${TEST_NODES_USAGES[TEST_NODES[1]]}"
     }
 
     def 'test that visitChildren of multiple children returns all the children then stops'() {
@@ -193,8 +183,7 @@ class UsageVisitorTest extends Specification {
         def usage = visitor.visitChildren(node)
 
         then:
-        usage == ' ' + TEST_NODES_USAGES.values()
-                .join('<dark_gray>|</dark_gray>')
+        usage == ' ' + TEST_NODES_USAGES.values().join(NODE_SEPARATOR)
     }
 
     def 'test that visitChildren of one child returns its usage'() {
