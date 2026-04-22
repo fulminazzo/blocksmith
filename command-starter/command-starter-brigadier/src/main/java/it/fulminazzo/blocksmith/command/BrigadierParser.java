@@ -140,7 +140,7 @@ final class BrigadierParser<S> {
                         return b.buildFuture();
                     }
             );
-            if (!(node.getParser() instanceof MultiArgumentParser<?>))
+            if (argumentBuilder.getArguments().isEmpty())
                 argumentBuilder = parseChildren(
                         root,
                         argumentBuilder.executes(executes(root)),
@@ -173,7 +173,8 @@ final class BrigadierParser<S> {
             final Stack<RequiredArgumentBuilder<S, T>> stack = new Stack<>();
             for (ArgumentParser<?> p : parser)
                 stack.push(generateArgumentNodeBuilder(root, node, p, suggestionProvider));
-            RequiredArgumentBuilder<S, T> builder = parseChildren(root, stack.pop(), node);
+            RequiredArgumentBuilder<S, T> builder = stack.pop();
+            if (builder.getArguments().isEmpty()) parseChildren(root, builder, node);
             while (!stack.isEmpty()) {
                 RequiredArgumentBuilder<S, T> tmp = stack.pop();
                 tmp.then(builder);
