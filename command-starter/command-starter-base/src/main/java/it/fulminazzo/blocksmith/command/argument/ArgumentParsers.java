@@ -24,6 +24,11 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ArgumentParsers {
+    /**
+     * The default name to identify the console in each platform.
+     */
+    public static final @NotNull String CONSOLE_COMMAND_NAME = "console";
+
     private static final @NotNull Map<@NotNull Class<?>, @NotNull ArgumentParser<?>> parsers = new ConcurrentHashMap<>();
 
     /*

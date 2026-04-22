@@ -10,6 +10,7 @@ import it.fulminazzo.blocksmith.conversion.Convertible;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,6 +51,27 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
                     players.removeIf(p -> !senderPlayer.canSee(p));
                 }
                 return players.stream().map(Player::getName).collect(Collectors.toList());
+            }
+
+        });
+        ArgumentParsers.register(ConsoleCommandSender.class, new ArgumentParser<>() {
+
+            @Override
+            public @NotNull ConsoleCommandSender parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
+                String current = visitor.getInput().getCurrent();
+                if (current.equals(ArgumentParsers.CONSOLE_COMMAND_NAME)) {
+                    Server server = visitor.getApplication().server();
+                    return server.getConsoleSender();
+                } else throw new ArgumentParseException(CommandMessages.UNRECOGNIZED_ARGOMENT)
+                        .arguments(
+                                Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, current),
+                                Placeholder.of("expected", ArgumentParsers.CONSOLE_COMMAND_NAME)
+                        );
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
+                return List.of(ArgumentParsers.CONSOLE_COMMAND_NAME);
             }
 
         });

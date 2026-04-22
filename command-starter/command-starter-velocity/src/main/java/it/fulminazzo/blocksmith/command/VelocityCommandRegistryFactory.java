@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
+import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -34,6 +35,27 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
                 return server.getAllPlayers().stream()
                         .map(Player::getUsername)
                         .collect(Collectors.toList());
+            }
+
+        });
+        ArgumentParsers.register(ConsoleCommandSource.class, new ArgumentParser<>() {
+
+            @Override
+            public @NotNull ConsoleCommandSource parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
+                String current = visitor.getInput().getCurrent();
+                if (current.equals(ArgumentParsers.CONSOLE_COMMAND_NAME)) {
+                    ProxyServer server = visitor.getApplication().server();
+                    return server.getConsoleCommandSource();
+                } else throw new ArgumentParseException(CommandMessages.UNRECOGNIZED_ARGOMENT)
+                        .arguments(
+                                Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, current),
+                                Placeholder.of("expected", ArgumentParsers.CONSOLE_COMMAND_NAME)
+                        );
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
+                return List.of(ArgumentParsers.CONSOLE_COMMAND_NAME);
             }
 
         });
