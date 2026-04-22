@@ -14,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 @Getter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UsageStyle {
+    private static final @NotNull String PUNCTUATION_COLOR_PLACEHOLDER = "<punctuation>";
+
     private static @NotNull UsageStyle instance = new UsageStyle();
 
     /*
@@ -30,6 +32,14 @@ public final class UsageStyle {
     private @NotNull String literalColor = "red";
     private @NotNull String literalSeparator = "|";
     private @Nullable String literalSeparatorColor;
+
+    /*
+     * MANDATORY ARGUMENT
+     */
+
+    private @NotNull String defaultArgumentColor = "yellow";
+    private @NotNull String argumentFormat = colorize("<", PUNCTUATION_COLOR_PLACEHOLDER) +
+            "%s" + colorize(">", PUNCTUATION_COLOR_PLACEHOLDER);
 
     /*
      * COMMON
@@ -108,6 +118,45 @@ public final class UsageStyle {
         return this;
     }
 
+    /*
+     * MANDATORY ARGUMENT
+     */
+
+    /**
+     * Gets the format of a {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     * The format uses the Java default format syntax (so {@code %s} will be replaced by the argument name).
+     *
+     * @return the format
+     */
+    public @NotNull String getArgumentFormat() {
+        return argumentFormat.replace(PUNCTUATION_COLOR_PLACEHOLDER, getPunctuationColor());
+    }
+
+    /**
+     * Sets the default color for displaying the name of a {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     *
+     * @param color the color (parsed through the <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
+     * @return this object (for method chaining)
+     */
+    public @NotNull UsageStyle defaultArgumentColor(final @NotNull String color) {
+        this.defaultArgumentColor = color;
+        return this;
+    }
+
+    /**
+     * Sets the format of a {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     * The format uses the Java default format syntax (so {@code %s} will be replaced by the argument name).
+     * If the special placeholder {@link  #PUNCTUATION_COLOR_PLACEHOLDER} is used,
+     * it will be replaced by the current {@link #getPunctuationColor()} color.
+     *
+     * @param format the format
+     * @return this object (for method chaining)
+     */
+    public @NotNull UsageStyle argumentFormat(final @NotNull String format) {
+        this.argumentFormat = format;
+        return this;
+    }
+
 
     /**
      * Resets the styling to its default values.
@@ -133,7 +182,7 @@ public final class UsageStyle {
      * <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>.
      * Effectively, it adds enclosing color tags around the text.
      *
-     * @param text the text
+     * @param text  the text
      * @param color the color
      * @return the formatted text
      */
