@@ -166,30 +166,31 @@ final class BrigadierParser<S> {
                                                                            final @NotNull ArgumentNode<?> node,
                                                                            final @NotNull ArgumentParser<?> argumentParser,
                                                                            final @NotNull SuggestionProvider<S> suggestionProvider) {
-        if (argumentParser instanceof DelegateArgumentParser<?, ?>)
-            return generateArgumentNodeBuilder(root, node, ((DelegateArgumentParser<?, ?>) argumentParser).getDelegate(), suggestionProvider);
-        else if (argumentParser instanceof MultiArgumentParser<?>) {
-            MultiArgumentParser<?> parser = (MultiArgumentParser<?>) argumentParser;
-            final Stack<RequiredArgumentBuilder<S, T>> stack = new Stack<>();
-            for (ArgumentParser<?> p : parser)
-                stack.push(generateArgumentNodeBuilder(root, node, p, suggestionProvider));
-            RequiredArgumentBuilder<S, T> builder = stack.pop();
-            if (builder.getArguments().isEmpty()) parseChildren(root, builder, node);
-            while (!stack.isEmpty()) {
-                RequiredArgumentBuilder<S, T> tmp = stack.pop();
-                tmp.then(builder);
-                builder = tmp;
+        ArgumentType<T> argumentType = getArgumentType(ArgumentParsers.type(argumentParser));
+        if (argumentType == null) {
+            if (argumentParser instanceof DelegateArgumentParser<?, ?>)
+                return generateArgumentNodeBuilder(root, node, ((DelegateArgumentParser<?, ?>) argumentParser).getDelegate(), suggestionProvider);
+            else if (argumentParser instanceof MultiArgumentParser<?>) {
+                MultiArgumentParser<?> parser = (MultiArgumentParser<?>) argumentParser;
+                final Stack<RequiredArgumentBuilder<S, T>> stack = new Stack<>();
+                for (ArgumentParser<?> p : parser)
+                    stack.push(generateArgumentNodeBuilder(root, node, p, suggestionProvider));
+                RequiredArgumentBuilder<S, T> builder = stack.pop();
+                if (builder.getArguments().isEmpty()) parseChildren(root, builder, node);
+                while (!stack.isEmpty()) {
+                    RequiredArgumentBuilder<S, T> tmp = stack.pop();
+                    tmp.then(builder);
+                    builder = tmp;
+                }
+                return builder;
             }
-            return builder;
-        } else {
-            ArgumentType<T> argumentType = getArgumentType(ArgumentParsers.type(argumentParser));
-            final RequiredArgumentBuilder<S, T> builder;
-            if (argumentType != null) builder = RequiredArgumentBuilder.argument(node.getName(), argumentType);
-            else builder = RequiredArgumentBuilder
-                    .<S, T>argument(node.getName(), (ArgumentType<T>) StringArgumentType.string())
-                    .suggests(suggestionProvider);
-            return builder.executes(executes(root));
         }
+        final RequiredArgumentBuilder<S, T> builder;
+        if (argumentType != null) builder = RequiredArgumentBuilder.argument(node.getName(), argumentType);
+        else builder = RequiredArgumentBuilder
+                .<S, T>argument(node.getName(), (ArgumentType<T>) StringArgumentType.string())
+                .suggests(suggestionProvider);
+        return builder.executes(executes(root));
     }
 
     /**
