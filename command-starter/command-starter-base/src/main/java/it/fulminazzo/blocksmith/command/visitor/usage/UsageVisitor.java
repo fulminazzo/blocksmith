@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
  * A visitor for generating the usage of a {@link it.fulminazzo.blocksmith.command.node.CommandNode}.
  */
 public final class UsageVisitor implements Visitor<@NotNull String, RuntimeException> {
+    private static final @NotNull String COMMAND_START = "/";
+
     private final @NotNull Visitor<@NotNull String, RuntimeException> singleUsageVisitor = new SimpleUsageVisitor();
 
     @Override
@@ -27,7 +29,9 @@ public final class UsageVisitor implements Visitor<@NotNull String, RuntimeExcep
 
     @Override
     public @NotNull String visitCommandNode(final @NotNull CommandNode node) {
-        return visitParentNode(node) +
+        final UsageStyle style = UsageStyle.get();
+        return UsageStyle.colorize(COMMAND_START, style.getLiteralColor()) +
+                visitParentNode(node) +
                 node.accept(singleUsageVisitor) +
                 visitChildren(node);
     }
