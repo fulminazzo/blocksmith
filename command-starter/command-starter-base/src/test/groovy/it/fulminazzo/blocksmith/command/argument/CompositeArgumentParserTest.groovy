@@ -29,6 +29,14 @@ class CompositeArgumentParserTest extends Specification {
         thrown(IllegalArgumentException)
     }
 
+    def 'test that initializing CompositeArgumentParser with no parsers throws'() {
+        when:
+        new CompositeArgumentParser<>(new ArgumentParser<?>[0])
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
     def 'test that parse of #argument returns #expected'() {
         given:
         input.addInput(argument)
@@ -68,7 +76,7 @@ class CompositeArgumentParserTest extends Specification {
         def actual = parser.getCompletions(visitor)
 
         then:
-        actual.sort() == expected.sort()
+        actual == expected
 
         where:
         argument || expected

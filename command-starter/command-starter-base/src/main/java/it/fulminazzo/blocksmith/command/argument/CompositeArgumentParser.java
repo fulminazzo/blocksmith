@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A special {@link ArgumentParser} that provides completions through multiple {@link ArgumentParser}s
@@ -22,9 +23,16 @@ public final class CompositeArgumentParser<T> implements ArgumentParser<T> {
      *
      * @param argumentTypes the Java type of the arguments
      */
-    @SuppressWarnings("unchecked")
+    @SafeVarargs
     public CompositeArgumentParser(final @NotNull Class<? extends T> @NotNull ... argumentTypes) {
-        this(Arrays.stream(argumentTypes).map(ArgumentParsers::of).toArray(ArgumentParser[]::new));
+        if (argumentTypes.length == 0)
+            throw new IllegalArgumentException(String.format(
+                    "Could not create %s: at least one argument type must be given",
+                    getClass().getSimpleName()
+            ));
+        this.parsers = Arrays.stream(argumentTypes)
+                .map(ArgumentParsers::of)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -39,7 +47,7 @@ public final class CompositeArgumentParser<T> implements ArgumentParser<T> {
                     "Could not create %s: at least one argument type must be given",
                     getClass().getSimpleName()
             ));
-        this.parsers = Arrays.asList(argumentParsers);
+        this.parsers = new ArrayList<>(Arrays.asList(argumentParsers));
     }
 
     @Override
@@ -56,7 +64,7 @@ public final class CompositeArgumentParser<T> implements ArgumentParser<T> {
 
     @Override
     public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
-        Set<String> completions = new HashSet<>();
+        Set<String> completions = new LinkedHashSet<>();
         for (ArgumentParser<? extends T> parser : parsers)
             completions.addAll(snapshot(visitor, () -> parser.getCompletions(visitor)));
         return new ArrayList<>(completions);
