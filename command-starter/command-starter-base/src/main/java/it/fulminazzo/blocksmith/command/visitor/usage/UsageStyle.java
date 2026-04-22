@@ -76,7 +76,8 @@ public final class UsageStyle {
      * <br>
      * If {@link #getLiteralSeparatorColor()} is not set, this color will be used instead.
      *
-     * @param color the color (parsed through the <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
+     * @param color the color (parsed through the
+     *              <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
      * @return this object (for method chaining)
      */
     public @NotNull UsageStyle punctuationColor(final @NotNull String color) {
@@ -89,7 +90,8 @@ public final class UsageStyle {
      */
 
     /**
-     * Gets the color of the separator between the aliases of a {@link it.fulminazzo.blocksmith.command.node.LiteralNode}.
+     * Gets the color of the separator between the aliases of a
+     * {@link it.fulminazzo.blocksmith.command.node.LiteralNode}.
      * <br>
      * If not set, {@link #getPunctuationColor()} will be used instead.
      *
@@ -102,7 +104,8 @@ public final class UsageStyle {
     /**
      * Sets the color for displaying the aliases of a {@link it.fulminazzo.blocksmith.command.node.LiteralNode}.
      *
-     * @param color the color (parsed through the <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
+     * @param color the color (parsed through the
+     *              <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
      * @return this object (for method chaining)
      */
     public @NotNull UsageStyle literalColor(final @NotNull String color) {
@@ -122,9 +125,11 @@ public final class UsageStyle {
     }
 
     /**
-     * Sets the color of the separator between the aliases of a {@link it.fulminazzo.blocksmith.command.node.LiteralNode}.
+     * Sets the color of the separator between the aliases of a
+     * {@link it.fulminazzo.blocksmith.command.node.LiteralNode}.
      *
-     * @param color the color (parsed through the <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
+     * @param color the color (parsed through the
+     *              <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
      * @return this object (for method chaining)
      */
     public @NotNull UsageStyle literalSeparatorColor(final @NotNull String color) {
@@ -149,7 +154,8 @@ public final class UsageStyle {
     /**
      * Sets the default color for displaying the name of a {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
      *
-     * @param color the color (parsed through the <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
+     * @param color the color (parsed through the
+     *              <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
      * @return this object (for method chaining)
      */
     public @NotNull UsageStyle defaultArgumentColor(final @NotNull String color) {
@@ -186,9 +192,11 @@ public final class UsageStyle {
     }
 
     /**
-     * Sets the default color for displaying the name of an optional {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     * Sets the default color for displaying the name of an optional
+     * {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
      *
-     * @param color the color (parsed through the <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
+     * @param color the color (parsed through the
+     *              <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
      * @return this object (for method chaining)
      */
     public @NotNull UsageStyle defaultOptionalArgumentColor(final @NotNull String color) {
