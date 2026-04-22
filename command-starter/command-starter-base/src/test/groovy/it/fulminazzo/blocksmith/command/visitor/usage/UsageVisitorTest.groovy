@@ -10,7 +10,7 @@ import spock.lang.Specification
 import java.lang.reflect.Parameter
 
 class UsageVisitorTest extends Specification {
-    private static final Parameter PARAMETER = Visitor.getMethod('visitChildren', CommandNode).parameters[0]
+    private static final Parameter PARAMETER = Visitor.getMethod('visitCommandNode', CommandNode).parameters[0]
 
     private static final Visitor<String, ? extends Exception> SINGLE_VISITOR = new UsageVisitor.SimpleUsageVisitor()
     private static final List<CommandNode> TEST_NODES = [
@@ -30,6 +30,26 @@ class UsageVisitorTest extends Specification {
             Reflect.on(it).set('parent', null)
             it.children.clear()
         }
+    }
+
+    def 'test that visit#type delegates to visitCommandNode'() {
+        given:
+        def visitor = Mock(UsageVisitor)
+        visitor."visit${type.simpleName}"(_) >> {
+            callRealMethod()
+        }
+
+        and:
+        def node = Mock(type)
+
+        when:
+        visitor."visit${type.simpleName}"(node)
+
+        then:
+        1 * visitor.visitCommandNode(node)
+
+        where:
+        type << [LiteralNode, ArgumentNode]
     }
 
     /*
