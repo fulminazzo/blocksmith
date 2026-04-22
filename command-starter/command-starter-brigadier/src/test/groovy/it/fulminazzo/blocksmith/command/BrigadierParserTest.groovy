@@ -318,6 +318,7 @@ class BrigadierParserTest extends Specification {
         and:
         def argumentParser = Mock(DelegateArgumentParser)
         argumentParser.delegate >> ArgumentParsers.of(Position)
+        ArgumentParsers.register(BrigadierParserTest, argumentParser)
 
         and:
         def parser = new BrigadierParser(delegate)
@@ -335,6 +336,9 @@ class BrigadierParserTest extends Specification {
 
         and:
         builder.suggestionsProvider == provider
+
+        cleanup:
+        ArgumentParsers.parsers.remove(BrigadierParserTest)
     }
 
     def 'test that generateArgumentNodeBuilder of MultiArgumentParser adds in correct order arguments'() {
@@ -355,6 +359,7 @@ class BrigadierParserTest extends Specification {
                 ArgumentParsers.of(Boolean),
                 ArgumentParsers.of(String)
         ].iterator()
+        ArgumentParsers.register(BrigadierParserTest, argumentParser)
 
         and:
         def parser = new BrigadierParser(delegate)
@@ -388,6 +393,9 @@ class BrigadierParserTest extends Specification {
         def str = args2[0] as ArgumentCommandNode<?, ?>
         str.command != null
         (str.type instanceof StringArgumentType)
+
+        cleanup:
+        ArgumentParsers.parsers.remove(BrigadierParserTest)
     }
 
     def 'test that generateArgumentNodeBuilder of #type works'() {
