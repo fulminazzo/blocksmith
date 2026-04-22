@@ -65,4 +65,38 @@ class UsageStyleTest extends Specification {
         'greedyArgumentFormat'         | 'GREEDY_ARG_FORM' || '%s...'         || 'GREEDY_ARG_FORM'
     }
 
+    def 'test that #methodName returns #expectedDefault and #expected'() {
+        given:
+        def style = UsageStyle.get()
+
+        when:
+        def actual = style."get$methodName"(UsageStyleTest)
+
+        then:
+        actual == expectedDefault
+
+        when:
+        style.setArgumentColor(UsageStyleTest, 'COL')
+
+        and:
+        actual = style."get$methodName"(UsageStyleTest)
+
+        then:
+        actual == expected
+
+        when:
+        style.setArgumentColor(UsageStyleTest, null)
+
+        and:
+        actual = style."get$methodName"(UsageStyleTest)
+
+        then:
+        actual == expectedDefault
+
+        where:
+        methodName              || expectedDefault || expected
+        'ArgumentColor'         || 'yellow'        || 'COL'
+        'OptionalArgumentColor' || 'aqua'          || 'COL'
+    }
+
 }

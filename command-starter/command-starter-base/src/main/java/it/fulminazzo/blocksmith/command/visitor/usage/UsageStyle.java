@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Holds the universal styling for the usage of {@link it.fulminazzo.blocksmith.command.node.CommandNode}s.
  * <br>
@@ -15,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UsageStyle {
     private static final @NotNull String PUNCTUATION_COLOR_PLACEHOLDER = "<punctuation>";
+    private static final @NotNull Map<Class<?>, String> ARGUMENT_COLORS;
 
     private static @NotNull UsageStyle instance = new UsageStyle();
 
@@ -54,6 +58,10 @@ public final class UsageStyle {
      */
 
     private @NotNull String greedyArgumentFormat = "%s...";
+
+    static {
+        ARGUMENT_COLORS = new ConcurrentHashMap<>();
+    }
 
     /*
      * COMMON
@@ -142,6 +150,19 @@ public final class UsageStyle {
      */
 
     /**
+     * Gets the color for displaying the name of a {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     * <br>
+     * First, it will search for a specific color from the given type.
+     * If it fails, it defaults to {@link #getDefaultArgumentColor()}.
+     *
+     * @param type the type of the argument
+     * @return the color
+     */
+    public @NotNull String getArgumentColor(final @NotNull Class<?> type) {
+        return ARGUMENT_COLORS.getOrDefault(type, getDefaultArgumentColor());
+    }
+
+    /**
      * Gets the format of a {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
      * The format uses the Java default format syntax (so {@code %s} will be replaced by the argument name).
      *
@@ -180,6 +201,20 @@ public final class UsageStyle {
     /*
      * OPTIONAL ARGUMENT
      */
+
+    /**
+     * Gets the color for displaying the name of an optional
+     * {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     * <br>
+     * First, it will search for a specific color from the given type.
+     * If it fails, it defaults to {@link #getDefaultArgumentColor()}.
+     *
+     * @param type the type of the argument
+     * @return the color
+     */
+    public @NotNull String getOptionalArgumentColor(final @NotNull Class<?> type) {
+        return ARGUMENT_COLORS.getOrDefault(type, getDefaultOptionalArgumentColor());
+    }
 
     /**
      * Gets the format of an optional {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
@@ -221,6 +256,22 @@ public final class UsageStyle {
     /*
      * ARGUMENT
      */
+
+    /**
+     * Sets the color for displaying the name of a {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
+     * <br>
+     * This color will <b>overwrite</b> any default styling of a node with the same type as the one specified.
+     *
+     * @param type  the type of the argument
+     * @param color the color (parsed through the
+     *              <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
+     * @return this object (for method chaining)
+     */
+    public @NotNull UsageStyle setArgumentColor(final @NotNull Class<?> type, final @Nullable String color) {
+        if (color != null) ARGUMENT_COLORS.put(type, color);
+        else ARGUMENT_COLORS.remove(type);
+        return this;
+    }
 
     /**
      * Gets the format of a greedy {@link it.fulminazzo.blocksmith.command.node.ArgumentNode}.
