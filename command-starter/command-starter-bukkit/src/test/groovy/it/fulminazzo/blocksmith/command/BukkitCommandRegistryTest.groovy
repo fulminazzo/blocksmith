@@ -1,3 +1,4 @@
+//file:noinspection unused
 package it.fulminazzo.blocksmith.command
 
 import be.seeseemelk.mockbukkit.MockBukkit
@@ -15,6 +16,8 @@ import org.bukkit.Server
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.SimpleCommandMap
+import org.bukkit.help.HelpMap
+import org.bukkit.help.HelpTopic
 import org.bukkit.permissions.PermissionDefault
 import org.bukkit.plugin.PluginManager
 import spock.lang.Specification
@@ -198,6 +201,7 @@ class BukkitCommandRegistryTest extends Specification {
         def server = Spy(CraftServer, additionalInterfaces: [Server])
         Reflect.on(server).set('map', new SimpleCommandMap(server))
         server.pluginManager >> Mock(PluginManager)
+        server.helpMap >> Spy(CraftHelpMap, additionalInterfaces: [HelpMap])
 
         and:
         def application = Mock(ApplicationHandle)
@@ -285,10 +289,14 @@ class BukkitCommandRegistryTest extends Specification {
     private static class CraftServer {
         private SimpleCommandMap map
 
-        @SuppressWarnings('unused')
         void syncCommands() {
 
         }
+
+    }
+
+    private static class CraftHelpMap {
+        private final Map<String, HelpTopic> helpTopics = [:]
 
     }
 

@@ -13,6 +13,8 @@ import org.bukkit.Server
 import org.bukkit.command.CommandSender
 import org.bukkit.command.SimpleCommandMap
 import org.bukkit.entity.Player
+import org.bukkit.help.HelpMap
+import org.bukkit.help.HelpTopic
 import org.bukkit.plugin.PluginManager
 import spock.lang.Specification
 
@@ -24,9 +26,12 @@ class BrigadierBukkitCommandRegistryTest extends Specification {
     private BrigadierBukkitCommandRegistry registry
 
     void setup() {
+        def helpMap = Spy(CraftHelpMap, additionalInterfaces: [HelpMap]) as HelpMap
+
         def server = Spy(CraftServer, additionalInterfaces: [Server]) as Server
         Reflect.on(server).set('map', new SimpleCommandMap(server))
         server.pluginManager >> Mock(PluginManager)
+        server.helpMap >> helpMap
 
         application = Mock(ApplicationHandle)
         application.server() >> server
@@ -123,7 +128,6 @@ class BrigadierBukkitCommandRegistryTest extends Specification {
         private final ServerHandle handle = new ServerHandle()
         private SimpleCommandMap map
 
-        @SuppressWarnings('unused')
         void syncCommands() {
 
         }
@@ -131,6 +135,11 @@ class BrigadierBukkitCommandRegistryTest extends Specification {
         ServerHandle getHandle() {
             return handle
         }
+
+    }
+
+    private static class CraftHelpMap {
+        private final Map<String, HelpTopic> helpTopics = [:]
 
     }
 

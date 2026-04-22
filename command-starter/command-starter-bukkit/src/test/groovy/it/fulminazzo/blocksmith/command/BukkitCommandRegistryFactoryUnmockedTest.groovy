@@ -1,3 +1,4 @@
+//file:noinspection unused
 package it.fulminazzo.blocksmith.command
 
 import com.mojang.brigadier.CommandDispatcher
@@ -9,6 +10,8 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Server
 import org.bukkit.command.SimpleCommandMap
+import org.bukkit.help.HelpMap
+import org.bukkit.help.HelpTopic
 import org.bukkit.plugin.PluginManager
 import spock.lang.Specification
 
@@ -17,12 +20,20 @@ import spock.lang.Specification
  */
 class BukkitCommandRegistryFactoryUnmockedTest extends Specification {
 
+    private Server server
+
+    void setup() {
+        def helpMap = Spy(CraftHelpMap, additionalInterfaces: [HelpMap]) as HelpMap
+
+        server = Spy(CraftServer, additionalInterfaces: [Server])
+        Reflect.on(server).set('map', new SimpleCommandMap(server as Server))
+        server.pluginManager >> Mock(PluginManager)
+        server.helpMap >> helpMap
+    }
+
     def 'test newRegistry in newer versions returns brigadier registry'() {
         given:
-        def server = Spy(CraftServer, additionalInterfaces: [Server])
-        Reflect.on(server).set('map', new SimpleCommandMap(server as Server))
         server.handle.commandDispatcher = new CommandDispatcher<>()
-        server.pluginManager >> Mock(PluginManager)
 
         and:
         def application = Mock(ApplicationHandle)
@@ -37,11 +48,6 @@ class BukkitCommandRegistryFactoryUnmockedTest extends Specification {
 
     def 'test newRegistry in legacy versions returns legacy registry'() {
         given:
-        def server = Spy(CraftServer, additionalInterfaces: [Server])
-        Reflect.on(server).set('map', new SimpleCommandMap(server as Server))
-        server.pluginManager >> Mock(PluginManager)
-
-        and:
         def application = Mock(ApplicationHandle)
         application.server() >> server
 
@@ -54,7 +60,6 @@ class BukkitCommandRegistryFactoryUnmockedTest extends Specification {
 
     def 'test that convert of Position to Location with no worlds does not throw'() {
         given:
-        def server = Mock(Server)
         server.worlds >> []
         Reflect.on(Bukkit).set('server', server)
 
@@ -75,7 +80,6 @@ class BukkitCommandRegistryFactoryUnmockedTest extends Specification {
         Reflect.on(Bukkit).set('server', null)
     }
 
-    @SuppressWarnings('unused')
     private static class CraftServer {
         private final ServerHandle handle = new ServerHandle()
         private SimpleCommandMap map
@@ -83,6 +87,11 @@ class BukkitCommandRegistryFactoryUnmockedTest extends Specification {
         ServerHandle getHandle() {
             return handle
         }
+
+    }
+
+    private static class CraftHelpMap {
+        private final Map<String, HelpTopic> helpTopics = [:]
 
     }
 
