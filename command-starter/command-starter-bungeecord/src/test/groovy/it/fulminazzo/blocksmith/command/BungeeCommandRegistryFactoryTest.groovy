@@ -84,6 +84,10 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         // PLAYER
         ProxiedPlayer | 'Alex'    || { a -> a.server().getPlayer('Alex') }
         ProxiedPlayer | 'Camilla' || { a -> a.server().getPlayer('Camilla') }
+        // COMMAND SENDER
+        CommandSender | 'Alex'    || { a -> a.server().getPlayer('Alex') }
+        CommandSender | 'Camilla' || { a -> a.server().getPlayer('Camilla') }
+        CommandSender | 'console' || { a -> a.server().console }
         // SERVER
         ServerInfo    | 'Lobby'   || { a -> a.server().getServerInfo('Lobby') }
         ServerInfo    | 'Bedwars' || { a -> a.server().getServerInfo('Bedwars') }
@@ -111,6 +115,10 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         ProxiedPlayer | 'C'        || 'error.player-not-found'
         ProxiedPlayer | 'c'        || 'error.player-not-found'
         ProxiedPlayer | 'steve'    || 'error.player-not-found'
+        // COMMAND SENDER
+        CommandSender | 'z'        || 'error.player-not-found'
+        CommandSender | 'steve'    || 'error.player-not-found'
+        CommandSender | 'k'        || 'error.player-not-found'
         // SERVER
         ServerInfo    | ''         || 'error.server-not-found'
         ServerInfo    | 'L'        || 'error.server-not-found'
@@ -142,6 +150,17 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         ProxiedPlayer | 'Camilla'  || ['Alex', 'Camilla']
         ProxiedPlayer | 'c'        || ['Alex', 'Camilla']
         ProxiedPlayer | 'steve'    || ['Alex', 'Camilla']
+        // COMMAND SENDER
+        CommandSender | ''         || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender | 'A'        || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender | 'Alex'     || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender | 'C'        || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender | 'Camilla'  || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender | 'c'        || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender | 'steve'    || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender | ''         || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender | 'c'        || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender | 'console'  || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         // SERVER
         ServerInfo    | ''         || ['Lobby', 'Bedwars']
         ServerInfo    | 'L'        || ['Lobby', 'Bedwars']

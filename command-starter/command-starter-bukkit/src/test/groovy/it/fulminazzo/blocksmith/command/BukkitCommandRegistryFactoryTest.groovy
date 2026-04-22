@@ -209,8 +209,12 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         // PLAYER
         Player               | 'Alex'           || { a -> a.server().getPlayer('Alex') }
         Player               | 'Camilla'        || { a -> a.server().getPlayer('Camilla') }
-        // SERVER
+        // CONSOLE
         ConsoleCommandSender | 'console'        || { a -> a.server().consoleSender }
+        // COMMAND SENDER
+        CommandSender        | 'Alex'           || { a -> a.server().getPlayer('Alex') }
+        CommandSender        | 'Camilla'        || { a -> a.server().getPlayer('Camilla') }
+        CommandSender        | 'console'        || { a -> a.server().consoleSender }
         // OFFLINE PLAYER
         OfflinePlayer        | 'Alex'           || { a -> a.server().getOfflinePlayer('Alex') }
         OfflinePlayer        | 'Camilla'        || { a -> a.server().getOfflinePlayer('Camilla') }
@@ -243,7 +247,11 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         Player               | 'z'             || 'error.player-not-found'
         Player               | 'steve'         || 'error.player-not-found'
         // CONSOLE
-        ConsoleCommandSender | 'z'             || 'error.unrecognized-argument'
+        ConsoleCommandSender | 'k'             || 'error.unrecognized-argument'
+        // COMMAND SENDER
+        CommandSender        | 'z'             || 'error.player-not-found'
+        CommandSender        | 'steve'         || 'error.player-not-found'
+        CommandSender        | 'k'             || 'error.player-not-found'
         // OFFLINE PLAYER
         OfflinePlayer        | ''              || 'error.player-not-found'
         OfflinePlayer        | 'z'             || 'error.player-not-found'
@@ -281,6 +289,17 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         ConsoleCommandSender | ''               || [ArgumentParsers.CONSOLE_COMMAND_NAME]
         ConsoleCommandSender | 'c'              || [ArgumentParsers.CONSOLE_COMMAND_NAME]
         ConsoleCommandSender | 'console'        || [ArgumentParsers.CONSOLE_COMMAND_NAME]
+        // COMMAND SENDER
+        CommandSender        | ''               || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'A'              || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'Alex'           || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'C'              || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'Camilla'        || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'c'              || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'steve'          || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | ''               || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'c'              || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'console'        || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         // OFFLINE PLAYER
         OfflinePlayer        | ''               || ['Alex', 'Camilla', 'Steve', 'Michael']
         OfflinePlayer        | 'A'              || ['Alex', 'Camilla', 'Steve', 'Michael']

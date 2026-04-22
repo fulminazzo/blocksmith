@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command;
 
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -9,6 +10,7 @@ import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
+import it.fulminazzo.blocksmith.command.argument.CompositeArgumentParser;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +61,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
             }
 
         });
+        ArgumentParsers.register(CommandSource.class, new CompositeArgumentParser<>(ConsoleCommandSource.class, Player.class));
         ArgumentParsers.register(RegisteredServer.class, new ArgumentParser<>() {
 
             @Override

@@ -86,8 +86,12 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         // PLAYER
         Player               | 'Alex'    || { a -> a.server().getPlayer('Alex').get() }
         Player               | 'Camilla' || { a -> a.server().getPlayer('Camilla').get() }
-        // SERVER
+        // CONSOLE COMMAND SOURCE
         ConsoleCommandSource | 'console' || { a -> a.server().consoleCommandSource }
+        // COMMAND SOURCE
+        CommandSource        | 'Alex'    || { a -> a.server().getPlayer('Alex').get() }
+        CommandSource        | 'Camilla' || { a -> a.server().getPlayer('Camilla').get() }
+        CommandSource        | 'console' || { a -> a.server().consoleCommandSource }
         // SERVER
         RegisteredServer     | 'Lobby'   || { a -> a.server().getServer('Lobby').get() }
         RegisteredServer     | 'Bedwars' || { a -> a.server().getServer('Bedwars').get() }
@@ -117,6 +121,13 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         Player               | 'steve'    || 'error.player-not-found'
         // CONSOLE
         ConsoleCommandSource | 'z'        || 'error.unrecognized-argument'
+        // PLAYER
+        CommandSource        | ''         || 'error.player-not-found'
+        CommandSource        | 'A'        || 'error.player-not-found'
+        CommandSource        | 'C'        || 'error.player-not-found'
+        CommandSource        | 'c'        || 'error.player-not-found'
+        CommandSource        | 'steve'    || 'error.player-not-found'
+        CommandSource        | 'z'        || 'error.player-not-found'
         // SERVER
         RegisteredServer     | ''         || 'error.server-not-found'
         RegisteredServer     | 'L'        || 'error.server-not-found'
@@ -152,6 +163,17 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         ConsoleCommandSource | ''         || [ArgumentParsers.CONSOLE_COMMAND_NAME]
         ConsoleCommandSource | 'c'        || [ArgumentParsers.CONSOLE_COMMAND_NAME]
         ConsoleCommandSource | 'console'  || [ArgumentParsers.CONSOLE_COMMAND_NAME]
+        // COMMAND SENDER
+        CommandSource        | ''         || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'A'        || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'Alex'     || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'C'        || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'Camilla'  || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'c'        || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'steve'    || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | ''         || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'c'        || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'console'  || [ArgumentParsers.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         // SERVER
         RegisteredServer     | ''         || ['Lobby', 'Bedwars']
         RegisteredServer     | 'L'        || ['Lobby', 'Bedwars']
