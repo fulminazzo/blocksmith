@@ -10,6 +10,8 @@ import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.help.GenericCommandHelpTopic;
+import org.bukkit.help.HelpTopic;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -21,11 +23,16 @@ import java.util.stream.Collectors;
  * Implementation of {@link CommandRegistry} for Bukkit platforms.
  */
 class BukkitCommandRegistry extends CommandRegistry {
+    private static final @NotNull String COMMAND_PREFIX = "/";
+
     protected final @NotNull Server server;
 
     private final @NotNull SimpleCommandMap commandMap;
     private final @NotNull Map<String, Command> knownCommands;
     private final @NotNull Map<String, Command> previousCommands = new ConcurrentHashMap<>();
+
+    private final @NotNull Map<String, HelpTopic> helpMap;
+    private final @NotNull Map<String, HelpTopic> previousTopics = new ConcurrentHashMap<>();
 
     private final @NotNull BukkitPermissionRegistry permissionRegistry;
 
@@ -41,6 +48,8 @@ class BukkitCommandRegistry extends CommandRegistry {
         Reflect reflect = Reflect.on(server).get(f -> SimpleCommandMap.class.isAssignableFrom(f.getType()));
         this.commandMap = reflect.get();
         this.knownCommands = reflect.get("knownCommands").get();
+
+        this.helpMap = Reflect.on(server.getHelpMap()).get(f -> f.getType().isAssignableFrom(Map.class)).get();
 
         this.permissionRegistry = new BukkitPermissionRegistry(application);
     }
@@ -64,6 +73,11 @@ class BukkitCommandRegistry extends CommandRegistry {
         BukkitCommand cmd = new BukkitCommand(commandName, command);
         cmd.setPermission(permissionRegistry.registerPermission(command).getName());
         commandMap.register(commandName, getPrefix(), cmd);
+
+        for (String name : command.getAliases()) {
+            registerInHelpMap(name, cmd);
+            registerInHelpMap(getBukkitPrefix() + name, cmd);
+        }
     }
 
     @Override
@@ -97,8 +111,11 @@ class BukkitCommandRegistry extends CommandRegistry {
         return getPrefix() + ":";
     }
 
-    private void unregisterPermission(final @NotNull Command command) {
-        permissionRegistry.unregisterPermission(command.getPermission());
+    private void registerInHelpMap(final @NotNull String name, final @NotNull BukkitCommand command) {
+        String prefixedName = COMMAND_PREFIX + name;
+        HelpTopic prev = helpMap.remove(prefixedName);
+        if (prev != null) previousTopics.put(prefixedName, prev);
+        helpMap.put(prefixedName, new GenericCommandHelpTopic(command));
     }
 
     private void removeOrRestoreCommand(final @NotNull String alias) {
@@ -110,8 +127,21 @@ class BukkitCommandRegistry extends CommandRegistry {
                 unregisterPermission(current);
                 knownCommands.put(alias, cmd);
             }
+            unregisterFromHelpMap(alias);
         }
         knownCommands.remove(getBukkitPrefix() + alias);
+        unregisterFromHelpMap(getBukkitPrefix() + alias);
+    }
+
+    private void unregisterFromHelpMap(final @NotNull String name) {
+        String prefixedName = COMMAND_PREFIX + name;
+        HelpTopic prev = previousTopics.remove(prefixedName);
+        if (prev != null) helpMap.put(prefixedName, prev);
+        else helpMap.remove(prefixedName);
+    }
+
+    private void unregisterPermission(final @NotNull Command command) {
+        permissionRegistry.unregisterPermission(command.getPermission());
     }
 
     private void updateClientCommands() {
