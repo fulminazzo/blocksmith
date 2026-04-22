@@ -17,17 +17,19 @@ public final class UsageVisitor implements Visitor<@NotNull String, RuntimeExcep
 
     @Override
     public @NotNull String visitArgumentNode(final @NotNull ArgumentNode<?> node) {
-        throw new UnsupportedOperationException(); //TODO:
+        return visitCommandNode(node);
     }
 
     @Override
     public @NotNull String visitLiteralNode(final @NotNull LiteralNode node) {
-        throw new UnsupportedOperationException(); //TODO:
+        return visitCommandNode(node);
     }
 
     @Override
     public @NotNull String visitCommandNode(final @NotNull CommandNode node) {
-        return visitChildren(node);
+        return visitParentNode(node) +
+                node.accept(singleUsageVisitor) +
+                visitChildren(node);
     }
 
     /**
