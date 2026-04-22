@@ -10,7 +10,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +22,7 @@ final class OfflinePlayerArgumentParser implements ArgumentParser<OfflinePlayer>
 
     @SuppressWarnings("deprecation")
     @Override
-    public @NonNull OfflinePlayer parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+    public @NotNull OfflinePlayer parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
         Server server = visitor.getApplication().server();
         String argument = visitor.getInput().getCurrent();
         if (getNames(visitor.getApplication()).stream().anyMatch(argument::equalsIgnoreCase))

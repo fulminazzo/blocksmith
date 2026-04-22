@@ -13,7 +13,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +25,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
         ArgumentParsers.register(Player.class, new ArgumentParser<>() {
 
             @Override
-            public @NonNull Player parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
+            public @NotNull Player parse(final @NotNull Visitor<?, ?> visitor) throws ArgumentParseException {
                 Server server = visitor.getApplication().server();
                 CommandSender sender = (CommandSender) visitor.getCommandSender().getActualSender();
                 String argument = visitor.getInput().getCurrent();

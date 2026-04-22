@@ -6,7 +6,6 @@ import it.fulminazzo.blocksmith.command.MockApplicationHandle;
 import it.fulminazzo.blocksmith.command.Player;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,7 +30,7 @@ public class CommandSenderReceiverFactory extends AbstractReceiverFactory {
     }
 
     @Override
-    protected @NotNull <R> Receiver createImpl(final @NonNull R receiver) {
+    protected @NotNull <R> Receiver createImpl(final @NotNull R receiver) {
         return new CommandSenderReceiver((CommandSender) receiver);
     }
 
@@ -54,7 +53,7 @@ public class CommandSenderReceiverFactory extends AbstractReceiverFactory {
 
             @SuppressWarnings("unchecked")
             @Override
-            public @NonNull <R> R internal() {
+            public @NotNull <R> R internal() {
                 return (R) sender;
             }
 

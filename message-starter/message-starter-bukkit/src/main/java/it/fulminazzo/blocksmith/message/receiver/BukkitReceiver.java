@@ -1,14 +1,12 @@
 package it.fulminazzo.blocksmith.message.receiver;
 
 import it.fulminazzo.blocksmith.message.util.LocaleUtils;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Locale;
 
@@ -31,7 +29,7 @@ final class BukkitReceiver implements Receiver {
 
     @SuppressWarnings("unchecked")
     @Override
-    public @NonNull <R> R internal() {
+    public @NotNull <R> R internal() {
         return (R) internal;
     }
 

@@ -7,7 +7,6 @@ import lombok.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 /**
  * A Command sender wrapper for Bukkit.
@@ -23,7 +22,7 @@ final class BukkitCommandSenderWrapper extends CommandSenderWrapper<CommandSende
      * @param actualSender the actual sender
      */
     public BukkitCommandSenderWrapper(final @NotNull ApplicationHandle application,
-                                      final @NonNull CommandSender actualSender) {
+                                      final @NotNull CommandSender actualSender) {
         super(application, actualSender);
     }
 

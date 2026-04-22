@@ -7,7 +7,6 @@ import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 /**
  * A Command sender wrapper for Velocity.
@@ -23,7 +22,7 @@ final class VelocityCommandSenderWrapper extends CommandSenderWrapper<CommandSou
      * @param actualSender the actual sender
      */
     public VelocityCommandSenderWrapper(final @NotNull ApplicationHandle application,
-                                        final @NonNull CommandSource actualSender) {
+                                        final @NotNull CommandSource actualSender) {
         super(application, actualSender);
     }
 

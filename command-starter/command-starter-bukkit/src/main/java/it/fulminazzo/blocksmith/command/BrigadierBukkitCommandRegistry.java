@@ -14,7 +14,6 @@ import it.fulminazzo.blocksmith.reflect.ReflectException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -121,7 +120,7 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
             restoreIntoBrigadier(getBukkitPrefix() + name);
     }
 
-    private void removeChild(final @NonNull String name) {
+    private void removeChild(final @NotNull String name) {
         Reflect root = Reflect.on(getRoot());
         root.get("children").invoke("remove", name);
         root.get("literals").invoke("remove", name);
@@ -147,7 +146,7 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
         }
     }
 
-    private static @NonNull Class<?> getPositionArgumentTypeClass() throws ClassNotFoundException {
+    private static @NotNull Class<?> getPositionArgumentTypeClass() throws ClassNotFoundException {
         try {
             return Class.forName("net.minecraft.commands.arguments.coordinates.BlockPosArgument");
         } catch (ClassNotFoundException e) {

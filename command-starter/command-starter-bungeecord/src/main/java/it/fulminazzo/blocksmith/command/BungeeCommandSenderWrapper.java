@@ -7,7 +7,6 @@ import lombok.ToString;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 /**
  * A Command sender wrapper for Bungeecord.
@@ -23,7 +22,7 @@ final class BungeeCommandSenderWrapper extends CommandSenderWrapper<CommandSende
      * @param actualSender the actual sender
      */
     public BungeeCommandSenderWrapper(final @NotNull ApplicationHandle application,
-                                      final @NonNull CommandSender actualSender) {
+                                      final @NotNull CommandSender actualSender) {
         super(application, actualSender);
     }
 

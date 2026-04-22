@@ -6,7 +6,6 @@ import it.fulminazzo.blocksmith.message.Messenger;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,7 @@ public class MockApplicationHandle implements ApplicationHandle, ServerApplicati
     }
 
     @Override
-    public @NonNull <S> S server() {
+    public @NotNull <S> S server() {
         throw new UnsupportedOperationException();
     }
 

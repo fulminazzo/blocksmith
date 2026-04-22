@@ -9,7 +9,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Map;
@@ -87,7 +86,7 @@ class BukkitCommandRegistry extends CommandRegistry {
      *
      * @return the prefix
      */
-    @NonNull String getBukkitPrefix() {
+    @NotNull String getBukkitPrefix() {
         return getPrefix() + ":";
     }
 
@@ -145,17 +144,17 @@ class BukkitCommandRegistry extends CommandRegistry {
         }
 
         @Override
-        public boolean execute(final @NonNull CommandSender sender,
-                               final @NonNull String commandLabel,
-                               final @NonNull String[] args) {
+        public boolean execute(final @NotNull CommandSender sender,
+                               final @NotNull String commandLabel,
+                               final @NotNull String[] args) {
             BukkitCommandRegistry.this.execute(command, sender, commandLabel, args);
             return true;
         }
 
         @Override
-        public @NonNull List<String> tabComplete(final @NonNull CommandSender sender,
-                                                 final @NonNull String alias,
-                                                 final @NonNull String[] args) throws IllegalArgumentException {
+        public @NotNull List<String> tabComplete(final @NotNull CommandSender sender,
+                                                 final @NotNull String alias,
+                                                 final @NotNull String[] args) throws IllegalArgumentException {
             return BukkitCommandRegistry.this.tabComplete(command, sender, alias, args);
         }
 
