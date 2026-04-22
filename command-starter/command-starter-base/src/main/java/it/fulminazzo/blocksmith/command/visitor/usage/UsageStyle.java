@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Holds the universal styling for the usage of {@link it.fulminazzo.blocksmith.command.node.CommandNode}s.
@@ -16,15 +17,63 @@ public final class UsageStyle {
     private static @NotNull UsageStyle instance = new UsageStyle();
 
     /*
-     * LITERAL
+     * COMMON
      */
-    private @NotNull String literalColor = "red";
-    private @NotNull String literalSeparator = "|";
-    private @NotNull String literalSeparatorColor = "dark_gray";
+
+    private @NotNull String separator = "|";
+    private @NotNull String punctuationColor = "dark_gray";
 
     /*
      * LITERAL
      */
+
+    private @NotNull String literalColor = "red";
+    private @NotNull String literalSeparator = "|";
+    private @Nullable String literalSeparatorColor;
+
+    /*
+     * COMMON
+     */
+
+    /**
+     * Sets the separator between the children of a {@link it.fulminazzo.blocksmith.command.node.CommandNode}.
+     *
+     * @param separator the separator
+     * @return this object (for method chaining)
+     */
+    public @NotNull UsageStyle separator(final @NotNull String separator) {
+        this.separator = separator;
+        return this;
+    }
+
+    /**
+     * Sets the universal color used for punctuation (separating children, aliases, declaring
+     * optional or mandatory argument nodes, etc.).
+     * <br>
+     * If {@link #getLiteralSeparatorColor()} is not set, this color will be used instead.
+     *
+     * @param color the color (parsed through the <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>)
+     * @return this object (for method chaining)
+     */
+    public @NotNull UsageStyle punctuationColor(final @NotNull String color) {
+        this.punctuationColor = color;
+        return this;
+    }
+
+    /*
+     * LITERAL
+     */
+
+    /**
+     * Gets the color of the separator between the aliases of a {@link it.fulminazzo.blocksmith.command.node.LiteralNode}.
+     * <br>
+     * If not set, {@link #getPunctuationColor()} will be used instead.
+     *
+     * @return the color
+     */
+    public @NotNull String getLiteralSeparatorColor() {
+        return literalSeparatorColor == null ? getPunctuationColor() : literalSeparatorColor;
+    }
 
     /**
      * Sets the color for displaying the aliases of a {@link it.fulminazzo.blocksmith.command.node.LiteralNode}.
