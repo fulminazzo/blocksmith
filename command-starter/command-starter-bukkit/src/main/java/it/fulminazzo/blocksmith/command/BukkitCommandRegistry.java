@@ -2,8 +2,10 @@ package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.reflect.ReflectException;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -135,7 +137,9 @@ class BukkitCommandRegistry extends CommandRegistry {
         public BukkitCommand(final @NotNull String commandName, final @NotNull LiteralNode command) {
             super(commandName,
                     command.getCommandInfo().getDescription(),
-                    command.getUsage(),
+                    LegacyComponentSerializer.legacySection().serialize(
+                            ComponentUtils.toComponent(command.getUsage())
+                    ),
                     command.getAliases().stream()
                             .filter(a -> !a.equals(commandName))
                             .collect(Collectors.toList())
