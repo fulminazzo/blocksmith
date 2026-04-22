@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <br>
  * Each color follows the <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>.
  */
-@Getter(AccessLevel.PRIVATE)
+@Getter(AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UsageStyle {
     private static final @NotNull Map<Class<?>, String> DEFAULT_ARGUMENT_COLORS;
@@ -135,7 +135,7 @@ public final class UsageStyle {
      *
      * @return the color
      */
-    public @NotNull String getLiteralSeparatorColor() {
+    @NotNull String getLiteralSeparatorColor() {
         return literalSeparatorColor == null ? getPunctuationColor() : literalSeparatorColor;
     }
 
@@ -188,7 +188,7 @@ public final class UsageStyle {
      * @param type the type of the argument
      * @return the color
      */
-    public @NotNull String getArgumentColor(final @NotNull Class<?> type) {
+    @NotNull String getArgumentColor(final @NotNull Class<?> type) {
         return getArgumentColorOrDefault(type, getDefaultArgumentColor());
     }
 
@@ -198,7 +198,7 @@ public final class UsageStyle {
      *
      * @return the format
      */
-    public @NotNull String getArgumentFormat() {
+    @NotNull String getArgumentFormat() {
         return argumentFormat.replace(PUNCTUATION_COLOR_PLACEHOLDER, getPunctuationColor());
     }
 
@@ -242,7 +242,7 @@ public final class UsageStyle {
      * @param type the type of the argument
      * @return the color
      */
-    public @NotNull String getOptionalArgumentColor(final @NotNull Class<?> type) {
+    @NotNull String getOptionalArgumentColor(final @NotNull Class<?> type) {
         return getArgumentColorOrDefault(type, getDefaultOptionalArgumentColor());
     }
 
@@ -252,7 +252,7 @@ public final class UsageStyle {
      *
      * @return the format
      */
-    public @NotNull String getOptionalArgumentFormat() {
+    @NotNull String getOptionalArgumentFormat() {
         return optionalArgumentFormat.replace(PUNCTUATION_COLOR_PLACEHOLDER, getPunctuationColor());
     }
 
@@ -309,7 +309,7 @@ public final class UsageStyle {
      *
      * @return the format
      */
-    public @NotNull String getGreedyArgumentFormat() {
+    @NotNull String getGreedyArgumentFormat() {
         return greedyArgumentFormat.replace(PUNCTUATION_COLOR_PLACEHOLDER, getPunctuationColor());
     }
 
