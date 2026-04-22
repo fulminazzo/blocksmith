@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.reflect.ReflectException;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
@@ -13,8 +14,10 @@ import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.help.GenericCommandHelpTopic;
 import org.bukkit.help.HelpTopic;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -70,7 +73,7 @@ class BukkitCommandRegistry extends CommandRegistry {
             Command curr = knownCommands.remove(a);
             if (curr != null) previousCommands.put(a, curr);
         });
-        BukkitCommand cmd = new BukkitCommand(commandName, command);
+        BukkitCommand cmd = BukkitCommand.of(this, commandName, command);
         cmd.setPermission(permissionRegistry.registerPermission(command).getName());
         commandMap.register(commandName, getPrefix(), cmd);
 
@@ -155,33 +158,28 @@ class BukkitCommandRegistry extends CommandRegistry {
     /**
      * Bukkit command implementation associated with the current registry.
      */
-    final class BukkitCommand extends Command {
+    static final class BukkitCommand extends Command {
+        private final @NotNull CommandRegistry delegate;
+
         private final @NotNull LiteralNode command;
 
-        /**
-         * Instantiates a new Bukkit command.
-         *
-         * @param commandName the command name
-         * @param command     the root of the command route
-         */
-        public BukkitCommand(final @NotNull String commandName, final @NotNull LiteralNode command) {
-            super(commandName,
-                    command.getCommandInfo().getDescription(),
-                    LegacyComponentSerializer.legacySection().serialize(
-                            ComponentUtils.toComponent(command.getUsage())
-                    ),
-                    command.getAliases().stream()
-                            .filter(a -> !a.equals(commandName))
-                            .collect(Collectors.toList())
-            );
-            this.command = command;
+        private BukkitCommand(final @NotNull CommandRegistry delegate,
+                              final @NonNull String name,
+                              final @NonNull String description,
+                              final @NonNull String usageMessage,
+                              final @NonNull List<String> aliases,
+                              final @NotNull LiteralNode node) {
+            super(name, description, usageMessage, aliases);
+            this.delegate = delegate;
+            this.command = node;
         }
+
 
         @Override
         public boolean execute(final @NotNull CommandSender sender,
                                final @NotNull String commandLabel,
                                final @NotNull String[] args) {
-            BukkitCommandRegistry.this.execute(command, sender, commandLabel, args);
+            delegate.execute(command, sender, commandLabel, args);
             return true;
         }
 
@@ -189,7 +187,29 @@ class BukkitCommandRegistry extends CommandRegistry {
         public @NotNull List<String> tabComplete(final @NotNull CommandSender sender,
                                                  final @NotNull String alias,
                                                  final @NotNull String[] args) throws IllegalArgumentException {
-            return BukkitCommandRegistry.this.tabComplete(command, sender, alias, args);
+            return delegate.tabComplete(command, sender, alias, args);
+        }
+
+        /**
+         * Instantiates a new Bukkit command.
+         *
+         * @param delegate    the delegate to handle execution and tab completion
+         * @param commandName the command name
+         * @param command     the node referring to the command
+         * @return the bukkit command
+         */
+        public static @NotNull BukkitCommand of(final @NotNull CommandRegistry delegate,
+                                                final @NotNull String commandName,
+                                                final @NotNull LiteralNode command) {
+            LegacyComponentSerializer serializer = LegacyComponentSerializer.legacySection();
+            String description = command.getCommandInfo().getDescription();
+            Component component = delegate.application.getMessenger().getComponentOrNull(description, Locale.getDefault());
+            if (component != null) description = serializer.serialize(component);
+            final String usage = serializer.serialize(ComponentUtils.toComponent(command.getUsage()));
+            final List<String> aliases = command.getAliases().stream()
+                    .filter(a -> !a.equals(commandName))
+                    .collect(Collectors.toList());
+            return new BukkitCommand(delegate, commandName, description, usage, aliases, command);
         }
 
     }
