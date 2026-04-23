@@ -34,7 +34,7 @@ final class BungeeCommandRegistry extends CommandRegistry {
     }
 
     @Override
-    protected @NotNull CommandSenderWrapper<CommandSender> wrapSender(final @NotNull Object executor) {
+    public @NotNull CommandSenderWrapper<CommandSender> wrapSender(final @NotNull Object executor) {
         return new BungeeCommandSenderWrapper(application, (CommandSender) executor);
     }
 
@@ -51,7 +51,7 @@ final class BungeeCommandRegistry extends CommandRegistry {
     }
 
     @Override
-    protected @NotNull Class<?> getSenderType() {
+    public @NotNull Class<?> getSenderType() {
         return CommandSender.class;
     }
 

@@ -27,8 +27,8 @@ final class VelocityCommandSenderWrapper extends CommandSenderWrapper<CommandSou
     }
 
     @Override
-    public @NotNull String getName() {
-        return isPlayer() ? ((Player) actualSender).getUsername() : "console";
+    protected @NotNull String getNameImpl() {
+        return ((Player) actualSender).getUsername();
     }
 
     @Override

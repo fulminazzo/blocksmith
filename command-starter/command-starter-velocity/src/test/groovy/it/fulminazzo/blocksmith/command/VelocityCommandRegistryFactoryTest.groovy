@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command
 
 import com.velocitypowered.api.command.CommandSource
+import com.velocitypowered.api.proxy.ConsoleCommandSource
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.proxy.server.RegisteredServer
@@ -81,13 +82,19 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         actual == expected(application)
 
         where:
-        type             | argument  || expected
+        type                 | argument  || expected
         // PLAYER
-        Player           | 'Alex'    || { a -> a.server().getPlayer('Alex').get() }
-        Player           | 'Camilla' || { a -> a.server().getPlayer('Camilla').get() }
+        Player               | 'Alex'    || { a -> a.server().getPlayer('Alex').get() }
+        Player               | 'Camilla' || { a -> a.server().getPlayer('Camilla').get() }
+        // CONSOLE COMMAND SOURCE
+        ConsoleCommandSource | 'console' || { a -> a.server().consoleCommandSource }
+        // COMMAND SOURCE
+        CommandSource        | 'Alex'    || { a -> a.server().getPlayer('Alex').get() }
+        CommandSource        | 'Camilla' || { a -> a.server().getPlayer('Camilla').get() }
+        CommandSource        | 'console' || { a -> a.server().consoleCommandSource }
         // SERVER
-        RegisteredServer | 'Lobby'   || { a -> a.server().getServer('Lobby').get() }
-        RegisteredServer | 'Bedwars' || { a -> a.server().getServer('Bedwars').get() }
+        RegisteredServer     | 'Lobby'   || { a -> a.server().getServer('Lobby').get() }
+        RegisteredServer     | 'Bedwars' || { a -> a.server().getServer('Bedwars').get() }
     }
 
     def 'test that parse of parser for #type throws exception with #expected message with #argument'() {
@@ -105,19 +112,28 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         e.message == expected
 
         where:
-        type             | argument   || expected
+        type                 | argument   || expected
         // PLAYER
-        Player           | ''         || 'error.player-not-found'
-        Player           | 'A'        || 'error.player-not-found'
-        Player           | 'C'        || 'error.player-not-found'
-        Player           | 'c'        || 'error.player-not-found'
-        Player           | 'steve'    || 'error.player-not-found'
+        Player               | ''         || 'error.player-not-found'
+        Player               | 'A'        || 'error.player-not-found'
+        Player               | 'C'        || 'error.player-not-found'
+        Player               | 'c'        || 'error.player-not-found'
+        Player               | 'steve'    || 'error.player-not-found'
+        // CONSOLE
+        ConsoleCommandSource | 'z'        || 'error.unrecognized-argument'
+        // PLAYER
+        CommandSource        | ''         || 'error.player-not-found'
+        CommandSource        | 'A'        || 'error.player-not-found'
+        CommandSource        | 'C'        || 'error.player-not-found'
+        CommandSource        | 'c'        || 'error.player-not-found'
+        CommandSource        | 'steve'    || 'error.player-not-found'
+        CommandSource        | 'z'        || 'error.player-not-found'
         // SERVER
-        RegisteredServer | ''         || 'error.server-not-found'
-        RegisteredServer | 'L'        || 'error.server-not-found'
-        RegisteredServer | 'B'        || 'error.server-not-found'
-        RegisteredServer | 'b'        || 'error.server-not-found'
-        RegisteredServer | 'survival' || 'error.server-not-found'
+        RegisteredServer     | ''         || 'error.server-not-found'
+        RegisteredServer     | 'L'        || 'error.server-not-found'
+        RegisteredServer     | 'B'        || 'error.server-not-found'
+        RegisteredServer     | 'b'        || 'error.server-not-found'
+        RegisteredServer     | 'survival' || 'error.server-not-found'
     }
 
     def 'test that completions of parser for #type return #expected with #argument'() {
@@ -134,23 +150,38 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         actual == expected
 
         where:
-        type             | argument   || expected
+        type                 | argument   || expected
         // PLAYER
-        Player           | ''         || ['Alex', 'Camilla']
-        Player           | 'A'        || ['Alex', 'Camilla']
-        Player           | 'Alex'     || ['Alex', 'Camilla']
-        Player           | 'C'        || ['Alex', 'Camilla']
-        Player           | 'Camilla'  || ['Alex', 'Camilla']
-        Player           | 'c'        || ['Alex', 'Camilla']
-        Player           | 'steve'    || ['Alex', 'Camilla']
+        Player               | ''         || ['Alex', 'Camilla']
+        Player               | 'A'        || ['Alex', 'Camilla']
+        Player               | 'Alex'     || ['Alex', 'Camilla']
+        Player               | 'C'        || ['Alex', 'Camilla']
+        Player               | 'Camilla'  || ['Alex', 'Camilla']
+        Player               | 'c'        || ['Alex', 'Camilla']
+        Player               | 'steve'    || ['Alex', 'Camilla']
+        // CONSOLE
+        ConsoleCommandSource | ''         || [CommandSenderWrapper.CONSOLE_COMMAND_NAME]
+        ConsoleCommandSource | 'c'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME]
+        ConsoleCommandSource | 'console'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME]
+        // COMMAND SENDER
+        CommandSource        | ''         || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'A'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'Alex'     || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'C'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'Camilla'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'c'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'steve'    || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | ''         || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'c'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSource        | 'console'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         // SERVER
-        RegisteredServer | ''         || ['Lobby', 'Bedwars']
-        RegisteredServer | 'L'        || ['Lobby', 'Bedwars']
-        RegisteredServer | 'Lobby'    || ['Lobby', 'Bedwars']
-        RegisteredServer | 'B'        || ['Lobby', 'Bedwars']
-        RegisteredServer | 'Bedwars'  || ['Lobby', 'Bedwars']
-        RegisteredServer | 'b'        || ['Lobby', 'Bedwars']
-        RegisteredServer | 'survival' || ['Lobby', 'Bedwars']
+        RegisteredServer     | ''         || ['Lobby', 'Bedwars']
+        RegisteredServer     | 'L'        || ['Lobby', 'Bedwars']
+        RegisteredServer     | 'Lobby'    || ['Lobby', 'Bedwars']
+        RegisteredServer     | 'B'        || ['Lobby', 'Bedwars']
+        RegisteredServer     | 'Bedwars'  || ['Lobby', 'Bedwars']
+        RegisteredServer     | 'b'        || ['Lobby', 'Bedwars']
+        RegisteredServer     | 'survival' || ['Lobby', 'Bedwars']
     }
 
 }

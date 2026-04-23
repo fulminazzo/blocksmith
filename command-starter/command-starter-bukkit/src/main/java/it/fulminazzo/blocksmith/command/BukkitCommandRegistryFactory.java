@@ -11,6 +11,7 @@ import it.fulminazzo.blocksmith.conversion.Convertible;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,6 +56,31 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
 
         });
         UsageStyle.registerDefaultArgumentColor(Player.class, UsageStyle.DEFAULT_PLAYER_COLOR);
+        ArgumentParsers.register(ConsoleCommandSender.class, new ArgumentParser<>() {
+
+            @Override
+            public @NotNull ConsoleCommandSender parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
+                String current = visitor.getInput().getCurrent();
+                if (current.equals(CommandSenderWrapper.CONSOLE_COMMAND_NAME)) {
+                    Server server = visitor.getApplication().server();
+                    return server.getConsoleSender();
+                } else throw new ArgumentParseException(CommandMessages.UNRECOGNIZED_ARGOMENT)
+                        .arguments(
+                                Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, current),
+                                Placeholder.of("expected", CommandSenderWrapper.CONSOLE_COMMAND_NAME)
+                        );
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
+                return List.of(CommandSenderWrapper.CONSOLE_COMMAND_NAME);
+            }
+
+        });
+        ArgumentParsers.register(CommandSender.class, new CompositeArgumentParser<>(ConsoleCommandSender.class, Player.class));
+        UsageStyle.registerDefaultArgumentColor(CommandSender.class, UsageStyle.DEFAULT_PLAYER_COLOR);
+        ArgumentParsers.register(CommandSenderWrapper.class, new CommandSenderWrapperArgumentParser<>(CommandSender.class));
+        UsageStyle.registerDefaultArgumentColor(CommandSenderWrapper.class, UsageStyle.DEFAULT_PLAYER_COLOR);
         ArgumentParsers.register(OfflinePlayer.class, new OfflinePlayerArgumentParser());
         UsageStyle.registerDefaultArgumentColor(Player.class, UsageStyle.DEFAULT_PLAYER_COLOR);
         ArgumentParsers.register(World.class, new ArgumentParser<>() {

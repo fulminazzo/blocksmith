@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -143,7 +144,9 @@ public class ArgumentNode<T> extends CommandNode {
      * @return the argument parser
      */
     public @NotNull ArgumentParser<T> getParser() {
-        return ArgumentParsers.of(getType());
+        Type type = parameter.getParameterizedType();
+        if (type != null) return ArgumentParsers.of(type);
+        else return ArgumentParsers.of(getType());
     }
 
     /**

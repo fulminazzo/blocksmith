@@ -81,8 +81,8 @@ class BukkitCommandSenderWrapperTest extends Specification {
 
         where:
         method     || expected
-        'getName'  || 'CONSOLE'
-        'getId'    || 'CONSOLE'
+        'getName'  || CommandSenderWrapper.CONSOLE_COMMAND_NAME
+        'getId'    || CommandSenderWrapper.CONSOLE_COMMAND_NAME
         'isPlayer' || false
     }
 

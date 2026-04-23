@@ -33,7 +33,7 @@ final class VelocityCommandRegistry extends BrigadierCommandRegistry<CommandSour
     }
 
     @Override
-    protected @NotNull CommandSenderWrapper<CommandSource> wrapSender(final @NotNull Object executor) {
+    public @NotNull CommandSenderWrapper<CommandSource> wrapSender(final @NotNull Object executor) {
         return new VelocityCommandSenderWrapper(application, (CommandSource) executor);
     }
 
@@ -65,7 +65,7 @@ final class VelocityCommandRegistry extends BrigadierCommandRegistry<CommandSour
     }
 
     @Override
-    protected @NotNull Class<?> getSenderType() {
+    public @NotNull Class<?> getSenderType() {
         return CommandSource.class;
     }
 

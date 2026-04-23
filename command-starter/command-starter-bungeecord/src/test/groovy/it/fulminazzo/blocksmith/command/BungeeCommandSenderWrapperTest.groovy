@@ -79,8 +79,8 @@ class BungeeCommandSenderWrapperTest extends Specification {
 
         where:
         method     || expected
-        'getName'  || '(server)'
-        'getId'    || '(server)'
+        'getName'  || CommandSenderWrapper.CONSOLE_COMMAND_NAME
+        'getId'    || CommandSenderWrapper.CONSOLE_COMMAND_NAME
         'isPlayer' || false
     }
 

@@ -3,12 +3,16 @@ package it.fulminazzo.blocksmith.command;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
+import it.fulminazzo.blocksmith.message.receiver.Receiver;
+import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories;
+import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.scheduler.Scheduler;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -23,6 +27,11 @@ import java.util.function.Consumer;
 @EqualsAndHashCode
 @ToString
 public abstract class CommandSenderWrapper<S> {
+    /**
+     * The default name to identify the console in each platform.
+     */
+    public static final @NotNull String CONSOLE_COMMAND_NAME = "console";
+
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private final @NotNull ApplicationHandle application;
@@ -40,6 +49,15 @@ public abstract class CommandSenderWrapper<S> {
     }
 
     /**
+     * Converts this sender to a {@link Receiver}.
+     *
+     * @return the receiver
+     */
+    public @NotNull Receiver receiver() {
+        return ReceiverFactories.get(actualSender.getClass(), application).create(actualSender);
+    }
+
+    /**
      * Checks if the actual sender extends the given Java class.
      *
      * @param type the type
@@ -50,11 +68,35 @@ public abstract class CommandSenderWrapper<S> {
     }
 
     /**
+     * Sends a message to the wrapped sender.
+     *
+     * @param message the message to send
+     * @return this object (for method chaining)
+     */
+    public @NotNull CommandSenderWrapper<S> sendMessage(final @NotNull String message) {
+        return sendMessage(ComponentUtils.toComponent(message));
+    }
+
+    /**
+     * Sends a message to the wrapped sender.
+     *
+     * @param message the message to send
+     * @return this object (for method chaining)
+     */
+    public @NotNull CommandSenderWrapper<S> sendMessage(final @NotNull Component message) {
+        receiver().toAudience().sendMessage(message);
+        return this;
+    }
+
+    /**
      * Gets the name of the sender.
+     * If the sender is <b>not</b> a player, it will return {@link #CONSOLE_COMMAND_NAME}.
      *
      * @return the name
      */
-    public abstract @NotNull String getName();
+    public final @NotNull String getName() {
+        return isPlayer() ? getNameImpl() : CONSOLE_COMMAND_NAME;
+    }
 
     /**
      * Checks if the sender has the given permission.
@@ -65,6 +107,15 @@ public abstract class CommandSenderWrapper<S> {
     public boolean hasPermission(final @NotNull PermissionInfo permissionInfo) {
         return permissionInfo.getGrant() == Permission.Grant.ALL || hasPermissionImpl(permissionInfo);
     }
+
+    /**
+     * Gets the actual name of the sender.
+     * <br>
+     * For internal use only.
+     *
+     * @return the name
+     */
+    protected abstract @NotNull String getNameImpl();
 
     /**
      * Internal implementation for {@link #hasPermission(PermissionInfo)}.

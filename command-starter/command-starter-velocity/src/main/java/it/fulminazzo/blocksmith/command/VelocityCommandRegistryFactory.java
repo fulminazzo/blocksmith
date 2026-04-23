@@ -1,13 +1,13 @@
 package it.fulminazzo.blocksmith.command;
 
+import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import it.fulminazzo.blocksmith.ApplicationHandle;
-import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
-import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
-import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
+import it.fulminazzo.blocksmith.command.argument.*;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.command.visitor.usage.UsageStyle;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
@@ -39,6 +39,32 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
 
         });
         UsageStyle.registerDefaultArgumentColor(Player.class, UsageStyle.DEFAULT_PLAYER_COLOR);
+        ArgumentParsers.register(ConsoleCommandSource.class, new ArgumentParser<>() {
+
+            @Override
+            public @NotNull ConsoleCommandSource parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
+                String current = visitor.getInput().getCurrent();
+                if (current.equals(CommandSenderWrapper.CONSOLE_COMMAND_NAME)) {
+                    ProxyServer server = visitor.getApplication().server();
+                    return server.getConsoleCommandSource();
+                } else throw new ArgumentParseException(CommandMessages.UNRECOGNIZED_ARGOMENT)
+                        .arguments(
+                                Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, current),
+                                Placeholder.of("expected", CommandSenderWrapper.CONSOLE_COMMAND_NAME)
+                        );
+            }
+
+            @Override
+            public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
+                return List.of(CommandSenderWrapper.CONSOLE_COMMAND_NAME);
+            }
+
+        });
+        UsageStyle.registerDefaultArgumentColor(ConsoleCommandSource.class, UsageStyle.DEFAULT_PLAYER_COLOR);
+        ArgumentParsers.register(CommandSource.class, new CompositeArgumentParser<>(ConsoleCommandSource.class, Player.class));
+        UsageStyle.registerDefaultArgumentColor(CommandSource.class, UsageStyle.DEFAULT_PLAYER_COLOR);
+        ArgumentParsers.register(CommandSenderWrapper.class, new CommandSenderWrapperArgumentParser<>(CommandSource.class));
+        UsageStyle.registerDefaultArgumentColor(CommandSenderWrapper.class, UsageStyle.DEFAULT_PLAYER_COLOR);
         ArgumentParsers.register(RegisteredServer.class, new ArgumentParser<>() {
 
             @Override

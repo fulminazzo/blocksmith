@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -14,7 +15,7 @@ import java.util.function.BiFunction;
  * @param <F> the type of the delegate
  * @param <T> the type of the Java object
  */
-public final class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
+public class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
     @Getter
     private final @NotNull ArgumentParser<F> delegate;
     private final @NotNull BiFunction<@NotNull InputVisitor<?, ?>, @Nullable F, @Nullable T> converter;
@@ -23,10 +24,21 @@ public final class DelegateArgumentParser<F, T> implements ArgumentParser<T> {
      * Instantiates a new Delegate argument parser.
      *
      * @param converter    the function to convert the parsed object to the desired type
-     * @param delegateType the Java type of the delegate argument
+     * @param delegateType the Java class of the delegate argument
      */
     public DelegateArgumentParser(final @NotNull BiFunction<@NotNull InputVisitor<?, ?>, @Nullable F, @Nullable T> converter,
                                   final @NotNull Class<F> delegateType) {
+        this(converter, (Type) delegateType);
+    }
+
+    /**
+     * Instantiates a new Delegate argument parser.
+     *
+     * @param converter    the function to convert the parsed object to the desired type
+     * @param delegateType the Java type of the delegate argument
+     */
+    public DelegateArgumentParser(final @NotNull BiFunction<@NotNull InputVisitor<?, ?>, @Nullable F, @Nullable T> converter,
+                                  final @NotNull Type delegateType) {
         this(converter, ArgumentParsers.of(delegateType));
     }
 
