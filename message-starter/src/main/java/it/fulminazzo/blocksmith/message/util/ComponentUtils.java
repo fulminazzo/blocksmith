@@ -24,6 +24,8 @@ public final class ComponentUtils {
     private static final @NotNull Pattern AMPERSAND_HEX_CODE_REGEX = Pattern.compile("&(#[0-9a-fA-F]{6})");
     private static final @NotNull Pattern SECTION_SIGN_HEX_CODE_REGEX = Pattern.compile("§x((?:§[0-9a-fA-F]){6})");
 
+    public static final @NotNull String TRUNCATE_SUFFIX = "...";
+
     private static final char TAG_START = '<';
     private static final char TAG_END = '>';
     private static final char ESCAPE_CHAR = '\\';
@@ -74,7 +76,7 @@ public final class ComponentUtils {
                                               final int length) {
         final int actual = actualLength(component);
         if (actual <= length) return component;
-        else if (length > 3) return subcomponent(component, 0, length - 3).append(Component.text("..."));
+        else if (length > 3) return subcomponent(component, 0, length - 3).append(Component.text(TRUNCATE_SUFFIX));
         else return subcomponent(component, 0, length);
     }
 
