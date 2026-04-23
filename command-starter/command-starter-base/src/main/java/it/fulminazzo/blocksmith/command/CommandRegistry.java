@@ -42,10 +42,10 @@ public abstract class CommandRegistry {
             if (commands.containsKey(name))
                 throw new IllegalArgumentException(String.format("Could not add command '%s' as it has already been registered", name));
         }
-        for (String name : nodes.keySet()) {
-            LiteralNode node = nodes.get(name);
+        for (Map.Entry<String, LiteralNode> entry : nodes.entrySet()) {
+            LiteralNode node = entry.getValue();
             commands.merge(node.getName(), node, LiteralNode::merge);
-            registerSingle(name, node);
+            registerSingle(entry.getKey(), node);
         }
         return this;
     }
@@ -186,7 +186,7 @@ public abstract class CommandRegistry {
      * @param executor the executor of the command
      * @return the wrapped command sender
      */
-    protected abstract @NotNull CommandSenderWrapper<?> wrapSender(final @NotNull Object executor);
+    public abstract @NotNull CommandSenderWrapper<?> wrapSender(final @NotNull Object executor);
 
     /**
      * Method called upon actively registering a command.
