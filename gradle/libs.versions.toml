@@ -60,6 +60,7 @@ night_config_toml = { module = "com.electronwill.night-config:toml", version.ref
 
 # ADVENTURE
 minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure_text" }
+adventure_serializer_plain = { module = "net.kyori:adventure-text-serializer-plain", version.ref = "adventure_text" }
 adventure_serializer_legacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure_text" }
 adventure_platform_bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure_text_platform" }
 adventure_platform_bungeecord = { module = "net.kyori:adventure-platform-bungeecord", version.ref = "adventure_text_platform" }
@@ -86,7 +87,7 @@ test_framework = ["spock_core", "mockito"]
 toml = ["jackson_toml", "night_config_toml"]
 
 # ADVENTURE
-adventure_text = ["minimessage", "adventure_serializer_legacy"]
+adventure_text = ["minimessage", "adventure_serializer_plain", "adventure_serializer_legacy"]
 
 [plugins]
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
