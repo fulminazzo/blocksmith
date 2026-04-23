@@ -189,6 +189,13 @@ public abstract class CommandRegistry {
     public abstract @NotNull CommandSenderWrapper<?> wrapSender(final @NotNull Object executor);
 
     /**
+     * Gets the sender type.
+     *
+     * @return the sender type
+     */
+    public abstract @NotNull Class<?> getSenderType();
+
+    /**
      * Method called upon actively registering a command.
      *
      * @param commandName the command name
@@ -202,13 +209,6 @@ public abstract class CommandRegistry {
      * @param commandName the command name
      */
     protected abstract void onUnregister(final @NotNull String commandName);
-
-    /**
-     * Gets the sender type.
-     *
-     * @return the sender type
-     */
-    protected abstract @NotNull Class<?> getSenderType();
 
     /**
      * Identifies the state of the current registry.

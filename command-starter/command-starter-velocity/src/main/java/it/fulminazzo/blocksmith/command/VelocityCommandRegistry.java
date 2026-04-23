@@ -65,7 +65,7 @@ final class VelocityCommandRegistry extends BrigadierCommandRegistry<CommandSour
     }
 
     @Override
-    protected @NotNull Class<?> getSenderType() {
+    public @NotNull Class<?> getSenderType() {
         return CommandSource.class;
     }
 

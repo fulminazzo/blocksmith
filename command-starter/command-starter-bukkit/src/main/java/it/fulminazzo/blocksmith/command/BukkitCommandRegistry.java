@@ -108,7 +108,7 @@ class BukkitCommandRegistry extends CommandRegistry {
     }
 
     @Override
-    protected @NotNull Class<?> getSenderType() {
+    public @NotNull Class<?> getSenderType() {
         return CommandSender.class;
     }
 
