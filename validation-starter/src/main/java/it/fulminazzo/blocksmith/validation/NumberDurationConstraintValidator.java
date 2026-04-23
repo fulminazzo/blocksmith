@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.validation;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.function.Predicate;
+import java.util.function.DoublePredicate;
 
 /**
  * A Constraint validator for {@link Number} or {@link Duration} types.
@@ -15,7 +15,7 @@ final class NumberDurationConstraintValidator extends ConstraintValidatorImpl {
      *
      * @param validPredicate the valid predicate
      */
-    public NumberDurationConstraintValidator(final @NotNull Predicate<@NotNull Double> validPredicate) {
+    public NumberDurationConstraintValidator(final @NotNull DoublePredicate validPredicate) {
         super(o -> {
             if (o == null) return true;
             else if (o instanceof Duration) o = ((Duration) o).toMillis();
