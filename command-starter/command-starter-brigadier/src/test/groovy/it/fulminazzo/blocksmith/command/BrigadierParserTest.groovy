@@ -13,6 +13,7 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
 import it.fulminazzo.blocksmith.command.argument.DelegateArgumentParser
 import it.fulminazzo.blocksmith.command.argument.MultiArgumentParser
 import it.fulminazzo.blocksmith.command.argument.dto.Position
+import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier
@@ -396,6 +397,64 @@ class BrigadierParserTest extends Specification {
 
         cleanup:
         ArgumentParsers.PARSERS.remove(BrigadierParserTest)
+    }
+    
+    def 'test that generateArgumentNodeBuilder of MultiArgumentParser with delegate MultiArgumentParser works'() {
+        given:
+        def delegate = Mock(CommandRegistry)
+
+        and:
+        def root = Mock(LiteralNode)
+        def node = Mock(ArgumentNode)
+        node.name >> 'node'
+        node.children >> []
+        SuggestionProvider<?> provider = (s, b) -> b
+
+        and:
+        def argumentParser = ArgumentParsers.of(WorldPosition)
+        ArgumentParsers.register(BrigadierParserTest, argumentParser)
+
+        and:
+        def parser = new BrigadierParser(delegate)
+
+        when:
+        def builder = parser.generateArgumentNodeBuilder(
+                root,
+                node,
+                argumentParser,
+                provider
+        )
+
+        then:
+        builder.command != null
+        (builder.type instanceof StringArgumentType)
+
+        and:
+        def args1 = builder.arguments
+        args1.size() == 1
+
+        and:
+        def xCoordinate = args1[0] as ArgumentCommandNode<?, ?>
+        xCoordinate.command != null
+        (xCoordinate.type instanceof StringArgumentType)
+
+        and:
+        def args2 = xCoordinate.children
+        args2.size() == 1
+
+        and:
+        def yCoordinate = args2[0] as ArgumentCommandNode<?, ?>
+        yCoordinate.command != null
+        (yCoordinate.type instanceof StringArgumentType)
+
+        and:
+        def args3 = yCoordinate.children
+        args3.size() == 1
+
+        and:
+        def zCoordinate = args3[0] as ArgumentCommandNode<?, ?>
+        zCoordinate.command != null
+        (zCoordinate.type instanceof StringArgumentType)
     }
 
     def 'test that generateArgumentNodeBuilder of #type works'() {
