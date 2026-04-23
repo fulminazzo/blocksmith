@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command.node;
 import it.fulminazzo.blocksmith.command.TabCompletable;
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.command.visitor.usage.UsageVisitor;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +46,15 @@ public abstract class CommandNode implements TabCompletable {
     /*
      * GETTERS
      */
+
+    /**
+     * Gets the usage of the current node.
+     *
+     * @return the usage
+     */
+    public @NotNull String getUsage() {
+        return UsageVisitor.generateUsage(this);
+    }
 
     /**
      * Gets the node that carries information about the command (description, permission...).

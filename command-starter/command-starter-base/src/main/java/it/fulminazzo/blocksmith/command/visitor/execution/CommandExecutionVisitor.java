@@ -94,7 +94,7 @@ public final class CommandExecutionVisitor extends InputVisitorImpl<Void, Comman
     }
 
     @Override
-    protected Void visitCommandNode(final @NotNull CommandNode node) throws CommandExecutionException {
+    public Void visitCommandNode(final @NotNull CommandNode node) throws CommandExecutionException {
         if (input.advanceCursor().isDone()) {
             if (node.isExecutable()) return handleExecution(node);
             else {

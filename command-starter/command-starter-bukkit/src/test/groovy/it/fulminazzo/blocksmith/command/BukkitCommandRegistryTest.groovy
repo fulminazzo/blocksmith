@@ -1,3 +1,4 @@
+//file:noinspection unused
 package it.fulminazzo.blocksmith.command
 
 import be.seeseemelk.mockbukkit.MockBukkit
@@ -15,6 +16,8 @@ import org.bukkit.Server
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.SimpleCommandMap
+import org.bukkit.help.HelpMap
+import org.bukkit.help.HelpTopic
 import org.bukkit.permissions.PermissionDefault
 import org.bukkit.plugin.PluginManager
 import spock.lang.Specification
@@ -34,7 +37,10 @@ class BukkitCommandRegistryTest extends Specification {
         application = Mock(ApplicationHandle)
         application.server() >> Bukkit.server
         application.logger() >> log
-        application.messenger >> new Messenger(application)
+        application.messenger >> {
+            def messenger = Mock(Messenger)
+            return messenger
+        }
         application.name >> 'blocksmith'
 
         registry = new BukkitCommandRegistry(application)
@@ -136,7 +142,7 @@ class BukkitCommandRegistryTest extends Specification {
                 'command.description.help',
                 new PermissionInfo(null, 'help', Permission.Grant.ALL)
         )
-        def command = new BukkitCommandRegistry.BukkitCommand(registry, 'help', node)
+        def command = BukkitCommandRegistry.BukkitCommand.of(registry, 'help', node)
         command.permission = 'help'
 
         and:
@@ -198,6 +204,7 @@ class BukkitCommandRegistryTest extends Specification {
         def server = Spy(CraftServer, additionalInterfaces: [Server])
         Reflect.on(server).set('map', new SimpleCommandMap(server))
         server.pluginManager >> Mock(PluginManager)
+        server.helpMap >> Spy(CraftHelpMap, additionalInterfaces: [HelpMap])
 
         and:
         def application = Mock(ApplicationHandle)
@@ -233,9 +240,32 @@ class BukkitCommandRegistryTest extends Specification {
         registry.senderType == CommandSender
     }
 
+    def 'test that getUsage of BukkitCommand returns correct usage'() {
+        given:
+        def registry = Mock(BukkitCommandRegistry)
+        Reflect.on(registry).set('application', application)
+
+        and:
+        def node = new LiteralNode('hello')
+        node.commandInfo = new CommandInfo(
+                'hello.description',
+                new PermissionInfo(null, 'hello.permission', Permission.Grant.NONE)
+        )
+
+        and:
+        def command = BukkitCommandRegistry.BukkitCommand.of(registry, 'hello', node)
+
+        when:
+        def usage = command.usage
+
+        then:
+        usage == '§c/hello'
+    }
+
     def 'test that BukkitCommand delegates #method to #expected'() {
         given:
         def registry = Mock(BukkitCommandRegistry)
+        Reflect.on(registry).set('application', application)
 
         and:
         def node = new LiteralNode('test')
@@ -247,7 +277,7 @@ class BukkitCommandRegistryTest extends Specification {
         def args = ['first', 'second', 'third'].toArray(String[]::new)
 
         and:
-        def command = new BukkitCommandRegistry.BukkitCommand(registry, 'test', node)
+        def command = BukkitCommandRegistry.BukkitCommand.of(registry, 'test', node)
 
         when:
         command."$method"(sender, 'test', args)
@@ -264,10 +294,14 @@ class BukkitCommandRegistryTest extends Specification {
     private static class CraftServer {
         private SimpleCommandMap map
 
-        @SuppressWarnings('unused')
         void syncCommands() {
 
         }
+
+    }
+
+    private static class CraftHelpMap {
+        private final Map<String, HelpTopic> helpTopics = [:]
 
     }
 

@@ -30,11 +30,6 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
         ArgumentTypes.register(Position.class, getPositionArgumentType());
     }
 
-    /**
-     * After and including this version, it is not necessary to register the commands in the command map anymore.
-     */
-    private static final int BRIDGE_VERSION = 20;
-
     private final @NotNull BrigadierParser<S> parser = new BrigadierParser<>(this);
 
     private final @NotNull RootCommandNode<S> cachedRoot;
@@ -64,7 +59,7 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
 
     @Override
     protected void onRegister(final @NotNull String commandName, final @NotNull LiteralNode command) {
-        if (NMSUtils.getServerVersion() < 20) super.registerInCommandMap(commandName, command);
+        super.registerInCommandMap(commandName, command);
 
         LiteralCommandNode<S> brigadierNode = parser.parse(commandName, command);
         injectIntoBrigadier(commandName, brigadierNode);
@@ -82,14 +77,14 @@ final class BrigadierBukkitCommandRegistry<S> extends BukkitCommandRegistry {
 
     @Override
     protected void onUnregister(final @NotNull String commandName) {
-        removeChild(commandName);
+        restoreIntoBrigadier(commandName);
         LiteralNode command = registeredCommands.remove(commandName);
         if (command != null)
             command.getAliases().stream()
                     .filter(a -> !a.equals(commandName))
                     .forEach(this::restoreIntoBrigadier);
 
-        if (NMSUtils.getServerVersion() < BRIDGE_VERSION) super.onUnregister(commandName);
+        super.onUnregister(commandName);
 
         updateClientCommands();
     }

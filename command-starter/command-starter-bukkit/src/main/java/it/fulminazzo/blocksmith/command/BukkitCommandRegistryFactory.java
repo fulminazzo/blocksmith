@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.command.argument.dto.Coordinate;
 import it.fulminazzo.blocksmith.command.argument.dto.Position;
 import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
+import it.fulminazzo.blocksmith.command.visitor.usage.UsageStyle;
 import it.fulminazzo.blocksmith.conversion.Convertible;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import org.bukkit.*;
@@ -53,7 +54,9 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             }
 
         });
+        UsageStyle.registerDefaultArgumentColor(Player.class, UsageStyle.DEFAULT_PLAYER_COLOR);
         ArgumentParsers.register(OfflinePlayer.class, new OfflinePlayerArgumentParser());
+        UsageStyle.registerDefaultArgumentColor(Player.class, UsageStyle.DEFAULT_PLAYER_COLOR);
         ArgumentParsers.register(World.class, new ArgumentParser<>() {
 
             @Override
@@ -73,6 +76,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             }
 
         });
+        UsageStyle.registerDefaultArgumentColor(World.class, UsageStyle.DEFAULT_POSITION_COLOR);
         ArgumentParsers.register(WorldPosition.class, new MultiArgumentParser<>(
                 l -> {
                     World world = (World) l.get(0);
@@ -81,10 +85,12 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
                 },
                 World.class, Position.class
         ));
+        UsageStyle.registerDefaultArgumentColor(WorldPosition.class, UsageStyle.DEFAULT_POSITION_COLOR);
         ArgumentParsers.register(Location.class, new DelegateArgumentParser<>(
                 (v, p) -> p.as(Location.class, v.getCommandSender()),
                 WorldPosition.class
         ));
+        UsageStyle.registerDefaultArgumentColor(Location.class, UsageStyle.DEFAULT_POSITION_COLOR);
 
         Convertible.register(Position.class, Location.class, (p, a) -> {
             Location start = new Location(null, 0, 0, 0);

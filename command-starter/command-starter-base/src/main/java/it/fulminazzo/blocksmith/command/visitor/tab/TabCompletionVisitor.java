@@ -63,7 +63,7 @@ public final class TabCompletionVisitor extends InputVisitorImpl<@NotNull List<S
     }
 
     @Override
-    protected @NotNull List<String> visitCommandNode(final @NotNull CommandNode node) {
+    public @NotNull List<String> visitCommandNode(final @NotNull CommandNode node) {
         if (input.isLast()) {
             return filterCompletions(node.getChildren().stream()
                     .map(c -> c.getCompletions(this))

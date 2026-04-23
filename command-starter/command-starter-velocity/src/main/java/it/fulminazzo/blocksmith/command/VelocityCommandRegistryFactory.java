@@ -9,6 +9,7 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
 import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
+import it.fulminazzo.blocksmith.command.visitor.usage.UsageStyle;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +38,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
             }
 
         });
+        UsageStyle.registerDefaultArgumentColor(Player.class, UsageStyle.DEFAULT_PLAYER_COLOR);
         ArgumentParsers.register(RegisteredServer.class, new ArgumentParser<>() {
 
             @Override
@@ -57,6 +59,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
             }
 
         });
+        UsageStyle.registerDefaultArgumentColor(RegisteredServer.class, UsageStyle.DEFAULT_SERVER_COLOR);
     }
 
     @Override
