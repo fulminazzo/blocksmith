@@ -15,9 +15,11 @@ import it.fulminazzo.blocksmith.reflect.ReflectUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -210,7 +212,7 @@ public final class ArgumentParsers {
      * Gets the most appropriate argument parser for the given type.
      *
      * @param <T>  the type of the argument
-     * @param type the Java class of the argument
+     * @param type the Java type of the argument
      * @return the argument parser
      * @throws IllegalArgumentException if no parser is found
      */
@@ -220,14 +222,11 @@ public final class ArgumentParsers {
         if (Enum.class.isAssignableFrom(actualType))
             return (ArgumentParser<T>) parsers.computeIfAbsent(actualType, t -> new EnumArgumentParser<>((Class) t));
         else if (CommandSenderWrapper.class.isAssignableFrom(actualType) && type instanceof ParameterizedType) {
-            ParameterizedType paramType = (ParameterizedType) type;
-            return (ArgumentParser<T>) new DelegateArgumentParser<>(
-                    (v, o) -> v.getApplication().getCommandRegistry().wrapSender(o),
-                    of(paramType.getActualTypeArguments()[0])
-            );
+            ArgumentParser<T> parser = (ArgumentParser<T>) buildCommandSenderParser((ParameterizedType) type);
+            if (parser != null) return parser;
         }
-        ArgumentParser<?> parser = parsers.get(Reflect.toWrapper(actualType));
-        if (parser != null) return (ArgumentParser<T>) parser;
+        actualType = Reflect.toWrapper(actualType);
+        if (parsers.containsKey(actualType)) return (ArgumentParser<T>) parsers.get(actualType);
         else throw new IllegalArgumentException(ReflectException.formatMessage(
                 "No default Argument parser supports the type %s. Please provide a custom parser through %s#register",
                 type, ArgumentParsers.class
@@ -237,8 +236,8 @@ public final class ArgumentParsers {
     /**
      * Retrieves the Java type associated with the given argument parser.
      *
-     * @param parser the argument parser
      * @param <T>    the type of the argument
+     * @param parser the argument parser
      * @return the Java class of the argument
      * @throws IllegalArgumentException if the parser is not registered yet
      */
@@ -261,6 +260,27 @@ public final class ArgumentParsers {
      */
     public static <T> void register(final @NotNull Class<T> type, final @NotNull ArgumentParser<T> parser) {
         parsers.put(type, parser);
+    }
+
+    /**
+     * Attempts to create a new ArgumentParser specifically tailored for the required generic parameter type
+     * of the {@link CommandSenderWrapper} type itself.
+     *
+     * @param <W>  type of the argument
+     * @param type the parameterized type of the argument
+     * @return the argument parser (or {@code null} to fall back to default)
+     */
+    static <W extends CommandSenderWrapper<?>> @Nullable ArgumentParser<W> buildCommandSenderParser(final @NotNull ParameterizedType type) {
+        Type actualSenderType = type.getActualTypeArguments()[0];
+        if (actualSenderType instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) actualSenderType;
+            actualSenderType = wildcardType.getUpperBounds()[0];
+            if (actualSenderType.equals(Object.class)) return null;
+        }
+        return (ArgumentParser<W>) new DelegateArgumentParser<>(
+                (v, o) -> v.getApplication().getCommandRegistry().wrapSender(o),
+                of(actualSenderType)
+        );
     }
 
     private static boolean isValidLocale(final @NotNull Locale locale) {
