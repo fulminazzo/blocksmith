@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.argument;
 
 import it.fulminazzo.blocksmith.command.CommandMessages;
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.argument.dto.Coordinate;
 import it.fulminazzo.blocksmith.command.argument.dto.Position;
 import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition;
@@ -10,10 +11,13 @@ import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.util.LocaleUtils;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.reflect.ReflectException;
+import it.fulminazzo.blocksmith.reflect.ReflectUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -211,10 +215,18 @@ public final class ArgumentParsers {
      * @throws IllegalArgumentException if no parser is found
      */
     @SuppressWarnings({"rawtypes"})
-    public static <T> @NotNull ArgumentParser<T> of(final @NotNull Class<T> type) {
-        if (Enum.class.isAssignableFrom(type))
-            return (ArgumentParser<T>) parsers.computeIfAbsent(type, t -> new EnumArgumentParser<>((Class) t));
-        ArgumentParser<?> parser = parsers.get(Reflect.toWrapper(type));
+    public static <T> @NotNull ArgumentParser<T> of(final @NotNull Type type) {
+        Class<?> actualType = ReflectUtils.toClass(type);
+        if (Enum.class.isAssignableFrom(actualType))
+            return (ArgumentParser<T>) parsers.computeIfAbsent(actualType, t -> new EnumArgumentParser<>((Class) t));
+        else if (CommandSenderWrapper.class.isAssignableFrom(actualType) && type instanceof ParameterizedType) {
+            ParameterizedType paramType = (ParameterizedType) type;
+            return (ArgumentParser<T>) new DelegateArgumentParser<>(
+                    (v, o) -> v.getApplication().getCommandRegistry().wrapSender(o),
+                    of(paramType.getActualTypeArguments()[0])
+            );
+        }
+        ArgumentParser<?> parser = parsers.get(Reflect.toWrapper(actualType));
         if (parser != null) return (ArgumentParser<T>) parser;
         else throw new IllegalArgumentException(ReflectException.formatMessage(
                 "No default Argument parser supports the type %s. Please provide a custom parser through %s#register",

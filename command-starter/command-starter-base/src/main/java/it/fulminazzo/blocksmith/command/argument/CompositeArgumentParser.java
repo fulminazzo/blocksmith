@@ -23,6 +23,7 @@ public final class CompositeArgumentParser<T> implements ArgumentParser<T> {
      *
      * @param argumentTypes the Java type of the arguments
      */
+    @SuppressWarnings("unchecked")
     @SafeVarargs
     public CompositeArgumentParser(final @NotNull Class<? extends T> @NotNull ... argumentTypes) {
         if (argumentTypes.length == 0)
@@ -32,6 +33,7 @@ public final class CompositeArgumentParser<T> implements ArgumentParser<T> {
             ));
         this.parsers = Arrays.stream(argumentTypes)
                 .map(ArgumentParsers::of)
+                .map(a -> (ArgumentParser<? extends T>) a)
                 .collect(Collectors.toList());
     }
 
