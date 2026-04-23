@@ -1,10 +1,29 @@
 package it.fulminazzo.blocksmith.command.help;
 
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
 public final class HelpPageRenderer {
+    private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
+
     private static final int MAX_FONT_WIDTH = 320;
+
+    /**
+     * Checks if the given component needs to be truncated (a.k.a. it exceeds {@link #MAX_FONT_WIDTH}).
+     * If it does, then a new cut component is returned that when hovering on will display the full text.
+     *
+     * @param prefix the prefix to keep into account when checking for the total length
+     * @param component the component
+     * @return the (truncated) component
+     */
+    static @NotNull Component truncate(final @NotNull String prefix, final @NotNull Component component) {
+        int length = getMaxTruncationLength(prefix + PLAIN_SERIALIZER.serialize(component));
+        if (length == -1) return component;
+        return ComponentUtils.truncate(component, length).hoverEvent(HoverEvent.showText(component));
+    }
 
     /**
      * Given the string, returns the index at which it should be <b>truncated</b>,
