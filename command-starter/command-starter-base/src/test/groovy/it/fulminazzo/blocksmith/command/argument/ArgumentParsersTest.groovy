@@ -390,7 +390,7 @@ class ArgumentParsersTest extends Specification {
 
     def 'test that type returns correct type'() {
         given:
-        Map<Class<?>, ArgumentParser<?>> parsers = ArgumentParsers.parsers
+        Map<Class<?>, ArgumentParser<?>> parsers = ArgumentParsers.PARSERS
 
         expect:
         for (Entry<Class<?>, ArgumentParser<?>> e : parsers.entrySet()) {

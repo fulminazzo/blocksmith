@@ -338,7 +338,7 @@ class BrigadierParserTest extends Specification {
         builder.suggestionsProvider == provider
 
         cleanup:
-        ArgumentParsers.parsers.remove(BrigadierParserTest)
+        ArgumentParsers.PARSERS.remove(BrigadierParserTest)
     }
 
     def 'test that generateArgumentNodeBuilder of MultiArgumentParser adds in correct order arguments'() {
@@ -395,7 +395,7 @@ class BrigadierParserTest extends Specification {
         (str.type instanceof StringArgumentType)
 
         cleanup:
-        ArgumentParsers.parsers.remove(BrigadierParserTest)
+        ArgumentParsers.PARSERS.remove(BrigadierParserTest)
     }
 
     def 'test that generateArgumentNodeBuilder of #type works'() {

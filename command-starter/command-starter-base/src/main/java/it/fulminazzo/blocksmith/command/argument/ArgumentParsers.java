@@ -35,7 +35,7 @@ public final class ArgumentParsers {
      */
     public static final @NotNull String CONSOLE_COMMAND_NAME = "console";
 
-    private static final @NotNull Map<@NotNull Class<?>, @NotNull ArgumentParser<?>> parsers = new ConcurrentHashMap<>();
+    private static final @NotNull Map<@NotNull Type, @NotNull ArgumentParser<?>> PARSERS = new ConcurrentHashMap<>();
 
     /*
      * COMPLETIONS
@@ -220,13 +220,13 @@ public final class ArgumentParsers {
     public static <T> @NotNull ArgumentParser<T> of(final @NotNull Type type) {
         Class<?> actualType = ReflectUtils.toClass(type);
         if (Enum.class.isAssignableFrom(actualType))
-            return (ArgumentParser<T>) parsers.computeIfAbsent(actualType, t -> new EnumArgumentParser<>((Class) t));
+            return (ArgumentParser<T>) PARSERS.computeIfAbsent(actualType, t -> new EnumArgumentParser<>((Class) t));
         else if (CommandSenderWrapper.class.isAssignableFrom(actualType) && type instanceof ParameterizedType) {
             ArgumentParser<T> parser = (ArgumentParser<T>) buildCommandSenderParser((ParameterizedType) type);
             if (parser != null) return parser;
         }
         actualType = Reflect.toWrapper(actualType);
-        if (parsers.containsKey(actualType)) return (ArgumentParser<T>) parsers.get(actualType);
+        if (PARSERS.containsKey(actualType)) return (ArgumentParser<T>) PARSERS.get(actualType);
         else throw new IllegalArgumentException(ReflectException.formatMessage(
                 "No default Argument parser supports the type %s. Please provide a custom parser through %s#register",
                 type, ArgumentParsers.class
@@ -242,9 +242,10 @@ public final class ArgumentParsers {
      * @throws IllegalArgumentException if the parser is not registered yet
      */
     public static <T> @NotNull Class<T> type(final @NotNull ArgumentParser<T> parser) {
-        return (Class<T>) parsers.entrySet().stream()
+        return (Class<T>) PARSERS.entrySet().stream()
                 .filter(e -> e.getValue().equals(parser))
                 .map(Map.Entry::getKey)
+                .map(ReflectUtils::toClass)
                 .findFirst().orElseThrow(() -> new IllegalArgumentException(ReflectException.formatMessage(
                         "Argument parser has not been registered yet. Please use %s#register",
                         ArgumentParsers.class
@@ -259,7 +260,7 @@ public final class ArgumentParsers {
      * @param parser the argument parser
      */
     public static <T> void register(final @NotNull Class<?> type, final @NotNull ArgumentParser<T> parser) {
-        parsers.put(type, parser);
+        PARSERS.put(type, parser);
     }
 
     /**
@@ -277,7 +278,12 @@ public final class ArgumentParsers {
             actualSenderType = wildcardType.getUpperBounds()[0];
             if (actualSenderType.equals(Object.class)) return null;
         }
-        return (ArgumentParser<W>) new CommandSenderWrapperArgumentParser<>(actualSenderType);
+        if (PARSERS.containsKey(type)) return (ArgumentParser<W>) PARSERS.get(type);
+        else {
+            ArgumentParser<?> parser = new CommandSenderWrapperArgumentParser<>(actualSenderType);
+            PARSERS.put(type, parser);
+            return (ArgumentParser<W>) parser;
+        }
     }
 
     private static boolean isValidLocale(final @NotNull Locale locale) {
