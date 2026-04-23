@@ -69,6 +69,33 @@ class HelpPageRendererTest extends Specification {
         Component.text('Usage: ') || ['Usage: /test']
     }
 
+    def 'test that renderPermission of #permissionComponent returns #expected'() {
+        given:
+        def node = new LiteralNode('test')
+        node.commandInfo = new CommandInfo(
+                'test.description',
+                new PermissionInfo('blocksmith', 'test.permission', Permission.Grant.NONE)
+        )
+
+        and:
+        def messenger = Mock(Messenger)
+        messenger.getComponentOrNull(_, _) >> permissionComponent
+
+        and:
+        def renderer = new HelpPageRenderer(node)
+
+        when:
+        renderer.renderPermission(messenger, Locale.ITALY)
+
+        then:
+        renderer.lines.collect { PLAIN_SERIALIZER.serialize(it) } == expected
+
+        where:
+        permissionComponent            || expected
+        null                           || ['blocksmith.test.permission']
+        Component.text('Permission: ') || ['Permission: blocksmith.test.permission']
+    }
+
 
     def 'test that truncateLines of #string returns #expected'() {
         given:

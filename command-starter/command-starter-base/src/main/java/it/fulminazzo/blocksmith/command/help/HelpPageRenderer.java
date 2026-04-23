@@ -56,11 +56,22 @@ public final class HelpPageRenderer {
         Component usageComponent = messenger.getComponentOrNull("command.help.usage", locale);
         if (usageComponent == null) usageComponent = Component.text("");
         Component usage = ComponentUtils.toComponent(commandNode.getUsage());
-        usage = truncate(
-                PLAIN_SERIALIZER.serialize(usageComponent),
-                usage
-        );
+        usage = truncate(PLAIN_SERIALIZER.serialize(usageComponent), usage);
         lines.add(usageComponent.append(usage));
+    }
+
+    /**
+     * Renders the permission component for the given {@link Locale}.
+     *
+     * @param messenger the messenger to get the general permission component from
+     * @param locale    the locale
+     */
+    void renderPermission(final @NotNull Messenger messenger, final @NotNull Locale locale) {
+        Component permissionComponent = messenger.getComponentOrNull("command.help.permission", locale);
+        if (permissionComponent == null) permissionComponent = Component.text("");
+        Component permission = ComponentUtils.toComponent(commandNode.getCommandInfo().getPermission().getPermission());
+        permission = truncate(PLAIN_SERIALIZER.serialize(permissionComponent), permission);
+        lines.add(permissionComponent.append(permission));
     }
 
     /**
