@@ -37,7 +37,7 @@ public final class MockCommandSenderWrapper extends CommandSenderWrapper<Command
     }
 
     @Override
-    public @NotNull String getName() {
+    protected @NotNull String getNameImpl() {
         return actualSender.getName();
     }
 

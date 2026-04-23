@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command
 
+import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
 import it.fulminazzo.blocksmith.scheduler.Scheduler
 import it.fulminazzo.blocksmith.scheduler.Task
 import it.fulminazzo.blocksmith.scheduler.TaskBuilder
@@ -41,6 +42,25 @@ class CommandSenderWrapperTest extends Specification {
 
         cleanup:
         mocked.close()
+    }
+
+    def 'test that getName with #player returns #expected'() {
+        given:
+        def sender = new MockCommandSenderWrapper(player
+                ? new Player('Steve')
+                : new ConsoleCommandSender()
+        )
+
+        when:
+        def name = sender.name
+
+        then:
+        name == expected
+
+        where:
+        player || expected
+        true   || 'Steve'
+        false  || ArgumentParsers.CONSOLE_COMMAND_NAME
     }
 
 }

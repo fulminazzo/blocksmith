@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
+import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.scheduler.Scheduler;
@@ -51,10 +52,13 @@ public abstract class CommandSenderWrapper<S> {
 
     /**
      * Gets the name of the sender.
+     * If the sender is <b>not</b> a player, it will return {@link ArgumentParsers#CONSOLE_COMMAND_NAME}.
      *
      * @return the name
      */
-    public abstract @NotNull String getName();
+    public final @NotNull String getName() {
+        return isPlayer() ? getNameImpl() : ArgumentParsers.CONSOLE_COMMAND_NAME;
+    }
 
     /**
      * Checks if the sender has the given permission.
@@ -65,6 +69,15 @@ public abstract class CommandSenderWrapper<S> {
     public boolean hasPermission(final @NotNull PermissionInfo permissionInfo) {
         return permissionInfo.getGrant() == Permission.Grant.ALL || hasPermissionImpl(permissionInfo);
     }
+
+    /**
+     * Gets the actual name of the sender.
+     * <br>
+     * For internal use only.
+     *
+     * @return the name
+     */
+    protected abstract @NotNull String getNameImpl();
 
     /**
      * Internal implementation for {@link #hasPermission(PermissionInfo)}.

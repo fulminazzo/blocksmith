@@ -27,7 +27,7 @@ final class BungeeCommandSenderWrapper extends CommandSenderWrapper<CommandSende
     }
 
     @Override
-    public @NotNull String getName() {
+    protected @NotNull String getNameImpl() {
         return actualSender.getName();
     }
 
