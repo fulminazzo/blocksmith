@@ -10,6 +10,7 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.message.Messenger
+import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import it.fulminazzo.blocksmith.reflect.Reflect
 import org.bukkit.Bukkit
 import org.bukkit.Server
@@ -34,13 +35,12 @@ class BukkitCommandRegistryTest extends Specification {
     void setup() {
         MockBukkit.mock()
 
+        def messenger = Mock(Messenger)
+
         application = Mock(ApplicationHandle)
         application.server() >> Bukkit.server
         application.logger() >> log
-        application.messenger >> {
-            def messenger = Mock(Messenger)
-            return messenger
-        }
+        application.messenger >> messenger
         application.name >> 'blocksmith'
 
         registry = new BukkitCommandRegistry(application)
@@ -54,6 +54,10 @@ class BukkitCommandRegistryTest extends Specification {
         given:
         def previousCommand = Mock(Command)
         registry.knownCommands.put('?', previousCommand)
+
+        and:
+        def previousTopic = Mock(HelpTopic)
+        registry.helpMap.put('/?', previousTopic)
 
         and:
         def pluginManager = Bukkit.server.pluginManager
@@ -116,6 +120,13 @@ class BukkitCommandRegistryTest extends Specification {
         previousCommands['?'] == previousCommand
 
         and:
+        def previousTopics = registry.previousTopics
+        previousTopics.size() == 1
+
+        and:
+        previousTopics['/?'] == previousTopic
+
+        and:
         def previousPermissions = registry.permissionRegistry.previousPermissions
         previousPermissions.size() == 1
 
@@ -128,6 +139,10 @@ class BukkitCommandRegistryTest extends Specification {
         def previousCommand = Mock(Command)
         registry.previousCommands['?'] = previousCommand
         registry.previousCommands['showhelp'] = previousCommand
+
+        and:
+        def helpTopic = Mock(HelpTopic)
+        registry.previousTopics['/?'] = helpTopic
 
         and:
         def previousPermission = new org.bukkit.permissions.Permission(
@@ -151,6 +166,9 @@ class BukkitCommandRegistryTest extends Specification {
         registry.knownCommands["${application.name}:help"] = command
         registry.knownCommands["${application.name}:?"] = command
         registry.knownCommands['showhelp'] = Mock(Command)
+
+        and:
+        registry.helpMap['/?'] == helpTopic
 
         and:
         def pluginManager = Bukkit.server.pluginManager
@@ -246,6 +264,9 @@ class BukkitCommandRegistryTest extends Specification {
         Reflect.on(registry).set('application', application)
 
         and:
+        application.messenger.getComponentOrNull(_, _, _) >> description
+
+        and:
         def node = new LiteralNode('hello')
         node.commandInfo = new CommandInfo(
                 'hello.description',
@@ -260,6 +281,9 @@ class BukkitCommandRegistryTest extends Specification {
 
         then:
         usage == '§c/hello'
+
+        where:
+        description << [null, ComponentUtils.toComponent('hello.description')]
     }
 
     def 'test that BukkitCommand delegates #method to #expected'() {
