@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.function.SupplierException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,8 +25,7 @@ public final class CompositeArgumentParser<T> implements ArgumentParser<T> {
      * @param argumentTypes the Java type of the arguments
      */
     @SuppressWarnings("unchecked")
-    @SafeVarargs
-    public CompositeArgumentParser(final @NotNull Class<? extends T> @NotNull ... argumentTypes) {
+    public CompositeArgumentParser(final @NotNull Type @NotNull ... argumentTypes) {
         if (argumentTypes.length == 0)
             throw new IllegalArgumentException(String.format(
                     "Could not create %s: at least one argument type must be given",

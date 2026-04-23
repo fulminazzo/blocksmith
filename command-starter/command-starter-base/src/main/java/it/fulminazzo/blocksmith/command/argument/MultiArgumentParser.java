@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -41,7 +42,7 @@ public class MultiArgumentParser<T> implements ArgumentParser<T>, Iterable<Argum
      * @param argumentTypes the Java type of the arguments
      */
     public MultiArgumentParser(final @NotNull Function<@NotNull List<Object>, @Nullable T> constructor,
-                               final @NotNull Class<?> @NotNull ... argumentTypes) {
+                               final @NotNull Type @NotNull ... argumentTypes) {
         this(constructor, Stream.of(argumentTypes).map(ArgumentParsers::of).toArray(ArgumentParser[]::new));
     }
 
