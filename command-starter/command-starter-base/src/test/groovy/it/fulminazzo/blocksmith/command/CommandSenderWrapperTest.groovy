@@ -1,9 +1,13 @@
 package it.fulminazzo.blocksmith.command
 
-
+import it.fulminazzo.blocksmith.message.receiver.Receiver
+import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories
+import it.fulminazzo.blocksmith.message.receiver.ReceiverFactory
+import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import it.fulminazzo.blocksmith.scheduler.Scheduler
 import it.fulminazzo.blocksmith.scheduler.Task
 import it.fulminazzo.blocksmith.scheduler.TaskBuilder
+import net.kyori.adventure.audience.Audience
 import org.mockito.Mockito
 import spock.lang.Specification
 
@@ -42,6 +46,39 @@ class CommandSenderWrapperTest extends Specification {
 
         cleanup:
         mocked.close()
+    }
+
+    def 'test that sendMessage calls on audience'() {
+        given:
+        def audience = Mock(Audience)
+        def receiver = Mock(Receiver)
+        receiver.toAudience() >> audience
+
+        and:
+        def receiverFactory = Mock(ReceiverFactory)
+        receiverFactory.create(_) >> receiver
+
+        and:
+        def receiverFactories = Mockito.mockStatic(ReceiverFactories)
+        receiverFactories.when { ReceiverFactories.get(Mockito.any(), Mockito.any()) }.thenReturn(receiverFactory)
+
+        and:
+        def sender = new MockCommandSenderWrapper(new CommandSender())
+
+        when:
+        sender.sendMessage(message)
+
+        then:
+        1 * audience.sendMessage(_) >> { a ->
+            def m = ComponentUtils.toString(a[0])
+            assert m == 'Hello, world!'
+        }
+
+        cleanup:
+        receiverFactories.close()
+
+        where:
+        message << ['Hello, world!', ComponentUtils.toComponent('Hello, world!')]
     }
 
     def 'test that getName with #player returns #expected'() {
