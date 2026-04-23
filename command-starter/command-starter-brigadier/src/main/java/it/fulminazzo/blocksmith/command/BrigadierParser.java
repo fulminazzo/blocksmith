@@ -166,7 +166,13 @@ final class BrigadierParser<S> {
                                                                            final @NotNull ArgumentNode<?> node,
                                                                            final @NotNull ArgumentParser<?> argumentParser,
                                                                            final @NotNull SuggestionProvider<S> suggestionProvider) {
-        ArgumentType<T> argumentType = getArgumentType(ArgumentParsers.type(argumentParser));
+        ArgumentType<T> argumentType = null;
+        try {
+            Class<?> type = ArgumentParsers.type(argumentParser);
+            argumentType = getArgumentType(type);
+        } catch (IllegalArgumentException ignored) {
+            // unknown ArgumentParser, probably something internal
+        }
         if (argumentType == null) {
             if (argumentParser instanceof DelegateArgumentParser<?, ?>)
                 return generateArgumentNodeBuilder(root, node, ((DelegateArgumentParser<?, ?>) argumentParser).getDelegate(), suggestionProvider);
