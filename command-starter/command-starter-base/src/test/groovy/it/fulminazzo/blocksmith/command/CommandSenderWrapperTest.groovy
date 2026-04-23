@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.command
 
-import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
+
 import it.fulminazzo.blocksmith.scheduler.Scheduler
 import it.fulminazzo.blocksmith.scheduler.Task
 import it.fulminazzo.blocksmith.scheduler.TaskBuilder
@@ -60,7 +60,7 @@ class CommandSenderWrapperTest extends Specification {
         where:
         player || expected
         true   || 'Steve'
-        false  || ArgumentParsers.CONSOLE_COMMAND_NAME
+        false  || CommandSenderWrapper.CONSOLE_COMMAND_NAME
     }
 
 }

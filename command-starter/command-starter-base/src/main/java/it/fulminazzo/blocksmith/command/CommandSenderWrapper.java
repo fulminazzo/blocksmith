@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
-import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import it.fulminazzo.blocksmith.message.receiver.Receiver;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories;
@@ -28,6 +27,11 @@ import java.util.function.Consumer;
 @EqualsAndHashCode
 @ToString
 public abstract class CommandSenderWrapper<S> {
+    /**
+     * The default name to identify the console in each platform.
+     */
+    public static final @NotNull String CONSOLE_COMMAND_NAME = "console";
+
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private final @NotNull ApplicationHandle application;
@@ -86,12 +90,12 @@ public abstract class CommandSenderWrapper<S> {
 
     /**
      * Gets the name of the sender.
-     * If the sender is <b>not</b> a player, it will return {@link ArgumentParsers#CONSOLE_COMMAND_NAME}.
+     * If the sender is <b>not</b> a player, it will return {@link #CONSOLE_COMMAND_NAME}.
      *
      * @return the name
      */
     public final @NotNull String getName() {
-        return isPlayer() ? getNameImpl() : ArgumentParsers.CONSOLE_COMMAND_NAME;
+        return isPlayer() ? getNameImpl() : CONSOLE_COMMAND_NAME;
     }
 
     /**

@@ -59,19 +59,19 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             @Override
             public @NotNull ConsoleCommandSender parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
                 String current = visitor.getInput().getCurrent();
-                if (current.equals(ArgumentParsers.CONSOLE_COMMAND_NAME)) {
+                if (current.equals(CommandSenderWrapper.CONSOLE_COMMAND_NAME)) {
                     Server server = visitor.getApplication().server();
                     return server.getConsoleSender();
                 } else throw new ArgumentParseException(CommandMessages.UNRECOGNIZED_ARGOMENT)
                         .arguments(
                                 Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, current),
-                                Placeholder.of("expected", ArgumentParsers.CONSOLE_COMMAND_NAME)
+                                Placeholder.of("expected", CommandSenderWrapper.CONSOLE_COMMAND_NAME)
                         );
             }
 
             @Override
             public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
-                return List.of(ArgumentParsers.CONSOLE_COMMAND_NAME);
+                return List.of(CommandSenderWrapper.CONSOLE_COMMAND_NAME);
             }
 
         });
