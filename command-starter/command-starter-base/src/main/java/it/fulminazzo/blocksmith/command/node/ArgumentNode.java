@@ -143,7 +143,7 @@ public class ArgumentNode<T> extends CommandNode {
      * @return the argument parser
      */
     public @NotNull ArgumentParser<T> getParser() {
-        return ArgumentParsers.of(getType());
+        return ArgumentParsers.of(parameter.getParameterizedType());
     }
 
     /**
