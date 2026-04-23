@@ -1,25 +1,57 @@
 package it.fulminazzo.blocksmith.command.help;
 
+import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
+@RequiredArgsConstructor
 public final class HelpPageRenderer {
     private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
     private static final int MAX_FONT_WIDTH = 320;
+
+    private static final int MAX_DESCRIPTION_LINES = 3;
+
+    private final @NotNull LiteralNode commandNode;
+    private final @NotNull List<Component> lines = new LinkedList<>();
+
+    /**
+     * Renders the description component(s) for the given {@link Locale}.
+     * <br>
+     * If the description is missing, empty lines will be printed.
+     *
+     * @param messenger the messenger to get the description component from
+     * @param locale    the locale
+     */
+    void renderDescription(final @NotNull Messenger messenger, final @NotNull Locale locale) {
+        final Component description = messenger.getComponentOrNull(
+                commandNode.getCommandInfo().getDescription(),
+                locale
+        );
+        List<Component> descriptionComponents = new ArrayList<>();
+        if (description != null)
+            descriptionComponents.addAll(truncateLines(description, MAX_DESCRIPTION_LINES));
+        while (descriptionComponents.size() < MAX_DESCRIPTION_LINES)
+            descriptionComponents.add(Component.text(""));
+        lines.addAll(descriptionComponents);
+    }
 
     /**
      * Given a component, it attempts to subdivide it into multiple components for the given number of lines.
      * The last component will be truncated with {@link #truncate(String, Component)}.
      *
      * @param component the component
-     * @param lines the maximum number of lines to show
+     * @param lines     the maximum number of lines to show
      * @return the components
      */
     static @NotNull List<@NotNull Component> truncateLines(@NotNull Component component, final int lines) {

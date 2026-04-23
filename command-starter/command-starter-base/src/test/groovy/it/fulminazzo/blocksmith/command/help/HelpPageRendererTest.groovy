@@ -1,11 +1,47 @@
 package it.fulminazzo.blocksmith.command.help
 
+import it.fulminazzo.blocksmith.command.annotation.Permission
+import it.fulminazzo.blocksmith.command.node.LiteralNode
+import it.fulminazzo.blocksmith.command.node.info.CommandInfo
+import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
+import it.fulminazzo.blocksmith.message.Messenger
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import spock.lang.Specification
 
 class HelpPageRendererTest extends Specification {
+    private static final PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
+
     private static final String MAX_CHARS = '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
     private static final String TRUNCATED_CHARS = '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@...'
+
+    def 'test that renderDescription of #description returns #expected'() {
+        given:
+        def node = new LiteralNode('test')
+        node.commandInfo = new CommandInfo(
+                'test.description',
+                new PermissionInfo(null, 'test.permission', Permission.Grant.NONE)
+        )
+
+        and:
+        def messenger = Mock(Messenger)
+        messenger.getComponentOrNull(_, _) >> description
+
+        and:
+        def renderer = new HelpPageRenderer(node)
+
+        when:
+        renderer.renderDescription(messenger, Locale.ITALY)
+
+        then:
+        renderer.lines.collect { PLAIN_SERIALIZER.serialize(it) } == expected
+
+        where:
+        description                     || expected
+        null                            || ['', '', '']
+        Component.text('Hello, world!') || ['Hello, world!', '', '']
+    }
+
 
     def 'test that truncateLines of #string returns #expected'() {
         given:
@@ -13,7 +49,7 @@ class HelpPageRendererTest extends Specification {
 
         when:
         def actual = HelpPageRenderer.truncateLines(component, 3)
-                .collect { HelpPageRenderer.PLAIN_SERIALIZER.serialize(it) }
+                .collect { PLAIN_SERIALIZER.serialize(it) }
 
         then:
         actual == expected
@@ -42,7 +78,7 @@ class HelpPageRendererTest extends Specification {
         actual != component
 
         and:
-        HelpPageRenderer.PLAIN_SERIALIZER.serialize(actual) == TRUNCATED_CHARS
+        PLAIN_SERIALIZER.serialize(actual) == TRUNCATED_CHARS
 
         and:
         def hoverEvent = actual.hoverEvent()
