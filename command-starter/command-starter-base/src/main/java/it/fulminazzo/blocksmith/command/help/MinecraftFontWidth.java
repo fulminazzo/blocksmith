@@ -319,8 +319,8 @@ public final class MinecraftFontWidth {
      * @param text the text
      * @return the width
      */
-    public static int getWidth(final @NotNull String text) {
-        if (text.isEmpty()) return 0;
+    public static int getWidth(final @NotNull StringBuilder text) {
+        if (text.length() == 0) return 0;
         int total = 0;
         for (int i = 0; i < text.length(); i++) {
             Integer w = WIDTHS.get(text.charAt(i));

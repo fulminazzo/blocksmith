@@ -13,10 +13,10 @@ public final class HelpPageRenderer {
      * @return the index (or {@code -1} if it does not need to be extracted)
      */
     static int getMaxLength(final @NotNull String string) {
-        String tmp = "";
+        StringBuilder tmp = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
-            tmp += c;
+            tmp.append(c);
             if (MinecraftFontWidth.getWidth(tmp) > MAX_FONT_WIDTH)
                 return i - 1;
         }
