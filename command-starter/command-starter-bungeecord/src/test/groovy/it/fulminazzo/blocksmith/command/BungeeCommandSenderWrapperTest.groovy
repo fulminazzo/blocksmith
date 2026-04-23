@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command
 
 import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.annotation.Permission
+import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import net.md_5.bungee.api.CommandSender
 import net.md_5.bungee.api.connection.ProxiedPlayer
@@ -79,8 +80,8 @@ class BungeeCommandSenderWrapperTest extends Specification {
 
         where:
         method     || expected
-        'getName'  || '(server)'
-        'getId'    || '(server)'
+        'getName'  || ArgumentParsers.CONSOLE_COMMAND_NAME
+        'getId'    || ArgumentParsers.CONSOLE_COMMAND_NAME
         'isPlayer' || false
     }
 

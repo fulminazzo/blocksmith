@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command
 
 import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.annotation.Permission
+import it.fulminazzo.blocksmith.command.argument.ArgumentParsers
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
@@ -81,8 +82,8 @@ class BukkitCommandSenderWrapperTest extends Specification {
 
         where:
         method     || expected
-        'getName'  || 'CONSOLE'
-        'getId'    || 'CONSOLE'
+        'getName'  || ArgumentParsers.CONSOLE_COMMAND_NAME
+        'getId'    || ArgumentParsers.CONSOLE_COMMAND_NAME
         'isPlayer' || false
     }
 

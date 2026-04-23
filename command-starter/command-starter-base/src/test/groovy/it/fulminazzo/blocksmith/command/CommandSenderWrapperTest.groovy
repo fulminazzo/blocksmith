@@ -29,7 +29,7 @@ class CommandSenderWrapperTest extends Specification {
         }
 
         and:
-        def sender = new MockCommandSenderWrapper(new CommandSender('Alex'))
+        def sender = new MockCommandSenderWrapper(new Player('Alex'))
 
         and:
         def result = new AtomicReference()
