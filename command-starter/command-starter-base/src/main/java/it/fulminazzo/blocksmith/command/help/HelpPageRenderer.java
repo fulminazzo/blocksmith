@@ -6,16 +6,48 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class HelpPageRenderer {
     private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
     private static final int MAX_FONT_WIDTH = 320;
 
     /**
+     * Given a component, it attempts to subdivide it into multiple components for the given number of lines.
+     * The last component will be truncated with {@link #truncate(String, Component)}.
+     *
+     * @param component the component
+     * @param lines the maximum number of lines to show
+     * @return the components
+     */
+    static @NotNull List<@NotNull Component> truncateLines(@NotNull Component component, final int lines) {
+        List<Component> components = new ArrayList<>();
+        for (int i = 0; i < lines; i++) {
+            String raw = PLAIN_SERIALIZER.serialize(component);
+            if (raw.isEmpty()) break;
+            else if (i == lines - 1) components.add(truncate("", component));
+            else {
+                int length = getMaxTruncationLength(raw);
+                if (length == -1) {
+                    components.add(component);
+                    return components;
+                } else {
+                    length++;
+                    components.add(ComponentUtils.subcomponent(component, 0, length));
+                    component = ComponentUtils.subcomponent(component, length, raw.length());
+                }
+            }
+        }
+        return components;
+    }
+
+    /**
      * Checks if the given component needs to be truncated (a.k.a. it exceeds {@link #MAX_FONT_WIDTH}).
      * If it does, then a new cut component is returned that when hovering on will display the full text.
      *
-     * @param prefix the prefix to keep into account when checking for the total length
+     * @param prefix    the prefix to keep into account when checking for the total length
      * @param component the component
      * @return the (truncated) component
      */
