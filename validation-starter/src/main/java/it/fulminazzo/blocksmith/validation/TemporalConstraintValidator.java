@@ -7,7 +7,7 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.function.Predicate;
+import java.util.function.LongPredicate;
 
 /**
  * A Constraint validator for {@link TemporalAccessor} and time related types.
@@ -19,7 +19,7 @@ final class TemporalConstraintValidator extends ConstraintValidatorImpl {
      *
      * @param validPredicate the valid predicate
      */
-    public TemporalConstraintValidator(final @NotNull Predicate<@NotNull Long> validPredicate) {
+    public TemporalConstraintValidator(final @NotNull LongPredicate validPredicate) {
         super(o -> o == null || validPredicate.test(toMillis(o)), Date.class, Calendar.class, TemporalAccessor.class);
     }
 
