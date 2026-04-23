@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.argument
 
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper
 import it.fulminazzo.blocksmith.command.argument.dto.Coordinate
 import it.fulminazzo.blocksmith.command.argument.dto.Position
 import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition
@@ -9,6 +10,8 @@ import it.fulminazzo.blocksmith.message.util.LocaleUtils
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 import java.util.Map.Entry
 import java.util.concurrent.TimeUnit
 
@@ -374,6 +377,45 @@ class ArgumentParsersTest extends Specification {
         WorldPosition | 'world 1 ~2 '                                           || [Coordinate.RELATIVE_IDENTIFIER]
         WorldPosition | 'world 1 ~2 ~-3'                                        ||
                 (0..9).collect { "${Coordinate.RELATIVE_IDENTIFIER}-3$it".toString() }
+    }
+
+    def 'test that of function does not regenerate twice argument parser for parameterized type CommandSenderWrapper'() {
+        given:
+        def type = new ParameterizedType() {
+
+            @Override
+            Type[] getActualTypeArguments() {
+                return [String].toArray(new Type[1])
+            }
+
+            @Override
+            Type getRawType() {
+                return CommandSenderWrapper
+            }
+
+            @Override
+            Type getOwnerType() {
+                return null
+            }
+
+        }
+
+        when:
+        def p1 = ArgumentParsers.of(type)
+
+        then:
+        p1 != null
+
+        when:
+        def p2 = ArgumentParsers.of(type)
+
+        then:
+        p2 != null
+        p1 == p2
+        p1.hashCode() == p2.hashCode()
+
+        cleanup:
+        ArgumentParsers.PARSERS.remove(type)
     }
 
     def 'test that of function throws IllegalArgumentException if type was not recognized'() {
