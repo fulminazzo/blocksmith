@@ -26,6 +26,11 @@ public class MockApplicationHandle implements ApplicationHandle, ServerApplicati
     }
 
     @Override
+    public @NotNull CommandRegistry getCommandRegistry() {
+        return new MockCommandRegistry(messenger, log);
+    }
+
+    @Override
     public @NotNull ExecutorService getExecutor() {
         return executor;
     }
