@@ -1,10 +1,7 @@
 package it.fulminazzo.blocksmith.command;
 
 import it.fulminazzo.blocksmith.ApplicationHandle;
-import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
-import it.fulminazzo.blocksmith.command.argument.ArgumentParser;
-import it.fulminazzo.blocksmith.command.argument.ArgumentParsers;
-import it.fulminazzo.blocksmith.command.argument.CompositeArgumentParser;
+import it.fulminazzo.blocksmith.command.argument.*;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import net.md_5.bungee.api.CommandSender;
@@ -66,6 +63,7 @@ public final class BungeeCommandRegistryFactory implements CommandRegistryFactor
                 },
                 ArgumentParsers.of(ProxiedPlayer.class)
         ));
+        ArgumentParsers.register(CommandSenderWrapper.class, new CommandSenderWrapperArgumentParser<>(CommandSender.class));
         ArgumentParsers.register(ServerInfo.class, new ArgumentParser<>() {
 
             @Override

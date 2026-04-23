@@ -76,6 +76,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
 
         });
         ArgumentParsers.register(CommandSender.class, new CompositeArgumentParser<>(ConsoleCommandSender.class, Player.class));
+        ArgumentParsers.register(CommandSenderWrapper.class, new CommandSenderWrapperArgumentParser<>(CommandSender.class));
         ArgumentParsers.register(OfflinePlayer.class, new OfflinePlayerArgumentParser());
         ArgumentParsers.register(World.class, new ArgumentParser<>() {
 

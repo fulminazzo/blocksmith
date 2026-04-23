@@ -258,7 +258,7 @@ public final class ArgumentParsers {
      * @param type   the java class of the argument
      * @param parser the argument parser
      */
-    public static <T> void register(final @NotNull Class<T> type, final @NotNull ArgumentParser<T> parser) {
+    public static <T> void register(final @NotNull Class<?> type, final @NotNull ArgumentParser<T> parser) {
         parsers.put(type, parser);
     }
 
