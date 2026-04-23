@@ -47,6 +47,23 @@ public final class HelpPageRenderer {
     }
 
     /**
+     * Renders the usage component for the given {@link Locale}.
+     *
+     * @param messenger the messenger to get the general usage component from
+     * @param locale    the locale
+     */
+    void renderUsage(final @NotNull Messenger messenger, final @NotNull Locale locale) {
+        Component usageComponent = messenger.getComponentOrNull("command.help.usage", locale);
+        if (usageComponent == null) usageComponent = Component.text("");
+        Component usage = ComponentUtils.toComponent(commandNode.getUsage());
+        usage = truncate(
+                PLAIN_SERIALIZER.serialize(usageComponent),
+                usage
+        );
+        lines.add(usageComponent.append(usage));
+    }
+
+    /**
      * Given a component, it attempts to subdivide it into multiple components for the given number of lines.
      * The last component will be truncated with {@link #truncate(String, Component)}.
      *
