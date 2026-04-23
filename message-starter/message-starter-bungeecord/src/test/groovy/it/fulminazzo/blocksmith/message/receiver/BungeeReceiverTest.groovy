@@ -27,12 +27,12 @@ class BungeeReceiverTest extends Specification {
         adventure = BungeeAudiences.create(plugin)
     }
 
-    def 'test that #toAudience converts receiver'() {
+    def 'test that #audience converts receiver'() {
         given:
         def receiver = Mock(CommandSender)
 
         when:
-        def actual = new BungeeReceiver(adventure, receiver).toAudience()
+        def actual = new BungeeReceiver(adventure, receiver).audience()
 
         then:
         actual != null

@@ -16,23 +16,23 @@ class BukkitReceiverTest extends Specification {
         adventure.sender(_) >> Mock(Audience)
     }
 
-    def 'test that #toAudience converts receiver'() {
+    def 'test that #audience converts receiver'() {
         given:
         def receiver = Mock(CommandSender)
 
         when:
-        def actual = new BukkitReceiver(adventure, receiver).toAudience()
+        def actual = new BukkitReceiver(adventure, receiver).audience()
 
         then:
         actual != null
     }
 
-    def 'test that #toAudience returns same audience receiver'() {
+    def 'test that #audience returns same audience receiver'() {
         given:
         def receiver = Mock(CommandSender, additionalInterfaces: [Audience])
 
         when:
-        def actual = new BukkitReceiver(adventure, receiver).toAudience()
+        def actual = new BukkitReceiver(adventure, receiver).audience()
 
         then:
         actual == receiver

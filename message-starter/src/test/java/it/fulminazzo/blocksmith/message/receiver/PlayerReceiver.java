@@ -13,7 +13,12 @@ import java.util.Locale;
 record PlayerReceiver(@NotNull Player internal) implements Receiver {
 
     @Override
-    public @NotNull Audience toAudience() {
+    public @NotNull Locale getLocale() {
+        return internal.getLocale();
+    }
+
+    @Override
+    public @NotNull Audience audience() {
         return new Audience() {
 
             @Override
@@ -35,11 +40,6 @@ record PlayerReceiver(@NotNull Player internal) implements Receiver {
             }
 
         };
-    }
-
-    @Override
-    public @NotNull Locale getLocale() {
-        return internal.getLocale();
     }
 
 }

@@ -15,14 +15,14 @@ final class VelocityReceiver implements Receiver {
     private final @NotNull CommandSource internal;
 
     @Override
-    public @NotNull Audience toAudience() {
-        return internal;
-    }
-
-    @Override
     public @NotNull Locale getLocale() {
         if (internal instanceof Player) return ((Player) internal).getPlayerSettings().getLocale();
         else return Locale.getDefault();
+    }
+
+    @Override
+    public @NotNull Audience audience() {
+        return internal;
     }
 
     @SuppressWarnings("unchecked")

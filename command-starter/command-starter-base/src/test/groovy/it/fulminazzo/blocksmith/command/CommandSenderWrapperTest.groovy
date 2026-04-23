@@ -52,7 +52,7 @@ class CommandSenderWrapperTest extends Specification {
         given:
         def audience = Mock(Audience)
         def receiver = Mock(Receiver)
-        receiver.toAudience() >> audience
+        receiver.audience() >> audience
 
         and:
         def receiverFactory = Mock(ReceiverFactory)

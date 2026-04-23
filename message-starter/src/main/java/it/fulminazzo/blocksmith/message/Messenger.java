@@ -179,7 +179,7 @@ public final class Messenger {
         if (titleCode == null && subtitleCode == null) return;
         ReceiverFactory factory = ReceiverFactories.get(receiver.getClass(), application);
         Receiver rec = factory.create(receiver);
-        rec.toAudience().sendTitlePart(TitlePart.TIMES, times);
+        rec.audience().sendTitlePart(TitlePart.TIMES, times);
         if (subtitleCode != null)
             sendMessageHelper((a, c) -> a.sendTitlePart(TitlePart.SUBTITLE, c), receiver, subtitleCode, arguments);
         if (titleCode != null)
@@ -227,7 +227,7 @@ public final class Messenger {
             Receiver rec = factory.create(receiver);
             Locale locale = rec.getLocale();
             Component message = getComponent(messageCode, locale, arguments);
-            function.accept(rec.toAudience(), message);
+            function.accept(rec.audience(), message);
         } catch (MessageNotFoundException e) {
             application.logger().warn(e.getMessage());
         }

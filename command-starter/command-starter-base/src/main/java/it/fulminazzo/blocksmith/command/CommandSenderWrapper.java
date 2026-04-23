@@ -84,7 +84,7 @@ public abstract class CommandSenderWrapper<S> {
      * @return this object (for method chaining)
      */
     public @NotNull CommandSenderWrapper<S> sendMessage(final @NotNull Component message) {
-        receiver().toAudience().sendMessage(message);
+        receiver().audience().sendMessage(message);
         return this;
     }
 

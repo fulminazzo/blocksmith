@@ -42,7 +42,7 @@ public class CommandSenderReceiverFactory extends AbstractReceiverFactory {
     public record CommandSenderReceiver(@NotNull CommandSender sender) implements Receiver {
 
             @Override
-            public @NotNull Audience toAudience() {
+            public @NotNull Audience audience() {
                 throw new UnsupportedOperationException();
             }
 

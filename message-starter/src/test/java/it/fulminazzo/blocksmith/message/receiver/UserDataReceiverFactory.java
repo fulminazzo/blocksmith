@@ -26,13 +26,13 @@ public final class UserDataReceiverFactory implements ReceiverFactory {
         return new Receiver() {
 
             @Override
-            public @NotNull Audience toAudience() {
-                throw new UnsupportedOperationException();
+            public @NotNull Locale getLocale() {
+                return ((UserData) receiver).getLocale();
             }
 
             @Override
-            public @NotNull Locale getLocale() {
-                return ((UserData) receiver).getLocale();
+            public @NotNull Audience audience() {
+                throw new UnsupportedOperationException();
             }
 
             @Override

@@ -1,5 +1,5 @@
 dependencies {
-    api(projects.base.validation)
+    api(projects.validationStarter)
     api(projects.messageStarter)
     api(projects.schedulerStarter)
 
