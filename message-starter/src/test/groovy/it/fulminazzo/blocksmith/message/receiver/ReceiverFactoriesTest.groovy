@@ -49,7 +49,7 @@ class ReceiverFactoriesTest extends Specification {
             }
 
             @Override
-            <R> @NotNull Receiver create(final @NotNull R receiver) {
+            <R> Receiver create(final @NotNull R receiver) {
                 return new GroovyPlayerReceiver((Player) receiver)
             }
 
@@ -134,7 +134,7 @@ class ReceiverFactoriesTest extends Specification {
         }
 
         @Override
-        <R> @NotNull R internal() {
+        <R> R internal() {
             return (R) internal;
         }
 
