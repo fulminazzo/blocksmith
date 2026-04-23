@@ -39,6 +39,7 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         }
 
         final server = Mock(ProxyServer)
+        server.consoleCommandSource >> Mock(ConsoleCommandSource)
 
         server.allPlayers >> [player1, player2]
         server.getPlayer(_ as String) >> { a ->
@@ -52,6 +53,11 @@ class VelocityCommandRegistryFactoryTest extends Specification {
 
         application = Mock(ApplicationHandle)
         application.server() >> server
+        application.commandRegistry >> {
+            def registry = Mock(CommandRegistry)
+            registry.wrapSender(_) >> { a -> new VelocityCommandSenderWrapper(application, a[0]) }
+            return registry
+        }
 
         def input = new CommandInput()
         visitor = Mock(InputVisitor)
@@ -92,6 +98,10 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         CommandSource        | 'Alex'    || { a -> a.server().getPlayer('Alex').get() }
         CommandSource        | 'Camilla' || { a -> a.server().getPlayer('Camilla').get() }
         CommandSource        | 'console' || { a -> a.server().consoleCommandSource }
+        // COMMAND SENDER WRAPPER
+        CommandSenderWrapper | 'Alex'    || { a -> new VelocityCommandSenderWrapper(a, a.server().getPlayer('Alex').get()) }
+        CommandSenderWrapper | 'Camilla' || { a -> new VelocityCommandSenderWrapper(a, a.server().getPlayer('Camilla').get()) }
+        CommandSenderWrapper | 'console' || { a -> new VelocityCommandSenderWrapper(a, a.server().consoleCommandSource) }
         // SERVER
         RegisteredServer     | 'Lobby'   || { a -> a.server().getServer('Lobby').get() }
         RegisteredServer     | 'Bedwars' || { a -> a.server().getServer('Bedwars').get() }
@@ -119,15 +129,22 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         Player               | 'C'        || 'error.player-not-found'
         Player               | 'c'        || 'error.player-not-found'
         Player               | 'steve'    || 'error.player-not-found'
-        // CONSOLE
+        // CONSOLE COMMAND SOURCE
         ConsoleCommandSource | 'z'        || 'error.unrecognized-argument'
-        // PLAYER
+        // COMMAND SOURCE
         CommandSource        | ''         || 'error.player-not-found'
         CommandSource        | 'A'        || 'error.player-not-found'
         CommandSource        | 'C'        || 'error.player-not-found'
         CommandSource        | 'c'        || 'error.player-not-found'
         CommandSource        | 'steve'    || 'error.player-not-found'
         CommandSource        | 'z'        || 'error.player-not-found'
+        // COMMAND SENDER WRAPPER
+        CommandSenderWrapper | ''         || 'error.player-not-found'
+        CommandSenderWrapper | 'A'        || 'error.player-not-found'
+        CommandSenderWrapper | 'C'        || 'error.player-not-found'
+        CommandSenderWrapper | 'c'        || 'error.player-not-found'
+        CommandSenderWrapper | 'steve'    || 'error.player-not-found'
+        CommandSenderWrapper | 'z'        || 'error.player-not-found'
         // SERVER
         RegisteredServer     | ''         || 'error.server-not-found'
         RegisteredServer     | 'L'        || 'error.server-not-found'
@@ -171,9 +188,16 @@ class VelocityCommandRegistryFactoryTest extends Specification {
         CommandSource        | 'Camilla'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         CommandSource        | 'c'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         CommandSource        | 'steve'    || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSource        | ''         || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSource        | 'c'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         CommandSource        | 'console'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        // COMMAND SENDER WRAPPER
+        CommandSenderWrapper | ''         || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'A'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'Alex'     || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'C'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'Camilla'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'c'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'steve'    || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'console'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         // SERVER
         RegisteredServer     | ''         || ['Lobby', 'Bedwars']
         RegisteredServer     | 'L'        || ['Lobby', 'Bedwars']

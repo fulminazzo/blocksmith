@@ -32,6 +32,7 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         server2.name >> 'Bedwars'
 
         final server = Mock(ProxyServer)
+        server.console >> Mock(CommandSender)
 
         server.players >> [player1, player2]
         server.getPlayer(_ as String) >> { a ->
@@ -49,6 +50,11 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         application.proxy >> server
         application.server() >> {
             return application.proxy
+        }
+        application.commandRegistry >> {
+            def registry = Mock(CommandRegistry)
+            registry.wrapSender(_) >> { a -> new BungeeCommandSenderWrapper(application, a[0]) }
+            return registry
         }
 
         def input = new CommandInput()
@@ -80,17 +86,21 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         actual == expected(application)
 
         where:
-        type          | argument  || expected
+        type                 | argument  || expected
         // PLAYER
-        ProxiedPlayer | 'Alex'    || { a -> a.server().getPlayer('Alex') }
-        ProxiedPlayer | 'Camilla' || { a -> a.server().getPlayer('Camilla') }
+        ProxiedPlayer        | 'Alex'    || { a -> a.server().getPlayer('Alex') }
+        ProxiedPlayer        | 'Camilla' || { a -> a.server().getPlayer('Camilla') }
         // COMMAND SENDER
-        CommandSender | 'Alex'    || { a -> a.server().getPlayer('Alex') }
-        CommandSender | 'Camilla' || { a -> a.server().getPlayer('Camilla') }
-        CommandSender | 'console' || { a -> a.server().console }
+        CommandSender        | 'Alex'    || { a -> a.server().getPlayer('Alex') }
+        CommandSender        | 'Camilla' || { a -> a.server().getPlayer('Camilla') }
+        CommandSender        | 'console' || { a -> a.server().console }
+        // COMMAND SENDER WRAPPER
+        CommandSenderWrapper | 'Alex'    || { a -> new BungeeCommandSenderWrapper(a, a.server().getPlayer('Alex')) }
+        CommandSenderWrapper | 'Camilla' || { a -> new BungeeCommandSenderWrapper(a, a.server().getPlayer('Camilla')) }
+        CommandSenderWrapper | 'console' || { a -> new BungeeCommandSenderWrapper(a, a.server().console) }
         // SERVER
-        ServerInfo    | 'Lobby'   || { a -> a.server().getServerInfo('Lobby') }
-        ServerInfo    | 'Bedwars' || { a -> a.server().getServerInfo('Bedwars') }
+        ServerInfo           | 'Lobby'   || { a -> a.server().getServerInfo('Lobby') }
+        ServerInfo           | 'Bedwars' || { a -> a.server().getServerInfo('Bedwars') }
     }
 
     def 'test that parse of parser for #type throws exception with #expected message with #argument'() {
@@ -108,23 +118,27 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         e.message == expected
 
         where:
-        type          | argument   || expected
+        type                 | argument   || expected
         // PLAYER
-        ProxiedPlayer | ''         || 'error.player-not-found'
-        ProxiedPlayer | 'A'        || 'error.player-not-found'
-        ProxiedPlayer | 'C'        || 'error.player-not-found'
-        ProxiedPlayer | 'c'        || 'error.player-not-found'
-        ProxiedPlayer | 'steve'    || 'error.player-not-found'
+        ProxiedPlayer        | ''         || 'error.player-not-found'
+        ProxiedPlayer        | 'A'        || 'error.player-not-found'
+        ProxiedPlayer        | 'C'        || 'error.player-not-found'
+        ProxiedPlayer        | 'c'        || 'error.player-not-found'
+        ProxiedPlayer        | 'steve'    || 'error.player-not-found'
         // COMMAND SENDER
-        CommandSender | 'z'        || 'error.player-not-found'
-        CommandSender | 'steve'    || 'error.player-not-found'
-        CommandSender | 'k'        || 'error.player-not-found'
+        CommandSender        | 'z'        || 'error.player-not-found'
+        CommandSender        | 'steve'    || 'error.player-not-found'
+        CommandSender        | 'k'        || 'error.player-not-found'
+        // COMMAND SENDER WRAPPER
+        CommandSenderWrapper | 'z'        || 'error.player-not-found'
+        CommandSenderWrapper | 'steve'    || 'error.player-not-found'
+        CommandSenderWrapper | 'k'        || 'error.player-not-found'
         // SERVER
-        ServerInfo    | ''         || 'error.server-not-found'
-        ServerInfo    | 'L'        || 'error.server-not-found'
-        ServerInfo    | 'B'        || 'error.server-not-found'
-        ServerInfo    | 'b'        || 'error.server-not-found'
-        ServerInfo    | 'survival' || 'error.server-not-found'
+        ServerInfo           | ''         || 'error.server-not-found'
+        ServerInfo           | 'L'        || 'error.server-not-found'
+        ServerInfo           | 'B'        || 'error.server-not-found'
+        ServerInfo           | 'b'        || 'error.server-not-found'
+        ServerInfo           | 'survival' || 'error.server-not-found'
     }
 
     def 'test that completions of parser for #type return #expected with #argument'() {
@@ -141,34 +155,41 @@ class BungeeCommandRegistryFactoryTest extends Specification {
         actual == expected
 
         where:
-        type          | argument   || expected
+        type                 | argument   || expected
         // PLAYER
-        ProxiedPlayer | ''         || ['Alex', 'Camilla']
-        ProxiedPlayer | 'A'        || ['Alex', 'Camilla']
-        ProxiedPlayer | 'Alex'     || ['Alex', 'Camilla']
-        ProxiedPlayer | 'C'        || ['Alex', 'Camilla']
-        ProxiedPlayer | 'Camilla'  || ['Alex', 'Camilla']
-        ProxiedPlayer | 'c'        || ['Alex', 'Camilla']
-        ProxiedPlayer | 'steve'    || ['Alex', 'Camilla']
+        ProxiedPlayer        | ''         || ['Alex', 'Camilla']
+        ProxiedPlayer        | 'A'        || ['Alex', 'Camilla']
+        ProxiedPlayer        | 'Alex'     || ['Alex', 'Camilla']
+        ProxiedPlayer        | 'C'        || ['Alex', 'Camilla']
+        ProxiedPlayer        | 'Camilla'  || ['Alex', 'Camilla']
+        ProxiedPlayer        | 'c'        || ['Alex', 'Camilla']
+        ProxiedPlayer        | 'steve'    || ['Alex', 'Camilla']
         // COMMAND SENDER
-        CommandSender | ''         || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender | 'A'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender | 'Alex'     || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender | 'C'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender | 'Camilla'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender | 'c'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender | 'steve'    || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender | ''         || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender | 'c'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender | 'console'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | ''         || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'A'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'Alex'     || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'C'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'Camilla'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'c'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'steve'    || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender        | 'console'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        // COMMAND SENDER WRAPPER
+        CommandSenderWrapper | ''         || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'A'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'Alex'     || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'C'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'Camilla'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'c'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'steve'    || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'console'  || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         // SERVER
-        ServerInfo    | ''         || ['Lobby', 'Bedwars']
-        ServerInfo    | 'L'        || ['Lobby', 'Bedwars']
-        ServerInfo    | 'Lobby'    || ['Lobby', 'Bedwars']
-        ServerInfo    | 'B'        || ['Lobby', 'Bedwars']
-        ServerInfo    | 'Bedwars'  || ['Lobby', 'Bedwars']
-        ServerInfo    | 'b'        || ['Lobby', 'Bedwars']
-        ServerInfo    | 'survival' || ['Lobby', 'Bedwars']
+        ServerInfo           | ''         || ['Lobby', 'Bedwars']
+        ServerInfo           | 'L'        || ['Lobby', 'Bedwars']
+        ServerInfo           | 'Lobby'    || ['Lobby', 'Bedwars']
+        ServerInfo           | 'B'        || ['Lobby', 'Bedwars']
+        ServerInfo           | 'Bedwars'  || ['Lobby', 'Bedwars']
+        ServerInfo           | 'b'        || ['Lobby', 'Bedwars']
+        ServerInfo           | 'survival' || ['Lobby', 'Bedwars']
     }
 
 }

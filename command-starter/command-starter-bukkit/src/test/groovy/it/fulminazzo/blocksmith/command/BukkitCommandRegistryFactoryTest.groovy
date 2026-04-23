@@ -56,6 +56,11 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         application.server() >> {
             return application.server
         }
+        application.commandRegistry >> {
+            def registry = Mock(CommandRegistry)
+            registry.wrapSender(_) >> { a -> new BukkitCommandSenderWrapper(application, a[0]) }
+            return registry
+        }
 
         def player = Mock(Player)
         player.location >> new Location(null, 1, 0, 6)
@@ -215,6 +220,10 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         CommandSender        | 'Alex'           || { a -> a.server().getPlayer('Alex') }
         CommandSender        | 'Camilla'        || { a -> a.server().getPlayer('Camilla') }
         CommandSender        | 'console'        || { a -> a.server().consoleSender }
+        // COMMAND SENDER WRAPPER
+        CommandSenderWrapper | 'Alex'           || { a -> new BukkitCommandSenderWrapper(a, a.server().getPlayer('Alex')) }
+        CommandSenderWrapper | 'Camilla'        || { a -> new BukkitCommandSenderWrapper(a, a.server().getPlayer('Camilla')) }
+        CommandSenderWrapper | 'console'        || { a -> new BukkitCommandSenderWrapper(a, a.server().consoleSender) }
         // OFFLINE PLAYER
         OfflinePlayer        | 'Alex'           || { a -> a.server().getOfflinePlayer('Alex') }
         OfflinePlayer        | 'Camilla'        || { a -> a.server().getOfflinePlayer('Camilla') }
@@ -252,6 +261,10 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         CommandSender        | 'z'             || 'error.player-not-found'
         CommandSender        | 'steve'         || 'error.player-not-found'
         CommandSender        | 'k'             || 'error.player-not-found'
+        // COMMAND SENDER WRAPPER
+        CommandSenderWrapper | 'z'             || 'error.player-not-found'
+        CommandSenderWrapper | 'steve'         || 'error.player-not-found'
+        CommandSenderWrapper | 'k'             || 'error.player-not-found'
         // OFFLINE PLAYER
         OfflinePlayer        | ''              || 'error.player-not-found'
         OfflinePlayer        | 'z'             || 'error.player-not-found'
@@ -297,9 +310,16 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         CommandSender        | 'Camilla'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         CommandSender        | 'c'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         CommandSender        | 'steve'          || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender        | ''               || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender        | 'c'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         CommandSender        | 'console'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        // COMMAND SENDER WRAPPER
+        CommandSenderWrapper | ''               || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'A'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'Alex'           || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'C'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'Camilla'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'c'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'steve'          || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper | 'console'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         // OFFLINE PLAYER
         OfflinePlayer        | ''               || ['Alex', 'Camilla', 'Steve', 'Michael']
         OfflinePlayer        | 'A'              || ['Alex', 'Camilla', 'Steve', 'Michael']
