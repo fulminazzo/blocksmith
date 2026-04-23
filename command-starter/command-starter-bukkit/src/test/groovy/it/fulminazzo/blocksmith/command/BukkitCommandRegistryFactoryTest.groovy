@@ -22,6 +22,9 @@ import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import spock.lang.Specification
 
+import java.lang.reflect.Type
+import java.lang.reflect.ParameterizedType
+
 class BukkitCommandRegistryFactoryTest extends Specification {
 
     private ApplicationHandle application
@@ -210,32 +213,37 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         actual == expected(application)
 
         where:
-        type                 | argument         || expected
+        type                                       | argument         || expected
         // PLAYER
-        Player               | 'Alex'           || { a -> a.server().getPlayer('Alex') }
-        Player               | 'Camilla'        || { a -> a.server().getPlayer('Camilla') }
+        Player                                     | 'Alex'           || { a -> a.server().getPlayer('Alex') }
+        Player                                     | 'Camilla'        || { a -> a.server().getPlayer('Camilla') }
         // CONSOLE
-        ConsoleCommandSender | 'console'        || { a -> a.server().consoleSender }
+        ConsoleCommandSender                       | 'console'        || { a -> a.server().consoleSender }
         // COMMAND SENDER
-        CommandSender        | 'Alex'           || { a -> a.server().getPlayer('Alex') }
-        CommandSender        | 'Camilla'        || { a -> a.server().getPlayer('Camilla') }
-        CommandSender        | 'console'        || { a -> a.server().consoleSender }
+        CommandSender                              | 'Alex'           || { a -> a.server().getPlayer('Alex') }
+        CommandSender                              | 'Camilla'        || { a -> a.server().getPlayer('Camilla') }
+        CommandSender                              | 'console'        || { a -> a.server().consoleSender }
+        // PLAYER WRAPPER
+        commandSenderWrapper(Player)               | 'Alex'           || { a -> new BukkitCommandSenderWrapper(a, a.server().getPlayer('Alex')) }
+        commandSenderWrapper(Player)               | 'Camilla'        || { a -> new BukkitCommandSenderWrapper(a, a.server().getPlayer('Camilla')) }
+        // CONSOLE WRAPPER
+        commandSenderWrapper(ConsoleCommandSender) | 'console'        || { a -> new BukkitCommandSenderWrapper(a, a.server().consoleSender) }
         // COMMAND SENDER WRAPPER
-        CommandSenderWrapper | 'Alex'           || { a -> new BukkitCommandSenderWrapper(a, a.server().getPlayer('Alex')) }
-        CommandSenderWrapper | 'Camilla'        || { a -> new BukkitCommandSenderWrapper(a, a.server().getPlayer('Camilla')) }
-        CommandSenderWrapper | 'console'        || { a -> new BukkitCommandSenderWrapper(a, a.server().consoleSender) }
+        CommandSenderWrapper                       | 'Alex'           || { a -> new BukkitCommandSenderWrapper(a, a.server().getPlayer('Alex')) }
+        CommandSenderWrapper                       | 'Camilla'        || { a -> new BukkitCommandSenderWrapper(a, a.server().getPlayer('Camilla')) }
+        CommandSenderWrapper                       | 'console'        || { a -> new BukkitCommandSenderWrapper(a, a.server().consoleSender) }
         // OFFLINE PLAYER
-        OfflinePlayer        | 'Alex'           || { a -> a.server().getOfflinePlayer('Alex') }
-        OfflinePlayer        | 'Camilla'        || { a -> a.server().getOfflinePlayer('Camilla') }
-        OfflinePlayer        | 'Steve'          || { a -> a.server().getOfflinePlayer('Steve') }
-        OfflinePlayer        | 'Michael'        || { a -> a.server().getOfflinePlayer('Michael') }
+        OfflinePlayer                              | 'Alex'           || { a -> a.server().getOfflinePlayer('Alex') }
+        OfflinePlayer                              | 'Camilla'        || { a -> a.server().getOfflinePlayer('Camilla') }
+        OfflinePlayer                              | 'Steve'          || { a -> a.server().getOfflinePlayer('Steve') }
+        OfflinePlayer                              | 'Michael'        || { a -> a.server().getOfflinePlayer('Michael') }
         // WORLD
-        World                | 'world'          || { a -> a.server().getWorld('world') }
-        World                | 'world_nether'   || { a -> a.server().getWorld('world_nether') }
+        World                                      | 'world'          || { a -> a.server().getWorld('world') }
+        World                                      | 'world_nether'   || { a -> a.server().getWorld('world_nether') }
         // LOCATION
-        Location             | 'world 1 2 -3'   || { a -> new Location(a.server().getWorld('world'), 1, 2, -3) }
-        Location             | 'world ~ ~2 ~-3' || { a -> new Location(a.server().getWorld('world'), 1, 2, 3) }
-        Location             | 'world ~ ~2 ~-4' || { a -> new Location(a.server().getWorld('world'), 1, 2, 2) }
+        Location                                   | 'world 1 2 -3'   || { a -> new Location(a.server().getWorld('world'), 1, 2, -3) }
+        Location                                   | 'world ~ ~2 ~-3' || { a -> new Location(a.server().getWorld('world'), 1, 2, 3) }
+        Location                                   | 'world ~ ~2 ~-4' || { a -> new Location(a.server().getWorld('world'), 1, 2, 2) }
     }
 
     def 'test that parse of parser for #type throws exception with #expected message with #argument'() {
@@ -251,30 +259,35 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         e.message == expected
 
         where:
-        type                 | argument        || expected
+        type                                       | argument        || expected
         // PLAYER
-        Player               | 'z'             || 'error.player-not-found'
-        Player               | 'steve'         || 'error.player-not-found'
+        Player                                     | 'z'             || 'error.player-not-found'
+        Player                                     | 'steve'         || 'error.player-not-found'
         // CONSOLE
-        ConsoleCommandSender | 'k'             || 'error.unrecognized-argument'
+        ConsoleCommandSender                       | 'k'             || 'error.unrecognized-argument'
         // COMMAND SENDER
-        CommandSender        | 'z'             || 'error.player-not-found'
-        CommandSender        | 'steve'         || 'error.player-not-found'
-        CommandSender        | 'k'             || 'error.player-not-found'
+        CommandSender                              | 'z'             || 'error.player-not-found'
+        CommandSender                              | 'steve'         || 'error.player-not-found'
+        CommandSender                              | 'k'             || 'error.player-not-found'
+        // PLAYER WRAPPER
+        commandSenderWrapper(Player)               | 'z'             || 'error.player-not-found'
+        commandSenderWrapper(Player)               | 'steve'         || 'error.player-not-found'
+        // CONSOLE WRAPPER
+        commandSenderWrapper(ConsoleCommandSender) | 'k'             || 'error.unrecognized-argument'
         // COMMAND SENDER WRAPPER
-        CommandSenderWrapper | 'z'             || 'error.player-not-found'
-        CommandSenderWrapper | 'steve'         || 'error.player-not-found'
-        CommandSenderWrapper | 'k'             || 'error.player-not-found'
+        CommandSenderWrapper                       | 'z'             || 'error.player-not-found'
+        CommandSenderWrapper                       | 'steve'         || 'error.player-not-found'
+        CommandSenderWrapper                       | 'k'             || 'error.player-not-found'
         // OFFLINE PLAYER
-        OfflinePlayer        | ''              || 'error.player-not-found'
-        OfflinePlayer        | 'z'             || 'error.player-not-found'
-        OfflinePlayer        | 'jake'          || 'error.player-not-found'
+        OfflinePlayer                              | ''              || 'error.player-not-found'
+        OfflinePlayer                              | 'z'             || 'error.player-not-found'
+        OfflinePlayer                              | 'jake'          || 'error.player-not-found'
         // WORLD
-        World                | ''              || 'error.world-not-found'
-        World                | 'l'             || 'error.world-not-found'
-        World                | 'm'             || 'error.world-not-found'
-        World                | 'M'             || 'error.world-not-found'
-        World                | 'world_the_end' || 'error.world-not-found'
+        World                                      | ''              || 'error.world-not-found'
+        World                                      | 'l'             || 'error.world-not-found'
+        World                                      | 'm'             || 'error.world-not-found'
+        World                                      | 'M'             || 'error.world-not-found'
+        World                                      | 'world_the_end' || 'error.world-not-found'
     }
 
     def 'test that completions of parser for #type return #expected with #argument'() {
@@ -289,63 +302,75 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         actual.sort() == expected.sort()
 
         where:
-        type                 | argument         || expected
+        type                                       | argument         || expected
         // PLAYER
-        Player               | ''               || ['Alex', 'Camilla']
-        Player               | 'A'              || ['Alex', 'Camilla']
-        Player               | 'Alex'           || ['Alex', 'Camilla']
-        Player               | 'C'              || ['Alex', 'Camilla']
-        Player               | 'Camilla'        || ['Alex', 'Camilla']
-        Player               | 'c'              || ['Alex', 'Camilla']
-        Player               | 'steve'          || ['Alex', 'Camilla']
+        Player                                     | ''               || ['Alex', 'Camilla']
+        Player                                     | 'A'              || ['Alex', 'Camilla']
+        Player                                     | 'Alex'           || ['Alex', 'Camilla']
+        Player                                     | 'C'              || ['Alex', 'Camilla']
+        Player                                     | 'Camilla'        || ['Alex', 'Camilla']
+        Player                                     | 'c'              || ['Alex', 'Camilla']
+        Player                                     | 'steve'          || ['Alex', 'Camilla']
         // CONSOLE
-        ConsoleCommandSender | ''               || [CommandSenderWrapper.CONSOLE_COMMAND_NAME]
-        ConsoleCommandSender | 'c'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME]
-        ConsoleCommandSender | 'console'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME]
+        ConsoleCommandSender                       | ''               || [CommandSenderWrapper.CONSOLE_COMMAND_NAME]
+        ConsoleCommandSender                       | 'c'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME]
+        ConsoleCommandSender                       | 'console'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME]
         // COMMAND SENDER
-        CommandSender        | ''               || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender        | 'A'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender        | 'Alex'           || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender        | 'C'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender        | 'Camilla'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender        | 'c'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender        | 'steve'          || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSender        | 'console'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender                              | ''               || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender                              | 'A'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender                              | 'Alex'           || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender                              | 'C'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender                              | 'Camilla'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender                              | 'c'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender                              | 'steve'          || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSender                              | 'console'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        // PLAYER WRAPPER
+        commandSenderWrapper(Player)               | ''               || ['Alex', 'Camilla']
+        commandSenderWrapper(Player)               | 'A'              || ['Alex', 'Camilla']
+        commandSenderWrapper(Player)               | 'Alex'           || ['Alex', 'Camilla']
+        commandSenderWrapper(Player)               | 'C'              || ['Alex', 'Camilla']
+        commandSenderWrapper(Player)               | 'Camilla'        || ['Alex', 'Camilla']
+        commandSenderWrapper(Player)               | 'c'              || ['Alex', 'Camilla']
+        commandSenderWrapper(Player)               | 'steve'          || ['Alex', 'Camilla']
+        // CONSOLE WRAPPER
+        commandSenderWrapper(ConsoleCommandSender) | ''               || [CommandSenderWrapper.CONSOLE_COMMAND_NAME]
+        commandSenderWrapper(ConsoleCommandSender) | 'c'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME]
+        commandSenderWrapper(ConsoleCommandSender) | 'console'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME]
         // COMMAND SENDER WRAPPER
-        CommandSenderWrapper | ''               || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSenderWrapper | 'A'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSenderWrapper | 'Alex'           || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSenderWrapper | 'C'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSenderWrapper | 'Camilla'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSenderWrapper | 'c'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSenderWrapper | 'steve'          || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
-        CommandSenderWrapper | 'console'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper                       | ''               || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper                       | 'A'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper                       | 'Alex'           || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper                       | 'C'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper                       | 'Camilla'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper                       | 'c'              || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper                       | 'steve'          || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
+        CommandSenderWrapper                       | 'console'        || [CommandSenderWrapper.CONSOLE_COMMAND_NAME, 'Alex', 'Camilla']
         // OFFLINE PLAYER
-        OfflinePlayer        | ''               || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer        | 'A'              || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer        | 'Alex'           || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer        | 'C'              || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer        | 'Camilla'        || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer        | 'c'              || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer        | 'steve'          || ['Alex', 'Camilla', 'Steve', 'Michael']
-        OfflinePlayer        | 'Jake'           || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer                              | ''               || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer                              | 'A'              || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer                              | 'Alex'           || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer                              | 'C'              || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer                              | 'Camilla'        || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer                              | 'c'              || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer                              | 'steve'          || ['Alex', 'Camilla', 'Steve', 'Michael']
+        OfflinePlayer                              | 'Jake'           || ['Alex', 'Camilla', 'Steve', 'Michael']
         // WORLD
-        World                | ''               || ['world', 'world_nether']
-        World                | 'l'              || ['world', 'world_nether']
-        World                | 'world'          || ['world', 'world_nether']
-        World                | 'm'              || ['world', 'world_nether']
-        World                | 'world_nether'   || ['world', 'world_nether']
-        World                | 'M'              || ['world', 'world_nether']
-        World                | 'world_the_end'  || ['world', 'world_nether']
+        World                                      | ''               || ['world', 'world_nether']
+        World                                      | 'l'              || ['world', 'world_nether']
+        World                                      | 'world'          || ['world', 'world_nether']
+        World                                      | 'm'              || ['world', 'world_nether']
+        World                                      | 'world_nether'   || ['world', 'world_nether']
+        World                                      | 'M'              || ['world', 'world_nether']
+        World                                      | 'world_the_end'  || ['world', 'world_nether']
         // LOCATION
-        Location             | ''               || ['world', 'world_nether']
-        Location             | 'world'          || ['world', 'world_nether']
-        Location             | 'world '         || [Coordinate.RELATIVE_IDENTIFIER]
-        Location             | 'world 1'        || (0..9).collect { "1$it" }
-        Location             | 'world 1 2'      || (0..9).collect { "2$it" }
-        Location             | 'world 1 2 3'    || (0..9).collect { "3$it" }
-        Location             | 'world ~ ~2 ~-3' || (0..9).collect { "~-3$it" }
-        Location             | 'world a'        || []
+        Location                                   | ''               || ['world', 'world_nether']
+        Location                                   | 'world'          || ['world', 'world_nether']
+        Location                                   | 'world '         || [Coordinate.RELATIVE_IDENTIFIER]
+        Location                                   | 'world 1'        || (0..9).collect { "1$it" }
+        Location                                   | 'world 1 2'      || (0..9).collect { "2$it" }
+        Location                                   | 'world 1 2 3'    || (0..9).collect { "3$it" }
+        Location                                   | 'world ~ ~2 ~-3' || (0..9).collect { "~-3$it" }
+        Location                                   | 'world a'        || []
     }
 
     def 'test that convert of #position to Location with #sender returns #expected'() {
@@ -480,6 +505,27 @@ class BukkitCommandRegistryFactoryTest extends Specification {
         visitor.input >> input
         visitor.commandSender >> new BukkitCommandSenderWrapper(application, sender)
         return visitor
+    }
+
+    private static Type commandSenderWrapper(final Type type) {
+        return new ParameterizedType() {
+
+            @Override
+            Type[] getActualTypeArguments() {
+                return [type].toArray(new Type[1])
+            }
+
+            @Override
+            Type getRawType() {
+                return CommandSenderWrapper
+            }
+
+            @Override
+            Type getOwnerType() {
+                return null
+            }
+
+        }
     }
 
 }
