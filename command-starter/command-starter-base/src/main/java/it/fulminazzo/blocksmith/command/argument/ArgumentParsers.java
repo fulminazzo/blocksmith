@@ -277,10 +277,7 @@ public final class ArgumentParsers {
             actualSenderType = wildcardType.getUpperBounds()[0];
             if (actualSenderType.equals(Object.class)) return null;
         }
-        return (ArgumentParser<W>) new DelegateArgumentParser<>(
-                (v, o) -> v.getApplication().getCommandRegistry().wrapSender(o),
-                of(actualSenderType)
-        );
+        return (ArgumentParser<W>) new CommandSenderWrapperArgumentParser<>(actualSenderType);
     }
 
     private static boolean isValidLocale(final @NotNull Locale locale) {
