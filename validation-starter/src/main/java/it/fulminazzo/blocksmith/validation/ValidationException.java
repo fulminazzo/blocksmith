@@ -14,9 +14,9 @@ public final class ValidationException extends Exception {
     private static final long serialVersionUID = -4425591507230226127L;
 
     @Getter
-    private final @Nullable Object object;
+    private final transient @Nullable Object object;
     @Getter
-    private final @NotNull Map<String, Set<ConstraintViolation>> violations;
+    private final transient @NotNull Map<String, Set<ConstraintViolation>> violations;
 
     /**
      * Instantiates a new Compose validation exception.

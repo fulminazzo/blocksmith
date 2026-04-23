@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public final class Validator {
-    private static final @NotNull String propertyFormat = "property '%s'";
-    private static final @NotNull String parameterFormat = "parameter at position %s";
+    private static final @NotNull String PROPERTY_FORMAT = "property '%s'";
+    private static final @NotNull String PARAMETER_FORMAT = "parameter at position %s";
 
     private static final @NotNull Validator INSTANCE = new Validator();
 
@@ -123,13 +123,12 @@ public final class Validator {
             final String currentPath = paths.get(current);
             visited.add(current);
             final Reflect beanReflect = Reflect.on(current);
-            if (beanReflect.isBaseType()) continue;
-            if (current.getClass().getPackageName().startsWith("java")) continue;
+            if (beanReflect.isBaseType() || current.getClass().getPackageName().startsWith("java")) continue;
             for (Field field : beanReflect.getInstanceFields()) {
                 Object value = beanReflect.get(field).get();
                 String fieldPath = (currentPath.isEmpty() ? "" : currentPath + ".") + field.getName();
                 try {
-                    validateRec(field, String.format(propertyFormat, fieldPath), value);
+                    validateRec(field, String.format(PROPERTY_FORMAT, fieldPath), value);
                 } catch (ValidationException e) {
                     violations.putAll(e.getViolations());
                 }
@@ -176,7 +175,7 @@ public final class Validator {
             }
         }
         if (!violations.isEmpty())
-            throw new ValidationException(String.format(propertyFormat, value), Map.of(elementName, violations));
+            throw new ValidationException(String.format(PROPERTY_FORMAT, value), Map.of(elementName, violations));
     }
 
     /**
@@ -270,7 +269,7 @@ public final class Validator {
                     if (key.equals(name)) {
                         Set<ConstraintViolation> value = tmp.get(key);
                         tmp.remove(key, value);
-                        tmp.put(String.format(parameterFormat, i), value);
+                        tmp.put(String.format(PARAMETER_FORMAT, i), value);
                     }
                 }
                 violations.putAll(tmp);
