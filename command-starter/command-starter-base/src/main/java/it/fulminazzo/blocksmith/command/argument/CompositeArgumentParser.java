@@ -22,6 +22,16 @@ public final class CompositeArgumentParser<T> implements ArgumentParser<T> {
     /**
      * Instantiates a new Composite argument parser.
      *
+     * @param argumentTypes the Java classes of the arguments
+     */
+    @SafeVarargs
+    public CompositeArgumentParser(final @NotNull Class<? extends T> @NotNull ... argumentTypes) {
+        this((Type[]) argumentTypes);
+    }
+
+    /**
+     * Instantiates a new Composite argument parser.
+     *
      * @param argumentTypes the Java type of the arguments
      */
     @SuppressWarnings("unchecked")
