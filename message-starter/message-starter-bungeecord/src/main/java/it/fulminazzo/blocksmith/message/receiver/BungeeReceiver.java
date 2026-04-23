@@ -17,14 +17,14 @@ final class BungeeReceiver implements Receiver {
     private final @NotNull CommandSender internal;
 
     @Override
-    public @NotNull Audience toAudience() {
-        return adventure.sender(internal);
-    }
-
-    @Override
     public @NotNull Locale getLocale() {
         if (internal instanceof ProxiedPlayer) return ((ProxiedPlayer) internal).getLocale();
         else return Locale.getDefault();
+    }
+
+    @Override
+    public @NotNull Audience audience() {
+        return adventure.sender(internal);
     }
 
     @SuppressWarnings("unchecked")

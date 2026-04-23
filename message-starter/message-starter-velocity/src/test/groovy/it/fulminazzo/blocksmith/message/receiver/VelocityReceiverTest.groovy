@@ -7,12 +7,12 @@ import spock.lang.Specification
 
 class VelocityReceiverTest extends Specification {
 
-    def 'test that #toAudience converts receiver'() {
+    def 'test that #audience converts receiver'() {
         given:
         def receiver = Mock(CommandSource)
 
         when:
-        def actual = new VelocityReceiver(receiver).toAudience()
+        def actual = new VelocityReceiver(receiver).audience()
 
         then:
         actual != null

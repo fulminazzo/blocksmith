@@ -18,15 +18,15 @@ final class BukkitReceiver implements Receiver {
     private final @NotNull CommandSender internal;
 
     @Override
-    public @NotNull Audience toAudience() {
-        if (internal instanceof Audience) return (Audience) internal;
-        else return adventure.sender(internal);
-    }
-
-    @Override
     public @NotNull Locale getLocale() {
         if (internal instanceof Player) return LocaleUtils.fromString(((Player) internal).getLocale());
         else return Locale.getDefault();
+    }
+
+    @Override
+    public @NotNull Audience audience() {
+        if (internal instanceof Audience) return (Audience) internal;
+        else return adventure.sender(internal);
     }
 
     @SuppressWarnings("unchecked")

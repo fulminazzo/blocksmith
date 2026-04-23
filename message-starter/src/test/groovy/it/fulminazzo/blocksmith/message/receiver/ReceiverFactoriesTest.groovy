@@ -104,7 +104,12 @@ class ReceiverFactoriesTest extends Specification {
         }
 
         @Override
-        @NotNull Audience toAudience() {
+        @NotNull Locale getLocale() {
+            return internal.locale
+        }
+
+        @Override
+        @NotNull Audience audience() {
             return new Audience() {
 
                 @Override
@@ -126,11 +131,6 @@ class ReceiverFactoriesTest extends Specification {
                 }
 
             }
-        }
-
-        @Override
-        @NotNull Locale getLocale() {
-            return internal.locale
         }
 
         @Override

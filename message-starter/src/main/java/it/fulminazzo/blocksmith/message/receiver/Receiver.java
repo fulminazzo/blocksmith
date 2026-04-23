@@ -11,18 +11,18 @@ import java.util.Locale;
 public interface Receiver {
 
     /**
-     * Converts the given receiver to an Audience.
-     *
-     * @return the audience
-     */
-    @NotNull Audience toAudience();
-
-    /**
      * Gets the locale of the receiver.
      *
      * @return the locale
      */
     @NotNull Locale getLocale();
+
+    /**
+     * Converts the given receiver to an Audience.
+     *
+     * @return the audience
+     */
+    @NotNull Audience audience();
 
     /**
      * Gets the internal wrapped receiver.
