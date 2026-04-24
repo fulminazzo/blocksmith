@@ -21,8 +21,8 @@ public final class HelpPageStyle {
     private @NotNull String filler = "-";
     private final @NotNull List<String> fillerStyles = new ArrayList<>(List.of("strikethrough", "gold"));
 
-    private @NotNull String header = "<name>";
-    private @NotNull String separatorText = "<subcommands>";
+    private @NotNull String header = "%name%";
+    private @NotNull String separatorText = "%subcommands%";
     private @NotNull String footer = ""; //TODO: compute pages distances
 
     /**
@@ -55,15 +55,15 @@ public final class HelpPageStyle {
      * <br>
      * It supports the following placeholders:
      * <ul>
-     *     <li>{@code <filler>}: one character of the current {@link #getFiller()};</li>
-     *     <li>{@code <name>}: the name of the command;</li>
-     *     <li>{@code <subcommands>}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     <li>{@code %filler%}: one character of the current {@link #getFiller()};</li>
+     *     <li>{@code %name%}: the name of the command;</li>
+     *     <li>{@code %subcommands%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under "command.help.subcommands";</li> //TODO: constant class
-     *     <li>{@code <previous>}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     <li>{@code %previous%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under "command.help.previous-page" (only shown if necessary);</li> //TODO: option to disable
-     *     <li>{@code <next>}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     <li>{@code %next%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under "command.help.next-page" (only shown if necessary);</li> //TODO: option to disable
-     *     <li>{@code <current>}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     <li>{@code %current%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under "command.help.current-page".</li>
      * </ul>
      *
@@ -81,15 +81,15 @@ public final class HelpPageStyle {
      * <br>
      * It supports the following placeholders:
      * <ul>
-     *     <li>{@code <filler>}: one character of the current {@link #getFiller()};</li>
-     *     <li>{@code <name>}: the name of the command;</li>
-     *     <li>{@code <subcommands>}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     <li>{@code %filler%}: one character of the current {@link #getFiller()};</li>
+     *     <li>{@code %name%}: the name of the command;</li>
+     *     <li>{@code %subcommands%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under "command.help.subcommands";</li> //TODO: constant class
-     *     <li>{@code <previous>}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     <li>{@code %previous%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under "command.help.previous-page" (only shown if necessary);</li> //TODO: option to disable
-     *     <li>{@code <next>}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     <li>{@code %next%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under "command.help.next-page" (only shown if necessary);</li> //TODO: option to disable
-     *     <li>{@code <current>}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     <li>{@code %current%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under "command.help.current-page".</li>
      * </ul>
      *
@@ -107,15 +107,15 @@ public final class HelpPageStyle {
      * <br>
      * It supports the following placeholders:
      * <ul>
-     *     <li>{@code <filler>}: one character of the current {@link #getFiller()};</li>
-     *     <li>{@code <name>}: the name of the command;</li>
-     *     <li>{@code <subcommands>}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     <li>{@code %filler%}: one character of the current {@link #getFiller()};</li>
+     *     <li>{@code %name%}: the name of the command;</li>
+     *     <li>{@code %subcommands%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under "command.help.subcommands";</li> //TODO: constant class
-     *     <li>{@code <previous>}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     <li>{@code %previous%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under "command.help.previous-page" (only shown if necessary);</li> //TODO: option to disable
-     *     <li>{@code <next>}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     <li>{@code %next%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under "command.help.next-page" (only shown if necessary);</li> //TODO: option to disable
-     *     <li>{@code <current>}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     <li>{@code %current%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under "command.help.current-page".</li>
      * </ul>
      *
