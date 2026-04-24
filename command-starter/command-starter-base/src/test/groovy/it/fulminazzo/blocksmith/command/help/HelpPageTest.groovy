@@ -24,6 +24,11 @@ class HelpPageTest extends Specification {
 
         node.addChild(newLiteralNode('actionbar'))
         node.addChild(newLiteralNode('title'))
+        node.addChild(newLiteralNode('bossbar'))
+        node.addChild(newLiteralNode('help'))
+        node.addChild(newLiteralNode('silent'))
+        node.addChild(newLiteralNode('bb'))
+        node.addChild(newLiteralNode('ab'))
 
         page = new HelpPage(
                 HelpPage.CommandData.builder()
@@ -32,27 +37,23 @@ class HelpPageTest extends Specification {
                         .permission(node.commandInfo.permission)
                         .usage(node.usage)
                         .build(),
-                [
-                        HelpPage.CommandData.builder()
-                                .name(node.children[0].name)
-                                .description(node.children[0].commandInfo.description)
-                                .permission(node.children[0].commandInfo.permission)
-                                .usage(node.children[0].usage)
-                                .build(),
-                        HelpPage.CommandData.builder()
-                                .name(node.children[2].name)
-                                .description(node.children[2].commandInfo.description)
-                                .permission(node.children[2].commandInfo.permission)
-                                .usage(node.children[2].usage)
-                                .build(),
-                ]
+                node.children
+                        .findAll { it instanceof LiteralNode }
+                        .collect {
+                            HelpPage.CommandData.builder()
+                                    .name(it.name)
+                                    .description(it.commandInfo.description)
+                                    .permission(it.commandInfo.permission)
+                                    .usage(it.usage)
+                                    .build()
+                        }
         )
     }
 
     def 'test that getSubcommandsPages with #subcommands returns #expected'() {
         given:
         def page = Mock(HelpPage)
-        page.getSubcommandsPages(_) >> {
+        page.getSubcommandsPages(_, _) >> {
             callRealMethod()
         }
         page.getExecutableSubcommands(_) >> {
@@ -65,7 +66,7 @@ class HelpPageTest extends Specification {
         def sender = Mock(CommandSenderWrapper)
 
         when:
-        def pages = page.getSubcommandsPages(sender)
+        def pages = page.getSubcommandsPages(sender, 3)
 
         then:
         pages == expected
