@@ -8,12 +8,174 @@ import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
 /**
  * Represents a general message receiver.
  */
 public interface Receiver {
+    /**
+     * The default timings for titles.
+     */
+    @NotNull Title.Times DEFAULT_TIMES = Title.Times.times(
+            Duration.of(1L, ChronoUnit.SECONDS),
+            Duration.of(2L, ChronoUnit.SECONDS),
+            Duration.of(1L, ChronoUnit.SECONDS)
+    );
+
+    /**
+     * Sends a title to this receiver.
+     * <br>
+     * Uses {@link #DEFAULT_TIMES} for the timings.
+     *
+     * @param title the title
+     * @return this object (for method chaining)
+     */
+    default @NotNull Receiver sendTitle(final @Nullable String title) {
+        return sendTitle(title, (Component) null, DEFAULT_TIMES);
+    }
+
+    /**
+     * Sends a title to this receiver.
+     * <br>
+     * Uses {@link #DEFAULT_TIMES} for the timings.
+     *
+     * @param title the title
+     * @return this object (for method chaining)
+     */
+    default @NotNull Receiver sendTitle(final @Nullable Component title) {
+        return sendTitle(title, (Component) null, DEFAULT_TIMES);
+    }
+
+    /**
+     * Sends a title to this receiver.
+     *
+     * @param title the title
+     * @param times the timings of the title
+     * @return this object (for method chaining)
+     */
+    default @NotNull Receiver sendTitle(final @Nullable String title,
+                                        final @NotNull Title.Times times) {
+        return sendTitle(title, (Component) null, times);
+    }
+
+    /**
+     * Sends a title to this receiver.
+     *
+     * @param title the title
+     * @param times the timings of the title
+     * @return this object (for method chaining)
+     */
+    default @NotNull Receiver sendTitle(final @Nullable Component title,
+                                        final @NotNull Title.Times times) {
+        return sendTitle(title, (Component) null, times);
+    }
+
+    /**
+     * Sends a subtitle to this receiver.
+     * <br>
+     * Uses {@link #DEFAULT_TIMES} for the timings.
+     *
+     * @param subtitle the subtitle
+     * @return this object (for method chaining)
+     */
+    default @NotNull Receiver sendSubtitle(final @Nullable String subtitle) {
+        return sendTitle(subtitle, (Component) null, DEFAULT_TIMES);
+    }
+
+    /**
+     * Sends a subtitle to this receiver.
+     * <br>
+     * Uses {@link #DEFAULT_TIMES} for the timings.
+     *
+     * @param subtitle the subtitle
+     * @return this object (for method chaining)
+     */
+    default @NotNull Receiver sendSubtitle(final @Nullable Component subtitle) {
+        return sendTitle(subtitle, (Component) null, DEFAULT_TIMES);
+    }
+
+    /**
+     * Sends a subtitle to this receiver.
+     *
+     * @param subtitle the subtitle
+     * @param times    the timings of the subtitle
+     * @return this object (for method chaining)
+     */
+    default @NotNull Receiver sendSubtitle(final @Nullable String subtitle,
+                                           final @NotNull Title.Times times) {
+        return sendTitle(subtitle, (Component) null, times);
+    }
+
+    /**
+     * Sends a subtitle to this receiver.
+     *
+     * @param subtitle the subtitle
+     * @param times    the timings of the subtitle
+     * @return this object (for method chaining)
+     */
+    default @NotNull Receiver sendSubtitle(final @Nullable Component subtitle,
+                                           final @NotNull Title.Times times) {
+        return sendTitle(subtitle, (Component) null, times);
+    }
+
+    /**
+     * Sends a title to this receiver.
+     * <br>
+     * Uses {@link #DEFAULT_TIMES} for the timings.
+     *
+     * @param title    the title
+     * @param subtitle the subtitle
+     * @return this object (for method chaining)
+     */
+    default @NotNull Receiver sendTitle(final @Nullable String title,
+                                        final @Nullable String subtitle) {
+        return sendTitle(title, subtitle, DEFAULT_TIMES);
+    }
+
+    /**
+     * Sends a title to this receiver.
+     * <br>
+     * Uses {@link #DEFAULT_TIMES} for the timings.
+     *
+     * @param title    the title
+     * @param subtitle the subtitle
+     * @return this object (for method chaining)
+     */
+    default @NotNull Receiver sendTitle(final @Nullable String title,
+                                        final @Nullable Component subtitle) {
+        return sendTitle(title, subtitle, DEFAULT_TIMES);
+    }
+
+    /**
+     * Sends a title to this receiver.
+     * <br>
+     * Uses {@link #DEFAULT_TIMES} for the timings.
+     *
+     * @param title    the title
+     * @param subtitle the subtitle
+     * @return this object (for method chaining)
+     */
+    default @NotNull Receiver sendTitle(final @Nullable Component title,
+                                        final @Nullable String subtitle) {
+        return sendTitle(title, subtitle, DEFAULT_TIMES);
+    }
+
+    /**
+     * Sends a title to this receiver.
+     * <br>
+     * Uses {@link #DEFAULT_TIMES} for the timings.
+     *
+     * @param title    the title
+     * @param subtitle the subtitle
+     * @return this object (for method chaining)
+     */
+    default @NotNull Receiver sendTitle(final @Nullable Component title,
+                                        final @Nullable Component subtitle) {
+        return sendTitle(title, subtitle, DEFAULT_TIMES);
+    }
 
     /**
      * Sends a title to this receiver.
