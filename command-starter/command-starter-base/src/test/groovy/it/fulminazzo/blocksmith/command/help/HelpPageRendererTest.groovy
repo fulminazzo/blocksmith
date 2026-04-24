@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.message.Messenger
+import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import spock.lang.Specification
@@ -94,6 +95,26 @@ class HelpPageRendererTest extends Specification {
         permissionComponent            || expected
         null                           || ['blocksmith.test.permission']
         Component.text('Permission: ') || ['Permission: blocksmith.test.permission']
+    }
+
+    def 'test that formatAndFill correctly formats component'() {
+        given:
+        def node = new LiteralNode('test')
+        node.commandInfo = new CommandInfo(
+                'test.description',
+                new PermissionInfo('blocksmith', 'test.permission', Permission.Grant.NONE)
+        )
+
+        and:
+        def renderer = new HelpPageRenderer(node)
+
+        when:
+        def component = renderer.formatAndFill('Title', Mock(Messenger), Locale.ITALY)
+
+        then:
+        ComponentUtils.toString(component) == '<strikethrough><gold>--------------------------</gold></strikethrough>' +
+                'Title' +
+                '<strikethrough><gold>--------------------------'
     }
 
 

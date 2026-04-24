@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command.help;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
+import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -73,6 +74,31 @@ public final class HelpPageRenderer {
     }
 
     /**
+     * Formats the given string with {@link #format(Component, Messenger, Locale)}.
+     * Then, it fills it using {@link HelpPageStyle#getFiller()}.
+     *
+     * @param raw       the raw string
+     * @param messenger the messenger to get the messages from
+     * @param locale    the locale
+     * @return the formatted component
+     */
+    @NotNull Component formatAndFill(final @NotNull String raw,
+                                     final @NotNull Messenger messenger,
+                                     final @NotNull Locale locale) {
+        Component baseComponent = format(ComponentUtils.toComponent(raw), messenger, locale);
+        final HelpPageStyle style = HelpPageStyle.get();
+        StringBuilder fillers = new StringBuilder(style.getFiller());
+        String rawComponent = PLAIN_SERIALIZER.serialize(baseComponent);
+        while (getMaxLength(fillers + rawComponent + fillers) == -1)
+            fillers.append(style.getFiller());
+        String filler = fillers.toString();
+        for (String s : style.getFillerStyles())
+            filler = StringUtils.tag(s, filler);
+        rawComponent = ComponentUtils.toString(baseComponent);
+        return ComponentUtils.toComponent(filler + rawComponent + filler);
+    }
+
+    /**
      * Formats the given text with the following placeholders:
      * <ul>
      *     <li>{@code %filler%}: one character of the current {@link HelpPageStyle#getFiller()};</li>
@@ -96,6 +122,7 @@ public final class HelpPageRenderer {
                               final @NotNull Messenger messenger,
                               final @NotNull Locale locale) {
         HelpPageStyle style = HelpPageStyle.get();
+        //TODO: proper testing
         return component
                 .replaceText(b -> b.matchLiteral("%filler%").replacement(style.getStyledFiller()))
                 .replaceText(b -> b.matchLiteral("%name%").replacement(commandNode.getName()))
