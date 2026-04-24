@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.help;
 
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import it.fulminazzo.blocksmith.util.StringUtils;
@@ -22,9 +23,28 @@ public final class HelpPageRenderer {
     private static final int MAX_FONT_WIDTH = 320;
 
     private static final int MAX_DESCRIPTION_LINES = 2;
+    private static final int SUBCOMMANDS_LINES = 3;
 
     private final @NotNull LiteralNode commandNode;
     private final @NotNull List<Component> lines = new LinkedList<>();
+
+    public @NotNull List<Component> render(final @NotNull InputVisitor<?, ?> visitor) {
+        final HelpPageStyle style = HelpPageStyle.get();
+        final Messenger messenger = visitor.getApplication().getMessenger();
+        final Locale locale = visitor.getCommandSender().receiver().getLocale();
+        // Header
+        lines.add(formatAndFill(style.getHeader(), messenger, locale));
+        renderDescription(messenger, locale);
+        renderPermission(messenger, locale);
+        renderUsage(messenger, locale);
+        // Separator
+        lines.add(formatAndFill(style.getSeparatorText(), messenger, locale));
+        //TODO: temporary subcommand blanks
+        for (int i = 0; i < SUBCOMMANDS_LINES; i++) lines.add(Component.text(""));
+        // Footer
+        lines.add(formatAndFill(style.getFooter(), messenger, locale));
+        return lines;
+    }
 
     /**
      * Renders the description component(s) for the given {@link Locale}.
@@ -48,19 +68,6 @@ public final class HelpPageRenderer {
     }
 
     /**
-     * Renders the usage component for the given {@link Locale}.
-     *
-     * @param messenger the messenger to get the general usage component from
-     * @param locale    the locale
-     */
-    void renderUsage(final @NotNull Messenger messenger, final @NotNull Locale locale) {
-        final Component usageComponent = getComponentOrEmpty(messenger, "command.help.usage", locale);
-        Component usage = ComponentUtils.toComponent(commandNode.getUsage());
-        usage = truncate(PLAIN_SERIALIZER.serialize(usageComponent), usage);
-        lines.add(usageComponent.append(usage));
-    }
-
-    /**
      * Renders the permission component for the given {@link Locale}.
      *
      * @param messenger the messenger to get the general permission component from
@@ -71,6 +78,19 @@ public final class HelpPageRenderer {
         Component permission = ComponentUtils.toComponent(commandNode.getCommandInfo().getPermission().getPermission());
         permission = truncate(PLAIN_SERIALIZER.serialize(permissionComponent), permission);
         lines.add(permissionComponent.append(permission));
+    }
+
+    /**
+     * Renders the usage component for the given {@link Locale}.
+     *
+     * @param messenger the messenger to get the general usage component from
+     * @param locale    the locale
+     */
+    void renderUsage(final @NotNull Messenger messenger, final @NotNull Locale locale) {
+        final Component usageComponent = getComponentOrEmpty(messenger, "command.help.usage", locale);
+        Component usage = ComponentUtils.toComponent(commandNode.getUsage());
+        usage = truncate(PLAIN_SERIALIZER.serialize(usageComponent), usage);
+        lines.add(usageComponent.append(usage));
     }
 
     /**

@@ -43,33 +43,6 @@ class HelpPageRendererTest extends Specification {
         Component.text('Hello, world!') || ['Hello, world!', '']
     }
 
-    def 'test that renderUsage of #usageComponent returns #expected'() {
-        given:
-        def node = new LiteralNode('test')
-        node.commandInfo = new CommandInfo(
-                'test.description',
-                new PermissionInfo(null, 'test.permission', Permission.Grant.NONE)
-        )
-
-        and:
-        def messenger = Mock(Messenger)
-        messenger.getComponentOrNull(_, _) >> usageComponent
-
-        and:
-        def renderer = new HelpPageRenderer(node)
-
-        when:
-        renderer.renderUsage(messenger, Locale.ITALY)
-
-        then:
-        renderer.lines.collect { PLAIN_SERIALIZER.serialize(it) } == expected
-
-        where:
-        usageComponent            || expected
-        null                      || ['/test']
-        Component.text('Usage: ') || ['Usage: /test']
-    }
-
     def 'test that renderPermission of #permissionComponent returns #expected'() {
         given:
         def node = new LiteralNode('test')
@@ -95,6 +68,33 @@ class HelpPageRendererTest extends Specification {
         permissionComponent            || expected
         null                           || ['blocksmith.test.permission']
         Component.text('Permission: ') || ['Permission: blocksmith.test.permission']
+    }
+
+    def 'test that renderUsage of #usageComponent returns #expected'() {
+        given:
+        def node = new LiteralNode('test')
+        node.commandInfo = new CommandInfo(
+                'test.description',
+                new PermissionInfo(null, 'test.permission', Permission.Grant.NONE)
+        )
+
+        and:
+        def messenger = Mock(Messenger)
+        messenger.getComponentOrNull(_, _) >> usageComponent
+
+        and:
+        def renderer = new HelpPageRenderer(node)
+
+        when:
+        renderer.renderUsage(messenger, Locale.ITALY)
+
+        then:
+        renderer.lines.collect { PLAIN_SERIALIZER.serialize(it) } == expected
+
+        where:
+        usageComponent            || expected
+        null                      || ['/test']
+        Component.text('Usage: ') || ['Usage: /test']
     }
 
     def 'test that formatAndFill correctly formats component'() {
