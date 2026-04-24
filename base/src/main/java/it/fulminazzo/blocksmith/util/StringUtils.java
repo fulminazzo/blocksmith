@@ -185,4 +185,15 @@ public final class StringUtils {
         return List.copyOf(strings);
     }
 
+    /**
+     * Wraps the given content in tags.
+     *
+     * @param tag     the name of the tags
+     * @param content the content
+     * @return the wrapped content
+     */
+    public static @NotNull String tag(final @NotNull String tag, final @NotNull String content) {
+        return String.format("<%1$s>%2$s</%1$s>", tag, content);
+    }
+
 }
