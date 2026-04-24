@@ -108,4 +108,9 @@ class StringUtilsTest extends Specification {
         'a,b,'                          | ','    | []                                     || ['a', 'b', '']
     }
 
+    def 'test that tag works'() {
+        expect:
+        StringUtils.tag('red', 'Hello, world!') == '<red>Hello, world!</red>'
+    }
+
 }
