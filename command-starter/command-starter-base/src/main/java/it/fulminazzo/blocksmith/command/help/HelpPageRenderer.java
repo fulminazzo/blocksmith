@@ -62,16 +62,16 @@ public final class HelpPageRenderer {
         // By using this calculation, we make sure that the renderer does not halt in this or similar scenarios
         page = Math.min(page, pages);
         // Header
-        lines.add(formatAndFill(style.getHeader(), messenger, locale));
+        lines.add(formatAndFill(style.getHeader(), visitor, page, pages));
         renderDescription(messenger, locale);
         renderPermission(messenger, locale);
         renderUsage(messenger, locale);
         // Separator
-        lines.add(formatAndFill(style.getSeparatorText(), messenger, locale));
+        lines.add(formatAndFill(style.getSeparatorText(),visitor, page, pages));
         // Subcommands
         renderSubcommands(messenger, sender, page);
         // Footer
-        lines.add(formatAndFill(style.getFooter(), messenger, locale));
+        lines.add(formatAndFill(style.getFooter(), visitor, page, pages));
         return lines;
     }
 
@@ -175,18 +175,20 @@ public final class HelpPageRenderer {
     }
 
     /**
-     * Formats the given string with {@link #format(Component, Messenger, Locale)}.
+     * Formats the given string with {@link #format(Component, InputVisitor, int, int)}.
      * Then, it fills it using {@link HelpPageStyle#getFiller()}.
      *
      * @param raw       the raw string
-     * @param messenger the messenger to get the messages from
-     * @param locale    the locale
+     * @param visitor   the current visitor handling the input
+     * @param page      the page
+     * @param pages     the total pages
      * @return the formatted component
      */
     @NotNull Component formatAndFill(final @NotNull String raw,
-                                     final @NotNull Messenger messenger,
-                                     final @NotNull Locale locale) {
-        Component baseComponent = format(ComponentUtils.toComponent(raw), messenger, locale);
+                                     final @NotNull InputVisitor<?, ?> visitor,
+                                     final @Range(from = 0, to = Integer.MAX_VALUE) int page,
+                                     final @Range(from = 0, to = Integer.MAX_VALUE) int pages) {
+        Component baseComponent = format(ComponentUtils.toComponent(raw), visitor, page, pages);
         final HelpPageStyle style = HelpPageStyle.get();
 
         final String styleFiller = style.getFiller();
