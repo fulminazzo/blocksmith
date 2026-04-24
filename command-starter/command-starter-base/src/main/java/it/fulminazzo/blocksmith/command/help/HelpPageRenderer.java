@@ -26,11 +26,9 @@ public final class HelpPageRenderer {
     public static final @NotNull String DEFAULT_USAGE = "<gray>Usage</gray><dark_gray>:</dark_gray> ";
     public static final @NotNull String DEFAULT_SUBCOMMANDS = "Subcommands";
     public static final @NotNull String DEFAULT_SUBCOMMAND_FORMAT =
-            "<click:run_command:'%command%'>" +
                     "<hover:show_text:'<white>%usage%</white>\n<gray>%permission%</gray>\n\n<aqua>Click for more information</aqua>'>" +
                     "<white>%name%</white> <dark_gray>-</dark_gray> <gray>%description%</gray>" +
-                    "</hover>" +
-                    "</click>";
+                    "</hover>";
     public static final @NotNull String DEFAULT_NO_SUBCOMMANDS = "\n  <red>(none)</red>\n ";
     public static final @NotNull String DEFAULT_PREVIOUS_PAGE = "<gold>[</gold><red><<<</red><gold>]</gold>";
     public static final @NotNull String DEFAULT_NEXT_PAGE = "<gold>[</gold><red>>>></red><gold>]</gold>";
@@ -70,7 +68,7 @@ public final class HelpPageRenderer {
         // Separator
         lines.add(formatAndFill(style.getSeparatorText(), visitor, page, pages));
         // Subcommands
-        renderSubcommands(messenger, sender, page);
+        renderSubcommands(visitor, page);
         // Footer
         lines.add(formatAndFill(style.getFooter(), visitor, page, pages));
         return lines;
@@ -127,19 +125,19 @@ public final class HelpPageRenderer {
     /**
      * Renders all the subcommands for the given page.
      *
-     * @param messenger the messenger to get the subcommand format component from
-     * @param sender    to get the subcommands for
-     * @param page      the requested page
+     * @param visitor the current visitor handling the input
+     * @param page    the requested page
      */
-    void renderSubcommands(final @NotNull Messenger messenger,
-                           final @NotNull CommandSenderWrapper<?> sender,
+    void renderSubcommands(final @NotNull InputVisitor<?, ?> visitor,
                            final @Range(from = 1, to = Integer.MAX_VALUE) int page) {
+        final Messenger messenger = visitor.getApplication().getMessenger();
+        final CommandSenderWrapper<?> sender = visitor.getCommandSender();
         final Locale locale = sender.receiver().getLocale();
         int rendered = 0;
         if (page > 0) {
             List<HelpPage.CommandData> subcommands = helpPage.getSubcommandsPage(sender, page, SUBCOMMANDS_LINES);
             for (HelpPage.CommandData command : subcommands) {
-                renderSubcommand(messenger, locale, command);
+                renderSubcommand(visitor, command);
                 rendered++;
             }
         }
@@ -152,13 +150,14 @@ public final class HelpPageRenderer {
     /**
      * Renders the given subcommand information in the subcommands section.
      *
-     * @param messenger   the messenger to get the subcommand format component from
-     * @param locale      the locale
+     * @param visitor     the current visitor handling the input
      * @param commandData the subcommand data
      */
-    void renderSubcommand(final @NotNull Messenger messenger,
-                          final @NotNull Locale locale,
+    void renderSubcommand(final @NotNull InputVisitor<?, ?> visitor,
                           final @NotNull HelpPage.CommandData commandData) {
+        final Messenger messenger = visitor.getApplication().getMessenger();
+        final Locale locale = visitor.getCommandSender().receiver().getLocale();
+        final String currentInput = visitor.getInput().getPartialRawInput();
         Component subcommandComponent = getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_SUBCOMMAND_FORMAT, locale, DEFAULT_SUBCOMMAND_FORMAT)
                 .replaceText(r -> r.matchLiteral("%name%").replacement(commandData.getName()))
                 .replaceText(r -> r.matchLiteral("%permission%").replacement(commandData.getPermission().getPermission()))
@@ -169,7 +168,8 @@ public final class HelpPageRenderer {
                 .replaceText(r -> r
                         .matchLiteral("%usage%")
                         .replacement(ComponentUtils.toComponent(commandData.getUsage()))
-                );
+                )
+                .clickEvent(ClickEvent.runCommand(currentInput + " " + commandData.getName() + " " + HELP_COMMAND_NAME));
         int length = getMaxTruncationLength(PLAIN_SERIALIZER.serialize(subcommandComponent));
         if (length != -1) subcommandComponent = ComponentUtils.truncate(subcommandComponent, length);
         lines.add(subcommandComponent);
