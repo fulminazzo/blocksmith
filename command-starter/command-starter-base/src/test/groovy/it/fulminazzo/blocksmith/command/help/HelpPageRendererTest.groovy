@@ -30,16 +30,37 @@ class HelpPageRendererTest extends Specification {
             []
     )
 
+    private Messenger messenger = Mock(Messenger)
+    private CommandSenderWrapper<?> sender = Mock(CommandSenderWrapper)
+    private InputVisitor<?, ?> visitor = Mock(InputVisitor)
+
+    private HelpPageRenderer renderer
+
+    void setup() {
+        sender.receiver() >> {
+            def receiver = Mock(Receiver)
+            receiver.locale >> Locale.ITALY
+            return receiver
+        }
+
+        visitor.application >> {
+            def application = Mock(ApplicationHandle)
+            application.messenger >> messenger
+            return application
+        }
+        visitor.commandSender >> sender
+        def input = new CommandInput().addInput('root').advanceCursor()
+        visitor.input >> input
+
+        renderer = new HelpPageRenderer(helpPage, visitor)
+    }
+
     def 'test that renderDescription of #description returns #expected'() {
         given:
-        def messenger = Mock(Messenger)
         messenger.getComponentOrNull(_, _) >> description
 
-        and:
-        def renderer = new HelpPageRenderer(helpPage)
-
         when:
-        renderer.renderDescription(messenger, Locale.ITALY)
+        renderer.renderDescription()
 
         then:
         renderer.lines.collect { PLAIN_SERIALIZER.serialize(it) } == expected
@@ -52,14 +73,10 @@ class HelpPageRendererTest extends Specification {
 
     def 'test that renderPermission of #permissionComponent returns #expected'() {
         given:
-        def messenger = Mock(Messenger)
         messenger.getComponentOrNull(_, _) >> permissionComponent
 
-        and:
-        def renderer = new HelpPageRenderer(helpPage)
-
         when:
-        renderer.renderPermission(messenger, Locale.ITALY)
+        renderer.renderPermission()
 
         then:
         renderer.lines.collect { PLAIN_SERIALIZER.serialize(it) } == expected
@@ -72,14 +89,10 @@ class HelpPageRendererTest extends Specification {
 
     def 'test that renderUsage of #usageComponent returns #expected'() {
         given:
-        def messenger = Mock(Messenger)
         messenger.getComponentOrNull(_, _) >> usageComponent
 
-        and:
-        def renderer = new HelpPageRenderer(helpPage)
-
         when:
-        renderer.renderUsage(messenger, Locale.ITALY)
+        renderer.renderUsage()
 
         then:
         renderer.lines.collect { PLAIN_SERIALIZER.serialize(it) } == expected
@@ -108,40 +121,32 @@ class HelpPageRendererTest extends Specification {
         }
 
         and:
-        def renderer = new HelpPageRenderer(helpPage)
+        def renderer = new HelpPageRenderer(helpPage, visitor)
 
         and:
-        def messenger = Mock(Messenger)
         messenger.getComponentOrNull(CommandMessages.HELP_COMMAND_SUBCOMMAND_FORMAT, _, _) >> Component.text('subcommand')
 
-        and:
-        def sender = Mock(CommandSenderWrapper)
-        sender.receiver() >> {
-            def receiver = Mock(Receiver)
-            receiver.locale >> Locale.ITALY
-            return receiver
-        }
-
         when:
-        renderer.renderSubcommands(messenger, sender, page)
+        renderer.renderSubcommands(page)
 
         then:
         renderer.lines.collect { ComponentUtils.toString(it) } == expected
 
         where:
         pages | page | subcommands || expected
-        1     | 1    | 1           || ['subcommand', '', '']
-        1     | 1    | 2           || ['subcommand', 'subcommand', '']
-        1     | 1    | 3           || ['subcommand', 'subcommand', 'subcommand']
-        1     | 2    | 1           || ['subcommand', '', '']
+        1     | 1    | 1           || ['<click:run_command:\'root subcommand1 help\'>subcommand', '', '']
+        1     | 1    | 2           || ['<click:run_command:\'root subcommand1 help\'>subcommand',
+                                       '<click:run_command:\'root subcommand2 help\'>subcommand',
+                                       '']
+        1     | 1    | 3           || ['<click:run_command:\'root subcommand1 help\'>subcommand',
+                                       '<click:run_command:\'root subcommand2 help\'>subcommand',
+                                       '<click:run_command:\'root subcommand3 help\'>subcommand']
+        1     | 2    | 1           || ['<click:run_command:\'root subcommand1 help\'>subcommand', '', '']
         0     | 0    | 0           || ['\n  <red>(none)</red>\n ']
     }
 
     def 'test that renderSubcommand correctly renders subcommand'() {
         given:
-        def renderer = new HelpPageRenderer(helpPage)
-
-        and:
         def command = HelpPage.CommandData.builder()
                 .name('test')
                 .description('command.test.description')
@@ -150,17 +155,16 @@ class HelpPageRendererTest extends Specification {
                 .build()
 
         and:
-        def messenger = Mock(Messenger)
         messenger.getComponentOrNull('command.test.description', _, _) >> Component.text(actualDescription)
 
         when:
-        renderer.renderSubcommand(messenger, Locale.ITALY, command)
+        renderer.renderSubcommand(command)
 
         then:
-        ComponentUtils.toString(renderer.lines[0]) == '<click:run_command:\'%command%\'>' +
+        ComponentUtils.toString(renderer.lines[0]) == '<click:run_command:\'root test help\'>' +
                 '<hover:show_text:\'' +
-                '<white>/test test \\\\<something></white>\\\\\\\\n' +
-                '<gray>blocksmith.test</gray>\\\\\\\\n\\\\\\\\n' +
+                '<white>/test test \\\\<something></white><br>' +
+                '<gray>blocksmith.test</gray>\n\n' +
                 '<aqua>Click for more information' +
                 '\'>' +
                 "<white>test</white> <dark_gray>-</dark_gray> <gray>$description"
@@ -172,25 +176,8 @@ class HelpPageRendererTest extends Specification {
     }
 
     def 'test that formatAndFill correctly formats component'() {
-        given:
-        def renderer = new HelpPageRenderer(helpPage)
-
-        and:
-        def visitor = Mock(InputVisitor)
-        visitor.application >> {
-            def application = Mock(ApplicationHandle)
-            application.messenger >> Mock(Messenger)
-            return application
-        }
-        visitor.commandSender >> {
-            def sender = Mock(CommandSenderWrapper)
-            sender.receiver() >> Mock(Receiver)
-            return sender
-        }
-        visitor.input >> new CommandInput()
-
         when:
-        def component = renderer.formatAndFill('Title', visitor, 1, 1)
+        def component = renderer.formatAndFill('Title', 1, 1)
 
         then:
         ComponentUtils.toString(component) == '<strikethrough><gold>------------------------</gold></strikethrough>' +

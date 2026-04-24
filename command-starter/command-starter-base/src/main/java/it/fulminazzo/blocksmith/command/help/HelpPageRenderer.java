@@ -6,7 +6,8 @@ import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import it.fulminazzo.blocksmith.util.StringUtils;
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -20,13 +21,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public final class HelpPageRenderer {
     public static final @NotNull String DEFAULT_PERMISSION = "<gray>Permission</gray><dark_gray>:</dark_gray> ";
     public static final @NotNull String DEFAULT_USAGE = "<gray>Usage</gray><dark_gray>:</dark_gray> ";
     public static final @NotNull String DEFAULT_SUBCOMMANDS = "Subcommands";
     public static final @NotNull String DEFAULT_SUBCOMMAND_FORMAT =
-                    "<hover:show_text:'<white>%usage%</white>\n<gray>%permission%</gray>\n\n<aqua>Click for more information</aqua>'>" +
+            "<hover:show_text:'<white>%usage%</white>\n<gray>%permission%</gray>\n\n<aqua>Click for more information</aqua>'>" +
                     "<white>%name%</white> <dark_gray>-</dark_gray> <gray>%description%</gray>" +
                     "</hover>";
     public static final @NotNull String DEFAULT_NO_SUBCOMMANDS = "\n  <red>(none)</red>\n ";
@@ -46,14 +47,30 @@ public final class HelpPageRenderer {
     private static final int MAX_DESCRIPTION_LINES = 2;
     private static final int SUBCOMMANDS_LINES = 3;
 
-    private final @NotNull HelpPage helpPage;
-    private final @NotNull List<Component> lines = new LinkedList<>();
+    @NotNull HelpPage helpPage;
+    @NotNull InputVisitor<?, ?> visitor;
+    @NotNull List<Component> lines = new LinkedList<>();
 
-    public @NotNull List<Component> render(final @NotNull InputVisitor<?, ?> visitor, int page) {
+    @NotNull Messenger messenger;
+    @NotNull CommandSenderWrapper<?> sender;
+    @NotNull Locale locale;
+
+    /**
+     * Instantiates a new Help page renderer.
+     *
+     * @param helpPage the help page to render
+     * @param visitor  the visitor requesting the rendering
+     */
+    public HelpPageRenderer(final @NotNull HelpPage helpPage, final @NotNull InputVisitor<?, ?> visitor) {
+        this.helpPage = helpPage;
+        this.visitor = visitor;
+        this.messenger = visitor.getApplication().getMessenger();
+        this.sender = visitor.getCommandSender();
+        this.locale = sender.receiver().getLocale();
+    }
+
+    public @NotNull List<Component> render(int page) {
         final HelpPageStyle style = HelpPageStyle.get();
-        final Messenger messenger = visitor.getApplication().getMessenger();
-        final CommandSenderWrapper<?> sender = visitor.getCommandSender();
-        final Locale locale = sender.receiver().getLocale();
 
         final int pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
         // Imagine the sender requested the help page and got access to a next page.
@@ -61,16 +78,16 @@ public final class HelpPageRenderer {
         // By using this calculation, we make sure that the renderer does not halt in this or similar scenarios
         page = Math.min(page, pages);
         // Header
-        lines.add(formatAndFill(style.getHeader(), visitor, page, pages));
-        renderDescription(messenger, locale);
-        renderPermission(messenger, locale);
-        renderUsage(messenger, locale);
+        lines.add(formatAndFill(style.getHeader(), page, pages));
+        renderDescription();
+        renderPermission();
+        renderUsage();
         // Separator
-        lines.add(formatAndFill(style.getSeparatorText(), visitor, page, pages));
+        lines.add(formatAndFill(style.getSeparatorText(), page, pages));
         // Subcommands
-        renderSubcommands(visitor, page);
+        renderSubcommands(page);
         // Footer
-        lines.add(formatAndFill(style.getFooter(), visitor, page, pages));
+        lines.add(formatAndFill(style.getFooter(), page, pages));
         return lines;
     }
 
@@ -78,11 +95,8 @@ public final class HelpPageRenderer {
      * Renders the description component(s) for the given {@link Locale}.
      * <br>
      * If the description is missing, empty lines will be printed.
-     *
-     * @param messenger the messenger to get the description component from
-     * @param locale    the locale
      */
-    void renderDescription(final @NotNull Messenger messenger, final @NotNull Locale locale) {
+    void renderDescription() {
         final Component description = messenger.getComponentOrNull(helpPage.getCommand().getDescription(), locale);
         List<Component> descriptionComponents = new ArrayList<>();
         if (description != null)
@@ -96,11 +110,8 @@ public final class HelpPageRenderer {
      * Renders the permission component for the given {@link Locale}.
      * <br>
      * If it could not be found, it falls back to {@link #DEFAULT_PERMISSION}.
-     *
-     * @param messenger the messenger to get the general permission component from
-     * @param locale    the locale
      */
-    void renderPermission(final @NotNull Messenger messenger, final @NotNull Locale locale) {
+    void renderPermission() {
         final Component permissionComponent = getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_PERMISSION, locale, DEFAULT_PERMISSION);
         Component permission = ComponentUtils.toComponent(helpPage.getCommand().getPermission().getPermission());
         permission = truncate(PLAIN_SERIALIZER.serialize(permissionComponent), permission);
@@ -111,11 +122,8 @@ public final class HelpPageRenderer {
      * Renders the usage component for the given {@link Locale}.
      * <br>
      * If it could not be found, it falls back to {@link #DEFAULT_USAGE}.
-     *
-     * @param messenger the messenger to get the general usage component from
-     * @param locale    the locale
      */
-    void renderUsage(final @NotNull Messenger messenger, final @NotNull Locale locale) {
+    void renderUsage() {
         final Component usageComponent = getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_USAGE, locale, DEFAULT_USAGE);
         Component usage = ComponentUtils.toComponent(helpPage.getCommand().getUsage());
         usage = truncate(PLAIN_SERIALIZER.serialize(usageComponent), usage);
@@ -125,11 +133,9 @@ public final class HelpPageRenderer {
     /**
      * Renders all the subcommands for the given page.
      *
-     * @param visitor the current visitor handling the input
-     * @param page    the requested page
+     * @param page the requested page
      */
-    void renderSubcommands(final @NotNull InputVisitor<?, ?> visitor,
-                           final @Range(from = 1, to = Integer.MAX_VALUE) int page) {
+    void renderSubcommands(final @Range(from = 1, to = Integer.MAX_VALUE) int page) {
         final Messenger messenger = visitor.getApplication().getMessenger();
         final CommandSenderWrapper<?> sender = visitor.getCommandSender();
         final Locale locale = sender.receiver().getLocale();
@@ -137,7 +143,7 @@ public final class HelpPageRenderer {
         if (page > 0) {
             List<HelpPage.CommandData> subcommands = helpPage.getSubcommandsPage(sender, page, SUBCOMMANDS_LINES);
             for (HelpPage.CommandData command : subcommands) {
-                renderSubcommand(visitor, command);
+                renderSubcommand(command);
                 rendered++;
             }
         }
@@ -150,11 +156,9 @@ public final class HelpPageRenderer {
     /**
      * Renders the given subcommand information in the subcommands section.
      *
-     * @param visitor     the current visitor handling the input
      * @param commandData the subcommand data
      */
-    void renderSubcommand(final @NotNull InputVisitor<?, ?> visitor,
-                          final @NotNull HelpPage.CommandData commandData) {
+    void renderSubcommand(final @NotNull HelpPage.CommandData commandData) {
         final Messenger messenger = visitor.getApplication().getMessenger();
         final Locale locale = visitor.getCommandSender().receiver().getLocale();
         final String currentInput = visitor.getInput().getPartialRawInput();
@@ -176,20 +180,18 @@ public final class HelpPageRenderer {
     }
 
     /**
-     * Formats the given string with {@link #format(Component, InputVisitor, int, int)}.
+     * Formats the given string with {@link #format(Component, int, int)}.
      * Then, it fills it using {@link HelpPageStyle#getFiller()}.
      *
-     * @param raw     the raw string
-     * @param visitor the current visitor handling the input
-     * @param page    the page
-     * @param pages   the total pages
+     * @param raw   the raw string
+     * @param page  the page
+     * @param pages the total pages
      * @return the formatted component
      */
     @NotNull Component formatAndFill(final @NotNull String raw,
-                                     final @NotNull InputVisitor<?, ?> visitor,
                                      final @Range(from = 0, to = Integer.MAX_VALUE) int page,
                                      final @Range(from = 0, to = Integer.MAX_VALUE) int pages) {
-        Component baseComponent = format(ComponentUtils.toComponent(raw), visitor, page, pages);
+        Component baseComponent = format(ComponentUtils.toComponent(raw), page, pages);
         final HelpPageStyle style = HelpPageStyle.get();
 
         final String styleFiller = style.getFiller();
@@ -223,13 +225,11 @@ public final class HelpPageRenderer {
      * </ul>
      *
      * @param component the component to format
-     * @param visitor   the current visitor handling the input
      * @param page      the page
      * @param pages     the total pages
      * @return the formatted component
      */
     @NotNull Component format(final @NotNull Component component,
-                              final @NotNull InputVisitor<?, ?> visitor,
                               final @Range(from = 0, to = Integer.MAX_VALUE) int page,
                               final @Range(from = 0, to = Integer.MAX_VALUE) int pages) {
         final HelpPageStyle style = HelpPageStyle.get();
