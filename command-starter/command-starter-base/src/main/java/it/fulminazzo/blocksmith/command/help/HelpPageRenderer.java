@@ -313,6 +313,8 @@ public final class HelpPageRenderer {
     static @NotNull Component truncate(final @NotNull String prefix, final @NotNull Component component) {
         int length = getMaxTruncationLength(prefix + PLAIN_SERIALIZER.serialize(component));
         if (length == -1) return component;
+        length -= prefix.length();
+        if (length < 0) length = 0;
         return ComponentUtils.truncate(component, length).hoverEvent(HoverEvent.showText(component));
     }
 
