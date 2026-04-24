@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.help;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.Messenger;
@@ -72,7 +73,7 @@ public final class HelpPageRenderer {
      * @param locale    the locale
      */
     void renderPermission(final @NotNull Messenger messenger, final @NotNull Locale locale) {
-        final Component permissionComponent = getComponentOrEmpty(messenger, "command.help.permission", locale);
+        final Component permissionComponent = getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_PERMISSION, locale);
         Component permission = ComponentUtils.toComponent(helpPage.getCommand().getPermission().getPermission());
         permission = truncate(PLAIN_SERIALIZER.serialize(permissionComponent), permission);
         lines.add(permissionComponent.append(permission));
@@ -85,7 +86,7 @@ public final class HelpPageRenderer {
      * @param locale    the locale
      */
     void renderUsage(final @NotNull Messenger messenger, final @NotNull Locale locale) {
-        final Component usageComponent = getComponentOrEmpty(messenger, "command.help.usage", locale);
+        final Component usageComponent = getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_USAGE, locale);
         Component usage = ComponentUtils.toComponent(helpPage.getCommand().getUsage());
         usage = truncate(PLAIN_SERIALIZER.serialize(usageComponent), usage);
         lines.add(usageComponent.append(usage));
@@ -126,7 +127,7 @@ public final class HelpPageRenderer {
     void renderSubcommand(final @NotNull Messenger messenger,
                           final @NotNull Locale locale,
                           final @NotNull HelpPage.CommandData commandData) {
-        Component subcommandComponent = getComponentOrEmpty(messenger, "command.help.subcommand-format", locale)
+        Component subcommandComponent = getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_SUBCOMMAND_FORMAT, locale)
                 .replaceText(r -> r.matchLiteral("%name%").replacement(commandData.getName()))
                 .replaceText(r -> r.matchLiteral("%permission%").replacement(commandData.getPermission().getPermission()))
                 .replaceText(r -> r
@@ -179,13 +180,13 @@ public final class HelpPageRenderer {
      *     <li>{@code %filler%}: one character of the current {@link HelpPageStyle#getFiller()};</li>
      *     <li>{@code %name%}: the name of the command;</li>
      *     <li>{@code %subcommands%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.subcommands";</li> //TODO: constant class
+     *     under {@link CommandMessages#HELP_COMMAND_SUBCOMMANDS};</li>
      *     <li>{@code %previous%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.previous-page" (only shown if necessary);</li> //TODO: option to disable
+     *     under {@link CommandMessages#HELP_COMMAND_PREVIOUS_PAGE} (only shown if necessary);</li> //TODO: option to disable
      *     <li>{@code %next%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.next-page" (only shown if necessary);</li> //TODO: option to disable
+     *     under {@link CommandMessages#HELP_COMMAND_NEXT_PAGE} (only shown if necessary);</li> //TODO: option to disable
      *     <li>{@code %current%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.current-page".</li>
+     *     under {@link CommandMessages#HELP_COMMAND_CURRENT_PAGE}.</li>
      * </ul>
      *
      * @param component the component to format
@@ -202,16 +203,16 @@ public final class HelpPageRenderer {
                 .replaceText(b -> b.matchLiteral("%filler%").replacement(style.getStyledFiller()))
                 .replaceText(b -> b.matchLiteral("%name%").replacement(helpPage.getCommand().getName()))
                 .replaceText(b -> b.matchLiteral("%subcommands%")
-                        .replacement(getComponentOrEmpty(messenger, "command.help.subcommands", locale)))
+                        .replacement(getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_SUBCOMMANDS, locale)))
                 //TODO: missing logic
                 .replaceText(b -> b.matchLiteral("%previous%")
-                        .replacement(getComponentOrEmpty(messenger, "command.help.previous-page", locale)))
+                        .replacement(getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_PREVIOUS_PAGE, locale)))
                 //TODO: missing logic
                 .replaceText(b -> b.matchLiteral("%next%")
-                        .replacement(getComponentOrEmpty(messenger, "command.help.next-page", locale)))
+                        .replacement(getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_NEXT_PAGE, locale)))
                 //TODO: missing logic
                 .replaceText(b -> b.matchLiteral("%current%")
-                        .replacement(getComponentOrEmpty(messenger, "command.help.current-page", locale)));
+                        .replacement(getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_CURRENT_PAGE, locale)));
     }
 
     /**

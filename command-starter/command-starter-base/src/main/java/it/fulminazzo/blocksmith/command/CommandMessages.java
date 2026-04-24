@@ -229,6 +229,73 @@ public final class CommandMessages {
 
 
     /**
+     * Identifies the path where to find the configurable description of a command.
+     */
+    public static final @NotNull String COMMAND_DESCRIPTION = "command.%s.description";
+
+    /**
+     * Identifies the text to prepend before a command permission in the help page.
+     */
+    public static final @NotNull String HELP_COMMAND_PERMISSION = "command.help.permission";
+
+    /**
+     * Identifies the text to prepend before a command usage in the help page.
+     */
+    public static final @NotNull String HELP_COMMAND_USAGE = "command.help.usage";
+
+    /**
+     * Identifies the title of the separator displayed in the help page of a command.
+     */
+    public static final @NotNull String HELP_COMMAND_SUBCOMMANDS = "command.help.subcommands";
+
+    /**
+     * Identifies the format with which to display a subcommand in the help page of a command.
+     * <br>
+     * Placeholders:
+     * <ul>
+     *     <li><b>name</b>: the name of the subcommand;</li>
+     *     <li><b>permission</b>: the permission of the subcommand;</li>
+     *     <li><b>description</b>: the description of the subcommand;</li>
+     *     <li><b>usage</b>: the usage of the subcommand.</li>
+     * </ul>
+     */
+    public static final @NotNull String HELP_COMMAND_SUBCOMMAND_FORMAT = "command.help.subcommand-format";
+
+    /**
+     * Identifies the name of the previous page button.
+     * <br>
+     * Placeholders:
+     * <ul>
+     *     <li><b>page</b>: the page number;</li>
+     *     <li><b>pages</b>: the total pages.</li>
+     * </ul>
+     */
+    public static final @NotNull String HELP_COMMAND_PREVIOUS_PAGE = "command.help.previous-page";
+
+    /**
+     * Identifies the name of the current page text.
+     * <br>
+     * Placeholders:
+     * <ul>
+     *     <li><b>page</b>: the page number;</li>
+     *     <li><b>pages</b>: the total pages.</li>
+     * </ul>
+     */
+    public static final @NotNull String HELP_COMMAND_CURRENT_PAGE = "command.help.current-page";
+
+    /**
+     * Identifies the name of the next page button.
+     * <br>
+     * Placeholders:
+     * <ul>
+     *     <li><b>page</b>: the page number;</li>
+     *     <li><b>pages</b>: the total pages.</li>
+     * </ul>
+     */
+    public static final @NotNull String HELP_COMMAND_NEXT_PAGE = "command.help.next-page";
+
+
+    /**
      * The placeholder used throughout the messages to replace the current argument.
      */
     public static final @NotNull String ARGUMENT_PLACEHOLDER = "argument";

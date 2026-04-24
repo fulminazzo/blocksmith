@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.help;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -68,16 +69,16 @@ public final class HelpPageStyle {
      * <br>
      * It supports the following placeholders:
      * <ul>
-     *     <li>{@code %filler%}: one character of the current {@link #getFiller()};</li>
+     *     <li>{@code %filler%}: one character of the current {@link HelpPageStyle#getFiller()};</li>
      *     <li>{@code %name%}: the name of the command;</li>
      *     <li>{@code %subcommands%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.subcommands";</li> //TODO: constant class
+     *     under {@link CommandMessages#HELP_COMMAND_SUBCOMMANDS};</li>
      *     <li>{@code %previous%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.previous-page" (only shown if necessary);</li> //TODO: option to disable
+     *     under {@link CommandMessages#HELP_COMMAND_PREVIOUS_PAGE} (only shown if necessary);</li>
      *     <li>{@code %next%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.next-page" (only shown if necessary);</li> //TODO: option to disable
+     *     under {@link CommandMessages#HELP_COMMAND_NEXT_PAGE} (only shown if necessary);</li>
      *     <li>{@code %current%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.current-page".</li>
+     *     under {@link CommandMessages#HELP_COMMAND_CURRENT_PAGE}.</li>
      * </ul>
      *
      * @param header the header
@@ -94,16 +95,16 @@ public final class HelpPageStyle {
      * <br>
      * It supports the following placeholders:
      * <ul>
-     *     <li>{@code %filler%}: one character of the current {@link #getFiller()};</li>
+     *     <li>{@code %filler%}: one character of the current {@link HelpPageStyle#getFiller()};</li>
      *     <li>{@code %name%}: the name of the command;</li>
      *     <li>{@code %subcommands%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.subcommands";</li> //TODO: constant class
+     *     under {@link CommandMessages#HELP_COMMAND_SUBCOMMANDS};</li>
      *     <li>{@code %previous%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.previous-page" (only shown if necessary);</li> //TODO: option to disable
+     *     under {@link CommandMessages#HELP_COMMAND_PREVIOUS_PAGE} (only shown if necessary);</li>
      *     <li>{@code %next%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.next-page" (only shown if necessary);</li> //TODO: option to disable
+     *     under {@link CommandMessages#HELP_COMMAND_NEXT_PAGE} (only shown if necessary);</li>
      *     <li>{@code %current%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.current-page".</li>
+     *     under {@link CommandMessages#HELP_COMMAND_CURRENT_PAGE}.</li>
      * </ul>
      *
      * @param separatorText the separator text
@@ -120,16 +121,16 @@ public final class HelpPageStyle {
      * <br>
      * It supports the following placeholders:
      * <ul>
-     *     <li>{@code %filler%}: one character of the current {@link #getFiller()};</li>
+     *     <li>{@code %filler%}: one character of the current {@link HelpPageStyle#getFiller()};</li>
      *     <li>{@code %name%}: the name of the command;</li>
      *     <li>{@code %subcommands%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.subcommands";</li> //TODO: constant class
+     *     under {@link CommandMessages#HELP_COMMAND_SUBCOMMANDS};</li>
      *     <li>{@code %previous%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.previous-page" (only shown if necessary);</li> //TODO: option to disable
+     *     under {@link CommandMessages#HELP_COMMAND_PREVIOUS_PAGE} (only shown if necessary);</li>
      *     <li>{@code %next%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.next-page" (only shown if necessary);</li> //TODO: option to disable
+     *     under {@link CommandMessages#HELP_COMMAND_NEXT_PAGE} (only shown if necessary);</li>
      *     <li>{@code %current%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under "command.help.current-page".</li>
+     *     under {@link CommandMessages#HELP_COMMAND_CURRENT_PAGE}.</li>
      * </ul>
      *
      * @param footer the footer

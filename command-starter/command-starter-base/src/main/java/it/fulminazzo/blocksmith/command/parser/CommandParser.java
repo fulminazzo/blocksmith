@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.parser;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.annotation.*;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
@@ -437,7 +438,7 @@ public final class CommandParser {
      * @return the default description
      */
     public static @NotNull String getDefaultDescription(final @NotNull String path) {
-        return "command.description." + path;
+        return String.format(CommandMessages.COMMAND_DESCRIPTION, path);
     }
 
     /**
