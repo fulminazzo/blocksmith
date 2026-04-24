@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.message.receiver;
 
 import it.fulminazzo.blocksmith.message.util.LocaleUtils;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;

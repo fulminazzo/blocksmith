@@ -20,8 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.function.BiConsumer;
 
@@ -147,11 +145,7 @@ public final class Messenger {
                 receiver,
                 titleCode,
                 subtitleCode,
-                Title.Times.times(
-                        Duration.of(1L, ChronoUnit.SECONDS),
-                        Duration.of(2L, ChronoUnit.SECONDS),
-                        Duration.of(1L, ChronoUnit.SECONDS)
-                ),
+                Receiver.DEFAULT_TIMES,
                 arguments
         );
     }
