@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.help
 
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper
 import it.fulminazzo.blocksmith.command.annotation.Permission
+import it.fulminazzo.blocksmith.command.help.HelpPage.CommandData
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
@@ -48,6 +49,40 @@ class HelpPageTest extends Specification {
                                     .build()
                         }
         )
+    }
+
+    def 'test that getSubcommandsPage of page #pageNumber returns #expected'() {
+        given:
+        def sender = Mock(CommandSenderWrapper)
+        sender.hasPermission(_) >> true
+
+        when:
+        def actual = page.getSubcommandsPage(sender, pageNumber, 2)
+
+        then:
+        actual == expected(page)
+
+        where:
+        pageNumber || expected
+        1          || { p -> [getSubcommand(p, 'ab'), getSubcommand(p, 'actionbar')] }
+        2          || { p -> [getSubcommand(p, 'bb'), getSubcommand(p, 'bossbar')] }
+        3          || { p -> [getSubcommand(p, 'help'), getSubcommand(p, 'silent')] }
+        4          || { p -> [getSubcommand(p, 'title')] }
+    }
+
+    def 'test that getSubcommandsPage of invalid #pageNumber throws'() {
+        given:
+        def sender = Mock(CommandSenderWrapper)
+        sender.hasPermission(_) >> true
+
+        when:
+        page.getSubcommandsPage(sender, pageNumber, 2)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        where:
+        pageNumber << [Integer.MIN_VALUE, -1, 0, 5, 6, Integer.MAX_VALUE]
     }
 
     def 'test that getSubcommandsPages with #subcommands returns #expected'() {
@@ -106,6 +141,10 @@ class HelpPageTest extends Specification {
 
         then:
         actual == page
+    }
+
+    private static CommandData getSubcommand(final HelpPage page, final String name) {
+        return page.subcommands.find { it.name == name }
     }
 
     private static LiteralNode newLiteralNode(final String... aliases) {
