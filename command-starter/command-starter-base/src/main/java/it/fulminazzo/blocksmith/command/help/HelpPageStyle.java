@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.help;
 
+import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,18 @@ public final class HelpPageStyle {
     private @NotNull String header = "%name%";
     private @NotNull String separatorText = "%subcommands%";
     private @NotNull String footer = ""; //TODO: compute pages distances
+
+    /**
+     * Gets the filler with the styling applied.
+     *
+     * @return the filler
+     */
+    @NotNull String getStyledFiller() {
+        String filler = getFiller();
+        for (String s : getFillerStyles())
+            filler = StringUtils.tag(s, filler);
+        return filler;
+    }
 
     /**
      * Sets the filler for header, separator and footer in a help page.
