@@ -29,7 +29,7 @@ public final class HelpPageRenderer {
                     "<white>%name%</white> <dark_gray>-</dark_gray> <gray>%description%</gray>" +
                     "</hover>" +
                     "</click>";
-    public static final @NotNull String DEFAULT_NO_SUBCOMMANDS = "\n  <red>(none)</red>\n";
+    public static final @NotNull String DEFAULT_NO_SUBCOMMANDS = "\n  <red>(none)</red>\n ";
 
     private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
