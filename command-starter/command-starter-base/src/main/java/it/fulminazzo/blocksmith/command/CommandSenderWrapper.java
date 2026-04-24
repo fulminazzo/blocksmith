@@ -89,6 +89,16 @@ public abstract class CommandSenderWrapper<S> {
     }
 
     /**
+     * Gets the unique identifier of the sender.
+     * If the sender is <b>not</b> a player, it will use {@link #getName()}.
+     *
+     * @return the identifier
+     */
+    public final @NotNull Object getId() {
+        return isPlayer() ? getIdImpl() : getName();
+    }
+
+    /**
      * Gets the name of the sender.
      * If the sender is <b>not</b> a player, it will return {@link #CONSOLE_COMMAND_NAME}.
      *
@@ -109,6 +119,22 @@ public abstract class CommandSenderWrapper<S> {
     }
 
     /**
+     * Checks if the internal sender is a player.
+     *
+     * @return {@code true} if they are
+     */
+    public abstract boolean isPlayer();
+
+    /**
+     * Gets a unique identifier for the wrapped sender.
+     * <br>
+     * Does <b>NOT</b> check if the wrapped sender is not a player.
+     *
+     * @return the id
+     */
+    protected abstract @NotNull Object getIdImpl();
+
+    /**
      * Gets the actual name of the sender.
      * <br>
      * For internal use only.
@@ -126,19 +152,5 @@ public abstract class CommandSenderWrapper<S> {
      * @return {@code true} if they have the permission
      */
     protected abstract boolean hasPermissionImpl(final @NotNull PermissionInfo permissionInfo);
-
-    /**
-     * Checks if the internal sender are a player.
-     *
-     * @return {@code true} if they are
-     */
-    public abstract boolean isPlayer();
-
-    /**
-     * Gets a unique identifier for the wrapped sender.
-     *
-     * @return the id
-     */
-    public abstract @NotNull Object getId();
 
 }

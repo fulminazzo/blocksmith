@@ -27,6 +27,16 @@ final class BungeeCommandSenderWrapper extends CommandSenderWrapper<CommandSende
     }
 
     @Override
+    public boolean isPlayer() {
+        return actualSender instanceof ProxiedPlayer;
+    }
+
+    @Override
+    protected @NotNull Object getIdImpl() {
+        return ((ProxiedPlayer) actualSender).getUniqueId();
+    }
+
+    @Override
     protected @NotNull String getNameImpl() {
         return actualSender.getName();
     }
@@ -34,16 +44,6 @@ final class BungeeCommandSenderWrapper extends CommandSenderWrapper<CommandSende
     @Override
     protected boolean hasPermissionImpl(final @NotNull PermissionInfo permissionInfo) {
         return actualSender.hasPermission(permissionInfo.getPermission());
-    }
-
-    @Override
-    public boolean isPlayer() {
-        return actualSender instanceof ProxiedPlayer;
-    }
-
-    @Override
-    public @NotNull Object getId() {
-        return isPlayer() ? ((ProxiedPlayer) actualSender).getUniqueId() : getName();
     }
 
 }

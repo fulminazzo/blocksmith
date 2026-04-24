@@ -3,7 +3,8 @@ package it.fulminazzo.blocksmith.command;
 import it.fulminazzo.blocksmith.ApplicationHandle;
 import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,16 @@ final class BukkitCommandSenderWrapper extends CommandSenderWrapper<CommandSende
     }
 
     @Override
+    public boolean isPlayer() {
+        return actualSender instanceof Player;
+    }
+
+    @Override
+    protected @NotNull Object getIdImpl() {
+        return ((Player) actualSender).getUniqueId();
+    }
+
+    @Override
     protected @NotNull String getNameImpl() {
         return actualSender.getName();
     }
@@ -35,16 +46,6 @@ final class BukkitCommandSenderWrapper extends CommandSenderWrapper<CommandSende
     protected boolean hasPermissionImpl(final @NotNull PermissionInfo permissionInfo) {
         if (permissionInfo.getGrant() == Permission.Grant.OP && actualSender.isOp()) return true;
         else return actualSender.hasPermission(permissionInfo.getPermission());
-    }
-
-    @Override
-    public boolean isPlayer() {
-        return actualSender instanceof Player;
-    }
-
-    @Override
-    public @NotNull Object getId() {
-        return isPlayer() ? ((Player) actualSender).getUniqueId() : getName();
     }
 
 }
