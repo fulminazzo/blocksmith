@@ -44,7 +44,7 @@ class CommandSenderWrapperReceiverFactoryTest extends Specification {
         receiver != null
 
         and:
-        receiver.internal() == sender
+        receiver.handle() == sender
     }
 
     def 'test that ReceiverFactories returns correct factory for #receiverType'() {
