@@ -8,6 +8,7 @@ import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,8 @@ public final class HelpPageRenderer {
             "<gold><strikethrough>--------</strikethrough></gold>" +
                     " <red>%page%</red><dark_gray>/</dark_gray><red>%pages%</red> " +
                     "<gold><strikethrough>--------</strikethrough></gold>";
+
+    public static final String HELP_COMMAND_NAME = "help"; //TODO: configurable
 
     private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
@@ -217,32 +220,39 @@ public final class HelpPageRenderer {
      * </ul>
      *
      * @param component the component to format
-     * @param messenger the messenger to get the messages from
-     * @param locale    the locale
+     * @param visitor   the current visitor handling the input
      * @param page      the page
      * @param pages     the total pages
      * @return the formatted component
      */
     @NotNull Component format(final @NotNull Component component,
-                              final @NotNull Messenger messenger,
-                              final @NotNull Locale locale,
+                              final @NotNull InputVisitor<?, ?> visitor,
                               final @Range(from = 0, to = Integer.MAX_VALUE) int page,
                               final @Range(from = 0, to = Integer.MAX_VALUE) int pages) {
-        HelpPageStyle style = HelpPageStyle.get();
-        //TODO: missing functionality
+        final HelpPageStyle style = HelpPageStyle.get();
+        final Messenger messenger = visitor.getApplication().getMessenger();
+        final Locale locale = visitor.getCommandSender().receiver().getLocale();
+        final String currentInput = visitor.getInput().getPartialRawInput();
         Component previousPage = page > 1 || style.isAlwaysShowPreviousPage() ?
                 replacePagePlaceholders(
                         getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_PREVIOUS_PAGE, locale, DEFAULT_PREVIOUS_PAGE),
                         page,
                         pages
                 ) : Component.empty();
-        //TODO: missing functionality
+        if (page > 1) previousPage.clickEvent(ClickEvent.clickEvent(
+                ClickEvent.Action.RUN_COMMAND,
+                ClickEvent.Payload.string(String.format("%s %s %s", currentInput, HELP_COMMAND_NAME, page - 1))
+        ));
         Component nextPage = page < pages || style.isAlwaysShowNextPage() ?
                 replacePagePlaceholders(
                         getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_NEXT_PAGE, locale, DEFAULT_NEXT_PAGE),
                         page,
                         pages
                 ) : Component.empty();
+        if (page < pages) nextPage.clickEvent(ClickEvent.clickEvent(
+                ClickEvent.Action.RUN_COMMAND,
+                ClickEvent.Payload.string(String.format("%s %s %s", currentInput, HELP_COMMAND_NAME, page + 1))
+        ));
         Component currentPage = pages > 0 || style.isAlwaysShowCurrentPage() ?
                 replacePagePlaceholders(
                         getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_CURRENT_PAGE, locale, DEFAULT_CURRENT_PAGE),
