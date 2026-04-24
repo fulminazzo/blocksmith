@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.message.receiver;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,14 +77,16 @@ public interface Receiver {
      * @param times    the timings of the title
      * @return this object (for method chaining)
      */
-    default @NotNull Receiver sendTitle(final @Nullable Component title,
-                                        final @Nullable Component subtitle,
+    default @NotNull Receiver sendTitle(@Nullable Component title,
+                                        @Nullable Component subtitle,
                                         final @NotNull Title.Times times) {
-        Title adventureTitle = Title.title(
-                title == null ? Component.empty() : title,
-                subtitle == null ? Component.empty() : subtitle,
-                times
-        );
+        if (title == null && subtitle == null) return this;
+        PlainTextComponentSerializer plainSerializer = PlainTextComponentSerializer.plainText();
+        if (title == null) title = Component.empty();
+        if (subtitle == null) subtitle = Component.empty();
+        if (plainSerializer.serialize(title).trim().isEmpty() && plainSerializer.serialize(subtitle).trim().isEmpty())
+            return this;
+        Title adventureTitle = Title.title(title, subtitle, times);
         audience().showTitle(adventureTitle);
         return this;
     }
