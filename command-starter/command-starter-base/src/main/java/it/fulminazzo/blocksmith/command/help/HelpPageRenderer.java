@@ -19,6 +19,10 @@ import java.util.Locale;
 
 @RequiredArgsConstructor
 public final class HelpPageRenderer {
+    public static final @NotNull String DEFAULT_PERMISSION = "<gray>Permission</gray><dark_gray>:</dark_gray> ";
+    public static final @NotNull String DEFAULT_USAGE = "<gray>Usage</gray><dark_gray>:</dark_gray> ";
+    public static final @NotNull String DEFAULT_SUBCOMMANDS = "Subcommands";
+
     private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
     private static final int MAX_FONT_WIDTH = 320;
@@ -68,12 +72,14 @@ public final class HelpPageRenderer {
 
     /**
      * Renders the permission component for the given {@link Locale}.
+     * <br>
+     * If it could not be found, it falls back to {@link #DEFAULT_PERMISSION}.
      *
      * @param messenger the messenger to get the general permission component from
      * @param locale    the locale
      */
     void renderPermission(final @NotNull Messenger messenger, final @NotNull Locale locale) {
-        final Component permissionComponent = getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_PERMISSION, locale);
+        final Component permissionComponent = getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_PERMISSION, locale, DEFAULT_PERMISSION);
         Component permission = ComponentUtils.toComponent(helpPage.getCommand().getPermission().getPermission());
         permission = truncate(PLAIN_SERIALIZER.serialize(permissionComponent), permission);
         lines.add(permissionComponent.append(permission));
@@ -81,12 +87,14 @@ public final class HelpPageRenderer {
 
     /**
      * Renders the usage component for the given {@link Locale}.
+     * <br>
+     * If it could not be found, it falls back to {@link #DEFAULT_USAGE}.
      *
      * @param messenger the messenger to get the general usage component from
      * @param locale    the locale
      */
     void renderUsage(final @NotNull Messenger messenger, final @NotNull Locale locale) {
-        final Component usageComponent = getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_USAGE, locale);
+        final Component usageComponent = getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_USAGE, locale, DEFAULT_USAGE);
         Component usage = ComponentUtils.toComponent(helpPage.getCommand().getUsage());
         usage = truncate(PLAIN_SERIALIZER.serialize(usageComponent), usage);
         lines.add(usageComponent.append(usage));
@@ -180,7 +188,8 @@ public final class HelpPageRenderer {
      *     <li>{@code %filler%}: one character of the current {@link HelpPageStyle#getFiller()};</li>
      *     <li>{@code %name%}: the name of the command;</li>
      *     <li>{@code %subcommands%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under {@link CommandMessages#HELP_COMMAND_SUBCOMMANDS};</li>
+     *     under {@link CommandMessages#HELP_COMMAND_SUBCOMMANDS}.
+     *     If it could not be found, it falls back to {@link #DEFAULT_SUBCOMMANDS}.</li>
      *     <li>{@code %previous%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under {@link CommandMessages#HELP_COMMAND_PREVIOUS_PAGE} (only shown if necessary);</li> //TODO: option to disable
      *     <li>{@code %next%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
@@ -203,7 +212,7 @@ public final class HelpPageRenderer {
                 .replaceText(b -> b.matchLiteral("%filler%").replacement(style.getStyledFiller()))
                 .replaceText(b -> b.matchLiteral("%name%").replacement(helpPage.getCommand().getName()))
                 .replaceText(b -> b.matchLiteral("%subcommands%")
-                        .replacement(getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_SUBCOMMANDS, locale)))
+                        .replacement(getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_SUBCOMMANDS, locale, DEFAULT_SUBCOMMANDS)))
                 //TODO: missing logic
                 .replaceText(b -> b.matchLiteral("%previous%")
                         .replacement(getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_PREVIOUS_PAGE, locale)))
