@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.help;
 
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
@@ -87,6 +88,31 @@ public final class HelpPageRenderer {
         Component usage = ComponentUtils.toComponent(helpPage.getCommand().getUsage());
         usage = truncate(PLAIN_SERIALIZER.serialize(usageComponent), usage);
         lines.add(usageComponent.append(usage));
+    }
+
+    /**
+     * Renders all the subcommands for the given page.
+     *
+     * @param messenger the messenger to get the subcommand format component from
+     * @param sender    to get the subcommands for
+     * @param page      the requested page
+     */
+    void renderSubcommands(final @NotNull Messenger messenger,
+                           final @NotNull CommandSenderWrapper<?> sender,
+                           final int page) {
+        int rendered = 0;
+        if (page > 0) {
+            int pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
+            if (page <= pages) {
+                List<HelpPage.CommandData> subcommands = helpPage.getSubcommandsPage(sender, page, SUBCOMMANDS_LINES);
+                for (HelpPage.CommandData command : subcommands) {
+                    renderSubcommand(messenger, sender.receiver().getLocale(), command);
+                    rendered++;
+                }
+            }
+        }
+        //TODO: if empty display message
+        while (rendered++ < SUBCOMMANDS_LINES) lines.add(Component.text(""));
     }
 
     /**
