@@ -39,8 +39,8 @@ class HelpPageRendererTest extends Specification {
 
         where:
         description                     || expected
-        null                            || ['', '', '']
-        Component.text('Hello, world!') || ['Hello, world!', '', '']
+        null                            || ['', '']
+        Component.text('Hello, world!') || ['Hello, world!', '']
     }
 
     def 'test that renderUsage of #usageComponent returns #expected'() {

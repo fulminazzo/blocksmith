@@ -21,7 +21,7 @@ public final class HelpPageRenderer {
 
     private static final int MAX_FONT_WIDTH = 320;
 
-    private static final int MAX_DESCRIPTION_LINES = 3;
+    private static final int MAX_DESCRIPTION_LINES = 2;
 
     private final @NotNull LiteralNode commandNode;
     private final @NotNull List<Component> lines = new LinkedList<>();
