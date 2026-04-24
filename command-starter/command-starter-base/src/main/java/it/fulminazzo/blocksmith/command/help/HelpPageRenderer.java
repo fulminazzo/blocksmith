@@ -28,10 +28,11 @@ public final class HelpPageRenderer {
     private final @NotNull HelpPage helpPage;
     private final @NotNull List<Component> lines = new LinkedList<>();
 
-    public @NotNull List<Component> render(final @NotNull InputVisitor<?, ?> visitor) {
+    public @NotNull List<Component> render(final @NotNull InputVisitor<?, ?> visitor, final int page) {
         final HelpPageStyle style = HelpPageStyle.get();
         final Messenger messenger = visitor.getApplication().getMessenger();
-        final Locale locale = visitor.getCommandSender().receiver().getLocale();
+        final CommandSenderWrapper<?> sender = visitor.getCommandSender();
+        final Locale locale = sender.receiver().getLocale();
         // Header
         lines.add(formatAndFill(style.getHeader(), messenger, locale));
         renderDescription(messenger, locale);
@@ -39,8 +40,8 @@ public final class HelpPageRenderer {
         renderUsage(messenger, locale);
         // Separator
         lines.add(formatAndFill(style.getSeparatorText(), messenger, locale));
-        //TODO: temporary subcommand blanks
-        for (int i = 0; i < SUBCOMMANDS_LINES; i++) lines.add(Component.text(""));
+        // Subcommands
+        renderSubcommands(messenger, sender, page);
         // Footer
         lines.add(formatAndFill(style.getFooter(), messenger, locale));
         return lines;
