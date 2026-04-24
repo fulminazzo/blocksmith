@@ -11,6 +11,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -116,17 +117,19 @@ public final class HelpPageRenderer {
      */
     void renderSubcommands(final @NotNull Messenger messenger,
                            final @NotNull CommandSenderWrapper<?> sender,
-                           final int page) {
+                           @Range(from = 1, to = Integer.MAX_VALUE) int page) {
         final Locale locale = sender.receiver().getLocale();
         int rendered = 0;
+        int pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
+        // Imagine the sender requested the help page and got access to a next page.
+        // Then, they lost some permissions, therefore the next page disappeared.
+        // By using this calculation, we make sure that the renderer does not halt in this or similar scenarios
+        page = Math.min(page, pages);
         if (page > 0) {
-            int pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
-            if (page <= pages) {
-                List<HelpPage.CommandData> subcommands = helpPage.getSubcommandsPage(sender, page, SUBCOMMANDS_LINES);
-                for (HelpPage.CommandData command : subcommands) {
-                    renderSubcommand(messenger, locale, command);
-                    rendered++;
-                }
+            List<HelpPage.CommandData> subcommands = helpPage.getSubcommandsPage(sender, page, SUBCOMMANDS_LINES);
+            for (HelpPage.CommandData command : subcommands) {
+                renderSubcommand(messenger, locale, command);
+                rendered++;
             }
         }
         if (rendered == 0)
