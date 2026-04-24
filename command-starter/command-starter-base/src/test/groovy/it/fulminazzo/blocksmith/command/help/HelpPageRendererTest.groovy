@@ -84,6 +84,40 @@ class HelpPageRendererTest extends Specification {
         Component.text('Use: ') || ['Use: /test']
     }
 
+    def 'test that renderSubcommand correctly renders subcommand'() {
+        given:
+        def renderer = new HelpPageRenderer(helpPage)
+
+        and:
+        def command = HelpPage.CommandData.builder()
+                .name('test')
+                .description('command.test.description')
+                .permission(new PermissionInfo('blocksmith', 'test', Permission.Grant.ALL))
+                .usage('/test test <something>')
+                .build()
+
+        and:
+        def messenger = Mock(Messenger)
+        messenger.getComponentOrNull('command.test.description', _, _) >> Component.text(actualDescription)
+
+        when:
+        renderer.renderSubcommand(messenger, Locale.ITALY, command)
+
+        then:
+        ComponentUtils.toString(renderer.lines[0]) == '<click:run_command:\'%command%\'>' +
+                '<hover:show_text:\'' +
+                '<white>/test test \\\\<something></white>\\\\\\\\n' +
+                '<gray>blocksmith.test</gray>\\\\\\\\n\\\\\\\\n' +
+                '<aqua>Click for more information' +
+                '\'>' +
+                "<white>test</white> <dark_gray>-</dark_gray> <gray>$description"
+
+        where:
+        actualDescription                                                || description
+        'Test description'                                               || 'Test description'
+        'Super long test description to ensure it is properly truncated' || 'Super long test description to ensure it is properl</gray>...'
+    }
+
     def 'test that formatAndFill correctly formats component'() {
         given:
         def renderer = new HelpPageRenderer(helpPage)
