@@ -251,10 +251,10 @@ class MessengerTest extends Specification {
         def lastTitle = player.lastTitle
 
         then:
-        lastTitle[TitlePart.TITLE] == titleCode?.with { expected }
+        lastTitle[TitlePart.TITLE] == titleCode == null ? Component.empty() : expected
 
         and:
-        lastTitle[TitlePart.SUBTITLE] == subtitleCode?.with { expected }
+        lastTitle[TitlePart.SUBTITLE] == subtitleCode == null ? Component.empty() : expected
 
         and:
         lastTitle[TitlePart.TIMES] == (titleCode == null && subtitleCode == null)
