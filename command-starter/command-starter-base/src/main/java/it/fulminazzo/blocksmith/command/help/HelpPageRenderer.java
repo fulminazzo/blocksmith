@@ -303,8 +303,15 @@ public final class HelpPageRenderer {
     private static @NotNull Component getComponentOrEmpty(final @NotNull Messenger messenger,
                                                           final @NotNull String messageCode,
                                                           final @NotNull Locale locale) {
+        return getComponentOrElse(messenger, messageCode, locale, "");
+    }
+
+    private static @NotNull Component getComponentOrElse(final @NotNull Messenger messenger,
+                                                         final @NotNull String messageCode,
+                                                         final @NotNull Locale locale,
+                                                         final @NotNull String alternative) {
         Component component = messenger.getComponentOrNull(messageCode, locale);
-        if (component == null) component = Component.text("");
+        if (component == null) component = ComponentUtils.toComponent(alternative);
         return component;
     }
 
