@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a node in a command tree.
@@ -116,6 +117,18 @@ public abstract class CommandNode implements TabCompletable {
         children.add(child);
         child.parent = this;
         return child;
+    }
+
+    /**
+     * Gets all the children of type {@link LiteralNode}.
+     *
+     * @return the nodes
+     */
+    public @NotNull Collection<LiteralNode> getSubcommands() {
+        return children.stream()
+                .filter(n -> n instanceof LiteralNode)
+                .map(n -> (LiteralNode) n)
+                .collect(Collectors.toList());
     }
 
     /**
