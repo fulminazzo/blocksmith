@@ -1,5 +1,7 @@
 package it.fulminazzo.blocksmith.command.help
 
+import it.fulminazzo.blocksmith.command.annotation.Permission
+import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.message.Messenger
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import net.kyori.adventure.text.Component
@@ -12,12 +14,15 @@ class HelpPageRendererTest extends Specification {
     private static final String MAX_CHARS = '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
     private static final String TRUNCATED_CHARS = '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@...'
 
-    private static final HelpPage helpPage = HelpPage.builder()
-            .name('test')
-            .description('test.description')
-            .permission('blocksmith.test.permission')
-            .usage('/test')
-            .build()
+    private static final HelpPage helpPage = new HelpPage(
+            HelpPage.CommandData.builder()
+                    .name('test')
+                    .description('test.description')
+                    .permission(new PermissionInfo('blocksmith', 'test.permission', Permission.Grant.NONE))
+                    .usage('/test')
+                    .build(),
+            []
+    )
 
     def 'test that renderDescription of #description returns #expected'() {
         given:

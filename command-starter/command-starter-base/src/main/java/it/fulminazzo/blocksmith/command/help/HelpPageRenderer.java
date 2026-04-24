@@ -54,7 +54,7 @@ public final class HelpPageRenderer {
      * @param locale    the locale
      */
     void renderDescription(final @NotNull Messenger messenger, final @NotNull Locale locale) {
-        final Component description = messenger.getComponentOrNull(helpPage.getDescription(), locale);
+        final Component description = messenger.getComponentOrNull(helpPage.getCommand().getDescription(), locale);
         List<Component> descriptionComponents = new ArrayList<>();
         if (description != null)
             descriptionComponents.addAll(truncateLines(description, MAX_DESCRIPTION_LINES));
@@ -71,7 +71,7 @@ public final class HelpPageRenderer {
      */
     void renderPermission(final @NotNull Messenger messenger, final @NotNull Locale locale) {
         final Component permissionComponent = getComponentOrEmpty(messenger, "command.help.permission", locale);
-        Component permission = ComponentUtils.toComponent(helpPage.getPermission());
+        Component permission = ComponentUtils.toComponent(helpPage.getCommand().getPermission().getPermission());
         permission = truncate(PLAIN_SERIALIZER.serialize(permissionComponent), permission);
         lines.add(permissionComponent.append(permission));
     }
@@ -84,7 +84,7 @@ public final class HelpPageRenderer {
      */
     void renderUsage(final @NotNull Messenger messenger, final @NotNull Locale locale) {
         final Component usageComponent = getComponentOrEmpty(messenger, "command.help.usage", locale);
-        Component usage = ComponentUtils.toComponent(helpPage.getUsage());
+        Component usage = ComponentUtils.toComponent(helpPage.getCommand().getUsage());
         usage = truncate(PLAIN_SERIALIZER.serialize(usageComponent), usage);
         lines.add(usageComponent.append(usage));
     }
@@ -145,7 +145,7 @@ public final class HelpPageRenderer {
         //TODO: proper testing
         return component
                 .replaceText(b -> b.matchLiteral("%filler%").replacement(style.getStyledFiller()))
-                .replaceText(b -> b.matchLiteral("%name%").replacement(helpPage.getName()))
+                .replaceText(b -> b.matchLiteral("%name%").replacement(helpPage.getCommand().getName()))
                 .replaceText(b -> b.matchLiteral("%subcommands%")
                         .replacement(getComponentOrEmpty(messenger, "command.help.subcommands", locale)))
                 //TODO: missing logic
