@@ -262,6 +262,13 @@ public final class CommandMessages {
     public static final @NotNull String HELP_COMMAND_SUBCOMMAND_FORMAT = "command.help.subcommand-format";
 
     /**
+     * Text rendered when no subcommand is available.
+     * Check {@link it.fulminazzo.blocksmith.command.help.HelpPageRenderer} to see
+     * how many lines are available.
+     */
+    public static final @NotNull String HELP_COMMAND_NO_SUBCOMMANDS = "command.help.no-subcommands";
+
+    /**
      * Identifies the name of the previous page button.
      * <br>
      * Placeholders:

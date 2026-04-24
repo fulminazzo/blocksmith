@@ -28,6 +28,7 @@ public final class HelpPageRenderer {
                     "<white>%name%</white> <dark_gray>-</dark_gray> <gray>%description%</gray>" +
                     "</hover>" +
                     "</click>";
+    public static final @NotNull String DEFAULT_NO_SUBCOMMANDS = "\n  <red>(none)</red>\n";
 
     private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
@@ -116,19 +117,22 @@ public final class HelpPageRenderer {
     void renderSubcommands(final @NotNull Messenger messenger,
                            final @NotNull CommandSenderWrapper<?> sender,
                            final int page) {
+        final Locale locale = sender.receiver().getLocale();
         int rendered = 0;
         if (page > 0) {
             int pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
             if (page <= pages) {
                 List<HelpPage.CommandData> subcommands = helpPage.getSubcommandsPage(sender, page, SUBCOMMANDS_LINES);
                 for (HelpPage.CommandData command : subcommands) {
-                    renderSubcommand(messenger, sender.receiver().getLocale(), command);
+                    renderSubcommand(messenger, locale, command);
                     rendered++;
                 }
             }
         }
-        //TODO: if empty display message
-        while (rendered++ < SUBCOMMANDS_LINES) lines.add(Component.text(""));
+        if (rendered == 0)
+            lines.add(getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_NO_SUBCOMMANDS, locale, DEFAULT_NO_SUBCOMMANDS));
+        else
+            while (rendered++ < SUBCOMMANDS_LINES) lines.add(Component.text(""));
     }
 
     /**
