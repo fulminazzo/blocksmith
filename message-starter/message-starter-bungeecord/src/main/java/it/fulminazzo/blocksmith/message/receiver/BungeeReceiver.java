@@ -6,7 +6,6 @@ import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Locale;
 
@@ -28,7 +27,7 @@ final class BungeeReceiver implements Receiver {
 
     @SuppressWarnings("unchecked")
     @Override
-    public @NonNull <R> R handle() {
+    public @NotNull <R> R handle() {
         return (R) internal;
     }
 

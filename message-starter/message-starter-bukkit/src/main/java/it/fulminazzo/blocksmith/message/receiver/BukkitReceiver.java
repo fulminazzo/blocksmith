@@ -7,7 +7,6 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Locale;
 
@@ -30,7 +29,7 @@ final class BukkitReceiver implements Receiver {
 
     @SuppressWarnings("unchecked")
     @Override
-    public @NonNull <R> R handle() {
+    public @NotNull <R> R handle() {
         return (R) internal;
     }
 
