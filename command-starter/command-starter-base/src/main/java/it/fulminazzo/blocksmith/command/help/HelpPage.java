@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,26 +20,45 @@ import java.util.stream.Collectors;
 @Value
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class HelpPage {
-    static final int SUBCOMMANDS_PER_PAGE = 3;
-
     @NotNull CommandData command;
     @NotNull List<CommandData> subcommands;
 
     /**
+     * Gets the subcommands corresponding to the requested page.
+     *
+     * @param sender             the sender to get the subcommands for
+     * @param page               the page
+     * @param subcommandsPerPage the number of subcommands shown per page
+     * @return the subcommands of the page
+     */
+    public @NotNull List<CommandData> getSubcommandsPage(final @NotNull CommandSenderWrapper<?> sender,
+                                                         final @Range(from = 1, to = Integer.MAX_VALUE) int page,
+                                                         final @Range(from = 1, to = Integer.MAX_VALUE) int subcommandsPerPage) {
+        int pages = getSubcommandsPages(sender, subcommandsPerPage);
+        if (page < 1 || page > pages)
+            throw new IllegalArgumentException(String.format("invalid page %s for pages [%s, %s]", page, 1, pages));
+        int from = (page - 1) * subcommandsPerPage;
+        int to = Math.min(page * subcommandsPerPage, subcommands.size());
+        return subcommands.subList(from, to);
+    }
+
+    /**
      * Gets the number of pages of the subcommands section for the given sender.
      *
-     * @param sender the sender
+     * @param sender             the sender to get the subcommands for
+     * @param subcommandsPerPage the number of subcommands shown per page
      * @return the number of pages
      */
-    public int getSubcommandsPages(final @NotNull CommandSenderWrapper<?> sender) {
+    public int getSubcommandsPages(final @NotNull CommandSenderWrapper<?> sender,
+                                   final int subcommandsPerPage) {
         int subcommands = getExecutableSubcommands(sender).size();
-        return subcommands / SUBCOMMANDS_PER_PAGE + Math.min(1, subcommands % SUBCOMMANDS_PER_PAGE);
+        return subcommands / subcommandsPerPage + Math.min(1, subcommands % subcommandsPerPage);
     }
 
     /**
      * Gets all the subcommands executable from the given sender.
      *
-     * @param sender the sender
+     * @param sender the sender to get the subcommands for
      * @return the subcommands
      */
     public @NotNull List<CommandData> getExecutableSubcommands(final @NotNull CommandSenderWrapper<?> sender) {
@@ -62,6 +82,9 @@ public class HelpPage {
         );
     }
 
+    /**
+     * Holds information about a command.
+     */
     @Value
     @Builder
     public static class CommandData {
