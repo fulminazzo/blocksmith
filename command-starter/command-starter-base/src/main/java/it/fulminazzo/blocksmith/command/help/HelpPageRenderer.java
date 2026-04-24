@@ -1,6 +1,5 @@
 package it.fulminazzo.blocksmith.command.help;
 
-import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
@@ -25,7 +24,7 @@ public final class HelpPageRenderer {
     private static final int MAX_DESCRIPTION_LINES = 2;
     private static final int SUBCOMMANDS_LINES = 3;
 
-    private final @NotNull LiteralNode commandNode;
+    private final @NotNull HelpPage helpPage;
     private final @NotNull List<Component> lines = new LinkedList<>();
 
     public @NotNull List<Component> render(final @NotNull InputVisitor<?, ?> visitor) {
@@ -55,10 +54,7 @@ public final class HelpPageRenderer {
      * @param locale    the locale
      */
     void renderDescription(final @NotNull Messenger messenger, final @NotNull Locale locale) {
-        final Component description = messenger.getComponentOrNull(
-                commandNode.getCommandInfo().getDescription(),
-                locale
-        );
+        final Component description = messenger.getComponentOrNull(helpPage.getDescription(), locale);
         List<Component> descriptionComponents = new ArrayList<>();
         if (description != null)
             descriptionComponents.addAll(truncateLines(description, MAX_DESCRIPTION_LINES));
@@ -75,7 +71,7 @@ public final class HelpPageRenderer {
      */
     void renderPermission(final @NotNull Messenger messenger, final @NotNull Locale locale) {
         final Component permissionComponent = getComponentOrEmpty(messenger, "command.help.permission", locale);
-        Component permission = ComponentUtils.toComponent(commandNode.getCommandInfo().getPermission().getPermission());
+        Component permission = ComponentUtils.toComponent(helpPage.getPermission());
         permission = truncate(PLAIN_SERIALIZER.serialize(permissionComponent), permission);
         lines.add(permissionComponent.append(permission));
     }
@@ -88,7 +84,7 @@ public final class HelpPageRenderer {
      */
     void renderUsage(final @NotNull Messenger messenger, final @NotNull Locale locale) {
         final Component usageComponent = getComponentOrEmpty(messenger, "command.help.usage", locale);
-        Component usage = ComponentUtils.toComponent(commandNode.getUsage());
+        Component usage = ComponentUtils.toComponent(helpPage.getUsage());
         usage = truncate(PLAIN_SERIALIZER.serialize(usageComponent), usage);
         lines.add(usageComponent.append(usage));
     }
@@ -149,7 +145,7 @@ public final class HelpPageRenderer {
         //TODO: proper testing
         return component
                 .replaceText(b -> b.matchLiteral("%filler%").replacement(style.getStyledFiller()))
-                .replaceText(b -> b.matchLiteral("%name%").replacement(commandNode.getName()))
+                .replaceText(b -> b.matchLiteral("%name%").replacement(helpPage.getName()))
                 .replaceText(b -> b.matchLiteral("%subcommands%")
                         .replacement(getComponentOrEmpty(messenger, "command.help.subcommands", locale)))
                 //TODO: missing logic

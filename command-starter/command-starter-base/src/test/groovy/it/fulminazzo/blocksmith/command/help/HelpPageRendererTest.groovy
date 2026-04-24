@@ -1,9 +1,5 @@
 package it.fulminazzo.blocksmith.command.help
 
-import it.fulminazzo.blocksmith.command.annotation.Permission
-import it.fulminazzo.blocksmith.command.node.LiteralNode
-import it.fulminazzo.blocksmith.command.node.info.CommandInfo
-import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.message.Messenger
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import net.kyori.adventure.text.Component
@@ -16,20 +12,20 @@ class HelpPageRendererTest extends Specification {
     private static final String MAX_CHARS = '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
     private static final String TRUNCATED_CHARS = '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@...'
 
+    private static final HelpPage helpPage = HelpPage.builder()
+            .name('test')
+            .description('test.description')
+            .permission('blocksmith.test.permission')
+            .usage('/test')
+            .build()
+
     def 'test that renderDescription of #description returns #expected'() {
         given:
-        def node = new LiteralNode('test')
-        node.commandInfo = new CommandInfo(
-                'test.description',
-                new PermissionInfo(null, 'test.permission', Permission.Grant.NONE)
-        )
-
-        and:
         def messenger = Mock(Messenger)
         messenger.getComponentOrNull(_, _) >> description
 
         and:
-        def renderer = new HelpPageRenderer(node)
+        def renderer = new HelpPageRenderer(helpPage)
 
         when:
         renderer.renderDescription(messenger, Locale.ITALY)
@@ -45,18 +41,11 @@ class HelpPageRendererTest extends Specification {
 
     def 'test that renderPermission of #permissionComponent returns #expected'() {
         given:
-        def node = new LiteralNode('test')
-        node.commandInfo = new CommandInfo(
-                'test.description',
-                new PermissionInfo('blocksmith', 'test.permission', Permission.Grant.NONE)
-        )
-
-        and:
         def messenger = Mock(Messenger)
         messenger.getComponentOrNull(_, _) >> permissionComponent
 
         and:
-        def renderer = new HelpPageRenderer(node)
+        def renderer = new HelpPageRenderer(helpPage)
 
         when:
         renderer.renderPermission(messenger, Locale.ITALY)
@@ -72,18 +61,11 @@ class HelpPageRendererTest extends Specification {
 
     def 'test that renderUsage of #usageComponent returns #expected'() {
         given:
-        def node = new LiteralNode('test')
-        node.commandInfo = new CommandInfo(
-                'test.description',
-                new PermissionInfo(null, 'test.permission', Permission.Grant.NONE)
-        )
-
-        and:
         def messenger = Mock(Messenger)
         messenger.getComponentOrNull(_, _) >> usageComponent
 
         and:
-        def renderer = new HelpPageRenderer(node)
+        def renderer = new HelpPageRenderer(helpPage)
 
         when:
         renderer.renderUsage(messenger, Locale.ITALY)
@@ -99,14 +81,7 @@ class HelpPageRendererTest extends Specification {
 
     def 'test that formatAndFill correctly formats component'() {
         given:
-        def node = new LiteralNode('test')
-        node.commandInfo = new CommandInfo(
-                'test.description',
-                new PermissionInfo('blocksmith', 'test.permission', Permission.Grant.NONE)
-        )
-
-        and:
-        def renderer = new HelpPageRenderer(node)
+        def renderer = new HelpPageRenderer(helpPage)
 
         when:
         def component = renderer.formatAndFill('Title', Mock(Messenger), Locale.ITALY)
