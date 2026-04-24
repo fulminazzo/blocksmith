@@ -1,8 +1,11 @@
 package it.fulminazzo.blocksmith.command.help
 
+import it.fulminazzo.blocksmith.command.CommandMessages
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.message.Messenger
+import it.fulminazzo.blocksmith.message.receiver.Receiver
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
@@ -82,6 +85,53 @@ class HelpPageRendererTest extends Specification {
         usageComponent          || expected
         null                    || ['Usage: /test']
         Component.text('Use: ') || ['Use: /test']
+    }
+
+    def 'test that renderSubcommands with #pages, #page and #subcommands sets lines to #expected'() {
+        given:
+        def helpPage = Mock(HelpPage)
+        helpPage.getSubcommandsPages(_, _) >> pages
+        helpPage.getSubcommandsPage(_, _, _) >> {
+            subcommands == 0
+                    ? []
+                    : (1..subcommands).collect {
+                def data = Mock(HelpPage.CommandData)
+                data.name >> "subcommand$it"
+                data.description >> "subcommand$it description"
+                data.permission >> new PermissionInfo('blocksmith', "subcommand$it", Permission.Grant.ALL)
+                data.usage >> "/test subcommand$it"
+                return data
+            }
+        }
+
+        and:
+        def renderer = new HelpPageRenderer(helpPage)
+
+        and:
+        def messenger = Mock(Messenger)
+        messenger.getComponentOrNull(CommandMessages.HELP_COMMAND_SUBCOMMAND_FORMAT, _, _) >> Component.text('subcommand')
+
+        and:
+        def sender = Mock(CommandSenderWrapper)
+        sender.receiver() >> {
+            def receiver = Mock(Receiver)
+            receiver.locale >> Locale.ITALY
+            return receiver
+        }
+
+        when:
+        renderer.renderSubcommands(messenger, sender, page)
+
+        then:
+        renderer.lines.collect { ComponentUtils.toString(it) } == expected
+
+        where:
+        pages | page | subcommands || expected
+        1     | 1    | 1           || ['subcommand', '', '']
+        1     | 1    | 2           || ['subcommand', 'subcommand', '']
+        1     | 1    | 3           || ['subcommand', 'subcommand', 'subcommand']
+        1     | 2    | 1           || ['subcommand', '', '']
+        0     | 2    | 1           || ['\n  <red>(none)</red>\n ']
     }
 
     def 'test that renderSubcommand correctly renders subcommand'() {
