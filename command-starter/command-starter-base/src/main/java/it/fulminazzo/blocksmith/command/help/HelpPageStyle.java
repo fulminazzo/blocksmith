@@ -27,6 +27,10 @@ public final class HelpPageStyle {
     private @NotNull String separatorText = "%subcommands%";
     private @NotNull String footer = ""; //TODO: compute pages distances
 
+    private boolean alwaysShowPreviousPage = false;
+    private boolean alwaysShowCurrentPage = true;
+    private boolean alwaysShowNextPage = false;
+
     /**
      * Gets the filler with the styling applied.
      *
@@ -138,6 +142,42 @@ public final class HelpPageStyle {
      */
     public @NotNull HelpPageStyle footer(final @NotNull String footer) {
         this.footer = footer;
+        return this;
+    }
+
+    /**
+     * Toggles static visibility of the previous page button.
+     *
+     * @param show if set to <code>true</code>, the page renderer will <b>always</b> show the previous page button,
+     *             regardless of its functionality.
+     * @return this object (for method chaining)
+     */
+    public @NotNull HelpPageStyle alwaysShowPreviousPage(final boolean show) {
+        this.alwaysShowPreviousPage = show;
+        return this;
+    }
+
+    /**
+     * Toggles static visibility of the current page text.
+     *
+     * @param show if set to <code>true</code>, the page renderer will <b>always</b> show the current page text,
+     *             regardless of its functionality.
+     * @return this object (for method chaining)
+     */
+    public @NotNull HelpPageStyle alwaysShowCurrentPage(final boolean show) {
+        this.alwaysShowCurrentPage = show;
+        return this;
+    }
+
+    /**
+     * Toggles static visibility of the next page button.
+     *
+     * @param show if set to <code>true</code>, the page renderer will <b>always</b> show the next page button,
+     *             regardless of its functionality.
+     * @return this object (for method chaining)
+     */
+    public @NotNull HelpPageStyle alwaysShowNextPage(final boolean show) {
+        this.alwaysShowNextPage = show;
         return this;
     }
 
