@@ -73,6 +73,46 @@ public final class HelpPageRenderer {
     }
 
     /**
+     * Formats the given text with the following placeholders:
+     * <ul>
+     *     <li>{@code %filler%}: one character of the current {@link HelpPageStyle#getFiller()};</li>
+     *     <li>{@code %name%}: the name of the command;</li>
+     *     <li>{@code %subcommands%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     under "command.help.subcommands";</li> //TODO: constant class
+     *     <li>{@code %previous%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     under "command.help.previous-page" (only shown if necessary);</li> //TODO: option to disable
+     *     <li>{@code %next%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     under "command.help.next-page" (only shown if necessary);</li> //TODO: option to disable
+     *     <li>{@code %current%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
+     *     under "command.help.current-page".</li>
+     * </ul>
+     *
+     * @param component the component to format
+     * @param messenger the messenger to get the messages from
+     * @param locale    the locale
+     * @return the formatted component
+     */
+    @NotNull Component format(final @NotNull Component component,
+                              final @NotNull Messenger messenger,
+                              final @NotNull Locale locale) {
+        HelpPageStyle style = HelpPageStyle.get();
+        return component
+                .replaceText(b -> b.matchLiteral("%filler%").replacement(style.getStyledFiller()))
+                .replaceText(b -> b.matchLiteral("%name%").replacement(commandNode.getName()))
+                .replaceText(b -> b.matchLiteral("%subcommands%")
+                        .replacement(getComponentOrEmpty(messenger, "command.help.subcommands", locale)))
+                //TODO: missing logic
+                .replaceText(b -> b.matchLiteral("%previous%")
+                        .replacement(getComponentOrEmpty(messenger, "command.help.previous-page", locale)))
+                //TODO: missing logic
+                .replaceText(b -> b.matchLiteral("%next%")
+                        .replacement(getComponentOrEmpty(messenger, "command.help.next-page", locale)))
+                //TODO: missing logic
+                .replaceText(b -> b.matchLiteral("%current%")
+                        .replacement(getComponentOrEmpty(messenger, "command.help.current-page", locale)));
+    }
+
+    /**
      * Given a component, it attempts to subdivide it into multiple components for the given number of lines.
      * The last component will be truncated with {@link #truncate(String, Component)}.
      *
