@@ -1,9 +1,12 @@
 package it.fulminazzo.blocksmith.command.help
 
+import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.CommandMessages
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
+import it.fulminazzo.blocksmith.command.visitor.CommandInput
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import it.fulminazzo.blocksmith.message.Messenger
 import it.fulminazzo.blocksmith.message.receiver.Receiver
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
@@ -172,8 +175,22 @@ class HelpPageRendererTest extends Specification {
         given:
         def renderer = new HelpPageRenderer(helpPage)
 
+        and:
+        def visitor = Mock(InputVisitor)
+        visitor.application >> {
+            def application = Mock(ApplicationHandle)
+            application.messenger >> Mock(Messenger)
+            return application
+        }
+        visitor.commandSender >> {
+            def sender = Mock(CommandSenderWrapper)
+            sender.receiver() >> Mock(Receiver)
+            return sender
+        }
+        visitor.input >> new CommandInput()
+
         when:
-        def component = renderer.formatAndFill('Title', Mock(Messenger), Locale.ITALY)
+        def component = renderer.formatAndFill('Title', visitor, 1, 1)
 
         then:
         ComponentUtils.toString(component) == '<strikethrough><gold>------------------------</gold></strikethrough>' +
