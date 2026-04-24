@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.command.node.CommandNode
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.visitor.Visitor
 import it.fulminazzo.blocksmith.reflect.Reflect
+import it.fulminazzo.blocksmith.util.StringUtils
 import spock.lang.Specification
 
 import java.lang.reflect.Parameter
@@ -13,13 +14,13 @@ class UsageVisitorTest extends Specification {
     private static final UsageStyle USAGE_STYLE = UsageStyle.get()
     private static final Parameter PARAMETER = Visitor.getMethod('visitCommandNode', CommandNode).parameters[0]
 
-    private static final String NODE_SEPARATOR = UsageStyle.colorize(USAGE_STYLE.separator, USAGE_STYLE.punctuationColor)
-    private static final String LITERAL_SEPARATOR = UsageStyle.colorize(USAGE_STYLE.literalSeparator, USAGE_STYLE.literalSeparatorColor)
-    private static final String OPEN_BRACKET = UsageStyle.colorize('[', USAGE_STYLE.punctuationColor)
-    private static final String CLOSE_BRACKET = UsageStyle.colorize(']', USAGE_STYLE.punctuationColor)
-    private static final String LESS_THAN = UsageStyle.colorize('<', USAGE_STYLE.punctuationColor)
-    private static final String GREATER_THAN = UsageStyle.colorize('>', USAGE_STYLE.punctuationColor)
-    private static final String SLASH = UsageStyle.colorize('/', USAGE_STYLE.literalColor)
+    private static final String NODE_SEPARATOR = StringUtils.tag(USAGE_STYLE.punctuationColor, USAGE_STYLE.separator)
+    private static final String LITERAL_SEPARATOR = StringUtils.tag(USAGE_STYLE.literalSeparatorColor, USAGE_STYLE.literalSeparator)
+    private static final String OPEN_BRACKET = StringUtils.tag(USAGE_STYLE.punctuationColor, '[')
+    private static final String CLOSE_BRACKET = StringUtils.tag(USAGE_STYLE.punctuationColor, ']')
+    private static final String LESS_THAN = StringUtils.tag(USAGE_STYLE.punctuationColor, '<')
+    private static final String GREATER_THAN = StringUtils.tag(USAGE_STYLE.punctuationColor, '>')
+    private static final String SLASH = StringUtils.tag(USAGE_STYLE.literalColor, '/')
 
     private static final Visitor<String, ? extends Exception> SINGLE_VISITOR = new UsageVisitor.SimpleUsageVisitor()
     private static final List<CommandNode> TEST_NODES = [
@@ -78,9 +79,9 @@ class UsageVisitorTest extends Specification {
         kick.addChild(reason)
 
         and:
-        def lit = { String s -> UsageStyle.colorize(s, USAGE_STYLE.literalColor) }
-        def arg = { String s -> UsageStyle.colorize(s, USAGE_STYLE.defaultArgumentColor) }
-        def optArg = { String s -> UsageStyle.colorize(s, USAGE_STYLE.defaultOptionalArgumentColor) }
+        def lit = { String s -> StringUtils.tag(USAGE_STYLE.literalColor, s) }
+        def arg = { String s -> StringUtils.tag(USAGE_STYLE.defaultArgumentColor, s) }
+        def optArg = { String s -> StringUtils.tag(USAGE_STYLE.defaultOptionalArgumentColor, s) }
         def greedy = { String s -> String.format(USAGE_STYLE.greedyArgumentFormat, s) }
 
         and:

@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
+import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +36,7 @@ public final class UsageVisitor implements Visitor<@NotNull String, RuntimeExcep
     @Override
     public @NotNull String visitCommandNode(final @NotNull CommandNode node) {
         final UsageStyle style = UsageStyle.get();
-        return UsageStyle.colorize(COMMAND_START, style.getLiteralColor()) +
+        return StringUtils.tag(style.getLiteralColor(), COMMAND_START) +
                 visitParentNode(node) +
                 node.accept(singleUsageVisitor) +
                 visitChildren(node);
@@ -76,7 +77,7 @@ public final class UsageVisitor implements Visitor<@NotNull String, RuntimeExcep
                 usage.append(" ").append(children.stream()
                         .map(c -> c.accept(singleUsageVisitor))
                         .collect(Collectors.joining(
-                                UsageStyle.colorize(style.getSeparator(), style.getPunctuationColor())
+                                StringUtils.tag(style.getPunctuationColor(), style.getSeparator())
                         ))
                 );
                 break;
@@ -113,17 +114,17 @@ public final class UsageVisitor implements Visitor<@NotNull String, RuntimeExcep
             final String name = node.isGreedy()
                     ? String.format(style.getGreedyArgumentFormat(), node.getName())
                     : node.getName();
-            return String.format(format, UsageStyle.colorize(name, color));
+            return String.format(format, StringUtils.tag(color, name));
         }
 
         @Override
         public @NotNull String visitLiteralNode(final @NotNull LiteralNode node) {
             UsageStyle style = UsageStyle.get();
             return node.getAliases().stream()
-                    .map(a -> UsageStyle.colorize(a, style.getLiteralColor()))
+                    .map(a -> StringUtils.tag(style.getLiteralColor(), a))
                     .sorted()
                     .collect(Collectors.joining(
-                            UsageStyle.colorize(style.getLiteralSeparator(), style.getLiteralSeparatorColor())
+                            StringUtils.tag(style.getLiteralSeparatorColor(), style.getLiteralSeparator())
                     ));
         }
 

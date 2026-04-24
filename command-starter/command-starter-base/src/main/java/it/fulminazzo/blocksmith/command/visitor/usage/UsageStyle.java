@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.command.visitor.usage;
 import it.fulminazzo.blocksmith.command.argument.dto.Coordinate;
 import it.fulminazzo.blocksmith.command.argument.dto.Position;
 import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition;
+import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,16 +59,16 @@ public final class UsageStyle {
      */
 
     private @NotNull String defaultArgumentColor = "yellow";
-    private @NotNull String argumentFormat = colorize("<", PUNCTUATION_COLOR_PLACEHOLDER) +
-            "%s" + colorize(">", PUNCTUATION_COLOR_PLACEHOLDER);
+    private @NotNull String argumentFormat = StringUtils.tag(PUNCTUATION_COLOR_PLACEHOLDER, "<") +
+            "%s" + StringUtils.tag(PUNCTUATION_COLOR_PLACEHOLDER, ">");
 
     /*
      * OPTIONAL ARGUMENT
      */
 
     private @NotNull String defaultOptionalArgumentColor = "aqua";
-    private @NotNull String optionalArgumentFormat = colorize("[", PUNCTUATION_COLOR_PLACEHOLDER) +
-            "%s" + colorize("]", PUNCTUATION_COLOR_PLACEHOLDER);
+    private @NotNull String optionalArgumentFormat = StringUtils.tag(PUNCTUATION_COLOR_PLACEHOLDER, "[") +
+            "%s" + StringUtils.tag(PUNCTUATION_COLOR_PLACEHOLDER, "]");
 
     /*
      * ARGUMENT
@@ -362,19 +363,6 @@ public final class UsageStyle {
      */
     public static @NotNull UsageStyle get() {
         return instance;
-    }
-
-    /**
-     * Applies the given color to the text, following the
-     * <a href="https://docs.papermc.io/adventure/minimessage/format/">MiniMessage format</a>.
-     * Effectively, it adds enclosing color tags around the text.
-     *
-     * @param text  the text
-     * @param color the color
-     * @return the formatted text
-     */
-    static @NotNull String colorize(final @NotNull String text, final @NotNull String color) {
-        return String.format("<%1$s>%2$s</%1$s>", color, text);
     }
 
 }
