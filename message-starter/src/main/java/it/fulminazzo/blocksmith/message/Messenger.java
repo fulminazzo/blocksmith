@@ -10,20 +10,16 @@ import it.fulminazzo.blocksmith.message.receiver.Receiver;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactory;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.title.Title;
-import net.kyori.adventure.title.TitlePart;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.Translator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.function.BiConsumer;
 
@@ -45,8 +41,7 @@ public final class Messenger {
      * <br>
      * Assuming the messenger has access to {@code greeting: 'Hello, world!'}
      * and the {@link #application} name is "blocksmith",
-     * {@code Component.translatable("blocksmith.greeting")} will
-     * return "Hello, world!".
+     * {@code Component.translatable("blocksmith.greeting")} will return "Hello, world!".
      *
      * @return this object (for method chaining)
      */
@@ -106,7 +101,7 @@ public final class Messenger {
     }
 
     /**
-     * Broadcasts a message to all the available receivers through action bar.
+     * Broadcasts a message to all the available receivers through the <b>action bar</b>.
      * If the message could not be found, a warning will be displayed
      * and no error will be returned.
      *
@@ -150,11 +145,7 @@ public final class Messenger {
                 receiver,
                 titleCode,
                 subtitleCode,
-                Title.Times.times(
-                        Duration.of(1L, ChronoUnit.SECONDS),
-                        Duration.of(2L, ChronoUnit.SECONDS),
-                        Duration.of(1L, ChronoUnit.SECONDS)
-                ),
+                Receiver.DEFAULT_TIMES,
                 arguments
         );
     }
@@ -179,15 +170,26 @@ public final class Messenger {
         if (titleCode == null && subtitleCode == null) return;
         ReceiverFactory factory = ReceiverFactories.get(receiver.getClass(), application);
         Receiver rec = factory.create(receiver);
-        rec.audience().sendTitlePart(TitlePart.TIMES, times);
-        if (subtitleCode != null)
-            sendMessageHelper((a, c) -> a.sendTitlePart(TitlePart.SUBTITLE, c), receiver, subtitleCode, arguments);
-        if (titleCode != null)
-            sendMessageHelper((a, c) -> a.sendTitlePart(TitlePart.TITLE, c), receiver, titleCode, arguments);
+        Locale locale = rec.getLocale();
+        Component title;
+        try {
+            title = titleCode == null ? Component.empty() : getComponent(titleCode, locale, arguments);
+        } catch (MessageNotFoundException e) {
+            application.logger().warn(e.getMessage());
+            title = Component.empty();
+        }
+        Component subtitle;
+        try {
+            subtitle = subtitleCode == null ? Component.empty() : getComponent(subtitleCode, locale, arguments);
+        } catch (MessageNotFoundException e) {
+            application.logger().warn(e.getMessage());
+            subtitle = Component.empty();
+        }
+        rec.sendTitle(title, subtitle, times);
     }
 
     /**
-     * Sends a message to the given receiver through action bar.
+     * Sends a message to the given receiver through the <b>action bar</b>.
      * If the message could not be found, a warning will be displayed
      * and no error will be returned.
      *
@@ -199,7 +201,7 @@ public final class Messenger {
     public <R> void sendActionBar(final @NotNull R receiver,
                                   final @NotNull String messageCode,
                                   final Argument @NotNull ... arguments) {
-        sendMessageHelper(Audience::sendActionBar, receiver, messageCode, arguments);
+        sendMessageHelper(Receiver::sendActionBar, receiver, messageCode, arguments);
     }
 
     /**
@@ -215,10 +217,10 @@ public final class Messenger {
     public <R> void sendMessage(final @NotNull R receiver,
                                 final @NotNull String messageCode,
                                 final Argument @NotNull ... arguments) {
-        sendMessageHelper(Audience::sendMessage, receiver, messageCode, arguments);
+        sendMessageHelper(Receiver::sendMessage, receiver, messageCode, arguments);
     }
 
-    private <R> void sendMessageHelper(final @NotNull BiConsumer<Audience, Component> function,
+    private <R> void sendMessageHelper(final @NotNull BiConsumer<Receiver, Component> function,
                                        final @NotNull R receiver,
                                        final @NotNull String messageCode,
                                        final Argument @NotNull ... arguments) {
@@ -227,7 +229,7 @@ public final class Messenger {
             Receiver rec = factory.create(receiver);
             Locale locale = rec.getLocale();
             Component message = getComponent(messageCode, locale, arguments);
-            function.accept(rec.audience(), message);
+            function.accept(rec, message);
         } catch (MessageNotFoundException e) {
             application.logger().warn(e.getMessage());
         }

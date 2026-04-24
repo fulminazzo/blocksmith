@@ -6,6 +6,7 @@ import it.fulminazzo.blocksmith.message.argument.Placeholder
 import it.fulminazzo.blocksmith.message.provider.MessageNotFoundException
 import it.fulminazzo.blocksmith.message.provider.MessageProvider
 import it.fulminazzo.blocksmith.message.receiver.PlayerReceiverFactory
+import it.fulminazzo.blocksmith.message.receiver.Receiver
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactory
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
@@ -251,19 +252,15 @@ class MessengerTest extends Specification {
         def lastTitle = player.lastTitle
 
         then:
-        lastTitle[TitlePart.TITLE] == titleCode?.with { expected }
+        lastTitle[TitlePart.TITLE] == titleCode == null ? Component.empty() : expected
 
         and:
-        lastTitle[TitlePart.SUBTITLE] == subtitleCode?.with { expected }
+        lastTitle[TitlePart.SUBTITLE] == subtitleCode == null ? Component.empty() : expected
 
         and:
         lastTitle[TitlePart.TIMES] == (titleCode == null && subtitleCode == null)
                 ? null
-                : Title.Times.times(
-                Duration.of(1L, ChronoUnit.SECONDS),
-                Duration.of(2L, ChronoUnit.SECONDS),
-                Duration.of(1L, ChronoUnit.SECONDS)
-        )
+                : Receiver.DEFAULT_TIMES
 
         where:
         titleCode | subtitleCode
@@ -271,6 +268,26 @@ class MessengerTest extends Specification {
         null      | 'message'
         'message' | null
         'message' | 'message'
+    }
+
+    def 'test that sendTitle of unknown title and subtitle does not throw but does not send anything'() {
+        given:
+        player.locale = Locale.ITALY
+
+        when:
+        messenger.sendTitle(player, 'invalid.title', 'invalid.subtitle')
+
+        and:
+        def lastTitle = player.lastTitle
+
+        then:
+        lastTitle[TitlePart.TITLE] == null
+
+        and:
+        lastTitle[TitlePart.SUBTITLE] == null
+
+        and:
+        lastTitle[TitlePart.TIMES] == null
     }
 
     def 'test that sendActionBar correctly converts and sends message'() {
