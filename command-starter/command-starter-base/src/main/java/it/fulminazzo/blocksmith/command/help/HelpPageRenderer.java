@@ -22,6 +22,12 @@ public final class HelpPageRenderer {
     public static final @NotNull String DEFAULT_PERMISSION = "<gray>Permission</gray><dark_gray>:</dark_gray> ";
     public static final @NotNull String DEFAULT_USAGE = "<gray>Usage</gray><dark_gray>:</dark_gray> ";
     public static final @NotNull String DEFAULT_SUBCOMMANDS = "Subcommands";
+    public static final @NotNull String DEFAULT_SUBCOMMAND_FORMAT =
+            "<click:run_command:'%command%'>" +
+                    "<hover:show_text:'<white>%usage%</white>\\n<gray>%permission%</gray>\\n\\n<aqua>Click for more information</aqua>'>" +
+                    "<white>%name%</white> <dark_gray>-</dark_gray> <gray>%description%</gray>" +
+                    "</hover>" +
+                    "</click>";
 
     private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
@@ -135,7 +141,7 @@ public final class HelpPageRenderer {
     void renderSubcommand(final @NotNull Messenger messenger,
                           final @NotNull Locale locale,
                           final @NotNull HelpPage.CommandData commandData) {
-        Component subcommandComponent = getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_SUBCOMMAND_FORMAT, locale)
+        Component subcommandComponent = getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_SUBCOMMAND_FORMAT, locale, DEFAULT_SUBCOMMAND_FORMAT)
                 .replaceText(r -> r.matchLiteral("%name%").replacement(commandData.getName()))
                 .replaceText(r -> r.matchLiteral("%permission%").replacement(commandData.getPermission().getPermission()))
                 .replaceText(r -> r
@@ -148,8 +154,6 @@ public final class HelpPageRenderer {
                 );
         int length = getMaxTruncationLength(PLAIN_SERIALIZER.serialize(subcommandComponent));
         if (length != -1) subcommandComponent = ComponentUtils.truncate(subcommandComponent, length);
-        //TODO: hover event
-        //TODO: click event
         lines.add(subcommandComponent);
     }
 
