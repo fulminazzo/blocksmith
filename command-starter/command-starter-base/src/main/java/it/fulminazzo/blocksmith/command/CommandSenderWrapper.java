@@ -5,13 +5,11 @@ import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import it.fulminazzo.blocksmith.message.receiver.Receiver;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories;
-import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.scheduler.Scheduler;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -63,27 +61,6 @@ public abstract class CommandSenderWrapper<S> {
      */
     public boolean extendsType(final @NotNull Type type) {
         return Reflect.on(actualSender).extendsType(type);
-    }
-
-    /**
-     * Sends a message to the wrapped sender.
-     *
-     * @param message the message to send
-     * @return this object (for method chaining)
-     */
-    public @NotNull CommandSenderWrapper<S> sendMessage(final @NotNull String message) {
-        return sendMessage(ComponentUtils.toComponent(message));
-    }
-
-    /**
-     * Sends a message to the wrapped sender.
-     *
-     * @param message the message to send
-     * @return this object (for method chaining)
-     */
-    public @NotNull CommandSenderWrapper<S> sendMessage(final @NotNull Component message) {
-        receiver().audience().sendMessage(message);
-        return this;
     }
 
     /**
