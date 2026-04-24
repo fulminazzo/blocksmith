@@ -56,7 +56,7 @@ public final class ReceiverFactories {
         return getFactories(application).stream()
                 .map(ReceiverFactory::getAllReceivers)
                 .flatMap(Collection::stream)
-                .filter(r -> seen.add(r.internal()))
+                .filter(r -> seen.add(r.handle()))
                 .collect(Collectors.toSet());
     }
 

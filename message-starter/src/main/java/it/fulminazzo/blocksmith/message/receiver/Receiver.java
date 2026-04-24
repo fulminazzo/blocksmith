@@ -30,6 +30,6 @@ public interface Receiver {
      * @param <R> the type of the receiver
      * @return the receiver
      */
-    <R> @NotNull R internal();
+    <R> @NotNull R handle();
 
 }

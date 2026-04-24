@@ -10,11 +10,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-record PlayerReceiver(@NotNull Player internal) implements Receiver {
+record PlayerReceiver(@NotNull Player handle) implements Receiver {
 
     @Override
     public @NotNull Locale getLocale() {
-        return internal.getLocale();
+        return handle.getLocale();
     }
 
     @Override
@@ -24,19 +24,19 @@ record PlayerReceiver(@NotNull Player internal) implements Receiver {
             @Override
             public <T> void sendTitlePart(final @NotNull TitlePart<T> part,
                                           final @NotNull T value) {
-                internal.getLastTitle().put(part, value);
+                handle.getLastTitle().put(part, value);
             }
 
             @Override
             public void sendMessage(final @NotNull Identity source,
                                     final @NotNull Component message,
                                     final @NotNull MessageType type) {
-                internal.setLastMessage(message);
+                handle.setLastMessage(message);
             }
 
             @Override
             public void sendActionBar(final @NotNull Component message) {
-                internal.setLastMessage(message);
+                handle.setLastMessage(message);
             }
 
         };

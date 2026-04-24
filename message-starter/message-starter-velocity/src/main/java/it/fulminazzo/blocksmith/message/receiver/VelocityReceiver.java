@@ -28,7 +28,7 @@ final class VelocityReceiver implements Receiver {
 
     @SuppressWarnings("unchecked")
     @Override
-    public @NonNull <R> R internal() {
+    public @NonNull <R> R handle() {
         return (R) internal;
     }
 

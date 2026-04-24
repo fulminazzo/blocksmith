@@ -136,7 +136,7 @@ class ReceiverFactoriesTest extends Specification {
 
         @NonNull
         @Override
-        <R> R internal() {
+        <R> R handle() {
             return (R) internal;
         }
 
