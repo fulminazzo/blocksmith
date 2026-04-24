@@ -49,6 +49,39 @@ class HelpPageTest extends Specification {
         )
     }
 
+    def 'test that getSubcommandsPages with #subcommands returns #expected'() {
+        given:
+        def page = Mock(HelpPage)
+        page.getSubcommandsPages(_) >> {
+            callRealMethod()
+        }
+        page.getExecutableSubcommands(_) >> {
+            subcommands == 0
+                    ? []
+                    : (1..subcommands).collect { Mock(HelpPage.CommandData) }
+        }
+
+        and:
+        def sender = Mock(CommandSenderWrapper)
+
+        when:
+        def pages = page.getSubcommandsPages(sender)
+
+        then:
+        pages == expected
+
+        where:
+        subcommands || expected
+        0           || 0
+        1           || 1
+        2           || 1
+        3           || 1
+        4           || 2
+        5           || 2
+        6           || 2
+        7           || 3
+    }
+
     def 'test that getExecutableSubcommands returns only subcommands which the sender has permission for'() {
         given:
         def expected = page.subcommands[0]

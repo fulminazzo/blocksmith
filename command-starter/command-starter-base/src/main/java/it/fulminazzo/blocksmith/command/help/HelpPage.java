@@ -19,8 +19,21 @@ import java.util.stream.Collectors;
 @Value
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class HelpPage {
+    static final int SUBCOMMANDS_PER_PAGE = 3;
+
     @NotNull CommandData command;
     @NotNull List<CommandData> subcommands;
+
+    /**
+     * Gets the number of pages of the subcommands section for the given sender.
+     *
+     * @param sender the sender
+     * @return the number of pages
+     */
+    public int getSubcommandsPages(final @NotNull CommandSenderWrapper<?> sender) {
+        int subcommands = getExecutableSubcommands(sender).size();
+        return subcommands / SUBCOMMANDS_PER_PAGE + Math.min(1, subcommands % SUBCOMMANDS_PER_PAGE);
+    }
 
     /**
      * Gets all the subcommands executable from the given sender.
