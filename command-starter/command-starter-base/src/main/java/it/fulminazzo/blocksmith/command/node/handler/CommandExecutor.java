@@ -80,7 +80,7 @@ public class CommandExecutor {
                         );
                 }
                 arguments.addFirst(sender);
-            } else if (sender.extendsType(parameterType)) arguments.addFirst(sender.getActualSender());
+            } else if (sender.extendsType(parameterType)) arguments.addFirst(sender.handle());
             else throw new CommandExecutionException(sender.isPlayer()
                         ? CommandMessages.PLAYER_CANNOT_EXECUTE
                         : CommandMessages.CONSOLE_CANNOT_EXECUTE

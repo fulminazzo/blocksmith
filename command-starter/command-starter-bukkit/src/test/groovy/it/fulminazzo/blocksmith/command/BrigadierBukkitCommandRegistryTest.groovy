@@ -104,7 +104,7 @@ class BrigadierBukkitCommandRegistryTest extends Specification {
 
         then:
         (wrapped instanceof BukkitCommandSenderWrapper)
-        wrapped.actualSender == executor.sender
+        wrapped.handle() == executor.sender
     }
 
     def 'test that wrapSender instantiates a new Bukkit CommandSenderWrapper'() {
@@ -116,7 +116,7 @@ class BrigadierBukkitCommandRegistryTest extends Specification {
 
         then:
         (wrapped instanceof BukkitCommandSenderWrapper)
-        wrapped.actualSender == sender
+        wrapped.handle() == sender
     }
 
     def 'test that sender type is correct'() {

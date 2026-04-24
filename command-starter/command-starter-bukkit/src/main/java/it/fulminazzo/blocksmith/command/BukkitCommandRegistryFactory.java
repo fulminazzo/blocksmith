@@ -29,7 +29,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             @Override
             public @NotNull Player parse(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException {
                 Server server = visitor.getApplication().server();
-                CommandSender sender = (CommandSender) visitor.getCommandSender().getActualSender();
+                CommandSender sender = (CommandSender) visitor.getCommandSender().handle();
                 String argument = visitor.getInput().getCurrent();
                 Player player = server.getPlayer(argument);
                 if (player != null) {
@@ -45,7 +45,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             @Override
             public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
                 Server server = visitor.getApplication().server();
-                CommandSender sender = (CommandSender) visitor.getCommandSender().getActualSender();
+                CommandSender sender = (CommandSender) visitor.getCommandSender().handle();
                 final Collection<Player> players = new ArrayList<>(server.getOnlinePlayers());
                 if (sender instanceof Player) {
                     Player senderPlayer = (Player) sender;
@@ -161,7 +161,7 @@ public final class BukkitCommandRegistryFactory implements CommandRegistryFactor
             if (arg instanceof CommandSenderWrapper<?>) {
                 CommandSenderWrapper<?> sender = (CommandSenderWrapper<?>) arg;
                 if (sender.isPlayer()) {
-                    Player player = (Player) sender.getActualSender();
+                    Player player = (Player) sender.handle();
                     return player.getLocation();
                 }
             } else if (arg instanceof Location) return (Location) arg;

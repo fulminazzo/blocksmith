@@ -110,7 +110,7 @@ class VelocityCommandRegistryTest extends Specification {
 
         then:
         (wrapped instanceof VelocityCommandSenderWrapper)
-        wrapped.actualSender == sender
+        wrapped.handle() == sender
     }
 
     def 'test that sender type is correct'() {

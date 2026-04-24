@@ -9,7 +9,6 @@ import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.scheduler.Scheduler;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import net.kyori.adventure.text.Component;
@@ -35,7 +34,6 @@ public abstract class CommandSenderWrapper<S> {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private final @NotNull ApplicationHandle application;
-    @Getter
     protected final @NotNull S actualSender;
 
     /**
@@ -116,6 +114,15 @@ public abstract class CommandSenderWrapper<S> {
      */
     public boolean hasPermission(final @NotNull PermissionInfo permissionInfo) {
         return permissionInfo.getGrant() == Permission.Grant.ALL || hasPermissionImpl(permissionInfo);
+    }
+
+    /**
+     * Gets the internal wrapped sender.
+     *
+     * @return the sender
+     */
+    public @NotNull S handle() {
+        return actualSender;
     }
 
     /**

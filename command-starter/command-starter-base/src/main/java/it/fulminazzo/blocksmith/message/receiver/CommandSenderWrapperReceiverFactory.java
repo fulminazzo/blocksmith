@@ -28,7 +28,7 @@ public final class CommandSenderWrapperReceiverFactory extends AbstractReceiverF
     @Override
     protected @NotNull <R> Receiver createImpl(final @NotNull R receiver) {
         CommandSenderWrapper<?> wrapper = (CommandSenderWrapper<?>) receiver;
-        Object internal = wrapper.getActualSender();
+        Object internal = wrapper.handle();
         return ReceiverFactories.get(internal.getClass(), application).create(internal);
     }
 
