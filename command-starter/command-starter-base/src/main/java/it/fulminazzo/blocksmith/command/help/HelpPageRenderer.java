@@ -90,6 +90,34 @@ public final class HelpPageRenderer {
     }
 
     /**
+     * Renders the given subcommand information in the subcommands section.
+     *
+     * @param messenger   the messenger to get the subcommand format component from
+     * @param locale      the locale
+     * @param commandData the subcommand data
+     */
+    void renderSubcommand(final @NotNull Messenger messenger,
+                          final @NotNull Locale locale,
+                          final @NotNull HelpPage.CommandData commandData) {
+        Component subcommandComponent = getComponentOrEmpty(messenger, "command.help.subcommand-format", locale)
+                .replaceText(r -> r.matchLiteral("%name%").replacement(commandData.getName()))
+                .replaceText(r -> r.matchLiteral("%permission%").replacement(commandData.getPermission().getPermission()))
+                .replaceText(r -> r
+                        .matchLiteral("%description%")
+                        .replacement(getComponentOrEmpty(messenger, commandData.getDescription(), locale))
+                )
+                .replaceText(r -> r
+                        .matchLiteral("%usage%")
+                        .replacement(ComponentUtils.toComponent(commandData.getUsage()))
+                );
+        int length = getMaxTruncationLength(PLAIN_SERIALIZER.serialize(subcommandComponent));
+        if (length != -1) subcommandComponent = ComponentUtils.truncate(subcommandComponent, length);
+        //TODO: hover event
+        //TODO: click event
+        lines.add(subcommandComponent);
+    }
+
+    /**
      * Formats the given string with {@link #format(Component, Messenger, Locale)}.
      * Then, it fills it using {@link HelpPageStyle#getFiller()}.
      *
