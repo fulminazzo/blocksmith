@@ -10,6 +10,7 @@ import it.fulminazzo.blocksmith.scheduler.Scheduler;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -23,7 +24,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-public abstract class CommandSenderWrapper<S> {
+public abstract class CommandSenderWrapper<S> implements Receiver {
     /**
      * The default name to identify the console in each platform.
      */
@@ -42,15 +43,6 @@ public abstract class CommandSenderWrapper<S> {
      */
     public void sync(final @NotNull Consumer<S> function) {
         Scheduler.schedule(application, t -> function.accept(actualSender)).run();
-    }
-
-    /**
-     * Converts this sender to a {@link Receiver}.
-     *
-     * @return the receiver
-     */
-    public @NotNull Receiver receiver() {
-        return ReceiverFactories.get(actualSender.getClass(), application).create(actualSender);
     }
 
     /**
@@ -100,6 +92,16 @@ public abstract class CommandSenderWrapper<S> {
      */
     public @NotNull S handle() {
         return actualSender;
+    }
+
+    /**
+     * Converts this sender to a {@link Receiver}.
+     *
+     * @return the receiver
+     */
+    @Delegate(types = Receiver.class)
+    private @NotNull Receiver receiver() {
+        return ReceiverFactories.get(actualSender.getClass(), application).create(actualSender);
     }
 
     /**
