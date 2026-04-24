@@ -59,9 +59,9 @@ class HelpPageRendererTest extends Specification {
         renderer.lines.collect { PLAIN_SERIALIZER.serialize(it) } == expected
 
         where:
-        permissionComponent            || expected
-        null                           || ['blocksmith.test.permission']
-        Component.text('Permission: ') || ['Permission: blocksmith.test.permission']
+        permissionComponent      || expected
+        null                     || ['Permission: blocksmith.test.permission']
+        Component.text('Perm: ') || ['Perm: blocksmith.test.permission']
     }
 
     def 'test that renderUsage of #usageComponent returns #expected'() {
@@ -79,9 +79,9 @@ class HelpPageRendererTest extends Specification {
         renderer.lines.collect { PLAIN_SERIALIZER.serialize(it) } == expected
 
         where:
-        usageComponent            || expected
-        null                      || ['/test']
-        Component.text('Usage: ') || ['Usage: /test']
+        usageComponent          || expected
+        null                    || ['Usage: /test']
+        Component.text('Use: ') || ['Use: /test']
     }
 
     def 'test that formatAndFill correctly formats component'() {
