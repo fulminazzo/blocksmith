@@ -131,7 +131,7 @@ class HelpPageRendererTest extends Specification {
         1     | 1    | 2           || ['subcommand', 'subcommand', '']
         1     | 1    | 3           || ['subcommand', 'subcommand', 'subcommand']
         1     | 2    | 1           || ['subcommand', '', '']
-        0     | 2    | 1           || ['\n  <red>(none)</red>\n ']
+        0     | 0    | 0           || ['\n  <red>(none)</red>\n ']
     }
 
     def 'test that renderSubcommand correctly renders subcommand'() {

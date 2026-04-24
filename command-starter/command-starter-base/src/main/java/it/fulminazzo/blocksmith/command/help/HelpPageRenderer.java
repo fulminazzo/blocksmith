@@ -41,11 +41,17 @@ public final class HelpPageRenderer {
     private final @NotNull HelpPage helpPage;
     private final @NotNull List<Component> lines = new LinkedList<>();
 
-    public @NotNull List<Component> render(final @NotNull InputVisitor<?, ?> visitor, final int page) {
+    public @NotNull List<Component> render(final @NotNull InputVisitor<?, ?> visitor, int page) {
         final HelpPageStyle style = HelpPageStyle.get();
         final Messenger messenger = visitor.getApplication().getMessenger();
         final CommandSenderWrapper<?> sender = visitor.getCommandSender();
         final Locale locale = sender.receiver().getLocale();
+
+        final int pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
+        // Imagine the sender requested the help page and got access to a next page.
+        // Then, they lost some permissions, therefore the next page disappeared.
+        // By using this calculation, we make sure that the renderer does not halt in this or similar scenarios
+        page = Math.min(page, pages);
         // Header
         lines.add(formatAndFill(style.getHeader(), messenger, locale));
         renderDescription(messenger, locale);
@@ -117,14 +123,9 @@ public final class HelpPageRenderer {
      */
     void renderSubcommands(final @NotNull Messenger messenger,
                            final @NotNull CommandSenderWrapper<?> sender,
-                           @Range(from = 1, to = Integer.MAX_VALUE) int page) {
+                           final @Range(from = 1, to = Integer.MAX_VALUE) int page) {
         final Locale locale = sender.receiver().getLocale();
         int rendered = 0;
-        int pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
-        // Imagine the sender requested the help page and got access to a next page.
-        // Then, they lost some permissions, therefore the next page disappeared.
-        // By using this calculation, we make sure that the renderer does not halt in this or similar scenarios
-        page = Math.min(page, pages);
         if (page > 0) {
             List<HelpPage.CommandData> subcommands = helpPage.getSubcommandsPage(sender, page, SUBCOMMANDS_LINES);
             for (HelpPage.CommandData command : subcommands) {
