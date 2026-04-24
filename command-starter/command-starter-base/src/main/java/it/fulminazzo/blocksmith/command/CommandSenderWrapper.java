@@ -11,7 +11,10 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Delegate;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.function.Consumer;
@@ -21,6 +24,7 @@ import java.util.function.Consumer;
  *
  * @param <S> the actual type of the sender
  */
+@SuppressWarnings("unchecked")
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
@@ -138,5 +142,121 @@ public abstract class CommandSenderWrapper<S> implements Receiver {
      * @return {@code true} if they have the permission
      */
     protected abstract boolean hasPermissionImpl(final @NotNull PermissionInfo permissionInfo);
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable String title) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable Component title) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable String title,
+                                                      final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable Component title,
+                                                      final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendSubtitle(final @Nullable String subtitle) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendSubtitle(subtitle);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendSubtitle(final @Nullable Component subtitle) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendSubtitle(subtitle);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendSubtitle(final @Nullable String subtitle,
+                                                         final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendSubtitle(subtitle, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendSubtitle(final @Nullable Component subtitle,
+                                                         final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendSubtitle(subtitle, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable String title,
+                                                      final @Nullable String subtitle) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable String title,
+                                                      final @Nullable Component subtitle) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable Component title,
+                                                      final @Nullable String subtitle) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable Component title,
+                                                      final @Nullable Component subtitle) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable String title,
+                                                      final @Nullable String subtitle,
+                                                      final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable String title,
+                                                      final @Nullable Component subtitle,
+                                                      final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable Component title,
+                                                      final @Nullable String subtitle,
+                                                      final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable Component title,
+                                                      final @Nullable Component subtitle,
+                                                      final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendActionBar(final @NotNull String message) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendActionBar(message);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendActionBar(final @NotNull Component component) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendActionBar(component);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendMessage(final @NotNull String message) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendMessage(message);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendMessage(final @NotNull Component component) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendMessage(component);
+    }
 
 }
