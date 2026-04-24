@@ -151,6 +151,15 @@ public final class CommandInput {
     }
 
     /**
+     * Gets the input up until the cursor, space-separated.
+     *
+     * @return the input
+     */
+    public @NotNull String getPartialRawInput() {
+        return String.join(DELIMITER, input.subList(0, Math.min(input.size(), current)));
+    }
+
+    /**
      * Gets the input, space-separated.
      *
      * @return the input
