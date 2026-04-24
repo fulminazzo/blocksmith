@@ -9,6 +9,7 @@ import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.TitlePart
 import org.jetbrains.annotations.NotNull
+import org.jspecify.annotations.NonNull
 import spock.lang.Specification
 
 import java.util.function.Supplier
@@ -133,6 +134,7 @@ class ReceiverFactoriesTest extends Specification {
             }
         }
 
+        @NonNull
         @Override
         <R> R internal() {
             return (R) internal;
