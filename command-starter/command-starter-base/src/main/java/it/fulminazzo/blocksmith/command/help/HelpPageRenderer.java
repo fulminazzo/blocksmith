@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public final class HelpPageRenderer {
@@ -281,25 +282,28 @@ public final class HelpPageRenderer {
      * @param lines     the maximum number of lines to show
      * @return the components
      */
-    static @NotNull List<@NotNull Component> truncateLines(@NotNull Component component, final int lines) {
+    static @NotNull List<@NotNull Component> truncateLines(final @NotNull Component component, final int lines) {
+        Component comp = component;
         List<Component> components = new ArrayList<>();
         for (int i = 0; i < lines; i++) {
-            String raw = PLAIN_SERIALIZER.serialize(component);
+            String raw = PLAIN_SERIALIZER.serialize(comp);
             if (raw.isEmpty()) break;
-            else if (i == lines - 1) components.add(truncate("", component));
+            else if (i == lines - 1) components.add(truncate("", comp));
             else {
                 int length = getMaxTruncationLength(raw);
                 if (length == -1) {
-                    components.add(component);
+                    components.add(comp);
                     return components;
                 } else {
                     length++;
-                    components.add(ComponentUtils.subcomponent(component, 0, length));
-                    component = ComponentUtils.subcomponent(component, length, raw.length());
+                    components.add(ComponentUtils.subcomponent(comp, 0, length));
+                    comp = ComponentUtils.subcomponent(comp, length, raw.length());
                 }
             }
         }
-        return components;
+        return components.stream()
+                .map(c -> c.hoverEvent(HoverEvent.showText(component)))
+                .collect(Collectors.toList());
     }
 
     /**
