@@ -30,6 +30,12 @@ public final class HelpPageRenderer {
                     "</hover>" +
                     "</click>";
     public static final @NotNull String DEFAULT_NO_SUBCOMMANDS = "\n  <red>(none)</red>\n ";
+    public static final @NotNull String DEFAULT_PREVIOUS_PAGE = "<gold>[</gold><red>\\<\\<\\<</red><gold>]</gold>";
+    public static final @NotNull String DEFAULT_NEXT_PAGE = "<gold>[</gold><red>\\>\\>\\></red><gold>]</gold>";
+    public static final @NotNull String DEFAULT_CURRENT_PAGE =
+            "<gold><strikethrough>--------</strikethrough></gold>" +
+                    " <red>%page%</red><dark_gray>/</dark_gray><red>%pages%</red> " +
+                    "<gold><strikethrough>--------</strikethrough></gold>";
 
     private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
@@ -203,9 +209,9 @@ public final class HelpPageRenderer {
      *     under {@link CommandMessages#HELP_COMMAND_SUBCOMMANDS}.
      *     If it could not be found, it falls back to {@link #DEFAULT_SUBCOMMANDS}.</li>
      *     <li>{@code %previous%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under {@link CommandMessages#HELP_COMMAND_PREVIOUS_PAGE} (only shown if necessary);</li> //TODO: option to disable
+     *     under {@link CommandMessages#HELP_COMMAND_PREVIOUS_PAGE} (only shown if necessary);</li>
      *     <li>{@code %next%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under {@link CommandMessages#HELP_COMMAND_NEXT_PAGE} (only shown if necessary);</li> //TODO: option to disable
+     *     under {@link CommandMessages#HELP_COMMAND_NEXT_PAGE} (only shown if necessary);</li>
      *     <li>{@code %current%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under {@link CommandMessages#HELP_COMMAND_CURRENT_PAGE}.</li>
      * </ul>
@@ -213,27 +219,46 @@ public final class HelpPageRenderer {
      * @param component the component to format
      * @param messenger the messenger to get the messages from
      * @param locale    the locale
+     * @param page      the page
+     * @param pages     the total pages
      * @return the formatted component
      */
     @NotNull Component format(final @NotNull Component component,
                               final @NotNull Messenger messenger,
-                              final @NotNull Locale locale) {
+                              final @NotNull Locale locale,
+                              final @Range(from = 0, to = Integer.MAX_VALUE) int page,
+                              final @Range(from = 0, to = Integer.MAX_VALUE) int pages) {
         HelpPageStyle style = HelpPageStyle.get();
+        //TODO: missing functionality
+        Component previousPage = page > 1 || style.isAlwaysShowPreviousPage() ?
+                replacePagePlaceholders(
+                        getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_PREVIOUS_PAGE, locale, DEFAULT_PREVIOUS_PAGE),
+                        page,
+                        pages
+                ) : Component.empty();
+        //TODO: missing functionality
+        Component nextPage = page < pages || style.isAlwaysShowNextPage() ?
+                replacePagePlaceholders(
+                        getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_NEXT_PAGE, locale, DEFAULT_NEXT_PAGE),
+                        page,
+                        pages
+                ) : Component.empty();
+        Component currentPage = pages > 0 || style.isAlwaysShowCurrentPage() ?
+                replacePagePlaceholders(
+                        getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_CURRENT_PAGE, locale, DEFAULT_CURRENT_PAGE),
+                        page,
+                        pages
+                ) : Component.empty();
         //TODO: proper testing
         return component
                 .replaceText(b -> b.matchLiteral("%filler%").replacement(style.getStyledFiller()))
                 .replaceText(b -> b.matchLiteral("%name%").replacement(helpPage.getCommand().getName()))
                 .replaceText(b -> b.matchLiteral("%subcommands%")
                         .replacement(getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_SUBCOMMANDS, locale, DEFAULT_SUBCOMMANDS)))
-                //TODO: missing logic
-                .replaceText(b -> b.matchLiteral("%previous%")
-                        .replacement(getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_PREVIOUS_PAGE, locale)))
-                //TODO: missing logic
-                .replaceText(b -> b.matchLiteral("%next%")
-                        .replacement(getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_NEXT_PAGE, locale)))
-                //TODO: missing logic
-                .replaceText(b -> b.matchLiteral("%current%")
-                        .replacement(getComponentOrEmpty(messenger, CommandMessages.HELP_COMMAND_CURRENT_PAGE, locale)));
+                .replaceText(b -> b.matchLiteral("%previous%").replacement(previousPage))
+                .replaceText(b -> b.matchLiteral("%current%").replacement(currentPage))
+                .replaceText(b -> b.matchLiteral("%next%").replacement(nextPage))
+                ;
     }
 
     /**
@@ -334,6 +359,14 @@ public final class HelpPageRenderer {
         Component component = messenger.getComponentOrNull(messageCode, locale);
         if (component == null) component = ComponentUtils.toComponent(alternative);
         return component;
+    }
+
+    private static @NotNull Component replacePagePlaceholders(final @NotNull Component component,
+                                                              final int page,
+                                                              final int pages) {
+        return component
+                .replaceText(b -> b.matchLiteral("%page%").replacement(String.valueOf(page)))
+                .replaceText(b -> b.matchLiteral("%pages%").replacement(String.valueOf(pages)));
     }
 
     private static @NotNull String formatTitle(final @NotNull String title) {
