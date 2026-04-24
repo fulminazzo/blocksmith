@@ -30,7 +30,7 @@ class AsyncManagerTest extends Specification {
         manager = new AsyncManager(executorService, Duration.ofSeconds(1))
 
         sender = Mock(CommandSenderWrapper)
-        sender.id >> UUID.randomUUID()
+        sender.idImpl >> UUID.randomUUID()
         sender.sync { _ } >> { a ->
             a[0].accept(sender)
         }

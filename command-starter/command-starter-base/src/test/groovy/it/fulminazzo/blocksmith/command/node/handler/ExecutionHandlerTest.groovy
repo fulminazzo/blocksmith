@@ -33,7 +33,7 @@ class ExecutionHandlerTest extends Specification {
         }
 
         def sender = Mock(CommandSenderWrapper)
-        sender.id >> 0
+        sender.idImpl >> 0
 
         visitor = Mock(CommandExecutionVisitor)
         visitor.commandSender >> sender
