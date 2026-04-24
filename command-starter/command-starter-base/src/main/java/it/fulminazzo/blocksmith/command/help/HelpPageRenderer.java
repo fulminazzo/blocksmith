@@ -108,13 +108,13 @@ public final class HelpPageRenderer {
         Component baseComponent = format(ComponentUtils.toComponent(raw), messenger, locale);
         final HelpPageStyle style = HelpPageStyle.get();
         StringBuilder fillers = new StringBuilder(style.getFiller());
-        String rawComponent = PLAIN_SERIALIZER.serialize(baseComponent);
+        String rawComponent = formatTitle(PLAIN_SERIALIZER.serialize(baseComponent));
         while (getMaxLength(fillers + rawComponent + fillers) == -1)
             fillers.append(style.getFiller());
         String filler = fillers.toString();
         for (String s : style.getFillerStyles())
             filler = StringUtils.tag(s, filler);
-        rawComponent = ComponentUtils.toString(baseComponent);
+        rawComponent = formatTitle(ComponentUtils.toString(baseComponent));
         return ComponentUtils.toComponent(filler + rawComponent + filler);
     }
 
@@ -250,6 +250,10 @@ public final class HelpPageRenderer {
         Component component = messenger.getComponentOrNull(messageCode, locale);
         if (component == null) component = Component.text("");
         return component;
+    }
+
+    private static @NotNull String formatTitle(final @NotNull String title) {
+        return title.isEmpty() ? title : String.format(" %s ", title);
     }
 
 }

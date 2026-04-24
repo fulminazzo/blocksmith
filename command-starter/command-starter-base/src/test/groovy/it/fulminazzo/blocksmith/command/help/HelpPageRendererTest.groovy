@@ -112,9 +112,9 @@ class HelpPageRendererTest extends Specification {
         def component = renderer.formatAndFill('Title', Mock(Messenger), Locale.ITALY)
 
         then:
-        ComponentUtils.toString(component) == '<strikethrough><gold>--------------------------</gold></strikethrough>' +
-                'Title' +
-                '<strikethrough><gold>--------------------------'
+        ComponentUtils.toString(component) == '<strikethrough><gold>-------------------------</gold></strikethrough>' +
+                ' Title ' +
+                '<strikethrough><gold>-------------------------'
     }
 
 
