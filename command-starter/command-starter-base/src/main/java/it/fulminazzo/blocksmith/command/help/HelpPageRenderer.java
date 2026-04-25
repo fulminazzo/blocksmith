@@ -2,10 +2,7 @@ package it.fulminazzo.blocksmith.command.help;
 
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
-import it.fulminazzo.blocksmith.message.MessageParseContext;
 import it.fulminazzo.blocksmith.message.Messenger;
-import it.fulminazzo.blocksmith.message.argument.Argument;
-import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -16,7 +13,10 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -211,16 +211,14 @@ public final class HelpPageRenderer {
      * @return the formatted component
      */
     @NotNull Component formatPageButtons(final @NotNull Component component) {
-        String helpCommand = visitor.getInput().getPartialRawInput() + " " + helpPage.getCommand().getHelpCommandName();
+        String helpCommand = visitor.getInput().getPartialRawInput() + " " + helpPage.getCommand().getHelpCommandName() + " ";
         Component previousPage = getComponentOrFillers(
                 page > 1,
-                format(style.getPreviousPageComponent())
-                        .clickEvent(ClickEvent.runCommand(helpCommand + " " + (page - 1)))
+                format(style.getPreviousPageComponent()).clickEvent(ClickEvent.runCommand(helpCommand + (page - 1)))
         );
         Component nextPage = getComponentOrFillers(
                 page < pages,
-                format(style.getNextPageComponent())
-                        .clickEvent(ClickEvent.runCommand(helpCommand + " " + (page + 1)))
+                format(style.getNextPageComponent()).clickEvent(ClickEvent.runCommand(helpCommand + (page + 1)))
         );
         return format(component
                 .replaceText(r -> r.matchLiteral("%previous%").replacement(previousPage))
@@ -269,46 +267,39 @@ public final class HelpPageRenderer {
      * @param commandData the container to get information from
      * @return the formatted component
      */
-    @NotNull Component format(@NotNull Component component,
+    @NotNull Component format(final @NotNull Component component,
                               final @NotNull HelpPage.CommandData commandData) {
-        final List<Argument> arguments = Arrays.asList(
-                Placeholder.of("name", commandData.getName()),
-                Placeholder.of("permission", commandData.getPermission().getPermission()),
-                Placeholder.of("description", messenger.getComponentOrElse(commandData.getDescription(), locale, "")),
-                Placeholder.of("usage", commandData.getUsage()),
-                Placeholder.of("page", page),
-                Placeholder.of("pages", pages)
-        );
-        for (Argument argument : arguments)
-            component = argument.apply(new MessageParseContext(messenger, locale, component));
-        return parseFillerComponent(component);
+        String description = ComponentUtils.toString(messenger.getComponentOrElse(commandData.getDescription(), locale, ""));
+        final String serialized = ComponentUtils.toString(component)
+                .replace("%name%", commandData.getName())
+                .replace("%permission%", commandData.getPermission().getPermission())
+                .replace("%description%", description)
+                .replace("%usage%", commandData.getUsage())
+                .replace("%page%", String.valueOf(page))
+                .replace("%pages%", String.valueOf(pages));
+        return parseFillerComponent(ComponentUtils.toComponent(serialized));
     }
 
     /**
-     * Given the component, will replace any {@link #FILLER_PLACEHOLDER}
+     * It will replace any {@link #FILLER_PLACEHOLDER} in the given component
      * with the result of {@link HelpPageStyle#getFillerComponent()}
-     * multiplied until the component does not reach {@link #MAX_FONT_WIDTH}.
+     * multiplied until the text does not reach {@link #MAX_FONT_WIDTH}.
      * <br>
      * Useful for generating centered text automatically.
      *
      * @param component the component to replace
      * @return the replaced component
      */
-    @NotNull Component parseFillerComponent(@NotNull Component component) {
-        if (!PLAIN_SERIALIZER.serialize(component).contains(FILLER_PLACEHOLDER)) return component;
+    @NotNull Component parseFillerComponent(final @NotNull Component component) {
+        String text = PLAIN_SERIALIZER.serialize(component);
+        if (!text.contains(FILLER_PLACEHOLDER)) return component;
         Component fillerComponent = style.getFillerComponent();
+        final String filler = PLAIN_SERIALIZER.serialize(fillerComponent);
         int current = 1;
-        String raw;
-        do {
-            Component replacement = repeat(fillerComponent, current++);
-            raw = PLAIN_SERIALIZER.serialize(component.replaceText(
-                    r -> r.matchLiteral(FILLER_PLACEHOLDER).replacement(replacement)
-            ));
-        } while (MinecraftFontWidth.getWidth(raw) <= MAX_FONT_WIDTH);
-        Component replacement = repeat(fillerComponent, Math.max(0, current - 2));
-        return component.replaceText(
-                r -> r.matchLiteral(FILLER_PLACEHOLDER).replacement(replacement)
-        );
+        while (MinecraftFontWidth.getWidth(text.replace(FILLER_PLACEHOLDER, filler.repeat(current + 1))) <= MAX_FONT_WIDTH)
+            current++;
+        Component replacement = repeat(fillerComponent, current);
+        return component.replaceText(r -> r.matchLiteral(FILLER_PLACEHOLDER).replacement(replacement));
     }
 
     /**
@@ -323,16 +314,14 @@ public final class HelpPageRenderer {
      */
     @NotNull Component getComponentOrFillers(final boolean condition, final @NotNull Component component) {
         if (condition) return component;
-        String serialized = PLAIN_SERIALIZER.serialize(component);
+        final String serialized = PLAIN_SERIALIZER.serialize(component);
         if (serialized.isEmpty()) return component;
         int length = MinecraftFontWidth.getWidth(serialized);
         Component fillerComponent = style.getFillerComponent();
-        Component current = Component.empty().append(fillerComponent);
-        while (MinecraftFontWidth.getWidth(
-                PLAIN_SERIALIZER.serialize(current) + PLAIN_SERIALIZER.serialize(fillerComponent)
-        ) <= length)
-            current = current.append(fillerComponent);
-        return current;
+        final String filler = PLAIN_SERIALIZER.serialize(fillerComponent);
+        int current = 1;
+        while (MinecraftFontWidth.getWidth(filler.repeat(current + 1)) <= length) current++;
+        return repeat(fillerComponent, current);
     }
 
     /*

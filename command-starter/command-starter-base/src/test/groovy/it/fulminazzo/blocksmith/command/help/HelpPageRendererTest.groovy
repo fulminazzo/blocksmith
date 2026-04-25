@@ -194,15 +194,32 @@ class HelpPageRendererTest extends Specification {
         'Super long test description to ensure it is properly truncated' || 'Super long test description to ensure it is properl</gray>...'
     }
 
-    def 'test that parseFillerComponent of #component returns #expected'() {
+    def 'test that format correctly renders data'() {
+        given:
+        def component = Component.text('%name%, %permission%, %description%, %usage%, %page%, %pages%')
+
+        and:
+        if (!description.empty) messages['test.description'] = description
+
         when:
-        def actual = renderer.parseFillerComponent(ComponentUtils.toComponent(component))
+        def actual = PLAIN_SERIALIZER.serialize(renderer.format(component))
+
+        then:
+        actual == "test, blocksmith.test.permission, $description, /test, 0, 0"
+
+        where:
+        description << ['', 'Test description']
+    }
+
+    def 'test that parseFillerComponent of #text returns #expected'() {
+        when:
+        def actual = renderer.parseFillerComponent(ComponentUtils.toComponent(text))
 
         then:
         ComponentUtils.toString(actual) == expected
 
         where:
-        component                             || expected
+        text                                  || expected
         'Hello, world!'                       || 'Hello, world!'
         '%filler%'                            || '<strikethrough><gold>-----------------------------------------------------'
         '%filler%A%filler%'                   || '<strikethrough><gold>--------------------------</gold></strikethrough>A<strikethrough><gold>--------------------------'
