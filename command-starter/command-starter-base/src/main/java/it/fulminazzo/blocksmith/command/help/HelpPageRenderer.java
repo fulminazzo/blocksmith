@@ -65,24 +65,12 @@ public final class HelpPageRenderer {
     }
 
     public @NotNull List<Component> render(int page) {
-        final HelpPageStyleOld style = HelpPageStyleOld.get();
-
         final int pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
         // Imagine the sender requested the help page and got access to a next page.
         // Then, they lost some permissions, therefore the next page disappeared.
         // By using this calculation, we make sure that the renderer does not halt in this or similar scenarios
         page = Math.min(page, pages);
-        // Header
-        lines.add(formatAndFill(style.getHeader(), page, pages));
-        renderDescription();
-        renderPermission();
-        renderUsage();
-        // Separator
-        lines.add(formatAndFill(style.getSeparatorText(), page, pages));
-        // Subcommands
-        renderSubcommands(page);
-        // Footer
-        lines.add(formatAndFill(style.getFooter(), page, pages));
+        //TODO: finish implementation
         return lines;
     }
 
@@ -153,22 +141,6 @@ public final class HelpPageRenderer {
         int length = getMaxTruncationLength(PLAIN_SERIALIZER.serialize(subcommandComponent));
         if (length != -1) subcommandComponent = ComponentUtils.truncate(subcommandComponent, length);
         lines.add(subcommandComponent);
-    }
-
-    /**
-     * Formats the given string with {@link #format(Component, int, int)}.
-     * Then, it fills it using {@link HelpPageStyleOld#getFiller()}.
-     *
-     * @param raw   the raw string
-     * @param page  the page
-     * @param pages the total pages
-     * @return the formatted component
-     */
-    @NotNull Component formatAndFill(final @NotNull String raw,
-                                     final @Range(from = 0, to = Integer.MAX_VALUE) int page,
-                                     final @Range(from = 0, to = Integer.MAX_VALUE) int pages) {
-        //TODO: implement
-        throw new UnsupportedOperationException();
     }
 
     /**
