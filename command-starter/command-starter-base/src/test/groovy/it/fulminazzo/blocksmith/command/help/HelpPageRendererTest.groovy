@@ -68,7 +68,7 @@ class HelpPageRendererTest extends Specification {
         visitor.commandSender >> sender
         visitor.input >> input
 
-        renderer = new HelpPageRenderer(helpPage, visitor)
+        renderer = new HelpPageRenderer(helpPage, visitor, 1)
     }
 
     def 'test that renderDescription of #description returns #expected'() {
@@ -139,13 +139,13 @@ class HelpPageRendererTest extends Specification {
 
         and:
         input.advanceCursor().advanceCursor()
-        def renderer = new HelpPageRenderer(helpPage, visitor)
+        def renderer = new HelpPageRenderer(helpPage, visitor, page)
 
         and:
         messages[CommandMessages.HELP_COMMAND_SUBCOMMAND_FORMAT] = 'subcommand'
 
         when:
-        renderer.renderSubcommands(page)
+        renderer.renderSubcommands()
 
         then:
         renderer.lines.collect { ComponentUtils.toString(it) } == expected

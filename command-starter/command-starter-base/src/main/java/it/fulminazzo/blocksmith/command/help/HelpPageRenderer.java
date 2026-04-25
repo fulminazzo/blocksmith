@@ -38,19 +38,32 @@ public final class HelpPageRenderer {
 
     @NotNull HelpPageStyle style;
 
+    @Range(from = 0, to = Integer.MAX_VALUE) int pages;
+    @Range(from = 0, to = Integer.MAX_VALUE) int page;
+
     /**
      * Instantiates a new Help page renderer.
      *
      * @param helpPage the help page to render
      * @param visitor  the visitor requesting the rendering
+     * @param page     the page to render
      */
-    public HelpPageRenderer(final @NotNull HelpPage helpPage, final @NotNull InputVisitor<?, ?> visitor) {
+    public HelpPageRenderer(final @NotNull HelpPage helpPage,
+                            final @NotNull InputVisitor<?, ?> visitor,
+                            final @Range(from = 0, to = Integer.MAX_VALUE) int page) {
         this.helpPage = helpPage;
         this.visitor = visitor;
         this.messenger = visitor.getApplication().getMessenger();
         this.sender = visitor.getCommandSender();
         this.locale = sender.receiver().getLocale();
         this.style = new HelpPageStyle(messenger, locale);
+        this.pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
+        /*
+         * Imagine the sender requested the help page and got access to the next page.
+         * Then, they lost some permissions, therefore the next page disappeared.
+         * By using this calculation, we make sure that the renderer does not halt in this or similar scenarios
+         */
+        this.page = Math.min(page, pages);
         /*
          * The logic of the next code is the following:
          * the user requested the help page of a command. They can either have written
@@ -65,11 +78,6 @@ public final class HelpPageRenderer {
     }
 
     public @NotNull List<Component> render(int page) {
-        final int pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
-        // Imagine the sender requested the help page and got access to a next page.
-        // Then, they lost some permissions, therefore the next page disappeared.
-        // By using this calculation, we make sure that the renderer does not halt in this or similar scenarios
-        page = Math.min(page, pages);
         //TODO: finish implementation
         return lines;
     }
@@ -111,10 +119,8 @@ public final class HelpPageRenderer {
 
     /**
      * Renders all the subcommands for the given page.
-     *
-     * @param page the requested page
      */
-    void renderSubcommands(final @Range(from = 1, to = Integer.MAX_VALUE) int page) {
+    void renderSubcommands() {
         int rendered = 0;
         if (page > 0) {
             List<HelpPage.CommandData> subcommands = helpPage.getSubcommandsPage(sender, page, SUBCOMMANDS_LINES);
