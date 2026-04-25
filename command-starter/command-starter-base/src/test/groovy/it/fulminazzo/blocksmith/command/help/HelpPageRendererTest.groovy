@@ -27,6 +27,7 @@ class HelpPageRendererTest extends Specification {
                     .description('test.description')
                     .permission(new PermissionInfo('blocksmith', 'test.permission', Permission.Grant.NONE))
                     .usage('/test')
+                    .helpCommandName('help')
                     .build(),
             []
     )
@@ -131,6 +132,7 @@ class HelpPageRendererTest extends Specification {
                 data.description >> "subcommand$it description"
                 data.permission >> new PermissionInfo('blocksmith', "subcommand$it", Permission.Grant.ALL)
                 data.usage >> "/test subcommand$it"
+                data.helpCommandName >> 'help'
                 return data
             }
         }
@@ -168,6 +170,7 @@ class HelpPageRendererTest extends Specification {
                 .description('command.test.description')
                 .permission(new PermissionInfo('blocksmith', 'test', Permission.Grant.ALL))
                 .usage('/test test <something>')
+                .helpCommandName('help')
                 .build()
 
         and:
