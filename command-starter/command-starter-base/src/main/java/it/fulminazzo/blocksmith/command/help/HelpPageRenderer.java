@@ -86,6 +86,13 @@ public final class HelpPageRenderer {
     }
 
     /**
+     * Renders the header component for the given {@link Locale}.
+     */
+    void renderHeader() {
+        lines.add(format(style.getHeaderComponent()));
+    }
+
+    /**
      * Renders the description component(s) for the given {@link Locale}.
      * <br>
      * If the description is missing, empty lines will be printed.
