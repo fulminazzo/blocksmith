@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.util.*;
-import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -177,13 +176,15 @@ public final class HelpPageRenderer {
      *     <li>{@code %filler%}: the value of
      *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_FILLER}
      *     (falls back to {@link HelpPageStyle#DEFAULT_FILLER} if not found)
-     *     repeated until the component exceeds length {@link #MAX_FONT_WIDTH}.</li>
+     *     repeated until the component exceeds length {@link #MAX_FONT_WIDTH};</li>
+     *     <li>{@code %page%}: the current page;</li>
+     *     <li>{@code %pages%}: the total number of pages.</li>
      * </ul>
      *
      * @param component the component to format
      * @return the formatted component
      */
-    @NotNull Component format(@NotNull Component component) {
+    @NotNull Component format(final @NotNull Component component) {
         return format(component, helpPage.getCommand());
     }
 
@@ -197,7 +198,9 @@ public final class HelpPageRenderer {
      *     <li>{@code %filler%}: the value of
      *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_FILLER}
      *     (falls back to {@link HelpPageStyle#DEFAULT_FILLER} if not found)
-     *     repeated until the component exceeds length {@link #MAX_FONT_WIDTH}.</li>
+     *     repeated until the component exceeds length {@link #MAX_FONT_WIDTH};</li>
+     *     <li>{@code %page%}: the current page;</li>
+     *     <li>{@code %pages%}: the total number of pages.</li>
      * </ul>
      *
      * @param component   the component to format
@@ -210,7 +213,9 @@ public final class HelpPageRenderer {
                 Placeholder.of("name", commandData.getName()),
                 Placeholder.of("permission", commandData.getPermission().getPermission()),
                 Placeholder.of("description", messenger.getComponentOrElse(commandData.getDescription(), locale, "")),
-                Placeholder.of("usage", commandData.getUsage())
+                Placeholder.of("usage", commandData.getUsage()),
+                Placeholder.of("page", page),
+                Placeholder.of("pages", pages)
         );
         for (Argument argument : arguments)
             component = argument.apply(new MessageParseContext(messenger, locale, component));
