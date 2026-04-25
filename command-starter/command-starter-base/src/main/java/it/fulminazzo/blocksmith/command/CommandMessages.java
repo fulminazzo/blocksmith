@@ -235,11 +235,27 @@ public final class CommandMessages {
 
     /**
      * Identifies the text to prepend before a command permission in the help page.
+     * <br>
+     * Placeholders:
+     * <ul>
+     *     <li><b>name</b>: the name of the command;</li>
+     *     <li><b>description</b>: the description of the command;</li>
+     *     <li><b>permission</b>: the permission of the command;</li>
+     *     <li><b>usage</b>: the usage of the command.</li>
+     * </ul>
      */
     public static final @NotNull String HELP_COMMAND_PERMISSION = "command.help.permission";
 
     /**
      * Identifies the text to prepend before a command usage in the help page.
+     * <br>
+     * Placeholders:
+     * <ul>
+     *     <li><b>name</b>: the name of the command;</li>
+     *     <li><b>description</b>: the description of the command;</li>
+     *     <li><b>permission</b>: the permission of the command;</li>
+     *     <li><b>usage</b>: the usage of the command.</li>
+     * </ul>
      */
     public static final @NotNull String HELP_COMMAND_USAGE = "command.help.usage";
 
@@ -254,8 +270,8 @@ public final class CommandMessages {
      * Placeholders:
      * <ul>
      *     <li><b>name</b>: the name of the subcommand;</li>
-     *     <li><b>permission</b>: the permission of the subcommand;</li>
      *     <li><b>description</b>: the description of the subcommand;</li>
+     *     <li><b>permission</b>: the permission of the subcommand;</li>
      *     <li><b>usage</b>: the usage of the subcommand.</li>
      * </ul>
      */

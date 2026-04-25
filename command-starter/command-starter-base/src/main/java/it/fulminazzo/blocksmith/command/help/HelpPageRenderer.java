@@ -93,7 +93,7 @@ public final class HelpPageRenderer {
      * Renders the permission component for the given {@link Locale}.
      */
     void renderPermission() {
-        final Component permissionComponent = style.getPermissionComponent();
+        Component permissionComponent = format(style.getPermissionComponent());
         Component permission = ComponentUtils.toComponent(helpPage.getCommand().getPermission().getPermission());
         permission = truncate(PLAIN_SERIALIZER.serialize(permissionComponent), permission);
         lines.add(permissionComponent.append(permission));
@@ -103,7 +103,7 @@ public final class HelpPageRenderer {
      * Renders the usage component for the given {@link Locale}.
      */
     void renderUsage() {
-        final Component usageComponent = style.getUsageComponent();
+        Component usageComponent = format(style.getUsageComponent());
         Component usage = ComponentUtils.toComponent(helpPage.getCommand().getUsage());
         usage = truncate(PLAIN_SERIALIZER.serialize(usageComponent), usage);
         lines.add(usageComponent.append(usage));
