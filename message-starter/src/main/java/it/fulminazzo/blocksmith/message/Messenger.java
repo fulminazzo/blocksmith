@@ -261,10 +261,10 @@ public final class Messenger {
      * @param alternative the alternate message to return in case the requested one could not be found
      * @return the component
      */
-    public @Nullable Component getComponentOrElse(final @NotNull String messageCode,
-                                                  final @NotNull Locale locale,
-                                                  final @Nullable String alternative,
-                                                  final Argument @NotNull ... arguments) {
+    public Component getComponentOrElse(final @NotNull String messageCode,
+                                        final @NotNull Locale locale,
+                                        final @Nullable String alternative,
+                                        final Argument @NotNull ... arguments) {
         return getComponentOrElse(messageCode, locale, alternative == null
                         ? null
                         : ComponentUtils.toComponent(alternative),
@@ -282,10 +282,10 @@ public final class Messenger {
      * @param alternative the alternate message to return in case the requested one could not be found
      * @return the component
      */
-    public @Nullable Component getComponentOrElse(final @NotNull String messageCode,
-                                                  final @NotNull Locale locale,
-                                                  @Nullable Component alternative,
-                                                  final Argument @NotNull ... arguments) {
+    public Component getComponentOrElse(final @NotNull String messageCode,
+                                        final @NotNull Locale locale,
+                                        @Nullable Component alternative,
+                                        final Argument @NotNull ... arguments) {
         try {
             return getComponent(messageCode, locale, arguments);
         } catch (MessageNotFoundException e) {
