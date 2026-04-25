@@ -49,8 +49,8 @@ public class HelpPage {
      * @param subcommandsPerPage the number of subcommands shown per page
      * @return the number of pages
      */
-    public int getSubcommandsPages(final @NotNull CommandSenderWrapper<?> sender,
-                                   final int subcommandsPerPage) {
+    public @Range(from = 0, to = Integer.MAX_VALUE) int getSubcommandsPages(final @NotNull CommandSenderWrapper<?> sender,
+                                                                            final @Range(from = 1, to = Integer.MAX_VALUE) int subcommandsPerPage) {
         int subcommands = getExecutableSubcommands(sender).size();
         return subcommands / subcommandsPerPage + Math.min(1, subcommands % subcommandsPerPage);
     }
