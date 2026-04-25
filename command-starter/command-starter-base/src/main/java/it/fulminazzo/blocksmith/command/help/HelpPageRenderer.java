@@ -101,14 +101,14 @@ public final class HelpPageRenderer {
     }
 
     /**
-     * Renders the header component for the given {@link Locale}.
+     * Renders the header component.
      */
     void renderHeader() {
         lines.add(formatPageButtons(style.getHeaderComponent()));
     }
 
     /**
-     * Renders the description component(s) for the given {@link Locale}.
+     * Renders the description component(s).
      * <br>
      * If the description is missing, empty lines will be printed.
      */
@@ -123,7 +123,7 @@ public final class HelpPageRenderer {
     }
 
     /**
-     * Renders the permission component for the given {@link Locale}.
+     * Renders the permission component.
      */
     void renderPermission() {
         Component permissionComponent = format(style.getPermissionComponent());
@@ -133,7 +133,7 @@ public final class HelpPageRenderer {
     }
 
     /**
-     * Renders the usage component for the given {@link Locale}.
+     * Renders the usage component.
      */
     void renderUsage() {
         Component usageComponent = format(style.getUsageComponent());
@@ -182,7 +182,7 @@ public final class HelpPageRenderer {
     }
 
     /**
-     * Renders the footer component for the given {@link Locale}.
+     * Renders the footer component.
      */
     void renderFooter() {
         lines.add(formatPageButtons(style.getFooterComponent()));
