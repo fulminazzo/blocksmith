@@ -3,7 +3,6 @@ package it.fulminazzo.blocksmith.command.help;
 import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.argument.Argument;
-import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +20,6 @@ public final class HelpPageStyle {
 
     public static final @NotNull String DEFAULT_PERMISSION = "<gray>Permission</gray><dark_gray>:</dark_gray> ";
     public static final @NotNull String DEFAULT_USAGE = "<gray>Usage</gray><dark_gray>:</dark_gray> ";
-    public static final @NotNull String DEFAULT_SUBCOMMANDS = "Subcommands";
     public static final @NotNull String DEFAULT_SUBCOMMAND_FORMAT =
             "<hover:show_text:'<white>%usage%</white>\n<gray>%permission%</gray>\n\n<aqua>Click for more information</aqua>'>" +
                     "<white>%name%</white> <dark_gray>-</dark_gray> <gray>%description%</gray>" +
@@ -45,10 +43,6 @@ public final class HelpPageStyle {
 
     public @NotNull Component getUsageComponent() {
         return getComponentOrElse(CommandMessages.HELP_COMMAND_USAGE, DEFAULT_USAGE);
-    }
-
-    public @NotNull Component getSubcommandsComponent() {
-        return getComponentOrElse(CommandMessages.HELP_COMMAND_SUBCOMMANDS, DEFAULT_SUBCOMMANDS);
     }
 
     public @NotNull Component getNoSubcommandsComponent() {

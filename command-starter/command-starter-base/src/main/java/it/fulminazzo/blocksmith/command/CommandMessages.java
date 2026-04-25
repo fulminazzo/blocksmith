@@ -251,7 +251,6 @@ public final class CommandMessages {
      *     <li><b>description</b>: the description of the command;</li>
      *     <li><b>permission</b>: the permission of the command;</li>
      *     <li><b>usage</b>: the usage of the command;</li>
-     *     <li><b>subcommands</b>: {@link #HELP_COMMAND_SUBCOMMANDS};</li>
      *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line.</li>
      * </ul>
      */
@@ -266,7 +265,6 @@ public final class CommandMessages {
      *     <li><b>description</b>: the description of the command;</li>
      *     <li><b>permission</b>: the permission of the command;</li>
      *     <li><b>usage</b>: the usage of the command;</li>
-     *     <li><b>subcommands</b>: {@link #HELP_COMMAND_SUBCOMMANDS};</li>
      *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line.</li>
      * </ul>
      */
@@ -281,16 +279,10 @@ public final class CommandMessages {
      *     <li><b>description</b>: the description of the command;</li>
      *     <li><b>permission</b>: the permission of the command;</li>
      *     <li><b>usage</b>: the usage of the command;</li>
-     *     <li><b>subcommands</b>: {@link #HELP_COMMAND_SUBCOMMANDS};</li>
      *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_USAGE = "command.help.usage";
-
-    /**
-     * Identifies the title of the separator displayed in the help page of a command.
-     */
-    public static final @NotNull String HELP_COMMAND_SUBCOMMANDS = "command.help.subcommands";
 
     /**
      * Identifies the format with which to display a subcommand in the help page of a command.
@@ -301,7 +293,6 @@ public final class CommandMessages {
      *     <li><b>description</b>: the description of the subcommand;</li>
      *     <li><b>permission</b>: the permission of the subcommand;</li>
      *     <li><b>usage</b>: the usage of the subcommand;</li>
-     *     <li><b>subcommands</b>: {@link #HELP_COMMAND_SUBCOMMANDS};</li>
      *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line.</li>
      * </ul>
      */

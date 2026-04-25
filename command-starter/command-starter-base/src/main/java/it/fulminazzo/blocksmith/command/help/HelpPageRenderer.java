@@ -166,9 +166,6 @@ public final class HelpPageRenderer {
      *     <li>{@code %permission%}: the permission of the given command;</li>
      *     <li>{@code %description%}: the description of the given command;</li>
      *     <li>{@code %usage%}: the usage of the given command;</li>
-     *     <li>{@code %subcommands%}: the value of
-     *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_SUBCOMMANDS}
-     *     (falls back to {@link HelpPageStyle#DEFAULT_SUBCOMMANDS} if not found);</li>
      *     <li>{@code %filler%}: the value of
      *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_FILLER}
      *     (falls back to {@link HelpPageStyle#DEFAULT_FILLER} if not found)
@@ -189,9 +186,6 @@ public final class HelpPageRenderer {
      *     <li>{@code %permission%}: the permission of the given command;</li>
      *     <li>{@code %description%}: the description of the given command;</li>
      *     <li>{@code %usage%}: the usage of the given command;</li>
-     *     <li>{@code %subcommands%}: the value of
-     *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_SUBCOMMANDS}
-     *     (falls back to {@link HelpPageStyle#DEFAULT_SUBCOMMANDS} if not found);</li>
      *     <li>{@code %filler%}: the value of
      *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_FILLER}
      *     (falls back to {@link HelpPageStyle#DEFAULT_FILLER} if not found)
@@ -208,8 +202,7 @@ public final class HelpPageRenderer {
                 Placeholder.of("name", commandData.getName()),
                 Placeholder.of("permission", commandData.getPermission().getPermission()),
                 Placeholder.of("description", messenger.getComponentOrElse(commandData.getDescription(), locale, "")),
-                Placeholder.of("usage", commandData.getUsage()),
-                Placeholder.of("subcommands", style.getSubcommandsComponent())
+                Placeholder.of("usage", commandData.getUsage())
         );
         for (Argument argument : arguments)
             component = argument.apply(new MessageParseContext(messenger, locale, component));
