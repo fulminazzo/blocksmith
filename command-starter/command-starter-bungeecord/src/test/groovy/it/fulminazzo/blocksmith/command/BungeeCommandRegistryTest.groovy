@@ -94,7 +94,7 @@ class BungeeCommandRegistryTest extends Specification {
 
         then:
         (wrapped instanceof BungeeCommandSenderWrapper)
-        wrapped.actualSender == sender
+        wrapped.handle() == sender
     }
 
     def 'test that sender type is correct'() {

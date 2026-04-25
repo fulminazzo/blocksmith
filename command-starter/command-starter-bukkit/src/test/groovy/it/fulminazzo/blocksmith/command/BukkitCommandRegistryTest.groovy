@@ -250,7 +250,7 @@ class BukkitCommandRegistryTest extends Specification {
 
         then:
         (wrapped instanceof BukkitCommandSenderWrapper)
-        wrapped.actualSender == sender
+        wrapped.handle() == sender
     }
 
     def 'test that sender type is correct'() {

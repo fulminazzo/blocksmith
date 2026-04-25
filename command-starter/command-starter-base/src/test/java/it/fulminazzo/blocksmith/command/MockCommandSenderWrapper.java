@@ -37,6 +37,16 @@ public final class MockCommandSenderWrapper extends CommandSenderWrapper<Command
     }
 
     @Override
+    public boolean isPlayer() {
+        return actualSender instanceof Player;
+    }
+
+    @Override
+    protected @NotNull Object getIdImpl() {
+        return getName();
+    }
+
+    @Override
     protected @NotNull String getNameImpl() {
         return actualSender.getName();
     }
@@ -45,16 +55,6 @@ public final class MockCommandSenderWrapper extends CommandSenderWrapper<Command
     protected boolean hasPermissionImpl(final @NotNull PermissionInfo permissionInfo) {
         if (permissionInfo.getGrant() == Permission.Grant.OP && actualSender.isOp()) return true;
         return actualSender.hasPermission(permissionInfo.getPermission());
-    }
-
-    @Override
-    public boolean isPlayer() {
-        return actualSender instanceof Player;
-    }
-
-    @Override
-    public @NotNull Object getId() {
-        return getName();
     }
 
 }

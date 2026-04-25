@@ -10,7 +10,6 @@ import it.fulminazzo.blocksmith.command.visitor.CommandInput
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import it.fulminazzo.blocksmith.message.MessageParseContext
 import it.fulminazzo.blocksmith.message.Messenger
-import it.fulminazzo.blocksmith.message.receiver.Receiver
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
@@ -53,11 +52,7 @@ class HelpPageRendererTest extends Specification {
             return component
         }
 
-        sender.receiver() >> {
-            def receiver = Mock(Receiver)
-            receiver.locale >> Locale.ITALY
-            return receiver
-        }
+        sender.locale >> Locale.ITALY
 
         input = new CommandInput()
                 .addInput('root', 'help', '1')

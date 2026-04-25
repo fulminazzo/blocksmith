@@ -62,7 +62,7 @@ public final class HelpPageRenderer {
         this.visitor = visitor;
         this.messenger = visitor.getApplication().getMessenger();
         this.sender = visitor.getCommandSender();
-        this.locale = sender.receiver().getLocale();
+        this.locale = sender.getLocale();
         this.style = new HelpPageStyle(messenger, locale);
         this.pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
         /*

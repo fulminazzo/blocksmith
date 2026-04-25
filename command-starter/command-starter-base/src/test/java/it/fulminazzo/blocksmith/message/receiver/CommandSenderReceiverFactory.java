@@ -43,7 +43,8 @@ public class CommandSenderReceiverFactory extends AbstractReceiverFactory {
 
             @Override
             public @NotNull Audience audience() {
-                throw new UnsupportedOperationException();
+                return new Audience() {
+                };
             }
 
             @Override

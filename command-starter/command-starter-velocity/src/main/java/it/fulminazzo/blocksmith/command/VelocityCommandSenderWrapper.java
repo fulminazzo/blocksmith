@@ -27,6 +27,16 @@ final class VelocityCommandSenderWrapper extends CommandSenderWrapper<CommandSou
     }
 
     @Override
+    public boolean isPlayer() {
+        return actualSender instanceof Player;
+    }
+
+    @Override
+    protected @NotNull Object getIdImpl() {
+        return ((Player) actualSender).getUniqueId();
+    }
+
+    @Override
     protected @NotNull String getNameImpl() {
         return ((Player) actualSender).getUsername();
     }
@@ -34,16 +44,6 @@ final class VelocityCommandSenderWrapper extends CommandSenderWrapper<CommandSou
     @Override
     protected boolean hasPermissionImpl(final @NotNull PermissionInfo permissionInfo) {
         return actualSender.hasPermission(permissionInfo.getPermission());
-    }
-
-    @Override
-    public boolean isPlayer() {
-        return actualSender instanceof Player;
-    }
-
-    @Override
-    public @NotNull Object getId() {
-        return isPlayer() ? ((Player) actualSender).getUniqueId() : getName();
     }
 
 }

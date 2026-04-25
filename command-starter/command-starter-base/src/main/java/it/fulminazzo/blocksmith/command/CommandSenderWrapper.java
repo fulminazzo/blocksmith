@@ -5,15 +5,16 @@ import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import it.fulminazzo.blocksmith.message.receiver.Receiver;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories;
-import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.scheduler.Scheduler;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.Delegate;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.function.Consumer;
@@ -23,10 +24,11 @@ import java.util.function.Consumer;
  *
  * @param <S> the actual type of the sender
  */
+@SuppressWarnings("unchecked")
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-public abstract class CommandSenderWrapper<S> {
+public abstract class CommandSenderWrapper<S> implements Receiver {
     /**
      * The default name to identify the console in each platform.
      */
@@ -35,7 +37,6 @@ public abstract class CommandSenderWrapper<S> {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private final @NotNull ApplicationHandle application;
-    @Getter
     protected final @NotNull S actualSender;
 
     /**
@@ -49,15 +50,6 @@ public abstract class CommandSenderWrapper<S> {
     }
 
     /**
-     * Converts this sender to a {@link Receiver}.
-     *
-     * @return the receiver
-     */
-    public @NotNull Receiver receiver() {
-        return ReceiverFactories.get(actualSender.getClass(), application).create(actualSender);
-    }
-
-    /**
      * Checks if the actual sender extends the given Java class.
      *
      * @param type the type
@@ -68,24 +60,13 @@ public abstract class CommandSenderWrapper<S> {
     }
 
     /**
-     * Sends a message to the wrapped sender.
+     * Gets the unique identifier of the sender.
+     * If the sender is <b>not</b> a player, it will use {@link #getName()}.
      *
-     * @param message the message to send
-     * @return this object (for method chaining)
+     * @return the identifier
      */
-    public @NotNull CommandSenderWrapper<S> sendMessage(final @NotNull String message) {
-        return sendMessage(ComponentUtils.toComponent(message));
-    }
-
-    /**
-     * Sends a message to the wrapped sender.
-     *
-     * @param message the message to send
-     * @return this object (for method chaining)
-     */
-    public @NotNull CommandSenderWrapper<S> sendMessage(final @NotNull Component message) {
-        receiver().audience().sendMessage(message);
-        return this;
+    public final @NotNull Object getId() {
+        return isPlayer() ? getIdImpl() : getName();
     }
 
     /**
@@ -109,6 +90,41 @@ public abstract class CommandSenderWrapper<S> {
     }
 
     /**
+     * Gets the internal wrapped sender.
+     *
+     * @return the sender
+     */
+    public @NotNull S handle() {
+        return actualSender;
+    }
+
+    /**
+     * Converts this sender to a {@link Receiver}.
+     *
+     * @return the receiver
+     */
+    @Delegate(types = Receiver.class)
+    private @NotNull Receiver receiver() {
+        return ReceiverFactories.get(actualSender.getClass(), application).create(actualSender);
+    }
+
+    /**
+     * Checks if the internal sender is a player.
+     *
+     * @return {@code true} if they are
+     */
+    public abstract boolean isPlayer();
+
+    /**
+     * Gets a unique identifier for the wrapped sender.
+     * <br>
+     * Does <b>NOT</b> check if the wrapped sender is not a player.
+     *
+     * @return the id
+     */
+    protected abstract @NotNull Object getIdImpl();
+
+    /**
      * Gets the actual name of the sender.
      * <br>
      * For internal use only.
@@ -127,18 +143,120 @@ public abstract class CommandSenderWrapper<S> {
      */
     protected abstract boolean hasPermissionImpl(final @NotNull PermissionInfo permissionInfo);
 
-    /**
-     * Checks if the internal sender are a player.
-     *
-     * @return {@code true} if they are
-     */
-    public abstract boolean isPlayer();
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable String title) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title);
+    }
 
-    /**
-     * Gets a unique identifier for the wrapped sender.
-     *
-     * @return the id
-     */
-    public abstract @NotNull Object getId();
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable Component title) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable String title,
+                                                      final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable Component title,
+                                                      final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendSubtitle(final @Nullable String subtitle) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendSubtitle(subtitle);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendSubtitle(final @Nullable Component subtitle) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendSubtitle(subtitle);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendSubtitle(final @Nullable String subtitle,
+                                                         final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendSubtitle(subtitle, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendSubtitle(final @Nullable Component subtitle,
+                                                         final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendSubtitle(subtitle, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable String title,
+                                                      final @Nullable String subtitle) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable String title,
+                                                      final @Nullable Component subtitle) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable Component title,
+                                                      final @Nullable String subtitle) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable Component title,
+                                                      final @Nullable Component subtitle) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable String title,
+                                                      final @Nullable String subtitle,
+                                                      final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable String title,
+                                                      final @Nullable Component subtitle,
+                                                      final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable Component title,
+                                                      final @Nullable String subtitle,
+                                                      final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendTitle(final @Nullable Component title,
+                                                      final @Nullable Component subtitle,
+                                                      final @NotNull Title.Times times) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendTitle(title, subtitle, times);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendActionBar(final @NotNull String message) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendActionBar(message);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendActionBar(final @NotNull Component component) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendActionBar(component);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendMessage(final @NotNull String message) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendMessage(message);
+    }
+
+    @Override
+    public @NotNull CommandSenderWrapper<S> sendMessage(final @NotNull Component component) {
+        return (CommandSenderWrapper<S>) Receiver.super.sendMessage(component);
+    }
 
 }

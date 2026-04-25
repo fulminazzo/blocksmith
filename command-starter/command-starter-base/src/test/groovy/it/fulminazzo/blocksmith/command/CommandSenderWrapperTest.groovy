@@ -1,16 +1,17 @@
 package it.fulminazzo.blocksmith.command
 
 import it.fulminazzo.blocksmith.message.receiver.Receiver
-import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories
-import it.fulminazzo.blocksmith.message.receiver.ReceiverFactory
-import it.fulminazzo.blocksmith.message.util.ComponentUtils
+import it.fulminazzo.blocksmith.reflect.Reflect
 import it.fulminazzo.blocksmith.scheduler.Scheduler
 import it.fulminazzo.blocksmith.scheduler.Task
 import it.fulminazzo.blocksmith.scheduler.TaskBuilder
-import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.title.Title
 import org.mockito.Mockito
 import spock.lang.Specification
 
+import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 import java.util.concurrent.atomic.AtomicReference
 
 class CommandSenderWrapperTest extends Specification {
@@ -48,39 +49,6 @@ class CommandSenderWrapperTest extends Specification {
         mocked.close()
     }
 
-    def 'test that sendMessage calls on audience'() {
-        given:
-        def audience = Mock(Audience)
-        def receiver = Mock(Receiver)
-        receiver.audience() >> audience
-
-        and:
-        def receiverFactory = Mock(ReceiverFactory)
-        receiverFactory.create(_) >> receiver
-
-        and:
-        def receiverFactories = Mockito.mockStatic(ReceiverFactories)
-        receiverFactories.when { ReceiverFactories.get(Mockito.any(), Mockito.any()) }.thenReturn(receiverFactory)
-
-        and:
-        def sender = new MockCommandSenderWrapper(new CommandSender())
-
-        when:
-        sender.sendMessage(message)
-
-        then:
-        1 * audience.sendMessage(_) >> { a ->
-            def m = ComponentUtils.toString(a[0])
-            assert m == 'Hello, world!'
-        }
-
-        cleanup:
-        receiverFactories.close()
-
-        where:
-        message << ['Hello, world!', ComponentUtils.toComponent('Hello, world!')]
-    }
-
     def 'test that getName with #player returns #expected'() {
         given:
         def sender = new MockCommandSenderWrapper(player
@@ -98,6 +66,47 @@ class CommandSenderWrapperTest extends Specification {
         player || expected
         true   || 'Steve'
         false  || CommandSenderWrapper.CONSOLE_COMMAND_NAME
+    }
+
+    def 'test that #method returns CommandSenderWrapper'() {
+        given:
+        def sender = new MockCommandSenderWrapper(new CommandSender())
+        def reflect = Reflect.on(sender)
+
+        and:
+        def actualMethod = reflect.getMethod(method.name, method.parameterTypes)
+
+        expect:
+        actualMethod.returnType == CommandSenderWrapper
+
+        when:
+        def params = actualMethod.parameterTypes.collect {
+            switch (it) {
+                case String: return 'Hello, world!'
+                case Component: return Component.text('Hello, world!')
+                case Title.Times: return Receiver.DEFAULT_TIMES
+                default: return null
+            }
+        }
+
+        and:
+        def actual = reflect.invoke(method, *params)
+
+        then:
+        actual.get() == sender
+
+        where:
+        method << getReturnTypeMethods(Receiver)
+    }
+
+    /**
+     * Gets all the instance methods in the type that return the type itself.
+     *
+     * @param type the type to get the methods from
+     * @return the methods
+     */
+    static List<Method> getReturnTypeMethods(final Class<?> type) {
+        return Reflect.on(type).getMethods { !Modifier.isStatic(it.modifiers) && it.returnType == type }
     }
 
 }

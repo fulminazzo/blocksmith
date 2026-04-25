@@ -29,7 +29,7 @@ class BrigadierParserTest extends Specification {
     def 'test parse of full node'() {
         given:
         def sender = Mock(CommandSenderWrapper)
-        sender.actualSender >> new Object()
+        sender.handle() >> new Object()
 
         and:
         def delegate = Mock(CommandRegistry)
@@ -102,7 +102,7 @@ class BrigadierParserTest extends Specification {
         requirement != null
 
         when:
-        requirement.test(sender.actualSender)
+        requirement.test(sender.handle())
 
         then:
         1 * sender.hasPermission(_)
