@@ -286,18 +286,23 @@ class HelpPageRendererTest extends Specification {
         def component = Component.text("$MAX_CHARS@")
 
         when:
-        def actual = HelpPageRenderer.truncate('', component)
+        def actual = HelpPageRenderer.truncate(prefix, component)
 
         then:
         actual != component
 
         and:
-        PLAIN_SERIALIZER.serialize(actual) == TRUNCATED_CHARS
+        PLAIN_SERIALIZER.serialize(actual) == expected
 
         and:
         def hoverEvent = actual.hoverEvent()
         hoverEvent != null
         hoverEvent.value() == component
+
+        where:
+        prefix    || expected
+        ''        || TRUNCATED_CHARS
+        MAX_CHARS || ''
     }
 
     def 'test that truncate of short string does not truncate'() {
