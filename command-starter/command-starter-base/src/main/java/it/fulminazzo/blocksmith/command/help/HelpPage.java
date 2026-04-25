@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.help;
 
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
+import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
@@ -9,6 +10,7 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.util.List;
@@ -93,6 +95,15 @@ public class HelpPage {
         @NotNull PermissionInfo permission;
         @NotNull String usage;
         @NotNull String helpCommandName;
+        @Nullable String parentHelpCommandName;
+        /**
+         * This value tells how many nodes to traverse
+         * before reaching the nearest {@link LiteralNode}
+         * (representing the effective parent command node).
+         * <br>
+         * If {@code 0}, it means no parent is present.
+         */
+        int depth;
 
         /**
          * Creates a new Command data.
@@ -102,12 +113,21 @@ public class HelpPage {
          */
         public static @NotNull CommandData create(final @NotNull LiteralNode commandNode) {
             CommandInfo commandInfo = commandNode.getCommandInfo();
+            int depth = 0;
+            CommandNode node = commandNode;
+            while ((node = node.getParent()) != null) {
+                depth++;
+                if (node instanceof LiteralNode) break;
+            }
+            CommandNode parent = commandNode.getParent();
             return builder()
                     .name(commandNode.getName())
                     .description(commandInfo.getDescription())
                     .permission(commandInfo.getPermission())
                     .usage(commandNode.getUsage())
                     .helpCommandName(commandNode.getHelpCommandName())
+                    .parentHelpCommandName(parent == null ? null : parent.getHelpCommandName())
+                    .depth(depth)
                     .build();
         }
 
