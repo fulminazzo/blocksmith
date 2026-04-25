@@ -80,7 +80,7 @@ public final class HelpPageRenderer {
          * Therefore, to go back to the root command (while preserving the arguments)
          * we retrocede the cursor by 2.
          */
-        visitor.getInput().retrocedeCursor().retrocedeCursor();
+        visitor.getInput().retreatCursor().retreatCursor();
     }
 
     /**

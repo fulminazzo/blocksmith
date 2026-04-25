@@ -104,7 +104,7 @@ public final class CommandInput {
      *
      * @return this object (for method chaining)
      */
-    public @NotNull CommandInput retrocedeCursor() {
+    public @NotNull CommandInput retreatCursor() {
         current--;
         return this;
     }
