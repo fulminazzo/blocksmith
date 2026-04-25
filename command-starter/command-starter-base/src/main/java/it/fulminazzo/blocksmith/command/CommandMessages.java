@@ -334,8 +334,13 @@ public final class CommandMessages {
      * <br>
      * Placeholders:
      * <ul>
-     *     <li><b>page</b>: the page number;</li>
-     *     <li><b>pages</b>: the total pages.</li>
+     *     <li><b>name</b>: the name of the subcommand;</li>
+     *     <li><b>description</b>: the description of the subcommand;</li>
+     *     <li><b>permission</b>: the permission of the subcommand;</li>
+     *     <li><b>usage</b>: the usage of the subcommand;</li>
+     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
+     *     <li><b>page</b>: the current page;</li>
+     *     <li><b>pages</b>: the total number of pages.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_PREVIOUS_PAGE = "command.help.previous-page";
@@ -345,8 +350,13 @@ public final class CommandMessages {
      * <br>
      * Placeholders:
      * <ul>
-     *     <li><b>page</b>: the page number;</li>
-     *     <li><b>pages</b>: the total pages.</li>
+     *     <li><b>name</b>: the name of the subcommand;</li>
+     *     <li><b>description</b>: the description of the subcommand;</li>
+     *     <li><b>permission</b>: the permission of the subcommand;</li>
+     *     <li><b>usage</b>: the usage of the subcommand;</li>
+     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
+     *     <li><b>page</b>: the current page;</li>
+     *     <li><b>pages</b>: the total number of pages.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_NEXT_PAGE = "command.help.next-page";
