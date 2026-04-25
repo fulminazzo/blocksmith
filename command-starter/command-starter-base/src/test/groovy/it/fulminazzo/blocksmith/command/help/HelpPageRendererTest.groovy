@@ -74,6 +74,46 @@ class HelpPageRendererTest extends Specification {
         renderer = new HelpPageRenderer(helpPage, visitor, 1)
     }
 
+    def 'test full render'() {
+        given:
+        sender.hasPermission(_) >> true
+
+        and:
+        messenger.getComponentOrNull(_, _) >> { a ->
+            return messages[a[0]]?.with { ComponentUtils.toComponent(it) }
+        }
+
+        and:
+        messages[helpPage.command.description] = "$helpPage.command.name description"
+        for (def d : helpPage.subcommands)
+            messages[d.description] = "$d.name description"
+
+        and:
+        input.advanceCursor().advanceCursor()
+        def renderer = new HelpPageRenderer(helpPage, visitor, 1)
+
+        when:
+        def lines = renderer.render().collect { ComponentUtils.toString(it) }.join('\n')
+
+        then:
+        lines == """<strikethrough><gold>------------------------</gold></strikethrough> <white>test</white> <strikethrough><gold>------------------------
+test description
+
+<gray>Permission</gray><dark_gray>:</dark_gray> blocksmith.test.permission
+<gray>Usage</gray><dark_gray>:</dark_gray> /test
+<strikethrough><gold>--------------------</gold></strikethrough> <white>Subcommands</white> <strikethrough><gold>--------------------
+<click:run_command:'root first help'><hover:show_text:'<white>/test first</white><br><gray>blocksmith.first.permission</gray>
+
+<aqua>Click for more information'><white>first</white> <dark_gray>-</dark_gray> <gray>first description
+<click:run_command:'root second help'><hover:show_text:'<white>/test second</white><br><gray>blocksmith.second.permission</gray>
+
+<aqua>Click for more information'><white>second</white> <dark_gray>-</dark_gray> <gray>second description
+<click:run_command:'root third help'><hover:show_text:'<white>/test third</white><br><gray>blocksmith.third.permission</gray>
+
+<aqua>Click for more information'><white>third</white> <dark_gray>-</dark_gray> <gray>third description
+<strikethrough><gold>-------</gold></strikethrough><strikethrough><gold>-------</gold></strikethrough><strikethrough><gold>---</gold></strikethrough><strikethrough><gold>-------</gold></strikethrough><gold>[</gold><red>1</red><dark_gray>/</dark_gray><red>3</red><gold>]</gold><strikethrough><gold>-------</gold></strikethrough><click:run_command:'root help 2'><gold>[</gold><red>>></red><gold>]</gold></click><strikethrough><gold>-------</gold></strikethrough><strikethrough><gold>-------"""
+    }
+
     def 'test that renderDescription of #description returns #expected'() {
         given:
         messenger.getComponentOrNull(_, _) >> description
