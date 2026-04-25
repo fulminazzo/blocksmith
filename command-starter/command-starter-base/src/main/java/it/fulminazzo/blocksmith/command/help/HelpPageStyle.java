@@ -25,7 +25,12 @@ public final class HelpPageStyle {
     /**
      * The default header.
      */
-    public static final @NotNull String DEFAULT_HEADER = "%filler% <white>%name%</white> %filler%";
+    public static final @NotNull String DEFAULT_HEADER = "<gold><strikethrough>---</strikethrough></gold>" +
+            "%back%" +
+            "%filler% " +
+            "<white>%name%</white> " +
+            "%filler%" +
+            "<gold><strikethrough>-----";
     /**
      * The default separator.
      */
