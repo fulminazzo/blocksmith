@@ -53,7 +53,7 @@ public class CommandSenderReceiverFactory extends AbstractReceiverFactory {
 
             @SuppressWarnings("unchecked")
             @Override
-            public @NotNull <R> R internal() {
+            public @NotNull <R> R handle() {
                 return (R) sender;
             }
 

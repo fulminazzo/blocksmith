@@ -7,6 +7,7 @@ import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor
+import it.fulminazzo.blocksmith.message.MessageParseContext
 import it.fulminazzo.blocksmith.message.Messenger
 import it.fulminazzo.blocksmith.message.receiver.Receiver
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
@@ -30,6 +31,8 @@ class HelpPageRendererTest extends Specification {
             []
     )
 
+    private Map<String, String> messages = [:]
+
     private Messenger messenger = Mock(Messenger)
     private CommandSenderWrapper<?> sender = Mock(CommandSenderWrapper)
     private InputVisitor<?, ?> visitor = Mock(InputVisitor)
@@ -37,6 +40,13 @@ class HelpPageRendererTest extends Specification {
     private HelpPageRenderer renderer
 
     void setup() {
+        messenger.getComponentOrElse(_, _, _ as String, _) >> { a ->
+            def component = ComponentUtils.toComponent(messages[a[0]] ?: a[2])
+            for (def arg : a[3])
+                component = arg.apply(new MessageParseContext(messenger, a[1], component))
+            return component
+        }
+
         sender.receiver() >> {
             def receiver = Mock(Receiver)
             receiver.locale >> Locale.ITALY
@@ -73,7 +83,7 @@ class HelpPageRendererTest extends Specification {
 
     def 'test that renderPermission of #permissionComponent returns #expected'() {
         given:
-        messenger.getComponentOrNull(_, _) >> permissionComponent
+        messages[CommandMessages.HELP_COMMAND_PERMISSION] = permissionComponent
 
         when:
         renderer.renderPermission()
@@ -82,14 +92,14 @@ class HelpPageRendererTest extends Specification {
         renderer.lines.collect { PLAIN_SERIALIZER.serialize(it) } == expected
 
         where:
-        permissionComponent      || expected
-        null                     || ['Permission: blocksmith.test.permission']
-        Component.text('Perm: ') || ['Perm: blocksmith.test.permission']
+        permissionComponent || expected
+        null                || ['Permission: blocksmith.test.permission']
+        'Perm: '            || ['Perm: blocksmith.test.permission']
     }
 
     def 'test that renderUsage of #usageComponent returns #expected'() {
         given:
-        messenger.getComponentOrNull(_, _) >> usageComponent
+        messages[CommandMessages.HELP_COMMAND_USAGE] = usageComponent
 
         when:
         renderer.renderUsage()
@@ -98,9 +108,9 @@ class HelpPageRendererTest extends Specification {
         renderer.lines.collect { PLAIN_SERIALIZER.serialize(it) } == expected
 
         where:
-        usageComponent          || expected
-        null                    || ['Usage: /test']
-        Component.text('Use: ') || ['Use: /test']
+        usageComponent || expected
+        null           || ['Usage: /test']
+        'Use: '        || ['Use: /test']
     }
 
     def 'test that renderSubcommands with #pages, #page and #subcommands sets lines to #expected'() {
@@ -124,7 +134,7 @@ class HelpPageRendererTest extends Specification {
         def renderer = new HelpPageRenderer(helpPage, visitor)
 
         and:
-        messenger.getComponentOrNull(CommandMessages.HELP_COMMAND_SUBCOMMAND_FORMAT, _, _) >> Component.text('subcommand')
+        messages[CommandMessages.HELP_COMMAND_SUBCOMMAND_FORMAT] = 'subcommand'
 
         when:
         renderer.renderSubcommands(page)
@@ -155,7 +165,7 @@ class HelpPageRendererTest extends Specification {
                 .build()
 
         and:
-        messenger.getComponentOrNull('command.test.description', _, _) >> Component.text(actualDescription)
+        messages[command.description] = actualDescription
 
         when:
         renderer.renderSubcommand(command)
@@ -173,16 +183,6 @@ class HelpPageRendererTest extends Specification {
         actualDescription                                                || description
         'Test description'                                               || 'Test description'
         'Super long test description to ensure it is properly truncated' || 'Super long test description to ensure it is properl</gray>...'
-    }
-
-    def 'test that formatAndFill correctly formats component'() {
-        when:
-        def component = renderer.formatAndFill('Title', 1, 1)
-
-        then:
-        ComponentUtils.toString(component) == '<strikethrough><gold>------------------------</gold></strikethrough>' +
-                ' Title ' +
-                '<strikethrough><gold>------------------------'
     }
 
 
