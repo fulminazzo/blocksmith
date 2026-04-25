@@ -128,6 +128,13 @@ public final class HelpPageRenderer {
     }
 
     /**
+     * Renders the separator between the command description and subcommands list.
+     */
+    void renderSeparator() {
+        lines.add(format(style.getSeparatorComponent()));
+    }
+
+    /**
      * Renders all the subcommands for the given page.
      */
     void renderSubcommands() {

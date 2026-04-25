@@ -243,7 +243,7 @@ public final class CommandMessages {
     public static final @NotNull String HELP_COMMAND_FILLER = "command.help.filler";
 
     /**
-     * The header sent when requesting the help page of a command.
+     * The header sent at the beginning of the help page of a command.
      * <br>
      * Placeholders:
      * <ul>
@@ -255,6 +255,20 @@ public final class CommandMessages {
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_HEADER = "command.help.header";
+
+    /**
+     * The separator sent between the description and the subcommands list in the help page of a command.
+     * <br>
+     * Placeholders:
+     * <ul>
+     *     <li><b>name</b>: the name of the command;</li>
+     *     <li><b>description</b>: the description of the command;</li>
+     *     <li><b>permission</b>: the permission of the command;</li>
+     *     <li><b>usage</b>: the usage of the command;</li>
+     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line.</li>
+     * </ul>
+     */
+    public static final @NotNull String HELP_COMMAND_SEPARATOR = "command.help.separator";
 
     /**
      * Identifies the text to prepend before a command permission in the help page.

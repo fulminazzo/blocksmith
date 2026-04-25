@@ -17,6 +17,7 @@ public final class HelpPageStyle {
     public static final @NotNull String DEFAULT_FILLER = "<gold><strikethrough>-</strikethrough></gold>";
 
     public static final @NotNull String DEFAULT_HEADER = "%filler% <white>%name%</white> %filler%";
+    public static final @NotNull String DEFAULT_SEPARATOR = "%filler% <white>Subcommands</white> %filler%";
 
     public static final @NotNull String DEFAULT_PERMISSION = "<gray>Permission</gray><dark_gray>:</dark_gray> ";
     public static final @NotNull String DEFAULT_USAGE = "<gray>Usage</gray><dark_gray>:</dark_gray> ";
@@ -43,6 +44,10 @@ public final class HelpPageStyle {
 
     public @NotNull Component getUsageComponent() {
         return getComponentOrElse(CommandMessages.HELP_COMMAND_USAGE, DEFAULT_USAGE);
+    }
+
+    public @NotNull Component getSeparatorComponent() {
+        return getComponentOrElse(CommandMessages.HELP_COMMAND_SEPARATOR, DEFAULT_SEPARATOR);
     }
 
     public @NotNull Component getNoSubcommandsComponent() {
