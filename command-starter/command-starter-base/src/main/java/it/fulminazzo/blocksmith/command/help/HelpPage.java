@@ -92,6 +92,7 @@ public class HelpPage {
         @NotNull String description;
         @NotNull PermissionInfo permission;
         @NotNull String usage;
+        @NotNull String helpCommandName;
 
         /**
          * Creates a new Command data.
@@ -106,6 +107,7 @@ public class HelpPage {
                     .description(commandInfo.getDescription())
                     .permission(commandInfo.getPermission())
                     .usage(commandNode.getUsage())
+                    .helpCommandName(commandNode.getHelpCommandName())
                     .build();
         }
 

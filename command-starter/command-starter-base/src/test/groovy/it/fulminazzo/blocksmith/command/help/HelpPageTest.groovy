@@ -37,6 +37,7 @@ class HelpPageTest extends Specification {
                         .description(node.commandInfo.description)
                         .permission(node.commandInfo.permission)
                         .usage(node.usage)
+                        .helpCommandName(node.helpCommandName)
                         .build(),
                 node.children
                         .findAll { it instanceof LiteralNode }
@@ -46,6 +47,7 @@ class HelpPageTest extends Specification {
                                     .description(it.commandInfo.description)
                                     .permission(it.commandInfo.permission)
                                     .usage(it.usage)
+                                    .helpCommandName(it.helpCommandName)
                                     .build()
                         }
         )
