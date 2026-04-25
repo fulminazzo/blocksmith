@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public final class HelpPageRenderer {
     private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
+    private static final @NotNull String FILLER_PLACEHOLDER = "%filler%";
 
     private static final int MAX_FONT_WIDTH = 320;
 
@@ -38,8 +39,10 @@ public final class HelpPageRenderer {
 
     @NotNull HelpPageStyle style;
 
-    @Range(from = 0, to = Integer.MAX_VALUE) int pages;
-    @Range(from = 0, to = Integer.MAX_VALUE) int page;
+    @Range(from = 0, to = Integer.MAX_VALUE)
+    int pages;
+    @Range(from = 0, to = Integer.MAX_VALUE)
+    int page;
 
     /**
      * Instantiates a new Help page renderer.
@@ -152,10 +155,17 @@ public final class HelpPageRenderer {
     /**
      * Formats the given text with the following placeholders:
      * <ul>
-     *     <li>{@code %name%}: the name of the current command;</li>
-     *     <li>{@code %permission%}: the permission of the current command;</li>
-     *     <li>{@code %description%}: the description of the current command;</li>
-     *     <li>{@code %usage%}: the usage of the current command.</li>
+     *     <li>{@code %name%}: the name of the given command;</li>
+     *     <li>{@code %permission%}: the permission of the given command;</li>
+     *     <li>{@code %description%}: the description of the given command;</li>
+     *     <li>{@code %usage%}: the usage of the given command;</li>
+     *     <li>{@code %subcommands%}: the value of
+     *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_SUBCOMMANDS}
+     *     (falls back to {@link HelpPageStyle#DEFAULT_SUBCOMMANDS} if not found);</li>
+     *     <li>{@code %filler%}: the value of
+     *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_FILLER}
+     *     (falls back to {@link HelpPageStyle#DEFAULT_FILLER} if not found)
+     *     repeated until the component exceeds length {@link #MAX_FONT_WIDTH}.</li>
      * </ul>
      *
      * @param component the component to format
@@ -174,7 +184,11 @@ public final class HelpPageRenderer {
      *     <li>{@code %usage%}: the usage of the given command;</li>
      *     <li>{@code %subcommands%}: the value of
      *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_SUBCOMMANDS}
-     *     (falls back to {@link HelpPageStyle#DEFAULT_SUBCOMMANDS} if not found).</li>
+     *     (falls back to {@link HelpPageStyle#DEFAULT_SUBCOMMANDS} if not found);</li>
+     *     <li>{@code %filler%}: the value of
+     *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_FILLER}
+     *     (falls back to {@link HelpPageStyle#DEFAULT_FILLER} if not found)
+     *     repeated until the component exceeds length {@link #MAX_FONT_WIDTH}.</li>
      * </ul>
      *
      * @param component   the component to format
@@ -192,7 +206,34 @@ public final class HelpPageRenderer {
         );
         for (Argument argument : arguments)
             component = argument.apply(new MessageParseContext(messenger, locale, component));
-        return component;
+        return parseFillerComponent(component);
+    }
+
+    /**
+     * Given the component, will replace any {@link #FILLER_PLACEHOLDER}
+     * with the result of {@link HelpPageStyle#getFillerComponent()}
+     * multiplied until the component does not reach {@link #MAX_FONT_WIDTH}.
+     * <br>
+     * Useful for generating centered text automatically.
+     *
+     * @param component the component to replace
+     * @return the replaced component
+     */
+    @NotNull Component parseFillerComponent(@NotNull Component component) {
+        if (!PLAIN_SERIALIZER.serialize(component).contains(FILLER_PLACEHOLDER)) return component;
+        Component fillerComponent = style.getFillerComponent();
+        int current = 1;
+        String raw;
+        do {
+            Component replacement = repeat(fillerComponent, current++);
+            raw = PLAIN_SERIALIZER.serialize(component.replaceText(
+                    r -> r.matchLiteral(FILLER_PLACEHOLDER).replacement(replacement)
+            ));
+        } while (MinecraftFontWidth.getWidth(raw) <= MAX_FONT_WIDTH);
+        Component replacement = repeat(fillerComponent, --current);
+        return component.replaceText(
+                r -> r.matchLiteral(FILLER_PLACEHOLDER).replacement(replacement)
+        );
     }
 
     /**
@@ -283,6 +324,11 @@ public final class HelpPageRenderer {
                 return i - 1;
         }
         return -1;
+    }
+
+    private static @NotNull Component repeat(final @NotNull Component component, final int count) {
+        String raw = ComponentUtils.toString(component);
+        return ComponentUtils.toComponent(raw.repeat(count));
     }
 
 }
