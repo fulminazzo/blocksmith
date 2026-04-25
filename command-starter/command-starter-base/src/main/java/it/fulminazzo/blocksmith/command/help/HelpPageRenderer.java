@@ -203,6 +203,8 @@ public final class HelpPageRenderer {
      *     repeated until the component exceeds length {@link #MAX_FONT_WIDTH};</li>
      *     <li>{@code %page%}: the current page;</li>
      *     <li>{@code %pages%}: the total number of pages;</li>
+     *     <li>{@code %back%}: the button associated with
+     *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_PREVIOUS_COMMAND};</li>
      *     <li>{@code %previous%}: the button associated with
      *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_PREVIOUS_PAGE};</li>
      *     <li>{@code %next%}: the button associated with
@@ -214,6 +216,11 @@ public final class HelpPageRenderer {
      */
     @NotNull Component formatPageButtons(final @NotNull Component component) {
         String helpCommand = visitor.getInput().getPartialRawInput() + " " + helpPage.getCommand().getHelpCommandName() + " ";
+        String parentHelpCommand = helpPage.getCommand().getParentHelpCommand();
+        Component back = getComponentOrFillers(
+                parentHelpCommand != null,
+                format(style.getPreviousCommandComponent()).clickEvent(ClickEvent.runCommand(parentHelpCommand))
+        );
         Component previousPage = getComponentOrFillers(
                 page > 1,
                 format(style.getPreviousPageComponent()).clickEvent(ClickEvent.runCommand(helpCommand + (page - 1)))
@@ -223,6 +230,7 @@ public final class HelpPageRenderer {
                 format(style.getNextPageComponent()).clickEvent(ClickEvent.runCommand(helpCommand + (page + 1)))
         );
         return format(component
+                .replaceText(r -> r.matchLiteral("%back%").replacement(back))
                 .replaceText(r -> r.matchLiteral("%previous%").replacement(previousPage))
                 .replaceText(r -> r.matchLiteral("%next%").replacement(nextPage))
         );

@@ -254,6 +254,12 @@ public final class CommandMessages {
      *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
      *     <li><b>page</b>: the current page;</li>
      *     <li><b>pages</b>: the total number of pages.</li>
+     *     <li><b>back</b>: the button to go back (only shown if in a subcommand).
+     *     Takes the text from {@link #HELP_COMMAND_PREVIOUS_COMMAND};</li>
+     *     <li><b>previous</b>: the button to go to the previous subcommands page (only shown if present).
+     *     Takes the text from {@link #HELP_COMMAND_PREVIOUS_PAGE};</li>
+     *     <li><b>next</b>: the button to go to the next subcommands page (only shown if present).
+     *     Takes the text from {@link #HELP_COMMAND_NEXT_PAGE}.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_HEADER = "command.help.header";
@@ -270,6 +276,12 @@ public final class CommandMessages {
      *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
      *     <li><b>page</b>: the current page;</li>
      *     <li><b>pages</b>: the total number of pages.</li>
+     *     <li><b>back</b>: the button to go back (only shown if in a subcommand).
+     *     Takes the text from {@link #HELP_COMMAND_PREVIOUS_COMMAND};</li>
+     *     <li><b>previous</b>: the button to go to the previous subcommands page (only shown if present).
+     *     Takes the text from {@link #HELP_COMMAND_PREVIOUS_PAGE};</li>
+     *     <li><b>next</b>: the button to go to the next subcommands page (only shown if present).
+     *     Takes the text from {@link #HELP_COMMAND_NEXT_PAGE}.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_SEPARATOR = "command.help.separator";
@@ -285,7 +297,13 @@ public final class CommandMessages {
      *     <li><b>usage</b>: the usage of the command;</li>
      *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
      *     <li><b>page</b>: the current page;</li>
-     *     <li><b>pages</b>: the total number of pages.</li>
+     *     <li><b>pages</b>: the total number of pages;</li>
+     *     <li><b>back</b>: the button to go back (only shown if in a subcommand).
+     *     Takes the text from {@link #HELP_COMMAND_PREVIOUS_COMMAND};</li>
+     *     <li><b>previous</b>: the button to go to the previous subcommands page (only shown if present).
+     *     Takes the text from {@link #HELP_COMMAND_PREVIOUS_PAGE};</li>
+     *     <li><b>next</b>: the button to go to the next subcommands page (only shown if present).
+     *     Takes the text from {@link #HELP_COMMAND_NEXT_PAGE}.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_FOOTER = "command.help.footer";
@@ -346,14 +364,30 @@ public final class CommandMessages {
     public static final @NotNull String HELP_COMMAND_NO_SUBCOMMANDS = "command.help.no-subcommands";
 
     /**
+     * Identifies the name of the previous command button.
+     * <br>
+     * Placeholders:
+     * <ul>
+     *     <li><b>name</b>: the name of the current command;</li>
+     *     <li><b>description</b>: the description of the current command;</li>
+     *     <li><b>permission</b>: the permission of the current command;</li>
+     *     <li><b>usage</b>: the usage of the current command;</li>
+     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
+     *     <li><b>page</b>: the current page;</li>
+     *     <li><b>pages</b>: the total number of pages.</li>
+     * </ul>
+     */
+    public static final @NotNull String HELP_COMMAND_PREVIOUS_COMMAND = "command.help.previous-command";
+
+    /**
      * Identifies the name of the previous page button.
      * <br>
      * Placeholders:
      * <ul>
-     *     <li><b>name</b>: the name of the subcommand;</li>
-     *     <li><b>description</b>: the description of the subcommand;</li>
-     *     <li><b>permission</b>: the permission of the subcommand;</li>
-     *     <li><b>usage</b>: the usage of the subcommand;</li>
+     *     <li><b>name</b>: the name of the command;</li>
+     *     <li><b>description</b>: the description of the command;</li>
+     *     <li><b>permission</b>: the permission of the command;</li>
+     *     <li><b>usage</b>: the usage of the command;</li>
      *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
      *     <li><b>page</b>: the current page;</li>
      *     <li><b>pages</b>: the total number of pages.</li>
@@ -366,10 +400,10 @@ public final class CommandMessages {
      * <br>
      * Placeholders:
      * <ul>
-     *     <li><b>name</b>: the name of the subcommand;</li>
-     *     <li><b>description</b>: the description of the subcommand;</li>
-     *     <li><b>permission</b>: the permission of the subcommand;</li>
-     *     <li><b>usage</b>: the usage of the subcommand;</li>
+     *     <li><b>name</b>: the name of the command;</li>
+     *     <li><b>description</b>: the description of the command;</li>
+     *     <li><b>permission</b>: the permission of the command;</li>
+     *     <li><b>usage</b>: the usage of the command;</li>
      *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
      *     <li><b>page</b>: the current page;</li>
      *     <li><b>pages</b>: the total number of pages.</li>

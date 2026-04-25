@@ -65,6 +65,10 @@ public final class HelpPageStyle {
     public static final @NotNull String DEFAULT_NO_SUBCOMMANDS = "\n  <red>(none)</red>\n ";
 
     /**
+     * The default previous command button text.
+     */
+    public static final @NotNull String DEFAULT_PREVIOUS_COMMAND = "<gold>[</gold><red>↑</red><gold>]</gold>";
+    /**
      * The default previous page button text.
      */
     public static final @NotNull String DEFAULT_PREVIOUS_PAGE = "<gold>[</gold><red><<</red><gold>]</gold>";
@@ -162,6 +166,17 @@ public final class HelpPageStyle {
      */
     public @NotNull Component getSubcommandFormat() {
         return getComponentOrElse(CommandMessages.HELP_COMMAND_SUBCOMMAND_FORMAT, DEFAULT_SUBCOMMAND_FORMAT);
+    }
+
+    /**
+     * Gets the previous command button text from {@link CommandMessages#HELP_COMMAND_PREVIOUS_COMMAND}.
+     * <br>
+     * If it could not be found, falls back to {@link #DEFAULT_PREVIOUS_COMMAND}.
+     *
+     * @return the previous command component
+     */
+    public @NotNull Component getPreviousCommandComponent() {
+        return getComponentOrElse(CommandMessages.HELP_COMMAND_PREVIOUS_COMMAND, DEFAULT_PREVIOUS_COMMAND);
     }
 
     /**
