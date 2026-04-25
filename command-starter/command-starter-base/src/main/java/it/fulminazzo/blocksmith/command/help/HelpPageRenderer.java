@@ -1,9 +1,10 @@
 package it.fulminazzo.blocksmith.command.help;
 
-import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
+import it.fulminazzo.blocksmith.message.MessageParseContext;
 import it.fulminazzo.blocksmith.message.Messenger;
+import it.fulminazzo.blocksmith.message.argument.Argument;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import lombok.AccessLevel;
@@ -15,10 +16,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -150,12 +148,8 @@ public final class HelpPageRenderer {
      */
     void renderSubcommand(final @NotNull HelpPage.CommandData commandData) {
         final String currentInput = visitor.getInput().getPartialRawInput();
-        Component subcommandComponent = style.getSubcommandFormat(
-                Placeholder.of("name", commandData.getName()),
-                Placeholder.of("permission", commandData.getPermission().getPermission()),
-                Placeholder.of("description", messenger.getComponentOrElse(commandData.getDescription(), locale, "")),
-                Placeholder.of("usage", commandData.getUsage())
-        ).clickEvent(ClickEvent.runCommand(currentInput + " " + commandData.getName() + " " + commandData.getHelpCommandName()));
+        Component subcommandComponent = format(style.getSubcommandFormat(), commandData)
+                .clickEvent(ClickEvent.runCommand(currentInput + " " + commandData.getName() + " " + commandData.getHelpCommandName()));
         int length = getMaxTruncationLength(PLAIN_SERIALIZER.serialize(subcommandComponent));
         if (length != -1) subcommandComponent = ComponentUtils.truncate(subcommandComponent, length);
         lines.add(subcommandComponent);
@@ -180,29 +174,27 @@ public final class HelpPageRenderer {
     /**
      * Formats the given text with the following placeholders:
      * <ul>
-     *     <li>{@code %filler%}: one character of the current {@link HelpPageStyleOld#getFiller()};</li>
-     *     <li>{@code %name%}: the name of the command;</li>
-     *     <li>{@code %subcommands%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under {@link CommandMessages#HELP_COMMAND_SUBCOMMANDS}.
-     *     If it could not be found, it falls back to {@link #DEFAULT_SUBCOMMANDS}.</li>
-     *     <li>{@code %previous%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under {@link CommandMessages#HELP_COMMAND_PREVIOUS_PAGE} (only shown if necessary);</li>
-     *     <li>{@code %next%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under {@link CommandMessages#HELP_COMMAND_NEXT_PAGE} (only shown if necessary);</li>
-     *     <li>{@code %current%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
-     *     under {@link CommandMessages#HELP_COMMAND_CURRENT_PAGE}.</li>
+     *     <li>{@code %name%}: the name of the given command;</li>
+     *     <li>{@code %permission%}: the permission of the given command;</li>
+     *     <li>{@code %description%}: the description of the given command;</li>
+     *     <li>{@code %usage%}: the usage of the given command.</li>
      * </ul>
      *
-     * @param component the component to format
-     * @param page      the page
-     * @param pages     the total pages
+     * @param component   the component to format
+     * @param commandData the container to get information from
      * @return the formatted component
      */
-    @NotNull Component format(final @NotNull Component component,
-                              final @Range(from = 0, to = Integer.MAX_VALUE) int page,
-                              final @Range(from = 0, to = Integer.MAX_VALUE) int pages) {
-        //TODO: implement
-        throw new UnsupportedOperationException();
+    @NotNull Component format(@NotNull Component component,
+                              final @NotNull HelpPage.CommandData commandData) {
+        final List<Argument> arguments = Arrays.asList(
+                Placeholder.of("name", commandData.getName()),
+                Placeholder.of("permission", commandData.getPermission().getPermission()),
+                Placeholder.of("description", messenger.getComponentOrElse(commandData.getDescription(), locale, "")),
+                Placeholder.of("usage", commandData.getUsage())
+        );
+        for (Argument argument : arguments)
+            component = argument.apply(new MessageParseContext(messenger, locale, component));
+        return component;
     }
 
     /**
