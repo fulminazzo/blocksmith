@@ -48,6 +48,11 @@ public abstract class CommandNode implements TabCompletable {
      * GETTERS
      */
 
+    public @NotNull String getHelpCommandName() {
+        //TODO: replace with actual name
+        return "help";
+    }
+
     /**
      * Gets the usage of the current node.
      *
