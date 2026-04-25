@@ -19,6 +19,9 @@ import org.jetbrains.annotations.Range;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A renderer for the help page of the requested command.
+ */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public final class HelpPageRenderer {
     private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
@@ -80,8 +83,19 @@ public final class HelpPageRenderer {
         visitor.getInput().retrocedeCursor().retrocedeCursor();
     }
 
-    public @NotNull List<Component> render(int page) {
-        //TODO: finish implementation
+    /**
+     * Renders the help page in the form of <b>lines</b> for the Minecraft chat.
+     *
+     * @return the lines
+     */
+    public @NotNull List<Component> render() {
+        renderHeader();
+        renderDescription();
+        renderPermission();
+        renderUsage();
+        renderSeparator();
+        renderSubcommands();
+        renderFooter();
         return lines;
     }
 
