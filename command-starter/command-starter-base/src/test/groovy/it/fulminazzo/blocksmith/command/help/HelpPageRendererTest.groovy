@@ -219,6 +219,25 @@ class HelpPageRendererTest extends Specification {
         MAX_CHARS * 4                                  || [MAX_CHARS, MAX_CHARS, TRUNCATED_CHARS]
     }
 
+    def 'test that parseFillerComponent of #component returns #expected'() {
+        when:
+        def actual = renderer.parseFillerComponent(ComponentUtils.toComponent(component))
+
+        then:
+        ComponentUtils.toString(actual) == expected
+
+        where:
+        component                             || expected
+        'Hello, world!'                       || 'Hello, world!'
+        '%filler%'                            || '<strikethrough><gold>------------------------------------------------------'
+        '%filler%A%filler%'                   || '<strikethrough><gold>---------------------------</gold></strikethrough>A<strikethrough><gold>---------------------------'
+        '%filler%A%filler%B%filler%'          ||
+                '<strikethrough><gold>------------------</gold></strikethrough>A<strikethrough><gold>------------------</gold></strikethrough>B<strikethrough><gold>------------------'
+        '%filler%A%filler%B%filler%C%filler%' ||
+                '<strikethrough><gold>-------------</gold></strikethrough>A<strikethrough><gold>-------------</gold></strikethrough>B<strikethrough><gold>-------------</gold></strikethrough>C<strikethrough><gold>-------------'
+    }
+
+
     def 'test that truncate of long string truncates and sets hover event'() {
         given:
         def component = Component.text("$MAX_CHARS@")
