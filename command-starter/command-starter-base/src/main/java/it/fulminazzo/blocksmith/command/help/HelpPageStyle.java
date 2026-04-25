@@ -34,6 +34,10 @@ public final class HelpPageStyle {
         return getComponentOrElse(CommandMessages.HELP_COMMAND_USAGE, DEFAULT_USAGE);
     }
 
+    public @NotNull Component getSubcommandsComponent() {
+        return getComponentOrElse(CommandMessages.HELP_COMMAND_SUBCOMMANDS, DEFAULT_SUBCOMMANDS);
+    }
+
     public @NotNull Component getNoSubcommandsComponent() {
         return getComponentOrElse(CommandMessages.HELP_COMMAND_NO_SUBCOMMANDS, DEFAULT_NO_SUBCOMMANDS);
     }
