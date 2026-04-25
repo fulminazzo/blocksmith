@@ -146,6 +146,22 @@ public final class HelpPageRenderer {
     /**
      * Formats the given text with the following placeholders:
      * <ul>
+     *     <li>{@code %name%}: the name of the current command;</li>
+     *     <li>{@code %permission%}: the permission of the current command;</li>
+     *     <li>{@code %description%}: the description of the current command;</li>
+     *     <li>{@code %usage%}: the usage of the current command.</li>
+     * </ul>
+     *
+     * @param component the component to format
+     * @return the formatted component
+     */
+    @NotNull Component format(@NotNull Component component) {
+        return format(component, helpPage.getCommand());
+    }
+
+    /**
+     * Formats the given text with the following placeholders:
+     * <ul>
      *     <li>{@code %name%}: the name of the given command;</li>
      *     <li>{@code %permission%}: the permission of the given command;</li>
      *     <li>{@code %description%}: the description of the given command;</li>
