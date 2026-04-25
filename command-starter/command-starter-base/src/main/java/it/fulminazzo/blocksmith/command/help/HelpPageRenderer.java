@@ -4,8 +4,8 @@ import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.Messenger;
+import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
-import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import net.kyori.adventure.text.Component;
@@ -23,21 +23,6 @@ import java.util.stream.Collectors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public final class HelpPageRenderer {
-    public static final @NotNull String DEFAULT_PERMISSION = "<gray>Permission</gray><dark_gray>:</dark_gray> ";
-    public static final @NotNull String DEFAULT_USAGE = "<gray>Usage</gray><dark_gray>:</dark_gray> ";
-    public static final @NotNull String DEFAULT_SUBCOMMANDS = "Subcommands";
-    public static final @NotNull String DEFAULT_SUBCOMMAND_FORMAT =
-            "<hover:show_text:'<white>%usage%</white>\n<gray>%permission%</gray>\n\n<aqua>Click for more information</aqua>'>" +
-                    "<white>%name%</white> <dark_gray>-</dark_gray> <gray>%description%</gray>" +
-                    "</hover>";
-    public static final @NotNull String DEFAULT_NO_SUBCOMMANDS = "\n  <red>(none)</red>\n ";
-    public static final @NotNull String DEFAULT_PREVIOUS_PAGE = "<gold>[</gold><red><<<</red><gold>]</gold>";
-    public static final @NotNull String DEFAULT_NEXT_PAGE = "<gold>[</gold><red>>>></red><gold>]</gold>";
-    public static final @NotNull String DEFAULT_CURRENT_PAGE =
-            "<gold><strikethrough>--------</strikethrough></gold>" +
-                    " <red>%page%</red><dark_gray>/</dark_gray><red>%pages%</red> " +
-                    "<gold><strikethrough>--------</strikethrough></gold>";
-
     public static final String HELP_COMMAND_NAME = "help"; //TODO: configurable
 
     private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
@@ -55,6 +40,8 @@ public final class HelpPageRenderer {
     @NotNull CommandSenderWrapper<?> sender;
     @NotNull Locale locale;
 
+    @NotNull HelpPageStyle style;
+
     /**
      * Instantiates a new Help page renderer.
      *
@@ -67,10 +54,11 @@ public final class HelpPageRenderer {
         this.messenger = visitor.getApplication().getMessenger();
         this.sender = visitor.getCommandSender();
         this.locale = sender.receiver().getLocale();
+        this.style = new HelpPageStyle(messenger, locale);
     }
 
     public @NotNull List<Component> render(int page) {
-        final HelpPageStyle style = HelpPageStyle.get();
+        final HelpPageStyleOld style = HelpPageStyleOld.get();
 
         final int pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
         // Imagine the sender requested the help page and got access to a next page.
@@ -108,11 +96,9 @@ public final class HelpPageRenderer {
 
     /**
      * Renders the permission component for the given {@link Locale}.
-     * <br>
-     * If it could not be found, it falls back to {@link #DEFAULT_PERMISSION}.
      */
     void renderPermission() {
-        final Component permissionComponent = getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_PERMISSION, locale, DEFAULT_PERMISSION);
+        final Component permissionComponent = style.getPermissionComponent();
         Component permission = ComponentUtils.toComponent(helpPage.getCommand().getPermission().getPermission());
         permission = truncate(PLAIN_SERIALIZER.serialize(permissionComponent), permission);
         lines.add(permissionComponent.append(permission));
@@ -120,11 +106,9 @@ public final class HelpPageRenderer {
 
     /**
      * Renders the usage component for the given {@link Locale}.
-     * <br>
-     * If it could not be found, it falls back to {@link #DEFAULT_USAGE}.
      */
     void renderUsage() {
-        final Component usageComponent = getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_USAGE, locale, DEFAULT_USAGE);
+        final Component usageComponent = style.getUsageComponent();
         Component usage = ComponentUtils.toComponent(helpPage.getCommand().getUsage());
         usage = truncate(PLAIN_SERIALIZER.serialize(usageComponent), usage);
         lines.add(usageComponent.append(usage));
@@ -136,9 +120,6 @@ public final class HelpPageRenderer {
      * @param page the requested page
      */
     void renderSubcommands(final @Range(from = 1, to = Integer.MAX_VALUE) int page) {
-        final Messenger messenger = visitor.getApplication().getMessenger();
-        final CommandSenderWrapper<?> sender = visitor.getCommandSender();
-        final Locale locale = sender.receiver().getLocale();
         int rendered = 0;
         if (page > 0) {
             List<HelpPage.CommandData> subcommands = helpPage.getSubcommandsPage(sender, page, SUBCOMMANDS_LINES);
@@ -148,7 +129,7 @@ public final class HelpPageRenderer {
             }
         }
         if (rendered == 0)
-            lines.add(getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_NO_SUBCOMMANDS, locale, DEFAULT_NO_SUBCOMMANDS));
+            lines.add(style.getNoSubcommandsComponent());
         else
             while (rendered++ < SUBCOMMANDS_LINES) lines.add(Component.text(""));
     }
@@ -159,21 +140,13 @@ public final class HelpPageRenderer {
      * @param commandData the subcommand data
      */
     void renderSubcommand(final @NotNull HelpPage.CommandData commandData) {
-        final Messenger messenger = visitor.getApplication().getMessenger();
-        final Locale locale = visitor.getCommandSender().receiver().getLocale();
         final String currentInput = visitor.getInput().getPartialRawInput();
-        Component subcommandComponent = getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_SUBCOMMAND_FORMAT, locale, DEFAULT_SUBCOMMAND_FORMAT)
-                .replaceText(r -> r.matchLiteral("%name%").replacement(commandData.getName()))
-                .replaceText(r -> r.matchLiteral("%permission%").replacement(commandData.getPermission().getPermission()))
-                .replaceText(r -> r
-                        .matchLiteral("%description%")
-                        .replacement(getComponentOrEmpty(messenger, commandData.getDescription(), locale))
-                )
-                .replaceText(r -> r
-                        .matchLiteral("%usage%")
-                        .replacement(ComponentUtils.toComponent(commandData.getUsage()))
-                )
-                .clickEvent(ClickEvent.runCommand(currentInput + " " + commandData.getName() + " " + HELP_COMMAND_NAME));
+        Component subcommandComponent = style.getSubcommandFormat(
+                Placeholder.of("name", commandData.getName()),
+                Placeholder.of("permission", commandData.getPermission().getPermission()),
+                Placeholder.of("description", messenger.getComponentOrElse(commandData.getDescription(), locale, "")),
+                Placeholder.of("usage", commandData.getUsage())
+        ).clickEvent(ClickEvent.runCommand(currentInput + " " + commandData.getName() + " " + HELP_COMMAND_NAME));
         int length = getMaxTruncationLength(PLAIN_SERIALIZER.serialize(subcommandComponent));
         if (length != -1) subcommandComponent = ComponentUtils.truncate(subcommandComponent, length);
         lines.add(subcommandComponent);
@@ -181,7 +154,7 @@ public final class HelpPageRenderer {
 
     /**
      * Formats the given string with {@link #format(Component, int, int)}.
-     * Then, it fills it using {@link HelpPageStyle#getFiller()}.
+     * Then, it fills it using {@link HelpPageStyleOld#getFiller()}.
      *
      * @param raw   the raw string
      * @param page  the page
@@ -191,27 +164,14 @@ public final class HelpPageRenderer {
     @NotNull Component formatAndFill(final @NotNull String raw,
                                      final @Range(from = 0, to = Integer.MAX_VALUE) int page,
                                      final @Range(from = 0, to = Integer.MAX_VALUE) int pages) {
-        Component baseComponent = format(ComponentUtils.toComponent(raw), page, pages);
-        final HelpPageStyle style = HelpPageStyle.get();
-
-        final String styleFiller = style.getFiller();
-        StringBuilder fillers = new StringBuilder(styleFiller);
-        String rawComponent = formatTitle(PLAIN_SERIALIZER.serialize(baseComponent));
-        while (getMaxLength(rawComponent + (fillers + styleFiller).repeat(2)) == -1)
-            fillers.append(styleFiller);
-
-        String filler = fillers.toString();
-        for (String s : style.getFillerStyles())
-            filler = StringUtils.tag(s, filler);
-
-        rawComponent = formatTitle(ComponentUtils.toString(baseComponent));
-        return ComponentUtils.toComponent(filler + rawComponent + filler);
+        //TODO: implement
+        throw new UnsupportedOperationException();
     }
 
     /**
      * Formats the given text with the following placeholders:
      * <ul>
-     *     <li>{@code %filler%}: one character of the current {@link HelpPageStyle#getFiller()};</li>
+     *     <li>{@code %filler%}: one character of the current {@link HelpPageStyleOld#getFiller()};</li>
      *     <li>{@code %name%}: the name of the command;</li>
      *     <li>{@code %subcommands%}: the title specified in the {@link it.fulminazzo.blocksmith.message.Messenger}
      *     under {@link CommandMessages#HELP_COMMAND_SUBCOMMANDS}.
@@ -232,46 +192,8 @@ public final class HelpPageRenderer {
     @NotNull Component format(final @NotNull Component component,
                               final @Range(from = 0, to = Integer.MAX_VALUE) int page,
                               final @Range(from = 0, to = Integer.MAX_VALUE) int pages) {
-        final HelpPageStyle style = HelpPageStyle.get();
-        final Messenger messenger = visitor.getApplication().getMessenger();
-        final Locale locale = visitor.getCommandSender().receiver().getLocale();
-        final String currentInput = visitor.getInput().getPartialRawInput();
-        Component previousPage = page > 1 || style.isAlwaysShowPreviousPage() ?
-                replacePagePlaceholders(
-                        getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_PREVIOUS_PAGE, locale, DEFAULT_PREVIOUS_PAGE),
-                        page,
-                        pages
-                ) : Component.empty();
-        if (page > 1) previousPage.clickEvent(ClickEvent.clickEvent(
-                ClickEvent.Action.RUN_COMMAND,
-                ClickEvent.Payload.string(String.format("%s %s %s", currentInput, HELP_COMMAND_NAME, page - 1))
-        ));
-        Component nextPage = page < pages || style.isAlwaysShowNextPage() ?
-                replacePagePlaceholders(
-                        getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_NEXT_PAGE, locale, DEFAULT_NEXT_PAGE),
-                        page,
-                        pages
-                ) : Component.empty();
-        if (page < pages) nextPage.clickEvent(ClickEvent.clickEvent(
-                ClickEvent.Action.RUN_COMMAND,
-                ClickEvent.Payload.string(String.format("%s %s %s", currentInput, HELP_COMMAND_NAME, page + 1))
-        ));
-        Component currentPage = pages > 0 || style.isAlwaysShowCurrentPage() ?
-                replacePagePlaceholders(
-                        getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_CURRENT_PAGE, locale, DEFAULT_CURRENT_PAGE),
-                        page,
-                        pages
-                ) : Component.empty();
-        //TODO: proper testing
-        return component
-                .replaceText(b -> b.matchLiteral("%filler%").replacement(style.getStyledFiller()))
-                .replaceText(b -> b.matchLiteral("%name%").replacement(helpPage.getCommand().getName()))
-                .replaceText(b -> b.matchLiteral("%subcommands%")
-                        .replacement(getComponentOrElse(messenger, CommandMessages.HELP_COMMAND_SUBCOMMANDS, locale, DEFAULT_SUBCOMMANDS)))
-                .replaceText(b -> b.matchLiteral("%previous%").replacement(previousPage))
-                .replaceText(b -> b.matchLiteral("%current%").replacement(currentPage))
-                .replaceText(b -> b.matchLiteral("%next%").replacement(nextPage))
-                ;
+        //TODO: implement
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -362,33 +284,6 @@ public final class HelpPageRenderer {
                 return i - 1;
         }
         return -1;
-    }
-
-    private static @NotNull Component getComponentOrEmpty(final @NotNull Messenger messenger,
-                                                          final @NotNull String messageCode,
-                                                          final @NotNull Locale locale) {
-        return getComponentOrElse(messenger, messageCode, locale, "");
-    }
-
-    private static @NotNull Component getComponentOrElse(final @NotNull Messenger messenger,
-                                                         final @NotNull String messageCode,
-                                                         final @NotNull Locale locale,
-                                                         final @NotNull String alternative) {
-        Component component = messenger.getComponentOrNull(messageCode, locale);
-        if (component == null) component = ComponentUtils.toComponent(alternative);
-        return component;
-    }
-
-    private static @NotNull Component replacePagePlaceholders(final @NotNull Component component,
-                                                              final int page,
-                                                              final int pages) {
-        return component
-                .replaceText(b -> b.matchLiteral("%page%").replacement(String.valueOf(page)))
-                .replaceText(b -> b.matchLiteral("%pages%").replacement(String.valueOf(pages)));
-    }
-
-    private static @NotNull String formatTitle(final @NotNull String title) {
-        return title.isEmpty() ? title : String.format(" %s ", title);
     }
 
 }
