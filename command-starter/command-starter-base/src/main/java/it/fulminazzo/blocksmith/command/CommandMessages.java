@@ -275,6 +275,22 @@ public final class CommandMessages {
     public static final @NotNull String HELP_COMMAND_SEPARATOR = "command.help.separator";
 
     /**
+     * The footer sent at the end of the help page of a command.
+     * <br>
+     * Placeholders:
+     * <ul>
+     *     <li><b>name</b>: the name of the command;</li>
+     *     <li><b>description</b>: the description of the command;</li>
+     *     <li><b>permission</b>: the permission of the command;</li>
+     *     <li><b>usage</b>: the usage of the command;</li>
+     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
+     *     <li><b>page</b>: the current page;</li>
+     *     <li><b>pages</b>: the total number of pages.</li>
+     * </ul>
+     */
+    public static final @NotNull String HELP_COMMAND_FOOTER = "command.help.footer";
+
+    /**
      * Identifies the text to prepend before a command permission in the help page.
      * <br>
      * Placeholders:

@@ -18,6 +18,16 @@ public final class HelpPageStyle {
 
     public static final @NotNull String DEFAULT_HEADER = "%filler% <white>%name%</white> %filler%";
     public static final @NotNull String DEFAULT_SEPARATOR = "%filler% <white>Subcommands</white> %filler%";
+    public static final @NotNull String DEFAULT_FOOTER = "%filler%" +
+            "%filler%" +
+            "%previous%" +
+            "%filler%" +
+            "<gold>[</gold><red>%page%</red><dark_gray>/</dark_gray><red>%pages%</red><gold>]</gold>" +
+            "%filler%" +
+            "%next%" +
+            "%filler%" +
+            "%filler"
+            ;
 
     public static final @NotNull String DEFAULT_PERMISSION = "<gray>Permission</gray><dark_gray>:</dark_gray> ";
     public static final @NotNull String DEFAULT_USAGE = "<gray>Usage</gray><dark_gray>:</dark_gray> ";
@@ -44,6 +54,10 @@ public final class HelpPageStyle {
 
     public @NotNull Component getPermissionComponent() {
         return getComponentOrElse(CommandMessages.HELP_COMMAND_PERMISSION, DEFAULT_PERMISSION);
+    }
+
+    public @NotNull Component getFooterComponent() {
+        return getComponentOrElse(CommandMessages.HELP_COMMAND_FOOTER, DEFAULT_FOOTER);
     }
 
     public @NotNull Component getUsageComponent() {
