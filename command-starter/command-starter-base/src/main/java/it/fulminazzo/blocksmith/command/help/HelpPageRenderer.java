@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public final class HelpPageRenderer {
-    public static final String HELP_COMMAND_NAME = "help"; //TODO: configurable
-
     private static final @NotNull PlainTextComponentSerializer PLAIN_SERIALIZER = PlainTextComponentSerializer.plainText();
 
     private static final int MAX_FONT_WIDTH = 320;
@@ -157,7 +155,7 @@ public final class HelpPageRenderer {
                 Placeholder.of("permission", commandData.getPermission().getPermission()),
                 Placeholder.of("description", messenger.getComponentOrElse(commandData.getDescription(), locale, "")),
                 Placeholder.of("usage", commandData.getUsage())
-        ).clickEvent(ClickEvent.runCommand(currentInput + " " + commandData.getName() + " " + HELP_COMMAND_NAME));
+        ).clickEvent(ClickEvent.runCommand(currentInput + " " + commandData.getName() + " " + commandData.getHelpCommandName()));
         int length = getMaxTruncationLength(PLAIN_SERIALIZER.serialize(subcommandComponent));
         if (length != -1) subcommandComponent = ComponentUtils.truncate(subcommandComponent, length);
         lines.add(subcommandComponent);
