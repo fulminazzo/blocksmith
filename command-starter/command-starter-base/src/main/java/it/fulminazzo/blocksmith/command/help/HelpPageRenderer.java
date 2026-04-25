@@ -89,7 +89,7 @@ public final class HelpPageRenderer {
      * Renders the header component for the given {@link Locale}.
      */
     void renderHeader() {
-        lines.add(format(style.getHeaderComponent()));
+        lines.add(formatPageButtons(style.getHeaderComponent()));
     }
 
     /**
@@ -131,7 +131,7 @@ public final class HelpPageRenderer {
      * Renders the separator between the command description and subcommands list.
      */
     void renderSeparator() {
-        lines.add(format(style.getSeparatorComponent()));
+        lines.add(formatPageButtons(style.getSeparatorComponent()));
     }
 
     /**
@@ -164,6 +164,13 @@ public final class HelpPageRenderer {
         int length = getMaxTruncationLength(PLAIN_SERIALIZER.serialize(subcommandComponent));
         if (length != -1) subcommandComponent = ComponentUtils.truncate(subcommandComponent, length);
         lines.add(subcommandComponent);
+    }
+
+    /**
+     * Renders the footer component for the given {@link Locale}.
+     */
+    void renderFooter() {
+        lines.add(formatPageButtons(style.getFooterComponent()));
     }
 
     /**
