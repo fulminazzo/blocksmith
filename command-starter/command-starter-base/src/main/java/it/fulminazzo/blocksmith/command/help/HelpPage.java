@@ -126,7 +126,7 @@ public class HelpPage {
                     .permission(commandInfo.getPermission())
                     .usage(commandNode.getUsage())
                     .helpCommandName(commandNode.getHelpCommandName())
-                    .parentHelpCommandName(parent == null ? null : parent.getHelpCommandName())
+                    .parentHelpCommandName(parent == null ? null : parent.getCommandNode().getHelpCommandName())
                     .depth(depth)
                     .build();
         }
