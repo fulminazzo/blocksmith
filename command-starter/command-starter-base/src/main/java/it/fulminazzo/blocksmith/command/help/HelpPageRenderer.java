@@ -113,10 +113,12 @@ public final class HelpPageRenderer {
      * If the description is missing, empty lines will be printed.
      */
     void renderDescription() {
-        final Component description = messenger.getComponentOrNull(helpPage.getCommand().getDescription(), locale);
+        Component description = messenger.getComponentOrNull(helpPage.getCommand().getDescription(), locale);
         List<Component> descriptionComponents = new ArrayList<>();
-        if (description != null)
+        if (description != null) {
+            description = description.replaceText(r -> r.matchLiteral("\n").replacement(Component.text(" ")));
             descriptionComponents.addAll(truncateLines(description, MAX_DESCRIPTION_LINES));
+        }
         while (descriptionComponents.size() < MAX_DESCRIPTION_LINES)
             descriptionComponents.add(Component.text(""));
         lines.addAll(descriptionComponents);
