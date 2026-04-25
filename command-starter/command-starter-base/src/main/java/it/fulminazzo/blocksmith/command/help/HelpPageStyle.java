@@ -26,7 +26,7 @@ public final class HelpPageStyle {
             "%filler%" +
             "%next%" +
             "%filler%" +
-            "%filler"
+            "%filler%"
             ;
 
     public static final @NotNull String DEFAULT_PERMISSION = "<gray>Permission</gray><dark_gray>:</dark_gray> ";
