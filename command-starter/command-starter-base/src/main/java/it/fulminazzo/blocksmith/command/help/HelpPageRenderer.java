@@ -212,7 +212,7 @@ public final class HelpPageRenderer {
     @NotNull Component formatPageButtons(final @NotNull Component component) {
         String helpCommand = visitor.getInput().getPartialRawInput() + " " + helpPage.getCommand().getHelpCommandName();
         Component previousPage = getComponentOrFillers(
-                page > 0,
+                page > 1,
                 format(style.getPreviousPageComponent())
                         .clickEvent(ClickEvent.runCommand(helpCommand + " " + (page - 1)))
         );
