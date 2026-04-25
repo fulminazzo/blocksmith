@@ -304,7 +304,7 @@ public final class HelpPageRenderer {
                     r -> r.matchLiteral(FILLER_PLACEHOLDER).replacement(replacement)
             ));
         } while (MinecraftFontWidth.getWidth(raw) <= MAX_FONT_WIDTH);
-        Component replacement = repeat(fillerComponent, --current);
+        Component replacement = repeat(fillerComponent, Math.max(0, current - 2));
         return component.replaceText(
                 r -> r.matchLiteral(FILLER_PLACEHOLDER).replacement(replacement)
         );

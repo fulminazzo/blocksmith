@@ -204,12 +204,12 @@ class HelpPageRendererTest extends Specification {
         where:
         component                             || expected
         'Hello, world!'                       || 'Hello, world!'
-        '%filler%'                            || '<strikethrough><gold>------------------------------------------------------'
-        '%filler%A%filler%'                   || '<strikethrough><gold>---------------------------</gold></strikethrough>A<strikethrough><gold>---------------------------'
+        '%filler%'                            || '<strikethrough><gold>-----------------------------------------------------'
+        '%filler%A%filler%'                   || '<strikethrough><gold>--------------------------</gold></strikethrough>A<strikethrough><gold>--------------------------'
         '%filler%A%filler%B%filler%'          ||
-                '<strikethrough><gold>------------------</gold></strikethrough>A<strikethrough><gold>------------------</gold></strikethrough>B<strikethrough><gold>------------------'
+                '<strikethrough><gold>-----------------</gold></strikethrough>A<strikethrough><gold>-----------------</gold></strikethrough>B<strikethrough><gold>-----------------'
         '%filler%A%filler%B%filler%C%filler%' ||
-                '<strikethrough><gold>-------------</gold></strikethrough>A<strikethrough><gold>-------------</gold></strikethrough>B<strikethrough><gold>-------------</gold></strikethrough>C<strikethrough><gold>-------------'
+                '<strikethrough><gold>------------</gold></strikethrough>A<strikethrough><gold>------------</gold></strikethrough>B<strikethrough><gold>------------</gold></strikethrough>C<strikethrough><gold>------------'
     }
 
     def 'test that getComponentOrFillers of #string and #condition returns self'() {
