@@ -64,7 +64,7 @@ class ReceiverFactoriesTest extends Specification {
         and:
         def receiver = receivers[0]
         (receiver instanceof GroovyPlayerReceiver)
-        receiver.internal == player
+        receiver.handle() == player
     }
 
     def 'test that registerCustomFactory works'() {
@@ -133,8 +133,9 @@ class ReceiverFactoriesTest extends Specification {
             }
         }
 
+        @NotNull
         @Override
-        <R> R internal() {
+        <R> R handle() {
             return (R) internal;
         }
 

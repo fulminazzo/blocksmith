@@ -27,7 +27,7 @@ final class BungeeReceiver implements Receiver {
 
     @SuppressWarnings("unchecked")
     @Override
-    public @NotNull <R> R internal() {
+    public @NotNull <R> R handle() {
         return (R) internal;
     }
 

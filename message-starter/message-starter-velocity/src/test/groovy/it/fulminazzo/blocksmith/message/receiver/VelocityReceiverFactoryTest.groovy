@@ -38,7 +38,7 @@ class VelocityReceiverFactoryTest extends Specification {
         receivers != null
 
         when:
-        def internalReceivers = receivers.collect { it.internal }
+        def internalReceivers = receivers.collect { it.handle() }
 
         then:
         internalReceivers.sort() == [*players, console].sort()
@@ -58,7 +58,7 @@ class VelocityReceiverFactoryTest extends Specification {
         receiver != null
 
         and:
-        receiver.internal == sender
+        receiver.handle() == sender
     }
 
     def 'test that ReceiverFactories returns correct factory for #receiverType'() {

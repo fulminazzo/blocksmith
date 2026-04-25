@@ -53,7 +53,7 @@ class BungeeReceiverFactoryTest extends Specification {
         receivers != null
 
         when:
-        def internalReceivers = receivers.collect { it.internal }
+        def internalReceivers = receivers.collect { it.handle() }
 
         then:
         internalReceivers.sort() == [*players, console].sort()
@@ -73,7 +73,7 @@ class BungeeReceiverFactoryTest extends Specification {
         receiver != null
 
         and:
-        receiver.internal == sender
+        receiver.handle() == sender
     }
 
     def 'test that ReceiverFactories returns correct factory for #receiverType'() {

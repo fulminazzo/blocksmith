@@ -36,7 +36,7 @@ public final class UserDataReceiverFactory implements ReceiverFactory {
             }
 
             @Override
-            public <T> @NotNull T internal() {
+            public <T> @NotNull T handle() {
                 throw new UnsupportedOperationException();
             }
 
