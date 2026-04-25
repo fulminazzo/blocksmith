@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.message
 
 import groovy.util.logging.Slf4j
 import it.fulminazzo.blocksmith.ServerApplication
+import it.fulminazzo.blocksmith.message.argument.Argument
 import it.fulminazzo.blocksmith.message.argument.Placeholder
 import it.fulminazzo.blocksmith.message.provider.MessageNotFoundException
 import it.fulminazzo.blocksmith.message.provider.MessageProvider
@@ -10,6 +11,7 @@ import it.fulminazzo.blocksmith.message.receiver.Receiver
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactory
 import it.fulminazzo.blocksmith.message.util.ComponentUtils
+import it.fulminazzo.blocksmith.reflect.Reflect
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.title.TitlePart
@@ -25,6 +27,9 @@ class MessengerTest extends Specification {
 
     private Player player
     private MessageProvider provider
+
+    private ServerApplication application
+
     private Messenger messenger
 
     private Map<String, Component> messages = [:]
@@ -43,7 +48,7 @@ class MessengerTest extends Specification {
 
         messages['prefix'] = Component.text('blocksmith | ')
 
-        def application = Mock(ServerApplication)
+        application = Mock(ServerApplication)
         application.logger() >> log
         application.lowercaseName() >> 'blocksmith'
 
@@ -334,6 +339,48 @@ class MessengerTest extends Specification {
 
         then:
         noExceptionThrown()
+    }
+
+    def 'test that getComponentOrElse of #alternative returns #expected'() {
+        given:
+        def code = 'message_or_else'
+        def locale = Locale.default
+
+        and:
+        def argument = Mock(Argument)
+        argument.apply(_) >> { a ->
+            Component component = a[0].message
+            return component.replaceText { it.matchLiteral('%hello%').replacement('world') }
+        }
+
+        and:
+        messages[code] = returns ? Component.text('found') : null
+
+        and:
+        def reflect = Reflect.on(messenger)
+        def method = reflect.getMethod(
+                Component, 'getComponentOrElse',
+                String, Locale, alternative == null ? Component : alternative.class, null
+        )
+
+        when:
+        def actual = reflect.invoke(method,
+                code, locale, alternative == 'null' ? null : alternative, argument
+        ).get()
+
+        then:
+        actual == expected
+
+        where:
+        returns | alternative               || expected
+        false   | 'null'                    || null
+        true    | 'null'                    || Component.text('found')
+        false   | '%hello%'                 || Component.text('world')
+        true    | '%hello%'                 || Component.text('found')
+        false   | null                      || null
+        true    | null                      || Component.text('found')
+        false   | Component.text('%hello%') || Component.text('world')
+        true    | Component.text('%hello%') || Component.text('found')
     }
 
     def 'test that getComponent calls on provider'() {

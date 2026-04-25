@@ -9,6 +9,7 @@ import it.fulminazzo.blocksmith.message.provider.MessageProvider;
 import it.fulminazzo.blocksmith.message.receiver.Receiver;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactories;
 import it.fulminazzo.blocksmith.message.receiver.ReceiverFactory;
+import it.fulminazzo.blocksmith.message.util.ComponentUtils;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -247,10 +248,51 @@ public final class Messenger {
     public @Nullable Component getComponentOrNull(final @NotNull String messageCode,
                                                   final @NotNull Locale locale,
                                                   final Argument @NotNull ... arguments) {
+        return getComponentOrElse(messageCode, locale, (Component) null, arguments);
+    }
+
+    /**
+     * Gets a Text Adventure component from the given message code.
+     * Uses the internal {@link MessageProvider}.
+     *
+     * @param messageCode the message code
+     * @param locale      the locale
+     * @param arguments   the arguments to apply to the message (either fetched or alternative)
+     * @param alternative the alternate message to return in case the requested one could not be found
+     * @return the component
+     */
+    public Component getComponentOrElse(final @NotNull String messageCode,
+                                        final @NotNull Locale locale,
+                                        final @Nullable String alternative,
+                                        final Argument @NotNull ... arguments) {
+        return getComponentOrElse(messageCode, locale, alternative == null
+                        ? null
+                        : ComponentUtils.toComponent(alternative),
+                arguments
+        );
+    }
+
+    /**
+     * Gets a Text Adventure component from the given message code.
+     * Uses the internal {@link MessageProvider}.
+     *
+     * @param messageCode the message code
+     * @param locale      the locale
+     * @param arguments   the arguments to apply to the message (either fetched or alternative)
+     * @param alternative the alternate message to return in case the requested one could not be found
+     * @return the component
+     */
+    public Component getComponentOrElse(final @NotNull String messageCode,
+                                        final @NotNull Locale locale,
+                                        @Nullable Component alternative,
+                                        final Argument @NotNull ... arguments) {
         try {
             return getComponent(messageCode, locale, arguments);
         } catch (MessageNotFoundException e) {
-            return null;
+            if (alternative != null)
+                for (Argument argument : arguments)
+                    alternative = argument.apply(new MessageParseContext(this, locale, alternative));
+            return alternative;
         }
     }
 
