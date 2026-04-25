@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.ApplicationHandle
 import it.fulminazzo.blocksmith.command.CommandMessages
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper
 import it.fulminazzo.blocksmith.command.annotation.Permission
+import it.fulminazzo.blocksmith.command.help.HelpPage.CommandData
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor
@@ -22,14 +23,16 @@ class HelpPageRendererTest extends Specification {
     private static final String TRUNCATED_CHARS = '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@...'
 
     private static final HelpPage helpPage = new HelpPage(
-            HelpPage.CommandData.builder()
-                    .name('test')
-                    .description('test.description')
-                    .permission(new PermissionInfo('blocksmith', 'test.permission', Permission.Grant.NONE))
-                    .usage('/test')
-                    .helpCommandName('help')
-                    .build(),
-            []
+            newCommandData('test'),
+            [
+                    newCommandData('first'),
+                    newCommandData('second'),
+                    newCommandData('third'),
+                    newCommandData('fourth'),
+                    newCommandData('fifth'),
+                    newCommandData('sixth'),
+                    newCommandData('seventh')
+            ]
     )
 
     private Map<String, String> messages = [:]
@@ -192,6 +195,34 @@ class HelpPageRendererTest extends Specification {
         actualDescription                                                || description
         'Test description'                                               || 'Test description'
         'Super long test description to ensure it is properly truncated' || 'Super long test description to ensure it is properl</gray>...'
+    }
+
+    def 'test that formatPageButtons with #page returns #expected'() {
+        given:
+        def component = Component.text('%previous% %next%')
+
+        and:
+        sender.hasPermission(_ as PermissionInfo) >> hasPermission
+
+        and:
+        input.advanceCursor().advanceCursor()
+        def renderer = new HelpPageRenderer(helpPage, visitor, page)
+
+        when:
+        def actual = renderer.formatPageButtons(component)
+
+        then:
+        ComponentUtils.toString(actual) == expected
+
+        where:
+        page | hasPermission || expected
+        1    | false         || '<strikethrough><gold>---</gold></strikethrough> <strikethrough><gold>---'
+        1    | true          || '<strikethrough><gold>---</gold></strikethrough> <click:run_command:\'root help 2\'><gold>[</gold><red>>></red><gold>]'
+        2    | false         || '<strikethrough><gold>---</gold></strikethrough> <strikethrough><gold>---'
+        2    | true          ||
+                '<click:run_command:\'root help 1\'><gold>[</gold><red>\\<\\<</red><gold>]</gold></click> <click:run_command:\'root help 3\'><gold>[</gold><red>>></red><gold>]'
+        3    | false         || '<strikethrough><gold>---</gold></strikethrough> <strikethrough><gold>---'
+        3    | true          || '<click:run_command:\'root help 2\'><gold>[</gold><red>\\<\\<</red><gold>]</gold></click> <strikethrough><gold>---'
     }
 
     def 'test that format correctly renders data'() {
@@ -357,6 +388,16 @@ class HelpPageRendererTest extends Specification {
         string        || expected
         MAX_CHARS     || -1
         "$MAX_CHARS@" || 44
+    }
+
+    private static CommandData newCommandData(final String name) {
+        return CommandData.builder()
+                .name(name)
+                .description("${name}.description")
+                .permission(new PermissionInfo('blocksmith', "${name}.permission", Permission.Grant.ALL))
+                .usage("/test${name == 'test' ? '' : " $name"}")
+                .helpCommandName('help')
+                .build()
     }
 
 }
