@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.help;
 
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
+import it.fulminazzo.blocksmith.command.visitor.CommandInput;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.message.Messenger;
 import it.fulminazzo.blocksmith.message.util.ComponentUtils;
@@ -215,10 +216,19 @@ public final class HelpPageRenderer {
      * @return the formatted component
      */
     @NotNull Component formatPageButtons(final @NotNull Component component) {
-        String helpCommand = visitor.getInput().getPartialRawInput() + " " + helpPage.getCommand().getHelpCommandName() + " ";
-        String parentHelpCommand = helpPage.getCommand().getParentHelpCommand();
+        final HelpPage.CommandData command = helpPage.getCommand();
+        final CommandInput input = visitor.getInput();
+        String helpCommand = input.getPartialRawInput() + " " + command.getHelpCommandName() + " ";
+        String parentHelpCommand;
+        if (command.getParentHelpCommandName() == null) parentHelpCommand = "";
+        else {
+            CommandInput snapshot = input.snapshot();
+            for (int i = 0; i < command.getDepth(); i++) input.retreatCursor();
+            parentHelpCommand = input.getPartialRawInput() + " " + command.getParentHelpCommandName();
+            input.restore(snapshot);
+        }
         Component back = getComponentOrFillers(
-                parentHelpCommand != null,
+                !parentHelpCommand.isEmpty(),
                 format(style.getPreviousCommandComponent()).clickEvent(ClickEvent.runCommand(parentHelpCommand))
         );
         Component previousPage = getComponentOrFillers(
