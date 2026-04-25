@@ -96,7 +96,7 @@ class HelpPageRendererTest extends Specification {
         def lines = renderer.render().collect { ComponentUtils.toString(it) }.join('\n')
 
         then:
-        lines == """<strikethrough><gold>------------------------</gold></strikethrough> <white>test</white> <strikethrough><gold>------------------------
+        lines == """<strikethrough><gold>-----</gold></strikethrough><strikethrough><gold>-------------------</gold></strikethrough> <white>test</white> <strikethrough><gold>-------------------</gold></strikethrough><strikethrough><gold>-----
 test description
 
 <gray>Permission</gray><dark_gray>:</dark_gray> blocksmith.test.permission
