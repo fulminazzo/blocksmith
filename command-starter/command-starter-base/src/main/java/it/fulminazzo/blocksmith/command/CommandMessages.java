@@ -233,6 +233,15 @@ public final class CommandMessages {
      */
     public static final @NotNull String COMMAND_DESCRIPTION = "command.%s.description";
 
+    /*
+     * HELP COMMAND
+     */
+
+    /**
+     * The filler used to fill gaps in any string specified in this section.
+     */
+    public static final @NotNull String HELP_COMMAND_FILLER = "command.help.filler";
+
     /**
      * Identifies the text to prepend before a command permission in the help page.
      * <br>
@@ -241,7 +250,8 @@ public final class CommandMessages {
      *     <li><b>name</b>: the name of the command;</li>
      *     <li><b>description</b>: the description of the command;</li>
      *     <li><b>permission</b>: the permission of the command;</li>
-     *     <li><b>usage</b>: the usage of the command.</li>
+     *     <li><b>usage</b>: the usage of the command;</li>
+     *     <li><b>subcommands</b>: {@link #HELP_COMMAND_SUBCOMMANDS}.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_PERMISSION = "command.help.permission";
@@ -254,7 +264,8 @@ public final class CommandMessages {
      *     <li><b>name</b>: the name of the command;</li>
      *     <li><b>description</b>: the description of the command;</li>
      *     <li><b>permission</b>: the permission of the command;</li>
-     *     <li><b>usage</b>: the usage of the command.</li>
+     *     <li><b>usage</b>: the usage of the command;</li>
+     *     <li><b>subcommands</b>: {@link #HELP_COMMAND_SUBCOMMANDS}.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_USAGE = "command.help.usage";
@@ -272,7 +283,8 @@ public final class CommandMessages {
      *     <li><b>name</b>: the name of the subcommand;</li>
      *     <li><b>description</b>: the description of the subcommand;</li>
      *     <li><b>permission</b>: the permission of the subcommand;</li>
-     *     <li><b>usage</b>: the usage of the subcommand.</li>
+     *     <li><b>usage</b>: the usage of the subcommand;</li>
+     *     <li><b>subcommands</b>: {@link #HELP_COMMAND_SUBCOMMANDS}.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_SUBCOMMAND_FORMAT = "command.help.subcommand-format";
