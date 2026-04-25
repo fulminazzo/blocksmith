@@ -251,7 +251,9 @@ public final class CommandMessages {
      *     <li><b>description</b>: the description of the command;</li>
      *     <li><b>permission</b>: the permission of the command;</li>
      *     <li><b>usage</b>: the usage of the command;</li>
-     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line.</li>
+     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
+     *     <li><b>page</b>: the current page;</li>
+     *     <li><b>pages</b>: the total number of pages.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_HEADER = "command.help.header";
@@ -265,7 +267,9 @@ public final class CommandMessages {
      *     <li><b>description</b>: the description of the command;</li>
      *     <li><b>permission</b>: the permission of the command;</li>
      *     <li><b>usage</b>: the usage of the command;</li>
-     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line.</li>
+     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
+     *     <li><b>page</b>: the current page;</li>
+     *     <li><b>pages</b>: the total number of pages.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_SEPARATOR = "command.help.separator";
@@ -279,7 +283,9 @@ public final class CommandMessages {
      *     <li><b>description</b>: the description of the command;</li>
      *     <li><b>permission</b>: the permission of the command;</li>
      *     <li><b>usage</b>: the usage of the command;</li>
-     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line.</li>
+     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
+     *     <li><b>page</b>: the current page;</li>
+     *     <li><b>pages</b>: the total number of pages.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_PERMISSION = "command.help.permission";
@@ -293,7 +299,9 @@ public final class CommandMessages {
      *     <li><b>description</b>: the description of the command;</li>
      *     <li><b>permission</b>: the permission of the command;</li>
      *     <li><b>usage</b>: the usage of the command;</li>
-     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line.</li>
+     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
+     *     <li><b>page</b>: the current page;</li>
+     *     <li><b>pages</b>: the total number of pages.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_USAGE = "command.help.usage";
@@ -307,7 +315,9 @@ public final class CommandMessages {
      *     <li><b>description</b>: the description of the subcommand;</li>
      *     <li><b>permission</b>: the permission of the subcommand;</li>
      *     <li><b>usage</b>: the usage of the subcommand;</li>
-     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line.</li>
+     *     <li><b>filler</b>: {@link #HELP_COMMAND_FILLER} repeated until the message has filled the chat line;</li>
+     *     <li><b>page</b>: the current page;</li>
+     *     <li><b>pages</b>: the total number of pages.</li>
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_SUBCOMMAND_FORMAT = "command.help.subcommand-format";
@@ -329,17 +339,6 @@ public final class CommandMessages {
      * </ul>
      */
     public static final @NotNull String HELP_COMMAND_PREVIOUS_PAGE = "command.help.previous-page";
-
-    /**
-     * Identifies the name of the current page text.
-     * <br>
-     * Placeholders:
-     * <ul>
-     *     <li><b>page</b>: the page number;</li>
-     *     <li><b>pages</b>: the total pages.</li>
-     * </ul>
-     */
-    public static final @NotNull String HELP_COMMAND_CURRENT_PAGE = "command.help.current-page";
 
     /**
      * Identifies the name of the next page button.

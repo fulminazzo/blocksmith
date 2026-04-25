@@ -21,11 +21,15 @@ public final class HelpPageStyle {
 
     public static final @NotNull String DEFAULT_PERMISSION = "<gray>Permission</gray><dark_gray>:</dark_gray> ";
     public static final @NotNull String DEFAULT_USAGE = "<gray>Usage</gray><dark_gray>:</dark_gray> ";
+
     public static final @NotNull String DEFAULT_SUBCOMMAND_FORMAT =
             "<hover:show_text:'<white>%usage%</white>\n<gray>%permission%</gray>\n\n<aqua>Click for more information</aqua>'>" +
                     "<white>%name%</white> <dark_gray>-</dark_gray> <gray>%description%</gray>" +
                     "</hover>";
     public static final @NotNull String DEFAULT_NO_SUBCOMMANDS = "\n  <red>(none)</red>\n ";
+
+    public static final @NotNull String DEFAULT_PREVIOUS_PAGE = "<gold>[</gold><red><<</red><gold>]</gold>";
+    public static final @NotNull String DEFAULT_NEXT_PAGE = "<gold>[</gold><red>>></red><gold>]</gold>";
 
     @NotNull Messenger messenger;
     @NotNull Locale locale;
@@ -56,6 +60,14 @@ public final class HelpPageStyle {
 
     public @NotNull Component getSubcommandFormat(final @NotNull Argument @NotNull ... arguments) {
         return getComponentOrElse(CommandMessages.HELP_COMMAND_SUBCOMMAND_FORMAT, DEFAULT_SUBCOMMAND_FORMAT, arguments);
+    }
+
+    public @NotNull Component getPreviousPageComponent() {
+        return getComponentOrElse(CommandMessages.HELP_COMMAND_PREVIOUS_PAGE, DEFAULT_PREVIOUS_PAGE);
+    }
+
+    public @NotNull Component getNextPageComponent() {
+        return getComponentOrElse(CommandMessages.HELP_COMMAND_NEXT_PAGE, DEFAULT_NEXT_PAGE);
     }
 
     private @NotNull Component getComponentOrElse(final @NotNull String messageCode,
