@@ -55,6 +55,17 @@ public final class HelpPageRenderer {
         this.sender = visitor.getCommandSender();
         this.locale = sender.receiver().getLocale();
         this.style = new HelpPageStyle(messenger, locale);
+        /*
+         * The logic of the next code is the following:
+         * the user requested the help page of a command. They can either have written
+         * /clan help or /clan help 1
+         * In either case, when it comes to the parsing of the arguments,
+         * since the page number is an optional parameter, if not given
+         * an artificial one will be added.
+         * Therefore, to go back to the root command (while preserving the arguments)
+         * we retrocede the cursor by 2.
+         */
+        visitor.getInput().retrocedeCursor().retrocedeCursor();
     }
 
     public @NotNull List<Component> render(int page) {

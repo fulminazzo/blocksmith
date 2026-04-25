@@ -35,6 +35,8 @@ class HelpPageRendererTest extends Specification {
 
     private Messenger messenger = Mock(Messenger)
     private CommandSenderWrapper<?> sender = Mock(CommandSenderWrapper)
+
+    private CommandInput input
     private InputVisitor<?, ?> visitor = Mock(InputVisitor)
 
     private HelpPageRenderer renderer
@@ -53,13 +55,16 @@ class HelpPageRendererTest extends Specification {
             return receiver
         }
 
+        input = new CommandInput()
+                .addInput('root', 'help', '1')
+                .advanceCursor()
+                .advanceCursor()
         visitor.application >> {
             def application = Mock(ApplicationHandle)
             application.messenger >> messenger
             return application
         }
         visitor.commandSender >> sender
-        def input = new CommandInput().addInput('root').advanceCursor()
         visitor.input >> input
 
         renderer = new HelpPageRenderer(helpPage, visitor)
@@ -131,6 +136,7 @@ class HelpPageRendererTest extends Specification {
         }
 
         and:
+        input.advanceCursor().advanceCursor()
         def renderer = new HelpPageRenderer(helpPage, visitor)
 
         and:
