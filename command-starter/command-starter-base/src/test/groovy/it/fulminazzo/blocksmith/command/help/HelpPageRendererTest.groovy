@@ -194,6 +194,68 @@ class HelpPageRendererTest extends Specification {
         'Super long test description to ensure it is properly truncated' || 'Super long test description to ensure it is properl</gray>...'
     }
 
+    def 'test that parseFillerComponent of #component returns #expected'() {
+        when:
+        def actual = renderer.parseFillerComponent(ComponentUtils.toComponent(component))
+
+        then:
+        ComponentUtils.toString(actual) == expected
+
+        where:
+        component                             || expected
+        'Hello, world!'                       || 'Hello, world!'
+        '%filler%'                            || '<strikethrough><gold>------------------------------------------------------'
+        '%filler%A%filler%'                   || '<strikethrough><gold>---------------------------</gold></strikethrough>A<strikethrough><gold>---------------------------'
+        '%filler%A%filler%B%filler%'          ||
+                '<strikethrough><gold>------------------</gold></strikethrough>A<strikethrough><gold>------------------</gold></strikethrough>B<strikethrough><gold>------------------'
+        '%filler%A%filler%B%filler%C%filler%' ||
+                '<strikethrough><gold>-------------</gold></strikethrough>A<strikethrough><gold>-------------</gold></strikethrough>B<strikethrough><gold>-------------</gold></strikethrough>C<strikethrough><gold>-------------'
+    }
+
+    def 'test that getComponentOrFillers of #string and #condition returns self'() {
+        given:
+        def component = Component.text(string)
+
+        when:
+        def actual = renderer.getComponentOrFillers(condition, component)
+
+        then:
+        actual == component
+
+        where:
+        string  | condition
+        ''      | false
+        ''      | true
+        'Hello' | true
+    }
+
+    def 'test that getComponentOrFillers returns a component of fillers so that the length matches as much as possible the original'() {
+        given:
+        def component = Component.text(string)
+
+        when:
+        def actualComponent = renderer.getComponentOrFillers(false, component)
+        def actual = PLAIN_SERIALIZER.serialize(actualComponent)
+
+        then:
+        MinecraftFontWidth.getWidth(actual) - MinecraftFontWidth.getWidth(string) <= 5
+
+        where:
+        string << [
+                'Hello',
+                'Hello, world!',
+                'Goodbye, mars!',
+                '[<<]',
+                '@@',
+                '@@@@@',
+                '@@@@@@@',
+                '@@@@@@@@'
+        ]
+    }
+
+    /*
+     * UTILITIES
+     */
 
     def 'test that truncateLines of #string returns #expected'() {
         given:
@@ -218,25 +280,6 @@ class HelpPageRendererTest extends Specification {
         "$MAX_CHARS$MAX_CHARS$MAX_CHARS Hello, world!" || [MAX_CHARS, MAX_CHARS, TRUNCATED_CHARS]
         MAX_CHARS * 4                                  || [MAX_CHARS, MAX_CHARS, TRUNCATED_CHARS]
     }
-
-    def 'test that parseFillerComponent of #component returns #expected'() {
-        when:
-        def actual = renderer.parseFillerComponent(ComponentUtils.toComponent(component))
-
-        then:
-        ComponentUtils.toString(actual) == expected
-
-        where:
-        component                             || expected
-        'Hello, world!'                       || 'Hello, world!'
-        '%filler%'                            || '<strikethrough><gold>------------------------------------------------------'
-        '%filler%A%filler%'                   || '<strikethrough><gold>---------------------------</gold></strikethrough>A<strikethrough><gold>---------------------------'
-        '%filler%A%filler%B%filler%'          ||
-                '<strikethrough><gold>------------------</gold></strikethrough>A<strikethrough><gold>------------------</gold></strikethrough>B<strikethrough><gold>------------------'
-        '%filler%A%filler%B%filler%C%filler%' ||
-                '<strikethrough><gold>-------------</gold></strikethrough>A<strikethrough><gold>-------------</gold></strikethrough>B<strikethrough><gold>-------------</gold></strikethrough>C<strikethrough><gold>-------------'
-    }
-
 
     def 'test that truncate of long string truncates and sets hover event'() {
         given:

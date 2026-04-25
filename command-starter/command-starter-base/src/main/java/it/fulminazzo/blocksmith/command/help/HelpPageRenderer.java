@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.util.*;
+import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -242,6 +243,33 @@ public final class HelpPageRenderer {
                 r -> r.matchLiteral(FILLER_PLACEHOLDER).replacement(replacement)
         );
     }
+
+    /**
+     * Given a component, it will return the component if the condition is met,
+     * otherwise it will return a component with the same text but with the filler component repeated
+     * until the component reaches the same length as the given component.
+     *
+     * @param condition the condition to check
+     * @param component the component
+     * @return the component or the filler component
+     */
+    @NotNull Component getComponentOrFillers(final boolean condition, final @NotNull Component component) {
+        if (condition) return component;
+        String serialized = PLAIN_SERIALIZER.serialize(component);
+        if (serialized.isEmpty()) return component;
+        int length = MinecraftFontWidth.getWidth(serialized);
+        Component fillerComponent = style.getFillerComponent();
+        Component current = Component.empty().append(fillerComponent);
+        while (MinecraftFontWidth.getWidth(
+                PLAIN_SERIALIZER.serialize(current) + PLAIN_SERIALIZER.serialize(fillerComponent)
+        ) <= length)
+            current = current.append(fillerComponent);
+        return current;
+    }
+
+    /*
+     * UTILITIES
+     */
 
     /**
      * Given a component, it attempts to subdivide it into multiple components for the given number of lines.
