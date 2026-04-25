@@ -66,7 +66,7 @@ public final class HelpPageRenderer {
         this.pages = helpPage.getSubcommandsPages(sender, SUBCOMMANDS_LINES);
         /*
          * Imagine the sender requested the help page and got access to the next page.
-         * Then, they lost some permissions, therefore the next page disappeared.
+         * Then, they lost some permissions; therefore, the next page disappeared.
          * By using this calculation, we make sure that the renderer does not halt in this or similar scenarios
          */
         this.page = Math.min(page, pages);
@@ -75,10 +75,10 @@ public final class HelpPageRenderer {
          * the user requested the help page of a command. They can either have written
          * /clan help or /clan help 1
          * In either case, when it comes to the parsing of the arguments,
-         * since the page number is an optional parameter, if not given
+         * since the page number is an optional parameter, if not given,
          * an artificial one will be added.
-         * Therefore, to go back to the root command (while preserving the arguments)
-         * we retrocede the cursor by 2.
+         * Therefore, to go back to the root command (while preserving the arguments),
+         * we retreat the cursor by 2.
          */
         visitor.getInput().retreatCursor().retreatCursor();
     }
@@ -89,6 +89,7 @@ public final class HelpPageRenderer {
      * @return the lines
      */
     public @NotNull List<Component> render() {
+        lines.clear();
         renderHeader();
         renderDescription();
         renderPermission();
@@ -311,9 +312,10 @@ public final class HelpPageRenderer {
     }
 
     /**
-     * Given a component, it will return the component if the condition is met,
-     * otherwise it will return a component with the same text but with the filler component repeated
-     * until the component reaches the same length as the given component.
+     * Given a component, it will return the component if the condition is met;
+     * otherwise it will return a component with the same text, but with the filler component repeated
+     * until the component reaches the same length as the given one
+     * (basically creating a positional text).
      *
      * @param condition the condition to check
      * @param component the component
