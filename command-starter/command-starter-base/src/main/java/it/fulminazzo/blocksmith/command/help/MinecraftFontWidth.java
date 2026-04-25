@@ -319,6 +319,18 @@ public final class MinecraftFontWidth {
      * @param text the text
      * @return the width
      */
+    public static int getWidth(final @NotNull String text) {
+        return getWidth(new StringBuilder(text));
+    }
+
+    /**
+     * Gets the width of the given string if it was rendered in the Minecraft chat.
+     * <br>
+     * If a special character is used, the {@code @} character is assumed.
+     *
+     * @param text the text
+     * @return the width
+     */
     public static int getWidth(final @NotNull StringBuilder text) {
         if (text.length() == 0) return 0;
         int total = 0;
