@@ -220,6 +220,16 @@ class CommandInputTest extends Specification {
         '\'\''              || ''
     }
 
+    def 'test that getRawPartialInput works'() {
+        given:
+        def input = new CommandInput()
+                .addInput('Hello', 'world', 'goodbye', 'mars')
+                .advanceCursor()
+
+        expect:
+        input.partialRawInput == 'Hello world'
+    }
+
     def 'test toString works'() {
         given:
         def input = new CommandInput()

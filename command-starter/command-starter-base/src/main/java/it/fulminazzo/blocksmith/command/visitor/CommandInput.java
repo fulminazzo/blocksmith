@@ -166,7 +166,7 @@ public final class CommandInput {
      * @return the input
      */
     public @NotNull String getPartialRawInput() {
-        return String.join(DELIMITER, input.subList(0, Math.min(input.size(), current)));
+        return String.join(DELIMITER, input.subList(0, Math.min(input.size(), current + 1)));
     }
 
     /**
