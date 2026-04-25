@@ -178,6 +178,46 @@ public final class HelpPageRenderer {
      *     (falls back to {@link HelpPageStyle#DEFAULT_FILLER} if not found)
      *     repeated until the component exceeds length {@link #MAX_FONT_WIDTH};</li>
      *     <li>{@code %page%}: the current page;</li>
+     *     <li>{@code %pages%}: the total number of pages;</li>
+     *     <li>{@code %previous%}: the button associated with
+     *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_PREVIOUS_PAGE};</li>
+     *     <li>{@code %next%}: the button associated with
+     *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_NEXT_PAGE}.</li>
+     * </ul>
+     *
+     * @param component the component to format
+     * @return the formatted component
+     */
+    @NotNull Component formatPageButtons(final @NotNull Component component) {
+        String helpCommand = visitor.getInput().getPartialRawInput() + " " + helpPage.getCommand().getHelpCommandName();
+        Component previousPage = getComponentOrFillers(
+                page > 0,
+                format(style.getPreviousPageComponent())
+                        .clickEvent(ClickEvent.runCommand(helpCommand + " " + (page - 1)))
+        );
+        Component nextPage = getComponentOrFillers(
+                page < pages,
+                format(style.getNextPageComponent())
+                        .clickEvent(ClickEvent.runCommand(helpCommand + " " + (page + 1)))
+        );
+        return format(component
+                .replaceText(r -> r.matchLiteral("%previous%").replacement(previousPage))
+                .replaceText(r -> r.matchLiteral("%next%").replacement(nextPage))
+        );
+    }
+
+    /**
+     * Formats the given text with the following placeholders:
+     * <ul>
+     *     <li>{@code %name%}: the name of the given command;</li>
+     *     <li>{@code %permission%}: the permission of the given command;</li>
+     *     <li>{@code %description%}: the description of the given command;</li>
+     *     <li>{@code %usage%}: the usage of the given command;</li>
+     *     <li>{@code %filler%}: the value of
+     *     {@link it.fulminazzo.blocksmith.command.CommandMessages#HELP_COMMAND_FILLER}
+     *     (falls back to {@link HelpPageStyle#DEFAULT_FILLER} if not found)
+     *     repeated until the component exceeds length {@link #MAX_FONT_WIDTH};</li>
+     *     <li>{@code %page%}: the current page;</li>
      *     <li>{@code %pages%}: the total number of pages.</li>
      * </ul>
      *
