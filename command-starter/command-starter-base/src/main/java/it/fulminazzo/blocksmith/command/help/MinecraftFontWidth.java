@@ -292,6 +292,10 @@ public final class MinecraftFontWidth {
     };
 
     static {
+        WIDTHS.put('←', 8);
+        WIDTHS.put('↑', 8);
+        WIDTHS.put('→', 8);
+        WIDTHS.put('↓', 8);
         for (int i = 1; i < FONT_DATA.length; i++) {
             char ch = (char) i;
             if (i >= 32 && i < 32 + FONT_CHARS.length()) {
