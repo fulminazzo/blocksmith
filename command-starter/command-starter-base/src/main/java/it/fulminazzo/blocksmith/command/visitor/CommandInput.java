@@ -100,6 +100,16 @@ public final class CommandInput {
     }
 
     /**
+     * Retrocedes the internal cursor to the previous argument.
+     *
+     * @return this object (for method chaining)
+     */
+    public @NotNull CommandInput retrocedeCursor() {
+        current--;
+        return this;
+    }
+
+    /**
      * Injects a new argument into the current position of the input.
      *
      * @param input the argument
