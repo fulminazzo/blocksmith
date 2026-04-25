@@ -48,6 +48,8 @@ class HelpPageTest extends Specification {
                                     .permission(it.commandInfo.permission)
                                     .usage(it.usage)
                                     .helpCommandName(it.helpCommandName)
+                                    .parentHelpCommandName(node.helpCommandName)
+                                    .depth(1)
                                     .build()
                         }
         )
