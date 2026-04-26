@@ -15,7 +15,7 @@ final class ClanCommand {
     @Help(
             aliases = {"?"},
             description = "clan.help.description",
-            permission = "clan.help.permission"
+            permission = @Permission(value = "help.permission", group = "clan")
     )
     public void execute(
             final @NotNull CommandSender sender
