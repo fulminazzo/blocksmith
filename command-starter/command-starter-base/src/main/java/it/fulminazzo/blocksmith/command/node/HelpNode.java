@@ -14,6 +14,8 @@ import java.util.Arrays;
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
 public final class HelpNode extends InjectedNode {
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private @NotNull Help helpAnnotation;
 
     /**
