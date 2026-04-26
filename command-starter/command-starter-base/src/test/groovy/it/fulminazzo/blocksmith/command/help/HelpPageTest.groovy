@@ -4,9 +4,11 @@ import it.fulminazzo.blocksmith.command.CommandSenderWrapper
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.help.HelpPage.CommandData
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
+import it.fulminazzo.blocksmith.command.node.CommandNode
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
+import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 import java.lang.reflect.Parameter
@@ -145,6 +147,30 @@ class HelpPageTest extends Specification {
 
         then:
         actual == page
+    }
+
+    def 'test that CommandData creation of non-literal parent does not throw'() {
+        given:
+        def node = newLiteralNode('test')
+
+        and:
+        def parameter = Mock(Parameter)
+        parameter.type >> String
+        def parent = Mock(CommandNode)
+        parent.commandNode >> newLiteralNode('parent')
+        Reflect.on(node).set('parent', parent)
+
+        when:
+        def data = CommandData.create(node)
+
+        then:
+        data.name == node.name
+        data.description == node.commandInfo.description
+        data.permission == node.commandInfo.permission
+        data.usage == node.usage
+        data.helpCommandName == node.helpCommandName
+        data.parentHelpCommandName == 'help'
+        data.depth == 1
     }
 
     private static CommandData getSubcommand(final HelpPage page, final String name) {
