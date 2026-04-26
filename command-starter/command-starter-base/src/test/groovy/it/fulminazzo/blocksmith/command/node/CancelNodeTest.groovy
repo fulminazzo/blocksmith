@@ -28,10 +28,15 @@ class CancelNodeTest extends Specification {
                 new PermissionInfo('permission', 'root', Permission.Grant.ALL)
         )
 
+        def permission = Mock(Permission)
+        permission.group() >> ''
+        permission.value() >> ''
+        permission.grant() >> Permission.Grant.OP
+
         def annotation = Mock(Confirm)
         annotation.cancelAliases() >> ['cancel'].toArray()
         annotation.cancelDescription() >> 'description.cancel'
-        annotation.cancelPermission() >> 'permission.cancel'
+        annotation.cancelPermission() >> permission
 
         node = new CancelNode(annotation, parent, confirmationManager)
 

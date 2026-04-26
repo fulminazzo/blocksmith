@@ -28,10 +28,15 @@ class ConfirmNodeTest extends Specification {
                 new PermissionInfo('permission', 'root', Permission.Grant.ALL)
         )
 
+        def permission = Mock(Permission)
+        permission.group() >> ''
+        permission.value() >> ''
+        permission.grant() >> Permission.Grant.OP
+
         def annotation = Mock(Confirm)
         annotation.confirmAliases() >> ['confirm'].toArray()
         annotation.confirmDescription() >> 'description.confirm'
-        annotation.confirmPermission() >> 'permission.confirm'
+        annotation.confirmPermission() >> permission
 
         node = new ConfirmNode(annotation, parent, confirmationManager)
 
