@@ -8,14 +8,12 @@ import spock.lang.Specification
 
 class HelpNodeTest extends Specification {
 
-    def 'test merge with #baseHelp and #incomingHelp keeps expected help shape'() {
+    def 'test merge with #baseHelp and #incomingNode keeps expected help shape'() {
         given:
         def baseParent = parentNode('root')
-        def incomingParent = parentNode('root')
 
         and:
         def baseNode = new HelpNode(baseHelp as Help, baseParent)
-        def incomingNode = new HelpNode(incomingHelp as Help, incomingParent)
 
         when:
         def merged = baseNode.merge(incomingNode)
@@ -29,57 +27,69 @@ class HelpNodeTest extends Specification {
         merged.commandInfo.permission.grant == expectedGrant
 
         where:
-        baseHelp                                                      | incomingHelp || expectedName | expectedAliases         | expectedDescription             | expectedPermission       | expectedGrant
+        baseHelp                                                      | incomingNode || expectedName | expectedAliases               | expectedDescription             | expectedPermission       | expectedGrant
         help(
                 [Help.DEFAULT_NAME],
                 '',
                 permission('', '', Permission.Grant.OP)
         )                                                             |
-                help(
+                new HelpNode(help(
                         ['assist'],
                         'custom.help.description',
                         permission('custom.help', 'custom', Permission.Grant.NONE)
-                )                                                                    || 'assist'     | ['assist']              | 'custom.help.description'       | 'custom.custom.help'     | Permission.Grant.NONE
+                ), parentNode('root'))                                               || 'assist'     | ['assist']                    | 'custom.help.description'       | 'custom.custom.help'     | Permission.Grant.NONE
         help(
                 ['base-help'],
                 'base.help.description',
                 permission('base.help', 'base', Permission.Grant.ALL)
         )                                                             |
-                help(
+                new HelpNode(help(
                         ['assist'],
                         'custom.help.description',
                         permission('custom.help', 'custom', Permission.Grant.NONE)
-                )                                                                    || 'base-help'  | ['assist', 'base-help'] | 'base.help.description'         | 'base.base.help'         | Permission.Grant.ALL
+                ), parentNode('root'))                                               || 'base-help'  | ['assist', 'base-help']       | 'base.help.description'         | 'base.base.help'         | Permission.Grant.ALL
         help(
                 [Help.DEFAULT_NAME],
                 '',
                 permission('', '', Permission.Grant.OP)
         )                                                             |
-                help(
+                new HelpNode(help(
                         [Help.DEFAULT_NAME],
                         '',
                         permission('', '', Permission.Grant.OP)
-                )                                                                    || 'help'       | ['help']                | 'command.root.help.description' | 'permission.root.help'   | Permission.Grant.ALL
+                ), parentNode('root'))                                               || 'help'       | ['help']                      | 'command.root.help.description' | 'permission.root.help'   | Permission.Grant.ALL
         help(
                 [Help.DEFAULT_NAME],
                 '',
                 permission('', '', Permission.Grant.OP)
         )                                                             |
-                help(
+                new HelpNode(help(
                         [Help.DEFAULT_NAME],
                         'incoming.help.description',
                         permission('', '', Permission.Grant.OP)
-                )                                                                    || 'help'       | ['help']                | 'incoming.help.description'     | 'permission.root.help'   | Permission.Grant.ALL
+                ), parentNode('root'))                                               || 'help'       | ['help']                      | 'incoming.help.description'     | 'permission.root.help'   | Permission.Grant.ALL
         help(
                 [Help.DEFAULT_NAME],
                 '',
                 permission('', '', Permission.Grant.OP)
         )                                                             |
-                help(
+                new HelpNode(help(
                         [Help.DEFAULT_NAME],
                         '',
                         permission('incoming.help', 'incoming', Permission.Grant.OP)
-                )                                                                    || 'help'       | ['help']                | 'command.root.help.description' | 'incoming.incoming.help' | Permission.Grant.ALL
+                ), parentNode('root'))                                               || 'help'       | ['help']                      | 'command.root.help.description' | 'incoming.incoming.help' | Permission.Grant.ALL
+        help(
+                [Help.DEFAULT_NAME],
+                '',
+                permission('', '', Permission.Grant.OP)
+        )                                                             |
+                literalNode(
+                        ['assist', 'support'],
+                        'literal.help.description',
+                        'literal.help',
+                        'literal',
+                        Permission.Grant.NONE
+                )                                                                    || 'help'       | ['help', 'assist', 'support'] | 'command.root.help.description' | 'permission.root.help'   | Permission.Grant.ALL
     }
 
     def 'test isDefaultHelpAnnotation with #aliases #description and #permission returns #expected'() {
@@ -162,5 +172,18 @@ class HelpNodeTest extends Specification {
                 return Permission
             }
         }
+    }
+
+    private static LiteralNode literalNode(final List<String> aliases,
+                                           final String description,
+                                           final String permissionValue,
+                                           final String permissionGroup,
+                                           final Permission.Grant grant) {
+        def node = new LiteralNode(*aliases as String[])
+        node.commandInfo = new CommandInfo(
+                description,
+                new PermissionInfo(permissionGroup, permissionValue, grant)
+        )
+        return node
     }
 }
