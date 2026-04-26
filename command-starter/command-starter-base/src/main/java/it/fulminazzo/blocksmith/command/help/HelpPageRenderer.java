@@ -421,15 +421,13 @@ public final class HelpPageRenderer {
         if (getMaxLength(string) == -1) return -1;
         final String truncateSuffix = ComponentUtils.TRUNCATE_SUFFIX;
         final StringBuilder tmp = new StringBuilder();
-        for (int i = 0; i < string.length(); i++) {
+        int i;
+        for (i = 0; MinecraftFontWidth.getWidth(tmp.append(truncateSuffix)) <= MAX_FONT_WIDTH; i++) {
+            tmp.setLength(tmp.length() - truncateSuffix.length());
             char c = string.charAt(i);
             tmp.append(c);
-            if (MinecraftFontWidth.getWidth(tmp.append(truncateSuffix)) > MAX_FONT_WIDTH)
-                return i - 1;
-            else tmp.setLength(tmp.length() - truncateSuffix.length());
         }
-        // this should be impossible
-        return -1;
+        return i - 2;
     }
 
     /**
