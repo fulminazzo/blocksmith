@@ -344,6 +344,27 @@ class CommandNodeTest extends Specification {
                 prepareNode('first', executor, [new MockNode('second_child')])
     }
 
+    def 'test equals and hashCode'() {
+        expect:
+        (first == second) == equalsExpected
+
+        and:
+        !equalsExpected || first.hashCode() == second.hashCode()
+
+        where:
+        first                              | second                             || equalsExpected
+        new MockNode('same')               | new MockNode('same')               || true
+        new MockNode('first')              | new MockNode('second')             || false
+        new MockNode('same')               | new LiteralNode('same')            || false
+        new MockNode('first')              | new LiteralNode('second')          || false
+        withExecutor(new MockNode('same')) | withExecutor(new MockNode('same')) || true
+        withExecutor(new MockNode('same')) | new MockNode('same')               || false
+        new LiteralNode('help')            | new LiteralNode('help')            || true
+        new LiteralNode('help', '?')       | new LiteralNode('help')            || false
+        new MockNode('help')               | new LiteralNode('help')            || false
+        new MockNode('help')               | 'help'                             || false
+    }
+
     private ArgumentNode newMockArgumentNode(final @NotNull String name) {
         return newMockArgumentNode(name, false)
     }
@@ -364,6 +385,11 @@ class CommandNodeTest extends Specification {
         def node = new MockNode(name)
         node.children.addAll(children)
         node.executor = executionHandler
+        return node
+    }
+
+    private static <T extends CommandNode> T withExecutor(final @NotNull T node) {
+        node.executor = executor
         return node
     }
 
