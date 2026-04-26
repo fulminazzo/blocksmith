@@ -162,7 +162,7 @@ public final class CommandParser {
 
         Method method = executionHandler.getMethod();
         if (method.isAnnotationPresent(Confirm.class))
-            handleConfirmation(method.getAnnotation(Confirm.class), lastLiteral);
+            handleConfirmation(method.getAnnotation(Confirm.class), last, lastLiteral);
         else last.setExecutor(executionHandler);
 
         Help helpAnnotation = method.isAnnotationPresent(Help.class)
@@ -335,22 +335,31 @@ public final class CommandParser {
             throw parseException("expected '%s' but got '%s'", expected, tokenizer.getLastRead());
     }
 
-    private void handleConfirmation(final @NotNull Confirm confirmAnnotation, final @NotNull LiteralNode lastLiteral) {
+    /**
+     * Handles the case where a {@link Confirm} annotation was provided.
+     *
+     * @param confirmAnnotation the annotation
+     * @param node              the node responsible for executing the command
+     * @param commandNode       the literal node representing the command
+     */
+    void handleConfirmation(final @NotNull Confirm confirmAnnotation,
+                            final @NotNull CommandNode node,
+                            final @NotNull LiteralNode commandNode) {
         final Duration timeout = Duration.of(confirmAnnotation.timeout(), confirmAnnotation.unit().toChronoUnit());
         final PendingTaskManager<Object> confirmationManager = new PendingTaskManager<>();
-        ConfirmNode confirmNode = new ConfirmNode(confirmAnnotation, lastLiteral, confirmationManager);
+        ConfirmNode confirmNode = new ConfirmNode(confirmAnnotation, commandNode, confirmationManager);
         confirmNode.addChild(new HelpNode(confirmAnnotation.confirmHelp(), confirmNode));
-        lastLiteral.addChild(confirmNode);
-        CancelNode cancelNode = new CancelNode(confirmAnnotation, lastLiteral, confirmationManager);
+        commandNode.addChild(confirmNode);
+        CancelNode cancelNode = new CancelNode(confirmAnnotation, commandNode, confirmationManager);
         cancelNode.addChild(new HelpNode(confirmAnnotation.cancelHelp(), cancelNode));
-        lastLiteral.addChild(cancelNode);
-        lastLiteral.setExecutor((n, v) -> {
+        commandNode.addChild(cancelNode);
+        node.setExecutor((n, v) -> {
             confirmationManager.register(
                     v.getCommandSender().getId(),
                     timeout,
                     () -> {
                         try {
-                            executionHandler.execute(lastLiteral, v);
+                            executionHandler.execute(commandNode, v);
                         } catch (CommandExecutionException e) {
                             v.handleCommandExecutionException(e);
                         }

@@ -730,7 +730,7 @@ class CommandParserTest extends Specification {
         and:
         def parser = newMockCommandParser('test')
         Reflect.on(parser).set('executionHandler', handler)
-        parser.handleConfirmation(annotation, node)
+        parser.handleConfirmation(annotation, node, node)
 
         and:
         def sender = Mock(CommandSenderWrapper)
