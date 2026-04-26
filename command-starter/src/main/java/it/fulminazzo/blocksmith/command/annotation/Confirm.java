@@ -26,9 +26,9 @@ public @interface Confirm {
 
     @NotNull String confirmDescription() default "";
 
-    @NotNull String confirmPermission() default "";
+    @NotNull Permission confirmPermission() default @Permission;
 
-    @NotNull Help confirmHelp() default @Help();
+    @NotNull Help confirmHelp() default @Help;
 
     /*
      * CANCEL
@@ -38,8 +38,8 @@ public @interface Confirm {
 
     @NotNull String cancelDescription() default "";
 
-    @NotNull String cancelPermission() default "";
+    @NotNull Permission cancelPermission() default @Permission;
 
-    @NotNull Help cancelHelp() default @Help();
+    @NotNull Help cancelHelp() default @Help;
 
 }

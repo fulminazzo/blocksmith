@@ -17,6 +17,6 @@ public @interface Help {
 
     @NotNull String description() default "";
 
-    @NotNull String permission() default "";
+    @NotNull Permission permission() default @Permission;
 
 }
