@@ -47,7 +47,7 @@ public final class VelocityCommandRegistryFactory implements CommandRegistryFact
                 if (current.equals(CommandSenderWrapper.CONSOLE_COMMAND_NAME)) {
                     ProxyServer server = visitor.getApplication().server();
                     return server.getConsoleCommandSource();
-                } else throw new ArgumentParseException(CommandMessages.UNRECOGNIZED_ARGOMENT)
+                } else throw new ArgumentParseException(CommandMessages.UNRECOGNIZED_ARGUMENT)
                         .arguments(
                                 Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, current),
                                 Placeholder.of("expected", CommandSenderWrapper.CONSOLE_COMMAND_NAME)

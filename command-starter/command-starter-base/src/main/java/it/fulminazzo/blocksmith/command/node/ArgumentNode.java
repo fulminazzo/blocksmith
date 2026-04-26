@@ -100,7 +100,7 @@ public abstract class ArgumentNode<T> extends CommandNode {
             String current = input.getCurrent();
             List<String> completions = completionsSupplier.getUnquoted();
             if (completions.stream().noneMatch(c -> c.equalsIgnoreCase(current)))
-                throw new ArgumentParseException(CommandMessages.UNRECOGNIZED_ARGOMENT)
+                throw new ArgumentParseException(CommandMessages.UNRECOGNIZED_ARGUMENT)
                         .arguments(
                                 Placeholder.of(CommandMessages.ARGUMENT_PLACEHOLDER, current),
                                 Placeholder.of("expected", String.join(", ", completions))

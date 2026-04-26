@@ -154,7 +154,7 @@ public final class CommandMessages {
      *     <li><b>expected</b>: the expected values (specified through the annotation).</li>
      * </ul>
      */
-    public static final @NotNull String UNRECOGNIZED_ARGOMENT = "error.unrecognized-argument";
+    public static final @NotNull String UNRECOGNIZED_ARGUMENT = "error.unrecognized-argument";
 
     /**
      * The command was executed while another command was still pending a result.
