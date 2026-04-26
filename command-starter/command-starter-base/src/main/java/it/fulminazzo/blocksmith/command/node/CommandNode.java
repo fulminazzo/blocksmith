@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.TabCompletable;
-import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
+import it.fulminazzo.blocksmith.command.node.handler.IExecutionHandler;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.command.visitor.usage.UsageVisitor;
 import lombok.*;
@@ -30,7 +30,7 @@ public abstract class CommandNode implements TabCompletable {
     final @NotNull Set<CommandNode> children = Collections.synchronizedSet(new TreeSet<>(Comparator.comparing(CommandNode::getName)));
 
     @Setter
-    @Nullable ExecutionHandler executor;
+    @Nullable IExecutionHandler executor;
 
     /**
      * Merges the given node data with the current one.
@@ -89,7 +89,7 @@ public abstract class CommandNode implements TabCompletable {
      *
      * @return the actual executor of the command, if available
      */
-    public @NotNull Optional<ExecutionHandler> getExecutor() {
+    public @NotNull Optional<IExecutionHandler> getExecutor() {
         return Optional.ofNullable(executor);
     }
 

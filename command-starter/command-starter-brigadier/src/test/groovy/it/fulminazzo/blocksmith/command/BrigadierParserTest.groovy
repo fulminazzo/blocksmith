@@ -15,10 +15,13 @@ import it.fulminazzo.blocksmith.command.argument.MultiArgumentParser
 import it.fulminazzo.blocksmith.command.argument.dto.Position
 import it.fulminazzo.blocksmith.command.argument.dto.WorldPosition
 import it.fulminazzo.blocksmith.command.node.ArgumentNode
+import it.fulminazzo.blocksmith.command.node.CancelNode
+import it.fulminazzo.blocksmith.command.node.ConfirmNode
 import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
+import it.fulminazzo.blocksmith.structure.task.PendingTaskManager
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
@@ -114,12 +117,28 @@ class BrigadierParserTest extends Specification {
 
         and:
         def confirm = Mock(Confirm)
-        confirm.confirmWord() >> 'confirm'
-        confirm.cancelWord() >> 'cancel'
+
+        and:
+        confirm.confirmAliases() >> ['confirm'].toArray()
+        confirm.confirmDescription() >> 'confirm.description'
+        confirm.confirmPermission() >> 'confirm.permission'
+
+        and:
+        confirm.cancelAliases() >> ['cancel'].toArray()
+        confirm.cancelDescription() >> 'cancel.description'
+        confirm.cancelPermission() >> 'cancel.permission'
 
         and:
         def root = new LiteralNode('delete')
-        root.setConfirmationInfo(confirm)
+        root.commandInfo = new CommandInfo(
+                'description.root',
+                new PermissionInfo('permission', 'root', Permission.Grant.ALL)
+        )
+
+        and:
+        def confirmationManager = new PendingTaskManager()
+        root.addChild(new ConfirmNode(confirm, root, confirmationManager))
+        root.addChild(new CancelNode(confirm, root, confirmationManager))
 
         and:
         def parser = new BrigadierParser(delegate)
@@ -398,7 +417,7 @@ class BrigadierParserTest extends Specification {
         cleanup:
         ArgumentParsers.PARSERS.remove(BrigadierParserTest)
     }
-    
+
     def 'test that generateArgumentNodeBuilder of MultiArgumentParser with delegate MultiArgumentParser works'() {
         given:
         def delegate = Mock(CommandRegistry)

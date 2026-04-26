@@ -7,13 +7,11 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParseException;
 import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
-import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler;
-import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
+import it.fulminazzo.blocksmith.command.node.handler.IExecutionHandler;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitorImpl;
 import it.fulminazzo.blocksmith.message.argument.Argument;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
-import it.fulminazzo.blocksmith.message.argument.Time;
 import it.fulminazzo.blocksmith.validation.ValidationException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -88,8 +86,6 @@ public final class CommandExecutionVisitor extends InputVisitorImpl<Void, Comman
         if (!commandSender.hasPermission(permission))
             throw new CommandExecutionException(CommandMessages.NO_PERMISSION)
                     .arguments(Placeholder.of("permission", permission.getPermission()));
-        ConfirmationHandler confirmationHandler = node.getConfirmationHandler();
-        if (confirmationHandler != null && confirmationHandler.checkConfirmationKeywords(this)) return null;
         return visitCommandNode(node);
     }
 
@@ -149,18 +145,9 @@ public final class CommandExecutionVisitor extends InputVisitorImpl<Void, Comman
      * @throws CommandExecutionException if a confirmation is required or the execution failed
      */
     Void handleExecution(final @NotNull CommandNode node) throws CommandExecutionException {
-        final ExecutionHandler executionHandler = node.getExecutor()
+        final IExecutionHandler executionHandler = node.getExecutor()
                 .orElseThrow(() -> new IllegalStateException("No execution handler found for node: " + node));
         LiteralNode commandNode = Objects.requireNonNull(node.getCommandNode(), "Could not find command node of node: " + node);
-        ConfirmationHandler confirmationHandler = commandNode.getConfirmationHandler();
-        if (confirmationHandler != null) {
-            confirmationHandler.handleExecution(
-                    this,
-                    () -> executionHandler.execute(commandNode, this)
-            );
-            throw new CommandExecutionException(CommandMessages.AWAIT_CONFIRMATION)
-                    .arguments(Time.of(confirmationHandler.getConfirmationTimeout().toMillis()));
-        }
         executionHandler.execute(commandNode, this);
         return null;
     }

@@ -3,16 +3,16 @@ package it.fulminazzo.blocksmith.command.parser;
 import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
 import it.fulminazzo.blocksmith.command.annotation.*;
-import it.fulminazzo.blocksmith.command.node.ArgumentNode;
-import it.fulminazzo.blocksmith.command.node.CommandNode;
-import it.fulminazzo.blocksmith.command.node.LiteralNode;
-import it.fulminazzo.blocksmith.command.node.NumberArgumentNode;
+import it.fulminazzo.blocksmith.command.node.*;
 import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier;
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
+import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException;
+import it.fulminazzo.blocksmith.message.argument.Time;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.reflect.ReflectException;
+import it.fulminazzo.blocksmith.structure.task.PendingTaskManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -108,12 +108,10 @@ public final class CommandParser {
             lastLiteral.setCommandInfo(commandInfo);
         }
 
-        last.setExecutor(executionHandler);
         Method method = executionHandler.getMethod();
-        if (method.isAnnotationPresent(Confirm.class)) {
-            Confirm confirmAnnotation = method.getAnnotation(Confirm.class);
-            lastLiteral.setConfirmationInfo(confirmAnnotation);
-        }
+        if (method.isAnnotationPresent(Confirm.class))
+            handleConfirmation(method.getAnnotation(Confirm.class), lastLiteral);
+        else last.setExecutor(executionHandler);
 
         if (parameterIndex != parameters.length)
             throw parseException("method %s declares %s argument parameters, but only %s arguments were given",
@@ -282,6 +280,27 @@ public final class CommandParser {
     void match(final @NotNull CommandToken expected) {
         if (tokenizer.getLastToken() != expected)
             throw parseException("expected '%s' but got '%s'", expected, tokenizer.getLastRead());
+    }
+
+    private void handleConfirmation(final @NotNull Confirm confirmAnnotation, final @NotNull LiteralNode lastLiteral) {
+        final Duration timeout = Duration.of(confirmAnnotation.timeout(), confirmAnnotation.unit().toChronoUnit());
+        final PendingTaskManager<Object> confirmationManager = new PendingTaskManager<>();
+        lastLiteral.addChild(new ConfirmNode(confirmAnnotation, lastLiteral, confirmationManager));
+        lastLiteral.addChild(new CancelNode(confirmAnnotation, lastLiteral, confirmationManager));
+        lastLiteral.setExecutor((n, v) -> {
+            confirmationManager.register(
+                    v.getCommandSender().getId(),
+                    timeout,
+                    () -> {
+                        try {
+                            executionHandler.execute(lastLiteral, v);
+                        } catch (CommandExecutionException e) {
+                            v.handleCommandExecutionException(e);
+                        }
+                    }
+            );
+            throw new CommandExecutionException(CommandMessages.AWAIT_CONFIRMATION).arguments(Time.of(timeout.toMillis()));
+        });
     }
 
     private @NotNull CommandParseException parseException(final @NotNull String message,

@@ -1,8 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
-import it.fulminazzo.blocksmith.command.annotation.Confirm;
-import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
@@ -24,14 +22,12 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public final class LiteralNode extends CommandNode {
+public class LiteralNode extends CommandNode {
     final @NotNull String name;
     final @NotNull Set<String> aliases;
 
     @Setter
     @Nullable CommandInfo commandInfo;
-
-    @Nullable ConfirmationHandler confirmationHandler;
 
     /**
      * Instantiates a new Literal node.
@@ -55,18 +51,6 @@ public final class LiteralNode extends CommandNode {
         if (commandInfo == null)
             throw new IllegalStateException("Literal node not correctly initialized, missing command information: " + this);
         return commandInfo;
-    }
-
-    /**
-     * Toggles requirements for confirmation to execute this node.
-     *
-     * @param confirmationInfo the confirmation info ({@code null} to disable)
-     * @return this object (for method chaining)
-     */
-    public @NotNull LiteralNode setConfirmationInfo(final @Nullable Confirm confirmationInfo) {
-        if (confirmationInfo == null) this.confirmationHandler = null;
-        else this.confirmationHandler = new ConfirmationHandler(confirmationInfo);
-        return this;
     }
 
     @Override
@@ -95,11 +79,7 @@ public final class LiteralNode extends CommandNode {
     public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
         @NotNull CommandSenderWrapper<?> sender = visitor.getCommandSender();
         final List<String> completions = new ArrayList<>();
-        if (sender.hasPermission(getCommandInfo().getPermission())) {
-            if (confirmationHandler != null)
-                completions.addAll(confirmationHandler.getCompletions(visitor));
-            completions.addAll(aliases);
-        }
+        if (sender.hasPermission(getCommandInfo().getPermission())) completions.addAll(aliases);
         return completions;
     }
 

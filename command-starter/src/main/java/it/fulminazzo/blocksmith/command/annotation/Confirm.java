@@ -17,8 +17,24 @@ public @interface Confirm {
 
     @NotNull TimeUnit unit() default TimeUnit.SECONDS;
 
-    @NotNull String confirmWord() default "confirm";
+    /*
+     * CONFIRM
+     */
 
-    @NotNull String cancelWord() default "cancel";
+    @NotNull String @NotNull [] confirmAliases() default {"confirm"};
+
+    @NotNull String confirmDescription() default "";
+
+    @NotNull String confirmPermission() default "";
+
+    /*
+     * CANCEL
+     */
+
+    @NotNull String @NotNull [] cancelAliases() default {"cancel"};
+
+    @NotNull String cancelDescription() default "";
+
+    @NotNull String cancelPermission() default "";
 
 }

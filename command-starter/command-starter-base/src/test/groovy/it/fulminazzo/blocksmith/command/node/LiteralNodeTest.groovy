@@ -2,9 +2,7 @@
 package it.fulminazzo.blocksmith.command.node
 
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper
-import it.fulminazzo.blocksmith.command.annotation.Confirm
 import it.fulminazzo.blocksmith.command.annotation.Permission
-import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor
@@ -51,30 +49,6 @@ class LiteralNodeTest extends Specification {
 
         then:
         thrown(IllegalStateException)
-    }
-
-    def 'test that setConfirmationInfo works'() {
-        given:
-        def info = Mock(Confirm)
-
-        when:
-        node.confirmationInfo = info
-
-        then:
-        def confirmationHandler = node.confirmationHandler
-        confirmationHandler != null
-        confirmationHandler.confirmationInfo == info
-    }
-
-    def 'test that setConfirmationInfo supports null'() {
-        when:
-        node.confirmationInfo = null
-
-        then:
-        noExceptionThrown()
-
-        and:
-        node.confirmationHandler == null
     }
 
     def 'test that accept calls on visitLiteralNode'() {
@@ -229,17 +203,10 @@ class LiteralNodeTest extends Specification {
         'InVaLiD' || false
     }
 
-    def 'test that getCompletions returns #expected if #hasPermission and #requiresConfirmation'() {
+    def 'test that getCompletions returns #expected if #hasPermission'() {
         given:
         def sender = Mock(CommandSenderWrapper)
         sender.hasPermission(_) >> hasPermission
-
-        and:
-        if (requiresConfirmation) {
-            def confirmationHandler = Mock(ConfirmationHandler)
-            confirmationHandler.getCompletions(_) >> ['confirm', 'cancel']
-            node.confirmationHandler = confirmationHandler
-        }
 
         and:
         def visitor = Mock(InputVisitor)
@@ -252,11 +219,9 @@ class LiteralNodeTest extends Specification {
         actual.sort() == expected.sort()
 
         where:
-        hasPermission | requiresConfirmation || expected
-        false         | false                || []
-        true          | false                || ['test', 'command']
-        false         | true                 || []
-        true          | true                 || ['test', 'command', 'confirm', 'cancel']
+        hasPermission || expected
+        false         || []
+        true          || ['test', 'command']
     }
 
 }

@@ -16,7 +16,6 @@ import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.node.NumberArgumentNode;
-import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,9 +41,11 @@ final class BrigadierParser<S> {
      * @return the brigadier command node
      */
     public @NotNull LiteralCommandNode<S> parse(final @NotNull String commandName, final @NotNull LiteralNode node) {
-        LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder.<S>literal(commandName).executes(executes(node));
-        checkRequiresConfirmation(node, builder, node);
-        return parseChildren(node, builder, node).build();
+        return parseChildren(
+                node,
+                LiteralArgumentBuilder.<S>literal(commandName).executes(executes(node)),
+                node
+        ).build();
     }
 
     /**
@@ -96,7 +97,6 @@ final class BrigadierParser<S> {
                         node
                 ))
         );
-        checkRequiresConfirmation(root, builder, node);
     }
 
     /**
@@ -217,15 +217,6 @@ final class BrigadierParser<S> {
             );
             return Command.SINGLE_SUCCESS;
         };
-    }
-
-    private void checkRequiresConfirmation(final @NotNull LiteralNode root,
-                                           final @NotNull ArgumentBuilder<S, ?> builder,
-                                           final @NotNull LiteralNode node) {
-        ConfirmationHandler handler = node.getConfirmationHandler();
-        if (handler != null)
-            builder.then(LiteralArgumentBuilder.<S>literal(handler.getConfirmWord()).executes(executes(root)))
-                    .then(LiteralArgumentBuilder.<S>literal(handler.getCancelWord()).executes(executes(root)));
     }
 
     /**
