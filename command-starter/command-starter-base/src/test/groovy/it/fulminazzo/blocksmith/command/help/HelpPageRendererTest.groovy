@@ -46,7 +46,9 @@ class HelpPageRendererTest extends Specification {
 
     void setup() {
         messenger.getComponentOrElse(_, _, _ as String, _) >> { a ->
-            def component = ComponentUtils.toComponent(messages[a[0]] ?: a[2])
+            def raw = messages[a[0]]
+            if (raw == null) raw = a[2]
+            def component = ComponentUtils.toComponent(raw)
             for (def arg : a[3])
                 component = arg.apply(new MessageParseContext(messenger, a[1], component))
             return component
@@ -92,7 +94,17 @@ class HelpPageRendererTest extends Specification {
         def lines = renderer.render().collect { ComponentUtils.toString(it) }.join('\n')
 
         then:
-        lines == """<strikethrough><gold>-----</gold></strikethrough><strikethrough><gold>-------------------</gold></strikethrough> <white>test</white> <strikethrough><gold>-------------------</gold></strikethrough><strikethrough><gold>-----
+        lines == """
+
+
+
+
+
+
+
+
+
+<strikethrough><gold>-----</gold></strikethrough><strikethrough><gold>-------------------</gold></strikethrough> <white>test</white> <strikethrough><gold>-------------------</gold></strikethrough><strikethrough><gold>-----
 test description
 
 <gray>Permission</gray><dark_gray>:</dark_gray> blocksmith.test.permission
@@ -108,6 +120,22 @@ test description
 
 <aqua>Click for more information'><white>third</white> <dark_gray>-</dark_gray> <gray>third description
 <strikethrough><gold>-------</gold></strikethrough><strikethrough><gold>-------</gold></strikethrough><strikethrough><gold>---</gold></strikethrough><strikethrough><gold>-------</gold></strikethrough><gold>[</gold><red>1</red><dark_gray>/</dark_gray><red>3</red><gold>]</gold><strikethrough><gold>-------</gold></strikethrough><click:run_command:'root help 2'><gold>[</gold><red>>></red><gold>]</gold></click><strikethrough><gold>-------</gold></strikethrough><strikethrough><gold>-------"""
+    }
+
+    def 'test that renderHeaderPrefix of #prefix returns #expected'() {
+        given:
+        messages[CommandMessages.HELP_COMMAND_HEADER_PREFIX] = prefix
+
+        when:
+        renderer.renderHeaderPrefix()
+
+        then:
+        renderer.lines.collect { PLAIN_SERIALIZER.serialize(it) } == expected
+
+        where:
+        prefix          || expected
+        ''              || []
+        'Hello, world!' || ['Hello, world!']
     }
 
     def 'test that renderDescription of #description returns #expected'() {

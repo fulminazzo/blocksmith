@@ -94,6 +94,7 @@ public final class HelpPageRenderer {
      */
     public @NotNull List<Component> render() {
         lines.clear();
+        renderHeaderPrefix();
         renderHeader();
         renderDescription();
         renderPermission();
@@ -102,6 +103,14 @@ public final class HelpPageRenderer {
         renderSubcommands();
         renderFooter();
         return lines;
+    }
+
+    /**
+     * Renders the header prefix component.
+     */
+    void renderHeaderPrefix() {
+        Component component = style.getHeaderPrefixComponent();
+        if (!PLAIN_SERIALIZER.serialize(component).isEmpty()) lines.add(component);
     }
 
     /**

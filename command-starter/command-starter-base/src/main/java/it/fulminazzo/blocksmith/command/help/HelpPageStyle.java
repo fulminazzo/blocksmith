@@ -23,6 +23,11 @@ public final class HelpPageStyle {
     public static final @NotNull String DEFAULT_FILLER = "<gold><strikethrough>-</strikethrough></gold>";
 
     /**
+     * The default header prefix.
+     */
+    public static final @NotNull String DEFAULT_HEADER_PREFIX = "\n".repeat(9);
+
+    /**
      * The default header.
      */
     public static final @NotNull String DEFAULT_HEADER = "<gold><strikethrough>---</strikethrough></gold>" +
@@ -94,6 +99,17 @@ public final class HelpPageStyle {
      */
     public @NotNull Component getFillerComponent() {
         return getComponentOrElse(CommandMessages.HELP_COMMAND_FILLER, DEFAULT_FILLER);
+    }
+
+    /**
+     * Gets the header prefix from {@link CommandMessages#HELP_COMMAND_HEADER_PREFIX}.
+     * <br>
+     * If it could not be found, falls back to {@link #DEFAULT_HEADER_PREFIX}.
+     *
+     * @return the header component
+     */
+    public @NotNull Component getHeaderPrefixComponent() {
+        return getComponentOrElse(CommandMessages.HELP_COMMAND_HEADER_PREFIX, DEFAULT_HEADER_PREFIX);
     }
 
     /**

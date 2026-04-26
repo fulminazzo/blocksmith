@@ -243,6 +243,11 @@ public final class CommandMessages {
     public static final @NotNull String HELP_COMMAND_FILLER = "command.help.filler";
 
     /**
+     * The text sent before sending the {@link #HELP_COMMAND_HEADER}.
+     */
+    public static final @NotNull String HELP_COMMAND_HEADER_PREFIX = "command.help.header-prefix";
+
+    /**
      * The header sent at the beginning of the help page of a command.
      * <br>
      * Placeholders:
