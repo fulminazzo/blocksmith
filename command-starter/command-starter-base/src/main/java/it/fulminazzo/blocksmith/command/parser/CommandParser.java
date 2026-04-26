@@ -102,6 +102,11 @@ public final class CommandParser {
         }
         if (first == null) throw parseException("could not parse command");
 
+        if (parameterIndex != parameters.length)
+            throw parseException("method %s declares %s argument parameters, but only %s arguments were given",
+                    executionHandler.getMethod(), parameters.length - startIndex, parameterIndex - startIndex
+            );
+
         if (lastLiteral == null) throw parseException("at least one literal must be given to identify the command");
         else {
             commandInfo.merge(lastLiteral.getCommandInfo());
@@ -117,11 +122,6 @@ public final class CommandParser {
                 ? method.getAnnotation(Help.class)
                 : null;
         lastLiteral.addChild(new HelpNode(helpAnnotation, lastLiteral));
-
-        if (parameterIndex != parameters.length)
-            throw parseException("method %s declares %s argument parameters, but only %s arguments were given",
-                    executionHandler.getMethod(), parameters.length - startIndex, parameterIndex - startIndex
-            );
 
         return first;
     }
