@@ -82,9 +82,9 @@ public final class HelpPageRenderer {
          * since the page number is an optional parameter, if not given,
          * an artificial one will be added.
          * Therefore, to go back to the root command (while preserving the arguments),
-         * we retreat the cursor by 2.
+         * we retreat the cursor by 3.
          */
-        visitor.getInput().retreatCursor().retreatCursor();
+        visitor.getInput().retreatCursor().retreatCursor().retreatCursor();
     }
 
     /**
