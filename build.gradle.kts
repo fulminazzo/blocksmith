@@ -2,6 +2,8 @@ plugins {
     id("java-library")
     id("groovy")
     id("jacoco-report-aggregation")
+
+    alias(libs.plugins.buildconfig)
 }
 
 group = "it.fulminazzo"
@@ -12,7 +14,10 @@ extra["testingModuleName"] = "testing"
 allprojects {
     apply { plugin("java-library") }
     apply { plugin("groovy") }
-    apply { plugin("jacoco-report-aggregation") }
+    apply { plugin("jacoco") }
+    apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
+
+    val projectInfoClassName = "ProjectInfo"
 
     val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
     val mockitoAgent: Configuration by configurations.creating
@@ -61,6 +66,26 @@ allprojects {
         javaLauncher = javaToolchains.launcherFor {
             languageVersion = currentJava
         }
+    }
+
+    configure<com.github.gmazzo.buildconfig.BuildConfigExtension> {
+        packageName = "${rootProject.group}.${rootProject.name}"
+        className = projectInfoClassName
+
+        buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
+        buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
+        buildConfigField("String", "VERSION", "\"${rootProject.version}\"")
+        buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
+    }
+
+    tasks.withType<JacocoReport>().configureEach {
+        classDirectories.setFrom(
+            files(classDirectories.files.map {
+                fileTree(it) {
+                    exclude("**/$projectInfoClassName**")
+                }
+            })
+        )
     }
 
 }

@@ -1,4 +1,7 @@
 [versions]
+# PLUGINS
+buildconfig = "6.0.9"
+
 # ANNOTATIONS
 lombok = "1.18.44"
 jetbrains_annotations = "26.1.0"
@@ -35,3 +38,6 @@ log4j = ["log4j_api", "log4j_core", "log4j_slf4j"]
 
 # TESTING
 test_framework = ["spock_core", "mockito"]
+
+[plugins]
+buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
