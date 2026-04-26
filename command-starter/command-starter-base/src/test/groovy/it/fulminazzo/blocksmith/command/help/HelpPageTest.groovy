@@ -151,9 +151,10 @@ class HelpPageTest extends Specification {
         return page.subcommands.find { it.name == name }
     }
 
-    private static LiteralNode newLiteralNode(final String... aliases) {
-        def node = new LiteralNode(aliases)
-        node.commandInfo = new CommandInfo(
+    private LiteralNode newLiteralNode(final String... aliases) {
+        def node = Spy(LiteralNode, constructorArgs: [aliases])
+        node.helpCommandName >> 'help'
+        node.commandInfo >> new CommandInfo(
                 "description.${aliases[0]}",
                 new PermissionInfo(
                         null,
