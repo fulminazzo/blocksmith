@@ -61,6 +61,9 @@ class ConfirmNodeTest extends Specification {
         given:
         confirmationManager.register(visitor.commandSender.id, 1, () -> {})
 
+        and:
+        sleep(500)
+
         when:
         node.executor.orElseThrow().execute(parent, visitor)
 

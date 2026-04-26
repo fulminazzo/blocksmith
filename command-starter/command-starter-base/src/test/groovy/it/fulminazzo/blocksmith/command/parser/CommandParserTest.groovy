@@ -11,6 +11,7 @@ import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
+import it.fulminazzo.blocksmith.structure.task.PendingTaskManager
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 import spock.lang.Specification
@@ -169,15 +170,18 @@ class CommandParserTest extends Specification {
                 executor,
                 method
         )
+        final annotation = ClanCommand.getMethod('adminMembersKick', CommandSender, Object).getAnnotation(Confirm)
         def kick = new LiteralNode('kick')
         kick.commandInfo = new CommandInfo(
                 'command.description.clan.admin.members.kick',
                 new PermissionInfo(null, 'clan.admin.members.kick', Permission.Grant.OP)
         )
-        kick
-                .setConfirmationInfo(ClanCommand.getMethod('adminMembersKick', CommandSender, Object)
-                        .getAnnotation(Confirm))
-                .addChild(target)
+        kick.addChild(target)
+        final PendingTaskManager<Object> confirmationManager = new PendingTaskManager<>()
+        def confirm = new ConfirmNode(annotation, kick, confirmationManager)
+        def cancel = new CancelNode(annotation, kick, confirmationManager)
+        kick.addChild(confirm)
+        kick.addChild(cancel)
         members = new LiteralNode('members')
         members.commandInfo = new CommandInfo(
                 'command.description.clan.admin.members',
@@ -694,6 +698,12 @@ class CommandParserTest extends Specification {
     }
 
     private static void compareNodes(final CommandNode actual, final CommandNode expected) {
+        if (expected.children.find { ConfirmationNode.isAssignableFrom(it.class) }) {
+            actual.executor = null
+            expected.executor = null
+            actual.children.each { it.executor = null }
+            expected.children.each { it.executor = null }
+        }
         assert actual.toString() == expected.toString()
         assert actual == expected
         def actualChildren = actual.children

@@ -10,6 +10,7 @@ import it.fulminazzo.blocksmith.command.node.LiteralNode
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
+import it.fulminazzo.blocksmith.command.parser.CommandParser
 import it.fulminazzo.blocksmith.message.Messenger
 import it.fulminazzo.blocksmith.message.argument.Argument
 import it.fulminazzo.blocksmith.message.argument.Placeholder
@@ -190,7 +191,15 @@ class CommandExecutionVisitorTest extends Specification {
                 CommandExecutionVisitorTest,
                 method
         )
-        delete.setConfirmationInfo(annotation)
+
+        and:
+        new CommandParser(
+                delete.name,
+                delete.commandInfo,
+                delete.executor.get(),
+                0,
+                ''
+        ).handleConfirmation(annotation, delete)
 
         when:
         printer = null
@@ -215,7 +224,7 @@ class CommandExecutionVisitorTest extends Specification {
                 Mock(ApplicationHandle),
                 commandSender,
                 'delete',
-                annotation.confirmWord()
+                annotation.confirmAliases()[0]
         )
 
         and:
@@ -250,7 +259,7 @@ class CommandExecutionVisitorTest extends Specification {
                 Mock(ApplicationHandle),
                 commandSender,
                 'delete',
-                annotation.cancelWord()
+                annotation.cancelAliases()[0]
         )
 
         and:
