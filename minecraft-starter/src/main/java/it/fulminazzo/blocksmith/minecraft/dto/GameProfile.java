@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.minecraft.dto;
 
+import it.fulminazzo.blocksmith.conversion.Convertible;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public final class GameProfile {
+public final class GameProfile implements Convertible {
     final @NotNull UUID uuid;
     final @NotNull String name;
 
