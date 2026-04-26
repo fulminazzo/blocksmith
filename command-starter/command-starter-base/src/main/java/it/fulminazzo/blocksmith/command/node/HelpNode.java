@@ -36,7 +36,7 @@ public final class HelpNode extends InjectedNode {
         this.helpAnnotation = helpAnnotation;
         //TODO: dynamic resolution of min and max
         //TODO: better handling
-        Method method = Reflect.on(this).getMethod("unused");
+        Method method = Reflect.on(this).getMethod("unused", int.class);
         Parameter parameter = method.getParameters()[0];
         NumberArgumentNode<?> page = (NumberArgumentNode<?>) (Object) ArgumentNode.of("page", parameter, true);
         page.setDefaultValue("1");
