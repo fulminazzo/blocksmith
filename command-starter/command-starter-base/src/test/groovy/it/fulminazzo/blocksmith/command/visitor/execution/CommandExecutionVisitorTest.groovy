@@ -199,7 +199,7 @@ class CommandExecutionVisitorTest extends Specification {
                 delete.executor.get(),
                 0,
                 ''
-        ).handleConfirmation(annotation, delete)
+        ).handleConfirmation(annotation, delete, delete)
 
         when:
         printer = null
