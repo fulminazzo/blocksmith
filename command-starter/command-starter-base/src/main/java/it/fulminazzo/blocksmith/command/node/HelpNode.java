@@ -20,11 +20,11 @@ public final class HelpNode extends InjectedNode {
      * @param helpAnnotation the {@link Help} annotation to get information from
      * @param parent         the parent
      */
-    public HelpNode(final @Nullable Help helpAnnotation, final @NotNull LiteralNode parent) {
+    public HelpNode(final @NotNull Help helpAnnotation, final @NotNull LiteralNode parent) {
         super(
-                helpAnnotation == null ? new String[]{Help.DEFAULT_NAME} : helpAnnotation.aliases(),
-                helpAnnotation == null ? "" : helpAnnotation.description(),
-                helpAnnotation == null ? "" : helpAnnotation.permission(),
+                helpAnnotation.aliases(),
+                helpAnnotation.description(),
+                helpAnnotation.permission(),
                 parent
         );
         this.helpAnnotation = helpAnnotation;
