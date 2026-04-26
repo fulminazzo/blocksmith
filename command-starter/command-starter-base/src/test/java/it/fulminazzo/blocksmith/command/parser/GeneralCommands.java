@@ -10,8 +10,11 @@ import org.jetbrains.annotations.Nullable;
 @SuppressWarnings("unused")
 final class GeneralCommands {
 
-    @Command(value = "help [command]", description = "Displays help for all the available commands")
-    @Permission(value = "blocksmith.help", grant = Permission.Grant.ALL)
+    @Command(
+            value = "help [command]",
+            description = "Displays help for all the available commands",
+            permission = @Permission(value = "blocksmith.help", grant = Permission.Grant.ALL)
+    )
     public static void help(final @NotNull CommandSender sender,
                             final @Nullable String command
     ) {

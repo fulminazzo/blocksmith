@@ -18,4 +18,8 @@ public @interface Command {
 
     boolean dynamic() default false;
 
+    @NotNull Permission permission() default @Permission;
+
+    @NotNull Help help() default @Help;
+
 }

@@ -12,8 +12,10 @@ import java.util.List;
 @SuppressWarnings("unused")
 final class DynamicGeneralCommands {
 
-    @Command(dynamic = true)
-    @Permission(value = "help", grant = Permission.Grant.NONE, group = "plugin")
+    @Command(
+            dynamic = true,
+            permission = @Permission(value = "help", grant = Permission.Grant.NONE, group = "plugin")
+    )
     public static void help(final @NotNull CommandSenderWrapper<CommandSender> sender) {
     }
 

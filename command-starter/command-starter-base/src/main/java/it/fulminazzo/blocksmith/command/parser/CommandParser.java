@@ -120,7 +120,7 @@ public final class CommandParser {
 
         Help helpAnnotation = method.isAnnotationPresent(Help.class)
                 ? method.getAnnotation(Help.class)
-                : null;
+                : method.getAnnotation(Command.class).help();
         lastLiteral.addChild(new HelpNode(helpAnnotation, lastLiteral));
 
         return first;
@@ -481,22 +481,19 @@ public final class CommandParser {
      */
     static @NotNull CommandInfo createCommandInfo(final @NotNull AnnotatedElement element,
                                                   final @NotNull String permissionGroup) {
-        final String description = element.getAnnotation(Command.class).description().trim();
+        Command commandAnnotation = element.getAnnotation(Command.class);
+        final String description = commandAnnotation.description().trim();
 
         final String permission;
         String group;
         final Permission.Grant grant;
-        if (element.isAnnotationPresent(Permission.class)) {
-            Permission permissionAnnotation = element.getAnnotation(Permission.class);
-            permission = permissionAnnotation.value().trim();
-            group = permissionAnnotation.group();
-            if (group.trim().isEmpty()) group = permissionGroup;
-            grant = permissionAnnotation.grant();
-        } else {
-            permission = "";
-            group = permissionGroup;
-            grant = Permission.Grant.OP;
-        }
+        Permission permissionAnnotation = element.isAnnotationPresent(Permission.class)
+                ? element.getAnnotation(Permission.class)
+                : commandAnnotation.permission();
+        permission = permissionAnnotation.value().trim();
+        group = permissionAnnotation.group();
+        if (group.trim().isEmpty()) group = permissionGroup;
+        grant = permissionAnnotation.grant();
 
         PermissionInfo permissionInfo = new PermissionInfo(group, permission, grant);
         return new CommandInfo(description, permissionInfo);
