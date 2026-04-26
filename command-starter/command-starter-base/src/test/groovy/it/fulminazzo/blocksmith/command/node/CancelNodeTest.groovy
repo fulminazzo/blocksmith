@@ -14,7 +14,7 @@ import spock.lang.Specification
 import java.util.concurrent.atomic.AtomicBoolean
 
 class CancelNodeTest extends Specification {
-    private final PendingTaskManager<Object> confirmationManager = new PendingTaskManager<>()
+    private final PendingTaskManager<Object> confirmationManager = Spy(PendingTaskManager)
 
     private LiteralNode parent
     private CancelNode node
@@ -88,6 +88,17 @@ class CancelNodeTest extends Specification {
         then:
         def e = thrown(CommandExecutionException)
         e.message == CommandMessages.NO_PENDING_ACTION
+    }
+
+    def 'test that execute with unknown result does nothing'() {
+        given:
+        confirmationManager.cancel(_) >> {Mock(PendingTaskManager.Result)}
+
+        when:
+        node.executor.orElseThrow().execute(parent, visitor)
+
+        then:
+        noExceptionThrown()
     }
 
 }
