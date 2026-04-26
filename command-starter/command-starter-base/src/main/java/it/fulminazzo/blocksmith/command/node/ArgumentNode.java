@@ -11,14 +11,12 @@ import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.message.argument.Placeholder;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.validation.ValidationException;
-import it.fulminazzo.blocksmith.validation.Validator;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,12 +30,10 @@ import java.util.stream.Collectors;
 @Getter
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PROTECTED)
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class ArgumentNode<T> extends CommandNode {
+public abstract class ArgumentNode<T> extends CommandNode {
     final @NotNull String name;
-    @Getter(AccessLevel.NONE)
-    final @NotNull Parameter parameter;
     final boolean optional;
     @Getter(AccessLevel.NONE)
     @Setter
@@ -110,10 +106,7 @@ public class ArgumentNode<T> extends CommandNode {
                                 Placeholder.of("expected", String.join(", ", completions))
                         );
         }
-        final @NotNull ArgumentParser<T> parser = getParser();
-        T value = parser.parse(visitor);
-        Validator.getInstance().validate(parameter, value);
-        return value;
+        return parseCurrentImpl(visitor);
     }
 
     /**
@@ -144,19 +137,40 @@ public class ArgumentNode<T> extends CommandNode {
      * @return the argument parser
      */
     public @NotNull ArgumentParser<T> getParser() {
-        Type type = parameter.getParameterizedType();
-        if (type != null) return ArgumentParsers.of(type);
-        else return ArgumentParsers.of(getType());
+        return ArgumentParsers.of(getType());
     }
+
+    /**
+     * Converts the current input of the {@link Visitor} to an instance of {@link #getType()}.
+     * <br>
+     * The conversion process uses the following rules:
+     * <ul>
+     *     <li>if the argument is {@link it.fulminazzo.blocksmith.command.annotation.Greedy},
+     *     the entire input is merged in a single one;</li>
+     *     <li>if no input was given and {@link it.fulminazzo.blocksmith.command.annotation.Default}
+     *     was used, then the value of the annotation will be considered as input.
+     *     Otherwise {@code null} is returned;</li>
+     *     <li>if {@link it.fulminazzo.blocksmith.command.annotation.Tab} was used to specify custom completions
+     *     and the input is not present in the values,
+     *     it is considered invalid and a {@link ArgumentParseException} is thrown;</li>
+     *     <li>finally, the input is checked against the associated {@link ArgumentParser} which
+     *     will throw {@link ArgumentParseException} if is not valid.</li>
+     * </ul>
+     * For internal use only.
+     *
+     * @param visitor the visitor to get the input from
+     * @return the parsed input
+     * @throws ArgumentParseException in case of parsing exceptions
+     * @throws ValidationException    in case of invalid argument
+     */
+    protected abstract @Nullable T parseCurrentImpl(final @NotNull InputVisitor<?, ?> visitor) throws ArgumentParseException, ValidationException;
 
     /**
      * Gets the type of the argument.
      *
      * @return the Java class
      */
-    public @NotNull Class<T> getType() {
-        return (Class<T>) Reflect.toWrapper(parameter.getType());
-    }
+    public abstract @NotNull Class<T> getType();
 
     @Override
     public <O, X extends Exception> O accept(final @NotNull Visitor<O, X> visitor) throws X {
@@ -199,7 +213,7 @@ public class ArgumentNode<T> extends CommandNode {
         Class<T> actualType = (Class<T>) Reflect.toWrapper(parameter.getType());
         if (Number.class.isAssignableFrom(actualType))
             return (ArgumentNode<T>) new NumberArgumentNode<>(name, parameter, optional);
-        else return new ArgumentNode<>(name, parameter, optional);
+        else return new ArgumentNodeImpl<>(name, parameter, optional);
     }
 
 }

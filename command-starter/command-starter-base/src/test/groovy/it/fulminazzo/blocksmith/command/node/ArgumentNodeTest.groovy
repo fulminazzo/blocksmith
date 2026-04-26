@@ -272,12 +272,12 @@ class ArgumentNodeTest extends Specification {
         Float     || NumberArgumentNode
         double    || NumberArgumentNode
         Double    || NumberArgumentNode
-        char      || ArgumentNode
-        Character || ArgumentNode
-        boolean   || ArgumentNode
-        Boolean   || ArgumentNode
-        String    || ArgumentNode
-        Object    || ArgumentNode
+        char      || ArgumentNodeImpl
+        Character || ArgumentNodeImpl
+        boolean   || ArgumentNodeImpl
+        Boolean   || ArgumentNodeImpl
+        String    || ArgumentNodeImpl
+        Object    || ArgumentNodeImpl
     }
 
     private ArgumentNode newArgumentNode(final Class<?> type) {

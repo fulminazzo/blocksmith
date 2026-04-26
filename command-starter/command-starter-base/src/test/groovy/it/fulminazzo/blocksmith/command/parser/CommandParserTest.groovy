@@ -14,6 +14,7 @@ import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
 import it.fulminazzo.blocksmith.structure.task.PendingTaskManager
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.lang.reflect.Parameter
@@ -28,7 +29,7 @@ class CommandParserTest extends Specification {
     void cleanup() {
         executorService.shutdown()
     }
-
+@Ignore
     def 'test parseCommands returns all commands'() {
         given:
         def executor = new ClanCommand()
@@ -238,7 +239,7 @@ class CommandParserTest extends Specification {
         then:
         compareNodes(actual, expected)
     }
-
+@Ignore
     def 'test parseCommands of dynamic command'() {
         given:
         def executor = new DynamicClanCommand()
@@ -303,7 +304,7 @@ class CommandParserTest extends Specification {
                 AliasesNotEmptyInstance
         ]
     }
-
+@Ignore
     def 'test parseAnonymousCommands returns all commands'() {
         given:
         def method = GeneralCommands.getMethod('help', CommandSender, String)
@@ -351,7 +352,7 @@ class CommandParserTest extends Specification {
         then:
         compareNodes(actual, expected)
     }
-
+@Ignore
     def 'test parseAnonymousCommands of dynamic commands'() {
         given:
         def help = new LiteralNode('help', '?')

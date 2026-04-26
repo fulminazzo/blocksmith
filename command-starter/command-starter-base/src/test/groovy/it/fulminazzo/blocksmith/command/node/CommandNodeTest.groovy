@@ -351,7 +351,7 @@ class CommandNodeTest extends Specification {
     private ArgumentNode newMockArgumentNode(final @NotNull String name, final boolean optional) {
         def parameter = Mock(Parameter)
         parameter.type >> String
-        return new ArgumentNode(
+        return ArgumentNode.of(
                 name,
                 parameter,
                 optional

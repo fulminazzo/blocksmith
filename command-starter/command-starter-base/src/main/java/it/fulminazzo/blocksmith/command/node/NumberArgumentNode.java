@@ -24,7 +24,7 @@ import java.util.List;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public final class NumberArgumentNode<N extends Number> extends ArgumentNode<N> {
+public final class NumberArgumentNode<N extends Number> extends ArgumentNodeImpl<N> {
     double min;
     double max;
 
