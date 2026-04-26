@@ -113,6 +113,11 @@ public final class CommandParser {
             handleConfirmation(method.getAnnotation(Confirm.class), lastLiteral);
         else last.setExecutor(executionHandler);
 
+        Help helpAnnotation = method.isAnnotationPresent(Help.class)
+                ? method.getAnnotation(Help.class)
+                : null;
+        lastLiteral.addChild(new HelpNode(helpAnnotation, lastLiteral));
+
         if (parameterIndex != parameters.length)
             throw parseException("method %s declares %s argument parameters, but only %s arguments were given",
                     executionHandler.getMethod(), parameters.length - startIndex, parameterIndex - startIndex
@@ -215,6 +220,7 @@ public final class CommandParser {
         computedPermission += literalNode.getName();
         final CommandInfo computed = computeCurrentCommandInfo();
         literalNode.setCommandInfo(computed);
+        literalNode.addChild(new HelpNode(null, literalNode));
         return literalNode;
     }
 
