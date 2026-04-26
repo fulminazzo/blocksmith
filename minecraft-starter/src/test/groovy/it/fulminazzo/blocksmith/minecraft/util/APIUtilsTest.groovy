@@ -11,33 +11,33 @@ class APIUtilsTest extends Specification {
 
     private static final UUID notchUuid = UUIDUtils.dashed('069a79f444e94726a5befca90e38aaf5')
 
-    def 'test that getSkinData stores skin in cache'() {
+    def 'test that getUserProfile stores skin in cache'() {
         given:
         def uuid = UUIDUtils.dashed('853c80ef3c3749fdaa49938b674adae6')
 
         when:
-        def first = APIUtils.getSkinData(uuid).orElse(null)
+        def first = APIUtils.getUserProfile(uuid).orElse(null)
 
         then:
         first != null
 
         when:
-        def cached = APIUtils.SKIN_CACHE[uuid]
+        def cached = APIUtils.PROFILE_CACHE[uuid]
 
         then:
         cached == first
 
         when:
-        def second = APIUtils.getSkinData(uuid).orElse(null)
+        def second = APIUtils.getUserProfile(uuid).orElse(null)
 
         then:
         second == cached
         second == first
     }
 
-    def 'test that getSkinData of #uuid returns #found'() {
+    def 'test that getUserProfile of #uuid returns #found'() {
         when:
-        def actual = APIUtils.getSkinData(uuid)
+        def actual = APIUtils.getUserProfile(uuid)
 
         then:
         actual.isPresent() == found
@@ -48,7 +48,7 @@ class APIUtilsTest extends Specification {
         UUID.randomUUID() || false
     }
 
-    def 'test that getSkinData #exception do not throw'() {
+    def 'test that getUserProfile #exception do not throw'() {
         given:
         def mock = Mockito.mockStatic(APIUtils)
 
@@ -58,7 +58,7 @@ class APIUtilsTest extends Specification {
         }
 
         when:
-        def actual = APIUtils.getSkinData(notchUuid)
+        def actual = APIUtils.getUserProfile(notchUuid)
 
         then:
         actual.empty
