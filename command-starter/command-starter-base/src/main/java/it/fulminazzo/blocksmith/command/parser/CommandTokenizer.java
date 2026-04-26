@@ -35,23 +35,24 @@ final class CommandTokenizer {
      */
     public @NotNull CommandToken next() {
         try {
-            String tmp = "";
+            StringBuilder tmp = new StringBuilder();
             if (buffer != null) {
-                tmp = buffer.toString();
+                tmp.append(buffer);
                 buffer = null;
-                lastRead = tmp;
+                lastRead = tmp.toString();
             }
-            CommandToken commandToken = CommandToken.getToken(tmp);
+            CommandToken commandToken = CommandToken.getToken(tmp.toString());
             int c;
             while ((c = stream.read()) != -1) {
-                tmp += (char) c;
-                CommandToken nextToken = CommandToken.getToken(tmp);
+                tmp.append((char) c);
+                String current = tmp.toString();
+                CommandToken nextToken = CommandToken.getToken(current);
                 if (commandToken == null) commandToken = nextToken;
                 else if (commandToken != nextToken) {
                     buffer = (char) c;
                     break;
                 }
-                lastRead = tmp;
+                lastRead = current;
             }
             if (commandToken == null) commandToken = CommandToken.EOF;
             lastToken = commandToken;

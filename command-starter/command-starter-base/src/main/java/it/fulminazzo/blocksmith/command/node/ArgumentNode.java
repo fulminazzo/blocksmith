@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
  *
  * @param <T> the type that the value is converted to
  */
-@SuppressWarnings("unchecked")
 @Getter
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
@@ -206,7 +205,7 @@ public abstract class ArgumentNode<T> extends CommandNode {
      * @param optional  if {@code true} the parameter will be non-mandatory
      * @return the argument node
      */
-    @SuppressWarnings("RedundantCast")
+    @SuppressWarnings({"RedundantCast", "unchecked"})
     public static <T> @NotNull ArgumentNode<T> of(final @NotNull String name,
                                                   final @NotNull Parameter parameter,
                                                   final boolean optional) {

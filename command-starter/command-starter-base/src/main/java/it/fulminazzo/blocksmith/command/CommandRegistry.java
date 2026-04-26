@@ -60,7 +60,7 @@ public abstract class CommandRegistry {
      * @param commandModules the command modules
      * @return this object (for method chaining)
      */
-    public @NotNull CommandRegistry register(final Object @NotNull ... commandModules) {
+    public synchronized @NotNull CommandRegistry register(final Object @NotNull ... commandModules) {
         if (state == State.REGISTERED)
             throw new IllegalStateException("It is not possible to register new commands at this time. Please register all commands before committing");
         state = State.REGISTERING;
