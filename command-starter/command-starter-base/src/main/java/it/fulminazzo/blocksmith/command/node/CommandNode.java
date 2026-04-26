@@ -46,29 +46,6 @@ public abstract class CommandNode implements TabCompletable {
      */
 
     /**
-     * Gets the help command name.
-     *
-     * @return the name
-     */
-    public @NotNull String getHelpCommandName() {
-        return getHelpCommand().getName();
-    }
-
-    /**
-     * Gets the {@link CommandNode} representing the help node.
-     *
-     * @return the help node
-     */
-    public @NotNull CommandNode getHelpCommand() {
-        LiteralNode commandNode = Objects.requireNonNull(getCommandNode(), "Could not find command node in " + this);
-        if (commandNode instanceof HelpNode) return commandNode;
-        return commandNode.getChildren().stream()
-                .filter(c -> c instanceof HelpNode)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Could not find help node in " + commandNode));
-    }
-
-    /**
      * Gets the usage of the current node.
      *
      * @return the usage

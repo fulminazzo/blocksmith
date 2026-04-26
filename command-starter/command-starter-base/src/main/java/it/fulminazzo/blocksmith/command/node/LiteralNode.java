@@ -9,10 +9,7 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents a static node in a command tree.
@@ -39,6 +36,29 @@ public class LiteralNode extends CommandNode {
         this.name = literals[0].trim().toLowerCase();
         this.aliases = new HashSet<>();
         for (String literal : literals) this.aliases.add(literal.trim().toLowerCase());
+    }
+
+    /**
+     * Gets the help command name.
+     *
+     * @return the name
+     */
+    public @NotNull String getHelpCommandName() {
+        return getHelpCommand().getName();
+    }
+
+    /**
+     * Gets the {@link CommandNode} representing the help node.
+     *
+     * @return the help node
+     */
+    public @NotNull CommandNode getHelpCommand() {
+        LiteralNode commandNode = Objects.requireNonNull(getCommandNode(), "Could not find command node in " + this);
+        if (commandNode instanceof HelpNode) return commandNode;
+        return commandNode.getChildren().stream()
+                .filter(c -> c instanceof HelpNode)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Could not find help node in " + commandNode));
     }
 
     /**
