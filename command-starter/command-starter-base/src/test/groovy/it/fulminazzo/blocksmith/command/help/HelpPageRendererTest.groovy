@@ -58,6 +58,7 @@ class HelpPageRendererTest extends Specification {
                 .addInput('root', 'help', '1')
                 .advanceCursor()
                 .advanceCursor()
+                .advanceCursor()
         visitor.application >> {
             def application = Mock(ApplicationHandle)
             application.messenger >> messenger
@@ -84,7 +85,7 @@ class HelpPageRendererTest extends Specification {
             messages[d.description] = "$d.name description"
 
         and:
-        input.advanceCursor().advanceCursor()
+        input.advanceCursor().advanceCursor().advanceCursor()
         def renderer = new HelpPageRenderer(helpPage, visitor, 1)
 
         when:
@@ -176,7 +177,7 @@ test description
         }
 
         and:
-        input.advanceCursor().advanceCursor()
+        input.advanceCursor().advanceCursor().advanceCursor()
         def renderer = new HelpPageRenderer(helpPage, visitor, page)
 
         and:
@@ -240,7 +241,7 @@ test description
         sender.hasPermission(_ as PermissionInfo) >> hasPermission
 
         and:
-        input.advanceCursor().advanceCursor()
+        input.advanceCursor().advanceCursor().advanceCursor()
         def renderer = new HelpPageRenderer(helpPage, visitor, page)
 
         when:

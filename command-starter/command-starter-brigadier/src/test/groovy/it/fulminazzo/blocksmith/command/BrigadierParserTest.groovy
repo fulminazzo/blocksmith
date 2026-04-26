@@ -121,12 +121,24 @@ class BrigadierParserTest extends Specification {
         and:
         confirm.confirmAliases() >> ['confirm'].toArray()
         confirm.confirmDescription() >> 'confirm.description'
-        confirm.confirmPermission() >> 'confirm.permission'
+        confirm.confirmPermission() >> {
+            def permission = Mock(Permission)
+            permission.group() >> ''
+            permission.value() >> 'confirm.permission'
+            permission.grant() >> Permission.Grant.OP
+            return permission
+        }
 
         and:
         confirm.cancelAliases() >> ['cancel'].toArray()
         confirm.cancelDescription() >> 'cancel.description'
-        confirm.cancelPermission() >> 'cancel.permission'
+        confirm.cancelPermission() >> {
+            def permission = Mock(Permission)
+            permission.group() >> ''
+            permission.value() >> 'cancel.permission'
+            permission.grant() >> Permission.Grant.OP
+            return permission
+        }
 
         and:
         def root = new LiteralNode('delete')

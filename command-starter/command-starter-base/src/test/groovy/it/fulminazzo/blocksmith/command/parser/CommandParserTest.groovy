@@ -728,7 +728,7 @@ class CommandParserTest extends Specification {
             injectHelpNodes(it.children)
             if (it.children.find { it instanceof HelpNode }) return
             if (it instanceof LiteralNode && !InjectedNode.isAssignableFrom(it.class))
-                it.addChild(new HelpNode(null, it))
+                it.addChild(new HelpNode(CommandParser.DEFAULT_HELP_ANNOTATION, it))
         }
     }
 
