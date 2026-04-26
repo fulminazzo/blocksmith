@@ -1,10 +1,12 @@
 package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.annotation.Help;
+import it.fulminazzo.blocksmith.command.annotation.Permission;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
 
 /**
  * A special {@link CommandNode} that represents the help command associated with {@link Help}.
@@ -12,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
 public final class HelpNode extends InjectedNode {
-    private @Nullable Help helpAnnotation;
+    private @NotNull Help helpAnnotation;
 
     /**
      * Instantiates a new Help node.
@@ -33,7 +35,7 @@ public final class HelpNode extends InjectedNode {
 
     @Override
     public @NotNull HelpNode merge(final @NotNull CommandNode node) {
-        if (node instanceof HelpNode && helpAnnotation == null) {
+        if (node instanceof HelpNode && isDefaultHelpAnnotation(helpAnnotation)) {
             HelpNode helpNode = (HelpNode) node;
             getAliases().clear();
             setCommandInfo(null);
@@ -41,6 +43,15 @@ public final class HelpNode extends InjectedNode {
             helpAnnotation = helpNode.helpAnnotation;
         }
         return (HelpNode) super.merge(node);
+    }
+
+    private static boolean isDefaultHelpAnnotation(final @NotNull Help helpAnnotation) {
+        if (!Arrays.equals(helpAnnotation.aliases(), new String[]{Help.DEFAULT_NAME})) return false;
+        if (!helpAnnotation.description().isEmpty()) return false;
+        Permission permission = helpAnnotation.permission();
+        return permission.value().isEmpty() &&
+                permission.group().isEmpty() &&
+                permission.grant() == Permission.Grant.OP;
     }
 
 }
