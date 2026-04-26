@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
-public final class ConfirmNode extends ConfirmationNode {
+public final class ConfirmNode extends InjectedNode {
 
     /**
      * Instantiates a new Confirm node.

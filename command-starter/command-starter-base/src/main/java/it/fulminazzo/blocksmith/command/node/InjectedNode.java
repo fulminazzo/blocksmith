@@ -7,25 +7,26 @@ import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Abstraction of {@link CommandNode} for confirmation related nodes.
+ * Abstraction of {@link InjectedNode} to generate an injected node
+ * with description and permission computed from the parent node if not present.
  */
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
-abstract class ConfirmationNode extends LiteralNode {
+abstract class InjectedNode extends LiteralNode {
     private static final String DESCRIPTION_SUFFIX = ".description";
 
     /**
-     * Instantiates a new Confirmation node.
+     * Instantiates a new Injected node.
      *
      * @param aliases     the aliases
      * @param description the description
      * @param permission  the permission
      * @param parent      the parent node
      */
-    protected ConfirmationNode(final @NotNull String @NotNull [] aliases,
-                               @NotNull String description,
-                               @NotNull String permission,
-                               final @NotNull LiteralNode parent) {
+    protected InjectedNode(final @NotNull String @NotNull [] aliases,
+                           @NotNull String description,
+                           @NotNull String permission,
+                           final @NotNull LiteralNode parent) {
         super(aliases);
         final CommandInfo reference = parent.getCommandInfo();
         final String identifier = "." + getName();
