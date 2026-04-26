@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
 abstract class ConfirmationNode extends LiteralNode {
+    private static final String DESCRIPTION_SUFFIX = ".description";
 
     /**
      * Instantiates a new Confirmation node.
@@ -27,9 +28,11 @@ abstract class ConfirmationNode extends LiteralNode {
                                final @NotNull LiteralNode parent) {
         super(aliases);
         final CommandInfo reference = parent.getCommandInfo();
-        if (description.isEmpty()) description = reference.getDescription() + "." + getName();
+        final String identifier = "." + getName();
+        if (description.isEmpty()) description = reference.getDescription()
+                .replace(DESCRIPTION_SUFFIX, identifier + DESCRIPTION_SUFFIX);
         PermissionInfo referencePermission = reference.getPermission();
-        if (permission.isEmpty()) permission = referencePermission.getActualPermission() + "." + getName();
+        if (permission.isEmpty()) permission = referencePermission.getActualPermission() + identifier;
         setCommandInfo(new CommandInfo(
                 description,
                 new PermissionInfo(referencePermission.getPrefix(), permission, referencePermission.getGrant())
