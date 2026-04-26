@@ -31,7 +31,10 @@ public final class HelpPageRenderer {
     private static final int MAX_FONT_WIDTH = 320;
 
     private static final int MAX_DESCRIPTION_LINES = 2;
-    private static final int SUBCOMMANDS_LINES = 3;
+    /**
+     * Gets the number of subcommands lines to show.
+     */
+    public static final int SUBCOMMANDS_LINES = 3;
 
     @NotNull HelpPage helpPage;
     @NotNull InputVisitor<?, ?> visitor;
