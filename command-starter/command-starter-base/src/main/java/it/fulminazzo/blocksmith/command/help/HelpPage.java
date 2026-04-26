@@ -36,12 +36,13 @@ public class HelpPage {
     public @NotNull List<CommandData> getSubcommandsPage(final @NotNull CommandSenderWrapper<?> sender,
                                                          final @Range(from = 1, to = Integer.MAX_VALUE) int page,
                                                          final @Range(from = 1, to = Integer.MAX_VALUE) int subcommandsPerPage) {
+        List<CommandData> executableSubcommands = getExecutableSubcommands(sender);
         int pages = getSubcommandsPages(sender, subcommandsPerPage);
         if (page < 1 || page > pages)
             throw new IllegalArgumentException(String.format("invalid page %s for pages [%s, %s]", page, 1, pages));
         int from = (page - 1) * subcommandsPerPage;
-        int to = Math.min(page * subcommandsPerPage, subcommands.size());
-        return subcommands.subList(from, to);
+        int to = Math.min(page * subcommandsPerPage, executableSubcommands.size());
+        return executableSubcommands.subList(from, to);
     }
 
     /**
