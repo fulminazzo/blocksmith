@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.annotation;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -27,6 +28,8 @@ public @interface Confirm {
 
     @NotNull String confirmPermission() default "";
 
+    @NotNull Help confirmHelp() default @Help();
+
     /*
      * CANCEL
      */
@@ -36,5 +39,7 @@ public @interface Confirm {
     @NotNull String cancelDescription() default "";
 
     @NotNull String cancelPermission() default "";
+
+    @NotNull Help cancelHelp() default @Help();
 
 }
