@@ -61,6 +61,7 @@ public abstract class CommandNode implements TabCompletable {
      */
     public @NotNull CommandNode getHelpCommand() {
         LiteralNode commandNode = Objects.requireNonNull(getCommandNode(), "Could not find command node in " + this);
+        if (commandNode instanceof HelpNode) return commandNode;
         return commandNode.getChildren().stream()
                 .filter(c -> c instanceof HelpNode)
                 .findFirst()
