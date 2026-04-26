@@ -7,14 +7,15 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 class HttpRequestCatcherTest extends Specification {
+    private static final int PORT = 17390
 
     def 'test that request catcher works'() {
         given:
-        def catcher = new HttpRequestCatcher().start()
+        def catcher = new HttpRequestCatcher().start(PORT)
 
         when:
         HttpClient.newHttpClient().send(
-                HttpRequest.newBuilder(URI.create('http://localhost:8080/path')).build(),
+                HttpRequest.newBuilder(URI.create("http://localhost:$PORT/path")).build(),
                 HttpResponse.BodyHandlers.ofString()
         )
 

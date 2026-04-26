@@ -10,8 +10,8 @@ final class HttpRequestCatcher {
         return future?.get()
     }
 
-    HttpRequestCatcher start() {
-        socket = new ServerSocket(8080)
+    HttpRequestCatcher start(int port) {
+        socket = new ServerSocket(port)
         future = CompletableFuture.supplyAsync {
             def client = socket.accept()
             def lines = handleClient(client)
