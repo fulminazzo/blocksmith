@@ -35,27 +35,28 @@ final class TimeTokenizer {
      */
     public @NotNull TimeToken next() {
         try {
-            String tmp = "";
+            StringBuilder tmp = new StringBuilder();
             if (buffer != null) {
-                tmp = buffer.toString();
+                tmp.append(buffer);
                 buffer = null;
-                lastRead = tmp;
+                lastRead = tmp.toString();
             }
-            TimeToken commandToken = TimeToken.getToken(tmp);
+            TimeToken timeToken = TimeToken.getToken(tmp.toString());
             int c;
             while ((c = stream.read()) != -1) {
-                tmp += (char) c;
-                TimeToken nextToken = TimeToken.getToken(tmp);
-                if (commandToken == null) commandToken = nextToken;
-                else if (commandToken != nextToken) {
+                tmp.append((char) c);
+                String current = tmp.toString();
+                TimeToken nextToken = TimeToken.getToken(current);
+                if (timeToken == null) timeToken = nextToken;
+                else if (timeToken != nextToken) {
                     buffer = (char) c;
                     break;
                 }
-                lastRead = tmp;
+                lastRead = current;
             }
-            if (commandToken == null) commandToken = TimeToken.EOF;
-            lastToken = commandToken;
-            return commandToken;
+            if (timeToken == null) timeToken = TimeToken.EOF;
+            lastToken = timeToken;
+            return timeToken;
         } catch (IOException e) {
             throw new TimeParseException("Could not read next token", e);
         }
