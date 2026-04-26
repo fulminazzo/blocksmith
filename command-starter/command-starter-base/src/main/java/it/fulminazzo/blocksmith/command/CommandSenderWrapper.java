@@ -10,13 +10,14 @@ import it.fulminazzo.blocksmith.scheduler.Scheduler;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.Delegate;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 /**
@@ -103,7 +104,6 @@ public abstract class CommandSenderWrapper<S> implements Receiver {
      *
      * @return the receiver
      */
-    @Delegate(types = Receiver.class)
     private @NotNull Receiver receiver() {
         return ReceiverFactories.get(actualSender.getClass(), application).create(actualSender);
     }
@@ -257,6 +257,16 @@ public abstract class CommandSenderWrapper<S> implements Receiver {
     @Override
     public @NotNull CommandSenderWrapper<S> sendMessage(final @NotNull Component component) {
         return (CommandSenderWrapper<S>) Receiver.super.sendMessage(component);
+    }
+
+    @Override
+    public @NotNull Locale getLocale() {
+        return receiver().getLocale();
+    }
+
+    @Override
+    public @NotNull Audience audience() {
+        return receiver().audience();
     }
 
 }
