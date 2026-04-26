@@ -21,6 +21,11 @@ import java.util.UUID;
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public final class APIUtils {
     /**
+     * The default Blocksmith User-Agent header value.
+     */
+    public static final String USER_AGENT = String.format("%s/%s", ProjectInfo.PROJECT_NAME, ProjectInfo.VERSION);
+
+    /**
      * The base API URL.
      */
     public static final @NotNull String API_URL = "https://api.mojang.com";
@@ -74,7 +79,7 @@ public final class APIUtils {
      */
     static @NotNull HttpRequest.Builder requestBuilder(final @NotNull String url) {
         return HttpRequest.newBuilder(URI.create(url))
-                .header("User-Agent", String.format("%s/%s", ProjectInfo.PROJECT_NAME, ProjectInfo.VERSION))
+                .header("User-Agent", USER_AGENT)
                 .header("Accept-Encoding", "gzip, deflate, br")
                 .header("Cache-Control", "no-cache, no-store, must-revalidate");
     }
