@@ -727,7 +727,7 @@ class CommandParserTest extends Specification {
         nodes.each {
             injectHelpNodes(it.children)
             if (it.children.find { it instanceof HelpNode }) return
-            if (it instanceof LiteralNode && !InjectedNode.isAssignableFrom(it.class))
+            if (it instanceof LiteralNode && !HelpNode.isAssignableFrom(it.class))
                 it.addChild(new HelpNode(CommandParser.DEFAULT_HELP_ANNOTATION, it))
         }
     }
@@ -750,6 +750,7 @@ class CommandParserTest extends Specification {
         return parser
     }
 
+    @Command
     private static void promote(final @NotNull Object commandSender,
                                 final @NotNull Object player,
                                 final @NotNull String rank,
