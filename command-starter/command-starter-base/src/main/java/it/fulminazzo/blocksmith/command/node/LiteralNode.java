@@ -24,7 +24,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public final class LiteralNode extends CommandNode {
+public class LiteralNode extends CommandNode {
     final @NotNull String name;
     final @NotNull Set<String> aliases;
 
