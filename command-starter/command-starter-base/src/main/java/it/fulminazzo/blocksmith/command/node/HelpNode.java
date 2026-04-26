@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
 public final class HelpNode extends InjectedNode {
-    private final @Nullable Help helpAnnotation;
+    private @Nullable Help helpAnnotation;
 
     /**
      * Instantiates a new Help node.
@@ -34,8 +34,11 @@ public final class HelpNode extends InjectedNode {
     @Override
     public @NotNull HelpNode merge(final @NotNull CommandNode node) {
         if (node instanceof HelpNode && helpAnnotation == null) {
+            HelpNode helpNode = (HelpNode) node;
             getAliases().clear();
             setCommandInfo(null);
+            name = node.getName();
+            helpAnnotation = helpNode.helpAnnotation;
         }
         return (HelpNode) super.merge(node);
     }

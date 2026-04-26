@@ -23,7 +23,7 @@ import java.util.Set;
 @ToString(callSuper = true, doNotUseGetters = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LiteralNode extends CommandNode {
-    final @NotNull String name;
+    protected @NotNull String name;
     final @NotNull Set<String> aliases;
 
     @Setter
