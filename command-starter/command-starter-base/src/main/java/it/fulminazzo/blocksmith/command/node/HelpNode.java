@@ -18,6 +18,7 @@ import java.lang.reflect.Parameter;
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
 public final class HelpNode extends InjectedNode {
+    private final @Nullable Help helpAnnotation;
 
     /**
      * Instantiates a new Help node.
@@ -32,6 +33,7 @@ public final class HelpNode extends InjectedNode {
                 helpAnnotation == null ? "" : helpAnnotation.permission(),
                 parent
         );
+        this.helpAnnotation = helpAnnotation;
         //TODO: dynamic resolution of min and max
         //TODO: better handling
         Method method = Reflect.on(this).getMethod("unused");
@@ -45,6 +47,15 @@ public final class HelpNode extends InjectedNode {
                     v.getCommandSender().sendMessage(l)
             );
         });
+    }
+
+    @Override
+    public @NotNull HelpNode merge(final @NotNull CommandNode node) {
+        if (node instanceof HelpNode && helpAnnotation == null) {
+            getAliases().clear();
+            setCommandInfo(null);
+        }
+        return (HelpNode) super.merge(node);
     }
 
     @SuppressWarnings("unused")
