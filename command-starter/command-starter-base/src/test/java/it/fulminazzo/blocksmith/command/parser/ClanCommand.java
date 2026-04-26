@@ -12,6 +12,11 @@ import java.util.concurrent.TimeUnit;
 final class ClanCommand {
 
     @Command
+    @Help(
+            aliases = {"?"},
+            description = "clan.help.description",
+            permission = "clan.help.permission"
+    )
     public void execute(
             final @NotNull CommandSender sender
     ) {

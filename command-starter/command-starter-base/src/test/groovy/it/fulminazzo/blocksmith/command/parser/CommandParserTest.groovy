@@ -32,23 +32,28 @@ class CommandParserTest extends Specification {
     def 'test parseCommands returns all commands'() {
         given:
         def executor = new ClanCommand()
-        def expected = []
+        List<LiteralNode> expected = []
         def baseAliases = ['clan', 'team', 'gang']
 
         and:
         def clan = new LiteralNode(*baseAliases)
+        def method = ClanCommand.getMethod('execute', CommandSender)
         clan.executor = new ExecutionHandler(
                 executor,
-                ClanCommand.getMethod('execute', CommandSender)
+                method
         )
         clan.commandInfo = new CommandInfo(
                 'command.clan.description',
                 new PermissionInfo(null, 'clan', Permission.Grant.OP)
         )
+        clan.addChild(new HelpNode(
+                method.getAnnotation(Help),
+                clan
+        ))
         expected.add(clan)
 
         and:
-        def method = ClanCommand.getMethod('getClanInfo', CommandSender, String)
+        method = ClanCommand.getMethod('getClanInfo', CommandSender, String)
         def name = ArgumentNode.of('name', method.parameters[1], true)
         name.defaultValue = 'self'
         name.executor = new ExecutionHandler(
@@ -721,6 +726,7 @@ class CommandParserTest extends Specification {
     private static void injectHelpNodes(final Collection<CommandNode> nodes) {
         nodes.each {
             injectHelpNodes(it.children)
+            if (it.children.find { it instanceof HelpNode }) return
             if (it instanceof LiteralNode && !InjectedNode.isAssignableFrom(it.class))
                 it.addChild(new HelpNode(null, it))
         }
