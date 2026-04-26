@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.TabCompletable;
+import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
 import it.fulminazzo.blocksmith.command.node.handler.IExecutionHandler;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.command.visitor.usage.UsageVisitor;
@@ -16,17 +17,11 @@ import java.util.stream.Collectors;
  * Represents a node in a command tree.
  * A command node can have a parent, multiple children, and an optional executor.
  */
-@EqualsAndHashCode
-@ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class CommandNode implements TabCompletable {
     @Getter
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     @Nullable CommandNode parent;
     @Getter
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     final @NotNull Set<CommandNode> children = Collections.synchronizedSet(new TreeSet<>(Comparator.comparing(CommandNode::getName)));
 
     @Setter
@@ -172,6 +167,32 @@ public abstract class CommandNode implements TabCompletable {
      */
     public @Nullable CommandNode getFirstChild() {
         return !children.isEmpty() ? children.iterator().next() : null;
+    }
+
+    @Override
+    public int hashCode() {
+        List<Object> hashObjects = new ArrayList<>();
+        hashObjects.add(getClass());
+        hashObjects.add(getName());
+        if (executor instanceof ExecutionHandler) hashObjects.add(executor);
+        return Objects.hash(hashObjects.toArray());
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof CommandNode) {
+            CommandNode node = (CommandNode) obj;
+            if (!node.getClass().equals(getClass()) && node.getName().equals(getName())) return false;
+            if (executor instanceof ExecutionHandler) return executor.equals(node.executor);
+            else return true;
+        } else return false;
+    }
+
+    @Override
+    public @NotNull String toString() {
+        String base = String.format("%s(", CommandNode.class.getSimpleName());
+        if (executor instanceof ExecutionHandler) base += "executor=" + executor;
+        return base + ")";
     }
 
     /*
