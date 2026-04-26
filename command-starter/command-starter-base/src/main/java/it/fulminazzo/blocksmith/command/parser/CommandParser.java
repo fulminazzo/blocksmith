@@ -291,8 +291,12 @@ public final class CommandParser {
     private void handleConfirmation(final @NotNull Confirm confirmAnnotation, final @NotNull LiteralNode lastLiteral) {
         final Duration timeout = Duration.of(confirmAnnotation.timeout(), confirmAnnotation.unit().toChronoUnit());
         final PendingTaskManager<Object> confirmationManager = new PendingTaskManager<>();
-        lastLiteral.addChild(new ConfirmNode(confirmAnnotation, lastLiteral, confirmationManager));
-        lastLiteral.addChild(new CancelNode(confirmAnnotation, lastLiteral, confirmationManager));
+        ConfirmNode confirmNode = new ConfirmNode(confirmAnnotation, lastLiteral, confirmationManager);
+        confirmNode.addChild(new HelpNode(null, confirmNode));
+        lastLiteral.addChild(confirmNode);
+        CancelNode cancelNode = new CancelNode(confirmAnnotation, lastLiteral, confirmationManager);
+        cancelNode.addChild(new HelpNode(null, cancelNode));
+        lastLiteral.addChild(cancelNode);
         lastLiteral.setExecutor((n, v) -> {
             confirmationManager.register(
                     v.getCommandSender().getId(),
