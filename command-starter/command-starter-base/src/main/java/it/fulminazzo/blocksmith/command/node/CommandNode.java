@@ -5,7 +5,9 @@ import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
 import it.fulminazzo.blocksmith.command.node.handler.IExecutionHandler;
 import it.fulminazzo.blocksmith.command.visitor.Visitor;
 import it.fulminazzo.blocksmith.command.visitor.usage.UsageVisitor;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -109,7 +111,9 @@ public abstract class CommandNode implements TabCompletable {
      */
     public @NotNull CommandNode addChild(final @NotNull CommandNode child) {
         for (CommandNode c : children)
-            if (child.getClass().equals(c.getClass()) && c.getName().equals(child.getName())) {
+            if (child.getClass().equals(c.getClass()) && (
+                    c.getName().equals(child.getName()) || c instanceof HelpNode
+            )) {
                 c.merge(child);
                 c.parent = this;
                 return c;
