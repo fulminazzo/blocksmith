@@ -8,3 +8,8 @@ include(
 
     "base:testing"
 )
+
+// minecraft
+include(
+    "minecraft-starter"
+)
