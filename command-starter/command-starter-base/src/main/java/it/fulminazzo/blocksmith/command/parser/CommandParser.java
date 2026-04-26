@@ -35,6 +35,49 @@ import java.util.stream.Stream;
  * (declaration, description and permission).
  */
 public final class CommandParser {
+    private static final @NotNull Permission DEFAULT_PERMISSION_ANNOTATION = new Permission() {
+        @Override
+        public @NotNull String value() {
+            return "";
+        }
+
+        @Override
+        public @NotNull String group() {
+            return "";
+        }
+
+        @Override
+        public @NotNull Grant grant() {
+            return Grant.OP;
+        }
+
+        @Override
+        public @NotNull Class<Permission> annotationType() {
+            return Permission.class;
+        }
+    };
+    private static final @NotNull Help DEFAULT_HELP_ANNOTATION = new Help() {
+        @Override
+        public @NotNull String @NotNull [] aliases() {
+            return new String[]{Help.DEFAULT_NAME};
+        }
+
+        @Override
+        public @NotNull String description() {
+            return "";
+        }
+
+        @Override
+        public @NotNull Permission permission() {
+            return DEFAULT_PERMISSION_ANNOTATION;
+        }
+
+        @Override
+        public @NotNull Class<Help> annotationType() {
+            return Help.class;
+        }
+    };
+
     private final @NotNull String rawCommand;
     private final @NotNull CommandTokenizer tokenizer;
     private final @NotNull CommandInfo commandInfo;
@@ -220,7 +263,7 @@ public final class CommandParser {
         computedPermission += literalNode.getName();
         final CommandInfo computed = computeCurrentCommandInfo();
         literalNode.setCommandInfo(computed);
-        literalNode.addChild(new HelpNode(null, literalNode));
+        literalNode.addChild(new HelpNode(DEFAULT_HELP_ANNOTATION, literalNode));
         return literalNode;
     }
 
