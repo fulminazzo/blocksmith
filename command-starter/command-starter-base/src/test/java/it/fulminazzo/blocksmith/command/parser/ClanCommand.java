@@ -27,9 +27,9 @@ final class ClanCommand {
         // something
     }
 
-    @Command("help <verbose>")
+    @Command("list <verbose>")
     @Permission(grant = Permission.Grant.ALL)
-    public void help(
+    public void list(
             final @NotNull CommandSender sender,
             final boolean verbose
     ) {
