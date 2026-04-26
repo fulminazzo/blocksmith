@@ -11,6 +11,30 @@ class APIUtilsTest extends Specification {
 
     private static final UUID notchUuid = UUIDUtils.dashed('069a79f444e94726a5befca90e38aaf5')
 
+    def 'test that getSkinData stores skin in cache'() {
+        given:
+        def uuid = UUIDUtils.dashed('853c80ef3c3749fdaa49938b674adae6')
+
+        when:
+        def first = APIUtils.getSkinData(uuid).orElse(null)
+
+        then:
+        first != null
+
+        when:
+        def cached = APIUtils.SKIN_CACHE[uuid]
+
+        then:
+        cached == first
+
+        when:
+        def second = APIUtils.getSkinData(uuid).orElse(null)
+
+        then:
+        second == cached
+        second == first
+    }
+
     def 'test that getSkinData of #uuid returns #found'() {
         when:
         def actual = APIUtils.getSkinData(uuid)
@@ -44,6 +68,30 @@ class APIUtilsTest extends Specification {
 
         where:
         exception << [new IOException(), new InterruptedException()]
+    }
+
+    def 'test that getUuidFromName stores uuid in cache'() {
+        given:
+        def name = 'jeb_'
+
+        when:
+        def first = APIUtils.getUuidFromName(name).orElse(null)
+
+        then:
+        first != null
+
+        when:
+        def cached = APIUtils.NAME_CACHE[name]
+
+        then:
+        cached == first
+
+        when:
+        def second = APIUtils.getUuidFromName(name).orElse(null)
+
+        then:
+        second == cached
+        second == first
     }
 
     def 'test that getUuidFromName of #name returns #expected'() {

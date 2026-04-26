@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A collection of utilities to work with Mojang's API.
@@ -53,6 +54,9 @@ public final class APIUtils {
             .build();
     private static final @NotNull Gson GSON = new Gson();
 
+    private static final @NotNull Map<UUID, SkinData> SKIN_CACHE = new ConcurrentHashMap<>();
+    private static final @NotNull Map<String, UUID> NAME_CACHE = new ConcurrentHashMap<>();
+
     /**
      * Fetches the session server API to get the skin data associated with the given profile.
      * <br>
@@ -63,6 +67,7 @@ public final class APIUtils {
      */
     public static @NotNull Optional<SkinData> getSkinData(final @NotNull UUID uuid) {
         try {
+            if (SKIN_CACHE.containsKey(uuid)) return Optional.of(SKIN_CACHE.get(uuid));
             HttpRequest request = requestBuilder(String.format(PROFILE_BY_UNDASHED_UUID_URL, uuid.toString().replace("-", ""))).GET().build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             Map<?, ?> data = GSON.fromJson(response.body(), Map.class);
@@ -72,7 +77,9 @@ public final class APIUtils {
                     Map<?, ?> map = (Map<?, ?>) list.get(0);
                     String value = (String) map.get("value");
                     String signature = (String) map.get("signature");
-                    return Optional.of(SkinData.fromBase64(value, signature));
+                    SkinData skinData = SkinData.fromBase64(value, signature);
+                    SKIN_CACHE.put(uuid, skinData);
+                    return Optional.of(skinData);
                 }
             }
         } catch (IOException | InterruptedException ignored) {
@@ -91,13 +98,16 @@ public final class APIUtils {
      */
     public static @NotNull Optional<UUID> getUuidFromName(final @NotNull String name) {
         try {
+            if (NAME_CACHE.containsKey(name)) return Optional.of(NAME_CACHE.get(name));
             HttpRequest request = requestBuilder(String.format(UUID_BY_NAME_URL, name)).GET().build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             Map<?, ?> data = GSON.fromJson(response.body(), Map.class);
             if (data == null) return Optional.empty();
             Object id = data.get("id");
             if (id == null) return Optional.empty();
-            return Optional.of(UUIDUtils.dashed(id.toString()));
+            UUID uuid = UUIDUtils.dashed(id.toString());
+            NAME_CACHE.put(name, uuid);
+            return Optional.of(uuid);
         } catch (IOException | InterruptedException e) {
             return Optional.empty();
         }
