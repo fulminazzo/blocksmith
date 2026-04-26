@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node;
 
+import it.fulminazzo.blocksmith.command.annotation.Permission;
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import lombok.EqualsAndHashCode;
@@ -25,7 +26,7 @@ abstract class InjectedNode extends LiteralNode {
      */
     protected InjectedNode(final @NotNull String @NotNull [] aliases,
                            @NotNull String description,
-                           @NotNull String permission,
+                           @NotNull Permission permission,
                            final @NotNull LiteralNode parent) {
         super(aliases);
         final CommandInfo reference = parent.getCommandInfo();
@@ -33,10 +34,20 @@ abstract class InjectedNode extends LiteralNode {
         if (description.isEmpty()) description = reference.getDescription()
                 .replace(DESCRIPTION_SUFFIX, identifier + DESCRIPTION_SUFFIX);
         PermissionInfo referencePermission = reference.getPermission();
-        if (permission.isEmpty()) permission = referencePermission.getActualPermission() + identifier;
+        final String prefix;
+        final String actualPermission;
+        final Permission.Grant grant;
+        if (permission.value().isEmpty()) {
+            prefix = referencePermission.getPrefix();
+            actualPermission = referencePermission.getActualPermission() + identifier;
+        } else {
+            prefix = permission.group();
+            actualPermission = permission.value();
+        }
+        grant = permission.grant() == Permission.Grant.OP ? referencePermission.getGrant() : permission.grant();
         setCommandInfo(new CommandInfo(
                 description,
-                new PermissionInfo(referencePermission.getPrefix(), permission, referencePermission.getGrant())
+                new PermissionInfo(prefix, actualPermission, grant)
         ));
     }
 
