@@ -178,10 +178,10 @@ public abstract class CommandNode implements TabCompletable {
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (obj instanceof CommandNode) {
-            CommandNode node = (CommandNode) obj;
-            if (!node.getClass().equals(getClass()) && node.getName().equals(getName())) return false;
+    public boolean equals(final @Nullable Object object) {
+        if (object instanceof CommandNode) {
+            CommandNode node = (CommandNode) object;
+            if (!(node.getClass().equals(getClass()) && node.getName().equals(getName()))) return false;
             if (executor instanceof ExecutionHandler) return executor.equals(node.executor);
             else return true;
         } else return false;
