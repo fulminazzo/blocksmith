@@ -270,7 +270,9 @@ test description
         sender.hasPermission(_ as PermissionInfo) >> hasPermission
 
         and:
-        Reflect.on(helpPage.command).set('parentHelpCommandName', parentHelpCommandName)
+        Reflect.on(helpPage.command)
+                .set('depth', 1)
+                .set('parentHelpCommandName', parentHelpCommandName)
 
         and:
         input.advanceCursor().advanceCursor().advanceCursor()
@@ -297,17 +299,17 @@ test description
         3    | true          | null                  ||
                 '<click:run_command:\'root help 2\'><gold>[</gold><red>\\<\\<</red><gold>]</gold></click> <strikethrough><gold>---</gold></strikethrough> <strikethrough><gold>--'
         1    | false         | 'parent_help'         ||
-                '<strikethrough><gold>---</gold></strikethrough> <strikethrough><gold>---</gold></strikethrough> <click:run_command:\'root parent_help\'><gold>[</gold><red>↑</red><gold>]'
+                '<strikethrough><gold>---</gold></strikethrough> <strikethrough><gold>---</gold></strikethrough> <click:run_command:\' parent_help\'><gold>[</gold><red>↑</red><gold>]'
         1    | true          | 'parent_help'         ||
-                '<strikethrough><gold>---</gold></strikethrough> <click:run_command:\'root help 2\'><gold>[</gold><red>>></red><gold>]</gold></click> <click:run_command:\'root parent_help\'><gold>[</gold><red>↑</red><gold>]'
+                '<strikethrough><gold>---</gold></strikethrough> <click:run_command:\'root help 2\'><gold>[</gold><red>>></red><gold>]</gold></click> <click:run_command:\' parent_help\'><gold>[</gold><red>↑</red><gold>]'
         2    | false         | 'parent_help'         ||
-                '<strikethrough><gold>---</gold></strikethrough> <strikethrough><gold>---</gold></strikethrough> <click:run_command:\'root parent_help\'><gold>[</gold><red>↑</red><gold>]'
+                '<strikethrough><gold>---</gold></strikethrough> <strikethrough><gold>---</gold></strikethrough> <click:run_command:\' parent_help\'><gold>[</gold><red>↑</red><gold>]'
         2    | true          | 'parent_help'         ||
-                '<click:run_command:\'root help 1\'><gold>[</gold><red>\\<\\<</red><gold>]</gold></click> <click:run_command:\'root help 3\'><gold>[</gold><red>>></red><gold>]</gold></click> <click:run_command:\'root parent_help\'><gold>[</gold><red>↑</red><gold>]'
+                '<click:run_command:\'root help 1\'><gold>[</gold><red>\\<\\<</red><gold>]</gold></click> <click:run_command:\'root help 3\'><gold>[</gold><red>>></red><gold>]</gold></click> <click:run_command:\' parent_help\'><gold>[</gold><red>↑</red><gold>]'
         3    | false         | 'parent_help'         ||
-                '<strikethrough><gold>---</gold></strikethrough> <strikethrough><gold>---</gold></strikethrough> <click:run_command:\'root parent_help\'><gold>[</gold><red>↑</red><gold>]'
+                '<strikethrough><gold>---</gold></strikethrough> <strikethrough><gold>---</gold></strikethrough> <click:run_command:\' parent_help\'><gold>[</gold><red>↑</red><gold>]'
         3    | true          | 'parent_help'         ||
-                '<click:run_command:\'root help 2\'><gold>[</gold><red>\\<\\<</red><gold>]</gold></click> <strikethrough><gold>---</gold></strikethrough> <click:run_command:\'root parent_help\'><gold>[</gold><red>↑</red><gold>]'
+                '<click:run_command:\'root help 2\'><gold>[</gold><red>\\<\\<</red><gold>]</gold></click> <strikethrough><gold>---</gold></strikethrough> <click:run_command:\' parent_help\'><gold>[</gold><red>↑</red><gold>]'
     }
 
     def 'test that format correctly renders data'() {
