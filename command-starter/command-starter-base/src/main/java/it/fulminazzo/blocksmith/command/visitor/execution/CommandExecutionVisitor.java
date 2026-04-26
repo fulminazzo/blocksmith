@@ -8,7 +8,7 @@ import it.fulminazzo.blocksmith.command.node.ArgumentNode;
 import it.fulminazzo.blocksmith.command.node.CommandNode;
 import it.fulminazzo.blocksmith.command.node.LiteralNode;
 import it.fulminazzo.blocksmith.command.node.handler.ConfirmationHandler;
-import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
+import it.fulminazzo.blocksmith.command.node.handler.IExecutionHandler;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
 import it.fulminazzo.blocksmith.command.visitor.InputVisitorImpl;
 import it.fulminazzo.blocksmith.message.argument.Argument;
@@ -149,7 +149,7 @@ public final class CommandExecutionVisitor extends InputVisitorImpl<Void, Comman
      * @throws CommandExecutionException if a confirmation is required or the execution failed
      */
     Void handleExecution(final @NotNull CommandNode node) throws CommandExecutionException {
-        final ExecutionHandler executionHandler = node.getExecutor()
+        final IExecutionHandler executionHandler = node.getExecutor()
                 .orElseThrow(() -> new IllegalStateException("No execution handler found for node: " + node));
         LiteralNode commandNode = Objects.requireNonNull(node.getCommandNode(), "Could not find command node of node: " + node);
         ConfirmationHandler confirmationHandler = commandNode.getConfirmationHandler();

@@ -19,11 +19,11 @@ import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 
 /**
- * Handler to actually execute the command upon successful arguments validation.
+ * Base {@link IExecutionHandler} implementation.
  */
 @EqualsAndHashCode
 @ToString
-public final class ExecutionHandler {
+public final class ExecutionHandler implements IExecutionHandler {
     private final @NotNull CommandExecutor executor;
 
     private @Nullable FixedCooldownManager<Object> cooldownManager;
@@ -38,31 +38,6 @@ public final class ExecutionHandler {
      */
     public ExecutionHandler(final @NotNull Object executor, final @NotNull Method method) {
         this.executor = new CommandExecutor(executor, method);
-    }
-
-    /**
-     * Executes the actual command logic.
-     *
-     * @param commandNode      the literal node containing information about the executing command
-     * @param executionVisitor the execution visitor
-     * @throws CommandExecutionException in case of any errors
-     */
-    public void execute(final @NotNull LiteralNode commandNode,
-                        final @NotNull CommandExecutionVisitor executionVisitor) throws CommandExecutionException {
-        if (cooldownManager != null) {
-            CommandSenderWrapper<?> sender = executionVisitor.getCommandSender();
-            PermissionInfo cooldownPermission = getCooldownBypassPermission(commandNode.getCommandInfo().getPermission());
-            if (!sender.hasPermission(cooldownPermission)) {
-                Object id = sender.getId();
-                if (cooldownManager.isOnCooldown(id)) {
-                    long time = cooldownManager.getRemaining(id);
-                    throw new CommandExecutionException(CommandMessages.COMMAND_ON_COOLDOWN)
-                            .arguments(Time.of("cooldown", time));
-                } else cooldownManager.put(id);
-            }
-        }
-        if (asyncManager != null) asyncManager.execute(executor, executionVisitor);
-        else executor.execute(executionVisitor);
     }
 
     /**
@@ -117,6 +92,25 @@ public final class ExecutionHandler {
      */
     public @NotNull Method getMethod() {
         return executor.getMethod();
+    }
+
+    @Override
+    public void execute(final @NotNull LiteralNode commandNode,
+                        final @NotNull CommandExecutionVisitor executionVisitor) throws CommandExecutionException {
+        if (cooldownManager != null) {
+            CommandSenderWrapper<?> sender = executionVisitor.getCommandSender();
+            PermissionInfo cooldownPermission = getCooldownBypassPermission(commandNode.getCommandInfo().getPermission());
+            if (!sender.hasPermission(cooldownPermission)) {
+                Object id = sender.getId();
+                if (cooldownManager.isOnCooldown(id)) {
+                    long time = cooldownManager.getRemaining(id);
+                    throw new CommandExecutionException(CommandMessages.COMMAND_ON_COOLDOWN)
+                            .arguments(Time.of("cooldown", time));
+                } else cooldownManager.put(id);
+            }
+        }
+        if (asyncManager != null) asyncManager.execute(executor, executionVisitor);
+        else executor.execute(executionVisitor);
     }
 
     /**
