@@ -36,6 +36,7 @@ import java.util.stream.Stream;
  */
 public final class CommandParser {
     private static final @NotNull Permission DEFAULT_PERMISSION_ANNOTATION = new Permission() {
+
         @Override
         public @NotNull String value() {
             return "";
@@ -55,8 +56,10 @@ public final class CommandParser {
         public @NotNull Class<Permission> annotationType() {
             return Permission.class;
         }
+
     };
     private static final @NotNull Help DEFAULT_HELP_ANNOTATION = new Help() {
+
         @Override
         public @NotNull String @NotNull [] aliases() {
             return new String[]{Help.DEFAULT_NAME};
@@ -76,6 +79,7 @@ public final class CommandParser {
         public @NotNull Class<Help> annotationType() {
             return Help.class;
         }
+
     };
 
     private final @NotNull String rawCommand;

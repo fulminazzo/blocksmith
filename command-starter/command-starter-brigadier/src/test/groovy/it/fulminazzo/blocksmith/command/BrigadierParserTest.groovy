@@ -540,6 +540,7 @@ class BrigadierParserTest extends Specification {
         newArgumentNode('number', Integer).setGreedy(true) || StringArgumentType
         newArgumentNode('string', String).setGreedy(true)  || StringArgumentType
         newArgumentNode('object', Object)                  || null
+        newPageNode()                                      || null
     }
 
     def 'test that getArgumentType of #type returns #expected'() {
@@ -593,6 +594,12 @@ class BrigadierParserTest extends Specification {
         def parameter = Mock(Parameter)
         parameter.type >> type
         return ArgumentNode.of(name, parameter, false)
+    }
+
+    private ArgumentNode<?> newPageNode() {
+        def node = Mock(ArgumentNode)
+        node.type >> Number
+        return node
     }
 
 }

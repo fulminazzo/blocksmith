@@ -11,6 +11,9 @@ import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
+import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionException
+import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor
+import it.fulminazzo.blocksmith.reflect.Reflect
 import it.fulminazzo.blocksmith.structure.task.PendingTaskManager
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
@@ -20,6 +23,7 @@ import java.lang.reflect.Parameter
 import java.time.Duration
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class CommandParserTest extends Specification {
     private static final ExecutorService executorService = Executors.newSingleThreadExecutor()
@@ -691,6 +695,88 @@ class CommandParserTest extends Specification {
 
         then:
         node == new LiteralNode('test')
+    }
+
+    def 'test that CommandExecutionException during confirmation does not throw'() {
+        given:
+        def exception = new CommandExecutionException('something wrong happened!')
+
+        and:
+        def handler = Mock(ExecutionHandler)
+        handler.execute(_, _) >> {
+            throw exception
+        }
+
+        and:
+        def node = new LiteralNode('test')
+        node.commandInfo = new CommandInfo(
+                '',
+                new PermissionInfo('', '', Permission.Grant.OP)
+        )
+
+        and:
+        def annotation = Mock(Confirm)
+        annotation.timeout() >> 10
+        annotation.unit() >> TimeUnit.SECONDS
+        annotation.confirmAliases() >> ['confirm'].toArray()
+        annotation.confirmDescription() >> 'description.confirm'
+        annotation.confirmPermission() >> CommandParser.DEFAULT_PERMISSION_ANNOTATION
+        annotation.confirmHelp() >> CommandParser.DEFAULT_HELP_ANNOTATION
+        annotation.cancelAliases() >> ['cancel'].toArray()
+        annotation.cancelDescription() >> 'description.cancel'
+        annotation.cancelPermission() >> CommandParser.DEFAULT_PERMISSION_ANNOTATION
+        annotation.cancelHelp() >> CommandParser.DEFAULT_HELP_ANNOTATION
+
+        and:
+        def parser = newMockCommandParser('test')
+        Reflect.on(parser).set('executionHandler', handler)
+        parser.handleConfirmation(annotation, node)
+
+        and:
+        def sender = Mock(CommandSenderWrapper)
+        sender.idImpl >> 1
+
+        and:
+        def visitor = Mock(CommandExecutionVisitor)
+        visitor.commandSender >> sender
+
+        when:
+        node.executor.get().execute(node, visitor)
+
+        then:
+        thrown(CommandExecutionException)
+
+        when:
+        node.getChild('confirm').executor.get().execute(node, visitor)
+
+        then:
+        noExceptionThrown()
+
+        and:
+        1 * visitor.handleCommandExecutionException(exception)
+    }
+
+
+    def 'test that default permission annotation is correct'() {
+        given:
+        Permission annotation = CommandParser.DEFAULT_PERMISSION_ANNOTATION
+
+        expect:
+        annotation.value() == ''
+        annotation.group() == ''
+        annotation.grant() == Permission.Grant.OP
+        annotation.annotationType() == Permission
+    }
+
+    def 'test that default help annotation is correct'() {
+        given:
+        Help annotation = CommandParser.DEFAULT_HELP_ANNOTATION
+
+        expect:
+        annotation.aliases() == [Help.DEFAULT_NAME].toArray()
+        annotation.description() == ''
+        annotation.permission() == CommandParser.DEFAULT_PERMISSION_ANNOTATION
+        annotation.annotationType() == Help
     }
 
     private static boolean compareNodes(List<CommandNode> actual, List<CommandNode> expected) {
