@@ -113,6 +113,17 @@ class HelpNodeTest extends Specification {
         [Help.DEFAULT_NAME] | ''                        | permission('', '', Permission.Grant.NONE)          || false
     }
 
+    def 'test that getHelpCommand returns self'() {
+        given:
+        def node = new HelpNode(
+                help(['help'], 'description.help', permission('permission.help', null, Permission.Grant.ALL)),
+                parentNode('test')
+        )
+
+        expect:
+        node.helpCommand == node
+    }
+
     private static LiteralNode parentNode(final String alias) {
         def node = new LiteralNode(alias)
         node.commandInfo = new CommandInfo(

@@ -40,6 +40,17 @@ class LiteralNodeTest extends Specification {
         thrown(IllegalArgumentException)
     }
 
+    def 'test that getHelpCommand throws if it could not be found'() {
+        given:
+        def node = new LiteralNode('test')
+
+        when:
+        node.helpCommand
+
+        then:
+        thrown(IllegalStateException)
+    }
+
     def 'test that getCommandInfo throws if not initialized'() {
         given:
         def node = new LiteralNode('test')
