@@ -9,6 +9,43 @@ import java.net.http.HttpResponse
 class APIUtilsTest extends Specification {
     private static final int PORT = 17391
 
+    private static final UUID notchUuid = UUIDUtils.dashed('069a79f444e94726a5befca90e38aaf5')
+
+    def 'test that getSkinData of #uuid returns #found'() {
+        when:
+        def actual = APIUtils.getSkinData(uuid)
+
+        then:
+        actual.isPresent() == found
+
+        where:
+        uuid              || found
+        notchUuid         || true
+        UUID.randomUUID() || false
+    }
+
+    def 'test that getSkinData #exception do not throw'() {
+        given:
+        def mock = Mockito.mockStatic(APIUtils)
+
+        and:
+        mock.when { APIUtils.requestBuilder(Mockito.any()) }.thenAnswer {
+            throw exception
+        }
+
+        when:
+        def actual = APIUtils.getSkinData(notchUuid)
+
+        then:
+        actual.empty
+
+        cleanup:
+        mock.close()
+
+        where:
+        exception << [new IOException(), new InterruptedException()]
+    }
+
     def 'test that getUuidFromName of #name returns #expected'() {
         when:
         def actual = APIUtils.getUuidFromName(name).orElse(null)
@@ -18,7 +55,7 @@ class APIUtilsTest extends Specification {
 
         where:
         name                          || expected
-        'Notch'                       || UUIDUtils.dashed('069a79f444e94726a5befca90e38aaf5')
+        'Notch'                       || notchUuid
         'SomethingSuperLongSoInvalid' || null
     }
 

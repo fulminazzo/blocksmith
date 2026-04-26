@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.minecraft.util;
 
 import com.google.gson.Gson;
 import it.fulminazzo.blocksmith.ProjectInfo;
+import it.fulminazzo.blocksmith.minecraft.dto.SkinData;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,6 +12,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,6 +52,34 @@ public final class APIUtils {
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
     private static final @NotNull Gson GSON = new Gson();
+
+    /**
+     * Fetches the session server API to get the skin data associated with the given profile.
+     * <br>
+     * If not found or any general error occurs, an empty {@link Optional} is returned.
+     *
+     * @param uuid the id of the profile
+     * @return the skin data if found
+     */
+    public static @NotNull Optional<SkinData> getSkinData(final @NotNull UUID uuid) {
+        try {
+            HttpRequest request = requestBuilder(String.format(PROFILE_BY_UNDASHED_UUID_URL, uuid.toString().replace("-", ""))).GET().build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            Map<?, ?> data = GSON.fromJson(response.body(), Map.class);
+            if (data != null && data.containsKey("properties")) {
+                List<?> list = (List<?>) data.get("properties");
+                if (!list.isEmpty()) {
+                    Map<?, ?> map = (Map<?, ?>) list.get(0);
+                    String value = (String) map.get("value");
+                    String signature = (String) map.get("signature");
+                    return Optional.of(SkinData.fromBase64(value, signature));
+                }
+            }
+        } catch (IOException | InterruptedException ignored) {
+            // ignored
+        }
+        return Optional.empty();
+    }
 
     /**
      * Fetches the Mojang's API to get the {@link UUID} associated with the given name.
