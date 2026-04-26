@@ -698,7 +698,7 @@ class CommandParserTest extends Specification {
     }
 
     private static void compareNodes(final CommandNode actual, final CommandNode expected) {
-        if (expected.children.find { ConfirmationNode.isAssignableFrom(it.class) }) {
+        if (expected.children.find { it instanceof ConfirmNode || it instanceof CancelNode }) {
             actual.executor = null
             expected.executor = null
             actual.children.each { it.executor = null }
