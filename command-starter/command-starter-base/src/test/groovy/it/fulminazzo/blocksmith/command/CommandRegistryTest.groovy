@@ -97,7 +97,7 @@ class CommandRegistryTest extends Specification {
 
         def invite = new LiteralNode('invite')
         invite.commandInfo = new CommandInfo(
-                'command.description.clan.admin.invite',
+                'command.clan.admin.invite.description',
                 new PermissionInfo('blocksmith', 'clan.admin.invite', Permission.Grant.OP)
         )
         admin.addChild(invite)
@@ -116,14 +116,14 @@ class CommandRegistryTest extends Specification {
                 ClanAdminCommand.getMethod('adminMembers', CommandSender)
         )
         members.commandInfo = new CommandInfo(
-                'command.description.clan.admin.members',
+                'command.clan.admin.members.description',
                 new PermissionInfo('blocksmith', 'clan.admin.members', Permission.Grant.ALL)
         )
         admin.addChild(members)
 
         def kick = new LiteralNode('kick')
         kick.commandInfo = new CommandInfo(
-                'command.description.clan.admin.members.kick',
+                'command.clan.admin.members.kick.description',
                 new PermissionInfo('blocksmith', 'clan.admin.members.kick', Permission.Grant.OP)
         )
         members.addChild(kick)

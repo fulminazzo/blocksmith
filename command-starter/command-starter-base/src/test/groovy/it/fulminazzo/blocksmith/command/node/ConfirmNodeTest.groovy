@@ -24,7 +24,7 @@ class ConfirmNodeTest extends Specification {
     void setup() {
         parent = new LiteralNode('root')
         parent.commandInfo = new CommandInfo(
-                'command.description.root',
+                'command.root.description',
                 new PermissionInfo('permission', 'root', Permission.Grant.ALL)
         )
 

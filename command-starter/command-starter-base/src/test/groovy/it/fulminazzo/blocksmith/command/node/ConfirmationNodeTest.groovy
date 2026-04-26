@@ -12,7 +12,7 @@ class ConfirmationNodeTest extends Specification {
         given:
         def parent = new LiteralNode('root')
         parent.commandInfo = new CommandInfo(
-                'command.description.root',
+                'command.root.description',
                 new PermissionInfo('permission', 'root', Permission.Grant.ALL)
         )
 
@@ -27,9 +27,9 @@ class ConfirmationNodeTest extends Specification {
 
         where:
         description                | permission                || expectedDescription                     | expectedPermission
-        ''                         | ''                        || 'command.description.root.confirmation' | 'permission.root.confirmation'
+        ''                         | ''                        || 'command.root.confirmation.description' | 'permission.root.confirmation'
         'confirmation.description' | ''                        || 'confirmation.description'              | 'permission.root.confirmation'
-        ''                         | 'confirmation.permission' || 'command.description.root.confirmation' | 'permission.confirmation.permission'
+        ''                         | 'confirmation.permission' || 'command.root.confirmation.description' | 'permission.confirmation.permission'
         'confirmation.description' | 'confirmation.permission' || 'confirmation.description'              | 'permission.confirmation.permission'
     }
 

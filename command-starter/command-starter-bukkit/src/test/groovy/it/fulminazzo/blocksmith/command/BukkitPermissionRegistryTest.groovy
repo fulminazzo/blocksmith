@@ -51,12 +51,12 @@ class BukkitPermissionRegistryTest extends Specification {
         and:
         def node = new LiteralNode('help', '?')
         node.commandInfo = new CommandInfo(
-                'command.description.help',
+                'command.help.description',
                 new PermissionInfo(null, 'help', Permission.Grant.ALL)
         )
         def plugin = new LiteralNode('plugin')
         plugin.commandInfo = new CommandInfo(
-                'command.description.help.plugin',
+                'command.help.plugin.description',
                 new PermissionInfo(null, 'help.plugin', Permission.Grant.OP)
         )
         node.addChild(plugin)
@@ -108,7 +108,7 @@ class BukkitPermissionRegistryTest extends Specification {
         and:
         def node = new LiteralNode('help', '?')
         node.commandInfo = new CommandInfo(
-                'command.description.help',
+                'command.help.description',
                 new PermissionInfo(null, 'help', Permission.Grant.ALL)
         )
 
