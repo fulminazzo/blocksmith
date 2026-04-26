@@ -1,6 +1,9 @@
 package it.fulminazzo.blocksmith.minecraft.dto;
 
-import lombok.Value;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,10 +12,12 @@ import java.util.UUID;
 /**
  * Identifies the profile of a player.
  */
-@Value
-public class GameProfile {
-    @NotNull UUID uuid;
-    @NotNull String name;
+@Data
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public final class GameProfile {
+    final @NotNull UUID uuid;
+    final @NotNull String name;
 
     @Nullable SkinData skin;
 
