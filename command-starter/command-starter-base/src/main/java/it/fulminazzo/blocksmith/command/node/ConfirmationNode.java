@@ -2,11 +2,15 @@ package it.fulminazzo.blocksmith.command.node;
 
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo;
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Abstraction of {@link CommandNode} for confirmation related nodes.
  */
+@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
+@ToString(callSuper = true, doNotUseGetters = true)
 abstract class ConfirmationNode extends LiteralNode {
 
     /**
