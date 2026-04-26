@@ -64,8 +64,10 @@ public final class APIUtils {
             HttpRequest request = requestBuilder(String.format(UUID_BY_NAME_URL, name)).GET().build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             Map<?, ?> data = GSON.fromJson(response.body(), Map.class);
-            String id = data.get("id").toString();
-            return Optional.of(UUIDUtils.dashed(id));
+            if (data == null) return Optional.empty();
+            Object id = data.get("id");
+            if (id == null) return Optional.empty();
+            return Optional.of(UUIDUtils.dashed(id.toString()));
         } catch (IOException | InterruptedException e) {
             return Optional.empty();
         }
