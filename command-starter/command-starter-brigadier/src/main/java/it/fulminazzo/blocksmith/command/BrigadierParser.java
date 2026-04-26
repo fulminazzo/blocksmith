@@ -232,7 +232,7 @@ final class BrigadierParser<S> {
         else if (node.getCompletionsSupplier() != null) return null;
         Class<A> type = node.getType();
         return (ArgumentType<T>) ArgumentTypes.get(type).orElseGet(() -> {
-            if (Number.class.isAssignableFrom(type))
+            if (Number.class.isAssignableFrom(type) && node instanceof NumberArgumentNode<?>)
                 return getArgumentType((NumberArgumentNode<Number>) node);
             else return null;
         });
