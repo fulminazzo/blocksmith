@@ -15,7 +15,7 @@ spock_core = "2.4-groovy-5.0"
 mockito = "5.23.0"
 
 # MINECRAFT
-spigot = "1.16.5-R0.1-SNAPSHOT"
+bukkit = "1.16.5-R0.1-SNAPSHOT"
 folia = "1.20.1-R0.1-SNAPSHOT"
 bungeecord = "1.16-R0.2"
 velocity = "3.0.0-SNAPSHOT"
@@ -37,7 +37,7 @@ spock_core = { module = "org.spockframework:spock-core", version.ref = "spock_co
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 
 # MINECRAFT
-spigot = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
+bukkit = { module = "org.spigotmc:spigot-api", version.ref = "bukkit" }
 folia = { module = "dev.folia:folia-api", version.ref = "folia" }
 bungeecord = { module = "net.md-5:bungeecord-api", version.ref = "bungeecord" }
 velocity = { module = "com.velocitypowered:velocity-api", version.ref = "velocity" }
