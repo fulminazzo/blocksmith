@@ -31,6 +31,18 @@ if (extension.enableFolia.getOrElse(false)) projects.add("folia")
 
 projects.forEach {
 
+    repositories {
+        mavenCentral()
+        maven {
+            name = "spigotmc-repo"
+            url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+        }
+        maven {
+            name = "papermc"
+            url = uri("https://repo.papermc.io/repository/maven-public/")
+        }
+    }
+
     project("$path$path-$it") {
 
         dependencies {
