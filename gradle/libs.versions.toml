@@ -40,6 +40,12 @@ embedded_mariadb = "3.3.1"
 embedded_redis = "0.7.3"
 embedded_mongodb = "4.24.0"
 
+# MINECRAFT
+bukkit = "1.16.5-R0.1-SNAPSHOT"
+folia = "1.20.1-R0.1-SNAPSHOT"
+bungeecord = "1.16-R0.2"
+velocity = "3.0.0-SNAPSHOT"
+
 # PROJECT
 java_parser = "3.28.0"
 
@@ -89,6 +95,12 @@ reactor = { module = "io.projectreactor:reactor-core", version.ref = "reactor" }
 embedded_mariadb = { module = "ch.vorburger.mariaDB4j:mariaDB4j", version.ref = "embedded_mariadb" }
 embedded_redis = { module = "it.ozimov:embedded-redis", version.ref = "embedded_redis" }
 embedded_mongodb = { module = "de.flapdoodle.embed:de.flapdoodle.embed.mongo", version.ref = "embedded_mongodb" }
+
+# MINECRAFT
+bukkit = { module = "org.spigotmc:spigot-api", version.ref = "bukkit" }
+folia = { module = "dev.folia:folia-api", version.ref = "folia" }
+bungeecord = { module = "net.md-5:bungeecord-api", version.ref = "bungeecord" }
+velocity = { module = "com.velocitypowered:velocity-api", version.ref = "velocity" }
 
 # PROJECT
 java_parser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "java_parser" }
