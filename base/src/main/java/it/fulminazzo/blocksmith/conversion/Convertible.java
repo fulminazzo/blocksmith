@@ -2,13 +2,12 @@ package it.fulminazzo.blocksmith.conversion;
 
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Function;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Identifies an object that can be automatically converted into another type.
  * By default, this acts as a facade for casting types.
- * However, it is possible to register custom converters through {@link #register(Class, Class, Function)}.
+ * However, it is possible to register custom converters through {@link #register(Class, Class, Converter)}.
  */
 public interface Convertible {
 
@@ -17,13 +16,15 @@ public interface Convertible {
      *
      * @param <T>  the type to convert to
      * @param type the type to convert to
+     * @param args any argument that might be useful for the conversion.
+     *             Converters should <b>not</b> always assume the presence of these arguments.
      * @return the converted object
      */
     @SuppressWarnings("unchecked")
-    default <T> T as(final @NotNull Class<T> type) {
-        Function<Convertible, T> converter = (Function<Convertible, T>) ConversionRegistry.getConverter(getClass(), type)
-                .orElse(t -> Reflect.cast(type, t));
-        return converter.apply(this);
+    default <T> T as(final @NotNull Class<T> type, final @Nullable Object @NotNull ... args) {
+        Converter<Convertible, T> converter = (Converter<Convertible, T>) ConversionRegistry.getConverter(getClass(), type)
+                .orElse((t, a) -> Reflect.cast(type, t));
+        return converter.convert(this, args);
     }
 
     /**
@@ -39,7 +40,7 @@ public interface Convertible {
      */
     static <T, R> void register(final @NotNull Class<T> from,
                                 final @NotNull Class<R> to,
-                                final @NotNull Function<T, R> converter) {
+                                final @NotNull Converter<T, R> converter) {
         ConversionRegistry.register(from, to, converter);
     }
 

@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 /**
  * Registry for all the converters.
@@ -17,7 +16,7 @@ import java.util.function.Function;
 @SuppressWarnings("unchecked")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class ConversionRegistry {
-    private static final @NotNull Map<Class<?>, Converter<?>> CONVERTERS = new ConcurrentHashMap<>();
+    private static final @NotNull Map<Class<?>, ConverterRegistry<?>> CONVERTERS = new ConcurrentHashMap<>();
 
     /**
      * Gets the conversion function from the given type to the given target type.
@@ -28,8 +27,8 @@ final class ConversionRegistry {
      * @param target the target type
      * @return the conversion function
      */
-    public static <T, R> @NotNull Optional<Function<T, R>> getConverter(final @NotNull Class<T> type,
-                                                                        final @NotNull Class<R> target) {
+    public static <T, R> @NotNull Optional<Converter<T, R>> getConverter(final @NotNull Class<T> type,
+                                                                         final @NotNull Class<R> target) {
         return getConverter(type).getConverter(target);
     }
 
@@ -44,12 +43,12 @@ final class ConversionRegistry {
      */
     public static <T, R> void register(final @NotNull Class<T> type,
                                        final @NotNull Class<R> target,
-                                       final @NotNull Function<T, R> converter) {
+                                       final @NotNull Converter<T, R> converter) {
         getConverter(type).register(target, converter);
     }
 
-    private static <T> @NotNull Converter<T> getConverter(final @NotNull Class<T> type) {
-        return (Converter<T>) CONVERTERS.computeIfAbsent(type, k -> new Converter<>());
+    private static <T> @NotNull ConverterRegistry<T> getConverter(final @NotNull Class<T> type) {
+        return (ConverterRegistry<T>) CONVERTERS.computeIfAbsent(type, k -> new ConverterRegistry<>());
     }
 
     /**
@@ -58,8 +57,8 @@ final class ConversionRegistry {
      * @param <T> the type the converters refer to
      */
     @Value
-    public static class Converter<T> {
-        @NotNull Map<Class<?>, Function<T, ?>> converters = new ConcurrentHashMap<>();
+    public static class ConverterRegistry<T> {
+        @NotNull Map<Class<?>, Converter<T, ?>> converters = new ConcurrentHashMap<>();
 
         /**
          * Gets the converter for the given target type.
@@ -68,8 +67,8 @@ final class ConversionRegistry {
          * @param target the target type
          * @return the function to convert the given type to the target type
          */
-        public <R> @NotNull Optional<Function<T, R>> getConverter(final @NotNull Class<R> target) {
-            return Optional.ofNullable((Function<T, R>) converters.get(target));
+        public <R> @NotNull Optional<Converter<T, R>> getConverter(final @NotNull Class<R> target) {
+            return Optional.ofNullable((Converter<T, R>) converters.get(target));
         }
 
         /**
@@ -79,7 +78,7 @@ final class ConversionRegistry {
          * @param target    the target type
          * @param converter the function to convert the given type to the target type
          */
-        public <R> void register(final @NotNull Class<R> target, final @NotNull Function<T, R> converter) {
+        public <R> void register(final @NotNull Class<R> target, final @NotNull Converter<T, R> converter) {
             converters.put(target, converter);
         }
 
