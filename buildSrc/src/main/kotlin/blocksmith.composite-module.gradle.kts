@@ -1,7 +1,7 @@
 /**
  * Convention plugin identifying a composite module.
  *
- * A composite module requires a "<module>-<compositeModule>" subproject to be passed.
+ * A composite module requires a "<module>-<baseModuleName>" subproject to be passed.
  * Each subproject in the module will depend on the base subproject.
  * The parent project will depend on all subprojects (except those in the excludedSubmodules set).
  */
