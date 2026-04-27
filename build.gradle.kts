@@ -21,6 +21,8 @@ allprojects {
     extra["baseModuleName"] = "base"
     extra["testingModuleName"] = "testing"
 
+    val baseModuleName: String by extra
+
     val projectInfoClassName = "ProjectInfo"
 
     val mockitoAgent: Configuration by configurations.creating
@@ -54,9 +56,12 @@ allprojects {
         packageName = "${rootProject.group}.${rootProject.name}"
         className = projectInfoClassName
 
+        var projectName = project.name
+        if (project.name.endsWith("-$baseModuleName")) projectName = project.name.removeSuffix("-$baseModuleName")
+
         buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
         buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
-        buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
+        buildConfigField("String", "MODULE_NAME", "\"${projectName}\"")
     }
 
     tasks.withType<JacocoReport>().configureEach {
