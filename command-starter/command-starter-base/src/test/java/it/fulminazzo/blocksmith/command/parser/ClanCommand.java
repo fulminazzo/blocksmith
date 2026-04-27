@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.command.parser;
 
 import it.fulminazzo.blocksmith.command.CommandSender;
-import it.fulminazzo.blocksmith.command.annotation.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -59,7 +58,7 @@ final class ClanCommand {
     }
 
     @Command("admin members kick <target>")
-    @Confirm(timeout = 20_000, unit = TimeUnit.MILLISECONDS, confirmAliases = "yes", cancelAliases = "no")
+    @it.fulminazzo.blocksmith.command.annotation.Confirm(timeout = 20_000, unit = TimeUnit.MILLISECONDS, confirmAliases = "yes", cancelAliases = "no")
     public void adminMembersKick(final @NotNull CommandSender sender,
                                  final @NotNull @Tab("getMembers") Object target) {
         // something
