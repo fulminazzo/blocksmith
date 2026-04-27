@@ -20,7 +20,8 @@ folia = "1.20.1-R0.1-SNAPSHOT"
 bungeecord = "1.16-R0.2"
 velocity = "3.0.0-SNAPSHOT"
 
-mockbukkit = "3.43.0"
+
+mockbukkit20 = "3.43.0"
 
 [libraries]
 # ANNOTATIONS
@@ -44,7 +45,8 @@ folia = { module = "dev.folia:folia-api", version.ref = "folia" }
 bungeecord = { module = "net.md-5:bungeecord-api", version.ref = "bungeecord" }
 velocity = { module = "com.velocitypowered:velocity-api", version.ref = "velocity" }
 
-mockbukkit20 = { module = "com.github.seeseemelk:MockBukkit-v1.20", version.ref = "mockbukkit" }
+
+mockbukkit20 = { module = "com.github.seeseemelk:MockBukkit-v1.20", version.ref = "mockbukkit20" }
 
 [bundles]
 # ANNOTATIONS
