@@ -96,17 +96,24 @@ subprojects {
     val baseModuleName: String by rootProject.extra
     val testingModuleName: String by rootProject.extra
 
-    /**
-     * AUTOMATIC RESOLUTION OF BASE MODULES
-     */
+    /*
+    * A module is treated as a "composite module" if it contains a subproject
+    * matching the pattern "<module>:<module>-<baseName>" (e.g. "command:command-base").
+    *
+    * In that case, the dependency graph is structured as follows:
+    * - every other subproject in the module depends on the base subproject;
+    * - the parent project depends on all subprojects (except testing).
+    */
     dependencies {
         val path = project.path
-        findProject("$path$path-$baseModuleName")?.let {
-            api(it)
+        findProject("$path$path-$baseModuleName")?.let { baseModule ->
+            subprojects
+                .filter { !it.name.endsWith(testingModuleName) }
+                .forEach { api(it) }
 
             subprojects {
                 dependencies {
-                    if (project.path != it.path) api(it)
+                    if (project.path != baseModule.path) api(baseModule)
                 }
             }
 
