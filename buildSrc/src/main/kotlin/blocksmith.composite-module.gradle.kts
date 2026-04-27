@@ -13,27 +13,33 @@ plugins {
 interface CompositeModuleExtension {
     val excludedSubmodules: Set<String>
 }
+
 val extension = extensions.create<CompositeModuleExtension>("compositeModule")
 
 
 afterEvaluate {
-    val baseProjectName = "base"
+    val baseModuleName: String by extra
+    val testingModuleName: String by extra
+
     val excludedSubmodules = extension.excludedSubmodules
 
     dependencies {
         val path = project.path
+        val baseProject = project("$path$path-$baseModuleName")
 
-        val baseProject = project("$path$path-$baseProjectName")
         subprojects {
 
             dependencies {
-                if (project.path != baseProject.path && project.name !in excludedSubmodules)
+                if (project.path != baseProject.path)
                     api(baseProject)
             }
 
         }
 
-        subprojects.forEach { api(it) }
+        subprojects
+            .filter { !it.name.endsWith(testingModuleName) }
+            .filter { it.name !in excludedSubmodules }
+            .forEach { api(it) }
     }
 
 }
