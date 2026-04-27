@@ -45,6 +45,8 @@ include(
 include(
     "scheduler-starter",
 
+    "scheduler-starter:scheduler-starter-base",
+
     "scheduler-starter:scheduler-starter-bukkit",
     "scheduler-starter:scheduler-starter-folia",
     "scheduler-starter:scheduler-starter-bungeecord",
