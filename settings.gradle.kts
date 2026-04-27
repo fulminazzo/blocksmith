@@ -77,6 +77,10 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         maven {
+            name = "minecraft-libraries"
+            url = uri("https://libraries.minecraft.net/")
+        }
+        maven {
             name = "spigotmc-repo"
             url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         }
