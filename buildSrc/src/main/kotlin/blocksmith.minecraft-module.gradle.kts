@@ -29,13 +29,12 @@ extensions.configure<CompositeModuleExtension> {
 
 afterEvaluate {
     val libs = the<VersionCatalogsExtension>().named("libs")
-    val path = project.path
 
     val libraries = mutableListOf("bukkit", "bungeecord", "velocity")
     if (extension.enableFolia.getOrElse(false)) libraries.add("folia")
 
     libraries.forEach {
-        project("$path$path-$it") {
+        project("${project.path}:${project.name}-$it") {
 
             dependencies {
                 val dependency = libs.findLibrary(it).get()
