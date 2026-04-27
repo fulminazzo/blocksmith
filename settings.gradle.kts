@@ -31,6 +31,9 @@ include(
 // message-starter
 include(
     "message-starter",
+
+    "message-starter:message-starter-base",
+
     "message-starter:message-starter-translation",
 
     "message-starter:message-starter-bukkit",
