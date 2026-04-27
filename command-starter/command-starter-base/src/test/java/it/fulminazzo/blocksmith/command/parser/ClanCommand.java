@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.command.parser;
 
 import it.fulminazzo.blocksmith.command.CommandSender;
+import it.fulminazzo.blocksmith.command.annotation.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

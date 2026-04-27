@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.command.parser;
 
 import it.fulminazzo.blocksmith.command.CommandMessages;
 import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
+import it.fulminazzo.blocksmith.command.annotation.*;
 import it.fulminazzo.blocksmith.command.node.*;
 import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier;
 import it.fulminazzo.blocksmith.command.node.handler.ExecutionHandler;
