@@ -1,7 +1,7 @@
 plugins {
-    id("java-library")
-    id("groovy")
-    id("jacoco-report-aggregation")
+    `java-library`
+    groovy
+    `jacoco-report-aggregation`
 
     alias(libs.plugins.buildconfig)
 }
@@ -9,7 +9,7 @@ plugins {
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
-extra["testingModuleName"] = "testing"
+val testingModuleName: String by extra
 
 allprojects {
     apply { plugin("java-library") }
@@ -17,28 +17,20 @@ allprojects {
     apply { plugin("jacoco") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
-    val projectInfoClassName = "ProjectInfo"
+    apply { plugin("blocksmith.java-configuration")}
+    apply { plugin("blocksmith.testing-module-configuration")}
 
-    val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
-    val currentCompiler = javaToolchains.compilerFor { languageVersion = currentJava }
-    val currentLauncher = javaToolchains.launcherFor { languageVersion = currentJava }
+    extra["baseModuleName"] = "base"
+    extra["testingModuleName"] = "testing"
+
+    val baseModuleName: String by extra
+
+    val projectInfoClassName = "ProjectInfo"
 
     val mockitoAgent: Configuration by configurations.creating
 
-    val minJava = JavaLanguageVersion.of(11)
-
-    java {
-        toolchain {
-            languageVersion.set(minJava)
-        }
-    }
-
     repositories {
         mavenCentral()
-        maven {
-            name = "minecraft-libraries"
-            url = uri("https://libraries.minecraft.net/")
-        }
         maven {
             name = "spigotmc-repo"
             url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
@@ -65,32 +57,21 @@ allprojects {
         mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
 
-    tasks.compileJava {
-        javaCompiler = currentCompiler
-        options.release.set(minJava.asInt())
-    }
-
-    tasks.withType<GroovyCompile> {
-        javaLauncher = currentLauncher
-    }
-
-    tasks.compileTestJava {
-        javaCompiler = currentCompiler
-    }
-
     tasks.test {
         useJUnitPlatform()
         jvmArgs("-javaagent:${mockitoAgent.asPath}")
-        javaLauncher = currentLauncher
     }
 
     configure<com.github.gmazzo.buildconfig.BuildConfigExtension> {
         packageName = "${rootProject.group}.${rootProject.name}"
         className = projectInfoClassName
 
+        var projectName = project.name
+        if (project.name.endsWith("-$baseModuleName")) projectName = project.name.removeSuffix("-$baseModuleName")
+
         buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
         buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
-        buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
+        buildConfigField("String", "MODULE_NAME", "\"${projectName}\"")
     }
 
     tasks.withType<JacocoReport>().configureEach {
@@ -105,12 +86,11 @@ allprojects {
 
 }
 
-/**
- * TESTING MODULES CONFIGURATION
- */
 subprojects {
-    val testingModuleName: String by rootProject.extra
 
+    /**
+     * TESTING MODULES CONFIGURATION
+     */
     if (project.name.endsWith(testingModuleName)) {
         apply { plugin("groovy") }
 
@@ -122,8 +102,6 @@ subprojects {
 }
 
 dependencies {
-    val testingModuleName: String by rootProject.extra
-
     subprojects
         .filter { !it.name.endsWith("-$testingModuleName") }
         .forEach { implementation(it) }

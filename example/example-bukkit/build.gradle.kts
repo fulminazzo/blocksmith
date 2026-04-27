@@ -9,9 +9,9 @@ dependencies {
     implementation(projects.messageStarter.messageStarterBukkit)
     implementation(projects.messageStarter.messageStarterTranslation)
 
-    compileOnly(libs.spigot)
+    compileOnly(libs.bukkit)
 
-    testImplementation(libs.spigot)
+    testImplementation(libs.bukkit)
 }
 
 tasks.jar {
