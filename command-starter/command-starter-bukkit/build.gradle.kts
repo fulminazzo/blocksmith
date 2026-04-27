@@ -5,10 +5,8 @@ dependencies {
 
     api(projects.commandStarter.commandStarterBrigadier)
 
-    compileOnly(libs.spigot)
     compileOnly(libs.brigadier)
 
-    testImplementation(libs.spigot)
     testImplementation(libs.brigadier)
     testImplementation(libs.mockbukkit16) {
         exclude(group = "io.papermc.paper")
