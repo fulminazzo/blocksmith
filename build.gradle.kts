@@ -112,6 +112,7 @@ subprojects {
         dependencies {
             val path = project.path
 
+            // base
             findProject("$path$path-$baseModuleName")?.let { baseModule ->
                 subprojects
                     .filter { !it.name.endsWith(testingModuleName) }
@@ -125,6 +126,19 @@ subprojects {
                 }
 
             }
+
+            // testing
+            findProject("$path:$path-$testingModuleName")?.let { testingModule ->
+
+                allprojects {
+                    dependencies {
+                        if (project.path != testingModule.path)
+                            testImplementation(testingModule)
+                    }
+                }
+
+            }
+
         }
 
     }
