@@ -12,6 +12,7 @@ plugins {
 
 interface CompositeModuleExtension {
     val excludedSubmodules: SetProperty<String>
+    val importToParent: Property<Boolean>
 }
 
 val extension = extensions.create<CompositeModuleExtension>("compositeModule")
@@ -36,10 +37,11 @@ afterEvaluate {
 
         }
 
-        subprojects
-            .filter { !it.name.endsWith(testingModuleName) }
-            .filter { it.name !in excludedSubmodules.getOrElse(emptySet()) }
-            .forEach { api(it) }
+        if (extension.importToParent.getOrElse(true))
+            subprojects
+                .filter { !it.name.endsWith(testingModuleName) }
+                .filter { it.name !in excludedSubmodules.getOrElse(emptySet()) }
+                .forEach { api(it) }
     }
 
 }
