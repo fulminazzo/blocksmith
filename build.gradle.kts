@@ -9,6 +9,7 @@ plugins {
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
+extra["baseModuleName"] = "base"
 extra["testingModuleName"] = "testing"
 
 allprojects {
@@ -16,6 +17,8 @@ allprojects {
     apply { plugin("groovy") }
     apply { plugin("jacoco") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
+
+    val baseModuleName: String by rootProject.extra
 
     val projectInfoClassName = "ProjectInfo"
 
@@ -74,7 +77,7 @@ allprojects {
 
         buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
         buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
-        buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
+        buildConfigField("String", "MODULE_NAME", "\"${project.name.replace("-$baseModuleName", "")}\"")
     }
 
     tasks.withType<JacocoReport>().configureEach {
@@ -89,12 +92,30 @@ allprojects {
 
 }
 
-/**
- * TESTING MODULES CONFIGURATION
- */
 subprojects {
+    val baseModuleName: String by rootProject.extra
     val testingModuleName: String by rootProject.extra
 
+    /**
+     * AUTOMATIC RESOLUTION OF BASE MODULES
+     */
+    dependencies {
+        val path = project.path
+        findProject("$path$path-$baseModuleName")?.let {
+            api(it)
+
+            subprojects {
+                dependencies {
+                    if (project.path != it.path) api(it)
+                }
+            }
+
+        }
+    }
+
+    /**
+     * TESTING MODULES CONFIGURATION
+     */
     if (project.name.endsWith(testingModuleName)) {
         apply { plugin("groovy") }
 
