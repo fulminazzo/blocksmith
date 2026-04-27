@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.data.redis
 
 import it.fulminazzo.blocksmith.data.User
-import it.fulminazzo.blocksmith.data.mapper.Mappers
+import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import redis.embedded.RedisServer
 import spock.lang.Specification
 
@@ -35,7 +35,7 @@ class RedisDataSourceTest extends Specification {
                 )
                 .clientOptions(c -> c.autoReconnect(false))
                 .socketOptions(s -> s.keepAlive(true))
-                .mapper(Mappers.JSON)
+                .mapper(MapperFormat.JSON.newMapper())
                 .build()
 
         when:

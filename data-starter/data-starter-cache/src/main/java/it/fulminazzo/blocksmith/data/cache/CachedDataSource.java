@@ -25,7 +25,7 @@ import java.util.function.Function;
  *         CachedDataSource<?, ?> dataSource = CachedDataSource.create(
  *                 RedisDataSource.builder()
  *                         .uri(b -> b.withHost("0.0.0.0").withPort(6379))
- *                         .mapper(Mappers.JSON)
+ *                         .mapper(MapperFormat.JSON.newMapper())
  *                         .build(),
  *                 SqlDataSource.builder()
  *                         .database("database")

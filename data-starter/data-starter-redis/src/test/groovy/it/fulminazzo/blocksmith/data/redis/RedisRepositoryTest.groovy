@@ -7,14 +7,14 @@ import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.Users
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.data.mapper.Mapper
-import it.fulminazzo.blocksmith.data.mapper.Mappers
+import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import org.jetbrains.annotations.NotNull
 import redis.embedded.RedisServer
 
 import java.time.Duration
 
 class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
-    private static final Mapper mapper = Mappers.JSON
+    private static final Mapper mapper = MapperFormat.JSON.newMapper()
     private static final int serverPort = 16379
 
     private static RedisServer server

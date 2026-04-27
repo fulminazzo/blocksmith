@@ -6,12 +6,12 @@ import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.Users
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.data.mapper.Mapper
-import it.fulminazzo.blocksmith.data.mapper.Mappers
+import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import redis.embedded.RedisServer
 import spock.lang.Specification
 
 class RedisQueryEngineTest extends Specification {
-    private static final Mapper mapper = Mappers.JSON
+    private static final Mapper mapper = MapperFormat.JSON.newMapper()
     private static final int serverPort = 16378
 
     private static RedisServer server

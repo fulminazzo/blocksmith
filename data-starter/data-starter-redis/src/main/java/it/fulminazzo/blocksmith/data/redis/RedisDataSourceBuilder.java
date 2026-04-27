@@ -6,7 +6,7 @@ import io.lettuce.core.RedisURI;
 import io.lettuce.core.SocketOptions;
 import it.fulminazzo.blocksmith.data.RepositoryDataSourceBuilder;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
-import it.fulminazzo.blocksmith.data.mapper.Mappers;
+import it.fulminazzo.blocksmith.data.mapper.MapperFormat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -37,7 +37,7 @@ import java.util.function.Consumer;
  *                                 .build()
  *                 )
  *         )
- *         .mapper(Mappers.SERIALIZABLE) // defaults to JSON
+ *         .mapper(MapperFormat.SERIALIZABLE.newMapper()) // defaults to JSON
  *         .build();
  * }</pre>
  */
@@ -47,7 +47,7 @@ public final class RedisDataSourceBuilder implements RepositoryDataSourceBuilder
 
     private final @NotNull RedisURI.Builder redisURIbuilder;
 
-    private @NotNull Mapper mapper = Mappers.JSON;
+    private @NotNull Mapper mapper = MapperFormat.JSON.newMapper();
 
     /**
      * Instantiates a new Redis data source builder.
@@ -106,7 +106,7 @@ public final class RedisDataSourceBuilder implements RepositoryDataSourceBuilder
      * and deserialize data before accessing to it.
      * The mapper is the component responsible for serialization.
      * <br>
-     * Default: {@link Mappers#JSON}
+     * Default: {@link MapperFormat#JSON}
      *
      * @param mapper the mapper
      * @return this object (for method chaining)

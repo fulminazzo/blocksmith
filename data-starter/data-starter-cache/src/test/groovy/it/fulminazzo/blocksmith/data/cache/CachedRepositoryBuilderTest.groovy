@@ -2,7 +2,7 @@ package it.fulminazzo.blocksmith.data.cache
 
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
-import it.fulminazzo.blocksmith.data.mapper.Mappers
+import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import it.fulminazzo.blocksmith.data.memory.MemoryDataSource
 import it.fulminazzo.blocksmith.data.memory.MemoryRepositorySettings
 import it.fulminazzo.blocksmith.data.redis.RedisDataSource
@@ -55,7 +55,7 @@ class CachedRepositoryBuilderTest extends Specification {
                 .uri(b -> b.withHost('localhost').withPort(serverPort))
                 .clientOptions(c -> c.autoReconnect(false))
                 .socketOptions(s -> s.keepAlive(true))
-                .mapper(Mappers.JSON)
+                .mapper(MapperFormat.JSON.newMapper())
                 .build()
 
         memoryDataSource = MemoryDataSource.create(executor)
