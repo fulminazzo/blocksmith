@@ -1,6 +1,4 @@
 dependencies {
-    api(projects.validationStarter)
-
     api(libs.jooq)
     api(libs.hikaricp)
 
@@ -9,5 +7,4 @@ dependencies {
     testImplementation(libs.mysql)
     testImplementation(libs.mariadb)
     testImplementation(libs.postgresql)
-
 }
