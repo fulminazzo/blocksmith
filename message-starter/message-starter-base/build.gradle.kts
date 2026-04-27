@@ -6,7 +6,7 @@ allprojects {
 
 dependencies {
     api(libs.slf4j)
-    api(projects.configStarterBase)
+    api(projects.configStarter.configStarterBase)
 
     testImplementation(projects.configStarter.configStarterYaml)
 }
