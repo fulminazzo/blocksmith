@@ -9,6 +9,8 @@ plugins {
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
+val testingModuleName: String by extra
+
 allprojects {
     apply { plugin("java-library") }
     apply { plugin("groovy") }
@@ -76,8 +78,6 @@ allprojects {
 
 }
 
-val testingModuleName: String by extra
-
 subprojects {
 
     /**
@@ -94,11 +94,9 @@ subprojects {
 }
 
 dependencies {
-
     subprojects
         .filter { !it.name.endsWith("-$testingModuleName") }
         .forEach { implementation(it) }
-
 }
 
 tasks.testCodeCoverageReport {
