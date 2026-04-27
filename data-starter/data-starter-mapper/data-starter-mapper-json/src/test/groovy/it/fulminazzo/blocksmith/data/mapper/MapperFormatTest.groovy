@@ -9,7 +9,7 @@ class MapperFormatTest extends Specification {
         def actual = MapperFormat.JSON.newMapper()
 
         then:
-        (actual instanceof SerializableMapper)
+        (actual instanceof JsonMapper)
     }
 
 }
