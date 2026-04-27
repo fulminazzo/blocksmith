@@ -19,7 +19,7 @@ dependencies {
     implementation(projects.configStarter.configStarterYaml)
     implementation(projects.configStarter.configStarterData)
 
-    implementation(projects.dataStarter.dataStarterAll)
+    implementation(projects.dataStarter)
 
     jooqGenerator(libs.h2)
     implementation(libs.mariadb)

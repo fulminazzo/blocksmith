@@ -33,8 +33,8 @@ include(
 // data-starter
 include(
     "data-starter",
+
     "data-starter:data-starter-base",
-    "data-starter:data-starter-testing",
 
     "data-starter:data-starter-mapper",
     "data-starter:data-starter-mapper:data-starter-mapper-json",
@@ -47,7 +47,7 @@ include(
 
     "data-starter:data-starter-cache",
 
-    "data-starter:data-starter-all"
+    "data-starter:data-starter-testing"
 )
 
 // example
