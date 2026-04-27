@@ -29,10 +29,6 @@ allprojects {
 
     val mockitoAgent: Configuration by configurations.creating
 
-    repositories {
-        mavenCentral()
-    }
-
     dependencies {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
