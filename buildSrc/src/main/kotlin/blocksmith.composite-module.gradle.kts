@@ -25,8 +25,7 @@ afterEvaluate {
     val excludedSubmodules = extension.excludedSubmodules
 
     dependencies {
-        val path = project.path
-        val baseProject = project("$path$path-$baseModuleName")
+        val baseProject = project("${project.path}:${project.name}-$baseModuleName")
 
         subprojects {
 
