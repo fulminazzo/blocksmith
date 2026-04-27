@@ -9,14 +9,15 @@ plugins {
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
-extra["baseModuleName"] = "base"
-extra["testingModuleName"] = "testing"
-
 allprojects {
     apply { plugin("java-library") }
     apply { plugin("groovy") }
     apply { plugin("jacoco") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
+
+    extra["baseModuleName"] = "base"
+    extra["testingModuleName"] = "testing"
+    extra["excludedSubmodules"] = mutableSetOf<String>()
 
     val baseModuleName: String by rootProject.extra
 
@@ -93,31 +94,39 @@ allprojects {
 }
 
 subprojects {
-    val baseModuleName: String by rootProject.extra
-    val testingModuleName: String by rootProject.extra
+    val baseModuleName: String by extra
+    val testingModuleName: String by extra
 
-    /*
-    * A module is treated as a "composite module" if it contains a subproject
-    * matching the pattern "<module>:<module>-<baseName>" (e.g. "command:command-base").
-    *
-    * In that case, the dependency graph is structured as follows:
-    * - every other subproject in the module depends on the base subproject;
-    * - the parent project depends on all subprojects (except testing).
-    */
-    dependencies {
-        val path = project.path
-        findProject("$path$path-$baseModuleName")?.let { baseModule ->
-            subprojects
-                .filter { !it.name.endsWith(testingModuleName) }
-                .forEach { api(it) }
+    val excludedSubmodules: MutableSet<String> by extra
 
-            subprojects {
-                dependencies {
-                    if (project.path != baseModule.path) api(baseModule)
+    afterEvaluate {
+
+        /*
+         * A module is treated as a "composite module" if it contains a subproject
+         * matching the pattern "<module>:<module>-<baseName>" (e.g. "command:command-base").
+         *
+         * In that case, the dependency graph is structured as follows:
+         * - every other subproject in the module depends on the base subproject;
+         * - the parent project depends on all subprojects (except testing).
+         */
+        dependencies {
+            val path = project.path
+
+            findProject("$path$path-$baseModuleName")?.let { baseModule ->
+                subprojects
+                    .filter { !it.name.endsWith(testingModuleName) }
+                    .filter { it.name !in excludedSubmodules }
+                    .forEach { api(it) }
+
+                subprojects {
+                    dependencies {
+                        if (project.path != baseModule.path) api(baseModule)
+                    }
                 }
-            }
 
+            }
         }
+
     }
 
     /**
