@@ -37,6 +37,8 @@ include(
     "data-starter:data-starter-base",
 
     "data-starter:data-starter-mapper",
+
+    "data-starter:data-starter-mapper:data-starter-mapper-base",
     "data-starter:data-starter-mapper:data-starter-mapper-json",
 
     "data-starter:data-starter-file",

@@ -1,7 +1,1 @@
-subprojects {
-
-    dependencies {
-        api(project.parent!!)
-    }
-
-}
+plugins { id("blocksmith.composite-module") }
