@@ -9,13 +9,17 @@ plugins {
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
-extra["testingModuleName"] = "testing"
-
 allprojects {
     apply { plugin("java-library") }
     apply { plugin("groovy") }
     apply { plugin("jacoco") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
+
+    extra["baseModuleName"] = "base"
+    extra["testingModuleName"] = "testing"
+    extra["excludedSubmodules"] = mutableSetOf<String>()
+
+    val baseModuleName: String by rootProject.extra
 
     val projectInfoClassName = "ProjectInfo"
 
@@ -74,7 +78,7 @@ allprojects {
 
         buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
         buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
-        buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
+        buildConfigField("String", "MODULE_NAME", "\"${project.name.replace("-$baseModuleName", "")}\"")
     }
 
     tasks.withType<JacocoReport>().configureEach {
@@ -89,12 +93,59 @@ allprojects {
 
 }
 
-/**
- * TESTING MODULES CONFIGURATION
- */
 subprojects {
-    val testingModuleName: String by rootProject.extra
+    val baseModuleName: String by extra
+    val testingModuleName: String by extra
 
+    val excludedSubmodules: MutableSet<String> by extra
+
+    afterEvaluate {
+
+        /*
+         * A module is treated as a "composite module" if it contains a subproject
+         * matching the pattern "<module>:<module>-<baseName>" (e.g. "command:command-base").
+         *
+         * In that case, the dependency graph is structured as follows:
+         * - every other subproject in the module depends on the base subproject;
+         * - the parent project depends on all subprojects (except testing).
+         */
+        dependencies {
+            val path = project.path
+
+            // base
+            findProject("$path$path-$baseModuleName")?.let { baseModule ->
+                subprojects
+                    .filter { !it.name.endsWith(testingModuleName) }
+                    .filter { it.name !in excludedSubmodules }
+                    .forEach { api(it) }
+
+                subprojects {
+                    dependencies {
+                        if (project.path != baseModule.path) api(baseModule)
+                    }
+                }
+
+            }
+
+            // testing
+            findProject("$path:$path-$testingModuleName")?.let { testingModule ->
+
+                allprojects {
+                    dependencies {
+                        if (project.path != testingModule.path)
+                            testImplementation(testingModule)
+                    }
+                }
+
+            }
+
+        }
+
+    }
+
+    /**
+     * TESTING MODULES CONFIGURATION
+     */
     if (project.name.endsWith(testingModuleName)) {
         apply { plugin("groovy") }
 

@@ -15,7 +15,8 @@ include("validation-starter")
 // config-starter
 include(
     "config-starter",
-    "config-starter:config-starter-core",
+
+    "config-starter:config-starter-base",
 
     "config-starter:config-starter-json",
     "config-starter:config-starter-properties",
@@ -24,8 +25,6 @@ include(
     "config-starter:config-starter-yaml",
 
     "config-starter:config-starter-data",
-
-    "config-starter:config-starter-all",
 
     "config-starter:config-starter-testing",
     "config-starter:config-starter-generator"
