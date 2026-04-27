@@ -1,7 +1,7 @@
 plugins {
-    id("java-library")
-    id("groovy")
-    id("jacoco-report-aggregation")
+    `java-library`
+    groovy
+    `jacoco-report-aggregation`
 
     alias(libs.plugins.buildconfig)
 }
@@ -15,38 +15,20 @@ allprojects {
     apply { plugin("jacoco") }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
+    apply { plugin("blocksmith.java-configuration")}
+    apply { plugin("blocksmith.testing-module-configuration")}
+
     extra["baseModuleName"] = "base"
     extra["testingModuleName"] = "testing"
-    extra["excludedSubmodules"] = mutableSetOf<String>()
 
-    val baseModuleName: String by rootProject.extra
+    val baseModuleName: String by extra
 
     val projectInfoClassName = "ProjectInfo"
 
-    val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
-    val currentCompiler = javaToolchains.compilerFor { languageVersion = currentJava }
-    val currentLauncher = javaToolchains.launcherFor { languageVersion = currentJava }
-
     val mockitoAgent: Configuration by configurations.creating
-
-    val minJava = JavaLanguageVersion.of(11)
-
-    java {
-        toolchain {
-            languageVersion.set(minJava)
-        }
-    }
 
     repositories {
         mavenCentral()
-        maven {
-            name = "spigotmc-repo"
-            url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-        }
-        maven {
-            name = "papermc"
-            url = uri("https://repo.papermc.io/repository/maven-public/")
-        }
     }
 
     dependencies {
@@ -65,32 +47,21 @@ allprojects {
         mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
 
-    tasks.compileJava {
-        javaCompiler = currentCompiler
-        options.release.set(minJava.asInt())
-    }
-
-    tasks.withType<GroovyCompile> {
-        javaLauncher = currentLauncher
-    }
-
-    tasks.compileTestJava {
-        javaCompiler = currentCompiler
-    }
-
     tasks.test {
         useJUnitPlatform()
         jvmArgs("-javaagent:${mockitoAgent.asPath}")
-        javaLauncher = currentLauncher
     }
 
     configure<com.github.gmazzo.buildconfig.BuildConfigExtension> {
         packageName = "${rootProject.group}.${rootProject.name}"
         className = projectInfoClassName
 
+        var projectName = project.name
+        if (project.name.endsWith("-$baseModuleName")) projectName = project.name.removeSuffix("-$baseModuleName")
+
         buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
         buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
-        buildConfigField("String", "MODULE_NAME", "\"${project.name.replace("-$baseModuleName", "")}\"")
+        buildConfigField("String", "MODULE_NAME", "\"${projectName}\"")
     }
 
     tasks.withType<JacocoReport>().configureEach {
@@ -105,55 +76,9 @@ allprojects {
 
 }
 
+val testingModuleName: String by extra
+
 subprojects {
-    val baseModuleName: String by extra
-    val testingModuleName: String by extra
-
-    val excludedSubmodules: MutableSet<String> by extra
-
-    afterEvaluate {
-
-        /*
-         * A module is treated as a "composite module" if it contains a subproject
-         * matching the pattern "<module>:<module>-<baseName>" (e.g. "command:command-base").
-         *
-         * In that case, the dependency graph is structured as follows:
-         * - every other subproject in the module depends on the base subproject;
-         * - the parent project depends on all subprojects (except testing).
-         */
-        dependencies {
-            val path = project.path
-
-            // base
-            findProject("$path$path-$baseModuleName")?.let { baseModule ->
-                subprojects
-                    .filter { !it.name.endsWith(testingModuleName) }
-                    .filter { it.name !in excludedSubmodules }
-                    .forEach { api(it) }
-
-                subprojects {
-                    dependencies {
-                        if (project.path != baseModule.path) api(baseModule)
-                    }
-                }
-
-            }
-
-            // testing
-            findProject("$path:$path-$testingModuleName")?.let { testingModule ->
-
-                allprojects {
-                    dependencies {
-                        if (project.path != testingModule.path)
-                            testImplementation(testingModule)
-                    }
-                }
-
-            }
-
-        }
-
-    }
 
     /**
      * TESTING MODULES CONFIGURATION
@@ -169,11 +94,11 @@ subprojects {
 }
 
 dependencies {
-    val testingModuleName: String by rootProject.extra
 
     subprojects
         .filter { !it.name.endsWith("-$testingModuleName") }
         .forEach { implementation(it) }
+
 }
 
 tasks.testCodeCoverageReport {
