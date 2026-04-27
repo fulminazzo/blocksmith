@@ -1,5 +1,4 @@
-val excludedSubmodules: MutableSet<String> by extra
-excludedSubmodules.add(project.projects.configStarter.configStarterGenerator.name)
+plugins { id("blocksmith.composite-module") }
 
 dependencies {
     compileOnly(libs.slf4j)
@@ -11,4 +10,10 @@ allprojects {
         compileOnly(rootProject.libs.slf4j)
     }
 
+}
+
+compositeModule {
+    excludedSubmodules = setOf(
+        project.projects.configStarter.configStarterGenerator.name
+    )
 }
