@@ -6,16 +6,21 @@
  */
 
 plugins {
-    java
+    `java-library`
 }
 
 afterEvaluate {
+    val baseModuleName: String by extra
     val testingModuleName: String by extra
 
     dependencies {
         val path = project.path
 
         findProject("$path:$path-$testingModuleName")?.let { testingModule ->
+
+            dependencies {
+                api(project(":$baseModuleName:$testingModuleName"))
+            }
 
             allprojects {
 
