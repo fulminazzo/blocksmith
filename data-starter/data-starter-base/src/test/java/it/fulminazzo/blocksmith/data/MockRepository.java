@@ -1,7 +1,6 @@
-package it.fulminazzo.blocksmith;
+package it.fulminazzo.blocksmith.data;
 
-import it.fulminazzo.blocksmith.data.AbstractRepository;
-import it.fulminazzo.blocksmith.data.Page;
+import it.fulminazzo.blocksmith.Cat;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
- * Mock {@link it.fulminazzo.blocksmith.data.Repository} for testing purposes.
+ * Mock {@link Repository} for testing purposes.
  */
 public final class MockRepository extends AbstractRepository<Cat, String, MockQueryEngine> {
 

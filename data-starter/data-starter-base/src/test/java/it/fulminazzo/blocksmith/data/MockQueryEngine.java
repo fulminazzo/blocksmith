@@ -1,6 +1,6 @@
-package it.fulminazzo.blocksmith;
+package it.fulminazzo.blocksmith.data;
 
-import it.fulminazzo.blocksmith.data.QueryEngine;
+import it.fulminazzo.blocksmith.Cat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
