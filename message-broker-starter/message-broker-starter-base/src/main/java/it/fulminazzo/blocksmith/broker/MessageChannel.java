@@ -78,7 +78,7 @@ public interface MessageChannel {
      * @param <R>          the type of the response
      * @param payload      the payload to send
      * @param responseType the type of the response
-     * @param timeout      the timeout after which the task will fail
+     * @param timeout      the timeout after which the task will fail (in milliseconds)
      * @return the response
      */
     <T, R> @NotNull CompletableFuture<R> sendAndReceive(final @NotNull T payload,
@@ -100,7 +100,7 @@ public interface MessageChannel {
      * Then, awaits for the response and returns it.
      *
      * @param payload the payload to send
-     * @param timeout the timeout after which the task will fail
+     * @param timeout the timeout after which the task will fail (in milliseconds)
      * @return the response
      */
     @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final long timeout);
