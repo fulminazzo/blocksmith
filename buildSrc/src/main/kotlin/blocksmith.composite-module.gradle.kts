@@ -11,7 +11,17 @@ plugins {
 }
 
 interface CompositeModuleExtension {
+    /**
+     * These submodules will not be imported to the main module.
+     * For example, if the module is "blocksmith-core",
+     * the submodules "blocksmith-core-bukkit" and "blocksmith-core-bungeecord" will not be imported.
+     */
     val excludedSubmodules: SetProperty<String>
+
+    /**
+     * Modules for which the base module import will not happen.
+     */
+    val ignoredSubmodules: SetProperty<String>
     val importToParent: Property<Boolean>
 }
 
@@ -23,6 +33,7 @@ afterEvaluate {
     val testingModuleName: String by extra
 
     val excludedSubmodules = extension.excludedSubmodules
+    val ignoredSubmodules = extension.ignoredSubmodules
 
     dependencies {
         val baseProject = project("${project.path}:${project.name}-$baseModuleName")
@@ -30,8 +41,9 @@ afterEvaluate {
         subprojects {
 
             dependencies {
-                if (project.path != baseProject.path)
-                    api(baseProject)
+                if (project.path != baseProject.path &&
+                    ignoredSubmodules.getOrElse(emptySet()).none { it in project.name }
+                ) api(baseProject)
             }
 
         }
@@ -39,8 +51,8 @@ afterEvaluate {
         if (extension.importToParent.getOrElse(true))
             subprojects
                 .filter { !it.name.endsWith(testingModuleName) }
-                .filter { p -> excludedSubmodules.getOrElse(emptySet())
-                    .none { it in p.name }
+                .filter { p ->
+                    excludedSubmodules.getOrElse(emptySet()).none { it in p.name }
                 }
                 .forEach { api(it) }
     }
