@@ -13,7 +13,7 @@ import java.util.function.Consumer
 abstract class MessageChannelTest extends Specification {
     protected static final Logger logger = LoggerFactory.getLogger(MessageChannelTest)
 
-    protected static final int SLEEP_TIME = 75
+    protected static final int SLEEP_TIME = 125
 
     protected static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
@@ -65,6 +65,9 @@ abstract class MessageChannelTest extends Specification {
 
         when:
         send(message)
+
+        and:
+        sleep(SLEEP_TIME)
 
         then:
         received.get() == message
