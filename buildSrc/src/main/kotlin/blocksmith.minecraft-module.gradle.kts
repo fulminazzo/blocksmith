@@ -29,25 +29,12 @@ extensions.configure<CompositeModuleExtension> {
 
 afterEvaluate {
     val libs = the<VersionCatalogsExtension>().named("libs")
-    val path = project.path
 
     val libraries = mutableListOf("bukkit", "bungeecord", "velocity")
     if (extension.enableFolia.getOrElse(false)) libraries.add("folia")
 
     libraries.forEach {
-        project("$path$path-$it") {
-
-            repositories {
-                mavenCentral()
-                maven {
-                    name = "spigotmc-repo"
-                    url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-                }
-                maven {
-                    name = "papermc"
-                    url = uri("https://repo.papermc.io/repository/maven-public/")
-                }
-            }
+        project("${project.path}:${project.name}-$it") {
 
             dependencies {
                 val dependency = libs.findLibrary(it).get()

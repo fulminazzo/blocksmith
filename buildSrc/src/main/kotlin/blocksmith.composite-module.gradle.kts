@@ -25,8 +25,7 @@ afterEvaluate {
     val excludedSubmodules = extension.excludedSubmodules
 
     dependencies {
-        val path = project.path
-        val baseProject = project("$path$path-$baseModuleName")
+        val baseProject = project("${project.path}:${project.name}-$baseModuleName")
 
         subprojects {
 
@@ -40,7 +39,7 @@ afterEvaluate {
         if (extension.importToParent.getOrElse(true))
             subprojects
                 .filter { !it.name.endsWith(testingModuleName) }
-                .filter { it.name !in excludedSubmodules.getOrElse(emptySet()) }
+                .filter { p -> excludedSubmodules.getOrElse(emptySet()).any { it in p.name } }
                 .forEach { api(it) }
     }
 
