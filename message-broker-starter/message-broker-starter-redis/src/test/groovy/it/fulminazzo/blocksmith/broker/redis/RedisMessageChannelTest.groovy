@@ -70,7 +70,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
         send(message)
 
         and:
-        sleep(125)
+        sleep(SLEEP_TIME)
 
         then:
         received(message.id)

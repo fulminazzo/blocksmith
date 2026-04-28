@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 
 abstract class MessageChannelTest extends Specification {
+    protected static final int SLEEP_TIME = 75
+    
     protected MessageChannel channel
 
     void setupChannel() {
@@ -34,7 +36,7 @@ abstract class MessageChannelTest extends Specification {
         channel.send(message)
 
         and:
-        sleep(125)
+        sleep(SLEEP_TIME)
 
         then:
         received(message.id)
@@ -51,7 +53,7 @@ abstract class MessageChannelTest extends Specification {
         channel.subscribe(Message, (Consumer<Message>) (m -> received.set(m)))
 
         and:
-        sleep(125)
+        sleep(SLEEP_TIME)
 
         when:
         send(message)
@@ -71,13 +73,13 @@ abstract class MessageChannelTest extends Specification {
         def id = channel.subscribe(Message, (Consumer<Message>) (m -> received.set(m)))
 
         and:
-        sleep(125)
+        sleep(SLEEP_TIME)
 
         and:
         channel.unsubscribe(id)
 
         and:
-        sleep(125)
+        sleep(SLEEP_TIME)
 
         when:
         send(message)
