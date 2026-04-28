@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
@@ -82,8 +83,12 @@ public abstract class AbstractMessageChannel implements MessageChannel {
 
     @Override
     public @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final long timeout) {
-        //TODO: implement
-        throw new UnsupportedOperationException();
+        NetworkMessage message = new NetworkMessage(UUID.randomUUID(), payload);
+        CompletableFuture<String> future = new CompletableFuture<>();
+        pendingResponses.put(message.getConversationId(), future);
+        return sendRaw(message)
+                .thenCompose(v -> future.orTimeout(timeout, TimeUnit.MILLISECONDS))
+                .whenComplete((r, t) -> pendingResponses.remove(message.getConversationId()));
     }
 
     /**
@@ -97,7 +102,7 @@ public abstract class AbstractMessageChannel implements MessageChannel {
             NetworkMessage networkMessage = mapper.deserialize(message, NetworkMessage.class);
             UUID conversationId = networkMessage.getConversationId();
             if (pendingResponses.containsKey(conversationId)) {
-                CompletableFuture<String> future = pendingResponses.remove(conversationId);
+                CompletableFuture<String> future = pendingResponses.get(conversationId);
                 future.complete(networkMessage.getMessage());
                 return;
             }
