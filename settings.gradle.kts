@@ -57,6 +57,8 @@ include(
     "message-broker-starter",
 
     "message-broker-starter:message-broker-starter-base",
+
+    "message-broker-starter:message-broker-starter-redis"
 )
 
 // example
