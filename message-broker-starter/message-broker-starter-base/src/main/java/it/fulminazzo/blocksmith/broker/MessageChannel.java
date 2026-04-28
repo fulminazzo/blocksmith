@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -33,6 +34,16 @@ public interface MessageChannel {
      * Adds a new handler for incoming messages in the channel.
      *
      * @param <T>         the type of the message
+     * @param messageType the type to which the message should be converted
+     * @param consumer    the function to handle the message
+     * @return the id of the handler
+     */
+    <T> @NotNull UUID subscribe(final @NotNull Class<T> messageType, final @NotNull Consumer<T> consumer);
+
+    /**
+     * Adds a new handler for incoming messages in the channel.
+     *
+     * @param <T>         the type of the message
      * @param <R>         the type of the response
      * @param messageType the type to which the message should be converted
      * @param consumer    the function to handle the message.
@@ -40,6 +51,14 @@ public interface MessageChannel {
      * @return the id of the handler
      */
     <T, R> @NotNull UUID subscribe(final @NotNull Class<T> messageType, final @NotNull Function<T, R> consumer);
+
+    /**
+     * Adds a new handler for incoming messages in the channel.
+     *
+     * @param consumer the function to handle the message
+     * @return the id of the handler
+     */
+    @NotNull UUID subscribeRaw(final @NotNull Consumer<String> consumer);
 
     /**
      * Adds a new handler for incoming messages in the channel.

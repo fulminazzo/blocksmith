@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -41,10 +42,26 @@ public abstract class AbstractMessageChannel implements MessageChannel {
     }
 
     @Override
+    public @NotNull <T> UUID subscribe(final @NotNull Class<T> messageType, final @NotNull Consumer<T> consumer) {
+        return subscribe(messageType, t -> {
+            consumer.accept(t);
+            return null;
+        });
+    }
+
+    @Override
     public @NotNull <T, R> UUID subscribe(final @NotNull Class<T> messageType, final @NotNull Function<T, R> consumer) {
         return subscribeRaw(s -> {
             R result = consumer.apply(mapper.deserialize(s, messageType));
             return result == null ? null : mapper.serialize(result);
+        });
+    }
+
+    @Override
+    public @NotNull UUID subscribeRaw(final @NotNull Consumer<String> consumer) {
+        return subscribeRaw(s -> {
+            consumer.accept(s);
+            return null;
         });
     }
 
