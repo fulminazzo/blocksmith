@@ -1,0 +1,63 @@
+package it.fulminazzo.blocksmith.broker;
+
+import it.fulminazzo.blocksmith.data.mapper.Mapper;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.*;
+
+/**
+ * Test message channel with handling of messages through internal static map.
+ */
+public final class MockMessageChannel extends AbstractMessageChannel {
+    private static final @NotNull Map<String, Queue<String>> MESSAGES = new ConcurrentHashMap<>();
+
+    private final @NotNull String name;
+
+    /**
+     * Instantiates a new Mock message channel.
+     * Does <b>not</b> receive messages.
+     *
+     * @param mapper the mapper
+     * @param name   the name
+     */
+    public MockMessageChannel(final @NotNull Mapper mapper,
+                              final @NotNull String name) {
+        super(mapper);
+        this.name = name;
+    }
+
+    /**
+     * Instantiates a new Mock message channel.
+     * Uses the executor to <b>receive</b> messages.
+     *
+     * @param mapper          the mapper
+     * @param name            the name
+     * @param executorService the executor service
+     */
+    public MockMessageChannel(final @NotNull Mapper mapper,
+                              final @NotNull String name,
+                              final @NotNull ScheduledExecutorService executorService) {
+        this(mapper, name);
+        executorService.scheduleAtFixedRate(
+                () -> {
+                    Queue<String> queue = getQueue(name);
+                    if (!queue.isEmpty()) handleMessage(queue.poll());
+                },
+                0,
+                125,
+                TimeUnit.MILLISECONDS
+        );
+    }
+
+    @Override
+    protected @NotNull CompletableFuture<Void> sendRawImpl(final @NotNull String payload) {
+        return CompletableFuture.runAsync(() -> getQueue(name).add(payload));
+    }
+
+    public static @NotNull Queue<String> getQueue(final @NotNull String name) {
+        return MESSAGES.computeIfAbsent(name, _ -> new ConcurrentLinkedQueue<>());
+    }
+
+}
