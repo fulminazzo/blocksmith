@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.broker;
 
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -13,20 +14,8 @@ import java.util.concurrent.*;
 public final class MockMessageChannel extends AbstractMessageChannel {
     private static final @NotNull Map<String, Queue<String>> MESSAGES = new ConcurrentHashMap<>();
 
+    @Getter
     private final @NotNull String name;
-
-    /**
-     * Instantiates a new Mock message channel.
-     * Does <b>not</b> receive messages.
-     *
-     * @param mapper the mapper
-     * @param name   the name
-     */
-    public MockMessageChannel(final @NotNull Mapper mapper,
-                              final @NotNull String name) {
-        super(mapper);
-        this.name = name;
-    }
 
     /**
      * Instantiates a new Mock message channel.
@@ -39,7 +28,8 @@ public final class MockMessageChannel extends AbstractMessageChannel {
     public MockMessageChannel(final @NotNull Mapper mapper,
                               final @NotNull String name,
                               final @NotNull ScheduledExecutorService executorService) {
-        this(mapper, name);
+        super(mapper);
+        this.name = name;
         executorService.scheduleAtFixedRate(
                 () -> {
                     Queue<String> queue = getQueue(name);
@@ -53,7 +43,12 @@ public final class MockMessageChannel extends AbstractMessageChannel {
 
     @Override
     protected @NotNull CompletableFuture<Void> sendRawImpl(final @NotNull String payload) {
-        return CompletableFuture.runAsync(() -> getQueue(name).add(payload));
+        return CompletableFuture.runAsync(() ->
+                MESSAGES.keySet().stream()
+                        .filter(n -> !n.equals(name))
+                        .map(MESSAGES::get)
+                        .forEach(q -> q.add(payload))
+        );
     }
 
     public static @NotNull Queue<String> getQueue(final @NotNull String name) {

@@ -11,30 +11,25 @@ import java.util.function.Consumer
 import java.util.function.Function
 
 class AbstractMessageChannelTest extends Specification {
-    private static final String NAME = 'abstract-message-test'
     private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
     private final data = new Cat('Felix', 7, false)
 
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor()
 
-    private AbstractMessageChannel sender = new MockMessageChannel(MAPPER, NAME)
-    private AbstractMessageChannel receiver = new MockMessageChannel(MAPPER, NAME, executorService)
+    private AbstractMessageChannel sender = new MockMessageChannel(MAPPER, "abstract-message-test-1", executorService)
+    private AbstractMessageChannel receiver = new MockMessageChannel(MAPPER, "abstract-message-test-2", executorService)
 
     void cleanup() {
         executorService.shutdown()
     }
 
     def 'test that send correctly sends serialized payload'() {
-        given:
-        final name = "${NAME}1"
-        def sender = new MockMessageChannel(MAPPER, name)
-
         when:
         sender.send(data).join()
 
         then:
-        def queue = MockMessageChannel.getQueue(name)
+        def queue = MockMessageChannel.getQueue(receiver.name)
         !queue.isEmpty()
 
         and:
@@ -58,7 +53,7 @@ class AbstractMessageChannelTest extends Specification {
         receiver.subscribeRaw((Consumer<String>) (r -> raw.set(r)))
 
         when:
-        MockMessageChannel.getQueue(NAME).add(MAPPER.serialize(data))
+        MockMessageChannel.getQueue(receiver.name).add(MAPPER.serialize(data))
 
         and:
         sleep(250)
@@ -87,7 +82,7 @@ class AbstractMessageChannelTest extends Specification {
         }))
 
         when:
-        def queue = MockMessageChannel.getQueue(NAME)
+        def queue = MockMessageChannel.getQueue(receiver.name)
         queue.add(MAPPER.serialize(data))
 
         and:
@@ -97,7 +92,10 @@ class AbstractMessageChannelTest extends Specification {
         def actualData = actual.get()
         actualData == data
 
-        and:
+        when:
+        queue = MockMessageChannel.getQueue(sender.name)
+
+        then:
         !queue.isEmpty()
         def raw = queue.poll()
         def networkMessage = MAPPER.deserialize(raw, AbstractMessageChannel.NetworkMessage)
@@ -124,7 +122,7 @@ class AbstractMessageChannelTest extends Specification {
 
         then:
         actual.get() == null
-        !MockMessageChannel.getQueue(NAME).isEmpty()
+        !MockMessageChannel.getQueue(receiver.name).isEmpty()
     }
 
 }
