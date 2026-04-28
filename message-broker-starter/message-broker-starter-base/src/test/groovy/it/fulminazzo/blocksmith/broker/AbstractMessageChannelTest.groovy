@@ -68,7 +68,7 @@ class AbstractMessageChannelTest extends Specification {
         sender.send(data).join()
 
         then:
-        def queue = MockMessageChannel.getQueue(receiver.name)
+        def queue = MockMessageQueryEngine.getQueue(receiver.name)
         !queue.isEmpty()
 
         and:
@@ -92,7 +92,7 @@ class AbstractMessageChannelTest extends Specification {
         receiver.subscribeRaw((Consumer<String>) (r -> raw.set(r)))
 
         when:
-        MockMessageChannel.getQueue(receiver.name).add(MAPPER.serialize(data))
+        MockMessageQueryEngine.getQueue(receiver.name).add(MAPPER.serialize(data))
 
         and:
         sleep(250)
@@ -121,7 +121,7 @@ class AbstractMessageChannelTest extends Specification {
         }))
 
         when:
-        def queue = MockMessageChannel.getQueue(receiver.name)
+        def queue = MockMessageQueryEngine.getQueue(receiver.name)
         queue.add(MAPPER.serialize(data))
 
         and:
@@ -132,7 +132,7 @@ class AbstractMessageChannelTest extends Specification {
         actualData == data
 
         when:
-        queue = MockMessageChannel.getQueue(sender.name)
+        queue = MockMessageQueryEngine.getQueue(sender.name)
 
         then:
         !queue.isEmpty()
@@ -161,7 +161,7 @@ class AbstractMessageChannelTest extends Specification {
 
         then:
         actual.get() == null
-        !MockMessageChannel.getQueue(receiver.name).isEmpty()
+        !MockMessageQueryEngine.getQueue(receiver.name).isEmpty()
     }
 
 }
