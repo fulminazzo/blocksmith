@@ -19,7 +19,7 @@ afterEvaluate {
         findProject("$path:$path-$testingModuleName")?.let { testingModule ->
 
             dependencies {
-                api(findProject(":$baseModuleName:$testingModuleName"))
+                api(project(":$baseModuleName:$testingModuleName"))
             }
 
             allprojects {
