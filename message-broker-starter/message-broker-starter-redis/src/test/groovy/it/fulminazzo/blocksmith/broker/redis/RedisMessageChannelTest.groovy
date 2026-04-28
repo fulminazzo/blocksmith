@@ -8,14 +8,11 @@ import it.fulminazzo.blocksmith.broker.Message
 import it.fulminazzo.blocksmith.broker.MessageChannel
 import it.fulminazzo.blocksmith.broker.MessageChannelTest
 import it.fulminazzo.blocksmith.broker.Messages
-import it.fulminazzo.blocksmith.data.mapper.Mapper
-import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import org.jetbrains.annotations.NotNull
 import redis.embedded.RedisServer
 
 class RedisMessageChannelTest extends MessageChannelTest {
     private static final String channelName = 'redis-message-channel'
-    private static final Mapper mapper = MapperFormat.JSON.newMapper()
     private static final int serverPort = 16389
 
     private static RedisServer server
@@ -38,8 +35,9 @@ class RedisMessageChannelTest extends MessageChannelTest {
             @Override
             void message(final String channel, final String message) {
                 if (channel == channelName) {
-                    Message msg = mapper.deserialize(message, Message)
-                    logger.info("Received message id=${msg.id} on channel $channel")
+                    logger.debug("Received on channel ($channel) raw: $message")
+                    Message msg = deserializeMessage(message)
+                    logger.info("Received on channel ($channel) message with id=$msg.id")
                     receivedMessages.add(msg)
                 }
             }
@@ -90,7 +88,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
                         pubSubConnection,
                         channelName
                 ),
-                mapper
+                MAPPER
         )
     }
 
@@ -101,7 +99,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
 
     @Override
     void send(final @NotNull Message message) {
-        connection.sync().publish(channelName, mapper.serialize(message))
+        connection.sync().publish(channelName, serializeMessage(message))
     }
 
 }
