@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.data
 
 import it.fulminazzo.blocksmith.Cat
-import it.fulminazzo.blocksmith.MockRepository
 import spock.lang.Specification
 
 import java.util.concurrent.ExecutionException

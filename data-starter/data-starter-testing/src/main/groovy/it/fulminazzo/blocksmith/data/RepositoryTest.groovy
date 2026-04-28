@@ -283,8 +283,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         actual == 2L
     }
 
-    abstract @NotNull
-    R initializeRepository()
+    abstract R initializeRepository()
 
     /**
      * Checks if a entity with the given id exists in the repository.
