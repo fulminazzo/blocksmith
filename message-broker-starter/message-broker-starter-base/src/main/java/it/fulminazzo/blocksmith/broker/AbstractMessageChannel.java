@@ -1,7 +1,9 @@
 package it.fulminazzo.blocksmith.broker;
 
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
+import it.fulminazzo.blocksmith.data.mapper.MapperException;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -82,11 +84,32 @@ public abstract class AbstractMessageChannel implements MessageChannel {
      */
     protected void handleMessage(final @NotNull String message) {
         List<CompletableFuture<?>> futures = new ArrayList<>();
-        for (MessageHandler handler : messageHandlers.values()) {
-            String response = handler.handle(message);
-            if (response != null) futures.add(sendRaw(response));
+        try {
+            NetworkMessage networkMessage = mapper.deserialize(message, NetworkMessage.class);
+            for (MessageHandler handler : messageHandlers.values()) {
+                String response = handler.handle(networkMessage.getMessage());
+                if (response != null)
+                    futures.add(send(new NetworkMessage(networkMessage.getConversationId(), response)));
+            }
+        } catch (MapperException e) {
+            // provide support for messages not sent through blocksmith
+            for (MessageHandler handler : messageHandlers.values()) {
+                String response = handler.handle(message);
+                if (response != null)
+                    futures.add(sendRaw(response));
+            }
         }
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+    }
+
+    @Value
+    private static class NetworkMessage {
+        /**
+         * The id used to track back the flow of messages between clients.
+         */
+        @NotNull UUID conversationId;
+        @NotNull String message;
+
     }
 
 }
