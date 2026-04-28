@@ -23,7 +23,7 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor
 public abstract class AbstractMessageChannel implements MessageChannel {
-    private final @NotNull Map<UUID, MessageHandler> messageHandlers = new ConcurrentHashMap<>();
+    private final @NotNull Map<UUID, Function<String, String>> messageHandlers = new ConcurrentHashMap<>();
     /**
      * Identifies the sendAndReceive requests that are still pending an answer.
      */
@@ -96,7 +96,7 @@ public abstract class AbstractMessageChannel implements MessageChannel {
     }
 
     @Override
-    public @NotNull UUID subscribeRaw(final @NotNull MessageHandler consumer) {
+    public @NotNull UUID subscribeRaw(final @NotNull Function<String, String> consumer) {
         UUID id = UUID.randomUUID();
         messageHandlers.put(id, consumer);
         return id;
@@ -124,15 +124,15 @@ public abstract class AbstractMessageChannel implements MessageChannel {
                 future.complete(networkMessage.getMessage());
                 return CompletableFuture.completedFuture(null);
             }
-            for (MessageHandler handler : messageHandlers.values()) {
-                String response = handler.handle(networkMessage.getMessage());
+            for (Function<String, String> handler : messageHandlers.values()) {
+                String response = handler.apply(networkMessage.getMessage());
                 if (response != null)
                     futures.add(sendRaw(new NetworkMessage(conversationId, response)));
             }
         } catch (MapperException e) {
             // provide support for messages not sent through blocksmith
-            for (MessageHandler handler : messageHandlers.values()) {
-                String response = handler.handle(message);
+            for (Function<String, String> handler : messageHandlers.values()) {
+                String response = handler.apply(message);
                 if (response != null)
                     futures.add(sendRaw(response));
             }

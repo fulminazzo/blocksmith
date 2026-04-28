@@ -45,7 +45,7 @@ class AbstractMessageChannelTest extends Specification {
 
     def 'test that sendAndReceiveRaw works'() {
         given:
-        receiver.subscribeRaw((MessageHandler) (r -> r == 'ping' ? 'pong' : null))
+        receiver.subscribeRaw((Function<String, String>) (r -> r == 'ping' ? 'pong' : null))
 
         when:
         def actual = sender.sendAndReceiveRaw('ping', Duration.ofSeconds(1)).get()
