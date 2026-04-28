@@ -33,6 +33,9 @@ abstract class MessageChannelTest extends Specification {
         when:
         channel.send(message)
 
+        and:
+        sleep(125)
+
         then:
         received(message.id)
 
@@ -46,6 +49,9 @@ abstract class MessageChannelTest extends Specification {
 
         and:
         channel.subscribe(Message, (Consumer<Message>) (m -> received.set(m)))
+
+        and:
+        sleep(125)
 
         when:
         send(message)
