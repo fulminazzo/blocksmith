@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -71,6 +73,20 @@ public abstract class AbstractMessageChannel implements MessageChannel {
     public @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final long timeout) {
         //TODO: implement
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Handles an incoming message with all the listening message handlers.
+     *
+     * @param message the message
+     */
+    protected void handleMessage(final @NotNull String message) {
+        List<CompletableFuture<?>> futures = new ArrayList<>();
+        for (MessageHandler handler : messageHandlers.values()) {
+            String response = handler.handle(message);
+            if (response != null) futures.add(sendRaw(response));
+        }
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
 
 }
