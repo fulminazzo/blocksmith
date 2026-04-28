@@ -23,7 +23,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
     private static StatefulRedisConnection<String, String> connection
     private static StatefulRedisPubSubConnection<String, String> pubSubConnection
 
-    private final Queue<Message> receivedMessages = new LinkedList<>()
+    private static final Queue<Message> receivedMessages = new LinkedList<>()
 
     void setupSpec() {
         server = new RedisServer(serverPort)
