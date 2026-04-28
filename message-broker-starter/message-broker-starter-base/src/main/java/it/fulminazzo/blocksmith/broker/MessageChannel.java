@@ -48,7 +48,7 @@ public interface MessageChannel {
      *                 If the return is not {@code null}, the message is sent back into the channel.
      * @return the id of the handler
      */
-    @NotNull UUID subscribeRaw(final @NotNull Function<String, String> consumer);
+    @NotNull UUID subscribeRaw(final @NotNull MessageHandler consumer);
 
     /**
      * Unsubscribes a handler from the channel.

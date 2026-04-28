@@ -17,7 +17,7 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor
 public abstract class AbstractMessageChannel implements MessageChannel {
-    protected final @NotNull Map<UUID, Function<String, String>> messageHandlers = new ConcurrentHashMap<>();
+    protected final @NotNull Map<UUID, MessageHandler> messageHandlers = new ConcurrentHashMap<>();
 
     private final @NotNull Mapper mapper;
 
@@ -35,7 +35,7 @@ public abstract class AbstractMessageChannel implements MessageChannel {
     }
 
     @Override
-    public @NotNull UUID subscribeRaw(final @NotNull Function<String, String> consumer) {
+    public @NotNull UUID subscribeRaw(final @NotNull MessageHandler consumer) {
         UUID id = UUID.randomUUID();
         messageHandlers.put(id, consumer);
         return id;
