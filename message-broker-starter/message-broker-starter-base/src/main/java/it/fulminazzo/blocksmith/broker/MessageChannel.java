@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * A general channel for handling messaging across servers.
@@ -33,19 +33,22 @@ public interface MessageChannel {
      * Adds a new handler for incoming messages in the channel.
      *
      * @param <T>         the type of the message
+     * @param <R>         the type of the response
      * @param messageType the type to which the message should be converted
-     * @param consumer    the function to handle the message
+     * @param consumer    the function to handle the message.
+     *                    If the return is not {@code null}, the message is sent back into the channel.
      * @return the id of the handler
      */
-    <T> @NotNull UUID subscribe(final @NotNull Class<T> messageType, final @NotNull Consumer<T> consumer);
+    <T, R> @NotNull UUID subscribe(final @NotNull Class<T> messageType, final @NotNull Function<T, R> consumer);
 
     /**
      * Adds a new handler for incoming messages in the channel.
      *
-     * @param consumer the function to handle the message
+     * @param consumer the function to handle the message.
+     *                 If the return is not {@code null}, the message is sent back into the channel.
      * @return the id of the handler
      */
-    @NotNull UUID subscribeRaw(final @NotNull Consumer<String> consumer);
+    @NotNull UUID subscribeRaw(final @NotNull Function<String, String> consumer);
 
     /**
      * Unsubscribes a handler from the channel.

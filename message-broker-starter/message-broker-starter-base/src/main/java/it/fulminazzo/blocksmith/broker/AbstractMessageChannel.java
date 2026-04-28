@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Abstract implementation of {@link MessageChannel} with common checks
@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  */
 @RequiredArgsConstructor
 public abstract class AbstractMessageChannel implements MessageChannel {
-    protected final @NotNull Map<UUID, Consumer<String>> messageHandlers = new ConcurrentHashMap<>();
+    protected final @NotNull Map<UUID, Function<String, String>> messageHandlers = new ConcurrentHashMap<>();
 
     private final @NotNull Mapper mapper;
 
@@ -27,12 +27,15 @@ public abstract class AbstractMessageChannel implements MessageChannel {
     }
 
     @Override
-    public @NotNull <T> UUID subscribe(final @NotNull Class<T> messageType, final @NotNull Consumer<T> consumer) {
-        return subscribeRaw(s -> consumer.accept(mapper.deserialize(s, messageType)));
+    public @NotNull <T, R> UUID subscribe(final @NotNull Class<T> messageType, final @NotNull Function<T, R> consumer) {
+        return subscribeRaw(s -> {
+            R result = consumer.apply(mapper.deserialize(s, messageType));
+            return result == null ? null : mapper.serialize(result);
+        });
     }
 
     @Override
-    public @NotNull UUID subscribeRaw(final @NotNull Consumer<String> consumer) {
+    public @NotNull UUID subscribeRaw(final @NotNull Function<String, String> consumer) {
         UUID id = UUID.randomUUID();
         messageHandlers.put(id, consumer);
         return id;
