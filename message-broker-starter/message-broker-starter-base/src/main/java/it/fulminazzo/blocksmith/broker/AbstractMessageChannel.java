@@ -32,6 +32,36 @@ public abstract class AbstractMessageChannel implements MessageChannel {
     private final @NotNull Mapper mapper;
 
     @Override
+    public @NotNull <T, R> CompletableFuture<R> sendAndReceive(final @NotNull T payload,
+                                                               final @NotNull Class<R> responseType,
+                                                               final @NotNull Duration timeout) {
+        return sendAndReceive(payload, responseType, timeout.toMillis());
+    }
+
+    @Override
+    public @NotNull <T, R> CompletableFuture<R> sendAndReceive(final @NotNull T payload,
+                                                               final @NotNull Class<R> responseType,
+                                                               final long timeout) {
+        return sendAndReceiveRaw(mapper.serialize(payload), timeout)
+                .thenApply(r -> mapper.deserialize(r, responseType));
+    }
+
+    @Override
+    public @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final @NotNull Duration timeout) {
+        return sendAndReceiveRaw(payload, timeout.toMillis());
+    }
+
+    @Override
+    public @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final long timeout) {
+        NetworkMessage message = new NetworkMessage(UUID.randomUUID(), payload);
+        CompletableFuture<String> future = new CompletableFuture<>();
+        pendingResponses.put(message.getConversationId(), future);
+        return sendRaw(message)
+                .thenCompose(v -> future.orTimeout(timeout, TimeUnit.MILLISECONDS))
+                .whenComplete((r, t) -> pendingResponses.remove(message.getConversationId()));
+    }
+
+    @Override
     public @NotNull <T> CompletableFuture<Void> send(final @NotNull T payload) {
         return sendRaw(mapper.serialize(payload));
     }
@@ -76,36 +106,6 @@ public abstract class AbstractMessageChannel implements MessageChannel {
     public @NotNull MessageChannel unsubscribe(final @NotNull UUID id) {
         messageHandlers.remove(id);
         return this;
-    }
-
-    @Override
-    public @NotNull <T, R> CompletableFuture<R> sendAndReceive(final @NotNull T payload,
-                                                               final @NotNull Class<R> responseType,
-                                                               final @NotNull Duration timeout) {
-        return sendAndReceive(payload, responseType, timeout.toMillis());
-    }
-
-    @Override
-    public @NotNull <T, R> CompletableFuture<R> sendAndReceive(final @NotNull T payload,
-                                                               final @NotNull Class<R> responseType,
-                                                               final long timeout) {
-        return sendAndReceiveRaw(mapper.serialize(payload), timeout)
-                .thenApply(r -> mapper.deserialize(r, responseType));
-    }
-
-    @Override
-    public @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final @NotNull Duration timeout) {
-        return sendAndReceiveRaw(payload, timeout.toMillis());
-    }
-
-    @Override
-    public @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final long timeout) {
-        NetworkMessage message = new NetworkMessage(UUID.randomUUID(), payload);
-        CompletableFuture<String> future = new CompletableFuture<>();
-        pendingResponses.put(message.getConversationId(), future);
-        return sendRaw(message)
-                .thenCompose(v -> future.orTimeout(timeout, TimeUnit.MILLISECONDS))
-                .whenComplete((r, t) -> pendingResponses.remove(message.getConversationId()));
     }
 
     /**

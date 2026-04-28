@@ -15,6 +15,56 @@ public interface MessageChannel {
 
     /**
      * Sends a message to the channel.
+     * Then, awaits for the response and returns it.
+     *
+     * @param <T>          the type of the payload
+     * @param <R>          the type of the response
+     * @param payload      the payload to send
+     * @param responseType the type of the response
+     * @param timeout      the timeout after which the task will fail
+     * @return the response
+     */
+    <T, R> @NotNull CompletableFuture<R> sendAndReceive(final @NotNull T payload,
+                                                        final @NotNull Class<R> responseType,
+                                                        final @NotNull Duration timeout);
+
+    /**
+     * Sends a message to the channel.
+     * Then, awaits for the response and returns it.
+     *
+     * @param <T>          the type of the payload
+     * @param <R>          the type of the response
+     * @param payload      the payload to send
+     * @param responseType the type of the response
+     * @param timeout      the timeout after which the task will fail (in milliseconds)
+     * @return the response
+     */
+    <T, R> @NotNull CompletableFuture<R> sendAndReceive(final @NotNull T payload,
+                                                        final @NotNull Class<R> responseType,
+                                                        final long timeout);
+
+    /**
+     * Sends a message to the channel.
+     * Then, awaits for the response and returns it.
+     *
+     * @param payload the payload to send
+     * @param timeout the timeout after which the task will fail
+     * @return the response
+     */
+    @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final @NotNull Duration timeout);
+
+    /**
+     * Sends a message to the channel.
+     * Then, awaits for the response and returns it.
+     *
+     * @param payload the payload to send
+     * @param timeout the timeout after which the task will fail (in milliseconds)
+     * @return the response
+     */
+    @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final long timeout);
+
+    /**
+     * Sends a message to the channel.
      *
      * @param <T>     the type of the payload
      * @param payload the payload to send
@@ -76,55 +126,5 @@ public interface MessageChannel {
      * @return this object (for method chaining)
      */
     @NotNull MessageChannel unsubscribe(final @NotNull UUID id);
-
-    /**
-     * Sends a message to the channel.
-     * Then, awaits for the response and returns it.
-     *
-     * @param <T>          the type of the payload
-     * @param <R>          the type of the response
-     * @param payload      the payload to send
-     * @param responseType the type of the response
-     * @param timeout      the timeout after which the task will fail
-     * @return the response
-     */
-    <T, R> @NotNull CompletableFuture<R> sendAndReceive(final @NotNull T payload,
-                                                        final @NotNull Class<R> responseType,
-                                                        final @NotNull Duration timeout);
-
-    /**
-     * Sends a message to the channel.
-     * Then, awaits for the response and returns it.
-     *
-     * @param <T>          the type of the payload
-     * @param <R>          the type of the response
-     * @param payload      the payload to send
-     * @param responseType the type of the response
-     * @param timeout      the timeout after which the task will fail (in milliseconds)
-     * @return the response
-     */
-    <T, R> @NotNull CompletableFuture<R> sendAndReceive(final @NotNull T payload,
-                                                        final @NotNull Class<R> responseType,
-                                                        final long timeout);
-
-    /**
-     * Sends a message to the channel.
-     * Then, awaits for the response and returns it.
-     *
-     * @param payload the payload to send
-     * @param timeout the timeout after which the task will fail
-     * @return the response
-     */
-    @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final @NotNull Duration timeout);
-
-    /**
-     * Sends a message to the channel.
-     * Then, awaits for the response and returns it.
-     *
-     * @param payload the payload to send
-     * @param timeout the timeout after which the task will fail (in milliseconds)
-     * @return the response
-     */
-    @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final long timeout);
 
 }
