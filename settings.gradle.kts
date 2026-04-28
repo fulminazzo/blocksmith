@@ -52,6 +52,13 @@ include(
     "data-starter:data-starter-testing"
 )
 
+// message-broker-starter
+include(
+    "message-broker-starter",
+
+    "message-broker-starter:message-broker-starter-base",
+)
+
 // example
 include("example")
 
