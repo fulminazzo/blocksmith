@@ -37,8 +37,11 @@ class RedisMessageChannelTest extends MessageChannelTest {
 
             @Override
             void message(final String channel, final String message) {
-                if (channel == channelName)
-                    receivedMessages.add(mapper.deserialize(message, Message))
+                if (channel == channelName) {
+                    Message msg = mapper.deserialize(message, Message)
+                    logger.info("Received message id=${msg.id} on channel $channel")
+                    receivedMessages.add(msg)
+                }
             }
 
         })

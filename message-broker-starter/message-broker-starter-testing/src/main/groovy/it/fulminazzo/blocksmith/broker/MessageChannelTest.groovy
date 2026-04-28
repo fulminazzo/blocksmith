@@ -1,14 +1,18 @@
 package it.fulminazzo.blocksmith.broker
 
 import org.jetbrains.annotations.NotNull
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 
 abstract class MessageChannelTest extends Specification {
+    protected static final Logger logger = LoggerFactory.getLogger(MessageChannelTest)
+
     protected static final int SLEEP_TIME = 75
-    
+
     protected MessageChannel channel
 
     void setupChannel() {
