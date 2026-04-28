@@ -25,6 +25,8 @@ class AbstractMessageChannelTest extends Specification {
 
     void cleanup() {
         executorService.shutdown()
+        sender.close()
+        receiver.close()
     }
 
     def 'test that sendAndReceive works'() {

@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.broker;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Closeable;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -11,7 +12,7 @@ import java.util.function.Function;
 /**
  * A general channel for handling messaging across servers.
  */
-public interface MessageChannel {
+public interface MessageChannel extends Closeable {
 
     /**
      * Sends a message to the channel.

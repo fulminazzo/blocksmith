@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.*;
@@ -53,6 +54,11 @@ public final class MockMessageChannel extends AbstractMessageChannel {
 
     public static @NotNull Queue<String> getQueue(final @NotNull String name) {
         return MESSAGES.computeIfAbsent(name, _ -> new ConcurrentLinkedQueue<>());
+    }
+
+    @Override
+    public void close() {
+        MESSAGES.remove(name);
     }
 
 }
