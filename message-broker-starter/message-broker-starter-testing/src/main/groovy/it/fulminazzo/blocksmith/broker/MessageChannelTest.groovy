@@ -1,5 +1,7 @@
 package it.fulminazzo.blocksmith.broker
 
+import it.fulminazzo.blocksmith.data.mapper.Mapper
+import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import org.jetbrains.annotations.NotNull
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -12,6 +14,8 @@ abstract class MessageChannelTest extends Specification {
     protected static final Logger logger = LoggerFactory.getLogger(MessageChannelTest)
 
     protected static final int SLEEP_TIME = 75
+
+    protected static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
     protected MessageChannel channel
 
@@ -93,6 +97,23 @@ abstract class MessageChannelTest extends Specification {
 
         where:
         message << [Messages.MESSAGE1, Messages.MESSAGE2]
+    }
+
+    protected String serializeMessage(final @NotNull Message message) {
+        return MAPPER.serialize(new AbstractMessageChannel.NetworkMessage(
+                UUID.randomUUID(),
+                MAPPER.serialize(message)
+        ))
+    }
+
+    protected Message deserializeMessage(final @NotNull String payload) {
+        return MAPPER.deserialize(
+                MAPPER.deserialize(
+                        payload,
+                        AbstractMessageChannel.NetworkMessage
+                ).message,
+                Message
+        )
     }
 
     abstract MessageChannel initializeChannel()
