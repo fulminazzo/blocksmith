@@ -22,7 +22,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
     private static StatefulRedisConnection<String, String> connection
     private static StatefulRedisPubSubConnection<String, String> pubSubConnection
 
-    private final Queue<Message> received = new LinkedList<>()
+    private final Queue<Message> receivedMessages = new LinkedList<>()
 
     void setupSpec() {
         server = new RedisServer(serverPort)
@@ -37,7 +37,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
             @Override
             void message(final String channel, final String message) {
                 if (channel == channelName)
-                    received.add(mapper.deserialize(message, Message))
+                    receivedMessages.add(mapper.deserialize(message, Message))
             }
 
         })
@@ -50,7 +50,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
 
     void cleanup() {
         clearData()
-        received.clear()
+        receivedMessages.clear()
     }
 
     void cleanupSpec() {
@@ -78,7 +78,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
 
     @Override
     boolean received(final @NotNull Long id) {
-        return false
+        return receivedMessages.any { it.id == id }
     }
 
     @Override
