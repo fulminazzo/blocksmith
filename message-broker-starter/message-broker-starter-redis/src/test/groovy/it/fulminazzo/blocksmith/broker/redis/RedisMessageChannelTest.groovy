@@ -7,6 +7,7 @@ import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
 import it.fulminazzo.blocksmith.broker.Message
 import it.fulminazzo.blocksmith.broker.MessageChannel
 import it.fulminazzo.blocksmith.broker.MessageChannelTest
+import it.fulminazzo.blocksmith.broker.Messages
 import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import org.jetbrains.annotations.NotNull
@@ -62,6 +63,17 @@ class RedisMessageChannelTest extends MessageChannelTest {
     def 'test that server is online'() {
         expect:
         server.active
+    }
+
+    def 'test that sending on server works'() {
+        when:
+        send(message)
+
+        then:
+        received(message.id)
+
+        where:
+        message << [Messages.MESSAGE1, Messages.MESSAGE2]
     }
 
     @Override
