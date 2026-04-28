@@ -21,7 +21,11 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor
 public abstract class AbstractMessageChannel implements MessageChannel {
-    protected final @NotNull Map<UUID, MessageHandler> messageHandlers = new ConcurrentHashMap<>();
+    private final @NotNull Map<UUID, MessageHandler> messageHandlers = new ConcurrentHashMap<>();
+    /**
+     * Identifies the sendAndReceive requests that are still pending an answer.
+     */
+    private final @NotNull Map<UUID, CompletableFuture<String>> pendingResponses = new ConcurrentHashMap<>();
 
     private final @NotNull Mapper mapper;
 
@@ -86,10 +90,16 @@ public abstract class AbstractMessageChannel implements MessageChannel {
         List<CompletableFuture<?>> futures = new ArrayList<>();
         try {
             NetworkMessage networkMessage = mapper.deserialize(message, NetworkMessage.class);
+            UUID conversationId = networkMessage.getConversationId();
+            if (pendingResponses.containsKey(conversationId)) {
+                CompletableFuture<String> future = pendingResponses.remove(conversationId);
+                future.complete(networkMessage.getMessage());
+                return;
+            }
             for (MessageHandler handler : messageHandlers.values()) {
                 String response = handler.handle(networkMessage.getMessage());
                 if (response != null)
-                    futures.add(send(new NetworkMessage(networkMessage.getConversationId(), response)));
+                    futures.add(send(new NetworkMessage(conversationId, response)));
             }
         } catch (MapperException e) {
             // provide support for messages not sent through blocksmith
