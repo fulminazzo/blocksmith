@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +21,18 @@ import java.util.function.Function;
 /**
  * Abstract implementation of {@link MessageChannel} with common checks
  * and support methods.
+ *
+ * @param <E>the type of the {@link MessageQueryEngine} responsible for executing internal interactions
  */
 @RequiredArgsConstructor
-public abstract class AbstractMessageChannel implements MessageChannel {
+public abstract class AbstractMessageChannel<E extends MessageQueryEngine> implements MessageChannel {
     private final @NotNull Map<UUID, Function<String, String>> messageHandlers = new ConcurrentHashMap<>();
     /**
      * Identifies the sendAndReceive requests that are still pending an answer.
      */
     private final @NotNull Map<UUID, CompletableFuture<String>> pendingResponses = new ConcurrentHashMap<>();
 
+    protected final @NotNull E queryEngine;
     private final @NotNull Mapper mapper;
 
     @Override
@@ -108,6 +112,19 @@ public abstract class AbstractMessageChannel implements MessageChannel {
         return this;
     }
 
+    @Override
+    public void close() throws IOException {
+        queryEngine.close();
+    }
+
+    /**
+     * Initializes this channel.
+     * Should only be called once.
+     */
+    protected void initialize() {
+        queryEngine.listen(s -> handleMessage(s).join());
+    }
+
     /**
      * Handles an incoming message with all the listening message handlers.
      *
@@ -141,16 +158,8 @@ public abstract class AbstractMessageChannel implements MessageChannel {
     }
 
     private @NotNull CompletableFuture<Void> sendRaw(final @NotNull NetworkMessage message) {
-        return sendRawImpl(mapper.serialize(message));
+        return queryEngine.publish(mapper.serialize(message));
     }
-
-    /**
-     * Sends a raw message to the channel.
-     *
-     * @param payload the payload to send
-     * @return nothing
-     */
-    protected abstract @NotNull CompletableFuture<Void> sendRawImpl(final @NotNull String payload);
 
     @Data
     @NoArgsConstructor
