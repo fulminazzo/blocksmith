@@ -112,8 +112,9 @@ public abstract class AbstractMessageChannel implements MessageChannel {
      * Handles an incoming message with all the listening message handlers.
      *
      * @param message the message
+     * @return a future containing all the responses
      */
-    protected void handleMessage(final @NotNull String message) {
+    protected @NotNull CompletableFuture<Void> handleMessage(final @NotNull String message) {
         List<CompletableFuture<?>> futures = new ArrayList<>();
         try {
             NetworkMessage networkMessage = mapper.deserialize(message, NetworkMessage.class);
@@ -121,7 +122,7 @@ public abstract class AbstractMessageChannel implements MessageChannel {
             if (pendingResponses.containsKey(conversationId)) {
                 CompletableFuture<String> future = pendingResponses.get(conversationId);
                 future.complete(networkMessage.getMessage());
-                return;
+                return CompletableFuture.completedFuture(null);
             }
             for (MessageHandler handler : messageHandlers.values()) {
                 String response = handler.handle(networkMessage.getMessage());
@@ -136,7 +137,7 @@ public abstract class AbstractMessageChannel implements MessageChannel {
                     futures.add(sendRaw(response));
             }
         }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
     private @NotNull CompletableFuture<Void> sendRaw(final @NotNull NetworkMessage message) {

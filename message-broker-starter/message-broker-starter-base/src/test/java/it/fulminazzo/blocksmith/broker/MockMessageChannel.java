@@ -4,7 +4,6 @@ import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.*;
@@ -34,7 +33,7 @@ public final class MockMessageChannel extends AbstractMessageChannel {
         executorService.scheduleAtFixedRate(
                 () -> {
                     Queue<String> queue = getQueue(name);
-                    if (!queue.isEmpty()) handleMessage(queue.poll());
+                    if (!queue.isEmpty()) handleMessage(queue.poll()).join();
                 },
                 0,
                 125,
