@@ -63,6 +63,32 @@ abstract class MessageChannelTest extends Specification {
         message << [Messages.MESSAGE1, Messages.MESSAGE2]
     }
 
+    def 'test that unsubscribe correctly removes handler'() {
+        given:
+        def received = new AtomicReference<>()
+
+        and:
+        def id = channel.subscribe(Message, (Consumer<Message>) (m -> received.set(m)))
+
+        and:
+        sleep(125)
+
+        and:
+        channel.unsubscribe(id)
+
+        and:
+        sleep(125)
+
+        when:
+        send(message)
+
+        then:
+        received.get() == null
+
+        where:
+        message << [Messages.MESSAGE1, Messages.MESSAGE2]
+    }
+
     abstract MessageChannel initializeChannel()
 
     /**
