@@ -35,6 +35,11 @@ public abstract class AbstractMessageChannel implements MessageChannel {
     }
 
     @Override
+    public @NotNull CompletableFuture<Void> sendRaw(final @NotNull String payload) {
+        return sendRaw(new NetworkMessage(UUID.randomUUID(), payload));
+    }
+
+    @Override
     public @NotNull <T, R> UUID subscribe(final @NotNull Class<T> messageType, final @NotNull Function<T, R> consumer) {
         return subscribeRaw(s -> {
             R result = consumer.apply(mapper.deserialize(s, messageType));
@@ -99,7 +104,7 @@ public abstract class AbstractMessageChannel implements MessageChannel {
             for (MessageHandler handler : messageHandlers.values()) {
                 String response = handler.handle(networkMessage.getMessage());
                 if (response != null)
-                    futures.add(send(new NetworkMessage(conversationId, response)));
+                    futures.add(sendRaw(new NetworkMessage(conversationId, response)));
             }
         } catch (MapperException e) {
             // provide support for messages not sent through blocksmith
@@ -111,6 +116,18 @@ public abstract class AbstractMessageChannel implements MessageChannel {
         }
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
+
+    private @NotNull CompletableFuture<Void> sendRaw(final @NotNull NetworkMessage message) {
+        return sendRawImpl(mapper.serialize(message));
+    }
+
+    /**
+     * Sends a raw message to the channel.
+     *
+     * @param payload the payload to send
+     * @return nothing
+     */
+    protected abstract @NotNull CompletableFuture<Void> sendRawImpl(final @NotNull String payload);
 
     @Value
     private static class NetworkMessage {
