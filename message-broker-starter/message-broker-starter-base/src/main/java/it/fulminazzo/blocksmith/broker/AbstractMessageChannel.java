@@ -2,8 +2,8 @@ package it.fulminazzo.blocksmith.broker;
 
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.MapperException;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -134,8 +134,11 @@ public abstract class AbstractMessageChannel implements MessageChannel {
      */
     protected abstract @NotNull CompletableFuture<Void> sendRawImpl(final @NotNull String payload);
 
-    @Value
-    private static class NetworkMessage {
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    private final static class NetworkMessage {
         /**
          * The id used to track back the flow of messages between clients.
          */
