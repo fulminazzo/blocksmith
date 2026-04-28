@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.broker.redis;
 
+import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.pubsub.RedisPubSubAdapter;
 import io.lettuce.core.pubsub.RedisPubSubListener;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
@@ -21,21 +22,25 @@ import java.util.function.Consumer;
 public final class RedisMessageQueryEngine implements MessageQueryEngine {
     private final @NotNull Set<RedisPubSubListener<String, String>> listeners = ConcurrentHashMap.newKeySet();
 
-    private final @NotNull StatefulRedisPubSubConnection<String, String> connection;
+    private final @NotNull StatefulRedisConnection<String, String> connection;
+    private final @NotNull StatefulRedisPubSubConnection<String, String> pubSubConnection;
     private final @NotNull String channelName;
 
     /**
      * Instantiates a new Redis message query engine.
      *
-     * @param connection  the connection
-     * @param channelName the channel name
+     * @param connection       the connection used for sending
+     * @param pubSubConnection the connection used for receiving
+     * @param channelName      the channel name
      */
-    RedisMessageQueryEngine(final @NotNull StatefulRedisPubSubConnection<String, String> connection,
+    RedisMessageQueryEngine(final @NotNull StatefulRedisConnection<String, String> connection,
+                            final @NotNull StatefulRedisPubSubConnection<String, String> pubSubConnection,
                             final @NotNull String channelName) {
         this.connection = connection;
+        this.pubSubConnection = pubSubConnection;
         this.channelName = channelName;
 
-        connection.sync().subscribe(channelName);
+        pubSubConnection.sync().subscribe(channelName);
     }
 
     @Override
@@ -57,13 +62,13 @@ public final class RedisMessageQueryEngine implements MessageQueryEngine {
 
         };
         listeners.add(listener);
-        connection.addListener(listener);
+        pubSubConnection.addListener(listener);
     }
 
     @Override
     public void close() {
-        listeners.forEach(connection::removeListener);
-        connection.sync().unsubscribe(channelName);
+        listeners.forEach(pubSubConnection::removeListener);
+        pubSubConnection.sync().unsubscribe(channelName);
     }
 
 }

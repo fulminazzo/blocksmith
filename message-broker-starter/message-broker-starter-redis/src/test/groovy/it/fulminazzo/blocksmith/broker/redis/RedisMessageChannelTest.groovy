@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.broker.redis
 
 import io.lettuce.core.RedisClient
+import io.lettuce.core.api.StatefulRedisConnection
 import io.lettuce.core.pubsub.RedisPubSubAdapter
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
 import it.fulminazzo.blocksmith.broker.Message
@@ -18,7 +19,8 @@ class RedisMessageChannelTest extends MessageChannelTest {
 
     private static RedisServer server
     private static RedisClient client
-    private static StatefulRedisPubSubConnection<String, String> connection
+    private static StatefulRedisConnection<String, String> connection
+    private static StatefulRedisPubSubConnection<String, String> pubSubConnection
 
     private final Queue<Message> received = new LinkedList<>()
 
@@ -27,9 +29,10 @@ class RedisMessageChannelTest extends MessageChannelTest {
         server.start()
 
         client = RedisClient.create("redis://localhost:$serverPort")
-        connection = client.connectPubSub()
+        connection = client.connect()
+        pubSubConnection = client.connectPubSub()
 
-        connection.addListener(new RedisPubSubAdapter<String, String>() {
+        pubSubConnection.addListener(new RedisPubSubAdapter<String, String>() {
 
             @Override
             void message(final String channel, final String message) {
@@ -38,7 +41,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
             }
 
         })
-        connection.sync().subscribe(channelName)
+        pubSubConnection.sync().subscribe(channelName)
     }
 
     void setup() {
@@ -51,7 +54,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
     }
 
     void cleanupSpec() {
-        connection?.close()
+        pubSubConnection?.close()
         client?.shutdown()
         server?.stop()
     }
@@ -66,6 +69,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
         return new RedisMessageChannel(
                 new RedisMessageQueryEngine(
                         connection,
+                        pubSubConnection,
                         channelName
                 ),
                 mapper
