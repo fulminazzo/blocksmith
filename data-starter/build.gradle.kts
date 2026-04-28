@@ -1,5 +1,5 @@
 plugins { id("blocksmith.composite-module") }
 
 compositeModule {
-    excludedSubmodules = setOf(project.projects.dataStarter.dataStarterMapper.name)
+    ignoredSubmodules = setOf(project.projects.dataStarter.dataStarterMapper.name)
 }
