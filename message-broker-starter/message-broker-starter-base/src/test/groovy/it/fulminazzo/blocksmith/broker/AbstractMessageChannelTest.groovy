@@ -4,8 +4,11 @@ import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import spock.lang.Specification
 
+import java.time.Duration
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import java.util.function.Function
@@ -22,6 +25,40 @@ class AbstractMessageChannelTest extends Specification {
 
     void cleanup() {
         executorService.shutdown()
+    }
+
+    def 'test that sendAndReceive works'() {
+        given:
+        final expected = new Cat('Sissy', 15, true)
+
+        and:
+        receiver.subscribe(expected.class, (Function<?, ?>) (d -> d == data ? expected : null))
+
+        when:
+        def actual = sender.sendAndReceive(data, Cat, Duration.ofSeconds(1)).get()
+
+        then:
+        actual == expected
+    }
+
+    def 'test that sendAndReceiveRaw works'() {
+        given:
+        receiver.subscribeRaw((MessageHandler) (r -> r == 'ping' ? 'pong' : null))
+
+        when:
+        def actual = sender.sendAndReceiveRaw('ping', Duration.ofSeconds(1)).get()
+
+        then:
+        actual == 'pong'
+    }
+
+    def 'test that sendAndReceiveRaw throws Timeout if nobody is subscribed'() {
+        when:
+        sender.sendAndReceiveRaw('ping', Duration.ofMillis(125)).get()
+
+        then:
+        def e = thrown(ExecutionException)
+        (e.cause instanceof TimeoutException)
     }
 
     def 'test that send correctly sends serialized payload'() {
