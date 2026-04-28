@@ -1,0 +1,85 @@
+package it.fulminazzo.blocksmith.broker.redis
+
+import io.lettuce.core.RedisClient
+import io.lettuce.core.pubsub.RedisPubSubAdapter
+import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
+import it.fulminazzo.blocksmith.broker.Message
+import it.fulminazzo.blocksmith.broker.MessageChannel
+import it.fulminazzo.blocksmith.broker.MessageChannelTest
+import it.fulminazzo.blocksmith.data.mapper.Mapper
+import it.fulminazzo.blocksmith.data.mapper.MapperFormat
+import org.jetbrains.annotations.NotNull
+import redis.embedded.RedisServer
+
+class RedisMessageChannelTest extends MessageChannelTest {
+    private static final String channelName = 'redis-message-channel'
+    private static final Mapper mapper = MapperFormat.JSON.newMapper()
+    private static final int serverPort = 16389
+
+    private static RedisServer server
+    private static RedisClient client
+    private static StatefulRedisPubSubConnection<String, String> connection
+
+    private final Queue<Message> received = new LinkedList<>()
+
+    void setupSpec() {
+        server = new RedisServer(serverPort)
+        server.start()
+
+        client = RedisClient.create("redis://localhost:$serverPort")
+        connection = client.connectPubSub()
+
+        connection.addListener(new RedisPubSubAdapter<String, String>() {
+
+            @Override
+            void message(final String channel, final String message) {
+                if (channel == channelName)
+                    received.add(mapper.deserialize(message, Message))
+            }
+
+        })
+        connection.sync().subscribe(channelName)
+    }
+
+    void setup() {
+        setupChannel()
+    }
+
+    void cleanup() {
+        clearData()
+        received.clear()
+    }
+
+    void cleanupSpec() {
+        connection?.close()
+        client?.shutdown()
+        server?.stop()
+    }
+
+    def 'test that server is online'() {
+        expect:
+        server.active
+    }
+
+    @Override
+    MessageChannel initializeChannel() {
+        return new RedisMessageChannel(
+                new RedisMessageQueryEngine(
+                        connection,
+                        channelName
+                ),
+                mapper
+        )
+    }
+
+    @Override
+    boolean received(final @NotNull Long id) {
+        return false
+    }
+
+    @Override
+    void send(final @NotNull Message message) {
+        connection.sync().publish(channelName, mapper.serialize(message))
+    }
+
+}
