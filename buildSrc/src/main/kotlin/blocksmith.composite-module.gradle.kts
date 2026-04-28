@@ -39,7 +39,9 @@ afterEvaluate {
         if (extension.importToParent.getOrElse(true))
             subprojects
                 .filter { !it.name.endsWith(testingModuleName) }
-                .filter { p -> excludedSubmodules.getOrElse(emptySet()).any { it in p.name } }
+                .filter { p -> excludedSubmodules.getOrElse(emptySet())
+                    .none { it in p.name }
+                }
                 .forEach { api(it) }
     }
 
