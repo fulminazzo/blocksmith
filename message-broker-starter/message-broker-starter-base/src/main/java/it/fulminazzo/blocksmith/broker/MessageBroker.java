@@ -13,7 +13,7 @@ import java.io.Closeable;
  *
  * @param <S> the type of the message channel settings (to build new message channels)
  */
-public interface MessageBroker<S extends MessageChannelSettings> extends Closeable {
+public interface MessageBroker<S extends MessageChannelSettings<S>> extends Closeable {
 
     /**
      * Creates a new message channel.
