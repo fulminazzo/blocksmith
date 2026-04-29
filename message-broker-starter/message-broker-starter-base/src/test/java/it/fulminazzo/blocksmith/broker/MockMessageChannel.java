@@ -26,7 +26,6 @@ public final class MockMessageChannel extends AbstractMessageChannel<MockMessage
                               final @NotNull ScheduledExecutorService executorService) {
         super(new MockMessageQueryEngine(name, executorService), mapper);
         this.name = name;
-        initialize();
     }
 
 }

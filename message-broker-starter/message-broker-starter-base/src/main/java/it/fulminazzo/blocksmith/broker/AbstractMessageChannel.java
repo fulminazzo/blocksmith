@@ -22,7 +22,6 @@ import java.util.function.Function;
  *
  * @param <E> the type of the {@link MessageQueryEngine} responsible for executing internal interactions
  */
-@RequiredArgsConstructor
 public abstract class AbstractMessageChannel<E extends MessageQueryEngine> implements MessageChannel {
     private final @NotNull Map<UUID, Function<String, String>> messageHandlers = new ConcurrentHashMap<>();
     /**
@@ -39,6 +38,19 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
      */
     protected final @NotNull E queryEngine;
     private final @NotNull Mapper mapper;
+
+    /**
+     * Instantiates a new Abstract message channel.
+     *
+     * @param queryEngine the query engine
+     * @param mapper      the mapper
+     */
+    protected AbstractMessageChannel(final @NotNull E queryEngine,
+                                     final @NotNull Mapper mapper) {
+        this.queryEngine = queryEngine;
+        this.mapper = mapper;
+        queryEngine.listen(this::handleMessage);
+    }
 
     @Override
     public @NotNull <T, R> CompletableFuture<R> sendAndReceive(final @NotNull T payload,
@@ -120,14 +132,6 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
     @Override
     public void close() throws IOException {
         queryEngine.close();
-    }
-
-    /**
-     * Initializes this channel.
-     * Should only be called once.
-     */
-    protected void initialize() {
-        queryEngine.listen(this::handleMessage);
     }
 
     /**

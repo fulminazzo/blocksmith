@@ -18,7 +18,6 @@ public class RedisMessageChannel extends AbstractMessageChannel<RedisMessageQuer
     protected RedisMessageChannel(final @NotNull RedisMessageQueryEngine queryEngine,
                                   final @NotNull Mapper mapper) {
         super(queryEngine, mapper);
-        initialize();
     }
 
 }
