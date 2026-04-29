@@ -5,7 +5,12 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.*;
 
 /**
- * Marks a class or method as a command declaration for the Blocksmith command framework.
+ * <h1>Command</h1>
+ * The {@link Command} annotation marks a class or a method as a command declaration
+ * for the Blocksmith command framework.
+ * It alleviates most of the boilerplate required for command functioning like
+ * argument count checks, validation of arguments and executors, optional arguments
+ * and so much more.
  *
  * <h2>Command syntax</h2>
  * The syntax of the command is defined by the {@link #value()} attribute.
@@ -167,7 +172,71 @@ public @interface Command {
      */
     @NotNull String description() default "";
 
-    //TODO: document
+    /**
+     * <h1>Dynamic Command</h1>
+     * A dynamic command is a special type of command that <b>does not require</b> a name (or aliases) specified.
+     * This was created to offer the user the possibility to generate commands at <b>runtime</b>
+     * with their own aliases of preference.
+     * <br>
+     * The {@code dynamic} value will have different effects and requirements based on the scope of use.
+     *
+     * <h2>Class-level usage</h2>
+     * When the command was declared as a <b>root command</b>, the containing class <b>requires</b>
+     * a <b>no-parameters</b> {@code getAliases} method returning a {@link java.util.Collection} instance.
+     * This is where the actual dynamic aliases will be taken from.
+     * <br>
+     * Example:
+     * <pre>{@code
+     * @Command(dynamic = true)
+     * public class ClanCommand {
+     *
+     *     public List<String> getAliases() {
+     *         // Here the logic may differ as the developer pleases.
+     *         // For example, the aliases could be taken from a configuration file.
+     *         return Arrays.asList("clan", "gang", "team");
+     *     }
+     *
+     * }
+     * }</pre>
+     * The above will register the commands:
+     * <ul>
+     *     <li>{@code /clan}</li>
+     *     <li>{@code /gang}</li>
+     *     <li>{@code /team}</li>
+     * </ul>
+     *
+     * <h2>Method-level usage</h2>
+     * When the {@link Command} annotation is applied to a method, only the <b>static</b> case is supported.
+     * This means that, at the time of writing this documentation, it is <b>not</b> possible to declare
+     * <b>dynamic subcommands</b>.
+     * However, it is possible to declare <b>dynamic anonymous commands</b>.
+     * The containing class <b>requires</b> a <b>no-parameters</b> {@code get<capitalized_method_name>Aliases} method
+     * returning a {@link java.util.Collection} instance.
+     * This is where the actual dynamic aliases will be taken from.
+     * <br>
+     * Example:
+     * <pre>{@code
+     * public class Commands {
+     *
+     *     // Specifying the syntax of the command WITHOUT the aliases
+     *     @Command("<message>", dynamic = true)
+     *     public static void echo(CommandSender sender, String message) { ... }
+     *
+     *     // The name of this command depends on the name of the method of the command it refers to.
+     *     public static List<String> getEchoAliases() {
+     *         return Arrays.asList("echo", "print");
+     *     }
+     *
+     * }
+     * }</pre>
+     * The above will register the commands:
+     * <ul>
+     *     <li>{@code /echo <message>}</li>
+     *     <li>{@code /print <message>}</li>
+     * </ul>
+     *
+     * @return {@code true} if the command should be dynamic
+     */
     boolean dynamic() default false;
 
     /**
