@@ -7,6 +7,7 @@ import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
 import it.fulminazzo.blocksmith.broker.Message
 import it.fulminazzo.blocksmith.broker.MessageChannel
 import it.fulminazzo.blocksmith.broker.MessageChannelTest
+import it.fulminazzo.blocksmith.broker.Messages
 import org.jetbrains.annotations.NotNull
 import redis.embedded.RedisServer
 
@@ -40,6 +41,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
                     logger.debug("Received on channel ($channel) raw: $message")
                     logger.info("Received on channel ($channel) message with id=$msg.id")
                     receivedMessages.add(msg)
+                    if (msg == Messages.MESSAGE1) send(Messages.MESSAGE2)
                 }
             }
 
