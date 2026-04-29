@@ -2,10 +2,7 @@ package it.fulminazzo.blocksmith.command.annotation;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Specifies the <b>default value</b> for an <b>optional</b> argument.
@@ -31,6 +28,7 @@ import java.lang.annotation.Target;
  * @see Command
  * @see Greedy
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface Default {
