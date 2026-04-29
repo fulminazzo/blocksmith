@@ -1,3 +1,5 @@
+plugins { id("blocksmith.composite-module") }
+
 dependencies {
     compileOnly(libs.slf4j)
 }
@@ -5,19 +7,13 @@ dependencies {
 allprojects {
 
     dependencies {
-        val testingModule = rootProject.projects.configStarter.configStarterTesting
-        if (project.path != testingModule.path) testImplementation(testingModule)
+        compileOnly(rootProject.libs.slf4j)
     }
 
 }
 
-subprojects {
-
-    dependencies {
-        compileOnly(rootProject.libs.slf4j)
-
-        val coreModule = rootProject.projects.configStarter.configStarterCore
-        if (project.path != coreModule.path) api(coreModule)
-    }
-
+compositeModule {
+    excludedSubmodules = setOf(
+        project.projects.configStarter.configStarterGenerator.name
+    )
 }

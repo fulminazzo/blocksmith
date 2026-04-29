@@ -15,15 +15,14 @@ include("validation-starter")
 // config-starter
 include(
     "config-starter",
-    "config-starter:config-starter-core",
+
+    "config-starter:config-starter-base",
 
     "config-starter:config-starter-json",
     "config-starter:config-starter-properties",
     "config-starter:config-starter-toml",
     "config-starter:config-starter-xml",
     "config-starter:config-starter-yaml",
-
-    "config-starter:config-starter-all",
 
     "config-starter:config-starter-testing",
     "config-starter:config-starter-generator"
@@ -32,6 +31,9 @@ include(
 // message-starter
 include(
     "message-starter",
+
+    "message-starter:message-starter-base",
+
     "message-starter:message-starter-translation",
 
     "message-starter:message-starter-bukkit",
@@ -42,6 +44,8 @@ include(
 // scheduler-starter
 include(
     "scheduler-starter",
+
+    "scheduler-starter:scheduler-starter-base",
 
     "scheduler-starter:scheduler-starter-bukkit",
     "scheduler-starter:scheduler-starter-folia",
@@ -66,3 +70,24 @@ include(
 
     "example:example-bukkit"
 )
+
+@Suppress("UnstableApiUsage")
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        maven {
+            name = "minecraft-libraries"
+            url = uri("https://libraries.minecraft.net/")
+        }
+        maven {
+            name = "spigotmc-repo"
+            url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+        }
+        maven {
+            name = "papermc"
+            url = uri("https://repo.papermc.io/repository/maven-public/")
+        }
+    }
+
+}

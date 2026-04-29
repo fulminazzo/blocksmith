@@ -1,10 +1,7 @@
 dependencies {
     api(projects.schedulerStarter.schedulerStarterBukkit)
 
-    compileOnly(libs.folia)
-
-    testImplementation(libs.folia)
-    testImplementation(libs.mockbukkit) {
+    testImplementation(libs.mockbukkit20) {
         exclude(group = "io.papermc.paper")
         exclude(group = "net.bytebuddy")
         exclude(group = "org.junit.jupiter")

@@ -1,5 +1,5 @@
-subprojects {
-    dependencies {
-        project.parent?.let { api(it) }
-    }
+plugins { id("blocksmith.minecraft-module") }
+
+minecraftModule {
+    enableFolia = true
 }

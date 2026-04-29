@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.configStarter.configStarterAll)
+    implementation(projects.configStarter)
 }
 
 tasks.jar {

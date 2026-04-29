@@ -3,8 +3,4 @@ dependencies {
     api(projects.schedulerStarter.schedulerStarterVelocity)
 
     api(projects.commandStarter.commandStarterBrigadier)
-
-    compileOnly(libs.velocity)
-
-    testImplementation(libs.velocity)
 }
