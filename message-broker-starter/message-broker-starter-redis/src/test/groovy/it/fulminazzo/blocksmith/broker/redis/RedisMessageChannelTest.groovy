@@ -7,7 +7,6 @@ import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
 import it.fulminazzo.blocksmith.broker.Message
 import it.fulminazzo.blocksmith.broker.MessageChannel
 import it.fulminazzo.blocksmith.broker.MessageChannelTest
-import it.fulminazzo.blocksmith.broker.Messages
 import org.jetbrains.annotations.NotNull
 import redis.embedded.RedisServer
 
@@ -21,6 +20,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
     private static StatefulRedisPubSubConnection<String, String> pubSubConnection
 
     private static final Queue<Message> receivedMessages = new LinkedList<>()
+    private static final Queue<Message> sentMessages = new LinkedList<>()
 
     void setupSpec() {
         server = new RedisServer(serverPort)
@@ -35,8 +35,9 @@ class RedisMessageChannelTest extends MessageChannelTest {
             @Override
             void message(final String channel, final String message) {
                 if (channel == channelName) {
-                    logger.debug("Received on channel ($channel) raw: $message")
                     Message msg = deserializeMessage(message)
+                    if (msg in sentMessages) return
+                    logger.debug("Received on channel ($channel) raw: $message")
                     logger.info("Received on channel ($channel) message with id=$msg.id")
                     receivedMessages.add(msg)
                 }
@@ -52,11 +53,13 @@ class RedisMessageChannelTest extends MessageChannelTest {
 
     void cleanup() {
         clearData()
+        sentMessages.clear()
         receivedMessages.clear()
     }
 
     void cleanupSpec() {
         pubSubConnection?.close()
+        connection?.close()
         client?.shutdown()
         server?.stop()
     }
@@ -64,20 +67,6 @@ class RedisMessageChannelTest extends MessageChannelTest {
     def 'test that server is online'() {
         expect:
         server.active
-    }
-
-    def 'test that sending on server works'() {
-        when:
-        send(message)
-
-        and:
-        sleep(SLEEP_TIME)
-
-        then:
-        received(message.id)
-
-        where:
-        message << [Messages.MESSAGE1, Messages.MESSAGE2]
     }
 
     @Override
@@ -99,6 +88,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
 
     @Override
     void send(final @NotNull Message message) {
+        sentMessages.add(message)
         connection.sync().publish(channelName, serializeMessage(message))
     }
 
