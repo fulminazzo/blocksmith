@@ -127,40 +127,36 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
      * Should only be called once.
      */
     protected void initialize() {
-        queryEngine.listen(s -> handleMessage(s).join());
+        queryEngine.listen(this::handleMessage);
     }
 
     /**
      * Handles an incoming message with all the listening message handlers.
      *
      * @param message the message
-     * @return a future containing all the responses
      */
-    protected @NotNull CompletableFuture<Void> handleMessage(final @NotNull String message) {
-        List<CompletableFuture<?>> futures = new ArrayList<>();
+    protected void handleMessage(final @NotNull String message) {
         try {
             NetworkMessage networkMessage = mapper.deserialize(message, NetworkMessage.class);
-            if (sentMessages.remove(networkMessage.getId())) return CompletableFuture.completedFuture(null);
+            if (sentMessages.remove(networkMessage.getId())) return;
             UUID conversationId = networkMessage.getConversationId();
             if (pendingResponses.containsKey(conversationId)) {
                 CompletableFuture<String> future = pendingResponses.get(conversationId);
                 future.complete(networkMessage.getMessage());
-                return CompletableFuture.completedFuture(null);
+                return;
             }
             for (Function<String, String> handler : messageHandlers.values()) {
                 String response = handler.apply(networkMessage.getMessage());
                 if (response != null)
-                    futures.add(sendRaw(new NetworkMessage(UUID.randomUUID(), conversationId, response)));
+                    sendRaw(new NetworkMessage(UUID.randomUUID(), conversationId, response));
             }
         } catch (MapperException e) {
             // provide support for messages not sent through blocksmith
             for (Function<String, String> handler : messageHandlers.values()) {
                 String response = handler.apply(message);
-                if (response != null)
-                    futures.add(sendRaw(response));
+                if (response != null) sendRaw(response);
             }
         }
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
     private @NotNull CompletableFuture<Void> sendRaw(final @NotNull NetworkMessage message) {
