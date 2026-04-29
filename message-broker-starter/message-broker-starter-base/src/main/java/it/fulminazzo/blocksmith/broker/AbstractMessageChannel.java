@@ -2,18 +2,15 @@ package it.fulminazzo.blocksmith.broker;
 
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.MapperException;
+import it.fulminazzo.blocksmith.structure.expiring.ExpiringMap;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -22,16 +19,19 @@ import java.util.function.Function;
  * Abstract implementation of {@link MessageChannel} with common checks
  * and support methods.
  *
- * @param <E>the type of the {@link MessageQueryEngine} responsible for executing internal interactions
+ * @param <E> the type of the {@link MessageQueryEngine} responsible for executing internal interactions
  */
 @RequiredArgsConstructor
 public abstract class AbstractMessageChannel<E extends MessageQueryEngine> implements MessageChannel {
-    private final @NotNull Map<UUID, Function<String, String>> messageHandlers = new ConcurrentHashMap<>();
+    private final @NotNull Map<UUID, Function<String, String>> messageHandlers = new HashMap<>();
     /**
      * Identifies the sendAndReceive requests that are still pending an answer.
      */
-    private final @NotNull Map<UUID, CompletableFuture<String>> pendingResponses = new ConcurrentHashMap<>();
+    private final @NotNull ExpiringMap<UUID, CompletableFuture<String>> pendingResponses = ExpiringMap.lazy();
 
+    /**
+     * The Query engine.
+     */
     protected final @NotNull E queryEngine;
     private final @NotNull Mapper mapper;
 
@@ -59,7 +59,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
     public @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final long timeout) {
         NetworkMessage message = new NetworkMessage(UUID.randomUUID(), payload);
         CompletableFuture<String> future = new CompletableFuture<>();
-        pendingResponses.put(message.getConversationId(), future);
+        pendingResponses.put(message.getConversationId(), future, timeout);
         return sendRaw(message)
                 .thenCompose(v -> future.orTimeout(timeout, TimeUnit.MILLISECONDS))
                 .whenComplete((r, t) -> pendingResponses.remove(message.getConversationId()));
