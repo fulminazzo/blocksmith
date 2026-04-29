@@ -1,5 +1,11 @@
 package it.fulminazzo.blocksmith.command.annotation;
 
+import it.fulminazzo.blocksmith.command.CommandMessages;
+import it.fulminazzo.blocksmith.command.CommandRegistry;
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper;
+import it.fulminazzo.blocksmith.message.Messenger;
+import it.fulminazzo.blocksmith.validation.annotation.AlphabeticalOrDigit;
+import it.fulminazzo.blocksmith.validation.annotation.Size;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.*;
@@ -65,14 +71,19 @@ import java.lang.annotation.*;
  * public class ClanCommand {
  *
  *     @Command
- *     public void execute(CommandSender sender) {
+ *     public void execute(
+ *         CommandSenderWrapper<?> sender
+ *     ) {
  *         // This is a special use case of the annotation.
  *         // It allows to define the execution logic of the root command,
  *         // making it executable without subcommands.
  *     }
  *
  *     @Command("info <player>")
- *     public void info(CommandSender sender, Object player) { ... }
+ *     public void info(
+ *         CommandSenderWrapper<?> sender,
+ *         Player player
+ *     ) { ... }
  *
  * }
  * }</pre>
@@ -95,7 +106,10 @@ import java.lang.annotation.*;
  *         public class Commands {
  *
  *             @Command("echo <message>")
- *             public static void echo(CommandSender sender, String message) { ... }
+ *             public static void echo(
+ *                 CommandSenderWrapper<?> sender,
+ *                 String message
+ *             ) { ... }
  *
  *         }
  *         }</pre>
@@ -112,10 +126,13 @@ import java.lang.annotation.*;
  *         public class PartyCommand {
  *
  *             @Command("invite <player>")
- *             public void invite(CommandSender sender, Object player) { ... }
+ *             public void invite(
+ *                 CommandSenderWrapper<?> sender,
+ *                 Player player
+ *             ) { ... }
  *
  *             @Command("leave")
- *             public void leave(CommandSender sender) { ... }
+ *             public void leave(CommandSenderWrapper<?> sender) { ... }
  *
  *         }
  *         }</pre>
@@ -132,20 +149,66 @@ import java.lang.annotation.*;
  * The supported types are:
  * <ul>
  *     <li>any command sender class of the current implementation (in <b>Bukkit</b> this would be
- *     {@code CommandSender}, {@code ConsoleCommandSender} and {@code Player});</li>
- *     <li>{@link it.fulminazzo.blocksmith.command.CommandSenderWrapper}: a Blocksmith provided wrapper class.</li>
+ *     <a href="https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/command/CommandSender.html">CommandSender</a>,
+ *     <a href="https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/command/ConsoleCommandSender.html">ConsoleCommandSender</a>
+ *     and
+ *     <a href="https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/Player.html">Player</a>);</li>
+ *     <li>{@link CommandSenderWrapper}: a Blocksmith provided wrapper class.</li>
  * </ul>
  * The framework is intelligent enough to verify the compatibility of the command sender type with
  * the actual sender. For example, if the command is executed by a player, the actual sender will
  * be checked. If it is <b>not</b> a player, then a proper message will be sent stating that
  * only players are allowed to execute the command. Likewise with the console.
  *
+ * <h2>Arguments</h2>
+ * Arguments can either be <b>required</b> or <b>optional</b>.
+ * When an <b>optional</b> argument is not specified, the actual value will be {@code null}
+ * (therefore, code logic should take that into account, unless the {@link Default} annotation is used).
+ * <br>
+ * Arguments also support <b>Blocksmith validation</b> thanks to
+ * {@link it.fulminazzo.blocksmith.validation.annotation} annotations.
+ * The {@code message} value points to the error message sent to the user in case of invalid input,
+ * taken from a {@link Messenger} holding all the messages.
+ * {@link CommandMessages} documents all available messages with their default codes and supported placeholders.
+ * <br>
+ * Example:
+ * <pre>{@code
+ * public class Commands {
+ *
+ *     @Command("register <email> <password>")
+ *     public static void register(
+ *         CommandSenderWrapper<?> sender,
+ *         @Email String email,
+ *         @Size(min = 8, max = Integer.MAX_VALUE) String password
+ *     ) {
+ *         // To this point the email and password values have already been validated.
+ *     }
+ *
+ * }
+ * }</pre>
+ * The above will register the command {@code /register <email> <password>}.
+ * <br>
+ * If the user input had an <b>invalid</b> argument, the following messages will be sent:
+ * <ul>
+ *     <li>a general {@link CommandMessages#INVALID_ARGUMENTS};</li>
+ *     <li>one message for <b>all</b> the violated constraints.</li>
+ * </ul>
+ * For example, assume a parameter with {@link AlphabeticalOrDigit}
+ * and {@link Size} was specified.
+ * Inserting a wrong value will send the following messages:
+ * <ul>
+ *     <li>{@link CommandMessages#INVALID_ARGUMENTS};</li>
+ *     <li>{@link AlphabeticalOrDigit#message()}</li>
+ *     <li{@link Size#message()}
+ * </ul>
+ *
  * @see Permission
  * @see Help
  * @see Default
  * @see Greedy
- * @see it.fulminazzo.blocksmith.command.CommandMessages
- * @see it.fulminazzo.blocksmith.command.CommandRegistry
+ * @see CommandMessages
+ * @see CommandRegistry
+ * @see it.fulminazzo.blocksmith.validation
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -220,7 +283,7 @@ public @interface Command {
      *
      *     // Specifying the syntax of the command WITHOUT the aliases
      *     @Command("<message>", dynamic = true)
-     *     public static void echo(CommandSender sender, String message) { ... }
+     *     public static void echo(CommandSenderWrapper<?> sender, String message) { ... }
      *
      *     // The name of this command depends on the name of the method of the command it refers to.
      *     public static List<String> getEchoAliases() {
