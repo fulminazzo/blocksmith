@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -23,11 +24,15 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor
 public abstract class AbstractMessageChannel<E extends MessageQueryEngine> implements MessageChannel {
-    private final @NotNull Map<UUID, Function<String, String>> messageHandlers = new HashMap<>();
+    private final @NotNull Map<UUID, Function<String, String>> messageHandlers = new ConcurrentHashMap<>();
     /**
      * Identifies the sendAndReceive requests that are still pending an answer.
      */
     private final @NotNull ExpiringMap<UUID, CompletableFuture<String>> pendingResponses = ExpiringMap.lazy();
+    /**
+     * Identifies the messages sent by us. To prevent self-echoing.
+     */
+    private final @NotNull Set<UUID> sentMessages = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * The Query engine.
@@ -57,7 +62,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
 
     @Override
     public @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final long timeout) {
-        NetworkMessage message = new NetworkMessage(UUID.randomUUID(), payload);
+        NetworkMessage message = new NetworkMessage(UUID.randomUUID(), UUID.randomUUID(), payload);
         CompletableFuture<String> future = new CompletableFuture<>();
         pendingResponses.put(message.getConversationId(), future, timeout);
         return sendRaw(message)
@@ -72,7 +77,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
 
     @Override
     public @NotNull CompletableFuture<Void> sendRaw(final @NotNull String payload) {
-        return sendRaw(new NetworkMessage(UUID.randomUUID(), payload));
+        return sendRaw(new NetworkMessage(UUID.randomUUID(), UUID.randomUUID(), payload));
     }
 
     @Override
@@ -135,6 +140,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
         List<CompletableFuture<?>> futures = new ArrayList<>();
         try {
             NetworkMessage networkMessage = mapper.deserialize(message, NetworkMessage.class);
+            if (sentMessages.remove(networkMessage.getId())) return CompletableFuture.completedFuture(null);
             UUID conversationId = networkMessage.getConversationId();
             if (pendingResponses.containsKey(conversationId)) {
                 CompletableFuture<String> future = pendingResponses.get(conversationId);
@@ -144,7 +150,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
             for (Function<String, String> handler : messageHandlers.values()) {
                 String response = handler.apply(networkMessage.getMessage());
                 if (response != null)
-                    futures.add(sendRaw(new NetworkMessage(conversationId, response)));
+                    futures.add(sendRaw(new NetworkMessage(UUID.randomUUID(), conversationId, response)));
             }
         } catch (MapperException e) {
             // provide support for messages not sent through blocksmith
@@ -158,6 +164,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
     }
 
     private @NotNull CompletableFuture<Void> sendRaw(final @NotNull NetworkMessage message) {
+        sentMessages.add(message.getId());
         return queryEngine.publish(mapper.serialize(message));
     }
 
@@ -166,6 +173,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
     @AllArgsConstructor
     @FieldDefaults(level = AccessLevel.PRIVATE)
     private final static class NetworkMessage {
+        @NotNull UUID id;
         /**
          * The id used to track back the flow of messages between clients.
          */
