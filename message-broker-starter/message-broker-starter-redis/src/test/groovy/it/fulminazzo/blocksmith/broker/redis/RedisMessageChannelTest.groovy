@@ -8,6 +8,7 @@ import it.fulminazzo.blocksmith.broker.Message
 import it.fulminazzo.blocksmith.broker.MessageChannel
 import it.fulminazzo.blocksmith.broker.MessageChannelTest
 import it.fulminazzo.blocksmith.broker.Messages
+import it.fulminazzo.blocksmith.structure.Pair
 import org.jetbrains.annotations.NotNull
 import redis.embedded.RedisServer
 
@@ -36,10 +37,12 @@ class RedisMessageChannelTest extends MessageChannelTest {
             void message(final String channel, final String message) {
                 if (channel == channelName) {
                     logger.debug("Received on channel ($channel) raw: $message")
-                    Message msg = deserializeMessage(message)
+                    def pair = deserializeMessage(message)
+                    def msg = pair.first
                     logger.info("Received on channel ($channel) message with id=$msg.id")
                     receivedMessages.add(msg)
-                    if (msg == Messages.MESSAGE1) send(Messages.MESSAGE2)
+                    if (msg == Messages.MESSAGE1)
+                        send(Messages.MESSAGE2, pair.second)
                 }
             }
 
@@ -69,7 +72,7 @@ class RedisMessageChannelTest extends MessageChannelTest {
 
     def 'test that sending on server works'() {
         when:
-        send(message)
+        send(message, UUID.randomUUID())
 
         and:
         sleep(SLEEP_TIME)
@@ -99,8 +102,8 @@ class RedisMessageChannelTest extends MessageChannelTest {
     }
 
     @Override
-    void send(final @NotNull Message message) {
-        connection.sync().publish(channelName, serializeMessage(message))
+    void send(final @NotNull Message message, final @NotNull UUID conversationId) {
+        connection.sync().publish(channelName, serializeMessage(message, conversationId))
     }
 
 }

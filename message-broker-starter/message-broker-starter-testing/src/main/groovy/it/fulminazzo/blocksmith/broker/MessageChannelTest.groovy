@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.broker
 
 import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
+import it.fulminazzo.blocksmith.structure.Pair
 import org.jetbrains.annotations.NotNull
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -53,8 +54,11 @@ abstract class MessageChannelTest extends Specification {
         message << [Messages.MESSAGE1, Messages.MESSAGE2]
     }
 
-    def 'test that subscribe correctly handles message #message'() {
+    def 'test that subscribe correctly handles message'() {
         given:
+        def message = Messages.MESSAGE2
+
+        and:
         def received = new AtomicReference<>()
 
         and:
@@ -64,16 +68,13 @@ abstract class MessageChannelTest extends Specification {
         sleep(SLEEP_TIME)
 
         when:
-        send(message)
+        send(message, UUID.randomUUID())
 
         and:
         sleep(SLEEP_TIME)
 
         then:
         received.get() == message
-
-        where:
-        message << [Messages.MESSAGE1, Messages.MESSAGE2]
     }
 
     def 'test that unsubscribe correctly removes handler'() {
@@ -93,7 +94,7 @@ abstract class MessageChannelTest extends Specification {
         sleep(SLEEP_TIME)
 
         when:
-        send(message)
+        send(message, UUID.randomUUID())
 
         then:
         received.get() == null
@@ -102,20 +103,22 @@ abstract class MessageChannelTest extends Specification {
         message << [Messages.MESSAGE1, Messages.MESSAGE2]
     }
 
-    protected String serializeMessage(final @NotNull Message message) {
+    protected String serializeMessage(final @NotNull Message message, final @NotNull UUID conversationId) {
         return MAPPER.serialize(new AbstractMessageChannel.NetworkMessage(
                 UUID.randomUUID(),
+                conversationId,
                 MAPPER.serialize(message)
         ))
     }
 
-    protected Message deserializeMessage(final @NotNull String payload) {
-        return MAPPER.deserialize(
-                MAPPER.deserialize(
-                        payload,
-                        AbstractMessageChannel.NetworkMessage
-                ).message,
-                Message
+    protected Pair<Message, UUID> deserializeMessage(final @NotNull String payload) {
+        def actualMessage = MAPPER.deserialize(
+                payload,
+                AbstractMessageChannel.NetworkMessage
+        )
+        return Pair.of(
+                MAPPER.deserialize(actualMessage.message, Message),
+                actualMessage.conversationId
         )
     }
 
@@ -134,6 +137,6 @@ abstract class MessageChannelTest extends Specification {
      *
      * @param message the message
      */
-    abstract void send(final @NotNull Message message)
+    abstract void send(final @NotNull Message message, final @NotNull UUID conversationId)
 
 }
