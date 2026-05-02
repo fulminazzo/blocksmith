@@ -97,7 +97,7 @@ public abstract class ArgumentNode<T> extends CommandNode {
         }
         if (completionsSupplier != null) {
             String current = input.getCurrent();
-            List<String> completions = completionsSupplier.getUnquoted();
+            List<String> completions = completionsSupplier.getUnquoted(visitor);
             if (completions.stream().noneMatch(c -> c.equalsIgnoreCase(current)))
                 throw new ArgumentParseException(CommandMessages.UNRECOGNIZED_ARGUMENT)
                         .arguments(
@@ -186,7 +186,7 @@ public abstract class ArgumentNode<T> extends CommandNode {
     @Override
     public @NotNull List<String> getCompletions(final @NotNull InputVisitor<?, ?> visitor) {
         handleGreedy(visitor);
-        if (completionsSupplier != null) return completionsSupplier.get();
+        if (completionsSupplier != null) return completionsSupplier.get(visitor);
         else return getParser().getCompletions(visitor).stream()
                 .map(c -> c.replace("%name%", getName()))
                 .collect(Collectors.toList());

@@ -2,6 +2,11 @@
 package it.fulminazzo.blocksmith.command.node.handler
 
 import groovy.transform.EqualsAndHashCode
+import it.fulminazzo.blocksmith.command.CommandSenderWrapper
+import it.fulminazzo.blocksmith.command.ConsoleCommandSender
+import it.fulminazzo.blocksmith.command.MockCommandSenderWrapper
+import it.fulminazzo.blocksmith.command.Player
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor
 import it.fulminazzo.blocksmith.reflect.Reflect
 import it.fulminazzo.blocksmith.reflect.ReflectException
 import spock.lang.Specification
@@ -15,12 +20,18 @@ class CompletionsSupplierTest extends Specification {
     private static Method invalidReturnType = CompletionsSupplierTest.getMethod('invalidReturnType')
     private static Method invalidReturnTypeStatic = CompletionsSupplierTest.getMethod('invalidReturnTypeStatic')
 
+    private InputVisitor<?, ? extends Exception> visitor
+
+    void setup() {
+        visitor = Mock(InputVisitor)
+    }
+
     def 'test that get works'() {
         given:
         def supplier = new CompletionsSupplier(this, valid)
 
         when:
-        def actual = supplier.get()
+        def actual = supplier.get(visitor)
 
         then:
         actual == ['first', 'null', 'third', '"fourth completion"']
@@ -34,7 +45,7 @@ class CompletionsSupplierTest extends Specification {
         )
 
         when:
-        supplier.get()
+        supplier.get(visitor)
 
         then:
         def e = thrown(ReflectException)
@@ -51,13 +62,63 @@ class CompletionsSupplierTest extends Specification {
         )
 
         when:
-        supplier.get()
+        supplier.get(visitor)
 
         then:
         def e = thrown(ReflectException)
         def cause = e.cause
         (cause.class == RuntimeException)
         cause.message == 'Test runtime exception'
+    }
+
+    def 'test that get of #method returns #expected for player sender'() {
+        given:
+        def sender = new Player('Alex')
+        def wrapper = new MockCommandSenderWrapper(sender)
+        visitor.commandSender >> wrapper
+
+        and:
+        def supplier = new CompletionsSupplier(
+                this,
+                CompletionsSupplierTest.getMethod(method, parameterType)
+        )
+
+        when:
+        def actual = supplier.get(visitor)
+
+        then:
+        actual == expected
+
+        where:
+        method        | parameterType        || expected
+        'playerOnly'  | Player               || ['Hello', 'world']
+        'consoleOnly' | ConsoleCommandSender || []
+        'wrapper'     | CommandSenderWrapper || ['Hello', 'world']
+    }
+
+    def 'test that get of #method returns #expected for console sender'() {
+        given:
+        def sender = new ConsoleCommandSender()
+        def wrapper = new MockCommandSenderWrapper(sender)
+        visitor.commandSender >> wrapper
+
+        and:
+        def supplier = new CompletionsSupplier(
+                this,
+                CompletionsSupplierTest.getMethod(method, parameterType)
+        )
+
+        when:
+        def actual = supplier.get(visitor)
+
+        then:
+        actual == expected
+
+        where:
+        method        | parameterType        || expected
+        'playerOnly'  | Player               || []
+        'consoleOnly' | ConsoleCommandSender || ['Hello', 'world']
+        'wrapper'     | CommandSenderWrapper || ['Hello', 'world']
     }
 
     def 'test that of function with #methodDeclaration returns #expectedRequester, #expectedMethod'() {
@@ -132,6 +193,18 @@ class CompletionsSupplierTest extends Specification {
 
     static String invalidReturnTypeStatic() {
         return ''
+    }
+
+    static List<String> playerOnly(final Player player) {
+        return ['Hello', 'world']
+    }
+
+    static List<String> consoleOnly(final ConsoleCommandSender player) {
+        return ['Hello', 'world']
+    }
+
+    static List<String> wrapper(final CommandSenderWrapper<?> player) {
+        return ['Hello', 'world']
     }
 
 }

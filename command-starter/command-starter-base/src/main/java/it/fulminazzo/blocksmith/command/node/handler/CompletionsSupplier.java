@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.command.node.handler;
 
+import it.fulminazzo.blocksmith.command.visitor.InputVisitor;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import it.fulminazzo.blocksmith.reflect.ReflectException;
 import lombok.AccessLevel;
@@ -11,7 +12,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -20,7 +23,7 @@ import java.util.stream.Collectors;
  */
 @Value
 @AllArgsConstructor(access = AccessLevel.NONE)
-public class CompletionsSupplier implements Supplier<List<String>> {
+public class CompletionsSupplier {
     @NotNull Reflect executor;
     @NotNull Method method;
 
@@ -35,9 +38,14 @@ public class CompletionsSupplier implements Supplier<List<String>> {
         this.method = method;
     }
 
-    @Override
-    public @NotNull List<String> get() {
-        return getUnquoted().stream()
+    /**
+     * Gets the completions.
+     *
+     * @param visitor the visitor requesting the completions
+     * @return the completions
+     */
+    public @NotNull List<String> get(final @NotNull InputVisitor<?, ?> visitor) {
+        return getUnquoted(visitor).stream()
                 .map(s -> s.contains(" ") ? "\"" + s + "\"" : s)
                 .collect(Collectors.toList());
     }
@@ -46,10 +54,17 @@ public class CompletionsSupplier implements Supplier<List<String>> {
      * Gets the completions.
      * If a completion contains a white space, it will not be quoted.
      *
+     * @param visitor the visitor requesting the completions
      * @return the completions
      */
-    public @NotNull List<String> getUnquoted() {
-        Collection<?> completions = executor.invoke(method).get();
+    public @NotNull List<String> getUnquoted(final @NotNull InputVisitor<?, ?> visitor) {
+        final Collection<?> completions;
+        if (method.getParameterCount() == 0) completions = executor.invoke(method).get();
+        else {
+            Optional<?> sender = CommandExecutor.parseCommandSenderParameter(method, visitor.getCommandSender());
+            if (sender.isPresent()) completions = executor.invoke(method, sender.get()).get();
+            else completions = Collections.emptyList();
+        }
         return completions.stream()
                 .map(o -> o == null ? "null" : o.toString())
                 .collect(Collectors.toList());
@@ -76,15 +91,19 @@ public class CompletionsSupplier implements Supplier<List<String>> {
             requester = reflect.get();
         } else reflect = Reflect.on(requester);
         final Method method;
+        try {
+            @NotNull String methodName = methodDeclaration;
+            method = reflect.getMethod(m -> m.getName().equals(methodName) && m.getParameterCount() < 2);
+        } catch (ReflectException e) {
+            throw new ReflectException("Could not find method ? %s() in type '%s'", methodDeclaration, reflect.getType());
+        }
         if (reflect.extendsType(Type.class)) {
-            method = reflect.getMethod(methodDeclaration);
             if (!Modifier.isStatic(method.getModifiers()))
                 throw new ReflectException("Invalid method %s in type %s: " +
                         "completions functions with class executor must be static",
                         method, reflect.getType()
                 );
         } else {
-            method = reflect.getMethod(methodDeclaration);
             if (Modifier.isStatic(method.getModifiers())) {
                 reflect = Reflect.on(reflect.getType());
                 requester = reflect.get();

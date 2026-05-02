@@ -6,7 +6,6 @@ import it.fulminazzo.blocksmith.command.argument.ArgumentParser
 import it.fulminazzo.blocksmith.command.node.handler.CompletionsSupplier
 import it.fulminazzo.blocksmith.command.visitor.CommandInput
 import it.fulminazzo.blocksmith.command.visitor.InputVisitor
-import it.fulminazzo.blocksmith.command.visitor.Visitor
 import spock.lang.Specification
 
 import java.lang.reflect.Parameter
@@ -116,7 +115,7 @@ class NumberArgumentNodeTest extends Specification {
 
         and:
         def supplier = Mock(CompletionsSupplier)
-        supplier.get() >> ['PI']
+        supplier.get(visitor) >> ['PI']
         node.completionsSupplier = supplier
 
         when:
