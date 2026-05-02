@@ -42,8 +42,8 @@ public @interface Default {
      * a default value of {@code 5} will send the user an error message.
      * This also applies to <b>custom completions</b> (check {@link Tab} for more).
      *
-     * @see Tab
      * @return the default value
+     * @see Tab
      */
     @NotNull String value();
 
