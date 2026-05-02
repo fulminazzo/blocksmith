@@ -15,6 +15,7 @@ import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionExcept
 import it.fulminazzo.blocksmith.command.visitor.execution.CommandExecutionVisitor
 import it.fulminazzo.blocksmith.reflect.Reflect
 import it.fulminazzo.blocksmith.structure.task.PendingTaskManager
+import it.fulminazzo.blocksmith.validation.annotation.Range
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 import spock.lang.Specification
