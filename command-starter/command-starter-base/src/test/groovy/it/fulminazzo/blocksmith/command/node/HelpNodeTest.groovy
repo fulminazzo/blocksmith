@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.command.annotation.Help
 import it.fulminazzo.blocksmith.command.annotation.Permission
 import it.fulminazzo.blocksmith.command.node.info.CommandInfo
 import it.fulminazzo.blocksmith.command.node.info.PermissionInfo
+import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
 
 class HelpNodeTest extends Specification {
@@ -163,16 +164,19 @@ class HelpNodeTest extends Specification {
                                          final String group,
                                          final Permission.Grant grant) {
         return new Permission() {
+            @NotNull
             @Override
             String value() {
                 return value
             }
 
+            @NotNull
             @Override
             String group() {
                 return group
             }
 
+            @NotNull
             @Override
             Permission.Grant grant() {
                 return grant
