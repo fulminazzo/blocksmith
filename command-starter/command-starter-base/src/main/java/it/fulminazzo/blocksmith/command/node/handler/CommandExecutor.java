@@ -17,6 +17,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The actual executor of a command.
@@ -67,26 +68,40 @@ public class CommandExecutor {
                                  final @NotNull CommandSenderWrapper<?> sender) throws CommandExecutionException {
         LinkedList<Object> arguments = executionVisitor.getArguments();
         if (arguments.size() != method.getParameterCount()) {
-            Class<?> parameterType = method.getParameterTypes()[0];
-            if (CommandSenderWrapper.class.isAssignableFrom(parameterType)) {
-                Type senderType = method.getGenericParameterTypes()[0];
-                if (senderType instanceof ParameterizedType) {
-                    ParameterizedType paramType = (ParameterizedType) senderType;
-                    Type actualSenderType = paramType.getActualTypeArguments()[0];
-                    if (!sender.extendsType(actualSenderType))
-                        throw new CommandExecutionException(sender.isPlayer()
-                                ? CommandMessages.PLAYER_CANNOT_EXECUTE
-                                : CommandMessages.CONSOLE_CANNOT_EXECUTE
-                        );
-                }
-                arguments.addFirst(sender);
-            } else if (sender.extendsType(parameterType)) arguments.addFirst(sender.handle());
+            Optional<?> parsedSender = parseCommandSenderParameter(method, sender);
+            if (parsedSender.isPresent()) arguments.addFirst(parsedSender.get());
             else throw new CommandExecutionException(sender.isPlayer()
-                        ? CommandMessages.PLAYER_CANNOT_EXECUTE
-                        : CommandMessages.CONSOLE_CANNOT_EXECUTE
-                );
+                    ? CommandMessages.PLAYER_CANNOT_EXECUTE
+                    : CommandMessages.CONSOLE_CANNOT_EXECUTE
+            );
         }
         return arguments;
+    }
+
+    /**
+     * Parses the command sender parameter for the given method.
+     * <br>
+     * Assuming the method has a first parameter representing the executor of the command,
+     * the parameter type will be checked to return the most appropriate representation
+     * of the sender (namely the {@link CommandSenderWrapper} or the sender itself).
+     *
+     * @param method the method to check
+     * @param sender the command sender
+     * @return the parsed sender (or {@code null} if the sender is not recognized from the parameter type)
+     */
+    static @NotNull Optional<Object> parseCommandSenderParameter(final @NotNull Method method,
+                                                                 final @NotNull CommandSenderWrapper<?> sender) {
+        Class<?> parameterType = method.getParameterTypes()[0];
+        if (CommandSenderWrapper.class.isAssignableFrom(parameterType)) {
+            Type senderType = method.getGenericParameterTypes()[0];
+            if (senderType instanceof ParameterizedType) {
+                ParameterizedType paramType = (ParameterizedType) senderType;
+                Type actualSenderType = paramType.getActualTypeArguments()[0];
+                if (!sender.extendsType(actualSenderType)) return Optional.empty();
+            }
+            return Optional.of(sender);
+        } else if (sender.extendsType(parameterType)) return Optional.of(sender.handle());
+        else return Optional.empty();
     }
 
 }
