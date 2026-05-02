@@ -207,8 +207,10 @@ import java.lang.annotation.*;
  * @see Default
  * @see Greedy
  * @see CommandMessages
+ * @see CommandSenderWrapper
  * @see CommandRegistry
  * @see it.fulminazzo.blocksmith.validation
+ * @see Messenger
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
