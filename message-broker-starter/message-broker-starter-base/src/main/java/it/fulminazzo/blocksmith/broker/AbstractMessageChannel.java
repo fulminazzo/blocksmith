@@ -39,6 +39,9 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
     protected final @NotNull E queryEngine;
     private final @NotNull Mapper mapper;
 
+    @Getter
+    private boolean closed;
+
     /**
      * Instantiates a new Abstract message channel.
      *
@@ -131,7 +134,10 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
 
     @Override
     public void close() throws IOException {
-        queryEngine.close();
+        if (!isClosed()) {
+            queryEngine.close();
+            closed = true;
+        }
     }
 
     /**

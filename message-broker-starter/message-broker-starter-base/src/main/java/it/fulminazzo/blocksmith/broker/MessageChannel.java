@@ -128,4 +128,9 @@ public interface MessageChannel extends Closeable {
      */
     @NotNull MessageChannel unsubscribe(final @NotNull UUID id);
 
+    /**
+     * Checks if the current channel is closed.
+     */
+    boolean isClosed();
+
 }
