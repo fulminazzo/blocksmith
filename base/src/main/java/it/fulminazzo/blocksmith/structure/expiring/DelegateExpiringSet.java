@@ -159,11 +159,11 @@ final class DelegateExpiringSet<E> implements ExpiringSet<E> {
         return String.format("[%s]", delegate.delegate.entrySet().stream()
                 .map(e -> {
                     E key = e.getKey();
-                    AbstractExpiringMap.ExpiringEntry<?> value = e.getValue();
+                    ExpiringEntry<?> value = e.getValue();
                     StringBuilder builder = new StringBuilder(key.toString());
                     if (value.neverExpires())
-                        builder.append(" " + AbstractExpiringMap.ExpiringEntry.NEVER_EXPIRING_CHAR);
-                    else if (value.isExpired()) builder.append(" " + AbstractExpiringMap.ExpiringEntry.EXPIRED_CHAR);
+                        builder.append(" " + ExpiringEntry.NEVER_EXPIRING_CHAR);
+                    else if (value.isExpired()) builder.append(" " + ExpiringEntry.EXPIRED_CHAR);
                     return builder.toString();
                 })
                 .collect(Collectors.joining(", ")));

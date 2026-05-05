@@ -11,7 +11,7 @@ class ScheduledExpiringMapDelayedTest extends Specification {
     private static ScheduledExecutorService scheduler
 
     private ScheduledExpiringMap<String, String> map
-    private Map<String, AbstractExpiringMap.ExpiringEntry<String>> internal
+    private Map<String, ExpiringEntry<String>> internal
 
     void setupSpec() {
         scheduler = Executors.newSingleThreadScheduledExecutor()
@@ -36,7 +36,7 @@ class ScheduledExpiringMapDelayedTest extends Specification {
 
     def 'test that getExpiring returns null if expired but not yet removed'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)
@@ -53,7 +53,7 @@ class ScheduledExpiringMapDelayedTest extends Specification {
 
     def 'test that remove returns null if expired but not yet removed'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)
@@ -70,8 +70,8 @@ class ScheduledExpiringMapDelayedTest extends Specification {
 
     def 'test that keySet does not return expired but not yet removed keys'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 1000L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
+        internal['Goodbye'] = new ExpiringEntry<>('mars', 1000L)
 
         and:
         sleep(5L)
@@ -85,8 +85,8 @@ class ScheduledExpiringMapDelayedTest extends Specification {
 
     def 'test that values does not return expired but not yet removed values'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 1000L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
+        internal['Goodbye'] = new ExpiringEntry<>('mars', 1000L)
 
         and:
         sleep(5L)
