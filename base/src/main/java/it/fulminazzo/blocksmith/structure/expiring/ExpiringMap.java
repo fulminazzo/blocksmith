@@ -11,8 +11,7 @@ import java.util.function.Function;
 
 /**
  * An expiring map is a special {@link Map} whose elements are subject to expiration.
- * Each must be defined with a time-to-live (TTL) period after which they will not be
- * present anymore.
+ * Each can be defined with a time-to-live (TTL) period after which they will not be present anymore.
  *
  * @param <K> the type of the keys
  * @param <V> the type of the values

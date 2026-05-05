@@ -330,6 +330,9 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
      */
     @Data
     protected static final class ExpiringEntry<V> {
+        static final String NEVER_EXPIRING_CHAR = "(!)";
+        static final String EXPIRED_CHAR = "(*)";
+
         private V value;
         @EqualsAndHashCode.Exclude
         private long expireTime;
@@ -376,8 +379,8 @@ public abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
         @Override
         public @NotNull String toString() {
             StringBuilder builder = new StringBuilder(value == null ? "null" : value.toString());
-            if (neverExpires()) builder.append(" (!)");
-            else if (isExpired()) builder.append(" (*)");
+            if (neverExpires()) builder.append(" " + NEVER_EXPIRING_CHAR);
+            else if (isExpired()) builder.append(" " + EXPIRED_CHAR);
             return builder.toString();
         }
 
