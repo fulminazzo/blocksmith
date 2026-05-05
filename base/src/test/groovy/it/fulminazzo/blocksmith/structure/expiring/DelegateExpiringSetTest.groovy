@@ -271,7 +271,35 @@ class DelegateExpiringSetTest extends Specification {
         def string = set.toString()
 
         then:
-        string == '[Hello, Ciao (!), Goodbye (*)]'
+        string == '[Goodbye (*), Hello, Ciao (!)]'
+    }
+
+    def 'test that expiringEntries returns correct entries'() {
+        given:
+        def now = System.currentTimeMillis()
+        internal.put('Hello', PRESENT, ttl)
+        internal.put('Goodbye', PRESENT, 1L)
+        internal.put('Ciao', PRESENT, AbstractExpiringMap.NEVER_EXPIRE)
+
+        when:
+        def data = set.expiringEntries()
+
+        then:
+        def first = data.find {it.value == 'Hello'}
+        first != null
+        first.expireTime - now <= ttl + 10
+        first.expireTime - now >= ttl - 10
+
+        and:
+        def second = data.find {it.value == 'Goodbye'}
+        second != null
+        second.expireTime - now <= 1 + 10
+        second.expireTime - now >= 1 - 10
+
+        and:
+        def third = data.find {it.value == 'Ciao'}
+        third != null
+        third.expireTime == AbstractExpiringMap.NEVER_EXPIRE
     }
 
     private static sleepTtl() {

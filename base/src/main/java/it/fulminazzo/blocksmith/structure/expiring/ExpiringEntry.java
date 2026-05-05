@@ -13,6 +13,10 @@ import org.jetbrains.annotations.NotNull;
 final class ExpiringEntry<V> {
     static final String NEVER_EXPIRING_CHAR = "(!)";
     static final String EXPIRED_CHAR = "(*)";
+    /**
+     * Expire TTL for an endless entry.
+     */
+    static final long NEVER_EXPIRE = Long.MAX_VALUE;
 
     private V value;
     @EqualsAndHashCode.Exclude
@@ -35,7 +39,7 @@ final class ExpiringEntry<V> {
      * @return {@code true} if it does not
      */
     public boolean neverExpires() {
-        return expireTime == AbstractExpiringMap.NEVER_EXPIRE;
+        return expireTime == NEVER_EXPIRE;
     }
 
     /**
@@ -54,7 +58,7 @@ final class ExpiringEntry<V> {
      */
     public void setTimeToLive(final long ttl) {
         AbstractExpiringMap.checkTtl(ttl);
-        this.expireTime = ttl == AbstractExpiringMap.NEVER_EXPIRE ? AbstractExpiringMap.NEVER_EXPIRE : AbstractExpiringMap.now() + ttl;
+        this.expireTime = ttl == NEVER_EXPIRE ? NEVER_EXPIRE : AbstractExpiringMap.now() + ttl;
     }
 
     @Override
