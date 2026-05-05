@@ -33,6 +33,28 @@ import java.util.concurrent.TimeUnit;
  *
  * }
  * }</pre>
+ * If the annotation is applied to the <b>root command</b> class, it will only refer to its direct execution.
+ * It <b>will not</b> affect subcommands.
+ * <br>
+ * Example:
+ * <pre>{@code
+ * @Command("friend")
+ * @Cooldown(value = 10, unit = TimeUnit.SECONDS)
+ * public class FriendCommand {
+ *
+ *     @Command
+ *     public void execute(CommandSenderWrapper<?> sender) { ... }
+ *
+ *     @Command("add <player>")
+ *     public void add(CommandSenderWrapper<?> sender, Player player) { ... }
+ *
+ * }
+ * }</pre>
+ * In the above example:
+ * <ul>
+ *     <li>the {@code /friend} command will be put on cooldown upon execution;</li>
+ *     <li>the {@code /friend add <player>} command will be <b>always executable</b> (no cooldown).</li>
+ * </ul>
  *
  * @see Command
  * @see Permission
