@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * An expiring interface is a special {@link Set} whose elements are subject to expiration.
@@ -21,7 +22,7 @@ public interface ExpiringSet<E> extends Set<E> {
      * If the element is already present, its TTL will be renewed.
      *
      * @param element the element to add
-     * @param ttl the time-to-live (after which it will expire)
+     * @param ttl     the time-to-live (after which it will expire)
      * @return {@code true} if the element was added, {@code false} if it was already present
      */
     boolean add(final @Nullable E element, final @NotNull Duration ttl);
@@ -32,7 +33,7 @@ public interface ExpiringSet<E> extends Set<E> {
      * If the element is already present, its TTL will be renewed.
      *
      * @param element the element to add
-     * @param ttl the time-to-live (after which it will expire) in milliseconds
+     * @param ttl     the time-to-live (after which it will expire) in milliseconds
      * @return {@code true} if the element was added, {@code false} if it was already present
      */
     boolean add(final @Nullable E element, final long ttl);
@@ -60,7 +61,7 @@ public interface ExpiringSet<E> extends Set<E> {
      * Each element will have the same expiration time.
      *
      * @param collection the collection to take elements from
-     * @param ttl the time-to-live (after which the elements will expire)
+     * @param ttl        the time-to-live (after which the elements will expire)
      * @return {@code true} if the collection was modified, {@code false} if it was not modified
      */
     boolean addAll(final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl);
@@ -70,7 +71,7 @@ public interface ExpiringSet<E> extends Set<E> {
      * Each element will have the same expiration time.
      *
      * @param collection the collection to take elements from
-     * @param ttl the time-to-live (after which the elements will expire) in milliseconds
+     * @param ttl        the time-to-live (after which the elements will expire) in milliseconds
      * @return {@code true} if the collection was modified, {@code false} if it was not modified
      */
     boolean addAll(final @NotNull Collection<? extends E> collection, final long ttl);
@@ -106,5 +107,49 @@ public interface ExpiringSet<E> extends Set<E> {
      */
     @Override
     @NotNull String toString();
+
+    /**
+     * Initializes a new passive ExpiringSet.
+     * <br>
+     * The elements will persist in memory <b>FOREVER</b>,
+     * until the user <b>manually</b> removes them.
+     *
+     * @param <E> the type of the elements
+     * @return the set
+     */
+    static <E> @NotNull ExpiringSet<E> passive() {
+        return new DelegateExpiringSet<>((AbstractExpiringMap<E, Object>) ExpiringMap.<E, Object>passive());
+    }
+
+    /**
+     * Initializes a new lazy ExpiringSet.
+     * <br>
+     * The elements will persist in memory <b>FOREVER</b>,
+     * until the user <b>manually</b> removes them.
+     *
+     * @param <E> the type of the elements
+     * @return the set
+     */
+    static <E> @NotNull ExpiringSet<E> lazy() {
+        return new DelegateExpiringSet<>((AbstractExpiringMap<E, Object>) ExpiringMap.<E, Object>lazy());
+    }
+
+    /**
+     * Initializes a new scheduled ExpiringSet.
+     * <br>
+     * The elements will be periodically check for expiration and be removed.
+     *
+     * @param scheduler    the scheduler that will handle the periodical removal
+     * @param taskInterval the interval upon which to check expirations
+     * @param <E>          the type of the elements
+     * @return the set
+     */
+    static <E> @NotNull ExpiringSet<E> scheduled(final @NotNull ScheduledExecutorService scheduler,
+                                                 final @NotNull Duration taskInterval) {
+        return new DelegateExpiringSet<>((AbstractExpiringMap<E, Object>) ExpiringMap.<E, Object>scheduled(
+                scheduler,
+                taskInterval
+        ));
+    }
 
 }
