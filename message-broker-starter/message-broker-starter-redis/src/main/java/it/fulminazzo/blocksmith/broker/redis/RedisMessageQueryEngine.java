@@ -69,6 +69,7 @@ public final class RedisMessageQueryEngine implements MessageQueryEngine {
     public void close() {
         listeners.forEach(pubSubConnection::removeListener);
         pubSubConnection.sync().unsubscribe(channelName);
+        pubSubConnection.close();
     }
 
 }

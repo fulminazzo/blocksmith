@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.broker.redis;
 
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import it.fulminazzo.blocksmith.broker.AbstractMessageBroker;
 import it.fulminazzo.blocksmith.broker.MessageChannel;
 import it.fulminazzo.blocksmith.broker.MessageChannelType;
@@ -65,7 +64,6 @@ import java.util.function.BiFunction;
 public final class RedisMessageBroker extends AbstractMessageBroker<RedisMessageChannelSettings> {
     private final @NotNull RedisClient redisClient;
     private final @NotNull StatefulRedisConnection<String, String> connection;
-    private final @NotNull StatefulRedisPubSubConnection<String, String> pubSubConnection;
 
     private final @NotNull Mapper mapper;
 
@@ -79,7 +77,6 @@ public final class RedisMessageBroker extends AbstractMessageBroker<RedisMessage
                        final @NotNull Mapper mapper) {
         this.redisClient = redisClient;
         this.connection = redisClient.connect();
-        this.pubSubConnection = redisClient.connectPubSub();
         this.mapper = mapper;
     }
 
@@ -105,7 +102,7 @@ public final class RedisMessageBroker extends AbstractMessageBroker<RedisMessage
             channelName += ":" + settings.getSubchannelName();
         RedisMessageQueryEngine queryEngine = new RedisMessageQueryEngine(
                 connection,
-                pubSubConnection,
+                redisClient.connectPubSub(),
                 channelName
         );
         return registerChannel(channelBuilder.apply(queryEngine, mapper));
@@ -114,7 +111,6 @@ public final class RedisMessageBroker extends AbstractMessageBroker<RedisMessage
     @Override
     public void close() throws IOException {
         super.close();
-        pubSubConnection.close();
         connection.close();
         redisClient.shutdown();
     }
