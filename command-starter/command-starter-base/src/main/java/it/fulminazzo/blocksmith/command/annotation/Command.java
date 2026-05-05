@@ -57,8 +57,8 @@ import java.lang.annotation.*;
  *
  * }
  * }</pre>
- * <b>Note</b>: the above will <b>not</b> function correctly. Specifying dual commands will lead
- * to untested behavior. Choose only one of the two options.
+ * <b>Note</b>: the above will <b>not</b> function correctly.
+ * Specifying dual commands (or more) will lead to the last registered command overwriting the others.
  *
  * <h2>Class-level usage</h2>
  * When applied to a class, {@link Command} defines the <b>root command</b> of a command.
