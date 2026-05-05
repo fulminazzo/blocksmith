@@ -197,9 +197,9 @@ import java.lang.annotation.*;
  * and {@link Size} was specified.
  * Inserting a wrong value will send the following messages:
  * <ul>
- *     <li>{@link CommandMessages#INVALID_ARGUMENTS};</li>
+ *     <li>{@link CommandMessages#INVALID_ARGUMENTS}</li>
  *     <li>{@link AlphabeticalOrDigit#message()}</li>
- *     <li{@link Size#message()}
+ *     <li>{@link Size#message()}</li>
  * </ul>
  *
  * @see Permission
