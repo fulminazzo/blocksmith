@@ -39,6 +39,7 @@ public @interface Help {
     /**
      * The aliases of the help subcommand.
      * At least <b>one</b> must be specified.
+     * By default, the help subcommand is named {@code help}.
      *
      * @return the aliases of the help subcommand
      */
