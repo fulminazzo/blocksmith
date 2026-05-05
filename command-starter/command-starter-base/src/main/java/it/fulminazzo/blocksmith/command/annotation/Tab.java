@@ -128,6 +128,16 @@ public @interface Tab {
      *     }</pre>
      *     </li>
      * </ul>
+     * Note: if the method declares a command sender whose type is incompatible
+     * with the actual executor (for example, the method expects a {@code Player}
+     * but the command is run from the console), the argument will be treated as invalid:
+     * <ul>
+     *     <li>during completion time, no completion will be available;</li>
+     *     <li>during execution, since there was no valid value possible,
+     *     any argument given will be treated as invalid. To ensure the best user experience,
+     *     it is advised to flag both the completions method AND the command method to be executable
+     *     from the same sender type.</li>
+     * </ul>
      *
      * @return the name of the method
      * @see Command
