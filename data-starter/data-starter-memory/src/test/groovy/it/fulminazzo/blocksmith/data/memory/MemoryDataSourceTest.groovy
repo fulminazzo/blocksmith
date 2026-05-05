@@ -11,10 +11,7 @@ class MemoryDataSourceTest extends Specification {
 
     def 'test datasource life cycle'() {
         given:
-        def executor = Executors.newSingleThreadExecutor()
-
-        and:
-        def dataSource = MemoryDataSource.create(executor)
+        def dataSource = MemoryDataSource.create()
 
         when:
         def repository = dataSource.newRepository(
@@ -31,7 +28,7 @@ class MemoryDataSourceTest extends Specification {
         dataSource.close()
 
         then:
-        executor.isShutdown()
+        dataSource.executor.isShutdown()
     }
 
 }

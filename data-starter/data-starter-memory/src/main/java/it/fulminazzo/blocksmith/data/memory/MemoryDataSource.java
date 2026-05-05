@@ -62,7 +62,7 @@ public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryR
     private final @NotNull ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(runnable -> {
         Thread thread = new Thread(runnable);
         thread.setDaemon(true);
-        thread.setName(String.format("%s-Cleaner-%s", ExpiringMap.class.getSimpleName(), threadsCount++));
+        thread.setName(String.format("%s-Cleaner-%s", MemoryRepository.class.getSimpleName(), threadsCount++));
         return thread;
     });
 
@@ -106,6 +106,19 @@ public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryR
     public void close() {
         scheduler.shutdown();
         executor.shutdown();
+    }
+
+    /**
+     * Creates a new Memory data source.
+     *
+     * @return the memory data source
+     */
+    public static @NotNull MemoryDataSource create() {
+        return new MemoryDataSource(Executors.newCachedThreadPool(t -> {
+            Thread thread = new Thread(t);
+            thread.setName(String.format("%s-%s", MemoryQueryEngine.class.getSimpleName(), threadsCount++));
+            return thread;
+        }));
     }
 
     /**
