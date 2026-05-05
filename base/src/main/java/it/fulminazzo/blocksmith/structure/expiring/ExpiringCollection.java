@@ -87,10 +87,10 @@ public interface ExpiringCollection<E> extends Collection<E> {
     /**
      * Gets the remaining time-to-live of the element.
      *
-     * @param key the key
+     * @param element the element
      * @return the TTL ({@code null} if not present)
      */
-    @Nullable Duration getTtl(final @Nullable E key);
+    @Nullable Duration getTtl(final @Nullable E element);
 
     /**
      * Prints out the contents of this collection.

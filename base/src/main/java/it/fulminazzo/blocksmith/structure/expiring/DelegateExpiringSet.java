@@ -43,8 +43,8 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
     }
 
     @Override
-    public @Nullable Duration getTtl(final @Nullable E key) {
-        return delegate.getTtl(key);
+    public @Nullable Duration getTtl(final @Nullable E element) {
+        return delegate.getTtl(element);
     }
 
     @Override

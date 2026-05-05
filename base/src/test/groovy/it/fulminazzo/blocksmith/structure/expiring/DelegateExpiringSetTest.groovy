@@ -262,7 +262,7 @@ class DelegateExpiringSetTest extends Specification {
         given:
         internal.put('Hello', PRESENT, ttl)
         internal.put('Goodbye', PRESENT, 1L)
-        internal.put('Ciao', PRESENT, AbstractExpiringMap.NEVER_EXPIRE)
+        internal.put('Ciao', PRESENT, ExpiringEntry.NEVER_EXPIRE)
 
         and:
         sleepTtl()
@@ -279,7 +279,7 @@ class DelegateExpiringSetTest extends Specification {
         def now = System.currentTimeMillis()
         internal.put('Hello', PRESENT, ttl)
         internal.put('Goodbye', PRESENT, 1L)
-        internal.put('Ciao', PRESENT, AbstractExpiringMap.NEVER_EXPIRE)
+        internal.put('Ciao', PRESENT, ExpiringEntry.NEVER_EXPIRE)
 
         when:
         def data = set.expiringEntries()
@@ -299,7 +299,7 @@ class DelegateExpiringSetTest extends Specification {
         and:
         def third = data.find {it.value == 'Ciao'}
         third != null
-        third.expireTime == AbstractExpiringMap.NEVER_EXPIRE
+        third.expireTime == ExpiringEntry.NEVER_EXPIRE
     }
 
     private static sleepTtl() {

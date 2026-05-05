@@ -523,20 +523,20 @@ class AbstractExpiringMapTest extends Specification {
 
         where:
         method            | arguments                                              || expectedMethod    | expectedArguments
-        'put'             | ['Hello', 'world']                                     || 'put'             | ['Hello', 'world', AbstractExpiringMap.NEVER_EXPIRE]
+        'put'             | ['Hello', 'world']                                     || 'put'             | ['Hello', 'world', ExpiringEntry.NEVER_EXPIRE]
         'put'             | ['Hello', 'world', Duration.ofMillis(ttl)]             || 'put'             | ['Hello', 'world', ttl]
-        'putIfAbsent'     | ['Hello', 'world']                                     || 'putIfAbsent'     | ['Hello', 'world', AbstractExpiringMap.NEVER_EXPIRE]
+        'putIfAbsent'     | ['Hello', 'world']                                     || 'putIfAbsent'     | ['Hello', 'world', ExpiringEntry.NEVER_EXPIRE]
         'putIfAbsent'     | ['Hello', 'world', Duration.ofMillis(ttl)]             || 'putIfAbsent'     | ['Hello', 'world', ttl]
         'replace'         | ['Hello', 'world', 'moon', Duration.ofMillis(ttl)]     || 'replace'         | ['Hello', 'world', 'moon', ttl]
-        'computeIfAbsent' | ['Hello', function]                                    || 'computeIfAbsent' | ['Hello', function, AbstractExpiringMap.NEVER_EXPIRE]
+        'computeIfAbsent' | ['Hello', function]                                    || 'computeIfAbsent' | ['Hello', function, ExpiringEntry.NEVER_EXPIRE]
         'computeIfAbsent' | ['Hello', function, Duration.ofMillis(ttl)]            || 'computeIfAbsent' | ['Hello', function, ttl]
-        'compute'         | ['Hello', bifunction]                                  || 'compute'         | ['Hello', bifunction, AbstractExpiringMap.NEVER_EXPIRE]
+        'compute'         | ['Hello', bifunction]                                  || 'compute'         | ['Hello', bifunction, ExpiringEntry.NEVER_EXPIRE]
         'compute'         | ['Goodbye', bifunction]                                || 'compute'         | ['Goodbye', bifunction, ttl]
         'compute'         | ['Hello', bifunction, Duration.ofMillis(ttl)]          || 'compute'         | ['Hello', bifunction, ttl]
-        'merge'           | ['Hello', 'world', bifunction]                         || 'merge'           | ['Hello', 'world', bifunction, AbstractExpiringMap.NEVER_EXPIRE]
+        'merge'           | ['Hello', 'world', bifunction]                         || 'merge'           | ['Hello', 'world', bifunction, ExpiringEntry.NEVER_EXPIRE]
         'merge'           | ['Goodbye', 'world', bifunction]                       || 'merge'           | ['Goodbye', 'world', bifunction, ttl]
         'merge'           | ['Hello', 'world', bifunction, Duration.ofMillis(ttl)] || 'merge'           | ['Hello', 'world', bifunction, ttl]
-        'putAll'          | [[:]]                                                  || 'putAll'          | [[:], AbstractExpiringMap.NEVER_EXPIRE]
+        'putAll'          | [[:]]                                                  || 'putAll'          | [[:], ExpiringEntry.NEVER_EXPIRE]
         'putAll'          | [[:], Duration.ofMillis(ttl)]                          || 'putAll'          | [[:], ttl]
         'renew'           | ['Hello', Duration.ofMillis(ttl)]                      || 'renew'           | ['Hello', ttl]
     }
@@ -589,7 +589,7 @@ class AbstractExpiringMapTest extends Specification {
         given:
         internal['Hello'] = new ExpiringEntry<>('world', ttl)
         internal['Goodbye'] = new ExpiringEntry<>('mars', 1L)
-        internal['Ciao'] = new ExpiringEntry<>('moon', AbstractExpiringMap.NEVER_EXPIRE)
+        internal['Ciao'] = new ExpiringEntry<>('moon', ExpiringEntry.NEVER_EXPIRE)
         internal['Bye'] = new ExpiringEntry<>(null, ttl)
 
         and:
