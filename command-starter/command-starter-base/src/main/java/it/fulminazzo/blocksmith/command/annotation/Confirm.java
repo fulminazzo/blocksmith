@@ -29,9 +29,15 @@ import java.util.concurrent.TimeUnit;
  * (if the sender banned a non-existing player, the command would have reported an error and
  * no confirmation would be required).
  *
+ * <h3>Cooldown</h3>
+ * If the command is annotated with {@link Cooldown}, the confirmation will <b>always be requested</b>.
+ * Therefore, the user will <b>always</b> be able to execute the command, but only upon confirmation
+ * the cooldown will block the execution.
+ *
  * @see Command
  * @see Permission
  * @see Help
+ * @see Cooldown
  * @see CommandMessages
  */
 @Documented

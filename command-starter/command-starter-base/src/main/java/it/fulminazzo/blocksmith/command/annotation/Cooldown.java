@@ -56,8 +56,14 @@ import java.util.concurrent.TimeUnit;
  *     <li>the {@code /friend add <player>} command will be <b>always executable</b> (no cooldown).</li>
  * </ul>
  *
+ * <h3>Confirm</h3>
+ * If the command is annotated with {@link Confirm}, the cooldown will be applied <b>after the confirmation</b>.
+ * Therefore, the user will <b>always</b> be able to execute the command, but only upon confirmation
+ * the cooldown will block the execution.
+ *
  * @see Command
  * @see Permission
+ * @see Confirm
  * @see CommandMessages
  */
 @Documented
