@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.broker;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.MapperException;
 import it.fulminazzo.blocksmith.structure.expiring.ExpiringMap;
+import it.fulminazzo.blocksmith.structure.expiring.ExpiringSet;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,8 @@ import java.util.function.Function;
  * @param <E> the type of the {@link MessageQueryEngine} responsible for executing internal interactions
  */
 public abstract class AbstractMessageChannel<E extends MessageQueryEngine> implements MessageChannel {
+    private static final long SELF_ECHO_TIMEOUT = 10_000;
+
     private final @NotNull Map<UUID, Function<String, String>> messageHandlers = new ConcurrentHashMap<>();
     /**
      * Identifies the sendAndReceive requests that are still pending an answer.
@@ -31,7 +34,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
     /**
      * Identifies the messages sent by us. To prevent self-echoing.
      */
-    private final @NotNull Set<UUID> sentMessages = Collections.synchronizedSet(new HashSet<>());
+    private final @NotNull ExpiringSet<UUID> sentMessages = ExpiringSet.lazy();
 
     /**
      * The Query engine.
@@ -170,7 +173,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
     }
 
     private @NotNull CompletableFuture<Void> sendRaw(final @NotNull NetworkMessage message) {
-        sentMessages.add(message.getId());
+        sentMessages.add(message.getId(), SELF_ECHO_TIMEOUT);
         return queryEngine.publish(mapper.serialize(message));
     }
 
