@@ -52,7 +52,7 @@ class CommandParserTest extends Specification {
                 new PermissionInfo(null, 'clan', Permission.Grant.OP)
         )
         clan.addChild(new HelpNode(
-                method.getAnnotation(Help),
+                method.getAnnotation(Command).help(),
                 clan
         ))
         expected.add(clan)

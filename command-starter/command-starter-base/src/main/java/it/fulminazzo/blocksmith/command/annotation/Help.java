@@ -23,13 +23,33 @@ import java.lang.annotation.*;
  *     {@code command.clan.member.promote.help}.
  *     </li>
  * </ul>
+ * The annotation should only be applied in conjunction with other annotations.
+ * For example:
+ * <pre>{@code
+ * @Command(
+ *         value = "clan",
+ *         help = @Help(
+ *                 aliases = {"help", "describe", "?"}
+ *         )
+ * )
+ * class ClanCommand {
+ *     // execution logic
+ * }
+ * }</pre>
+ * The above will register the commands:
+ * <ul>
+ *     <li>{@code /clan}</li>
+ *     <li>{@code /clan help}</li>
+ *     <li>{@code /clan describe}</li>
+ *     <li>{@code /clan ?}</li>
+ * </ul>
  *
  * @see Command
  * @see Permission
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ElementType.ANNOTATION_TYPE})
 public @interface Help {
     /**
      * The default name of the help subcommand.

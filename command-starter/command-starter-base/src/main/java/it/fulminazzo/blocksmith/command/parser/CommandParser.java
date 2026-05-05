@@ -166,9 +166,7 @@ public final class CommandParser {
             handleConfirmation(method.getAnnotation(Confirm.class), last, lastLiteral);
         else last.setExecutor(executionHandler);
 
-        Help helpAnnotation = method.isAnnotationPresent(Help.class)
-                ? method.getAnnotation(Help.class)
-                : method.getAnnotation(Command.class).help();
+        Help helpAnnotation = method.getAnnotation(Command.class).help();
         lastLiteral.addChild(new HelpNode(helpAnnotation, lastLiteral));
 
         return first;

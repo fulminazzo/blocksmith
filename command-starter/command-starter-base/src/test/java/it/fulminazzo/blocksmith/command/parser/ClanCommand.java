@@ -11,11 +11,12 @@ import java.util.concurrent.TimeUnit;
 @Command("(clan|team|gang)")
 final class ClanCommand {
 
-    @Command
-    @Help(
-            aliases = {"?"},
-            description = "clan.help.description",
-            permission = @Permission(value = "help.permission", group = "clan")
+    @Command(
+            help = @Help(
+                    aliases = {"?"},
+                    description = "clan.help.description",
+                    permission = @Permission(value = "help.permission", group = "clan")
+            )
     )
     public void execute(
             final @NotNull CommandSender sender
