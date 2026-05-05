@@ -138,16 +138,19 @@ class HelpNodeTest extends Specification {
                              final String description,
                              final Permission permission) {
         return new Help() {
+            @NotNull
             @Override
-            String[] aliases() {
+            String@NotNull[] aliases() {
                 return aliases.toArray(new String[0])
             }
 
+            @NotNull
             @Override
             String description() {
                 return description
             }
 
+            @NotNull
             @Override
             Permission permission() {
                 return permission
