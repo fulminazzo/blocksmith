@@ -28,7 +28,7 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
      * @param key the key
      * @return the expiring entry (or {@code null} if not found)
      */
-    protected abstract @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key);
+    abstract @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key);
 
     @Override
     public @Nullable V put(final @Nullable K key, final @Nullable V value, final @NotNull Duration ttl) {
