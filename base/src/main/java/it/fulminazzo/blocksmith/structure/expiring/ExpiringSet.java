@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * An expiring interface is a special {@link Set} whose elements are subject to expiration.
+ * An expiring set is a special {@link Set} whose elements are subject to expiration.
  * Each can be defined with a time-to-live (TTL) period after which they will not be present anymore.
  *
  * @param <E> the type of the elements
