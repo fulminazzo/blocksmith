@@ -85,7 +85,7 @@ public final class MemoryMessageBroker extends AbstractMessageBroker<MemoryMessa
     @Override
     public void close() throws IOException {
         super.close();
-        executor.close();
+        executor.shutdown();
     }
 
     /**
