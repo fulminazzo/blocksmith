@@ -22,9 +22,8 @@ public interface ExpiringList<E> extends List<E> {
      * @param index   the index at which to insert the element
      * @param element the element to add
      * @param ttl     the time-to-live (after which it will expire)
-     * @return {@code true} if the element was added, {@code false} if it was already present
      */
-    public boolean add(final int index, final @Nullable E element, final @NotNull Duration ttl);
+    void add(final int index, final @Nullable E element, final @NotNull Duration ttl);
 
     /**
      * Adds an element in the list at the given index.
@@ -33,9 +32,8 @@ public interface ExpiringList<E> extends List<E> {
      * @param index   the index at which to insert the element
      * @param element the element to add
      * @param ttl     the time-to-live (after which it will expire) in milliseconds
-     * @return {@code true} if the element was added, {@code false} if it was already present
      */
-    public boolean add(final int index, final @Nullable E element, final long ttl);
+    void add(final int index, final @Nullable E element, final long ttl);
 
     /**
      * Adds an element in the list at the given index.
@@ -45,7 +43,7 @@ public interface ExpiringList<E> extends List<E> {
      * @param element the element to add
      */
     @Override
-    public void add(final int index, final @Nullable E element);
+    void add(final int index, final @Nullable E element);
 
     /**
      * Adds all the elements of the given list to the current one at the given index.
@@ -54,7 +52,7 @@ public interface ExpiringList<E> extends List<E> {
      * @param list  the list to take elements from
      * @return {@code true} if the list was modified, {@code false} if it was not modified
      */
-    public boolean addAll(final int index, final @NotNull ExpiringList<? extends E> list);
+    boolean addAll(final int index, final @NotNull ExpiringList<? extends E> list);
 
     /**
      * Adds all the elements of the given collection to the current one at the given index.
@@ -65,7 +63,7 @@ public interface ExpiringList<E> extends List<E> {
      * @param ttl        the time-to-live (after which the elements will expire)
      * @return {@code true} if the collection was modified, {@code false} if it was not modified
      */
-    public boolean addAll(final int index, final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl);
+    boolean addAll(final int index, final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl);
 
     /**
      * Adds all the elements of the given collection to the current one at the given index.
@@ -76,7 +74,7 @@ public interface ExpiringList<E> extends List<E> {
      * @param ttl        the time-to-live (after which the elements will expire) in milliseconds
      * @return {@code true} if the collection was modified, {@code false} if it was not modified
      */
-    public boolean addAll(final int index, final @NotNull Collection<? extends E> collection, final long ttl);
+    boolean addAll(final int index, final @NotNull Collection<? extends E> collection, final long ttl);
 
     /**
      * Adds all the elements of the given collection to the current one at the given index.
@@ -87,7 +85,7 @@ public interface ExpiringList<E> extends List<E> {
      * @return {@code true} if the collection was modified, {@code false} if it was not modified
      */
     @Override
-    public boolean addAll(final int index, final @NotNull Collection<? extends E> collection);
+    boolean addAll(final int index, final @NotNull Collection<? extends E> collection);
 
     /**
      * Sets the element at the given index.
@@ -97,7 +95,7 @@ public interface ExpiringList<E> extends List<E> {
      * @param ttl     the time-to-live (after which it will expire)
      * @return the previous element at the given index
      */
-    public E set(final int index, final @Nullable E element, final @NotNull Duration ttl);
+    E set(final int index, final @Nullable E element, final @NotNull Duration ttl);
 
     /**
      * Sets the element at the given index.
@@ -107,7 +105,7 @@ public interface ExpiringList<E> extends List<E> {
      * @param ttl     the time-to-live (after which it will expire) in milliseconds
      * @return the previous element at the given index
      */
-    public E set(final int index, final @Nullable E element, final long ttl);
+    E set(final int index, final @Nullable E element, final long ttl);
 
     /**
      * Sets the element at the given index.
@@ -117,6 +115,6 @@ public interface ExpiringList<E> extends List<E> {
      * @return the previous element at the given index
      */
     @Override
-    public E set(final int index, final @Nullable E element);
+    E set(final int index, final @Nullable E element);
 
 }
