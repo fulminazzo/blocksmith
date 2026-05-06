@@ -52,8 +52,8 @@ class AbstractExpiringListTest extends Specification {
 
         and:
         def actualTtl = entry.expireTime - now
-        actualTtl >= ttl - 10
-        actualTtl <= ttl + 10
+        actualTtl <= ttl
+        actualTtl >= ttl * 0.9
     }
 
     def 'test that add with index correctly adds shifted entry'() {
@@ -134,8 +134,8 @@ class AbstractExpiringListTest extends Specification {
         first != null
         first.value == SECOND.value
         def actualTtl = first.expireTime - now
-        actualTtl >= ttl - 10
-        actualTtl <= ttl + 10
+        actualTtl <= ttl
+        actualTtl >= ttl * 0.9
 
         and:
         def second = internal[2]
@@ -169,16 +169,16 @@ class AbstractExpiringListTest extends Specification {
         first != null
         first.value == SECOND.value
         def actualTtl1 = first.expireTime - now
-        actualTtl1 >= ttl - 10
-        actualTtl1 <= ttl + 10
+        actualTtl1 >= ttl * 0.9
+        actualTtl1 <= ttl
 
         and:
         def second = internal[2]
         second != null
         second.value == VALUE
         def actualTtl2 = second.expireTime - now
-        actualTtl2 >= ttl - 10
-        actualTtl2 <= ttl + 10
+        actualTtl2 <= ttl
+        actualTtl2 >= ttl * 0.9
 
         and:
         internal[3] == FIRST

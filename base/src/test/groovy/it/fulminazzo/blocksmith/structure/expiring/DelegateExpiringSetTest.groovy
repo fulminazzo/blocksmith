@@ -115,8 +115,8 @@ class DelegateExpiringSetTest extends Specification {
 
         and:
         def actualTtl = internal.getTtl(value)
-        actualTtl.toMillis() >= ttl - 10
-        actualTtl.toMillis() <= ttl + 10
+        actualTtl.toMillis() <= ttl
+        actualTtl.toMillis() >= ttl * 0.9
 
         and:
         internal.containsKey(secondValue)
@@ -220,14 +220,13 @@ class DelegateExpiringSetTest extends Specification {
         then:
         def first = data.find { it.value == 'Hello' }
         first != null
-        first.expireTime - now <= ttl + 10
-        first.expireTime - now >= ttl - 10
+        first.expireTime - now <= ttl
+        first.expireTime - now >= ttl * 0.9
 
         and:
         def second = data.find { it.value == 'Goodbye' }
         second != null
-        second.expireTime - now <= 1 + 10
-        second.expireTime - now >= 1 - 10
+        second.expireTime - now <= 1
 
         and:
         def third = data.find { it.value == 'Ciao' }
