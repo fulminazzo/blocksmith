@@ -97,21 +97,6 @@ abstract class ExpiringMapImplTest extends Specification {
         map['Hello'] == 'world'
     }
 
-    def 'test that get also clears other expired entries'() {
-        given:
-        internal['Hello'] = new ExpiringEntry<>('world', expiringTtl)
-        internal['Goodbye'] = new ExpiringEntry<>('mars', ttl)
-
-        and:
-        sleepTtl()
-
-        when:
-        map['Goodbye']
-
-        then:
-        internal['Hello'] == null
-    }
-
     def 'test that remove returns null for expired key'() {
         given:
         internal['Hello'] = new ExpiringEntry<>('world', expiringTtl)
@@ -136,21 +121,6 @@ abstract class ExpiringMapImplTest extends Specification {
 
         then:
         actual == 'world'
-        internal['Hello'] == null
-    }
-
-    def 'test that remove also clears other expired entries'() {
-        given:
-        internal['Hello'] = new ExpiringEntry<>('world', expiringTtl)
-        internal['Goodbye'] = new ExpiringEntry<>('mars', ttl)
-
-        and:
-        sleepTtl()
-
-        when:
-        map.remove('Goodbye')
-
-        then:
         internal['Hello'] == null
     }
 
@@ -247,7 +217,7 @@ abstract class ExpiringMapImplTest extends Specification {
         map."$method"(*arguments)
 
         then:
-        internal['Hello'] == null
+        !arguments.empty || internal['Hello'] == null
 
         where:
         method         | arguments

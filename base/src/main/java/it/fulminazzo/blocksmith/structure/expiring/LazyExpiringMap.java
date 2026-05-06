@@ -18,8 +18,11 @@ final class LazyExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     protected @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
-        clearExpired();
-        return delegate.get(key);
+        ExpiringEntry<V> entry = delegate.get(key);
+        if (entry != null && entry.isExpired()) {
+            delegate.remove(key);
+            return null;
+        } else return entry;
     }
 
     @Override
@@ -36,22 +39,23 @@ final class LazyExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     public boolean containsKey(final Object key) {
-        clearExpired();
-        return delegate.containsKey(key);
+        return getExpiring(key) != null;
     }
 
     @Override
     public V get(final Object key) {
-        clearExpired();
-        ExpiringEntry<V> entry = delegate.get(key);
+        ExpiringEntry<V> entry = getExpiring(key);
         return entry == null ? null : entry.getValue();
     }
 
     @Override
     public V remove(final Object key) {
-        clearExpired();
-        ExpiringEntry<V> entry = delegate.remove(key);
-        return entry == null ? null : entry.getValue();
+        ExpiringEntry<V> entry = getExpiring(key);
+        if (entry == null) return null;
+        else {
+            delegate.remove(key);
+            return entry.getValue();
+        }
     }
 
     @Override
