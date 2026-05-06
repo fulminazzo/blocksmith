@@ -17,6 +17,28 @@ import java.util.*;
 abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> implements ExpiringList<E> {
     protected final @NotNull List<ExpiringEntry<E>> delegate = Collections.synchronizedList(new ArrayList<>());
 
+    /**
+     * Gets the expiring entry associated with an index.
+     *
+     * @param index the index
+     * @return the expiring entry (or {@code null} if not found)
+     */
+    protected @Nullable ExpiringEntry<E> getExpiring(final int index) {
+        return delegate.get(index);
+    }
+
+    /**
+     * Manually removes all the expired entries.
+     */
+    public void clearExpired() {
+        delegate.removeIf(ExpiringEntry::isExpired);
+    }
+
+    @Override
+    @NotNull Collection<ExpiringEntry<E>> expiringEntries() {
+        return delegate;
+    }
+
     @Override
     public void add(final int index, final @Nullable E element, final @NotNull Duration ttl) {
         add(index, element, ttl.toMillis());
