@@ -102,9 +102,8 @@ public final class RedisMessageBroker extends AbstractMessageBroker<RedisMessage
         if (settings.getChannelType() == MessageChannelType.DIRECT)
             channelName += ":" + settings.getSubchannelName();
         RedisMessageQueryEngine queryEngine = new RedisMessageQueryEngine(
-                connection,
-                redisClient.connectPubSub(),
-                channelName
+                channelName, connection,
+                redisClient.connectPubSub()
         );
         return registerChannel(channelBuilder.apply(queryEngine, mapper));
     }
