@@ -30,6 +30,11 @@ abstract class AbstractExpiringCollection<E> implements ExpiringCollection<E> {
     }
 
     @Override
+    public boolean add(final @Nullable E element) {
+        return add(element, ExpiringEntry.NEVER_EXPIRE);
+    }
+
+    @Override
     public boolean addAll(final @NotNull ExpiringCollection<? extends E> collection) {
         return addAllHelper(collection);
     }

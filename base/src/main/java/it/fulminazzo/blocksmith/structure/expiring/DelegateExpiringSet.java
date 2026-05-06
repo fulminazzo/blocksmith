@@ -28,11 +28,6 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
     }
 
     @Override
-    public boolean add(final @Nullable E element) {
-        return delegate.put(element, PRESENT) == null;
-    }
-
-    @Override
     public boolean remove(final @Nullable Object object) {
         return delegate.remove(object) != null;
     }
