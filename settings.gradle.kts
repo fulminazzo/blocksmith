@@ -61,6 +61,8 @@ include(
     "message-broker-starter:message-broker-starter-memory",
     "message-broker-starter:message-broker-starter-redis",
 
+    "message-broker-starter:plugin-messaging",
+
     "message-broker-starter:message-broker-starter-testing"
 )
 
