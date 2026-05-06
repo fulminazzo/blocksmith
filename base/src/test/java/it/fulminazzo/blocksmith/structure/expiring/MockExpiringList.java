@@ -14,7 +14,7 @@ import java.util.Collection;
 public class MockExpiringList<E> extends AbstractExpiringList<E> {
 
     @Override
-    @Nullable ExpiringEntry<E> getExpiring(final int index) {
+    @NotNull ExpiringEntry<E> getExpiring(final int index) {
         return delegate.get(index);
     }
 
@@ -26,19 +26,19 @@ public class MockExpiringList<E> extends AbstractExpiringList<E> {
     @Override
     public E set(final int index, final @Nullable E element, final long ttl) {
         ExpiringEntry<E> entry = delegate.set(index, new ExpiringEntry<>(element, ttl));
-        return entry == null ? null : entry.getValue();
+        return entry.getValue();
     }
 
     @Override
     public E get(final int index) {
         ExpiringEntry<E> entry = delegate.get(index);
-        return entry == null ? null : entry.getValue();
+        return entry.getValue();
     }
 
     @Override
     public E remove(final int i) {
         ExpiringEntry<E> entry = delegate.remove(i);
-        return entry == null ? null : entry.getValue();
+        return entry.getValue();
     }
 
     @Override

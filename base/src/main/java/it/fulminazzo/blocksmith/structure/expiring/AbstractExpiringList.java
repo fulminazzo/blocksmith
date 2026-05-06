@@ -16,15 +16,17 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> implements ExpiringList<E> {
-    protected final @NotNull List<ExpiringEntry<E>> delegate = Collections.synchronizedList(new ArrayList<>());
+    protected final @NotNull List<@NotNull ExpiringEntry<E>> delegate = Collections.synchronizedList(new ArrayList<>());
 
     /**
      * Gets the expiring entry associated with an index.
      *
      * @param index the index
-     * @return the expiring entry (or {@code null} if not found)
+     * @return the expiring entry
+     * @throws IndexOutOfBoundsException if either the index is out of range OR
+     * the entry at the given index expired and there is no replacement entry
      */
-    abstract @Nullable ExpiringEntry<E> getExpiring(final int index);
+    abstract @NotNull ExpiringEntry<E> getExpiring(final int index);
 
     /**
      * Manually removes all the expired entries.
