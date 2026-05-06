@@ -117,4 +117,15 @@ public interface ExpiringList<E> extends List<E>, ExpiringCollection<E> {
     @Override
     E set(final int index, final @Nullable E element);
 
+    /**
+     * Returns a sublist of the elements in this list between
+     * the specified {@code fromIndex}, inclusive, and {@code toIndex}, exclusive.
+     *
+     * @param fromIndex the index of the first element to include in the sublist
+     * @param toIndex   the index of the first element to exclude from the sublist
+     * @return a sublist of the elements in this list between the specified indices
+     */
+    @Override
+    @NotNull ExpiringList<E> subList(int fromIndex, int toIndex);
+
 }
