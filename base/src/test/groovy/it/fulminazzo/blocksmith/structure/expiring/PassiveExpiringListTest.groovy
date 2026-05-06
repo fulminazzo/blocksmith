@@ -162,6 +162,22 @@ class PassiveExpiringListTest extends Specification {
         list.containsAll([first, second, third].collect { it.value })
     }
 
+    def 'test that iterator returns expired entries'() {
+        given:
+        def entries = [first, second, third]
+        internal.addAll(entries)
+
+        and:
+        sleepTtl()
+
+        when:
+        def actual = []
+        for (def i : list) actual.add(i)
+
+        then:
+        actual == entries.collect { it.value }
+    }
+
     private static void sleepTtl() {
         sleep(ttl / 2 as long)
     }

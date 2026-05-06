@@ -44,7 +44,7 @@ final class LazyExpiringList<E> extends AbstractExpiringList<E> {
     @Override
     public E remove(final int index) {
         ExpiringEntry<E> entry = getExpiring(index);
-        delegate.remove(entry);
+        delegate.remove(index);
         return entry.getValue();
     }
 

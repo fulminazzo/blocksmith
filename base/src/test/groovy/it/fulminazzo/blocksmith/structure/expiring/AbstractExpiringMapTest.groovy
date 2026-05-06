@@ -9,7 +9,7 @@ import java.util.function.BiFunction
 import java.util.function.Function
 
 class AbstractExpiringMapTest extends Specification {
-    private static final long ttl = 200L
+    private static final long ttl = 400L
 
     private static final Function<? super String, ? extends String> function = { k -> 'world' }
     private static final BiFunction<? super String, ? super String, ? extends String> bifunction = { (k, v) -> 'moon' }
@@ -554,7 +554,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that equals with #object returns #expected'() {
         given:
-        internal['Hello'] = new ExpiringEntry<>('world', 1000L)
+        internal['Hello'] = new ExpiringEntry<>('world', 10_000L)
         internal['Goodbye'] = new ExpiringEntry<>('mars', 1L)
 
         and:
@@ -567,22 +567,22 @@ class AbstractExpiringMapTest extends Specification {
         actual == expected
 
         where:
-        object                                || expected
-        null                                  || false
-        'Hello=world'                         || false
-        [:]                                   || false
-        ['Hello': 'world']                    || true
-        ['Goodbye': 'mars']                   || false
+        object                                  || expected
+        null                                    || false
+        'Hello=world'                           || false
+        [:]                                     || false
+        ['Hello': 'world']                      || true
+        ['Goodbye': 'mars']                     || false
         new MockExpiringMap() {
             {
-                put('Hello', 'world', 1000L)
+                put('Hello', 'world', 10_000L)
             }
-        }                                     || true
+        }                                       || true
         new MockExpiringMap() {
             {
-                put('Goodbye', 'mars', 1000L)
+                put('Goodbye', 'mars', 10_000L)
             }
-        }                                     || false
+        }                                       || false
     }
 
     def 'test that toString correctly prints expired entries'() {
