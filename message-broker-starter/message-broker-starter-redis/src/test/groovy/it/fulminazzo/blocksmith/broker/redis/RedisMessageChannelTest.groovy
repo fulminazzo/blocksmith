@@ -83,10 +83,10 @@ class RedisMessageChannelTest extends MessageChannelTest {
         pubSubConnection.sync().subscribe(channelName)
 
         return new RedisMessageChannel(
-                new RedisMessageQueryEngine(
+                new RedisMessageQueryEngine(channelName,
                         connection,
-                        pubSubConnection,
-                        channelName
+                        pubSubConnection
+
                 ),
                 MAPPER
         )

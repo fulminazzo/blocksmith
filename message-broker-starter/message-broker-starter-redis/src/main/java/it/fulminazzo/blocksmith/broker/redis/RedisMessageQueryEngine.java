@@ -19,26 +19,25 @@ import java.util.function.Consumer;
  * to leverage the speed and optimizations provided by Netty asynchronous operations.
  *
  */
-public final class RedisMessageQueryEngine implements MessageQueryEngine {
+public final class RedisMessageQueryEngine extends MessageQueryEngine {
     private final @NotNull Set<RedisPubSubListener<String, String>> listeners = ConcurrentHashMap.newKeySet();
 
     private final @NotNull StatefulRedisConnection<String, String> connection;
     private final @NotNull StatefulRedisPubSubConnection<String, String> pubSubConnection;
-    private final @NotNull String channelName;
 
     /**
      * Instantiates a new Redis message query engine.
      *
+     * @param channelName      the channel name
      * @param connection       the connection used for sending
      * @param pubSubConnection the connection used for receiving
-     * @param channelName      the channel name
      */
-    RedisMessageQueryEngine(final @NotNull StatefulRedisConnection<String, String> connection,
-                            final @NotNull StatefulRedisPubSubConnection<String, String> pubSubConnection,
-                            final @NotNull String channelName) {
+    RedisMessageQueryEngine(final @NotNull String channelName,
+                            final @NotNull StatefulRedisConnection<String, String> connection,
+                            final @NotNull StatefulRedisPubSubConnection<String, String> pubSubConnection) {
+        super(channelName);
         this.connection = connection;
         this.pubSubConnection = pubSubConnection;
-        this.channelName = channelName;
 
         pubSubConnection.sync().subscribe(channelName);
     }

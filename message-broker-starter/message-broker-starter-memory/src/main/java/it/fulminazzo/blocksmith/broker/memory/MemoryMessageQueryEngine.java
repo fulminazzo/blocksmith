@@ -13,11 +13,19 @@ import java.util.function.Consumer;
 /**
  * Pseudo-implementation of a Message query engine for in-memory messages.
  */
-@RequiredArgsConstructor
-public final class MemoryMessageQueryEngine implements MessageQueryEngine {
-    private final @NotNull String channelName;
-
+public final class MemoryMessageQueryEngine extends MessageQueryEngine {
     private final @NotNull Executor executor;
+
+    /**
+     * Instantiates a new Memory message query engine.
+     *
+     * @param channelName the channel name
+     * @param executor    the executor
+     */
+    public MemoryMessageQueryEngine(final @NotNull String channelName, final @NotNull Executor executor) {
+        super(channelName);
+        this.executor = executor;
+    }
 
     @Override
     public @NotNull CompletableFuture<Void> publish(final @NotNull String payload) {
