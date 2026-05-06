@@ -7,29 +7,26 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 /**
  * Pseudo-implementation of a Message query engine for in-memory messages.
  */
 public final class MemoryMessageQueryEngine extends MessageQueryEngine {
-    private final @NotNull Executor executor;
 
     /**
      * Instantiates a new Memory message query engine.
      *
      * @param channelName the channel name
-     * @param executor    the executor
      */
-    public MemoryMessageQueryEngine(final @NotNull String channelName, final @NotNull Executor executor) {
+    public MemoryMessageQueryEngine(final @NotNull String channelName) {
         super(channelName);
-        this.executor = executor;
     }
 
     @Override
     public @NotNull CompletableFuture<Void> publish(final @NotNull String payload) {
-        return CompletableFuture.runAsync(() -> getChannel().publish(payload), executor);
+        getChannel().publish(payload);
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override

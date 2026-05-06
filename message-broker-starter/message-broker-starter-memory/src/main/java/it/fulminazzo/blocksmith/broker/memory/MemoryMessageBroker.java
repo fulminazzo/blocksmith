@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
 import java.util.function.BiFunction;
 
 /**
@@ -53,8 +52,6 @@ import java.util.function.BiFunction;
 public final class MemoryMessageBroker extends AbstractMessageBroker<MemoryMessageChannelSettings> {
     private final @NotNull Mapper mapper;
 
-    private final @NotNull ExecutorService executor;
-
     @Override
     public @NotNull MessageChannel newChannel(final @NotNull MemoryMessageChannelSettings settings) {
         return newChannel(MemoryMessageChannel::new, settings);
@@ -75,29 +72,18 @@ public final class MemoryMessageBroker extends AbstractMessageBroker<MemoryMessa
         String channelName = settings.getChannelName();
         if (settings.getChannelType() == MessageChannelType.DIRECT)
             channelName += ":" + settings.getSubchannelName();
-        MemoryMessageQueryEngine queryEngine = new MemoryMessageQueryEngine(
-                channelName,
-                executor
-        );
+        MemoryMessageQueryEngine queryEngine = new MemoryMessageQueryEngine(channelName);
         return registerChannel(channelBuilder.apply(queryEngine, mapper));
-    }
-
-    @Override
-    public void close() throws IOException {
-        super.close();
-        executor.shutdown();
     }
 
     /**
      * Creates a new Memory message broker.
      *
-     * @param mapper   the mapper to serialize messages with
-     * @param executor the executor
+     * @param mapper the mapper to serialize messages with
      * @return the memory message broker
      */
-    public static @NotNull MemoryMessageBroker create(final @NotNull Mapper mapper,
-                                                      final @NotNull ExecutorService executor) {
-        return new MemoryMessageBroker(mapper, executor);
+    public static @NotNull MemoryMessageBroker create(final @NotNull Mapper mapper) {
+        return new MemoryMessageBroker(mapper);
     }
 
 }
