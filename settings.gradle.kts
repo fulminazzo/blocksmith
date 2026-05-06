@@ -61,7 +61,15 @@ include(
     "message-broker-starter:message-broker-starter-memory",
     "message-broker-starter:message-broker-starter-redis",
 
+
     "message-broker-starter:plugin-messaging",
+
+    "message-broker-starter:plugin-messaging:plugin-messaging-base",
+
+    "message-broker-starter:plugin-messaging:plugin-messaging-bukkit",
+    "message-broker-starter:plugin-messaging:plugin-messaging-bungeecord",
+    "message-broker-starter:plugin-messaging:plugin-messaging-velocity",
+
 
     "message-broker-starter:message-broker-starter-testing"
 )
