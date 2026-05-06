@@ -4,7 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.ListIterator;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link ExpiringList} with no removal of the elements.
@@ -75,6 +77,14 @@ final class PassiveExpiringList<E> extends AbstractExpiringList<E> {
                 delegate.stream().anyMatch(e2 ->
                         Objects.equals(e2.getValue(), e1)
                 ));
+    }
+
+    @Override
+    public @NotNull ListIterator<E> listIterator(final int index) {
+        return delegate.subList(index, size()).stream()
+                .map(ExpiringEntry::getValue)
+                .collect(Collectors.toList())
+                .listIterator();
     }
 
 }
