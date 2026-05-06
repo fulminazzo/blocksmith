@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Basic implementation of {@link ExpiringList} with common logic.
@@ -23,9 +24,7 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
      * @param index the index
      * @return the expiring entry (or {@code null} if not found)
      */
-    protected @Nullable ExpiringEntry<E> getExpiring(final int index) {
-        return delegate.get(index);
-    }
+    abstract @Nullable ExpiringEntry<E> getExpiring(final int index);
 
     /**
      * Manually removes all the expired entries.
@@ -35,8 +34,20 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
     }
 
     @Override
+    public @Nullable Duration getTtl(final @Nullable E element) {
+        int index = indexOf(element);
+        ExpiringEntry<E> entry = index == -1 ? null : getExpiring(index);
+        return entry == null ? null : Duration.ofMillis(entry.getExpireTime() - now());
+    }
+
+    @Override
     @NotNull Collection<ExpiringEntry<E>> expiringEntries() {
         return delegate;
+    }
+
+    @Override
+    public boolean add(final @Nullable E element, final long ttl) {
+        return delegate.add(new ExpiringEntry<>(element, ttl));
     }
 
     @Override
@@ -107,6 +118,67 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
     @Override
     public void clear() {
         delegate.clear();
+    }
+
+    @Override
+    public int indexOf(final @Nullable Object o) {
+        for (int i = 0; i < size(); i++) {
+            if (get(i).equals(o)) return i;
+        }
+        return -1;
+    }
+
+    @Override
+    public int lastIndexOf(final @Nullable Object o) {
+        for (int i = size() - 1; i >= 0; i--) {
+            if (get(i).equals(o)) return i;
+        }
+        return -1;
+    }
+
+    @Override
+    public @NotNull ListIterator<E> listIterator() {
+        return listIterator(0);
+    }
+
+    @Override
+    public @NotNull ListIterator<E> listIterator(final int index) {
+        clearExpired();
+        return delegate.subList(index, size()).stream()
+                .map(ExpiringEntry::getValue)
+                .collect(Collectors.toList())
+                .listIterator();
+    }
+
+    @Override
+    public @NotNull Iterator<E> iterator() {
+        return listIterator();
+    }
+
+    @Override
+    public @NotNull Object @NotNull [] toArray() {
+        return stream().toArray();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T @NotNull [] toArray(final T[] ts) {
+        Object[] elements = toArray();
+        if (ts.length < elements.length)
+            return (T[]) Arrays.copyOf(elements, elements.length, ts.getClass());
+        System.arraycopy(elements, 0, ts, 0, elements.length);
+        if (ts.length > elements.length)
+            ts[elements.length] = null;
+        return ts;
+    }
+
+    /**
+     * Gets the current time of the system.
+     *
+     * @return the time in milliseconds
+     */
+    protected static long now() {
+        return System.currentTimeMillis();
     }
 
 }
