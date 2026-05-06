@@ -28,8 +28,8 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
     }
 
     @Override
-    public boolean addAll(final int index, final @NotNull ExpiringList<? extends E> list) {
-        return addAllHelper(index, list);
+    public boolean addAll(final int index, final @NotNull ExpiringCollection<? extends E> collection) {
+        return addAllHelper(index, collection);
     }
 
     private <E1 extends E> boolean addAllHelper(int index, final @NotNull ExpiringCollection<E1> collection) {

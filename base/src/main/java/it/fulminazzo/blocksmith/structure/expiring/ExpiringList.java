@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @param <E> the type of the elements
  */
-public interface ExpiringList<E> extends List<E> {
+public interface ExpiringList<E> extends List<E>, ExpiringCollection<E> {
 
     /**
      * Adds an element in the list at the given index.
@@ -48,11 +48,11 @@ public interface ExpiringList<E> extends List<E> {
     /**
      * Adds all the elements of the given list to the current one at the given index.
      *
-     * @param index the index at which to insert the elements
-     * @param list  the list to take elements from
+     * @param index      the index at which to insert the elements
+     * @param collection the collection to take elements from
      * @return {@code true} if the list was modified, {@code false} if it was not modified
      */
-    boolean addAll(final int index, final @NotNull ExpiringList<? extends E> list);
+    boolean addAll(final int index, final @NotNull ExpiringCollection<? extends E> collection);
 
     /**
      * Adds all the elements of the given collection to the current one at the given index.
