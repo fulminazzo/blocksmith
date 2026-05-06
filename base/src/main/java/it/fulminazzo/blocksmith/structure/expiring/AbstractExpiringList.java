@@ -94,7 +94,7 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
 
     @Override
     public boolean addAll(int index, final @NotNull Collection<? extends E> collection) {
-        if (collection instanceof ExpiringCollection<?>) return addAll((ExpiringCollection<? extends E>) collection);
+        if (collection instanceof ExpiringCollection<?>) return addAll(index, (ExpiringCollection<? extends E>) collection);
         else {
             boolean added = false;
             for (E e : collection) {
