@@ -29,6 +29,15 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
      */
     abstract @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key);
 
+    /**
+     * Manually removes all the expired entries.
+     */
+    public void clearExpired() {
+        for (Entry<K, ExpiringEntry<V>> entry : new ArrayList<>(delegate.entrySet()))
+            if (entry.getValue().isExpired())
+                delegate.remove(entry.getKey());
+    }
+
     @Override
     public @Nullable V put(final @Nullable K key, final @Nullable V value, final @NotNull Duration ttl) {
         return put(key, value, ttl.toMillis());
@@ -236,15 +245,6 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     public void putAll(final @NotNull Map<? extends K, ? extends V> map) {
         if (map instanceof ExpiringMap) putAll((ExpiringMap<? extends K, ? extends V>) map);
         else putAll(map, ExpiringEntry.NEVER_EXPIRE);
-    }
-
-    /**
-     * Manually removes all the expired entries.
-     */
-    public void clearExpired() {
-        for (Entry<K, ExpiringEntry<V>> entry : new ArrayList<>(delegate.entrySet()))
-            if (entry.getValue().isExpired())
-                delegate.remove(entry.getKey());
     }
 
     @Override
