@@ -1,5 +1,6 @@
-package it.fulminazzo.blocksmith.broker;
+package it.fulminazzo.blocksmith.broker.memory;
 
+import it.fulminazzo.blocksmith.broker.MessageQueryEngine;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
