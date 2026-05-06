@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.broker;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +15,7 @@ import java.util.function.Consumer;
  * to interact with a particular message broker system.
  * Each backend implements this interface with its own specific methods and resources.
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class MessageQueryEngine implements Closeable {
     protected final @NotNull String channelName;
 
