@@ -20,8 +20,7 @@ import java.util.function.BiFunction;
  *     <li>creation:
  *         <pre>{@code
  *         Mapper mapper = ...;
- *         ExecutorService executor = ...;
- *         MemoryMessageBroker messageBroker = MemoryMessageBroker.create(mapper, executor);
+ *         MemoryMessageBroker messageBroker = MemoryMessageBroker.create(mapper);
  *         }</pre>
  *     </li>
  *     <li>creating a standard channel:
