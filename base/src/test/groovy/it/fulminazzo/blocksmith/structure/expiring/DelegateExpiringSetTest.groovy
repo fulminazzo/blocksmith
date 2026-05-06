@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.structure.expiring
 import spock.lang.Specification
 
 class DelegateExpiringSetTest extends Specification {
-    private static final long ttl = 200L
+    private static final long ttl = 400L
 
     private static final String value = 'Hello, world!'
     private static final Object PRESENT = DelegateExpiringSet.PRESENT
@@ -160,7 +160,7 @@ class DelegateExpiringSetTest extends Specification {
 
     def 'test that equals with #object returns #expected'() {
         given:
-        internal.put('Hello', PRESENT, 1000L)
+        internal.put('Hello', PRESENT, 10_000L)
         internal.put('Goodbye', PRESENT, 1L)
 
         and:
@@ -173,22 +173,22 @@ class DelegateExpiringSetTest extends Specification {
         actual == expected
 
         where:
-        object                                  || expected
-        null                                    || false
-        'Hello=world'                           || false
-        []                                      || false
-        ['Hello']                               || true
-        ['Goodbye']                             || false
+        object                                   || expected
+        null                                     || false
+        'Hello=world'                            || false
+        []                                       || false
+        ['Hello']                                || true
+        ['Goodbye']                              || false
         new DelegateExpiringSet(new MockExpiringMap() {
             {
-                put('Hello', PRESENT, 1000L)
+                put('Hello', PRESENT, 10_000L)
             }
-        })                                      || true
+        })                                       || true
         new DelegateExpiringSet(new MockExpiringMap() {
             {
-                put('Goodbye', PRESENT, 1000L)
+                put('Goodbye', PRESENT, 10_000L)
             }
-        })                                      || false
+        })                                       || false
     }
 
     def 'test that toString correctly prints expired entries'() {
@@ -218,19 +218,19 @@ class DelegateExpiringSetTest extends Specification {
         def data = set.expiringEntries()
 
         then:
-        def first = data.find {it.value == 'Hello'}
+        def first = data.find { it.value == 'Hello' }
         first != null
         first.expireTime - now <= ttl + 10
         first.expireTime - now >= ttl - 10
 
         and:
-        def second = data.find {it.value == 'Goodbye'}
+        def second = data.find { it.value == 'Goodbye' }
         second != null
         second.expireTime - now <= 1 + 10
         second.expireTime - now >= 1 - 10
 
         and:
-        def third = data.find {it.value == 'Ciao'}
+        def third = data.find { it.value == 'Ciao' }
         third != null
         third.expireTime == ExpiringEntry.NEVER_EXPIRE
     }
