@@ -52,12 +52,13 @@ import java.util.function.BiFunction;
  *         <pre>{@code
  *         RedisMessageBroker messageBroker = ...;
  *         MessageChannel channel = messageBroker.newChannel(
- *                 (e, m) -> new CustomRedisMessageChannel(e, m),
+ *                 (engine, mapper) -> new CustomRedisMessageChannel(engine, mapper),
  *                 new RedisMessageChannelSettings()
  *                         .withChannelName("redis_channel")
  *                         .direct("private_channel")
  *         );
  *         }</pre>
+ *         where CustomRedisMessageChannel extends RedisMessageChannel and adds custom behavior.
  *     </li>
  * </ul>
  */
