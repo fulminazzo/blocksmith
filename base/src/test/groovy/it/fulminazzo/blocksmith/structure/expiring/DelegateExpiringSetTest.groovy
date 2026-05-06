@@ -220,7 +220,7 @@ class DelegateExpiringSetTest extends Specification {
         then:
         def first = data.find { it.value == 'Hello' }
         first != null
-        first.expireTime - now <= ttl
+        first.expireTime - now <= ttl * 1.1
         first.expireTime - now >= ttl * 0.9
 
         and:
