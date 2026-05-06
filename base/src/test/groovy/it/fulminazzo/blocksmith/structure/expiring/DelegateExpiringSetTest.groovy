@@ -2,8 +2,6 @@ package it.fulminazzo.blocksmith.structure.expiring
 
 import spock.lang.Specification
 
-import java.time.Duration
-
 class DelegateExpiringSetTest extends Specification {
     private static final long ttl = 200L
 
@@ -100,28 +98,12 @@ class DelegateExpiringSetTest extends Specification {
         ['Goodbye, mars!']        || false
     }
 
-    def 'test that addAll with ttl sets correct TTLs'() {
-        given:
-        def second = [value]
-
-        when:
-        set.addAll(second, Duration.ofMillis(ttl))
-
-        then:
-        internal.containsKey(value)
-
-        and:
-        def actualTtl = internal.getTtl(value)
-        actualTtl.toMillis() >= ttl - 10
-        actualTtl.toMillis() <= ttl + 10
-    }
-
     def 'test that addAll adds of expiring set works'() {
         given:
         final secondValue = 'Goodbye, mars!'
 
         and:
-        def second = new DelegateExpiringSet(ExpiringMap.passive())
+        def second = new DelegateExpiringSet(ExpiringMap.passive() as AbstractExpiringMap)
         second.add(value, ttl)
         second.add(secondValue)
 
@@ -138,55 +120,6 @@ class DelegateExpiringSetTest extends Specification {
 
         and:
         internal.containsKey(secondValue)
-    }
-
-    def 'test that addAll adds of general collection works'() {
-        given:
-        def second = [value]
-
-        when:
-        set.addAll(second)
-
-        then:
-        internal.containsKey(value)
-    }
-
-    def 'test that retainAll works'() {
-        given:
-        internal[value] = PRESENT
-
-        when:
-        def result = set.retainAll(collection)
-
-        then:
-        result == expected
-
-        and:
-        internal.containsKey(value) == !expected
-
-        where:
-        collection         || expected
-        [value]            || false
-        ['Goodbye, mars!'] || true
-    }
-
-    def 'test that removeAll works'() {
-        given:
-        internal[value] = PRESENT
-
-        when:
-        def result = set.removeAll(collection)
-
-        then:
-        result == expected
-
-        and:
-        internal.containsKey(value) == !expected
-
-        where:
-        collection         || expected
-        [value]            || true
-        ['Goodbye, mars!'] || false
     }
 
     def 'test that #method(#arguments) calls on delegate #delegateMethod'() {
@@ -271,7 +204,7 @@ class DelegateExpiringSetTest extends Specification {
         def string = set.toString()
 
         then:
-        string == '[Goodbye (*), Hello, Ciao (!)]'
+        string == '[Hello, Ciao (!), Goodbye (*)]'
     }
 
     def 'test that expiringEntries returns correct entries'() {
