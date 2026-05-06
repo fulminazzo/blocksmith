@@ -48,6 +48,7 @@ velocity = "3.0.0-SNAPSHOT"
 
 # PROJECT
 java_parser = "3.28.0"
+guava = "33.6.0-jre"
 
 [libraries]
 # ANNOTATIONS
@@ -104,6 +105,7 @@ velocity = { module = "com.velocitypowered:velocity-api", version.ref = "velocit
 
 # PROJECT
 java_parser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "java_parser" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
 [bundles]
 # ANNOTATIONS
