@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * An expiring list is a special {@link List} whose elements are subject to expiration.
@@ -127,5 +128,46 @@ public interface ExpiringList<E> extends List<E>, ExpiringCollection<E> {
      */
     @Override
     @NotNull ExpiringList<E> subList(int fromIndex, int toIndex);
+
+    /**
+     * Initializes a new passive ExpirationList.
+     * <br>
+     * The elements will persist in memory <b>FOREVER</b>,
+     * until the user <b>manually</b> removes them.
+     *
+     * @param <E> the type of the elements
+     * @return the list
+     */
+    static <E> @NotNull ExpiringList<E> passive() {
+        return new PassiveExpiringList<>();
+    }
+
+    /**
+     * Initializes a new lazy ExpirationList.
+     * <br>
+     * The elements will persist in memory until an operation has been done
+     * to the list itself, at which point the expired elements will be removed.
+     *
+     * @param <E> the type of the elements
+     * @return the list
+     */
+    static <E> @NotNull ExpiringList<E> lazy() {
+        return new LazyExpiringList<>();
+    }
+
+    /**
+     * Initializes a new scheduled ExpirationList.
+     * <br>
+     * The elements will be periodically check for expiration and be removed.
+     *
+     * @param <E>          the type of the elements
+     * @param scheduler    the scheduler that will handle the periodical removal
+     * @param taskInterval the interval upon which to check expirations
+     * @return the list
+     */
+    static <E> @NotNull ExpiringList<E> scheduled(final @NotNull ScheduledExecutorService scheduler,
+                                                  final @NotNull Duration taskInterval) {
+        return new ScheduledExpiringList<>(scheduler, taskInterval);
+    }
 
 }
