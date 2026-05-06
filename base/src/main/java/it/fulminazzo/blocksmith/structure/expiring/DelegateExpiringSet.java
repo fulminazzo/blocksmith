@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.structure.expiring;
 
+import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -17,23 +18,13 @@ import java.util.stream.Collectors;
  * @param <E> the type of the elements
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-final class DelegateExpiringSet<E> implements ExpiringSet<E> {
+final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> implements ExpiringSet<E> {
     private static final @NotNull Object PRESENT = new Object();
     private final AbstractExpiringMap<E, Object> delegate;
 
     @Override
-    public boolean add(final @Nullable E element, final @NotNull Duration ttl) {
-        return add(element, ttl.toMillis());
-    }
-
-    @Override
     public boolean add(final @Nullable E element, final long ttl) {
         return delegate.put(element, PRESENT, ttl) == null;
-    }
-
-    @Override
-    public boolean add(final @Nullable E element) {
-        return delegate.put(element, PRESENT) == null;
     }
 
     @Override
@@ -47,62 +38,8 @@ final class DelegateExpiringSet<E> implements ExpiringSet<E> {
     }
 
     @Override
-    public boolean addAll(final @NotNull ExpiringSet<? extends E> set) {
-        return addAllHelper(set);
-    }
-
-    private <E1 extends E> boolean addAllHelper(final @NotNull ExpiringSet<E1> set) {
-        boolean added = false;
-        for (E1 e : set) {
-            Duration ttl = set.getTtl(e);
-            if (ttl != null) added |= add(e, ttl);
-        }
-        return added;
-    }
-
-    @Override
-    public boolean addAll(final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl) {
-        return addAll(collection, ttl.toMillis());
-    }
-
-    @Override
-    public boolean addAll(final @NotNull Collection<? extends E> collection, final long ttl) {
-        boolean added = false;
-        for (E e : collection) added |= add(e, ttl);
-        return added;
-    }
-
-    @Override
-    public boolean addAll(final @NotNull Collection<? extends E> collection) {
-        if (collection instanceof ExpiringSet<?>) return addAll((ExpiringSet<? extends E>) collection);
-        else {
-            boolean added = false;
-            for (E e : collection) added |= add(e);
-            return added;
-        }
-    }
-
-    @Override
-    public boolean retainAll(final @NotNull Collection<?> collection) {
-        boolean modified = false;
-        for (E element : this)
-            if (!collection.contains(element)) {
-                remove(element);
-                modified = true;
-            }
-        return modified;
-    }
-
-    @Override
-    public boolean removeAll(final @NotNull Collection<?> collection) {
-        boolean removed = false;
-        for (Object o : collection) removed |= remove(o);
-        return removed;
-    }
-
-    @Override
-    public @Nullable Duration getTtl(final @Nullable E key) {
-        return delegate.getTtl(key);
+    public @Nullable Duration getTtl(final @Nullable E element) {
+        return delegate.getTtl(element);
     }
 
     @Override
@@ -154,19 +91,16 @@ final class DelegateExpiringSet<E> implements ExpiringSet<E> {
         return delegate.keySet().hashCode();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public @NotNull String toString() {
-        return String.format("[%s]", delegate.delegate.entrySet().stream()
-                .map(e -> {
-                    E key = e.getKey();
-                    AbstractExpiringMap.ExpiringEntry<?> value = e.getValue();
-                    StringBuilder builder = new StringBuilder(key.toString());
-                    if (value.neverExpires())
-                        builder.append(" " + AbstractExpiringMap.ExpiringEntry.NEVER_EXPIRING_CHAR);
-                    else if (value.isExpired()) builder.append(" " + AbstractExpiringMap.ExpiringEntry.EXPIRED_CHAR);
-                    return builder.toString();
-                })
-                .collect(Collectors.joining(", ")));
+    @NotNull Collection<ExpiringEntry<E>> expiringEntries() {
+        return delegate.delegate.entrySet().stream()
+                .map(e ->
+                        (ExpiringEntry<E>) Reflect.on(new ExpiringEntry<>(e.getKey(), 1))
+                                .set("expireTime", e.getValue().getExpireTime())
+                                .get()
+                )
+                .collect(Collectors.toList());
     }
 
 }
