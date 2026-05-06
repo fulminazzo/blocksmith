@@ -45,9 +45,12 @@ allprojects {
         mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
 
-    tasks.test {
+    tasks.withType<Test>().configureEach {
         useJUnitPlatform()
         jvmArgs("-javaagent:${mockitoAgent.asPath}")
+        testLogging {
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        }
     }
 
     configure<com.github.gmazzo.buildconfig.BuildConfigExtension> {

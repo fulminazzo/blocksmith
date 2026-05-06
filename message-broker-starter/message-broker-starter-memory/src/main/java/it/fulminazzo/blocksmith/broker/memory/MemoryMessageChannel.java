@@ -5,8 +5,6 @@ import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.Executors;
-
 /**
  * Implementation of {@link it.fulminazzo.blocksmith.broker.MessageChannel} for in-memory databases.
  */
@@ -33,7 +31,7 @@ public class MemoryMessageChannel extends AbstractMessageChannel<MemoryMessageQu
      */
     public static @NotNull MemoryMessageChannel create(final @NotNull String channelName) {
         return new MemoryMessageChannel(
-                new MemoryMessageQueryEngine(channelName, Executors.newSingleThreadExecutor()),
+                new MemoryMessageQueryEngine(channelName),
                 MapperFormat.SERIALIZABLE.newMapper()
         );
     }

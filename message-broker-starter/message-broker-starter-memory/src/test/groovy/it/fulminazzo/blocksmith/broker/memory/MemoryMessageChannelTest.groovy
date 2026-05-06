@@ -6,11 +6,8 @@ import it.fulminazzo.blocksmith.broker.MessageChannelTest
 import it.fulminazzo.blocksmith.broker.Messages
 import org.jetbrains.annotations.NotNull
 
-import java.util.concurrent.Executor
-
 class MemoryMessageChannelTest extends MessageChannelTest {
     private static final String channelName = 'memory-message-channel'
-    private static final Executor executor = { it.run() }
 
     private static final Queue<Message> receivedMessages = new LinkedList<>()
 
@@ -48,7 +45,7 @@ class MemoryMessageChannelTest extends MessageChannelTest {
     @Override
     MessageChannel initializeChannel() {
         return new MemoryMessageChannel(
-                new MemoryMessageQueryEngine(channelName, executor),
+                new MemoryMessageQueryEngine(channelName),
                 MAPPER
         )
     }

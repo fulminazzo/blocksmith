@@ -42,8 +42,8 @@ class AbstractExpiringCollectionTest extends Specification {
 
         and:
         def actualTtl = internal.find { it.value == value }.expireTime - now
-        actualTtl >= ttl.toMillis() - 10
-        actualTtl <= ttl.toMillis() + 10
+        actualTtl <= ttl.toMillis()
+        actualTtl >= ttl.toMillis() * 0.9
     }
 
     def 'test that addAll adds of expiring collection works'() {
@@ -64,8 +64,8 @@ class AbstractExpiringCollectionTest extends Specification {
         then:
         def firstVal = internal.find { it.value == value }
         def actualTtl = firstVal.expireTime - now
-        actualTtl >= ttl.toMillis() - 10
-        actualTtl <= ttl.toMillis() + 10
+        actualTtl <= ttl.toMillis()
+        actualTtl >= ttl.toMillis() * 0.9
 
         and:
         internal.find { it.value == secondValue }

@@ -25,7 +25,7 @@ class RedisMessageBrokerTest extends Specification {
 
     def 'test broker life cycle'() {
         given:
-        def MessageBroker = RedisMessageBroker.builder()
+        def messageBroker = RedisMessageBroker.builder()
                 .uri(b ->
                         b.withHost('localhost')
                                 .withPort(serverPort)
@@ -36,7 +36,7 @@ class RedisMessageBrokerTest extends Specification {
                 .build()
 
         when:
-        def directChannel = MessageBroker.newChannel(
+        def directChannel = messageBroker.newChannel(
                 new RedisMessageChannelSettings()
                         .withChannelName('main')
                         .direct('sub')
@@ -46,7 +46,7 @@ class RedisMessageBrokerTest extends Specification {
         directChannel != null
 
         when:
-        def broadcastChannel = MessageBroker.newChannel(
+        def broadcastChannel = messageBroker.newChannel(
                 new RedisMessageChannelSettings()
                         .withChannelName('main')
                         .broadcast()
@@ -56,7 +56,7 @@ class RedisMessageBrokerTest extends Specification {
         broadcastChannel != null
 
         when:
-        MessageBroker.close()
+        messageBroker.close()
 
         then:
         noExceptionThrown()
