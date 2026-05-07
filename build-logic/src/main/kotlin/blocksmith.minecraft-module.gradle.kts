@@ -38,11 +38,16 @@ afterEvaluate {
     if (extension.enableFolia.getOrElse(false)) libraries.add(libs.folia)
 
     libraries.map { it.get() }.forEach { library ->
-        project("${project.path}:${project.name}-${library.name}") {
+        val name = library.name
+        project("${project.path}:${project.name}-$name") {
 
             dependencies {
                 compileOnly(library)
                 testImplementation(library)
+                if (name.equals(libs.velocity.get().name, ignoreCase = true)) {
+                    annotationProcessor(libs)
+                    testAnnotationProcessor(libs)
+                }
             }
 
         }
