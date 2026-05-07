@@ -5,6 +5,7 @@ plugins {
     `jacoco-report-aggregation`
     checkstyle
 
+    alias(libs.plugins.spotbugs)
     alias(libs.plugins.buildconfig)
 
     id("blocksmith.java-configuration")
@@ -23,6 +24,7 @@ allprojects {
     apply { plugin("jacoco") }
     apply { plugin("checkstyle") }
 
+    apply { plugin(rootProject.libs.plugins.spotbugs.get().pluginId) }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
     apply { plugin("blocksmith.java-configuration") }
@@ -76,6 +78,10 @@ allprojects {
         maxErrors = 0
         maxWarnings = 0
         toolVersion = rootProject.libs.versions.checkstyle.get()
+    }
+
+    spotbugs {
+        toolVersion = rootProject.libs.versions.spotbugs.version.get()
     }
 
     configure<com.github.gmazzo.buildconfig.BuildConfigExtension> {
