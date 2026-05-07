@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 /**
  * A wrapper for Java objects to work with reflections.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "CheckStyle", "unused"})
 @Value
 @EqualsAndHashCode(doNotUseGetters = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -29,7 +29,8 @@ public class Reflect {
             char.class, Character.class,
             boolean.class, Boolean.class
     );
-    private static final @NotNull Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITIVE = PRIMITIVE_TO_WRAPPER.entrySet().stream()
+    private static final @NotNull Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITIVE = PRIMITIVE_TO_WRAPPER.entrySet()
+            .stream()
             .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
     private static final @NotNull Map<Class<?>, Function<Number, Object>> NUMBERS_CONVERTER = new HashMap<>();
 
@@ -146,7 +147,7 @@ public class Reflect {
     /**
      * Converts the internal type to a Java wrapper type (if the type is primitive).
      *
-     * @return the reflect with the new object
+     * @return the new object wrapped
      */
     public @NotNull Reflect toWrapper() {
         if (isPrimitive()) {
@@ -159,7 +160,7 @@ public class Reflect {
     /**
      * Converts the internal type to a Java primitive type (if the type is a wrapper).
      *
-     * @return the reflect with the new object
+     * @return the new object wrapped
      */
     public @NotNull Reflect toPrimitive() {
         if (isWrapper()) {
@@ -173,7 +174,7 @@ public class Reflect {
      * Casts the internal object to the given type.
      *
      * @param type the type
-     * @return the reflect with the new object
+     * @return the new object wrapped
      */
     public @NotNull Reflect cast(final @NotNull Class<?> type) {
         if (object instanceof Class<?>) return new Reflect(type, type);
@@ -242,7 +243,9 @@ public class Reflect {
      * @throws ReflectException if no constructor was found
      */
     public @NotNull Constructor<?> getConstructor(final @NotNull Predicate<Constructor<?>> predicate) {
-        return getConstructors(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindConstructor(getType()));
+        return getConstructors(predicate).stream()
+                .findFirst()
+                .orElseThrow(() -> ReflectException.cannotFindConstructor(getType()));
     }
 
     /**
@@ -1044,7 +1047,7 @@ public class Reflect {
      * Gets the enum corresponding to the given name.
      *
      * @param <E>  the type of the enum
-     * @param name the name (case insensitive)
+     * @param name the name (case-insensitive)
      * @return the enum (if found)
      * @throws ReflectException if the wrapped type is not an enum
      */
@@ -1107,10 +1110,10 @@ public class Reflect {
      */
 
     /**
-     * Instantiates a new Reflect object.
+     * Instantiates a new instance of this class wrapping the given one.
      *
      * @param object the object
-     * @return the reflect
+     * @return the wrapped object
      */
     public static @NotNull Reflect on(final @Nullable Object object) {
         if (object instanceof Type) return on((Type) object);
@@ -1118,21 +1121,23 @@ public class Reflect {
     }
 
     /**
-     * Instantiates a new Reflect object.
+     * Instantiates a new instance of this class wrapping the type
+     * (the {@link #getType()} will be the same as {@link #get()}).
      *
      * @param type the type
-     * @return the reflect
+     * @return the wrapped type
      */
     public static @NotNull Reflect on(final @NotNull Type type) {
         return new Reflect(type, type);
     }
 
     /**
-     * Instantiates a new Reflect object.
+     * Attempts to load the class with the given name.
+     * Then delegates to {@link #on(Type)}.
      *
      * @param className the class name
-     * @return the reflect
-     * @throws ReflectException if it could not find the class
+     * @return the wrapped class
+     * @throws ReflectException if the class could not be found
      */
     public static @NotNull Reflect on(final @NotNull String className) {
         try {
@@ -1143,12 +1148,13 @@ public class Reflect {
     }
 
     /**
-     * Instantiates a new Reflect object.
+     * Attempts to load the class with the given name from the classloader.
+     * Then delegates to {@link #on(Type)}.
      *
      * @param className   the class name
      * @param classLoader the class loader to load the class from
-     * @return the reflect
-     * @throws ReflectException if it could not find the class
+     * @return the wrapped class
+     * @throws ReflectException if the class could not be found
      */
     public static @NotNull Reflect on(final @NotNull String className, final @NotNull ClassLoader classLoader) {
         try {
@@ -1205,7 +1211,7 @@ public class Reflect {
      * Any {@code null} parameter will have a {@code null} class.
      *
      * @param parameters the parameters
-     * @return the parameters types
+     * @return the type of the parameters
      */
     public static @Nullable Class<?> @NotNull [] getParameterTypes(final @Nullable Object @NotNull ... parameters) {
         return Arrays.stream(parameters)
