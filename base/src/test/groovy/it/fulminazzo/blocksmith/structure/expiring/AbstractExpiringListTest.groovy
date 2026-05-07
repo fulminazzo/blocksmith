@@ -236,7 +236,7 @@ class AbstractExpiringListTest extends Specification {
         actualTtl <= ttl + 20
     }
 
-    def 'test that set correctly overwrites value in list'() {
+    def 'test that set of never expiring works'() {
         given:
         internal.addAll([FIRST, FIRST])
 
