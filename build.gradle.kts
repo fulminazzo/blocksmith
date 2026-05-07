@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
     `java-library`
     groovy
@@ -47,21 +49,30 @@ allprojects {
 
         if (project.path != rootProject.projects.base.path) api(rootProject.projects.base)
 
-        testImplementation(rootProject.libs.bundles.annotations)
-        testRuntimeOnly(rootProject.libs.junit.platform)
-        testAnnotationProcessor(rootProject.libs.lombok)
-        testImplementation(rootProject.libs.bundles.test.framework)
-
-        testImplementation(rootProject.projects.base.testing)
-
         mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
 
-    tasks.withType<Test>().configureEach {
-        useJUnitPlatform()
-        jvmArgs("-javaagent:${mockitoAgent.asPath}")
-        testLogging {
-            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    testing {
+        suites {
+            withType<JvmTestSuite> {
+                useSpock(rootProject.libs.versions.spock.core.get())
+                dependencies {
+                    rootProject.libs.bundles.annotations.get().forEach { implementation(it) }
+                    annotationProcessor(rootProject.libs.lombok.get())
+
+                    implementation(rootProject.projects.base.testing)
+                }
+                targets {
+                    all {
+                        testTask.configure {
+                            jvmArgs("-javaagent:${mockitoAgent.asPath}")
+                            testLogging {
+                                exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
