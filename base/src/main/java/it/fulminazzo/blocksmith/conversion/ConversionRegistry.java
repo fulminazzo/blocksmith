@@ -27,9 +27,15 @@ final class ConversionRegistry {
      * @param target the target type
      * @return the conversion function
      */
-    public static <T, R> @NotNull Optional<Converter<T, R>> getConverter(final @NotNull Class<T> type,
-                                                                         final @NotNull Class<R> target) {
+    public static <T, R> @NotNull Optional<Converter<T, R>> getConverter(
+            final @NotNull Class<T> type,
+            final @NotNull Class<R> target
+    ) {
         return getConverter(type).getConverter(target);
+    }
+
+    private static <T> @NotNull ConverterRegistry<T> getConverter(final @NotNull Class<T> type) {
+        return (ConverterRegistry<T>) CONVERTERS.computeIfAbsent(type, k -> new ConverterRegistry<>());
     }
 
     /**
@@ -41,14 +47,12 @@ final class ConversionRegistry {
      * @param target    the target type
      * @param converter the conversion function
      */
-    public static <T, R> void register(final @NotNull Class<T> type,
-                                       final @NotNull Class<R> target,
-                                       final @NotNull Converter<T, R> converter) {
+    public static <T, R> void register(
+            final @NotNull Class<T> type,
+            final @NotNull Class<R> target,
+            final @NotNull Converter<T, R> converter
+    ) {
         getConverter(type).register(target, converter);
-    }
-
-    private static <T> @NotNull ConverterRegistry<T> getConverter(final @NotNull Class<T> type) {
-        return (ConverterRegistry<T>) CONVERTERS.computeIfAbsent(type, k -> new ConverterRegistry<>());
     }
 
     /**

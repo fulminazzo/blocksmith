@@ -5,8 +5,8 @@ import spock.lang.Specification
 import spock.lang.Stepwise
 
 @Stepwise
-class ConvertibleTest extends Specification {
-    private Convertible convertible = new Person('Alex', 23)
+class ConvertibleIntegrationTest extends Specification {
+    private final Convertible convertible = new Person('Alex', 23)
 
     def 'step 1: test that convert without converter throws'() {
         when:

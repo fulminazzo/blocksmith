@@ -21,5 +21,4 @@ public interface Converter<T, R> {
      */
     R convert(final T from, final @Nullable Object @NotNull ... args);
 
-
 }
