@@ -4,7 +4,7 @@ import spock.lang.Specification
 
 import java.time.Duration
 
-class PendingTaskManagerTest extends Specification {
+class PendingTaskManagerFunctionalTest extends Specification {
     private boolean executed = false
 
     def 'test that PendingTaskManager#execute works'() {
