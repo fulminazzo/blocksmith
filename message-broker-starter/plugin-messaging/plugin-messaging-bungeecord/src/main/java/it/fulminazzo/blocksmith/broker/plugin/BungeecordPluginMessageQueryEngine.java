@@ -7,10 +7,14 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Implementation of {@link PluginMessageQueryEngine} for Bungeecord platforms.
  */
 public final class BungeecordPluginMessageQueryEngine extends PluginMessageQueryEngine implements Listener {
+    private final @NotNull ExecutorService executor = Executors.newCachedThreadPool();
 
     /**
      * Instantiates a new Bungeecord plugin message query engine.
@@ -29,7 +33,8 @@ public final class BungeecordPluginMessageQueryEngine extends PluginMessageQuery
 
     @EventHandler
     public void on(final @NotNull PluginMessageEvent event) {
-        if (event.getTag().equals(channelName)) handleMessage(event.getData());
+        if (event.getTag().equals(channelName))
+            executor.execute(() -> handleMessage(event.getData()));
     }
 
     @Override
@@ -42,6 +47,7 @@ public final class BungeecordPluginMessageQueryEngine extends PluginMessageQuery
     @Override
     public void close() {
         super.close();
+        executor.shutdown();
         ProxyServer server = registrar.server();
         server.unregisterChannel(channelName);
         server.getPluginManager().unregisterListener(this);
