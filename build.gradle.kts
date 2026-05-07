@@ -6,6 +6,7 @@ plugins {
 
     `jacoco-report-aggregation`
     checkstyle
+    codenarc
 
     alias(libs.plugins.spotbugs)
     alias(libs.plugins.buildconfig)
@@ -26,6 +27,7 @@ allprojects {
 
     apply { plugin("jacoco") }
     apply { plugin("checkstyle") }
+    apply { plugin("codenarc") }
 
     apply { plugin(rootProject.libs.plugins.spotbugs.get().pluginId) }
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
@@ -91,6 +93,14 @@ allprojects {
         maxErrors = 0
         maxWarnings = 0
         toolVersion = rootProject.libs.versions.checkstyle.get()
+    }
+
+    codenarc {
+        configFile = rootProject.file("config/codenarc/codenarc.groovy")
+        maxPriority1Violations = 0
+        maxPriority2Violations = 0
+        maxPriority3Violations = 0
+        toolVersion = rootProject.libs.versions.codenarc.get()
     }
 
     spotbugs {
