@@ -1,11 +1,12 @@
 package it.fulminazzo.blocksmith.broker.plugin;
 
+import it.fulminazzo.blocksmith.conversion.Convertible;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Identifies a class that can register plugin messages.
  */
-public interface PluginMessageRegistrar {
+public interface PluginMessageRegistrar extends Convertible {
 
     /**
      * Gets the server that the application is running on.
