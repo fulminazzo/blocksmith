@@ -1,7 +1,9 @@
 plugins {
     `java-library`
     groovy
+
     `jacoco-report-aggregation`
+    checkstyle
 
     alias(libs.plugins.buildconfig)
 }
@@ -14,11 +16,14 @@ val testingModuleName: String by extra
 allprojects {
     apply { plugin("java-library") }
     apply { plugin("groovy") }
+
     apply { plugin("jacoco") }
+    apply { plugin("checkstyle") }
+
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
-    apply { plugin("blocksmith.java-configuration")}
-    apply { plugin("blocksmith.testing-module-configuration")}
+    apply { plugin("blocksmith.java-configuration") }
+    apply { plugin("blocksmith.testing-module-configuration") }
 
     extra["baseModuleName"] = "base"
     extra["testingModuleName"] = "testing"
@@ -53,6 +58,23 @@ allprojects {
         }
     }
 
+    tasks.withType<JacocoReport>().configureEach {
+        classDirectories.setFrom(
+            files(classDirectories.files.map {
+                fileTree(it) {
+                    exclude("**/$projectInfoClassName**")
+                }
+            })
+        )
+    }
+
+    checkstyle {
+        configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+        maxErrors = 0
+        maxWarnings = 0
+        toolVersion = rootProject.libs.versions.checkstyle.get()
+    }
+
     configure<com.github.gmazzo.buildconfig.BuildConfigExtension> {
         packageName = "${rootProject.group}.${rootProject.name}"
         className = projectInfoClassName
@@ -63,16 +85,6 @@ allprojects {
         buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
         buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
         buildConfigField("String", "MODULE_NAME", "\"${projectName}\"")
-    }
-
-    tasks.withType<JacocoReport>().configureEach {
-        classDirectories.setFrom(
-            files(classDirectories.files.map {
-                fileTree(it) {
-                    exclude("**/$projectInfoClassName**")
-                }
-            })
-        )
     }
 
 }

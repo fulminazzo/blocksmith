@@ -2,6 +2,7 @@
 # PLUGINS
 buildconfig = "6.0.9"
 shadow = "9.1.0"
+checkstyle = "13.4.2"
 
 # ANNOTATIONS
 lombok = "1.18.44"
