@@ -64,11 +64,13 @@ class AbstractMessageChannelTest extends Specification {
     }
 
     def 'test that send correctly sends serialized payload'() {
+        given:
+        def queue = MockMessageQueryEngine.getQueue(receiver.name)
+
         when:
         sender.send(data).join()
 
         then:
-        def queue = MockMessageQueryEngine.getQueue(receiver.name)
         !queue.isEmpty()
 
         and:
