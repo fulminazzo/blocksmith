@@ -4,21 +4,27 @@ import spock.lang.Specification
 
 import java.time.Duration
 
-class FixedCooldownManagerTest extends Specification {
+class CooldownManagerFunctionalTest extends Specification {
 
-    def 'test that FixedCooldownManager works'() {
+    def 'test that CooldownManager works'() {
         given:
-        def manager = new FixedCooldownManager(Duration.ofSeconds(1))
+        def manager = new CooldownManager()
         def entity = new Object()
 
         expect:
         !manager.isOnCooldown(entity)
 
+        when:
+        manager.put(entity, Duration.ofSeconds(-1))
+
+        then:
+        thrown(IllegalArgumentException)
+
         and:
         !manager.isOnCooldown(entity)
 
         when:
-        manager.put(entity)
+        manager.put(entity, Duration.ofSeconds(1))
 
         then:
         manager.isOnCooldown(entity)
@@ -37,21 +43,13 @@ class FixedCooldownManagerTest extends Specification {
         !manager.isOnCooldown(entity)
 
         when:
-        manager.put(entity).remove(entity)
+        manager.put(entity, 1_000).remove(entity)
 
         then:
         !manager.isOnCooldown(entity)
 
         when:
         manager.getRemaining(entity)
-
-        then:
-        thrown(IllegalArgumentException)
-    }
-
-    def 'test that initializing FixedCooldownManager with invalid duration throws'() {
-        when:
-        new FixedCooldownManager(Duration.ofSeconds(-1))
 
         then:
         thrown(IllegalArgumentException)
