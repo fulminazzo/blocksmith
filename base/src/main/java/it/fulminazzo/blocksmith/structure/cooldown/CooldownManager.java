@@ -36,8 +36,10 @@ public final class CooldownManager<E> implements ICooldownManager<E> {
      * @param cooldown the duration of the cooldown in milliseconds
      * @return this object (for method chaining)
      */
-    public @NotNull CooldownManager<E> put(final @NotNull E entity,
-                                           final @Range(from = 1, to = Long.MAX_VALUE) long cooldown) {
+    public @NotNull CooldownManager<E> put(
+            final @NotNull E entity,
+                                           final @Range(from = 1, to = Long.MAX_VALUE) long cooldown
+    ) {
         if (cooldown <= 0) throw new IllegalArgumentException("cooldown must be positive");
         expirations.put(entity, true, cooldown);
         return this;

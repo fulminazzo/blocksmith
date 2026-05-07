@@ -33,7 +33,8 @@ public final class ReflectException extends RuntimeException {
      * @param format the format of the message
      * @param args   the arguments to format
      */
-    public ReflectException(final @NotNull Throwable cause, final @NotNull String format, final Object @NotNull ... args) {
+    public ReflectException(final @NotNull Throwable cause,
+                            final @NotNull String format, final Object @NotNull ... args) {
         super(formatMessage(format, args), cause);
     }
 

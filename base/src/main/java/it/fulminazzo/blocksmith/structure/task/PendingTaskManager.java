@@ -35,9 +35,11 @@ public final class PendingTaskManager<E> {
      * @param timeout the timeout in milliseconds upon which the task will be considered as expired
      * @param task    the task
      */
-    public void register(final @NotNull E entity,
-                         final @Range(from = 1, to = Long.MAX_VALUE) long timeout,
-                         final @NotNull Runnable task) {
+    public void register(
+            final @NotNull E entity,
+            final @Range(from = 1, to = Long.MAX_VALUE) long timeout,
+            final @NotNull Runnable task
+    ) {
         tasks.put(entity, task, timeout);
     }
 
@@ -46,8 +48,8 @@ public final class PendingTaskManager<E> {
      *
      * @param entity the owner of the task
      * @return {@link Result#SUCCESS} if the task was executed,
-     * {@link Result#EXPIRED} if the task was executed too late,
-     * {@link Result#NOT_FOUND} if the entity has no pending task
+     *         {@link Result#EXPIRED} if the task was executed too late,
+     *         {@link Result#NOT_FOUND} if the entity has no pending task
      */
     public @NotNull Result execute(final @NotNull E entity) {
         return fetchTask(entity, Runnable::run);
@@ -58,8 +60,8 @@ public final class PendingTaskManager<E> {
      *
      * @param entity the owner of the task
      * @return {@link Result#SUCCESS} if the task was successfully removed,
-     * {@link Result#EXPIRED} if the task was removed too late,
-     * {@link Result#NOT_FOUND} if the entity has no pending task
+     *         {@link Result#EXPIRED} if the task was removed too late,
+     *         {@link Result#NOT_FOUND} if the entity has no pending task
      */
     public @NotNull Result cancel(final @NotNull E entity) {
         return fetchTask(entity, r -> {
@@ -72,8 +74,8 @@ public final class PendingTaskManager<E> {
      * @param entity the owner of the task
      * @param then   the action to do with the task (if found)
      * @return {@link Result#SUCCESS} if the task was successfully removed,
-     * {@link Result#EXPIRED} if the task was removed too late,
-     * {@link Result#NOT_FOUND} if the entity has no pending task
+     *         {@link Result#EXPIRED} if the task was removed too late,
+     *         {@link Result#NOT_FOUND} if the entity has no pending task
      */
     @NotNull Result fetchTask(final @NotNull E entity, final Consumer<@NotNull Runnable> then) {
         Duration ttl = tasks.getTtl(entity);

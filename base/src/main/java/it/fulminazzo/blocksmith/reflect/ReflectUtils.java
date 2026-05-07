@@ -168,7 +168,10 @@ public final class ReflectUtils {
         } else return OptionalInt.empty();
     }
 
-    private static @NotNull OptionalInt aggregateScore(final @NotNull Type source, final @NotNull Type @NotNull [] bounds) {
+    private static @NotNull OptionalInt aggregateScore(
+            final @NotNull Type source,
+            final @NotNull Type @NotNull [] bounds
+    ) {
         int score = 0;
         for (Type b : bounds) {
             OptionalInt opt = scoreTypeMatching(source, b);
@@ -210,13 +213,16 @@ public final class ReflectUtils {
      * @param parameterValues the parameter values
      * @return the array
      */
-    static @Nullable Object @NotNull [] regroup(final @NotNull Parameter @NotNull [] parameters,
-                                                final @Nullable Object @NotNull [] parameterValues) {
+    static @Nullable Object @NotNull [] regroup(
+            final @NotNull Parameter @NotNull [] parameters,
+            final @Nullable Object @NotNull [] parameterValues
+    ) {
         List<Object> flattened = new ArrayList<>();
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
             if (parameter.isVarArgs()) {
-                List<Object> remaining = new ArrayList<>(Arrays.asList(parameterValues).subList(i, parameterValues.length));
+                List<Object> remaining = new ArrayList<>(Arrays.asList(parameterValues)
+                        .subList(i, parameterValues.length));
                 Class<?> type = parameter.getType();
                 if (remaining.size() == 1) {
                     Object last = remaining.get(0);
@@ -225,7 +231,9 @@ public final class ReflectUtils {
                         continue;
                     }
                 }
-                flattened.add(remaining.toArray((Object[]) Array.newInstance(type.getComponentType(), remaining.size())));
+                flattened.add(remaining.toArray(
+                        (Object[]) Array.newInstance(type.getComponentType(), remaining.size())
+                ));
                 continue;
             }
             flattened.add(parameterValues[i]);
@@ -241,8 +249,10 @@ public final class ReflectUtils {
      * @param parameterTypes the parameter types
      * @return the executable (if found)
      */
-    static <E extends Executable> @NotNull Optional<E> findExecutable(final @NotNull Collection<E> executables,
-                                                                      final @Nullable Class<?> @NotNull [] parameterTypes) {
+    static <E extends Executable> @NotNull Optional<E> findExecutable(
+            final @NotNull Collection<E> executables,
+            final @Nullable Class<?> @NotNull [] parameterTypes
+    ) {
         return executables.stream()
                 .map(e -> {
                     OptionalInt score = parameterMatches(e.getParameters(), parameterTypes);
@@ -258,10 +268,12 @@ public final class ReflectUtils {
      *
      * @param parameters the parameters
      * @param given      the parameter types
-     * @return the parameters compatibility, computed as the difference between the given and the requested
+     * @return the parameter compatibility, computed as the difference between the given and the requested
      */
-    static OptionalInt parameterMatches(final @NotNull Parameter @NotNull [] parameters,
-                                        final @Nullable Class<?> @NotNull [] given) {
+    static OptionalInt parameterMatches(
+            final @NotNull Parameter @NotNull [] parameters,
+            final @Nullable Class<?> @NotNull [] given
+    ) {
         int total = 0;
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
