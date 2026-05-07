@@ -95,12 +95,26 @@ allprojects {
         toolVersion = rootProject.libs.versions.checkstyle.get()
     }
 
+    tasks.withType<Checkstyle> {
+        reports {
+            xml.required = true
+            html.required = true
+        }
+    }
+
     codenarc {
         configFile = rootProject.file("config/codenarc/codenarc.groovy")
         maxPriority1Violations = 0
         maxPriority2Violations = 0
         maxPriority3Violations = 0
         toolVersion = rootProject.libs.versions.codenarc.get()
+    }
+
+    tasks.withType<CodeNarc> {
+        reports {
+            xml.required = true
+            html.required = true
+        }
     }
 
     spotbugs {
