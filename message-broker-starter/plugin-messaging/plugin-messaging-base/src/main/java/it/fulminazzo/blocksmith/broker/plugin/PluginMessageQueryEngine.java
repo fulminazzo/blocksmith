@@ -7,9 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.function.Consumer;
 
 /**
@@ -23,7 +22,7 @@ public abstract class PluginMessageQueryEngine extends MessageQueryEngine {
      * If a message fails to be published due to a lack of online players,
      * it will be stored here and published when the server is back online.
      */
-    private final @NotNull Queue<byte[]> pendingMessages = new ConcurrentLinkedQueue<>();
+    private final @NotNull LinkedBlockingDeque<byte[]> pendingMessages = new LinkedBlockingDeque<>();
 
     protected final @NotNull PluginMessageRegistrar registrar;
 
@@ -62,8 +61,13 @@ public abstract class PluginMessageQueryEngine extends MessageQueryEngine {
      * Attempts to re-send all pending messages.
      */
     protected void resendPendingMessages() {
-        while (!pendingMessages.isEmpty())
-            if (!publish(pendingMessages.poll())) break;
+        while (!pendingMessages.isEmpty()) {
+            byte[] data = pendingMessages.poll();
+            if (!publish(data)) {
+                pendingMessages.addFirst(data);
+                break;
+            }
+        }
     }
 
     @Override
