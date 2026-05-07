@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.buildconfig)
 
     id("blocksmith.java-configuration")
+    id("blocksmith.tests-configuration")
     id("blocksmith.testing-module-configuration")
 }
 
@@ -28,6 +29,7 @@ allprojects {
     apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
     apply { plugin("blocksmith.java-configuration") }
+    apply { plugin("blocksmith.tests-configuration") }
     apply { plugin("blocksmith.testing-module-configuration") }
 
     extra["baseModuleName"] = "base"
