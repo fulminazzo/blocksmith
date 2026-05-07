@@ -24,7 +24,7 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
      * @param index the index
      * @return the expiring entry
      * @throws IndexOutOfBoundsException if either the index is out of range OR
-     * the entry at the given index expired and there is no replacement entry
+     *                                   the entry at the given index expired and there is no replacement entry
      */
     abstract @NotNull ExpiringEntry<E> getExpiring(final int index);
 
@@ -33,6 +33,18 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
      */
     public void clearExpired() {
         delegate.removeIf(ExpiringEntry::isExpired);
+    }
+
+    private <E1 extends E> boolean addAllHelper(int index, final @NotNull ExpiringCollection<E1> collection) {
+        boolean added = false;
+        for (E1 e : collection) {
+            Duration ttl = collection.getTtl(e);
+            if (ttl != null) {
+                add(index++, e, ttl);
+                added = true;
+            }
+        }
+        return added;
     }
 
     @Override
@@ -67,20 +79,12 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
         return addAllHelper(index, collection);
     }
 
-    private <E1 extends E> boolean addAllHelper(int index, final @NotNull ExpiringCollection<E1> collection) {
-        boolean added = false;
-        for (E1 e : collection) {
-            Duration ttl = collection.getTtl(e);
-            if (ttl != null) {
-                add(index++, e, ttl);
-                added = true;
-            }
-        }
-        return added;
-    }
-
     @Override
-    public boolean addAll(final int index, final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl) {
+    public boolean addAll(
+            final int index,
+            final @NotNull Collection<? extends E> collection,
+            final @NotNull Duration ttl
+    ) {
         return addAll(index, collection, ttl.toMillis());
     }
 
@@ -96,7 +100,8 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
 
     @Override
     public boolean addAll(int index, final @NotNull Collection<? extends E> collection) {
-        if (collection instanceof ExpiringCollection<?>) return addAll(index, (ExpiringCollection<? extends E>) collection);
+        if (collection instanceof ExpiringCollection<?>)
+            return addAll(index, (ExpiringCollection<? extends E>) collection);
         else {
             boolean added = false;
             for (E e : collection) {

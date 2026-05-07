@@ -358,7 +358,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that putAll adds every element with same TTL'() {
         given:
-        def map = ['Hello': 'world', 'Goodbye': 'mars']
+        def map = ['Hello' : 'world', 'Goodbye' : 'mars']
 
         and:
         def now = System.currentTimeMillis()
@@ -571,8 +571,8 @@ class AbstractExpiringMapTest extends Specification {
         null                                    || false
         'Hello=world'                           || false
         [:]                                     || false
-        ['Hello': 'world']                      || true
-        ['Goodbye': 'mars']                     || false
+        ['Hello' : 'world']                     || true
+        ['Goodbye' : 'mars']                    || false
         new MockExpiringMap() {
             {
                 put('Hello', 'world', 10_000L)
@@ -640,7 +640,7 @@ class AbstractExpiringMapTest extends Specification {
         def second = Map.entry('Hello', 'world')
 
         expect:
-        first.equals(second)
+        Reflect.on(first).invoke('equals', second).get()
     }
 
     def 'test that entry does not equal #other'() {
@@ -651,7 +651,7 @@ class AbstractExpiringMapTest extends Specification {
         )
 
         expect:
-        !entry.equals(other)
+        !Reflect.on(entry).invoke('equals', other).get()
 
         where:
         other << [

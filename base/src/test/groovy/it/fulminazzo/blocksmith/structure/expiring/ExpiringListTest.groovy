@@ -20,4 +20,5 @@ class ExpiringListTest extends Specification {
         'lazy'      | []                                                                   || LazyExpiringList
         'scheduled' | [Executors.newSingleThreadScheduledExecutor(), Duration.ofMillis(1)] || ScheduledExpiringList
     }
+
 }

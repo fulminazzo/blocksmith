@@ -24,6 +24,15 @@ abstract class AbstractExpiringCollection<E> implements ExpiringCollection<E> {
      */
     abstract @NotNull Collection<ExpiringEntry<E>> expiringEntries();
 
+    private <E1 extends E> boolean addAllHelper(final @NotNull ExpiringCollection<E1> collection) {
+        boolean added = false;
+        for (E1 e : collection) {
+            Duration ttl = collection.getTtl(e);
+            if (ttl != null) added |= add(e, ttl);
+        }
+        return added;
+    }
+
     @Override
     public boolean add(final @Nullable E element, final @NotNull Duration ttl) {
         return add(element, ttl.toMillis());
@@ -37,15 +46,6 @@ abstract class AbstractExpiringCollection<E> implements ExpiringCollection<E> {
     @Override
     public boolean addAll(final @NotNull ExpiringCollection<? extends E> collection) {
         return addAllHelper(collection);
-    }
-
-    private <E1 extends E> boolean addAllHelper(final @NotNull ExpiringCollection<E1> collection) {
-        boolean added = false;
-        for (E1 e : collection) {
-            Duration ttl = collection.getTtl(e);
-            if (ttl != null) added |= add(e, ttl);
-        }
-        return added;
     }
 
     @Override

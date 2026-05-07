@@ -165,8 +165,10 @@ public interface ExpiringList<E> extends List<E>, ExpiringCollection<E> {
      * @param taskInterval the interval upon which to check expirations
      * @return the list
      */
-    static <E> @NotNull ExpiringList<E> scheduled(final @NotNull ScheduledExecutorService scheduler,
-                                                  final @NotNull Duration taskInterval) {
+    static <E> @NotNull ExpiringList<E> scheduled(
+            final @NotNull ScheduledExecutorService scheduler,
+            final @NotNull Duration taskInterval
+    ) {
         return new ScheduledExpiringList<>(scheduler, taskInterval);
     }
 
