@@ -12,11 +12,14 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Implementation of {@link PluginMessageQueryEngine} for Bukkit platforms.
  */
 public final class BukkitPluginMessageQueryEngine extends PluginMessageQueryEngine implements Listener, PluginMessageListener {
+    private final @NotNull ExecutorService executor = Executors.newCachedThreadPool();
 
     /**
      * Instantiates a new Bukkit plugin message query engine.
@@ -39,12 +42,12 @@ public final class BukkitPluginMessageQueryEngine extends PluginMessageQueryEngi
     public void onPluginMessageReceived(final @NotNull String channel,
                                         final @NotNull Player player,
                                         final byte @NotNull [] message) {
-        if (channel.equals(channelName)) handleMessage(message);
+        if (channel.equals(channelName)) executor.execute(() -> handleMessage(message));
     }
 
     @EventHandler
     public void on(final @NotNull PlayerJoinEvent event) {
-        resendPendingMessages();
+        executor.execute(this::resendPendingMessages);
     }
 
     @Override
@@ -66,6 +69,7 @@ public final class BukkitPluginMessageQueryEngine extends PluginMessageQueryEngi
     @Override
     public void close() {
         super.close();
+        executor.shutdown();
         Server server = registrar.server();
         HandlerList.unregisterAll(this);
         Messenger messenger = server.getMessenger();
