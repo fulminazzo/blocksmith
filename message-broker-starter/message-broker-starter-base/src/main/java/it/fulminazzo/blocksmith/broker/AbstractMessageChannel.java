@@ -149,26 +149,28 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
      * @param message the message
      */
     protected void handleMessage(final @NotNull String message) {
+        NetworkMessage networkMessage;
         try {
-            NetworkMessage networkMessage = mapper.deserialize(message, NetworkMessage.class);
+            networkMessage = mapper.deserialize(message, NetworkMessage.class);
             if (sentMessages.remove(networkMessage.getId())) return;
-            UUID conversationId = networkMessage.getConversationId();
-            if (pendingResponses.containsKey(conversationId)) {
-                CompletableFuture<String> future = pendingResponses.get(conversationId);
-                future.complete(networkMessage.getMessage());
-                return;
-            }
-            for (Function<String, String> handler : messageHandlers.values()) {
-                String response = handler.apply(networkMessage.getMessage());
-                if (response != null)
-                    sendRaw(new NetworkMessage(UUID.randomUUID(), conversationId, response));
-            }
         } catch (MapperException e) {
             // provide support for messages not sent through blocksmith
             for (Function<String, String> handler : messageHandlers.values()) {
                 String response = handler.apply(message);
                 if (response != null) sendRaw(response);
             }
+            return;
+        }
+        UUID conversationId = networkMessage.getConversationId();
+        if (pendingResponses.containsKey(conversationId)) {
+            CompletableFuture<String> future = pendingResponses.get(conversationId);
+            future.complete(networkMessage.getMessage());
+            return;
+        }
+        for (Function<String, String> handler : messageHandlers.values()) {
+            String response = handler.apply(networkMessage.getMessage());
+            if (response != null)
+                sendRaw(new NetworkMessage(UUID.randomUUID(), conversationId, response));
         }
     }
 
