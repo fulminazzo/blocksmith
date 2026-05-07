@@ -8,7 +8,7 @@ import java.util.function.Predicate
 import java.util.jar.JarEntry
 import java.util.jar.JarOutputStream
 
-class ResourceUtilsTest extends Specification {
+class ResourceUtilsFunctionalTest extends Specification {
     private static final File testResourcesDirectory = new File('src/test/resources')
     private static final File extractTestsDirectory = new File('build/resources/test/resource_utils/extract')
     private static final File extractIfAbsentTestsDirectory = new File('build/resources/test/resource_utils/extract_absent')
@@ -136,18 +136,18 @@ class ResourceUtilsTest extends Specification {
         def classes = ResourceUtils.loadClasses(*arguments)
 
         then:
-        classes.contains(ResourceUtilsTest)
+        classes.contains(ResourceUtilsFunctionalTest)
 
         where:
         arguments << [
                 [''],
-                [ResourceUtilsTest.classLoader, ''],
+                [ResourceUtilsFunctionalTest.classLoader, ''],
                 ['', (s) -> true],
-                [ResourceUtilsTest.classLoader, '', (s) -> true],
-                [ResourceUtilsTest.packageName],
-                [ResourceUtilsTest.classLoader, ResourceUtilsTest.packageName],
-                [ResourceUtilsTest.packageName, (s) -> true],
-                [ResourceUtilsTest.classLoader, ResourceUtilsTest.packageName, (s) -> true]
+                [ResourceUtilsFunctionalTest.classLoader, '', (s) -> true],
+                [ResourceUtilsFunctionalTest.packageName],
+                [ResourceUtilsFunctionalTest.classLoader, ResourceUtilsFunctionalTest.packageName],
+                [ResourceUtilsFunctionalTest.packageName, (s) -> true],
+                [ResourceUtilsFunctionalTest.classLoader, ResourceUtilsFunctionalTest.packageName, (s) -> true]
         ]
     }
 
@@ -156,18 +156,18 @@ class ResourceUtilsTest extends Specification {
         def classes = ResourceUtils.listClassNames(*arguments)
 
         then:
-        classes.contains(ResourceUtilsTest.canonicalName)
+        classes.contains(ResourceUtilsFunctionalTest.canonicalName)
 
         where:
         arguments << [
                 [''],
-                [ResourceUtilsTest.classLoader, ''],
+                [ResourceUtilsFunctionalTest.classLoader, ''],
                 ['', (s) -> true],
-                [ResourceUtilsTest.classLoader, '', (s) -> true],
-                [ResourceUtilsTest.packageName],
-                [ResourceUtilsTest.classLoader, ResourceUtilsTest.packageName],
-                [ResourceUtilsTest.packageName, (s) -> true],
-                [ResourceUtilsTest.classLoader, ResourceUtilsTest.packageName, (s) -> true]
+                [ResourceUtilsFunctionalTest.classLoader, '', (s) -> true],
+                [ResourceUtilsFunctionalTest.packageName],
+                [ResourceUtilsFunctionalTest.classLoader, ResourceUtilsFunctionalTest.packageName],
+                [ResourceUtilsFunctionalTest.packageName, (s) -> true],
+                [ResourceUtilsFunctionalTest.classLoader, ResourceUtilsFunctionalTest.packageName, (s) -> true]
         ]
     }
 
@@ -181,9 +181,9 @@ class ResourceUtilsTest extends Specification {
         where:
         arguments << [
                 [''],
-                [ResourceUtilsTest.classLoader, ''],
+                [ResourceUtilsFunctionalTest.classLoader, ''],
                 ['', (s) -> true],
-                [ResourceUtilsTest.classLoader, '', (s) -> true]
+                [ResourceUtilsFunctionalTest.classLoader, '', (s) -> true]
         ]
     }
 
@@ -227,10 +227,10 @@ class ResourceUtilsTest extends Specification {
         (Predicate<String>) ((f) -> false)                  || []
     }
 
-    private Path createTestJar() {
+    private static Path createTestJar() {
         final Map<String, String> entries = [
-                'test.txt'       : 'Hello, world!',
-                'data/schema.sql': 'CREATE TABLE secret (id INT);'
+                'test.txt'        : 'Hello, world!',
+                'data/schema.sql' : 'CREATE TABLE secret (id INT);'
         ]
         Path jar = Files.createTempFile('test-resources', '.jar')
         new JarOutputStream(Files.newOutputStream(jar)).withCloseable { o ->

@@ -48,10 +48,15 @@ public final class ResourceUtils {
      * @return the resource
      * @throws IllegalArgumentException if the resource was not found
      */
-    public static @NotNull InputStream getResource(final @NotNull ClassLoader classLoader, final @NotNull String resource) {
+    public static @NotNull InputStream getResource(
+            final @NotNull ClassLoader classLoader,
+            final @NotNull String resource
+    ) {
         InputStream inputStream = classLoader.getResourceAsStream(resource);
         if (inputStream == null)
-            throw new IllegalArgumentException(String.format("Could not find resource '%s' from classloader", resource));
+            throw new IllegalArgumentException(
+                    String.format("Could not find resource '%s' from classloader", resource)
+            );
         return inputStream;
     }
 
@@ -63,7 +68,10 @@ public final class ResourceUtils {
      * @return the extracted resource
      * @throws IOException if an error occurs while extracting the resource
      */
-    public static @NotNull File extractIfAbsent(final @NotNull String resource, final @NotNull File directory) throws IOException {
+    public static @NotNull File extractIfAbsent(
+            final @NotNull String resource,
+            final @NotNull File directory
+    ) throws IOException {
         return extractIfAbsent(resource, directory.toPath()).toFile();
     }
 
@@ -76,9 +84,11 @@ public final class ResourceUtils {
      * @return the extracted resource
      * @throws IOException if an error occurs while extracting the resource
      */
-    public static File extractIfAbsent(final @NotNull ClassLoader classLoader,
-                                       final @NotNull String resource,
-                                       final @NotNull File directory) throws IOException {
+    public static File extractIfAbsent(
+            final @NotNull ClassLoader classLoader,
+            final @NotNull String resource,
+            final @NotNull File directory
+    ) throws IOException {
         return extractIfAbsent(classLoader, resource, directory.toPath()).toFile();
     }
 
@@ -90,7 +100,10 @@ public final class ResourceUtils {
      * @return the path to the extracted resource
      * @throws IOException if an error occurs while extracting the resource
      */
-    public static @NotNull Path extractIfAbsent(final @NotNull String resource, final @NotNull Path directory) throws IOException {
+    public static @NotNull Path extractIfAbsent(
+            final @NotNull String resource,
+            final @NotNull Path directory
+    ) throws IOException {
         return extractIfAbsent(classLoader, resource, directory);
     }
 
@@ -103,9 +116,11 @@ public final class ResourceUtils {
      * @return the path to the extracted resource
      * @throws IOException if an error occurs while extracting the resource
      */
-    public static @NotNull Path extractIfAbsent(final @NotNull ClassLoader classLoader,
-                                                final @NotNull String resource,
-                                                final @NotNull Path directory) throws IOException {
+    public static @NotNull Path extractIfAbsent(
+            final @NotNull ClassLoader classLoader,
+            final @NotNull String resource,
+            final @NotNull Path directory
+    ) throws IOException {
         Path target = directory.resolve(getResourceName(resource));
         if (Files.exists(target)) return target;
         else return extract(classLoader, resource, directory);
@@ -119,7 +134,10 @@ public final class ResourceUtils {
      * @return the extracted resource
      * @throws IOException if an error occurs while extracting the resource
      */
-    public static @NotNull File extract(final @NotNull String resource, final @NotNull File directory) throws IOException {
+    public static @NotNull File extract(
+            final @NotNull String resource,
+            final @NotNull File directory
+    ) throws IOException {
         return extract(resource, directory.toPath()).toFile();
     }
 
@@ -132,9 +150,11 @@ public final class ResourceUtils {
      * @return the extracted resource
      * @throws IOException if an error occurs while extracting the resource
      */
-    public static File extract(final @NotNull ClassLoader classLoader,
-                               final @NotNull String resource,
-                               final @NotNull File directory) throws IOException {
+    public static File extract(
+            final @NotNull ClassLoader classLoader,
+            final @NotNull String resource,
+            final @NotNull File directory
+    ) throws IOException {
         return extract(classLoader, resource, directory.toPath()).toFile();
     }
 
@@ -146,7 +166,10 @@ public final class ResourceUtils {
      * @return the path to the extracted resource
      * @throws IOException if an error occurs while extracting the resource
      */
-    public static @NotNull Path extract(final @NotNull String resource, final @NotNull Path directory) throws IOException {
+    public static @NotNull Path extract(
+            final @NotNull String resource,
+            final @NotNull Path directory
+    ) throws IOException {
         return extract(classLoader, resource, directory);
     }
 
@@ -159,9 +182,11 @@ public final class ResourceUtils {
      * @return the path to the extracted resource
      * @throws IOException if an error occurs while extracting the resource
      */
-    public static @NotNull Path extract(final @NotNull ClassLoader classLoader,
-                                        final @NotNull String resource,
-                                        final @NotNull Path directory) throws IOException {
+    public static @NotNull Path extract(
+            final @NotNull ClassLoader classLoader,
+            final @NotNull String resource,
+            final @NotNull Path directory
+    ) throws IOException {
         Files.createDirectories(directory);
         String fileName = getResourceName(resource);
         try (InputStream stream = getResource(classLoader, resource)) {
@@ -190,8 +215,10 @@ public final class ResourceUtils {
      * @return the loaded classes
      * @throws IOException if an error occurs while getting the classes
      */
-    public static @NotNull List<Class<?>> loadClasses(final @NotNull ClassLoader classLoader,
-                                                      final @NotNull String packageName) throws IOException {
+    public static @NotNull List<Class<?>> loadClasses(
+            final @NotNull ClassLoader classLoader,
+            final @NotNull String packageName
+    ) throws IOException {
         return loadClasses(classLoader, packageName, s -> true);
     }
 
@@ -203,8 +230,10 @@ public final class ResourceUtils {
      * @return the loaded classes
      * @throws IOException if an error occurs while getting the classes
      */
-    public static @NotNull List<Class<?>> loadClasses(final @NotNull String packageName,
-                                                      final @NotNull Predicate<String> filter) throws IOException {
+    public static @NotNull List<Class<?>> loadClasses(
+            final @NotNull String packageName,
+            final @NotNull Predicate<String> filter
+    ) throws IOException {
         return loadClasses(classLoader, packageName, filter);
     }
 
@@ -217,9 +246,11 @@ public final class ResourceUtils {
      * @return the loaded classes
      * @throws IOException if an error occurs while getting the classes
      */
-    public static @NotNull List<Class<?>> loadClasses(final @NotNull ClassLoader classLoader,
-                                                      final @NotNull String packageName,
-                                                      final @NotNull Predicate<String> filter) throws IOException {
+    public static @NotNull List<Class<?>> loadClasses(
+            final @NotNull ClassLoader classLoader,
+            final @NotNull String packageName,
+            final @NotNull Predicate<String> filter
+    ) throws IOException {
         return listClassNames(classLoader, packageName, filter).stream()
                 .map(c -> Reflect.on(c).getObjectClass())
                 .collect(Collectors.toList());
@@ -244,8 +275,10 @@ public final class ResourceUtils {
      * @return the list of class names
      * @throws IOException if an error occurs while listing the classes
      */
-    public static @NotNull List<String> listClassNames(final @NotNull ClassLoader classLoader,
-                                                       final @NotNull String packageName) throws IOException {
+    public static @NotNull List<String> listClassNames(
+            final @NotNull ClassLoader classLoader,
+            final @NotNull String packageName
+    ) throws IOException {
         return listClassNames(classLoader, packageName, s -> true);
     }
 
@@ -257,8 +290,10 @@ public final class ResourceUtils {
      * @return the list of class names
      * @throws IOException if an error occurs while listing the classes
      */
-    public static @NotNull List<String> listClassNames(final @NotNull String packageName,
-                                                       final @NotNull Predicate<String> filter) throws IOException {
+    public static @NotNull List<String> listClassNames(
+            final @NotNull String packageName,
+            final @NotNull Predicate<String> filter
+    ) throws IOException {
         return listClassNames(classLoader, packageName, filter);
     }
 
@@ -271,9 +306,11 @@ public final class ResourceUtils {
      * @return the list of class names
      * @throws IOException if an error occurs while listing the classes
      */
-    public static @NotNull List<String> listClassNames(final @NotNull ClassLoader classLoader,
-                                                       final @NotNull String packageName,
-                                                       final @NotNull Predicate<String> filter) throws IOException {
+    public static @NotNull List<String> listClassNames(
+            final @NotNull ClassLoader classLoader,
+            final @NotNull String packageName,
+            final @NotNull Predicate<String> filter
+    ) throws IOException {
         final String extension = ".class";
         return listResources(classLoader, packageName.replace(".", "/"), filter).stream()
                 .filter(r -> r.endsWith(extension))
@@ -300,8 +337,10 @@ public final class ResourceUtils {
      * @return the list of resources
      * @throws IOException if an error occurs while listing the resources
      */
-    public static @NotNull List<String> listResources(final @NotNull ClassLoader classLoader,
-                                                      final @NotNull String resourcesFolder) throws IOException {
+    public static @NotNull List<String> listResources(
+            final @NotNull ClassLoader classLoader,
+            final @NotNull String resourcesFolder
+    ) throws IOException {
         return listResources(classLoader, resourcesFolder, s -> true);
     }
 
@@ -313,8 +352,10 @@ public final class ResourceUtils {
      * @return the list of resources
      * @throws IOException if an error occurs while listing the resources
      */
-    public static @NotNull List<String> listResources(final @NotNull String resourcesFolder,
-                                                      final @NotNull Predicate<String> filter) throws IOException {
+    public static @NotNull List<String> listResources(
+            final @NotNull String resourcesFolder,
+            final @NotNull Predicate<String> filter
+    ) throws IOException {
         return listResources(classLoader, resourcesFolder, filter);
     }
 
@@ -327,9 +368,11 @@ public final class ResourceUtils {
      * @return the list of resources
      * @throws IOException if an error occurs while listing the resources
      */
-    public static @NotNull List<String> listResources(final @NotNull ClassLoader classLoader,
-                                                      final @NotNull String resourcesFolder,
-                                                      final @NotNull Predicate<String> filter) throws IOException {
+    public static @NotNull List<String> listResources(
+            final @NotNull ClassLoader classLoader,
+            final @NotNull String resourcesFolder,
+            final @NotNull Predicate<String> filter
+    ) throws IOException {
         final List<String> results = new ArrayList<>();
         final Enumeration<URL> urls = classLoader.getResources(resourcesFolder);
         while (urls.hasMoreElements()) {
@@ -348,9 +391,11 @@ public final class ResourceUtils {
      * @param filter  the filter to apply to the resources
      * @throws IOException if an error occurs while loading the resources
      */
-    static void loadFromJar(final @NotNull URL url,
-                            final @NotNull List<String> results,
-                            final @NotNull Predicate<String> filter) throws IOException {
+    static void loadFromJar(
+            final @NotNull URL url,
+            final @NotNull List<String> results,
+            final @NotNull Predicate<String> filter
+    ) throws IOException {
         JarURLConnection connection = (JarURLConnection) url.openConnection();
         connection.setUseCaches(false);
         String entryPrefix = connection.getEntryName();
@@ -373,17 +418,19 @@ public final class ResourceUtils {
      * @param filter          the filter to apply to the files
      * @throws IOException if an error occurs while loading the files
      */
-    static void loadFromFileSystem(final @NotNull URL url,
-                                   final @NotNull String resourcesFolder,
-                                   final @NotNull List<String> results,
-                                   final @NotNull Predicate<String> filter) throws IOException {
+    static void loadFromFileSystem(
+            final @NotNull URL url,
+            final @NotNull String resourcesFolder,
+            final @NotNull List<String> results,
+            final @NotNull Predicate<String> filter
+    ) throws IOException {
         final char separator = '/';
         final Path directory = Path.of(url.getPath());
         try (Stream<Path> stream = Files.walk(directory)) {
             stream.filter(Files::isRegularFile)
                     .map(directory::relativize)
-                    .map(p -> (resourcesFolder.isEmpty() ? "" : resourcesFolder + separator) +
-                            p.toString().replace(File.separatorChar, separator)
+                    .map(p -> (resourcesFolder.isEmpty() ? "" : resourcesFolder + separator)
+                            + p.toString().replace(File.separatorChar, separator)
                     )
                     .filter(filter)
                     .forEach(results::add);

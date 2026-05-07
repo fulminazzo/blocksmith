@@ -27,9 +27,11 @@ public final class StringUtils {
      *               Supports regular expressions
      * @return the strings
      */
-    public static @NotNull List<String> split(final @Nullable String string,
-                                              final @NotNull String regex,
-                                              final String @NotNull ... quotes) {
+    public static @NotNull List<String> split(
+            final @Nullable String string,
+            final @NotNull String regex,
+            final String @NotNull ... quotes
+    ) {
         return split(string, regex, true, quotes);
     }
 
@@ -45,10 +47,12 @@ public final class StringUtils {
      *               Supports regular expressions
      * @return the strings
      */
-    public static @NotNull List<String> split(final @Nullable String string,
-                                              final @NotNull String regex,
-                                              final boolean quoted,
-                                              final String @NotNull ... quotes) {
+    public static @NotNull List<String> split(
+            final @Nullable String string,
+            final @NotNull String regex,
+            final boolean quoted,
+            final String @NotNull ... quotes
+    ) {
         if (string == null) return Collections.emptyList();
         if (string.isEmpty()) return Collections.singletonList("");
         final List<String> strings = new LinkedList<>();
@@ -120,16 +124,18 @@ public final class StringUtils {
      *
      * @param string      the string
      * @param regex       the expression to use for splitting
-     * @param parenthesis if any of these "parenthesis" are met during splitting,
+     * @param parenthesis if any of these "parentheses" are met during splitting,
      *                    if the expression is found before the same quote is met,
      *                    the string will not be split (useful for splitting parenthesized arguments).
      *                    Supports regular expressions
      * @return the strings
      */
     @SafeVarargs
-    public static @NotNull List<String> split(final @Nullable String string,
-                                              final @NotNull String regex,
-                                              final @NotNull Pair<@NotNull String, @NotNull String> @NotNull ... parenthesis) {
+    public static @NotNull List<String> split(
+            final @Nullable String string,
+            final @NotNull String regex,
+            final @NotNull Pair<@NotNull String, @NotNull String> @NotNull ... parenthesis
+    ) {
         if (string == null) return Collections.emptyList();
         if (string.isEmpty()) return Collections.singletonList("");
         final List<String> strings = new LinkedList<>();

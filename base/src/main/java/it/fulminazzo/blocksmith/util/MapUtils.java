@@ -29,9 +29,11 @@ public final class MapUtils {
      * @return the converted map
      */
     @SuppressWarnings("unchecked")
-    public static @NotNull Map<@Nullable String, @Nullable Object> convertNames(final @NotNull Map<@Nullable String, ?> map,
-                                                                                final @NotNull Convention from,
-                                                                                final @NotNull Convention to) {
+    public static @NotNull Map<@Nullable String, @Nullable Object> convertNames(
+            final @NotNull Map<@Nullable String, ?> map,
+            final @NotNull Convention from,
+            final @NotNull Convention to
+    ) {
         Map<@Nullable String, @Nullable Object> converted = new HashMap<>();
         for (Map.Entry<@Nullable String, ?> entry : map.entrySet()) {
             String key = entry.getKey();
@@ -78,7 +80,7 @@ public final class MapUtils {
     /**
      * Flattens a nested {@link Map} into a single-level map using dot-notation keys.
      * Keys <b>must not</b> be {@code null}.
-     * <p>
+     * <br>
      * Nested maps are recursively traversed, with each level's key appended to the
      * parent key separated by a dot. For example, a nested structure such as:
      * <pre>{@code
@@ -141,7 +143,9 @@ public final class MapUtils {
      * @param map the map to unflatten
      * @return the unflattened map
      */
-    public static @NotNull Map<@NotNull String, @Nullable Object> unflatten(final @NotNull Map<@NotNull String, ?> map) {
+    public static @NotNull Map<@NotNull String, @Nullable Object> unflatten(
+            final @NotNull Map<@NotNull String, ?> map
+    ) {
         final Map<String, Object> unflattened = new HashMap<>();
         final Set<String> toUnflatten = new HashSet<>();
         for (Map.Entry<@NotNull String, ?> entry : map.entrySet()) {
@@ -176,7 +180,9 @@ public final class MapUtils {
      * @param map the map to expand
      * @return the expanded map
      */
-    public static @NotNull Map<@NotNull String, @Nullable Object> expandCollections(final @NotNull Map<@NotNull String, ?> map) {
+    public static @NotNull Map<@NotNull String, @Nullable Object> expandCollections(
+            final @NotNull Map<@NotNull String, ?> map
+    ) {
         final Map<@NotNull String, @Nullable Object> expanded = new HashMap<>();
         for (Map.Entry<@NotNull String, ?> entry : map.entrySet()) {
             String key = entry.getKey();
@@ -203,9 +209,11 @@ public final class MapUtils {
      * @param collection the collection to get elements from
      * @param keyPrefix  the key prefix
      */
-    static void expandCollection(final @NotNull Map<String, Object> expanded,
-                                 final @NotNull Collection<?> collection,
-                                 final @NotNull String keyPrefix) {
+    static void expandCollection(
+            final @NotNull Map<String, Object> expanded,
+            final @NotNull Collection<?> collection,
+            final @NotNull String keyPrefix
+    ) {
         List<Object> list = new ArrayList<>(collection);
         for (int i = 0; i < list.size(); i++) {
             Object value = list.get(i);
