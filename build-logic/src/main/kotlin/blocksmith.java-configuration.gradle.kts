@@ -11,31 +11,15 @@ plugins {
 }
 
 val currentJava = JavaLanguageVersion.of(Runtime.version().feature())
-val currentCompiler = javaToolchains.compilerFor { languageVersion = currentJava }
-val currentLauncher = javaToolchains.launcherFor { languageVersion = currentJava }
 
 val minJava = JavaLanguageVersion.of(11)
 
 java {
     toolchain {
-        languageVersion.set(minJava)
+        languageVersion.set(currentJava)
     }
 }
 
 tasks.compileJava {
-    javaCompiler = currentCompiler
     options.release.set(minJava.asInt())
 }
-
-tasks.withType<GroovyCompile> {
-    javaLauncher = currentLauncher
-}
-
-tasks.compileTestJava {
-    javaCompiler = currentCompiler
-}
-
-tasks.test {
-    javaLauncher = currentLauncher
-}
-
