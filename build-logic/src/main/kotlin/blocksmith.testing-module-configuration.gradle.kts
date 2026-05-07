@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 /**
  * Testing module configuration plugin.
  *
@@ -7,6 +9,7 @@
 
 plugins {
     `java-library`
+    `jvm-test-suite`
 }
 
 afterEvaluate {
@@ -24,9 +27,15 @@ afterEvaluate {
 
             allprojects {
 
-                dependencies {
-                    if (project.path != testingModule.path)
-                        testImplementation(testingModule)
+                testing {
+                    suites {
+                        withType<JvmTestSuite> {
+                            dependencies {
+                                if (project.path != testingModule.path)
+                                    implementation(testingModule)
+                            }
+                        }
+                    }
                 }
 
             }
