@@ -8,24 +8,26 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Defines a naming convention.
+ *
+ * @see CaseConverter
  */
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public enum Convention {
     /**
-     * camelCase (Java naming convention)
+     * The camelCase (Java naming) convention.
      */
     CAMEL_CASE(new CamelCaseConvention()),
     /**
-     * kebab-case
+     * The kebab-case convention.
      */
     KEBAB_CASE(new SeparatedCaseConvention("-")),
     /**
-     * snake_case
+     * The snake_case convention.
      */
     SNAKE_CASE(new SeparatedCaseConvention("_")),
     /**
-     * PascalCase
+     * The PascalCase convention.
      */
     PASCAL_CASE(new PascalCaseConvention())
     ;

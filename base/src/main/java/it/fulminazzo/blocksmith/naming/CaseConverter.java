@@ -5,7 +5,9 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * The main entry point of this package classes.
+ * Utility class for converting {@link String}s through naming conventions.
+ *
+ * @see Convention
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CaseConverter {
@@ -18,8 +20,10 @@ public final class CaseConverter {
      * @param convention the convention to convert to
      * @return the converted string
      */
-    public static @NotNull String convert(final @NotNull String input,
-                                          final @NotNull Convention convention) {
+    public static @NotNull String convert(
+            final @NotNull String input,
+            final @NotNull Convention convention
+    ) {
         return convert(input, Convention.CAMEL_CASE, convention);
     }
 
@@ -31,9 +35,11 @@ public final class CaseConverter {
      * @param to    the convention to convert to
      * @return the converted string
      */
-    public static @NotNull String convert(final @NotNull String input,
-                                          final @NotNull Convention from,
-                                          final @NotNull Convention to) {
+    public static @NotNull String convert(
+            final @NotNull String input,
+            final @NotNull Convention from,
+            final @NotNull Convention to
+    ) {
         NamingConvention fromConvention = from.getConvention();
         NamingConvention toConvention = to.getConvention();
         return toConvention.format(fromConvention.tokenize(input));
