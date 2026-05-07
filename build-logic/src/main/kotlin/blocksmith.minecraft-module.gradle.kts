@@ -1,3 +1,4 @@
+import CompositeModuleExtension
 import org.gradle.kotlin.dsl.create
 
 /**
@@ -28,18 +29,20 @@ extensions.configure<CompositeModuleExtension> {
 }
 
 afterEvaluate {
-    val libs = the<VersionCatalogsExtension>().named("libs")
 
-    val libraries = mutableListOf("bukkit", "bungeecord", "velocity")
-    if (extension.enableFolia.getOrElse(false)) libraries.add("folia")
+    val libraries = mutableListOf(
+        libs.bukkit,
+        libs.bungeecord,
+        libs.velocity
+    )
+    if (extension.enableFolia.getOrElse(false)) libraries.add(libs.folia)
 
-    libraries.forEach {
-        project("${project.path}:${project.name}-$it") {
+    libraries.map { it.get() }.forEach { library ->
+        project("${project.path}:${project.name}-${library.name}") {
 
             dependencies {
-                val dependency = libs.findLibrary(it).get()
-                compileOnly(dependency)
-                testImplementation(dependency)
+                compileOnly(library)
+                testImplementation(library)
             }
 
         }

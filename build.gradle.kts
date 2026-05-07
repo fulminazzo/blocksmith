@@ -6,6 +6,9 @@ plugins {
     checkstyle
 
     alias(libs.plugins.buildconfig)
+
+    id("blocksmith.java-configuration")
+    id("blocksmith.testing-module-configuration")
 }
 
 group = "it.fulminazzo"

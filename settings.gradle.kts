@@ -1,15 +1,5 @@
-rootProject.name = "blocksmith"
+@file:Suppress("UnstableApiUsage")
 
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
-// base
-include(
-    "base",
-
-    "base:testing"
-)
-
-@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -25,3 +15,22 @@ dependencyResolutionManagement {
     }
 
 }
+
+pluginManagement {
+    includeBuild("build-logic")
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+rootProject.name = "blocksmith"
+
+// base
+include(
+    "base",
+
+    "base:testing"
+)
