@@ -55,7 +55,7 @@ import java.util.function.BiFunction;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class PluginMessageBroker extends AbstractMessageBroker<PluginMessageChannelSettings> {
     private static final @Nullable PluginMessageQueryEngineFactory QUERY_ENGINE_FACTORY = ServiceLoader
-            .load(PluginMessageQueryEngineFactory.class)
+            .load(PluginMessageQueryEngineFactory.class, PluginMessageQueryEngineFactory.class.getClassLoader())
             .findFirst().orElse(null);
 
     private final @NotNull PluginMessageRegistrar registrar;
