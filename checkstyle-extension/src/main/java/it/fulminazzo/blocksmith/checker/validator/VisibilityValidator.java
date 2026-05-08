@@ -16,7 +16,7 @@ public enum VisibilityValidator implements RankerValidator {
     PUBLIC {
         @Override
         public boolean validate(final @NotNull DetailAST node) {
-            return node.findFirstToken(TokenTypes.LITERAL_PUBLIC) != null;
+            return NodeUtils.isModifierPresent(node, TokenTypes.LITERAL_PUBLIC);
         }
 
         @Override
@@ -30,7 +30,7 @@ public enum VisibilityValidator implements RankerValidator {
     PROTECTED {
         @Override
         public boolean validate(final @NotNull DetailAST node) {
-            return node.findFirstToken(TokenTypes.LITERAL_PROTECTED) != null;
+            return NodeUtils.isModifierPresent(node, TokenTypes.LITERAL_PROTECTED);
         }
 
         @Override
@@ -44,9 +44,9 @@ public enum VisibilityValidator implements RankerValidator {
     PACKAGE {
         @Override
         public boolean validate(final @NotNull DetailAST node) {
-            return node.findFirstToken(TokenTypes.LITERAL_PUBLIC) == null
-                    && node.findFirstToken(TokenTypes.LITERAL_PROTECTED) == null
-                    && node.findFirstToken(TokenTypes.LITERAL_PRIVATE) == null;
+            return !NodeUtils.isModifierPresent(node, TokenTypes.LITERAL_PUBLIC)
+                    && !NodeUtils.isModifierPresent(node, TokenTypes.LITERAL_PROTECTED)
+                    && !NodeUtils.isModifierPresent(node, TokenTypes.LITERAL_PRIVATE);
         }
 
         @Override
@@ -60,7 +60,7 @@ public enum VisibilityValidator implements RankerValidator {
     PRIVATE {
         @Override
         public boolean validate(final @NotNull DetailAST node) {
-            return node.findFirstToken(TokenTypes.LITERAL_PRIVATE) != null;
+            return NodeUtils.isModifierPresent(node, TokenTypes.LITERAL_PRIVATE);
         }
 
         @Override

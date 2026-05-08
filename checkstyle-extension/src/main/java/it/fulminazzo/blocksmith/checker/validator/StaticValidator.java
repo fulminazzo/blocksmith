@@ -16,7 +16,7 @@ public enum StaticValidator implements RankerValidator {
     STATIC {
         @Override
         public boolean validate(final @NotNull DetailAST node) {
-            return node.findFirstToken(TokenTypes.LITERAL_STATIC) != null;
+            return NodeUtils.isModifierPresent(node, TokenTypes.LITERAL_STATIC);
         }
 
         @Override
@@ -30,7 +30,7 @@ public enum StaticValidator implements RankerValidator {
     NON_STATIC {
         @Override
         public boolean validate(final @NotNull DetailAST node) {
-            return node.findFirstToken(TokenTypes.LITERAL_STATIC) == null;
+            return !NodeUtils.isModifierPresent(node, TokenTypes.LITERAL_STATIC);
         }
 
         @Override

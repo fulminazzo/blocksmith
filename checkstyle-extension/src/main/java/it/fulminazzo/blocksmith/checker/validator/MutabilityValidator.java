@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.checker.validator;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import it.fulminazzo.blocksmith.ProjectInfo;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,7 +16,7 @@ public enum MutabilityValidator implements RankerValidator {
     FINAL {
         @Override
         public boolean validate(final @NotNull DetailAST node) {
-            return node.findFirstToken(TokenTypes.FINAL) != null;
+            return NodeUtils.isModifierPresent(node, TokenTypes.FINAL);
         }
 
         @Override
@@ -31,7 +30,7 @@ public enum MutabilityValidator implements RankerValidator {
     NON_FINAL {
         @Override
         public boolean validate(final @NotNull DetailAST node) {
-            return node.findFirstToken(TokenTypes.FINAL) == null;
+            return !NodeUtils.isModifierPresent(node, TokenTypes.FINAL);
         }
 
         @Override
