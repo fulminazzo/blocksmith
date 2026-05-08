@@ -4,7 +4,9 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import it.fulminazzo.blocksmith.checker.validator.RankerValidator;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -14,7 +16,7 @@ import java.util.List;
  */
 public final class NodeValidator implements Ranker {
     private final @NotNull List<RankerImpl> rankers = new ArrayList<>();
-    private int lastScore;
+    private final @NotNull Deque<Integer> scopes = new ArrayDeque<>();
 
     /**
      * Instantiates a new Node validator.
@@ -44,13 +46,13 @@ public final class NodeValidator implements Ranker {
             if (mask != 1) mask++;
 
             int bits = totalBits - offset;
-            int last = (lastScore >> bits) & mask;
+            int last = (getLastScore() >> bits) & mask;
             int current = (score >> bits) & mask;
 
             if (current < last)
                 throw new ValidationException(ranker.getValidator(current).getErrorMessage());
             else if (current > last) {
-                lastScore = score;
+                setLastScore(score);
                 break;
             }
 
@@ -59,10 +61,38 @@ public final class NodeValidator implements Ranker {
     }
 
     /**
-     * Resets the validator.
+     * Updates the last computed score.
+     *
+     * @param lastScore the new score
      */
-    public void reset() {
-        lastScore = 0;
+    public void setLastScore(final int lastScore) {
+        exitScope();
+        scopes.push(lastScore);
+    }
+
+    /**
+     * Gets the latest score of {@link #computeScore(DetailAST)}.
+     *
+     * @return the last score
+     */
+    public int getLastScore() {
+        return scopes.isEmpty() ? 0 : scopes.peek();
+    }
+
+    /**
+     * Enters a new computation scope.
+     * Scopes are completely independent of each other:
+     * updating a {@link #getLastScore()} will not affect the score of other scopes.
+     */
+    public void enterScope() {
+        scopes.push(0);
+    }
+
+    /**
+     * Exits the current computation scope.
+     */
+    public void exitScope() {
+        if (!scopes.isEmpty()) scopes.pop();
     }
 
     @Override
