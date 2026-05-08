@@ -26,6 +26,8 @@ bungeecord = "1.16-R0.2"
 velocity = "3.0.0-SNAPSHOT"
 
 [libraries]
+checkstyle = { module = "com.puppycrawl.tools:checkstyle", version.ref = "checkstyle" }
+
 # ANNOTATIONS
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
