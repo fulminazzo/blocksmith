@@ -71,7 +71,7 @@ class NodeValidatorTest extends Specification {
         validator.validateNode(node)
 
         then:
-        thrown(IllegalArgumentException)
+        thrown(ValidationException)
 
         where:
         [lastScore, modifiers] << ENCODED_MODIFIERS.keySet().collectMany { score ->

@@ -30,8 +30,9 @@ public final class NodeValidator implements Ranker {
      * Validates the given node against the previously recorded score.
      *
      * @param node the node to validate
+     * @throws ValidationException if the node ordering is not valid
      */
-    public void validateNode(final @NotNull DetailAST node) {
+    public void validateNode(final @NotNull DetailAST node) throws ValidationException {
         int score = computeScore(node);
 
         int totalBits = 0;
@@ -47,8 +48,7 @@ public final class NodeValidator implements Ranker {
             int current = (score >> bits) & mask;
 
             if (current < last)
-                //TODO: proper exception message
-                throw new IllegalArgumentException();
+                throw new ValidationException(ranker.getValidator(offset).getErrorMessage());
             else if (current > last) {
                 lastScore = score;
                 break;
