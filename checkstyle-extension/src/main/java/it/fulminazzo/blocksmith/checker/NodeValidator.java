@@ -29,11 +29,15 @@ public final class NodeValidator implements Ranker {
     public int computeScore(final @NotNull DetailAST node) {
         int score = 0;
         for (RankerImpl ranker : rankers) {
-            int offset = Integer.SIZE - Integer.numberOfLeadingZeros(ranker.getValidatorsCount() - 1);
+            int offset = getRankerOffset(ranker);
             score <<= offset;
             score += ranker.computeScore(node);
         }
         return score;
+    }
+
+    private static int getRankerOffset(final @NotNull RankerImpl ranker) {
+        return Integer.SIZE - Integer.numberOfLeadingZeros(ranker.getValidatorsCount() - 1);
     }
 
 }
