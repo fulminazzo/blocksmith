@@ -58,6 +58,13 @@ public final class NodeValidator implements Ranker {
         }
     }
 
+    /**
+     * Resets the validator.
+     */
+    public void reset() {
+        lastScore = 0;
+    }
+
     @Override
     public int computeScore(final @NotNull DetailAST node) {
         int score = 0;
