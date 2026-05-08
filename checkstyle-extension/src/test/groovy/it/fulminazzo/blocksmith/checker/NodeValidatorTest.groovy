@@ -35,9 +35,7 @@ class NodeValidatorTest extends Specification {
 
     def 'test that validateNode when lastScore is #lastScore allows node with #modifiers and updates to #expected'() {
         given:
-        def node = Mock(DetailAST)
-        for (def modifier : modifiers)
-            node.findFirstToken(TokenTypes."$modifier") >> Mock(DetailAST)
+        def node = generateNode(modifiers)
 
         and:
         validator.lastScore = lastScore
@@ -60,9 +58,7 @@ class NodeValidatorTest extends Specification {
 
     def 'test that validateNode when lastScore is #lastScore throws for node with #modifiers'() {
         given:
-        def node = Mock(DetailAST)
-        for (def modifier : modifiers)
-            node.findFirstToken(TokenTypes."$modifier") >> Mock(DetailAST)
+        def node = generateNode(modifiers)
 
         and:
         validator.lastScore = lastScore
@@ -82,9 +78,7 @@ class NodeValidatorTest extends Specification {
 
     def 'test that computeScore of node with #modifiers returns #expected'() {
         given:
-        def node = Mock(DetailAST)
-        for (def modifier : modifiers)
-            node.findFirstToken(TokenTypes."$modifier") >> Mock(DetailAST)
+        def node = generateNode(modifiers)
 
         when:
         def score = validator.computeScore(node)
@@ -94,6 +88,27 @@ class NodeValidatorTest extends Specification {
 
         where:
         [modifiers, expected] << ENCODED_MODIFIERS.collect { [it.value, it.key] }
+    }
+
+    private DetailAST generateNode(final List<String> modifiers) {
+        def node = Mock(DetailAST)
+
+        def modifiersNodes = modifiers.collect {
+            def n = Mock(DetailAST)
+            n.type >> TokenTypes."$it"
+            return n
+        }
+        def size = modifiersNodes.size()
+        if (size > 1) {
+            for (i in 0..size - 2)
+                modifiersNodes[i].nextSibling >> modifiersNodes[i + 1]
+        }
+
+        def modifiersNode = Mock(DetailAST)
+        modifiersNode.firstChild >> modifiersNodes[0]
+        node.findFirstToken(TokenTypes.MODIFIERS) >> modifiersNode
+
+        return node
     }
 
 }
