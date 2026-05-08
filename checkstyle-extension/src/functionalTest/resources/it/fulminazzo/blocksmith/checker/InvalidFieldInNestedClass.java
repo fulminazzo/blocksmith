@@ -1,0 +1,20 @@
+package it.fulminazzo.blocksmith.checker;
+
+public class InvalidFieldInNestedClass {
+
+    public String valid1;
+    String valid2;
+    private String valid3;
+
+    public class Inner {
+
+        public String valid1;
+        String valid2;
+
+        public String invalid3;
+
+    }
+
+    String invalid4;
+
+}

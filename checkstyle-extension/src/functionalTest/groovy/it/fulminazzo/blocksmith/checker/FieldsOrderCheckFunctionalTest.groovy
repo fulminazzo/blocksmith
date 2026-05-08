@@ -110,4 +110,24 @@ class FieldsOrderCheckFunctionalTest extends Specification {
         ''           | 'private '
     }
 
+    def 'test that fields check works on nested classes'() {
+        when:
+        def violations = runCheck('InvalidFieldInNestedClass', FieldsOrderCheck)
+
+        then:
+        violations.size() == 2
+
+        and:
+        def nestedViolation = violations[0]
+        nestedViolation.line == 14
+        nestedViolation.column == 9
+        nestedViolation.message == message(VisibilityValidator.PUBLIC.errorMessage)
+
+        and:
+        def violation = violations[1]
+        violation.line == 18
+        violation.column == 5
+        violation.message == message(VisibilityValidator.PACKAGE.errorMessage)
+    }
+
 }
