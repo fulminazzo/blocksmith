@@ -14,6 +14,7 @@ import java.util.List;
  */
 public final class NodeValidator implements Ranker {
     private final @NotNull List<RankerImpl> rankers = new ArrayList<>();
+    private int lastScore;
 
     /**
      * Instantiates a new Node validator.
@@ -23,6 +24,38 @@ public final class NodeValidator implements Ranker {
     public NodeValidator(final @NotNull RankerValidator @NotNull [] @NotNull ... validators) {
         for (RankerValidator[] vs : validators)
             rankers.add(new RankerImpl(vs));
+    }
+
+    /**
+     * Validates the given node against the previously recorded score.
+     *
+     * @param node the node to validate
+     */
+    public void validateNode(final @NotNull DetailAST node) {
+        int score = computeScore(node);
+
+        int totalBits = 0;
+        for (RankerImpl ranker : rankers) totalBits += getRankerOffset(ranker);
+
+        for (RankerImpl ranker : rankers) {
+            int offset = getRankerOffset(ranker);
+            int mask = offset;
+            if (mask != 1) mask++;
+
+            int bits = totalBits - offset;
+            int last = (lastScore >> bits) & mask;
+            int current = (score >> bits) & mask;
+
+            if (current < last)
+                //TODO: proper exception message
+                throw new IllegalArgumentException();
+            else if (current > last) {
+                lastScore = score;
+                break;
+            }
+
+            totalBits -= offset;
+        }
     }
 
     @Override
