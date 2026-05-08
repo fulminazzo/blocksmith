@@ -5,6 +5,7 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck
 import com.puppycrawl.tools.checkstyle.api.AuditEvent
 import com.puppycrawl.tools.checkstyle.api.AuditListener
+import it.fulminazzo.blocksmith.checker.validator.RankerValidator
 
 /**
  * A collection of utilities for functional tests.
@@ -69,6 +70,21 @@ final class FunctionalTestUtils {
         def file = new File(checkType.getResource(resourceName).toURI())
         checker.process([file])
         return violations
+    }
+
+    static String message(final String partialMessageCode) {
+        return messages
+                .findAll { it.key.toString().contains(partialMessageCode) }
+                .collect { it.value }
+                .find()
+    }
+
+    static Properties getMessages() {
+        def props = new Properties()
+        def resourceName = "${NodeValidator.packageName.replace('.', '/')}/messages.properties"
+        def resource = RankerValidator.classLoader.getResourceAsStream(resourceName)
+        props.load(resource)
+        return props
     }
 
 }
