@@ -18,6 +18,11 @@ public enum StaticValidator implements RankerValidator {
         public boolean validate(final @NotNull DetailAST node) {
             return node.findFirstToken(TokenTypes.LITERAL_STATIC) != null;
         }
+
+        @Override
+        public @NotNull String getErrorMessage() {
+            return "order.static";
+        }
     },
     /**
      * Non-{@code static} validator.
@@ -26,6 +31,11 @@ public enum StaticValidator implements RankerValidator {
         @Override
         public boolean validate(final @NotNull DetailAST node) {
             return node.findFirstToken(TokenTypes.LITERAL_STATIC) == null;
+        }
+
+        @Override
+        public @NotNull String getErrorMessage() {
+            return "order.non-static";
         }
     }
 

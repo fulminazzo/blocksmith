@@ -18,6 +18,11 @@ public enum VisibilityValidator implements RankerValidator {
         public boolean validate(final @NotNull DetailAST node) {
             return node.findFirstToken(TokenTypes.LITERAL_PUBLIC) != null;
         }
+
+        @Override
+        public @NotNull String getErrorMessage() {
+            return "order.public";
+        }
     },
     /**
      * {@code protected} validator.
@@ -26,6 +31,11 @@ public enum VisibilityValidator implements RankerValidator {
         @Override
         public boolean validate(final @NotNull DetailAST node) {
             return node.findFirstToken(TokenTypes.LITERAL_PROTECTED) != null;
+        }
+
+        @Override
+        public @NotNull String getErrorMessage() {
+            return "order.protected";
         }
     },
     /**
@@ -38,6 +48,11 @@ public enum VisibilityValidator implements RankerValidator {
                     && node.findFirstToken(TokenTypes.LITERAL_PROTECTED) == null
                     && node.findFirstToken(TokenTypes.LITERAL_PRIVATE) == null;
         }
+
+        @Override
+        public @NotNull String getErrorMessage() {
+            return "order.package";
+        }
     },
     /**
      * {@code private} validator.
@@ -46,6 +61,11 @@ public enum VisibilityValidator implements RankerValidator {
         @Override
         public boolean validate(final @NotNull DetailAST node) {
             return node.findFirstToken(TokenTypes.LITERAL_PRIVATE) != null;
+        }
+
+        @Override
+        public @NotNull String getErrorMessage() {
+            return "order.private";
         }
     }
 
