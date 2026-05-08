@@ -29,7 +29,8 @@ public final class FieldsOrderCheck extends AbstractCheck {
     public int[] getDefaultTokens() {
         return new int[]{
                 TokenTypes.VARIABLE_DEF,
-                TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF, TokenTypes.ENUM_DEF
+                TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF,
+                TokenTypes.ENUM_DEF, TokenTypes.RECORD_DEF
         };
     }
 
