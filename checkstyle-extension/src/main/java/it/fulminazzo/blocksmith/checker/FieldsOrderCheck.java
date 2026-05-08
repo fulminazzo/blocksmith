@@ -27,7 +27,10 @@ public final class FieldsOrderCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[]{TokenTypes.VARIABLE_DEF};
+        return new int[]{
+                TokenTypes.VARIABLE_DEF,
+                TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF, TokenTypes.ENUM_DEF
+        };
     }
 
     @Override
@@ -41,12 +44,12 @@ public final class FieldsOrderCheck extends AbstractCheck {
     }
 
     @Override
-    public void beginTree(final @NotNull DetailAST rootAst) {
-        validator.reset();
-    }
-
-    @Override
     public void visitToken(final @NotNull DetailAST ast) {
+        if (ast.getType() != TokenTypes.VARIABLE_DEF) {
+            // New type declaration
+            validator.enterScope();
+            return;
+        }
         if (ast.getParent().getType() != TokenTypes.OBJBLOCK) return;
 
         try {
@@ -54,6 +57,12 @@ public final class FieldsOrderCheck extends AbstractCheck {
         } catch (ValidationException e) {
             log(ast, e.getMessage());
         }
+    }
+
+    @Override
+    public void leaveToken(final @NotNull DetailAST ast) {
+        if (ast.getType() != TokenTypes.VARIABLE_DEF)
+            validator.exitScope();
     }
 
 }
