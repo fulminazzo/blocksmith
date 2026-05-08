@@ -28,6 +28,11 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "blocksmith"
 
+// checkstyle extension module to apply our configurations
+include(
+    "checkstyle-extension"
+)
+
 // base
 include(
     "base",
