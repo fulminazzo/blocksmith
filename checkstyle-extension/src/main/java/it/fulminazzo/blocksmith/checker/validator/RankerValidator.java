@@ -19,4 +19,11 @@ public interface RankerValidator {
      */
     boolean validate(final @NotNull DetailAST node);
 
+    /**
+     * Gets the error message associated with the validation.
+     *
+     * @return the error message
+     */
+    @NotNull String getErrorMessage();
+
 }
