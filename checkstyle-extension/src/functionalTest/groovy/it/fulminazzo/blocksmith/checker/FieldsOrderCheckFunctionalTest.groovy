@@ -63,7 +63,7 @@ class FieldsOrderCheckFunctionalTest extends Specification {
         violations.empty
 
         where:
-        modifier    | other
+        modifier     | other
         // public
         'public '    | 'public '
         'public '    | 'protected '
@@ -74,8 +74,8 @@ class FieldsOrderCheckFunctionalTest extends Specification {
         'protected ' | ''
         'protected ' | 'private '
         // package
-        ''          | ''
-        ''          | 'private '
+        ''           | ''
+        ''           | 'private '
         // private
         'private '   | 'private '
     }
@@ -98,7 +98,7 @@ class FieldsOrderCheckFunctionalTest extends Specification {
         ).errorMessage)
 
         where:
-        modifier    | other
+        modifier     | other
         // public
         'public '    | 'protected '
         'public '    | ''
@@ -107,7 +107,7 @@ class FieldsOrderCheckFunctionalTest extends Specification {
         'protected ' | ''
         'protected ' | 'private '
         // package
-        ''          | 'private '
+        ''           | 'private '
     }
 
 }
