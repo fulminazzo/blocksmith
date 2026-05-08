@@ -7,6 +7,8 @@ import com.puppycrawl.tools.checkstyle.api.AuditEvent
 import com.puppycrawl.tools.checkstyle.api.AuditListener
 import it.fulminazzo.blocksmith.checker.validator.RankerValidator
 
+import java.util.function.Function
+
 /**
  * A collection of utilities for functional tests.
  */
@@ -20,6 +22,22 @@ final class FunctionalTestUtils {
      * @return the violations
      */
     static List<AuditEvent> runCheck(final String inputFile, final Class<? extends AbstractCheck> checkType) {
+        return runCheck(inputFile, checkType, null)
+    }
+
+    /**
+     * Executes the checkstyle checker and returns a list of violations derived from the given configuration.
+     *
+     * @param inputFile the input file to check
+     * @param checkType the type of the configuration
+     * @param linesTransformer a function to parse placeholders in the file lines (can be null)
+     * @return the violations
+     */
+    static List<AuditEvent> runCheck(
+            final String inputFile,
+            final Class<? extends AbstractCheck> checkType,
+            final Function<String, String> linesTransformer
+    ) {
         def checkConfig = new DefaultConfiguration(checkType.name)
 
         def treeWalker = new DefaultConfiguration('TreeWalker')
@@ -68,7 +86,16 @@ final class FunctionalTestUtils {
 
         def resourceName = "/${checkType.packageName.replace('.', '/')}/${inputFile}.java"
         def file = new File(checkType.getResource(resourceName).toURI())
+        def original = file.readLines()
+        def lines = file.readLines()
+        if (linesTransformer != null) {
+            file.delete()
+            file << lines.collect { linesTransformer(it) }.join('\n')
+        }
         checker.process([file])
+        file.delete()
+        file << original.join('\n')
+        printViolations(violations)
         return violations
     }
 
@@ -85,6 +112,10 @@ final class FunctionalTestUtils {
         def resource = RankerValidator.classLoader.getResourceAsStream(resourceName)
         props.load(resource)
         return props
+    }
+
+    static void printViolations(final List<AuditEvent> violations) {
+        violations.forEach { println("${it.line}:${it.column} - ${it.message}") }
     }
 
 }
