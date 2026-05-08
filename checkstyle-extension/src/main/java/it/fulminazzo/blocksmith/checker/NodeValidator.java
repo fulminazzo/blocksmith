@@ -48,7 +48,7 @@ public final class NodeValidator implements Ranker {
             int current = (score >> bits) & mask;
 
             if (current < last)
-                throw new ValidationException(ranker.getValidator(offset).getErrorMessage());
+                throw new ValidationException(ranker.getValidator(current).getErrorMessage());
             else if (current > last) {
                 lastScore = score;
                 break;
