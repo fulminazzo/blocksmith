@@ -1,12 +1,13 @@
-package it.fulminazzo.blocksmith.checker;
+package it.fulminazzo.blocksmith.checker.validator;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import it.fulminazzo.blocksmith.checker.NodeValidator;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Marks an object capable of validating a node for {@link RankerImpl}.
+ * Marks an object capable of validating nodes for {@link NodeValidator}.
  *
- * @see RankerImpl
+ * @see NodeValidator
  */
 public interface RankerValidator {
 

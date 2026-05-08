@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.checker;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import it.fulminazzo.blocksmith.checker.validator.RankerValidator;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
