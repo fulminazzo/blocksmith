@@ -53,6 +53,7 @@ public final class OverloadValidator implements Validator {
         if (!scopes.isEmpty()) {
             Scope scope = scopes.pop();
             if (next == null) return;
+            next.enterScope();
             List<ValidationException> exceptions = new ArrayList<>();
             for (DetailAST node : scope.getNodes()) {
                 try {
@@ -61,6 +62,7 @@ public final class OverloadValidator implements Validator {
                     exceptions.add(e);
                 }
             }
+            next.exitScope();
             if (!exceptions.isEmpty()) throw new CompositeValidationException(exceptions);
         }
     }

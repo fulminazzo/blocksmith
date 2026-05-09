@@ -112,6 +112,7 @@ public final class OrderValidator implements Validator, NodeScorer {
         if (!scopes.isEmpty()) {
             Scope scope = scopes.pop();
             if (next == null) return;
+            next.enterScope();
             List<ValidationException> exceptions = new ArrayList<>();
             for (int i = 0; i < getMaxScore(); i++) {
                 List<DetailAST> nodes = scope.getCommonScores(i);
@@ -123,6 +124,7 @@ public final class OrderValidator implements Validator, NodeScorer {
                     }
                 }
             }
+            next.exitScope();
             if (!exceptions.isEmpty()) throw new CompositeValidationException(exceptions);
         }
     }
