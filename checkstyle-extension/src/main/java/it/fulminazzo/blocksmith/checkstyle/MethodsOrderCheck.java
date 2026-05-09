@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.checkstyle;
 
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import it.fulminazzo.blocksmith.checkstyle.validator.GetterSetterValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.OverloadValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.MethodNameCriterion;
@@ -22,7 +23,10 @@ import java.util.List;
  *     <li><b>ordered overloads</b>: overloads should be grouped and sorted by their parameter count.
  *     Overloads with the same number of parameters must have primitive parameters before wrappers;</li>
  *     <li><b>name</b> ordering: {@code equals}, {@code hashCode} and {@code toString} should be last.
- *     Then, before them any <b>getter</b> or <b>setter</b>.</li>
+ *     Then, before them any <b>getter</b> or <b>setter</b>;</li>
+ *     <li>finally, <b>getters</b> and <b>setters</b> must be paired: if present, {@code get<value>}
+ *     must be always before the setter, and {@code set<value>} must be the method immediately following
+ *     (unless overloads).</li>
  * </ul>
  */
 public final class MethodsOrderCheck extends ValidatorCheck {
@@ -34,7 +38,13 @@ public final class MethodsOrderCheck extends ValidatorCheck {
         super(new OrderValidator(
                 MethodTraitCriterion.values(),
                 VisibilityCriterion.values()
-        ).then(new OverloadValidator().then(new OrderValidator(MethodNameCriterion.values()))));
+        ).then(
+                new OverloadValidator().then(
+                        new OrderValidator(MethodNameCriterion.values()).then(
+                                new GetterSetterValidator()
+                        )
+                )
+        ));
     }
 
     @Override
