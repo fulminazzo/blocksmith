@@ -16,8 +16,8 @@ import java.util.List;
  * @see Criterion
  */
 public final class NodeOrderValidator implements NodeValidator, NodeScorer {
-    private final @NotNull List<NodeScorerImpl> rankers = new ArrayList<>();
-    private final @NotNull Deque<Integer> scopes = new ArrayDeque<>();
+    private final @NotNull List<NodeScorerImpl> scorers = new ArrayList<>();
+    private final @NotNull Deque<OrderScope> scopes = new ArrayDeque<>();
     private @Nullable NodeValidator next;
 
     /**
@@ -27,7 +27,7 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
      */
     public NodeOrderValidator(final @NotNull Criterion @NotNull [] @NotNull ... criteria) {
         for (Criterion[] vs : criteria)
-            rankers.add(new NodeScorerImpl(vs));
+            scorers.add(new NodeScorerImpl(vs));
     }
 
     /**
@@ -36,8 +36,7 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
      * @param lastScore the new score
      */
     public void setLastScore(final int lastScore) {
-        exitScope();
-        scopes.push(lastScore);
+        getLastScope().setLastScore(lastScore);
     }
 
     /**
@@ -46,7 +45,7 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
      * @return the last score
      */
     public int getLastScore() {
-        return scopes.isEmpty() ? 0 : scopes.peek();
+        return getLastScope().getLastScore();
     }
 
     /**
@@ -55,7 +54,7 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
      * updating a {@link #getLastScore()} will not affect the score of other scopes.
      */
     public void enterScope() {
-        scopes.push(0);
+        scopes.push(new OrderScope());
     }
 
     /**
@@ -65,15 +64,21 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
         if (!scopes.isEmpty()) scopes.pop();
     }
 
+    @SuppressWarnings("DataFlowIssue")
+    private @NotNull OrderScope getLastScope() {
+        if (scopes.isEmpty()) enterScope();
+        return scopes.peek();
+    }
+
     @Override
     public void validateNode(final @NotNull DetailAST node) throws ValidationException {
         int score = computeScore(node);
 
         int totalBits = 0;
-        for (NodeScorerImpl ranker : rankers) totalBits += getRankerOffset(ranker);
+        for (NodeScorerImpl scorer : scorers) totalBits += getRankerOffset(scorer);
 
-        for (NodeScorerImpl ranker : rankers) {
-            int offset = getRankerOffset(ranker);
+        for (NodeScorerImpl scorer : scorers) {
+            int offset = getRankerOffset(scorer);
             int mask = offset;
             if (mask != 1) mask++;
 
@@ -82,7 +87,7 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
             int current = (score >> bits) & mask;
 
             if (current < last)
-                throw new ValidationException(ranker.getValidator(current).getErrorMessage());
+                throw new ValidationException(scorer.getValidator(current).getErrorMessage());
             else if (current > last) {
                 setLastScore(score);
                 break;
@@ -101,16 +106,16 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
     @Override
     public int computeScore(final @NotNull DetailAST node) {
         int score = 0;
-        for (NodeScorerImpl ranker : rankers) {
-            int offset = getRankerOffset(ranker);
+        for (NodeScorerImpl scorer : scorers) {
+            int offset = getRankerOffset(scorer);
             score <<= offset;
-            score += ranker.computeScore(node);
+            score += scorer.computeScore(node);
         }
         return score;
     }
 
-    private static int getRankerOffset(final @NotNull NodeScorerImpl ranker) {
-        return Integer.SIZE - Integer.numberOfLeadingZeros(ranker.getValidatorsCount() - 1);
+    private static int getRankerOffset(final @NotNull NodeScorerImpl scorer) {
+        return Integer.SIZE - Integer.numberOfLeadingZeros(scorer.getValidatorsCount() - 1);
     }
 
 }
