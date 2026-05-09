@@ -25,7 +25,7 @@ public final class FieldsOrderCheck extends OrderCheck {
      * Instantiates a new Fields order check.
      */
     public FieldsOrderCheck() {
-        super(new NodeValidator(
+        super(new NodeOrderValidator(
                 StaticValidator.values(),
                 MutabilityValidator.values(),
                 VisibilityValidator.values()

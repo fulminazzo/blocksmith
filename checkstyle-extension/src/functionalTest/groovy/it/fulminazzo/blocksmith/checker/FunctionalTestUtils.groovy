@@ -108,7 +108,7 @@ final class FunctionalTestUtils {
 
     static Properties getMessages() {
         def props = new Properties()
-        def resourceName = "${NodeValidator.packageName.replace('.', '/')}/messages.properties"
+        def resourceName = "${NodeOrderValidator.packageName.replace('.', '/')}/messages.properties"
         def resource = RankerValidator.classLoader.getResourceAsStream(resourceName)
         props.load(resource)
         return props

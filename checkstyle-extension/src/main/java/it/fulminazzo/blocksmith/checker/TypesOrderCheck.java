@@ -27,7 +27,7 @@ public final class TypesOrderCheck extends OrderCheck {
      * Instantiates a new Types order check.
      */
     public TypesOrderCheck() {
-        super(new NodeValidator(
+        super(new NodeOrderValidator(
                 TypeValidator.values(),
                 StaticValidator.values(),
                 VisibilityValidator.values()

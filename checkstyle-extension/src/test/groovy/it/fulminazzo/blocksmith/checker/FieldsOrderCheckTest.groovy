@@ -8,7 +8,7 @@ import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 class FieldsOrderCheckTest extends Specification {
-    private NodeValidator validator
+    private NodeOrderValidator validator
     private FieldsOrderCheck check
 
     private DetailAST node = Mock(DetailAST)
@@ -25,7 +25,7 @@ class FieldsOrderCheckTest extends Specification {
         check.validate(_) >> { callRealMethod() }
 
         def reflect = Reflect.on(check)
-        validator = Mock(NodeValidator)
+        validator = Mock(NodeOrderValidator)
         reflect.set('validator', validator)
 
         def parent = Mock(DetailAST)

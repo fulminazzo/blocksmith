@@ -3,9 +3,9 @@ package it.fulminazzo.blocksmith.checker;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Exception thrown by {@link NodeValidator}.
+ * Exception thrown by {@link NodeOrderValidator}.
  *
- * @see NodeValidator
+ * @see NodeOrderValidator
  */
 public final class ValidationException extends Exception {
     private static final long serialVersionUID = -7493503922158653249L;

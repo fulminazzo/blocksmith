@@ -7,7 +7,7 @@ import it.fulminazzo.blocksmith.checker.validator.StaticValidator
 import it.fulminazzo.blocksmith.checker.validator.VisibilityValidator
 import spock.lang.Specification
 
-class NodeValidatorTest extends Specification {
+class NodeOrderValidatorTest extends Specification {
     private static final Map<Integer, List<String>> ENCODED_MODIFIERS = [
             0  : ['LITERAL_STATIC', 'FINAL', 'LITERAL_PUBLIC'],
             1  : ['LITERAL_STATIC', 'FINAL', 'LITERAL_PROTECTED'],
@@ -27,7 +27,7 @@ class NodeValidatorTest extends Specification {
             15 : ['LITERAL_PRIVATE']
     ]
 
-    private final NodeValidator validator = new NodeValidator(
+    private final NodeOrderValidator validator = new NodeOrderValidator(
             StaticValidator.values(),
             MutabilityValidator.values(),
             VisibilityValidator.values()

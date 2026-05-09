@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 /**
  * Abstract implementation of {@link AbstractCheck} with common logic for validating the correct ordering of nodes.
  * <br>
- * When entering a new type declaration, a new scope for the {@link NodeValidator} will be created.
+ * When entering a new type declaration, a new scope for the {@link NodeOrderValidator} will be created.
  */
 @RequiredArgsConstructor
 abstract class OrderCheck extends AbstractCheck {
@@ -20,7 +20,7 @@ abstract class OrderCheck extends AbstractCheck {
             TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF, TokenTypes.ENUM_DEF, TokenTypes.RECORD_DEF
     );
 
-    protected final @NotNull NodeValidator validator;
+    protected final @NotNull NodeOrderValidator validator;
 
     /**
      * Gets the tokens that this check will validate.
