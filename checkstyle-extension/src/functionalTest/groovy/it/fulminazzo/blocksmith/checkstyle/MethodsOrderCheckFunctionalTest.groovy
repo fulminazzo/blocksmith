@@ -165,6 +165,37 @@ class MethodsOrderCheckFunctionalTest extends Specification {
         v4.message == message(msg)
     }
 
+    def 'test that valid overload grouping does not throw'() {
+        when:
+        def violations = runCheck('MethodValidOverloadGrouping', MethodsOrderCheck)
+
+        then:
+        violations.empty
+    }
+
+    def 'test that invalid overload grouping throws'() {
+        given:
+        final msg = 'it.fulminazzo.blocksmith.checkstyle.executable.overload.grouped'
+
+        when:
+        def violations = runCheck('MethodInvalidOverloadGrouping', MethodsOrderCheck)
+
+        then:
+        violations.size() == 2
+
+        and:
+        def v1 = violations[0]
+        v1.line == 9
+        v1.column == 5
+        v1.message == message(msg)
+
+        and:
+        def v2 = violations[1]
+        v2.line == 13
+        v2.column == 5
+        v2.message == message(msg)
+    }
+
     def 'test that valid method name #name ordering does not throw'() {
         when:
         def violations = runCheck('MethodValidName', MethodsOrderCheck) {
