@@ -59,9 +59,21 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
 
     /**
      * Exits the current computation scope.
+     * <br>
+     * If any {@link DetailAST} has been recorded in the last scope through {@link #validateNode(DetailAST)},
+     * each group formed with the <b>same scores</b> will be passed through the next {@link NodeValidator}.
+     *
+     * @throws ValidationException if any of those nodes is not valid
      */
-    public void exitScope() {
-        if (!scopes.isEmpty()) scopes.pop();
+    public void exitScope() throws ValidationException {
+        if (!scopes.isEmpty()) {
+            OrderScope scope = scopes.pop();
+            if (next == null) return;
+            for (int i = 0; i < getMaxScore(); i++) {
+                List<DetailAST> nodes = scope.getCommonScores(i);
+                for (DetailAST node : nodes) next.validateNode(node);
+            }
+        }
     }
 
     /**
@@ -110,6 +122,7 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
 
             totalBits -= offset;
         }
+        getLastScope().registerCommonScore(node, score);
     }
 
     @Override
