@@ -5,7 +5,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.MutabilityCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.StaticCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.VisibilityCriterion;
-import it.fulminazzo.blocksmith.checkstyle.validator.NodeOrderValidator;
+import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public final class FieldsOrderCheck extends OrderCheck {
      * Instantiates a new Fields order check.
      */
     public FieldsOrderCheck() {
-        super(new NodeOrderValidator(
+        super(new OrderValidator(
                 StaticCriterion.values(),
                 MutabilityCriterion.values(),
                 VisibilityCriterion.values()

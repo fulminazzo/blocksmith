@@ -6,7 +6,7 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck
 import com.puppycrawl.tools.checkstyle.api.AuditEvent
 import com.puppycrawl.tools.checkstyle.api.AuditListener
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.Criterion
-import it.fulminazzo.blocksmith.checkstyle.validator.NodeOrderValidator
+import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator
 
 import java.util.function.Function
 
@@ -109,7 +109,7 @@ final class FunctionalTestUtils {
 
     static Properties getMessages() {
         def props = new Properties()
-        def resourceName = "${NodeOrderValidator.packageName.replace('.', '/')}/messages.properties"
+        def resourceName = "${OrderValidator.packageName.replace('.', '/')}/messages.properties"
         def resource = Criterion.classLoader.getResourceAsStream(resourceName)
         props.load(resource)
         return props

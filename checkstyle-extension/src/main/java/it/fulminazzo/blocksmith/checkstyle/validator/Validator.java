@@ -6,9 +6,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * An object to validate nodes against multiple rulesets.
  *
- * @see NodeOrderValidator
+ * @see OrderValidator
  */
-public interface NodeValidator extends NodeScorer {
+public interface Validator {
 
     /**
      * Validates the given node with these validator rulesets.
@@ -24,6 +24,6 @@ public interface NodeValidator extends NodeScorer {
      * @param validator the validator to add
      * @return this object (for method chaining)
      */
-    @NotNull NodeValidator then(final @NotNull NodeValidator validator);
+    @NotNull Validator then(final @NotNull Validator validator);
 
 }

@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.checkstyle;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import it.fulminazzo.blocksmith.checkstyle.validator.NodeOrderValidator;
+import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 /**
  * Abstract implementation of {@link AbstractCheck} with common logic for validating the correct ordering of nodes.
  * <br>
- * When entering a new type declaration, a new scope for the {@link NodeOrderValidator} will be created.
+ * When entering a new type declaration, a new scope for the {@link OrderValidator} will be created.
  */
 @RequiredArgsConstructor
 abstract class OrderCheck extends AbstractCheck {
@@ -22,7 +22,7 @@ abstract class OrderCheck extends AbstractCheck {
             TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF, TokenTypes.ENUM_DEF, TokenTypes.RECORD_DEF
     );
 
-    protected final @NotNull NodeOrderValidator validator;
+    protected final @NotNull OrderValidator validator;
 
     /**
      * Gets the tokens that this check will validate.

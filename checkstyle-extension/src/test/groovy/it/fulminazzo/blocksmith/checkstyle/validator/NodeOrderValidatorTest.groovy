@@ -27,7 +27,7 @@ class NodeOrderValidatorTest extends Specification {
             15 : ['LITERAL_PRIVATE']
     ]
 
-    private final NodeOrderValidator validator = new NodeOrderValidator(
+    private final OrderValidator validator = new OrderValidator(
             StaticCriterion.values(),
             MutabilityCriterion.values(),
             VisibilityCriterion.values()

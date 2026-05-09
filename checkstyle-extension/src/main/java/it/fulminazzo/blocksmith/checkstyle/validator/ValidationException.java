@@ -6,9 +6,9 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Exception thrown by {@link NodeOrderValidator}.
+ * Exception thrown by {@link OrderValidator}.
  *
- * @see NodeOrderValidator
+ * @see OrderValidator
  */
 public final class ValidationException extends Exception {
     private static final long serialVersionUID = -7493503922158653249L;

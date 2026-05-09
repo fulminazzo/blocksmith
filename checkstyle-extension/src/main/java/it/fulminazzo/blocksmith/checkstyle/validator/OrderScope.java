@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents a scope for the {@link NodeOrderValidator}.
+ * Represents a scope for the {@link OrderValidator}.
  */
 final class OrderScope {
     private final @NotNull Map<Integer, List<DetailAST>> commonScores = new HashMap<>();

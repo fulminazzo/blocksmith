@@ -4,7 +4,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.StaticCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.TypeCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.VisibilityCriterion;
-import it.fulminazzo.blocksmith.checkstyle.validator.NodeOrderValidator;
+import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -28,7 +28,7 @@ public final class TypesOrderCheck extends OrderCheck {
      * Instantiates a new Types order check.
      */
     public TypesOrderCheck() {
-        super(new NodeOrderValidator(
+        super(new OrderValidator(
                 TypeCriterion.values(),
                 StaticCriterion.values(),
                 VisibilityCriterion.values()

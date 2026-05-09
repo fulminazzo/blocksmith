@@ -15,17 +15,17 @@ import java.util.List;
  *
  * @see Criterion
  */
-public final class NodeOrderValidator implements NodeValidator, NodeScorer {
+public final class OrderValidator implements Validator, NodeScorer {
     private final @NotNull List<NodeScorerImpl> scorers = new ArrayList<>();
     private final @NotNull Deque<OrderScope> scopes = new ArrayDeque<>();
-    private @Nullable NodeValidator next;
+    private @Nullable Validator next;
 
     /**
      * Instantiates a new Node order validator.
      *
      * @param criteria the group of criteria to use that represent the different rulesets
      */
-    public NodeOrderValidator(final @NotNull Criterion @NotNull [] @NotNull ... criteria) {
+    public OrderValidator(final @NotNull Criterion @NotNull [] @NotNull ... criteria) {
         for (Criterion[] vs : criteria)
             scorers.add(new NodeScorerImpl(vs));
     }
@@ -61,7 +61,7 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
      * Exits the current computation scope.
      * <br>
      * If any {@link DetailAST} has been recorded in the last scope through {@link #validateNode(DetailAST)},
-     * each group formed with the <b>same scores</b> will be passed through the next {@link NodeValidator}.
+     * each group formed with the <b>same scores</b> will be passed through the next {@link Validator}.
      *
      * @throws ValidationException if any of those nodes is not valid
      */
@@ -126,7 +126,7 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
     }
 
     @Override
-    public @NotNull NodeOrderValidator then(final @NotNull NodeValidator validator) {
+    public @NotNull OrderValidator then(final @NotNull Validator validator) {
         this.next = validator;
         return this;
     }

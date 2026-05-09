@@ -4,13 +4,13 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST
 import com.puppycrawl.tools.checkstyle.api.FileContents
 import com.puppycrawl.tools.checkstyle.api.FileText
 import com.puppycrawl.tools.checkstyle.api.TokenTypes
-import it.fulminazzo.blocksmith.checkstyle.validator.NodeOrderValidator
+import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator
 import it.fulminazzo.blocksmith.checkstyle.validator.ValidationException
 import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 class FieldsOrderCheckTest extends Specification {
-    private NodeOrderValidator validator
+    private OrderValidator validator
     private FieldsOrderCheck check
 
     private DetailAST node = Mock(DetailAST)
@@ -27,7 +27,7 @@ class FieldsOrderCheckTest extends Specification {
         check.validate(_) >> { callRealMethod() }
 
         def reflect = Reflect.on(check)
-        validator = Mock(NodeOrderValidator)
+        validator = Mock(OrderValidator)
         reflect.set('validator', validator)
 
         def parent = Mock(DetailAST)
