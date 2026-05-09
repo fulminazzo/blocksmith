@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.checker;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import it.fulminazzo.blocksmith.checker.validator.RankerValidator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.List;
 public final class NodeOrderValidator implements NodeValidator, Ranker {
     private final @NotNull List<RankerImpl> rankers = new ArrayList<>();
     private final @NotNull Deque<Integer> scopes = new ArrayDeque<>();
+    private @Nullable NodeValidator next;
 
     /**
      * Instantiates a new Node validator.
@@ -88,6 +90,12 @@ public final class NodeOrderValidator implements NodeValidator, Ranker {
 
             totalBits -= offset;
         }
+    }
+
+    @Override
+    public @NotNull NodeOrderValidator then(final @NotNull NodeValidator validator) {
+        this.next = validator;
+        return this;
     }
 
     @Override

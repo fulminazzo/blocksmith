@@ -18,4 +18,12 @@ public interface NodeValidator extends Ranker {
      */
     void validateNode(final @NotNull DetailAST node) throws ValidationException;
 
+    /**
+     * Adds a validator to the chain of validators.
+     *
+     * @param validator the validator to add
+     * @return this object (for method chaining)
+     */
+    @NotNull NodeValidator then(final @NotNull NodeValidator validator);
+
 }
