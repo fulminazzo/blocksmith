@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.checkstyle;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
+import it.fulminazzo.blocksmith.checkstyle.validator.CompositeValidationException;
 import it.fulminazzo.blocksmith.checkstyle.validator.ValidationException;
 import it.fulminazzo.blocksmith.checkstyle.validator.Validator;
 import lombok.AccessLevel;
@@ -86,8 +86,8 @@ abstract class ValidatorCheck extends AbstractCheck {
     public void leaveToken(final @NotNull DetailAST ast) {
         try {
             if (isScopeChanged(ast)) getValidator().exitScope();
-        } catch (ValidationException e) {
-            log(e.getNode(), e.getMessage());
+        } catch (CompositeValidationException c) {
+            c.getExceptions().forEach(e -> log(e.getNode(), e.getMessage()));
         }
     }
 
