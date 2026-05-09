@@ -1,6 +1,6 @@
-package it.fulminazzo.blocksmith.checker.fields_order_check;
+package it.fulminazzo.blocksmith.checker;
 
-public class ValidVisibilityModifier {
+public class FieldValidVisibilityModifier {
 
     %target%String valid1;
     %target%String valid2;

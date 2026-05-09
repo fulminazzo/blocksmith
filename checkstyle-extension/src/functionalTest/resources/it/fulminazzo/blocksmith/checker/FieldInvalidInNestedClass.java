@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.checker;
 
-public class InvalidFieldInNestedClass {
+public class FieldInvalidInNestedClass {
 
     public String valid1;
     String valid2;

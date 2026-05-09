@@ -11,7 +11,7 @@ class FieldsOrderCheckFunctionalTest extends Specification {
 
     def 'test that valid static ordering does not throw'() {
         when:
-        def violations = runCheck('ValidStatic', FieldsOrderCheck)
+        def violations = runCheck('FieldValidStatic', FieldsOrderCheck)
 
         then:
         violations.empty
@@ -19,7 +19,7 @@ class FieldsOrderCheckFunctionalTest extends Specification {
 
     def 'test that static after non-static throws'() {
         when:
-        def violations = runCheck('InvalidStatic', FieldsOrderCheck)
+        def violations = runCheck('FieldInvalidStatic', FieldsOrderCheck)
 
         then:
         violations.size() == 1
@@ -33,7 +33,7 @@ class FieldsOrderCheckFunctionalTest extends Specification {
 
     def 'test that valid final ordering does not throw'() {
         when:
-        def violations = runCheck('ValidFinal', FieldsOrderCheck)
+        def violations = runCheck('FieldValidFinal', FieldsOrderCheck)
 
         then:
         violations.empty
@@ -41,7 +41,7 @@ class FieldsOrderCheckFunctionalTest extends Specification {
 
     def 'test that final after non-final throws'() {
         when:
-        def violations = runCheck('InvalidFinal', FieldsOrderCheck)
+        def violations = runCheck('FieldInvalidFinal', FieldsOrderCheck)
 
         then:
         violations.size() == 1
@@ -53,9 +53,9 @@ class FieldsOrderCheckFunctionalTest extends Specification {
         violation.message == message(MutabilityValidator.FINAL.errorMessage)
     }
 
-    def 'test that valid #modifier ordering does not throw'() {
+    def 'test that valid visibility #modifier ordering does not throw'() {
         when:
-        def violations = runCheck('ValidVisibilityModifier', FieldsOrderCheck) {
+        def violations = runCheck('FieldValidVisibilityModifier', FieldsOrderCheck) {
             it.replace('%target%', modifier).replace('%other%', other)
         }
 
@@ -80,9 +80,9 @@ class FieldsOrderCheckFunctionalTest extends Specification {
         'private '   | 'private '
     }
 
-    def 'test that #modifier after #other throws'() {
+    def 'test that visibility #modifier after #other throws'() {
         when:
-        def violations = runCheck('InvalidVisibilityModifier', FieldsOrderCheck) {
+        def violations = runCheck('FieldInvalidVisibilityModifier', FieldsOrderCheck) {
             it.replace('%target%', modifier).replace('%other%', other)
         }
 
@@ -112,7 +112,7 @@ class FieldsOrderCheckFunctionalTest extends Specification {
 
     def 'test that fields check works on nested classes'() {
         when:
-        def violations = runCheck('InvalidFieldInNestedClass', FieldsOrderCheck)
+        def violations = runCheck('FieldInvalidInNestedClass', FieldsOrderCheck)
 
         then:
         violations.size() == 2

@@ -1,6 +1,6 @@
-package it.fulminazzo.blocksmith.checker.fields_order_check;
+package it.fulminazzo.blocksmith.checker;
 
-public class ValidStatic {
+public class FieldValidStatic {
 
     static String valid1;
     static String valid2;

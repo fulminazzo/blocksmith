@@ -1,6 +1,6 @@
-package it.fulminazzo.blocksmith.checker.fields_order_check;
+package it.fulminazzo.blocksmith.checker;
 
-public class ValidFinal {
+public class FieldValidFinal {
 
     final String valid1;
     final String valid2;
