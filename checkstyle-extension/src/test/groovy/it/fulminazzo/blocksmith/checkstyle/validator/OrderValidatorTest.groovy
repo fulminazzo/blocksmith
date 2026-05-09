@@ -98,7 +98,7 @@ class OrderValidatorTest extends Specification {
         then:
         def e = thrown(ValidationException)
         e.node == second
-        e.message == 'it.fulminazzo.blocksmith.checkstyle.order.final'
+        e.message == 'it.fulminazzo.blocksmith.checkstyle.final'
     }
 
     def 'test that computeScore of node with #modifiers returns #expected'() {

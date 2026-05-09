@@ -21,7 +21,7 @@ public enum VisibilityCriterion implements Criterion {
 
         @Override
         public @NotNull String getErrorMessage() {
-            return "order.public";
+            return "public";
         }
     },
     /**
@@ -35,7 +35,7 @@ public enum VisibilityCriterion implements Criterion {
 
         @Override
         public @NotNull String getErrorMessage() {
-            return "order.protected";
+            return "protected";
         }
     },
     /**
@@ -51,7 +51,7 @@ public enum VisibilityCriterion implements Criterion {
 
         @Override
         public @NotNull String getErrorMessage() {
-            return "order.package";
+            return "package";
         }
     },
     /**
@@ -65,7 +65,7 @@ public enum VisibilityCriterion implements Criterion {
 
         @Override
         public @NotNull String getErrorMessage() {
-            return "order.private";
+            return "private";
         }
     }
 

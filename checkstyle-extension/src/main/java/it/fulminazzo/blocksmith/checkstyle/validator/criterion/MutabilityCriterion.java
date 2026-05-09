@@ -21,7 +21,7 @@ public enum MutabilityCriterion implements Criterion {
 
         @Override
         public @NotNull String getErrorMessage() {
-            return "order.final";
+            return "final";
         }
     },
     /**
@@ -35,7 +35,7 @@ public enum MutabilityCriterion implements Criterion {
 
         @Override
         public @NotNull String getErrorMessage() {
-            return "order.non-final";
+            return "non-final";
         }
     }
 

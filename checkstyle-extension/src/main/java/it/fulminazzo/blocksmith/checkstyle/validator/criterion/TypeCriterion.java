@@ -41,7 +41,7 @@ public enum TypeCriterion implements Criterion {
 
     @Override
     public @NotNull String getErrorMessage() {
-        return "order." + typeName;
+        return typeName;
     }
 
 }

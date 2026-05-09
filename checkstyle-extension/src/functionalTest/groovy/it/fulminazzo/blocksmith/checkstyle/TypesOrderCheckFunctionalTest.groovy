@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.checkstyle
 
-import it.fulminazzo.blocksmith.checkstyle.validator.criterion.StaticCriterion
+
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.TypeCriterion
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.VisibilityCriterion
 import spock.lang.Specification
@@ -86,7 +86,7 @@ class TypesOrderCheckFunctionalTest extends Specification {
         def violation = violations[0]
         violation.line == 8
         violation.column == 5
-        violation.message == message(StaticCriterion.STATIC.errorMessage)
+        violation.message == message('it.fulminazzo.blocksmith.checkstyle.static')
     }
 
     def 'test that valid visibility #modifier ordering does not throw'() {
@@ -157,19 +157,19 @@ class TypesOrderCheckFunctionalTest extends Specification {
         def nestViolation = violations[0]
         nestViolation.line == 9
         nestViolation.column == 5
-        nestViolation.message == message(VisibilityCriterion.PUBLIC.errorMessage)
+        nestViolation.message == message('it.fulminazzo.blocksmith.checkstyle.public')
 
         and:
         def nestedViolation = violations[1]
         nestedViolation.line == 14
         nestedViolation.column == 9
-        nestedViolation.message == message(VisibilityCriterion.PUBLIC.errorMessage)
+        nestedViolation.message == message('it.fulminazzo.blocksmith.checkstyle.public')
 
         and:
         def violation = violations[2]
         violation.line == 18
         violation.column == 5
-        violation.message == message(VisibilityCriterion.PACKAGE.errorMessage)
+        violation.message == message('it.fulminazzo.blocksmith.checkstyle.package')
     }
 
     private static String applyRecordSyntax(final String line) {

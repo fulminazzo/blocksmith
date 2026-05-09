@@ -21,7 +21,7 @@ public enum StaticCriterion implements Criterion {
 
         @Override
         public @NotNull String getErrorMessage() {
-            return "order.static";
+            return "static";
         }
     },
     /**
@@ -35,7 +35,7 @@ public enum StaticCriterion implements Criterion {
 
         @Override
         public @NotNull String getErrorMessage() {
-            return "order.non-static";
+            return "non-static";
         }
     }
 
