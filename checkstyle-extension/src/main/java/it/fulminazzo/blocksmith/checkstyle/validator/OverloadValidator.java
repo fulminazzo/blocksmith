@@ -6,6 +6,9 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * An object to validate executable nodes for their overload ordering.
  *
@@ -14,12 +17,22 @@ import org.jetbrains.annotations.Nullable;
 public final class OverloadValidator extends AbstractValidator<OverloadValidator.Scope, OverloadValidator> {
 
     @Override
-    public void validateNodeImpl(final @NotNull DetailAST node) throws ValidationException {
+    protected void validateNodeImpl(final @NotNull DetailAST node) throws ValidationException {
         Executable executable = Executable.of(node);
         Scope lastScope = getLastScope();
-        Executable lastExecutable = lastScope.getLastExecutable();
-        if (lastExecutable != null && executable.compareTo(lastExecutable) < 0)
-            throw new ValidationException(node, "executable.overload");
+        String name = executable.getName();
+
+        if (name.equals(lastScope.getCurrentGroupName())) {
+            Executable lastExecutable = lastScope.getLastExecutable();
+            if (lastExecutable != null && executable.compareTo(lastExecutable) < 0)
+                throw new ValidationException(node, "executable.overload");
+        } else {
+            lastScope.closeCurrentGroup();
+            if (lastScope.isGroupClosed(name))
+                throw new ValidationException(node, "executable.overload.grouped");
+            lastScope.setCurrentGroupName(name);
+        }
+
         lastScope.setLastExecutable(executable);
     }
 
@@ -34,7 +47,32 @@ public final class OverloadValidator extends AbstractValidator<OverloadValidator
     protected static final class Scope extends AbstractValidator.Scope {
         @Getter
         @Setter
-        public @Nullable Executable lastExecutable;
+        private @Nullable Executable lastExecutable;
+        @Getter
+        @Setter
+        private @Nullable String currentGroupName;
+        private final @NotNull Set<String> closedGroups = new HashSet<>();
+
+        /**
+         * Closes the current group, recording its name so it cannot reopen.
+         */
+        public void closeCurrentGroup() {
+            if (currentGroupName != null) {
+                closedGroups.add(currentGroupName);
+                currentGroupName = null;
+            }
+        }
+
+        /**
+         * Returns {@code true} if the given name belongs to a group that was
+         * already opened and then closed by a different method appearing after it.
+         *
+         * @param name the method name to check
+         * @return {@code true} if the group is closed
+         */
+        public boolean isGroupClosed(final @NotNull String name) {
+            return closedGroups.contains(name);
+        }
 
     }
 
