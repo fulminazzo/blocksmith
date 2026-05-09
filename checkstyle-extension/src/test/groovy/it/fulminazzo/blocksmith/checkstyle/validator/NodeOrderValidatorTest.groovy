@@ -90,6 +90,11 @@ class NodeOrderValidatorTest extends Specification {
         [modifiers, expected] << ENCODED_MODIFIERS.collect { [it.value, it.key] }
     }
 
+    def 'test that getMaxScore returns correct value'() {
+        expect:
+        validator.maxScore == 15
+    }
+
     private DetailAST generateNode(final List<String> modifiers) {
         def node = Mock(DetailAST)
 

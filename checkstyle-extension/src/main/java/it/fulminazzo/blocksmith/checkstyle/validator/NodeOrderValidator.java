@@ -64,6 +64,21 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
         if (!scopes.isEmpty()) scopes.pop();
     }
 
+    /**
+     * Gets the maximum possible score.
+     *
+     * @return the max score
+     */
+    int getMaxScore() {
+        int score = 0;
+        for (NodeScorerImpl scorer : scorers) {
+            int offset = getRankerOffset(scorer);
+            score <<= offset;
+            score += scorer.getValidatorsCount() - 1;
+        }
+        return score;
+    }
+
     @SuppressWarnings("DataFlowIssue")
     private @NotNull OrderScope getLastScope() {
         if (scopes.isEmpty()) enterScope();
