@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
  * An object to validate getters and setters positioning.
  */
 public final class GetterSetterValidator extends AbstractValidator<GetterSetterValidator.Scope, GetterSetterValidator> {
-    private static final @NotNull String GETTER_PREFIX = "get";
+    private static final @NotNull List<String> GETTER_PREFIXES = Arrays.asList("get", "is");
     private static final @NotNull String SETTER_PREFIX = "set";
 
     @Override
@@ -25,11 +26,14 @@ public final class GetterSetterValidator extends AbstractValidator<GetterSetterV
     protected void validateNodeImpl(final @NotNull DetailAST node) throws ValidationException {
         String name = CriterionUtils.getMethodName(node);
         Scope lastScope = getLastScope();
-        if (name.startsWith(GETTER_PREFIX)) {
-            if (lastScope.getSetters().contains(name.substring(GETTER_PREFIX.length())))
-                throw new ValidationException(node, "method.getter");
-            else lastScope.registerGetter(name);
-        } else if (name.startsWith(SETTER_PREFIX)) {
+        for (String prefix : GETTER_PREFIXES)
+            if (name.startsWith(prefix)) {
+                if (lastScope.getSetters().contains(name.substring(prefix.length())))
+                    throw new ValidationException(node, "method.getter");
+                else lastScope.registerGetter(name.substring(prefix.length()));
+            }
+
+        if (name.startsWith(SETTER_PREFIX)) {
             lastScope.registerSetter(name);
             String unprefixedName = name.substring(SETTER_PREFIX.length());
             if (unprefixedName.equals(lastScope.getLastGetter())) return;
@@ -49,10 +53,9 @@ public final class GetterSetterValidator extends AbstractValidator<GetterSetterV
         /**
          * Registers a new getter.
          *
-         * @param getter the getter name
+         * @param name the name of the getter
          */
-        public void registerGetter(final @NotNull String getter) {
-            String name = getter.substring(GETTER_PREFIX.length());
+        public void registerGetter(final @NotNull String name) {
             if (!getters.contains(name)) getters.add(name);
         }
 
@@ -68,10 +71,10 @@ public final class GetterSetterValidator extends AbstractValidator<GetterSetterV
         /**
          * Registers a new setter.
          *
-         * @param setter the setter name
+         * @param name the name of the setter
          */
-        public void registerSetter(final @NotNull String setter) {
-            String name = setter.substring(SETTER_PREFIX.length());
+        public void registerSetter(@NotNull String name) {
+            name = name.substring(SETTER_PREFIX.length());
             if (!setters.contains(name)) setters.add(name);
         }
 
