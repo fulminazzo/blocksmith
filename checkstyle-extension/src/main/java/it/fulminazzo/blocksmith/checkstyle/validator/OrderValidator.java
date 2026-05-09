@@ -77,8 +77,7 @@ public final class OrderValidator implements Validator, NodeScorer {
 
         for (NodeScorerImpl scorer : scorers) {
             int offset = getRankerOffset(scorer);
-            int mask = offset;
-            if (mask != 1) mask++;
+            int mask = (1 << offset) - 1;
 
             int bits = totalBits - offset;
             int last = (getLastScore() >> bits) & mask;
