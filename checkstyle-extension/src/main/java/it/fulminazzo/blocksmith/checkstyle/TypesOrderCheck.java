@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  *     package-private and {@code private}.</li>
  * </ul>
  */
-public final class TypesOrderCheck extends OrderCheck {
+public final class TypesOrderCheck extends ValidatorCheck {
 
     /**
      * Instantiates a new Types order check.

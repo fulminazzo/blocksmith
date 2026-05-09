@@ -2,10 +2,10 @@ package it.fulminazzo.blocksmith.checkstyle;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.MutabilityCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.StaticCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.VisibilityCriterion;
-import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.List;
  *     package-private and {@code private}.</li>
  * </ul>
  */
-public final class FieldsOrderCheck extends OrderCheck {
+public final class FieldsOrderCheck extends ValidatorCheck {
 
     /**
      * Instantiates a new Fields order check.
