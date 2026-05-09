@@ -58,7 +58,7 @@ class FieldsOrderCheckTest extends Specification {
 
         and:
         validator.validateNode(_) >> {
-            throw new ValidationException('exception.message')
+            throw new ValidationException(node, 'exception.message')
         }
 
         when:
