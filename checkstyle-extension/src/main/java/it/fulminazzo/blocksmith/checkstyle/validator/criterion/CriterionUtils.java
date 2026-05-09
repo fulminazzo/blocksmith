@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * A collection of utilities for {@link DetailAST}.
  */
-final class CriterionUtils {
+public final class CriterionUtils {
 
     /**
      * Gets the name of a method node.
