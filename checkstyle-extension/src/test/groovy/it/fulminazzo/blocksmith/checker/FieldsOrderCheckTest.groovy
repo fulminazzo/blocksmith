@@ -22,6 +22,9 @@ class FieldsOrderCheckTest extends Specification {
         check.visitToken(_) >> {
             callRealMethod()
         }
+        check.leaveToken(_) >> {
+            callRealMethod()
+        }
 
         def reflect = Reflect.on(check)
         validator = Mock(NodeValidator)
@@ -31,22 +34,25 @@ class FieldsOrderCheckTest extends Specification {
         node.parent >> parent
     }
 
-    def 'test that beginTree resets validator'() {
+    def 'test that visitToken enters scope on #tokenType'() {
         given:
-        check.beginTree(_) >> {
-            callRealMethod()
-        }
+        node.type >> tokenType
 
         when:
-        check.beginTree(node)
+        check.visitToken(node)
 
         then:
-        1 * validator.reset()
+        0 * validator.validateNode(_)
+        1 * validator.enterScope()
+
+        where:
+        tokenType << [TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF, TokenTypes.ENUM_DEF, TokenTypes.RECORD_DEF]
     }
 
     def 'test that visitToken does not throw on ValidationException'() {
         given:
         node.parent.type >> TokenTypes.OBJBLOCK
+        node.type >> TokenTypes.VARIABLE_DEF
         node.lineNo >> 1
         node.columnNo >> 2
 
@@ -68,6 +74,7 @@ class FieldsOrderCheckTest extends Specification {
     def 'test that visitToken works only if parent is OBJBLOCK'() {
         when:
         node.parent.type >> TokenTypes.TEXT_BLOCK_CONTENT
+        node.type >> TokenTypes.VARIABLE_DEF
 
         and:
         check.visitToken(node)
@@ -77,12 +84,27 @@ class FieldsOrderCheckTest extends Specification {
 
         when:
         node.parent.type >> TokenTypes.OBJBLOCK
+        node.type >> TokenTypes.VARIABLE_DEF
 
         and:
         check.visitToken(node)
 
         then:
         1 * validator.validateNode(node)
+    }
+
+    def 'test that leaveToken exits scope on #tokenType'() {
+        given:
+        node.type >> tokenType
+
+        when:
+        check.leaveToken(node)
+
+        then:
+        1 * validator.exitScope()
+
+        where:
+        tokenType << [TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF, TokenTypes.ENUM_DEF, TokenTypes.RECORD_DEF]
     }
 
 }
