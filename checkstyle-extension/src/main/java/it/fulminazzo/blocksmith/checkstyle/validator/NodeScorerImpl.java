@@ -14,36 +14,36 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 final class NodeScorerImpl implements NodeScorer {
-    private final @NotNull Criterion @NotNull [] validators;
+    private final @NotNull Criterion @NotNull [] criteria;
 
     /**
-     * Gets the validator at the given index.
+     * Gets the criterion at the given index.
      *
-     * @param index the index of the validator
-     * @return the validator
+     * @param index the index of the criterion
+     * @return the criterion
      */
-    public @NotNull Criterion getValidator(final int index) {
-        return validators[index];
+    public @NotNull Criterion getCriterion(final int index) {
+        return criteria[index];
     }
 
     /**
-     * Gets the number of validators.
+     * Gets the number of criteria.
      *
-     * @return the number of validators`
+     * @return the number of criteria
      */
-    public int getValidatorsCount() {
-        return validators.length;
+    public int getCriteriaCount() {
+        return criteria.length;
     }
 
     @Override
     public int computeScore(final @NotNull DetailAST node) {
-        for (int i = 0; i < getValidatorsCount(); i++) {
-            Criterion validator = validators[i];
-            if (validator.matches(node)) return i;
+        for (int i = 0; i < getCriteriaCount(); i++) {
+            Criterion criterion = criteria[i];
+            if (criterion.matches(node)) return i;
         }
         throw new IllegalArgumentException(String.format(
-                "Could not compute score of node '%s' with validators: %s",
-                node, Arrays.toString(validators)
+                "Could not compute score of node '%s' with criteria: %s",
+                node, Arrays.toString(criteria)
         ));
     }
 

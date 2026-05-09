@@ -57,7 +57,7 @@ public final class OrderValidator implements Validator, NodeScorer {
         for (NodeScorerImpl scorer : scorers) {
             int offset = getRankerOffset(scorer);
             score <<= offset;
-            score += scorer.getValidatorsCount() - 1;
+            score += scorer.getCriteriaCount() - 1;
         }
         return score;
     }
@@ -85,7 +85,7 @@ public final class OrderValidator implements Validator, NodeScorer {
             int current = (score >> bits) & mask;
 
             if (current < last)
-                throw new ValidationException(node, scorer.getValidator(current).getErrorMessage());
+                throw new ValidationException(node, scorer.getCriterion(current).getErrorMessage());
             else if (current > last) {
                 setLastScore(score);
                 break;
@@ -141,7 +141,7 @@ public final class OrderValidator implements Validator, NodeScorer {
     }
 
     private static int getRankerOffset(final @NotNull NodeScorerImpl scorer) {
-        return Integer.SIZE - Integer.numberOfLeadingZeros(scorer.getValidatorsCount() - 1);
+        return Integer.SIZE - Integer.numberOfLeadingZeros(scorer.getCriteriaCount() - 1);
     }
 
     /**
