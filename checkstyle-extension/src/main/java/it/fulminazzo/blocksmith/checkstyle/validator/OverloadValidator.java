@@ -32,7 +32,7 @@ public final class OverloadValidator implements Validator {
         Scope lastScope = getLastScope();
         Executable lastExecutable = lastScope.getLastExecutable();
         if (lastExecutable != null && executable.compareTo(lastExecutable) < 0)
-            throw new ValidationException(node, "overload");
+            throw new ValidationException(node, "executable.overload");
         lastScope.setLastExecutable(executable);
         lastScope.register(node);
     }

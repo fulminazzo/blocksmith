@@ -75,7 +75,7 @@ class ConstructorsOrderCheckFunctionalTest extends Specification {
 
     def 'test that invalid overloads throws'() {
         given:
-        final msg = 'it.fulminazzo.blocksmith.checkstyle.overload'
+        final msg = 'it.fulminazzo.blocksmith.checkstyle.executable.overload'
 
         when:
         def violations = runCheck('ConstructorInvalidOverload', ConstructorsOrderCheck)
@@ -119,13 +119,13 @@ class ConstructorsOrderCheckFunctionalTest extends Specification {
         def nestedViolation = violations[0]
         nestedViolation.line == 15
         nestedViolation.column == 9
-        nestedViolation.message == message('it.fulminazzo.blocksmith.checkstyle.overload')
+        nestedViolation.message == message('it.fulminazzo.blocksmith.checkstyle.executable.overload')
 
         and:
         def violation = violations[1]
         violation.line == 19
         violation.column == 5
-        violation.message == message('it.fulminazzo.blocksmith.checkstyle.overload')
+        violation.message == message('it.fulminazzo.blocksmith.checkstyle.executable.overload')
     }
 
 }

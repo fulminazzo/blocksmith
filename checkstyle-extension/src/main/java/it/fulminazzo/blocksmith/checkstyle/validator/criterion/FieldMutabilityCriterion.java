@@ -5,11 +5,11 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * {@link Criterion} implementation for the {@code final} keyword.
+ * {@link Criterion} implementation for the {@code final} keyword in fields.
  *
  * @see Criterion
  */
-public enum MutabilityCriterion implements Criterion {
+public enum FieldMutabilityCriterion implements Criterion {
     /**
      * {@code final} criterion.
      */
@@ -21,7 +21,7 @@ public enum MutabilityCriterion implements Criterion {
 
         @Override
         public @NotNull String getErrorMessage() {
-            return "final";
+            return "field.final";
         }
     },
     /**
@@ -35,7 +35,7 @@ public enum MutabilityCriterion implements Criterion {
 
         @Override
         public @NotNull String getErrorMessage() {
-            return "non-final";
+            return "field.non-final";
         }
     }
 

@@ -2,7 +2,7 @@ package it.fulminazzo.blocksmith.checkstyle.validator
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST
 import com.puppycrawl.tools.checkstyle.api.TokenTypes
-import it.fulminazzo.blocksmith.checkstyle.validator.criterion.MutabilityCriterion
+import it.fulminazzo.blocksmith.checkstyle.validator.criterion.FieldMutabilityCriterion
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.StaticCriterion
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.VisibilityCriterion
 import spock.lang.Specification
@@ -29,7 +29,7 @@ class OrderValidatorTest extends Specification {
 
     private final OrderValidator validator = new OrderValidator(
             StaticCriterion.values(),
-            MutabilityCriterion.values(),
+            FieldMutabilityCriterion.values(),
             VisibilityCriterion.values()
     )
 
@@ -83,7 +83,7 @@ class OrderValidatorTest extends Specification {
 
         and:
         def validator = new OrderValidator(StaticCriterion.values())
-                .then(new OrderValidator(MutabilityCriterion.values()))
+                .then(new OrderValidator(FieldMutabilityCriterion.values()))
 
         when:
         validator.validateNode(first)
@@ -102,7 +102,7 @@ class OrderValidatorTest extends Specification {
         and:
         def e = c.exceptions[0]
         e.node == second
-        e.message == 'it.fulminazzo.blocksmith.checkstyle.final'
+        e.message == 'it.fulminazzo.blocksmith.checkstyle.field.final'
     }
 
     def 'test that computeScore of node with #modifiers returns #expected'() {

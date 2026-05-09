@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.checkstyle;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
-import it.fulminazzo.blocksmith.checkstyle.validator.criterion.MutabilityCriterion;
+import it.fulminazzo.blocksmith.checkstyle.validator.criterion.FieldMutabilityCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.StaticCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.VisibilityCriterion;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +28,7 @@ public final class FieldsOrderCheck extends ValidatorCheck {
     public FieldsOrderCheck() {
         super(new OrderValidator(
                 StaticCriterion.values(),
-                MutabilityCriterion.values(),
+                FieldMutabilityCriterion.values(),
                 VisibilityCriterion.values()
         ));
     }

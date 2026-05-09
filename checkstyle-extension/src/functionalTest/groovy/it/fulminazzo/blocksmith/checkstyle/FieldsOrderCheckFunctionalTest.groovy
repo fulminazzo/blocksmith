@@ -49,7 +49,7 @@ class FieldsOrderCheckFunctionalTest extends Specification {
         def violation = violations[0]
         violation.line == 8
         violation.column == 5
-        violation.message == message('it.fulminazzo.blocksmith.checkstyle.final')
+        violation.message == message('it.fulminazzo.blocksmith.checkstyle.field.final')
     }
 
     def 'test that valid visibility #modifier ordering does not throw'() {
