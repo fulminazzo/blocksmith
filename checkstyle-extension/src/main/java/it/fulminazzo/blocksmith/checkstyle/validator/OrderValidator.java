@@ -108,14 +108,22 @@ public final class OrderValidator implements Validator, NodeScorer {
     }
 
     @Override
-    public void exitScope() throws ValidationException {
+    public void exitScope() throws CompositeValidationException {
         if (!scopes.isEmpty()) {
             Scope scope = scopes.pop();
             if (next == null) return;
+            List<ValidationException> exceptions = new ArrayList<>();
             for (int i = 0; i < getMaxScore(); i++) {
                 List<DetailAST> nodes = scope.getCommonScores(i);
-                for (DetailAST node : nodes) next.validateNode(node);
+                for (DetailAST node : nodes) {
+                    try {
+                        next.validateNode(node);
+                    } catch (ValidationException e) {
+                        exceptions.add(e);
+                    }
+                }
             }
+            if (!exceptions.isEmpty()) throw new CompositeValidationException(exceptions);
         }
     }
 

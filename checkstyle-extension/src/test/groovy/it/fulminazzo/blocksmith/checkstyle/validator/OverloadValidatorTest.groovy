@@ -96,7 +96,11 @@ class OverloadValidatorTest extends Specification {
         validator.exitScope()
 
         then:
-        def e = thrown(ValidationException)
+        def c = thrown(CompositeValidationException)
+        c.exceptions.size() == 1
+
+        and:
+        def e = c.exceptions[0]
         e.node == noParametersNode
         e.message == 'it.fulminazzo.blocksmith.checkstyle.mock.exception'
     }

@@ -37,8 +37,8 @@ public interface Validator {
      * If any {@link DetailAST} has been recorded in the last scope through {@link #validateNode(DetailAST)},
      * each group formed with the <b>same scores</b> will be passed through the next {@link Validator}.
      *
-     * @throws ValidationException if any of those nodes is not valid
+     * @throws CompositeValidationException if any of those nodes is not valid
      */
-    void exitScope() throws ValidationException;
+    void exitScope() throws CompositeValidationException;
 
 }

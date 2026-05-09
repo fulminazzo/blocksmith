@@ -49,11 +49,19 @@ public final class OverloadValidator implements Validator {
     }
 
     @Override
-    public void exitScope() throws ValidationException {
+    public void exitScope() throws CompositeValidationException {
         if (!scopes.isEmpty()) {
             Scope scope = scopes.pop();
             if (next == null) return;
-            for (DetailAST node : scope.getNodes()) next.validateNode(node);
+            List<ValidationException> exceptions = new ArrayList<>();
+            for (DetailAST node : scope.getNodes()) {
+                try {
+                    next.validateNode(node);
+                } catch (ValidationException e) {
+                    exceptions.add(e);
+                }
+            }
+            if (!exceptions.isEmpty()) throw new CompositeValidationException(exceptions);
         }
     }
 
