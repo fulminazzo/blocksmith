@@ -4,10 +4,25 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * A collection of utilities for {@link DetailAST}.
  */
 final class CriterionUtils {
+
+    /**
+     * Gets the name of a method node.
+     *
+     * @param node the method node
+     * @return the name
+     */
+    public static @NotNull String getMethodName(final @NotNull DetailAST node) {
+        return Objects.requireNonNull(
+                node.findFirstToken(TokenTypes.IDENT),
+                "Could not find name node from: " + node
+        ).getText();
+    }
 
     /**
      * Checks if the element is annotated with the given annotation.
