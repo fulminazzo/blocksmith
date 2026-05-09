@@ -1,10 +1,10 @@
 package it.fulminazzo.blocksmith.checkstyle;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.StaticCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.TypeCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.VisibilityCriterion;
-import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -43,7 +43,7 @@ public final class TypesOrderCheck extends OrderCheck {
     @Override
     public void visitToken(final @NotNull DetailAST ast) {
         visitTokenImpl(ast);
-        if (isScopeChanged(ast)) validator.enterScope();
+        if (isScopeChanged(ast)) getValidator().enterScope();
     }
 
 }

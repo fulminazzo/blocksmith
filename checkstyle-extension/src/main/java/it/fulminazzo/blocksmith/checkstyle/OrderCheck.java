@@ -1,28 +1,32 @@
 package it.fulminazzo.blocksmith.checkstyle;
 
-import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.ValidationException;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Abstract implementation of {@link AbstractCheck} with common logic for validating the correct ordering of nodes.
+ * Abstract implementation of {@link ValidatorCheck} with common logic for validating the correct ordering of nodes.
  * <br>
  * When entering a new type declaration, a new scope for the {@link OrderValidator} will be created.
  */
-@RequiredArgsConstructor
-abstract class OrderCheck extends AbstractCheck {
+abstract class OrderCheck extends ValidatorCheck {
     private static final @NotNull List<Integer> SCOPE_CHANGE_TOKENS = List.of(
             TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF, TokenTypes.ENUM_DEF, TokenTypes.RECORD_DEF
     );
 
-    protected final @NotNull OrderValidator validator;
+    /**
+     * Instantiates a new Order check.
+     *
+     * @param validator the validator
+     */
+    protected OrderCheck(final @NotNull OrderValidator validator) {
+        super(validator);
+    }
 
     /**
      * Gets the tokens that this check will validate.
@@ -31,27 +35,9 @@ abstract class OrderCheck extends AbstractCheck {
      */
     protected abstract @NotNull List<Integer> getTokens();
 
-    /**
-     * Executes the actual logic when visiting a node.
-     *
-     * @param node the node
-     */
-    protected void visitTokenImpl(final @NotNull DetailAST node) {
-        validate(node);
-    }
-
-    /**
-     * Validates the given node.
-     * In case of {@link ValidationException}, the error message will be logged.
-     *
-     * @param node the node to validate
-     */
-    protected void validate(final @NotNull DetailAST node) {
-        try {
-            validator.validateNode(node);
-        } catch (ValidationException e) {
-            log(e.getNode(), e.getMessage());
-        }
+    @Override
+    protected @NotNull OrderValidator getValidator() {
+        return (OrderValidator) super.getValidator();
     }
 
     @Override
@@ -63,25 +49,15 @@ abstract class OrderCheck extends AbstractCheck {
     }
 
     @Override
-    public int[] getAcceptableTokens() {
-        return getDefaultTokens();
-    }
-
-    @Override
-    public int[] getRequiredTokens() {
-        return getDefaultTokens();
-    }
-
-    @Override
     public void visitToken(final @NotNull DetailAST ast) {
-        if (isScopeChanged(ast)) validator.enterScope();
+        if (isScopeChanged(ast)) getValidator().enterScope();
         else visitTokenImpl(ast);
     }
 
     @Override
     public void leaveToken(final @NotNull DetailAST ast) {
         try {
-            if (isScopeChanged(ast)) validator.exitScope();
+            if (isScopeChanged(ast)) getValidator().exitScope();
         } catch (ValidationException e) {
             log(e.getNode(), e.getMessage());
         }
