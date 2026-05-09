@@ -242,6 +242,34 @@ class MethodsOrderCheckFunctionalTest extends Specification {
         'hashCode'  | 'toString'  || MethodNameCriterion.HASH_CODE.errorMessage
     }
 
+    def 'test that valid getter-setter ordering does not throw'() {
+        when:
+        def violations = runCheck('MethodValidGetterSetter', MethodsOrderCheck)
+
+        then:
+        violations.empty
+    }
+
+    def 'test that invalid getter-setter ordering throws'() {
+        when:
+        def violations = runCheck('MethodInvalidGetterSetter', MethodsOrderCheck)
+
+        then:
+        violations.size() == 2
+
+        and:
+        def getterViolation = violations[0]
+        getterViolation.line == 9
+        getterViolation.column == 5
+        getterViolation.message == message('it.fulminazzo.blocksmith.checkstyle.method.getter')
+
+        and:
+        def setterViolation = violations[1]
+        setterViolation.line == 13
+        setterViolation.column == 5
+        setterViolation.message == message('it.fulminazzo.blocksmith.checkstyle.method.setter')
+    }
+
     def 'test that methods check works on nested classes'() {
         when:
         def violations = runCheck('MethodInvalidInNestedClass', MethodsOrderCheck)
