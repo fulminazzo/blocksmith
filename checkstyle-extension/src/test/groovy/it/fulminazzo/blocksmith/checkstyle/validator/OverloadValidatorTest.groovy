@@ -60,9 +60,14 @@ class OverloadValidatorTest extends Specification {
     def 'test that validateNode when lastExecutable is #lastExecutable throws for node #node'() {
         given:
         validator.lastScope.lastExecutable = OverloadValidatorTest."$lastExecutable"
+        validator.lastScope.currentGroupName = 'method'
+
+        and:
+        def mockNode = this."$node"
+        mockNode.name >> 'method'
 
         when:
-        validator.validateNode(this."$node")
+        validator.validateNode(mockNode)
 
         then:
         thrown(ValidationException)
