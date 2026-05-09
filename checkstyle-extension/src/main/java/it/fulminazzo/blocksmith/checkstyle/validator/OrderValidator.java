@@ -2,13 +2,12 @@ package it.fulminazzo.blocksmith.checkstyle.validator;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.Criterion;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 /**
  * An object to validate nodes against multiple ordered rulesets.
@@ -17,7 +16,7 @@ import java.util.List;
  */
 public final class OrderValidator implements Validator, NodeScorer {
     private final @NotNull List<NodeScorerImpl> scorers = new ArrayList<>();
-    private final @NotNull Deque<OrderScope> scopes = new ArrayDeque<>();
+    private final @NotNull Deque<Scope> scopes = new ArrayDeque<>();
     private @Nullable Validator next;
 
     /**
@@ -64,7 +63,7 @@ public final class OrderValidator implements Validator, NodeScorer {
     }
 
     @SuppressWarnings("DataFlowIssue")
-    private @NotNull OrderScope getLastScope() {
+    private @NotNull Scope getLastScope() {
         if (scopes.isEmpty()) enterScope();
         return scopes.peek();
     }
@@ -105,13 +104,13 @@ public final class OrderValidator implements Validator, NodeScorer {
 
     @Override
     public void enterScope() {
-        scopes.push(new OrderScope());
+        scopes.push(new Scope());
     }
 
     @Override
     public void exitScope() throws ValidationException {
         if (!scopes.isEmpty()) {
-            OrderScope scope = scopes.pop();
+            Scope scope = scopes.pop();
             if (next == null) return;
             for (int i = 0; i < getMaxScore(); i++) {
                 List<DetailAST> nodes = scope.getCommonScores(i);
@@ -133,6 +132,37 @@ public final class OrderValidator implements Validator, NodeScorer {
 
     private static int getRankerOffset(final @NotNull NodeScorerImpl scorer) {
         return Integer.SIZE - Integer.numberOfLeadingZeros(scorer.getValidatorsCount() - 1);
+    }
+
+    /**
+     * Represents a scope for {@link OrderValidator}.
+     */
+    private static final class Scope {
+        private final @NotNull Map<Integer, List<DetailAST>> commonScores = new HashMap<>();
+        @Getter
+        @Setter
+        private int lastScore;
+
+        /**
+         * Registers a node with the same score.
+         *
+         * @param node  the node
+         * @param score the score
+         */
+        public void registerCommonScore(final @NotNull DetailAST node, final int score) {
+            getCommonScores(score).add(node);
+        }
+
+        /**
+         * Gets all the registered nodes with the same score.
+         *
+         * @param score the score
+         * @return the common scores
+         */
+        public @NotNull List<DetailAST> getCommonScores(final int score) {
+            return commonScores.computeIfAbsent(score, k -> new ArrayList<>());
+        }
+
     }
 
 }
