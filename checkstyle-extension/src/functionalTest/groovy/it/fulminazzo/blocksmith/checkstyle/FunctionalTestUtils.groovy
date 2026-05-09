@@ -109,7 +109,7 @@ final class FunctionalTestUtils {
 
     static Properties getMessages() {
         def props = new Properties()
-        def resourceName = "${OrderValidator.packageName.replace('.', '/')}/messages.properties"
+        def resourceName = "${ValidatorCheck.packageName.replace('.', '/')}/messages.properties"
         def resource = Criterion.classLoader.getResourceAsStream(resourceName)
         props.load(resource)
         return props
