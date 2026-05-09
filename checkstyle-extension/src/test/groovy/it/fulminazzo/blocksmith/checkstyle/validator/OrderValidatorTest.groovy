@@ -7,7 +7,7 @@ import it.fulminazzo.blocksmith.checkstyle.validator.criterion.StaticCriterion
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.VisibilityCriterion
 import spock.lang.Specification
 
-class NodeOrderValidatorTest extends Specification {
+class OrderValidatorTest extends Specification {
     private static final Map<Integer, List<String>> ENCODED_MODIFIERS = [
             0  : ['LITERAL_STATIC', 'FINAL', 'LITERAL_PUBLIC'],
             1  : ['LITERAL_STATIC', 'FINAL', 'LITERAL_PROTECTED'],
@@ -74,6 +74,31 @@ class NodeOrderValidatorTest extends Specification {
             ENCODED_MODIFIERS.findAll { it.key < score }
                     .collect { [score, it.value] }
         }
+    }
+
+    def 'test that exitScope throws if ordered nodes are incorrect'() {
+        given:
+        def first = generateNode(['LITERAL_STATIC'])
+        def second = generateNode(['LITERAL_STATIC', 'FINAL'])
+
+        and:
+        def validator = new OrderValidator(StaticCriterion.values())
+                .then(new OrderValidator(MutabilityCriterion.values()))
+
+        when:
+        validator.validateNode(first)
+        validator.validateNode(second)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        validator.exitScope()
+
+        then:
+        def e = thrown(ValidationException)
+        e.node == second
+        e.message == 'it.fulminazzo.blocksmith.checkstyle.order.final'
     }
 
     def 'test that computeScore of node with #modifiers returns #expected'() {
