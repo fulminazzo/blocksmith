@@ -80,7 +80,9 @@ allprojects {
         }
     }
 
-    tasks.withType<JacocoReport>().configureEach {
+    tasks.jacocoTestReport {
+        dependsOn(tasks.withType<Test>())
+
         classDirectories.setFrom(
             files(classDirectories.files.map {
                 fileTree(it) {
@@ -88,6 +90,27 @@ allprojects {
                 }
             })
         )
+
+        executionData.setFrom(
+            fileTree(layout.buildDirectory).include("jacoco/*.exec")
+        )
+    }
+
+    tasks.jacocoTestCoverageVerification {
+        dependsOn(tasks.withType<Test>())
+
+        executionData.setFrom(
+            fileTree(layout.buildDirectory).include("jacoco/*.exec")
+        )
+
+        violationRules {
+            rule {
+                excludes = listOf("**/$projectInfoClassName**")
+                limit {
+                    minimum = "0.90".toBigDecimal()
+                }
+            }
+        }
     }
 
     checkstyle {
@@ -145,6 +168,10 @@ allprojects {
         buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
         buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
         buildConfigField("String", "MODULE_NAME", "\"${projectName}\"")
+    }
+
+    tasks.check {
+        dependsOn(tasks.jacocoTestCoverageVerification)
     }
 
 }
