@@ -62,6 +62,8 @@ allprojects {
                     rootProject.libs.bundles.annotations.get().forEach { implementation(it) }
                     annotationProcessor(rootProject.libs.lombok.get())
 
+                    implementation(libs.mockito)
+
                     implementation(rootProject.projects.base.testing)
                 }
                 targets {
