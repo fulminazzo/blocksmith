@@ -26,4 +26,19 @@ public interface Validator {
      */
     @NotNull Validator then(final @NotNull Validator validator);
 
+    /**
+     * Enters a new computation scope to allow isolated verifications.
+     */
+    void enterScope();
+
+    /**
+     * Exits the current computation scope.
+     * <br>
+     * If any {@link DetailAST} has been recorded in the last scope through {@link #validateNode(DetailAST)},
+     * each group formed with the <b>same scores</b> will be passed through the next {@link Validator}.
+     *
+     * @throws ValidationException if any of those nodes is not valid
+     */
+    void exitScope() throws ValidationException;
+
 }

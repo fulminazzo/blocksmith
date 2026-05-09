@@ -49,34 +49,6 @@ public final class OrderValidator implements Validator, NodeScorer {
     }
 
     /**
-     * Enters a new computation scope.
-     * Scopes are completely independent of each other:
-     * updating a {@link #getLastScore()} will not affect the score of other scopes.
-     */
-    public void enterScope() {
-        scopes.push(new OrderScope());
-    }
-
-    /**
-     * Exits the current computation scope.
-     * <br>
-     * If any {@link DetailAST} has been recorded in the last scope through {@link #validateNode(DetailAST)},
-     * each group formed with the <b>same scores</b> will be passed through the next {@link Validator}.
-     *
-     * @throws ValidationException if any of those nodes is not valid
-     */
-    public void exitScope() throws ValidationException {
-        if (!scopes.isEmpty()) {
-            OrderScope scope = scopes.pop();
-            if (next == null) return;
-            for (int i = 0; i < getMaxScore(); i++) {
-                List<DetailAST> nodes = scope.getCommonScores(i);
-                for (DetailAST node : nodes) next.validateNode(node);
-            }
-        }
-    }
-
-    /**
      * Gets the maximum possible score.
      *
      * @return the max score
@@ -129,6 +101,23 @@ public final class OrderValidator implements Validator, NodeScorer {
     public @NotNull OrderValidator then(final @NotNull Validator validator) {
         this.next = validator;
         return this;
+    }
+
+    @Override
+    public void enterScope() {
+        scopes.push(new OrderScope());
+    }
+
+    @Override
+    public void exitScope() throws ValidationException {
+        if (!scopes.isEmpty()) {
+            OrderScope scope = scopes.pop();
+            if (next == null) return;
+            for (int i = 0; i < getMaxScore(); i++) {
+                List<DetailAST> nodes = scope.getCommonScores(i);
+                for (DetailAST node : nodes) next.validateNode(node);
+            }
+        }
     }
 
     @Override
