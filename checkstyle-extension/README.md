@@ -20,6 +20,7 @@ The configuration will provide some sets of rules:
     - **before** them, any getter and setter should be coupled (`setValue` after `getValue`, unless overloads);
     - **before** them, any other method.
 - finally, **classes and interfaces** should be declared in the following order:
-  - **visibility-ordering**: (check **fields**);
-  - interfaces **before** classes;
+  - **type ordering**: **interface**, **enum**, **record** and **class**;
+  - **static** types before **instance**;
+  - **visibility ordering**: (check **fields**);
   - each of the rules in this document will be applied recursively to classes and interfaces as well.
