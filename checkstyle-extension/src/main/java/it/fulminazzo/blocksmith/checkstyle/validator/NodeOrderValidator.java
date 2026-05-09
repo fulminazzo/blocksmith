@@ -114,7 +114,7 @@ public final class NodeOrderValidator implements NodeValidator, NodeScorer {
             int current = (score >> bits) & mask;
 
             if (current < last)
-                throw new ValidationException(scorer.getValidator(current).getErrorMessage());
+                throw new ValidationException(node, scorer.getValidator(current).getErrorMessage());
             else if (current > last) {
                 setLastScore(score);
                 break;

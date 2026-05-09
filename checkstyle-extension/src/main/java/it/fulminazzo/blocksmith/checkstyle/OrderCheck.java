@@ -50,7 +50,7 @@ abstract class OrderCheck extends AbstractCheck {
         try {
             validator.validateNode(node);
         } catch (ValidationException e) {
-            log(node, e.getMessage());
+            log(e.getNode(), e.getMessage());
         }
     }
 
@@ -80,7 +80,11 @@ abstract class OrderCheck extends AbstractCheck {
 
     @Override
     public void leaveToken(final @NotNull DetailAST ast) {
-        if (isScopeChanged(ast)) validator.exitScope();
+        try {
+            if (isScopeChanged(ast)) validator.exitScope();
+        } catch (ValidationException e) {
+            log(e.getNode(), e.getMessage());
+        }
     }
 
     /**
