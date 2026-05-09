@@ -100,16 +100,15 @@ class ExecutableTest extends Specification {
         parameter.primitive == expectedPrimitive
 
         where:
-        type                       || expectedPrimitive
-        TokenTypes.LITERAL_BYTE    || true
-        TokenTypes.LITERAL_SHORT   || true
-        TokenTypes.LITERAL_CHAR    || true
-        TokenTypes.LITERAL_INT     || true
-        TokenTypes.LITERAL_LONG    || true
-        TokenTypes.LITERAL_FLOAT   || true
-        TokenTypes.LITERAL_DOUBLE  || true
-        TokenTypes.LITERAL_BOOLEAN || true
-        TokenTypes.IDENT           || false
+        [type, expectedPrimitive] << [TokenTypes.LITERAL_BYTE,
+                                      TokenTypes.LITERAL_SHORT,
+                                      TokenTypes.LITERAL_CHAR,
+                                      TokenTypes.LITERAL_INT,
+                                      TokenTypes.LITERAL_LONG,
+                                      TokenTypes.LITERAL_FLOAT,
+                                      TokenTypes.LITERAL_DOUBLE,
+                                      TokenTypes.LITERAL_BOOLEAN]
+                .collect { [it, true] } + [[TokenTypes.IDENT, false]]
     }
 
     private DetailAST createParameterNode(final int type) {

@@ -6,7 +6,6 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck
 import com.puppycrawl.tools.checkstyle.api.AuditEvent
 import com.puppycrawl.tools.checkstyle.api.AuditListener
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.Criterion
-import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator
 
 import java.util.function.Function
 
@@ -48,29 +47,30 @@ final class FunctionalTestUtils {
         rootConfig.addChild(treeWalker)
 
         def checker = new Checker()
-        checker.setModuleClassLoader(Thread.currentThread().contextClassLoader)
+        checker.moduleClassLoader = Thread.currentThread().contextClassLoader
         checker.configure(rootConfig)
 
         def violations = []
         checker.addListener(new AuditListener() {
+
             @Override
             void auditStarted(final AuditEvent event) {
-
+                // mock listener for testing purposes
             }
 
             @Override
             void auditFinished(final AuditEvent event) {
-
+                // mock listener for testing purposes
             }
 
             @Override
             void fileStarted(final AuditEvent event) {
-
+                // mock listener for testing purposes
             }
 
             @Override
             void fileFinished(final AuditEvent event) {
-
+                // mock listener for testing purposes
             }
 
             @Override
@@ -80,10 +80,10 @@ final class FunctionalTestUtils {
 
             @Override
             void addException(final AuditEvent event, final Throwable throwable) {
-
+                // mock listener for testing purposes
             }
-        })
 
+        })
 
         def resourceName = "/${checkType.packageName.replace('.', '/')}/${inputFile}.java"
         def file = new File(checkType.getResource(resourceName).toURI())
@@ -103,7 +103,7 @@ final class FunctionalTestUtils {
     static String message(final String partialMessageCode) {
         return messages
                 .findAll { it.key.toString().contains(partialMessageCode) }
-                .collect { it.value }
+                *.value
                 .find()
     }
 

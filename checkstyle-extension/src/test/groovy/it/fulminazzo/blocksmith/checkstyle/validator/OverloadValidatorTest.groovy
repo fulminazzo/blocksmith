@@ -16,7 +16,7 @@ class OverloadValidatorTest extends Specification {
 
     private final OverloadValidator validator = new OverloadValidator()
 
-    private def executableMock = Mockito.mockStatic(Executable)
+    private final executableMock = Mockito.mockStatic(Executable)
 
     void setup() {
         executableMock.when { Executable.of(noParametersNode) }.thenReturn(NO_PARAMETERS)

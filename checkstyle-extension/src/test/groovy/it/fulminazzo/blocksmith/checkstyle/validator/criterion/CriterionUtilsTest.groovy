@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.checkstyle.validator.criterion
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST
 import com.puppycrawl.tools.checkstyle.api.TokenTypes
-import it.fulminazzo.blocksmith.checkstyle.validator.criterion.CriterionUtils
 import spock.lang.Specification
 
 class CriterionUtilsTest extends Specification {

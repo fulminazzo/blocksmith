@@ -1,11 +1,10 @@
 package it.fulminazzo.blocksmith.checkstyle
 
-import it.fulminazzo.blocksmith.checkstyle.validator.criterion.MutabilityCriterion
-import it.fulminazzo.blocksmith.checkstyle.validator.criterion.StaticCriterion
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.VisibilityCriterion
 import spock.lang.Specification
 
-import static it.fulminazzo.blocksmith.checkstyle.FunctionalTestUtils.*
+import static it.fulminazzo.blocksmith.checkstyle.FunctionalTestUtils.message
+import static it.fulminazzo.blocksmith.checkstyle.FunctionalTestUtils.runCheck
 
 class FieldsOrderCheckFunctionalTest extends Specification {
 

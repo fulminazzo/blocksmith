@@ -10,17 +10,17 @@ import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 class FieldsOrderCheckTest extends Specification {
+    private final DetailAST node = Mock(DetailAST)
+
     private OrderValidator validator
     private FieldsOrderCheck check
 
-    private DetailAST node = Mock(DetailAST)
-
     void setup() {
         check = Mock(FieldsOrderCheck)
-        check.setFileContents(new FileContents(new FileText(
+        check.fileContents = new FileContents(new FileText(
                 File.createTempFile('TestClass', 'java'),
                 ['class TestClass {}']
-        )))
+        ))
         check.visitToken(_) >> { callRealMethod() }
         check.leaveToken(_) >> { callRealMethod() }
         check.visitTokenImpl(_) >> { callRealMethod() }

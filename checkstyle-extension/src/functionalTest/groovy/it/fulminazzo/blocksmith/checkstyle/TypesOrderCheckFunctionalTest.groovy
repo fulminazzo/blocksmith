@@ -1,6 +1,5 @@
 package it.fulminazzo.blocksmith.checkstyle
 
-
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.TypeCriterion
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.VisibilityCriterion
 import spock.lang.Specification
@@ -177,7 +176,8 @@ class TypesOrderCheckFunctionalTest extends Specification {
         if (matcher) {
             def match = matcher[0]
             return "${match[1]}()${match[2]}"
-        } else return line
+        }
+        return line
     }
 
 }

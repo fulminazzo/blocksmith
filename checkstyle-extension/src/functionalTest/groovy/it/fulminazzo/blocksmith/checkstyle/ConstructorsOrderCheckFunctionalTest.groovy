@@ -66,9 +66,6 @@ class ConstructorsOrderCheckFunctionalTest extends Specification {
     }
 
     def 'test that valid overloads ordering does not throw'() {
-        given:
-        final msg = 'it.fulminazzo.blocksmith.checkstyle.overload'
-
         when:
         def violations = runCheck('ConstructorValidOverload', ConstructorsOrderCheck)
 
