@@ -39,14 +39,12 @@ public enum VisibilityCriterion implements Criterion {
         }
     },
     /**
-     * Package (not {@code public}, {@code protected} or {@code private}) criterion.
+     * Package (not {@link #PUBLIC}, {@link #PROTECTED} or {@link #PRIVATE}) criterion.
      */
     PACKAGE {
         @Override
         public boolean matches(final @NotNull DetailAST node) {
-            return !CriterionUtils.isModifierPresent(node, TokenTypes.LITERAL_PUBLIC)
-                    && !CriterionUtils.isModifierPresent(node, TokenTypes.LITERAL_PROTECTED)
-                    && !CriterionUtils.isModifierPresent(node, TokenTypes.LITERAL_PRIVATE);
+            return !PUBLIC.matches(node) && !PROTECTED.matches(node) && !PRIVATE.matches(node);
         }
 
         @Override

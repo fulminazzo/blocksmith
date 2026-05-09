@@ -30,9 +30,7 @@ public enum MethodTraitCriterion implements Criterion {
     CONCRETE {
         @Override
         public boolean matches(final @NotNull DetailAST node) {
-            return !CriterionUtils.isModifierPresent(node, TokenTypes.ABSTRACT)
-                    && !CriterionUtils.isAnnotatedWith(node, "Override")
-                    && !CriterionUtils.isModifierPresent(node, TokenTypes.LITERAL_STATIC);
+            return !ABSTRACT.matches(node) && !OVERRIDE.matches(node) && !STATIC.matches(node);
         }
 
         @Override
