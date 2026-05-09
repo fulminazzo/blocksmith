@@ -19,12 +19,10 @@ class FieldsOrderCheckTest extends Specification {
                 File.createTempFile('TestClass', 'java'),
                 ['class TestClass {}']
         )))
-        check.visitToken(_) >> {
-            callRealMethod()
-        }
-        check.leaveToken(_) >> {
-            callRealMethod()
-        }
+        check.visitToken(_) >> { callRealMethod() }
+        check.leaveToken(_) >> { callRealMethod() }
+        check.visitTokenImpl(_) >> { callRealMethod() }
+        check.validate(_) >> { callRealMethod() }
 
         def reflect = Reflect.on(check)
         validator = Mock(NodeValidator)

@@ -1,12 +1,13 @@
 package it.fulminazzo.blocksmith.checker;
 
-import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import it.fulminazzo.blocksmith.checker.validator.MutabilityValidator;
 import it.fulminazzo.blocksmith.checker.validator.StaticValidator;
 import it.fulminazzo.blocksmith.checker.validator.VisibilityValidator;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * Validates the order of fields in a class.
@@ -18,52 +19,27 @@ import org.jetbrains.annotations.NotNull;
  *     package-private and {@code private}.</li>
  * </ul>
  */
-public final class FieldsOrderCheck extends AbstractCheck {
-    private final @NotNull NodeValidator validator = new NodeValidator(
-            StaticValidator.values(),
-            MutabilityValidator.values(),
-            VisibilityValidator.values()
-    );
+public final class FieldsOrderCheck extends OrderCheck {
 
-    @Override
-    public int[] getDefaultTokens() {
-        return new int[]{
-                TokenTypes.VARIABLE_DEF,
-                TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF,
-                TokenTypes.ENUM_DEF, TokenTypes.RECORD_DEF
-        };
+    /**
+     * Instantiates a new Fields order check.
+     */
+    public FieldsOrderCheck() {
+        super(new NodeValidator(
+                StaticValidator.values(),
+                MutabilityValidator.values(),
+                VisibilityValidator.values()
+        ));
     }
 
     @Override
-    public int[] getAcceptableTokens() {
-        return getDefaultTokens();
+    protected @NotNull List<Integer> getTokens() {
+        return List.of(TokenTypes.VARIABLE_DEF);
     }
 
     @Override
-    public int[] getRequiredTokens() {
-        return getDefaultTokens();
-    }
-
-    @Override
-    public void visitToken(final @NotNull DetailAST ast) {
-        if (ast.getType() != TokenTypes.VARIABLE_DEF) {
-            // New type declaration
-            validator.enterScope();
-            return;
-        }
-        if (ast.getParent().getType() != TokenTypes.OBJBLOCK) return;
-
-        try {
-            validator.validateNode(ast);
-        } catch (ValidationException e) {
-            log(ast, e.getMessage());
-        }
-    }
-
-    @Override
-    public void leaveToken(final @NotNull DetailAST ast) {
-        if (ast.getType() != TokenTypes.VARIABLE_DEF)
-            validator.exitScope();
+    protected void visitTokenImpl(final @NotNull DetailAST ast) {
+        if (ast.getParent().getType() == TokenTypes.OBJBLOCK) validate(ast);
     }
 
 }
