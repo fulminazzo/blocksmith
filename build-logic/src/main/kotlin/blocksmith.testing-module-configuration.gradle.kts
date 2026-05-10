@@ -30,8 +30,9 @@ afterEvaluate {
                 testing {
                     suites {
                         withType<JvmTestSuite> {
+                            val projectPath = project.path
                             dependencies {
-                                if (project.path != testingModule.path)
+                                if (projectPath != testingModule.path)
                                     implementation(testingModule)
                             }
                         }
