@@ -18,10 +18,13 @@ The configuration will provide some sets of rules:
     - **overloads ordering**: method overloads should be grouped (meaning there should not be non-overloaded
       methods in between). Among that grouping, methods with fewer parameters should come first,
       methods with the same amount should prioritize **primitive parameters** over general types;
-    - **method naming ordering**:
-        - `equals`, `toString` and `hashCode` should come last (in the order they were presented);
-        - **before** them, any getter and setter should be coupled (`setValue` after `getValue`, unless overloads);
-        - **before** them, any other method.
+    - **method naming ordering**: based on the method name, the following rules should be applied:
+        - any other method not described in the following rules;
+        - `addAll`, `appendAll`, `putAll` and `removeAll`, `deleteAll` prefixed methods;
+        - `register` and `unregister` prefixed methods;
+        - `add`, `append`, `put` and `remove`, `delete` prefixed methods;
+        - `is`, `get` and `set` prefixed methods;
+        - `equals`, `toString` and `hashCode`.
 - finally, **classes and interfaces** should be declared in the following order:
     - **type ordering**: **interface**, **enum**, **record** and **class**;
     - **static** types before **instance**;
