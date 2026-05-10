@@ -85,7 +85,7 @@ final class FunctionalTestUtils {
 
         })
 
-        def resourceName = "/${checkType.packageName.replace('.', '/')}/${inputFile}.java"
+        def resourceName = "/${checkType.packageName.replace('.', '/')}/test/${inputFile}.java"
         def file = new File(checkType.getResource(resourceName).toURI())
         def original = file.readLines()
         def lines = file.readLines()
