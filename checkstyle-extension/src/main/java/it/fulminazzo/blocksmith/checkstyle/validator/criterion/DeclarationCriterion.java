@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.checkstyle.validator.criterion;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import it.fulminazzo.blocksmith.checkstyle.CheckUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +21,7 @@ public enum DeclarationCriterion implements Criterion {
     FIELD(TokenTypes.VARIABLE_DEF) {
         @Override
         public boolean matches(final @NotNull DetailAST node) {
-            return super.matches(node) && node.getParent().getType() == TokenTypes.OBJBLOCK;
+            return CheckUtils.isField(node);
         }
     },
     /**

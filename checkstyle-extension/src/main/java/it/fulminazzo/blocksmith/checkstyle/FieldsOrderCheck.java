@@ -40,7 +40,7 @@ public final class FieldsOrderCheck extends ValidatorCheck {
 
     @Override
     protected void visitTokenImpl(final @NotNull DetailAST ast) {
-        if (ast.getParent().getType() == TokenTypes.OBJBLOCK) validate(ast);
+        if (CheckUtils.isField(ast)) validate(ast);
     }
 
 }
