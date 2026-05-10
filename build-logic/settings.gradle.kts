@@ -13,3 +13,8 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "build-logic"
+
+// checkstyle extension module to apply our configurations
+include(
+    "checkstyle-extension"
+)

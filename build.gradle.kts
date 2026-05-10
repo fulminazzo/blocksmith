@@ -5,7 +5,6 @@ plugins {
     groovy
 
     `jacoco-report-aggregation`
-    checkstyle
     codenarc
 
     alias(libs.plugins.spotbugs)
@@ -14,6 +13,8 @@ plugins {
     id("blocksmith.java-configuration")
     id("blocksmith.tests-configuration")
     id("blocksmith.testing-module-configuration")
+
+    id("blocksmith.checkstyle-convention")
 }
 
 group = "it.fulminazzo"
@@ -26,7 +27,6 @@ allprojects {
     apply { plugin("groovy") }
 
     apply { plugin("jacoco") }
-    apply { plugin("checkstyle") }
     apply { plugin("codenarc") }
 
     apply { plugin(rootProject.libs.plugins.spotbugs.get().pluginId) }
@@ -35,6 +35,8 @@ allprojects {
     apply { plugin("blocksmith.java-configuration") }
     apply { plugin("blocksmith.tests-configuration") }
     apply { plugin("blocksmith.testing-module-configuration") }
+
+    apply { plugin("blocksmith.checkstyle-convention") }
 
     extra["baseModuleName"] = "base"
     extra["testingModuleName"] = "testing"
@@ -62,6 +64,8 @@ allprojects {
                     rootProject.libs.bundles.annotations.get().forEach { implementation(it) }
                     annotationProcessor(rootProject.libs.lombok.get())
 
+                    implementation(libs.mockito)
+
                     implementation(rootProject.projects.base.testing)
                 }
                 targets {
@@ -78,7 +82,9 @@ allprojects {
         }
     }
 
-    tasks.withType<JacocoReport>().configureEach {
+    tasks.jacocoTestReport {
+        dependsOn(tasks.withType<Test>())
+
         classDirectories.setFrom(
             files(classDirectories.files.map {
                 fileTree(it) {
@@ -86,19 +92,33 @@ allprojects {
                 }
             })
         )
+
+        executionData.setFrom(
+            fileTree(layout.buildDirectory).include("jacoco/*.exec")
+        )
     }
 
-    checkstyle {
-        configFile = rootProject.file("config/checkstyle/checkstyle.xml")
-        maxErrors = 0
-        maxWarnings = 0
-        toolVersion = rootProject.libs.versions.checkstyle.get()
-    }
+    tasks.jacocoTestCoverageVerification {
+        dependsOn(tasks.withType<Test>())
 
-    tasks.withType<Checkstyle> {
-        reports {
-            xml.required = true
-            html.required = true
+        executionData.setFrom(
+            fileTree(layout.buildDirectory).include("jacoco/*.exec")
+        )
+
+        violationRules {
+            rule {
+                excludes = listOf("**/$projectInfoClassName**")
+                limit {
+                    counter = "INSTRUCTION"
+                    value = "COVEREDRATIO"
+                    minimum = "0.97".toBigDecimal()
+                }
+                limit {
+                    counter = "BRANCH"
+                    value = "COVEREDRATIO"
+                    minimum = "0.95".toBigDecimal()
+                }
+            }
         }
     }
 
@@ -118,7 +138,19 @@ allprojects {
     }
 
     spotbugs {
+        excludeFilter = rootProject.file("config/spotbugs/exclusions.xml")
         toolVersion = rootProject.libs.versions.spotbugs.version.get()
+    }
+
+    tasks.withType<com.github.spotbugs.snom.SpotBugsTask> {
+        reports {
+            create("xml") {
+                required.set(true)
+            }
+            create("html") {
+                required.set(true)
+            }
+        }
     }
 
     configure<com.github.gmazzo.buildconfig.BuildConfigExtension> {
@@ -131,6 +163,10 @@ allprojects {
         buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
         buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
         buildConfigField("String", "MODULE_NAME", "\"${projectName}\"")
+    }
+
+    tasks.check {
+        dependsOn(tasks.jacocoTestCoverageVerification)
     }
 
 }
