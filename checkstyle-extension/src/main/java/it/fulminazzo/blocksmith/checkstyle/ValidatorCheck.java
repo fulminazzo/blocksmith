@@ -54,7 +54,7 @@ abstract class ValidatorCheck extends AbstractCheck {
         try {
             validator.validateNode(node);
         } catch (ValidationException e) {
-            log(e.getNode(), e.getMessage());
+            log(e.getNode(), e.getMessage(), e.getArguments());
         }
     }
 
