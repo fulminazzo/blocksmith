@@ -19,8 +19,8 @@
 <module name="Checker">
 
     <!-- ALESSANDRO START -->
-    <module name="SuppressionFilter">
-        <property name="file" value="${config_loc}/suppressions.xml" />
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="ProjectInfo\.java$" />
     </module>
     <!-- ALESSANDRO END -->
 
