@@ -98,7 +98,7 @@ abstract class ValidatorCheck extends AbstractCheck {
         try {
             if (isScopeChanged(ast)) getValidator().exitScope();
         } catch (CompositeValidationException c) {
-            c.getExceptions().forEach(e -> log(e.getNode(), e.getMessage()));
+            c.getExceptions().forEach(e -> log(e.getNode(), e.getMessage(), e.getArguments()));
         }
     }
 
