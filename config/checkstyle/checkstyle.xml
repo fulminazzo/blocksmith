@@ -20,7 +20,18 @@
 
     <!-- ALESSANDRO START -->
     <module name="BeforeExecutionExclusionFileFilter">
-        <property name="fileNamePattern" value="ProjectInfo\.java$" />
+        <property name="fileNamePattern" value="ProjectInfo\.java$"/>
+    </module>
+    <!-- ALESSANDRO END -->
+
+    <!-- ALESSANDRO START -->
+    <module name="TreeWalker">
+        <module name="it.fulminazzo.blocksmith.checkstyle.DeclarationOrderCheck"/>
+        <module name="it.fulminazzo.blocksmith.checkstyle.AnnotationsOrderCheck"/>
+        <module name="it.fulminazzo.blocksmith.checkstyle.FieldsOrderCheck"/>
+        <module name="it.fulminazzo.blocksmith.checkstyle.ConstructorsOrderCheck"/>
+        <module name="it.fulminazzo.blocksmith.checkstyle.MethodsOrderCheck"/>
+        <module name="it.fulminazzo.blocksmith.checkstyle.TypesOrderCheck"/>
     </module>
     <!-- ALESSANDRO END -->
 
@@ -40,7 +51,7 @@
     <!-- https://checkstyle.org/filters/suppressionfilter.html -->
     <module name="SuppressionFilter">
         <property name="file" value="${org.checkstyle.google.suppressionfilter.config}"
-                  default="checkstyle-suppressions.xml" />
+                  default="checkstyle-suppressions.xml"/>
         <property name="optional" value="true"/>
     </module>
 
