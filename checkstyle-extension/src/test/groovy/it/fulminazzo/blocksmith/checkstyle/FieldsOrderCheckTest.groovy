@@ -25,6 +25,7 @@ class FieldsOrderCheckTest extends Specification {
         check.leaveToken(_) >> { callRealMethod() }
         check.visitTokenImpl(_) >> { callRealMethod() }
         check.validate(_) >> { callRealMethod() }
+        check.isScopeChanged(_) >> { callRealMethod() }
         check.getValidator() >> { return validator }
 
         def reflect = Reflect.on(check)
