@@ -122,90 +122,6 @@ public final class ReflectUtils {
         return scoreTypeMatching(source, target).isPresent();
     }
 
-    private static @NotNull OptionalInt scoreTypeMatching(final @NotNull Type source, final @NotNull Type target) {
-        final Class<?> sourceClass = toWrapper(toClass(source));
-        if (target instanceof Class<?>) {
-            Class<?> targetClass = toWrapper((Class<?>) target);
-            if (targetClass.isAssignableFrom(sourceClass))
-                return OptionalInt.of(-hierarchyDistance(sourceClass, targetClass));
-            else return OptionalInt.empty();
-        } else if (target instanceof ParameterizedType) {
-            ParameterizedType targetParameterizedType = (ParameterizedType) target;
-            if (!(source instanceof ParameterizedType))
-                return scoreTypeMatching(source, targetParameterizedType.getRawType());
-            ParameterizedType sourceParameterizedType = (ParameterizedType) source;
-            OptionalInt score = scoreTypeMatching(sourceParameterizedType.getRawType(), targetParameterizedType.getRawType());
-            if (score.isEmpty()) return score;
-            int s = score.getAsInt();
-            Type[] sourceActualTypeArguments = sourceParameterizedType.getActualTypeArguments();
-            Type[] targetActualTypeArguments = targetParameterizedType.getActualTypeArguments();
-            for (int i = 0; i < sourceActualTypeArguments.length; i++) {
-                score = scoreTypeMatching(sourceActualTypeArguments[i], targetActualTypeArguments[i]);
-                if (score.isEmpty()) return score;
-                s += score.getAsInt();
-            }
-            return OptionalInt.of(s);
-        } else if (target instanceof TypeVariable<?>) {
-            TypeVariable<?> targetTypeVariable = (TypeVariable<?>) target;
-            return aggregateScore(source, targetTypeVariable.getBounds());
-        } else if (target instanceof GenericArrayType) {
-            GenericArrayType targetGenericArrayType = (GenericArrayType) target;
-            if (!sourceClass.isArray()) return OptionalInt.empty();
-            Type targetComponentType = targetGenericArrayType.getGenericComponentType();
-            Type sourceComponentType = sourceClass.getComponentType();
-            return scoreTypeMatching(sourceComponentType, targetComponentType);
-        } else if (target instanceof WildcardType) {
-            WildcardType targetWildcardType = (WildcardType) target;
-            OptionalInt upper = aggregateScore(source, targetWildcardType.getUpperBounds());
-            if (upper.isEmpty()) return upper;
-            int score = upper.getAsInt();
-            for (Type b : targetWildcardType.getLowerBounds()) {
-                OptionalInt s = scoreTypeMatching(b, source);
-                if (s.isEmpty()) return s;
-                score += s.getAsInt();
-            }
-            return OptionalInt.of(score);
-        } else return OptionalInt.empty();
-    }
-
-    private static @NotNull OptionalInt aggregateScore(
-            final @NotNull Type source,
-            final @NotNull Type @NotNull [] bounds
-    ) {
-        int score = 0;
-        for (Type b : bounds) {
-            OptionalInt opt = scoreTypeMatching(source, b);
-            if (opt.isEmpty()) return opt;
-            else score += opt.getAsInt();
-        }
-        return OptionalInt.of(score);
-    }
-
-    private static int hierarchyDistance(final @NotNull Class<?> source, final @NotNull Class<?> target) {
-        if (source.equals(target)) return 0;
-        Queue<Class<?>> queue = new LinkedList<>();
-        Map<Class<?>, Integer> distances = new HashMap<>();
-        queue.add(source);
-        distances.put(source, 0);
-        while (!queue.isEmpty()) {
-            Class<?> current = queue.poll();
-            int distance = distances.get(current);
-
-            List<Class<?>> parents = new ArrayList<>();
-            Class<?> superClass = current.getSuperclass();
-            if (superClass != null) parents.add(superClass);
-            parents.addAll(Arrays.asList(current.getInterfaces()));
-            for (Class<?> p : parents)
-                if (!distances.containsKey(p)) {
-                    int d = distance + 1;
-                    if (p.equals(target)) return d;
-                    distances.put(p, d);
-                    queue.add(p);
-                }
-        }
-        return Integer.MAX_VALUE; // fallback value in case of target = Object and source = Interface
-    }
-
     /**
      * Regroups the given values to create an array that matches the expected parameter types.
      *
@@ -301,6 +217,93 @@ public final class ReflectUtils {
         }
         if (given.length != parameters.length) return OptionalInt.empty();
         else return OptionalInt.of(total);
+    }
+
+    private static @NotNull OptionalInt scoreTypeMatching(final @NotNull Type source, final @NotNull Type target) {
+        final Class<?> sourceClass = toWrapper(toClass(source));
+        if (target instanceof Class<?>) {
+            Class<?> targetClass = toWrapper((Class<?>) target);
+            if (targetClass.isAssignableFrom(sourceClass))
+                return OptionalInt.of(-hierarchyDistance(sourceClass, targetClass));
+            else return OptionalInt.empty();
+        } else if (target instanceof ParameterizedType) {
+            ParameterizedType targetParameterizedType = (ParameterizedType) target;
+            if (!(source instanceof ParameterizedType))
+                return scoreTypeMatching(source, targetParameterizedType.getRawType());
+            ParameterizedType sourceParameterizedType = (ParameterizedType) source;
+            OptionalInt score = scoreTypeMatching(
+                    sourceParameterizedType.getRawType(),
+                    targetParameterizedType.getRawType()
+            );
+            if (score.isEmpty()) return score;
+            int s = score.getAsInt();
+            Type[] sourceActualTypeArguments = sourceParameterizedType.getActualTypeArguments();
+            Type[] targetActualTypeArguments = targetParameterizedType.getActualTypeArguments();
+            for (int i = 0; i < sourceActualTypeArguments.length; i++) {
+                score = scoreTypeMatching(sourceActualTypeArguments[i], targetActualTypeArguments[i]);
+                if (score.isEmpty()) return score;
+                s += score.getAsInt();
+            }
+            return OptionalInt.of(s);
+        } else if (target instanceof TypeVariable<?>) {
+            TypeVariable<?> targetTypeVariable = (TypeVariable<?>) target;
+            return aggregateScore(source, targetTypeVariable.getBounds());
+        } else if (target instanceof GenericArrayType) {
+            GenericArrayType targetGenericArrayType = (GenericArrayType) target;
+            if (!sourceClass.isArray()) return OptionalInt.empty();
+            Type targetComponentType = targetGenericArrayType.getGenericComponentType();
+            Type sourceComponentType = sourceClass.getComponentType();
+            return scoreTypeMatching(sourceComponentType, targetComponentType);
+        } else if (target instanceof WildcardType) {
+            WildcardType targetWildcardType = (WildcardType) target;
+            OptionalInt upper = aggregateScore(source, targetWildcardType.getUpperBounds());
+            if (upper.isEmpty()) return upper;
+            int score = upper.getAsInt();
+            for (Type b : targetWildcardType.getLowerBounds()) {
+                OptionalInt s = scoreTypeMatching(b, source);
+                if (s.isEmpty()) return s;
+                score += s.getAsInt();
+            }
+            return OptionalInt.of(score);
+        } else return OptionalInt.empty();
+    }
+
+    private static @NotNull OptionalInt aggregateScore(
+            final @NotNull Type source,
+            final @NotNull Type @NotNull [] bounds
+    ) {
+        int score = 0;
+        for (Type b : bounds) {
+            OptionalInt opt = scoreTypeMatching(source, b);
+            if (opt.isEmpty()) return opt;
+            else score += opt.getAsInt();
+        }
+        return OptionalInt.of(score);
+    }
+
+    private static int hierarchyDistance(final @NotNull Class<?> source, final @NotNull Class<?> target) {
+        if (source.equals(target)) return 0;
+        Queue<Class<?>> queue = new LinkedList<>();
+        Map<Class<?>, Integer> distances = new HashMap<>();
+        queue.add(source);
+        distances.put(source, 0);
+        while (!queue.isEmpty()) {
+            Class<?> current = queue.poll();
+            int distance = distances.get(current);
+
+            List<Class<?>> parents = new ArrayList<>();
+            Class<?> superClass = current.getSuperclass();
+            if (superClass != null) parents.add(superClass);
+            parents.addAll(Arrays.asList(current.getInterfaces()));
+            for (Class<?> p : parents)
+                if (!distances.containsKey(p)) {
+                    int d = distance + 1;
+                    if (p.equals(target)) return d;
+                    distances.put(p, d);
+                    queue.add(p);
+                }
+        }
+        return Integer.MAX_VALUE; // fallback value in case of target = Object and source = Interface
     }
 
 }

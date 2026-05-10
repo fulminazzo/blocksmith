@@ -48,81 +48,6 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
     }
 
     @Override
-    public @Nullable Duration getTtl(final @Nullable E element) {
-        int index = indexOf(element);
-        ExpiringEntry<E> entry = index == -1 ? null : getExpiring(index);
-        return entry == null ? null : Duration.ofMillis(entry.getExpireTime() - now());
-    }
-
-    @Override
-    @NotNull Collection<ExpiringEntry<E>> expiringEntries() {
-        return delegate;
-    }
-
-    @Override
-    public boolean add(final @Nullable E element, final long ttl) {
-        return delegate.add(new ExpiringEntry<>(element, ttl));
-    }
-
-    @Override
-    public void add(final int index, final @Nullable E element, final @NotNull Duration ttl) {
-        add(index, element, ttl.toMillis());
-    }
-
-    @Override
-    public void add(final int index, final @Nullable E element) {
-        add(index, element, ExpiringEntry.NEVER_EXPIRE);
-    }
-
-    @Override
-    public boolean addAll(final int index, final @NotNull ExpiringCollection<? extends E> collection) {
-        return addAllHelper(index, collection);
-    }
-
-    @Override
-    public boolean addAll(
-            final int index,
-            final @NotNull Collection<? extends E> collection,
-            final @NotNull Duration ttl
-    ) {
-        return addAll(index, collection, ttl.toMillis());
-    }
-
-    @Override
-    public boolean addAll(int index, final @NotNull Collection<? extends E> collection, final long ttl) {
-        boolean added = false;
-        for (E e : collection) {
-            add(index++, e, ttl);
-            added = true;
-        }
-        return added;
-    }
-
-    @Override
-    public boolean addAll(int index, final @NotNull Collection<? extends E> collection) {
-        if (collection instanceof ExpiringCollection<?>)
-            return addAll(index, (ExpiringCollection<? extends E>) collection);
-        else {
-            boolean added = false;
-            for (E e : collection) {
-                add(index++, e);
-                added = true;
-            }
-            return added;
-        }
-    }
-
-    @Override
-    public E set(final int index, final @Nullable E element, final @NotNull Duration ttl) {
-        return set(index, element, ttl.toMillis());
-    }
-
-    @Override
-    public E set(final int index, final @Nullable E element) {
-        return set(index, element, ExpiringEntry.NEVER_EXPIRE);
-    }
-
-    @Override
     public void clear() {
         delegate.clear();
     }
@@ -177,6 +102,81 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
         if (ts.length > elements.length)
             ts[elements.length] = null;
         return ts;
+    }
+
+    @Override
+    public boolean addAll(final int index, final @NotNull ExpiringCollection<? extends E> collection) {
+        return addAllHelper(index, collection);
+    }
+
+    @Override
+    public boolean addAll(int index, final @NotNull Collection<? extends E> collection) {
+        if (collection instanceof ExpiringCollection<?>)
+            return addAll(index, (ExpiringCollection<? extends E>) collection);
+        else {
+            boolean added = false;
+            for (E e : collection) {
+                add(index++, e);
+                added = true;
+            }
+            return added;
+        }
+    }
+
+    @Override
+    public boolean addAll(int index, final @NotNull Collection<? extends E> collection, final long ttl) {
+        boolean added = false;
+        for (E e : collection) {
+            add(index++, e, ttl);
+            added = true;
+        }
+        return added;
+    }
+
+    @Override
+    public boolean addAll(
+            final int index,
+            final @NotNull Collection<? extends E> collection,
+            final @NotNull Duration ttl
+    ) {
+        return addAll(index, collection, ttl.toMillis());
+    }
+
+    @Override
+    public void add(final int index, final @Nullable E element) {
+        add(index, element, ExpiringEntry.NEVER_EXPIRE);
+    }
+
+    @Override
+    public boolean add(final @Nullable E element, final long ttl) {
+        return delegate.add(new ExpiringEntry<>(element, ttl));
+    }
+
+    @Override
+    public void add(final int index, final @Nullable E element, final @NotNull Duration ttl) {
+        add(index, element, ttl.toMillis());
+    }
+
+    @Override
+    public @Nullable Duration getTtl(final @Nullable E element) {
+        int index = indexOf(element);
+        ExpiringEntry<E> entry = index == -1 ? null : getExpiring(index);
+        return entry == null ? null : Duration.ofMillis(entry.getExpireTime() - now());
+    }
+
+    @Override
+    public E set(final int index, final @Nullable E element) {
+        return set(index, element, ExpiringEntry.NEVER_EXPIRE);
+    }
+
+    @Override
+    public E set(final int index, final @Nullable E element, final @NotNull Duration ttl) {
+        return set(index, element, ttl.toMillis());
+    }
+
+    @Override
+    @NotNull Collection<ExpiringEntry<E>> expiringEntries() {
+        return delegate;
     }
 
     /**

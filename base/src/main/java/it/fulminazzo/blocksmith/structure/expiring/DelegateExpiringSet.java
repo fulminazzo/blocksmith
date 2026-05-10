@@ -23,23 +23,8 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
     private final AbstractExpiringMap<E, Object> delegate;
 
     @Override
-    public boolean add(final @Nullable E element, final long ttl) {
-        return delegate.put(element, PRESENT, ttl) == null;
-    }
-
-    @Override
-    public boolean remove(final @Nullable Object object) {
-        return delegate.remove(object) != null;
-    }
-
-    @Override
     public boolean containsAll(final @NotNull Collection<?> collection) {
         return delegate.keySet().containsAll(collection);
-    }
-
-    @Override
-    public @Nullable Duration getTtl(final @Nullable E element) {
-        return delegate.getTtl(element);
     }
 
     @Override
@@ -50,11 +35,6 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
     @Override
     public int size() {
         return delegate.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return delegate.isEmpty();
     }
 
     @Override
@@ -75,6 +55,26 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
     @Override
     public @NotNull <T> T @NotNull [] toArray(final @NotNull T @NotNull [] ts) {
         return delegate.keySet().toArray(ts);
+    }
+
+    @Override
+    public boolean add(final @Nullable E element, final long ttl) {
+        return delegate.put(element, PRESENT, ttl) == null;
+    }
+
+    @Override
+    public boolean remove(final @Nullable Object object) {
+        return delegate.remove(object) != null;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return delegate.isEmpty();
+    }
+
+    @Override
+    public @Nullable Duration getTtl(final @Nullable E element) {
+        return delegate.getTtl(element);
     }
 
     @Override

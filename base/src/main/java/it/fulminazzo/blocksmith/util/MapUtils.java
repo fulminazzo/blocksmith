@@ -67,16 +67,6 @@ public final class MapUtils {
         return stringified;
     }
 
-    private static @NotNull String stringifyValue(final @NotNull Object value) {
-        if (value instanceof Collection<?>) {
-            Collection<?> collection = (Collection<?>) value;
-            return collection.stream()
-                    .filter(Objects::nonNull)
-                    .map(MapUtils::stringifyValue)
-                    .collect(Collectors.joining("\n"));
-        } else return value.toString();
-    }
-
     /**
      * Flattens a nested {@link Map} into a single-level map using dot-notation keys.
      * Keys <b>must not</b> be {@code null}.
@@ -199,6 +189,21 @@ public final class MapUtils {
     }
 
     /**
+     * Converts the given map to a map of {@link String} as keys.
+     * Keys that are {@code null} are ignored.
+     *
+     * @param map the map
+     * @return the converted map
+     */
+    public static @NotNull Map<@NotNull String, @Nullable Object> toStringKeyMap(final @NotNull Map<?, ?> map) {
+        final Map<String, Object> stringKeyMap = new HashMap<>();
+        map.forEach((k, v) -> {
+            if (k != null) stringKeyMap.put(k.toString(), v);
+        });
+        return stringKeyMap;
+    }
+
+    /**
      * Each element of the collection is put in the map in the format
      * {@code <keyPrefix>[<index>]} where {@code <index>}
      * is the index of the element.
@@ -246,19 +251,14 @@ public final class MapUtils {
         } else return object;
     }
 
-    /**
-     * Converts the given map to a map of {@link String} as keys.
-     * Keys that are {@code null} are ignored.
-     *
-     * @param map the map
-     * @return the converted map
-     */
-    public static @NotNull Map<@NotNull String, @Nullable Object> toStringKeyMap(final @NotNull Map<?, ?> map) {
-        final Map<String, Object> stringKeyMap = new HashMap<>();
-        map.forEach((k, v) -> {
-            if (k != null) stringKeyMap.put(k.toString(), v);
-        });
-        return stringKeyMap;
+    private static @NotNull String stringifyValue(final @NotNull Object value) {
+        if (value instanceof Collection<?>) {
+            Collection<?> collection = (Collection<?>) value;
+            return collection.stream()
+                    .filter(Objects::nonNull)
+                    .map(MapUtils::stringifyValue)
+                    .collect(Collectors.joining("\n"));
+        } else return value.toString();
     }
 
 }

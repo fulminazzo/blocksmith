@@ -18,33 +18,6 @@ import java.util.stream.Collectors;
 final class PassiveExpiringList<E> extends AbstractExpiringList<E> {
 
     @Override
-    @NotNull ExpiringEntry<E> getExpiring(final int index) {
-        return delegate.get(index);
-    }
-
-    @Override
-    public void add(final int index, final @Nullable E element, final long ttl) {
-        delegate.add(index, new ExpiringEntry<>(element, ttl));
-    }
-
-    @Override
-    public E set(final int index, final @Nullable E element, final long ttl) {
-        return delegate.set(index, new ExpiringEntry<>(element, ttl)).getValue();
-    }
-
-    @Override
-    public E get(final int index) {
-        return getExpiring(index).getValue();
-    }
-
-    @Override
-    public E remove(final int index) {
-        ExpiringEntry<E> entry = getExpiring(index);
-        delegate.remove(index);
-        return entry.getValue();
-    }
-
-    @Override
     public @NotNull ExpiringList<E> subList(final int fromIndex, final int toIndex) {
         PassiveExpiringList<E> sub = new PassiveExpiringList<>();
         sub.delegate.addAll(delegate.subList(fromIndex, toIndex));
@@ -57,18 +30,8 @@ final class PassiveExpiringList<E> extends AbstractExpiringList<E> {
     }
 
     @Override
-    public boolean isEmpty() {
-        return delegate.isEmpty();
-    }
-
-    @Override
     public boolean contains(final Object o) {
         return delegate.stream().anyMatch(e -> Objects.equals(e.getValue(), o));
-    }
-
-    @Override
-    public boolean remove(final Object o) {
-        return delegate.removeIf(e -> Objects.equals(e.getValue(), o));
     }
 
     @Override
@@ -85,6 +48,43 @@ final class PassiveExpiringList<E> extends AbstractExpiringList<E> {
                 .map(ExpiringEntry::getValue)
                 .collect(Collectors.toList())
                 .listIterator();
+    }
+
+    @Override
+    public void add(final int index, final @Nullable E element, final long ttl) {
+        delegate.add(index, new ExpiringEntry<>(element, ttl));
+    }
+
+    @Override
+    public E remove(final int index) {
+        ExpiringEntry<E> entry = getExpiring(index);
+        delegate.remove(index);
+        return entry.getValue();
+    }
+
+    @Override
+    public boolean remove(final Object o) {
+        return delegate.removeIf(e -> Objects.equals(e.getValue(), o));
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return delegate.isEmpty();
+    }
+
+    @Override
+    public E get(final int index) {
+        return getExpiring(index).getValue();
+    }
+
+    @Override
+    public E set(final int index, final @Nullable E element, final long ttl) {
+        return delegate.set(index, new ExpiringEntry<>(element, ttl)).getValue();
+    }
+
+    @Override
+    @NotNull ExpiringEntry<E> getExpiring(final int index) {
+        return delegate.get(index);
     }
 
 }

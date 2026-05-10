@@ -26,22 +26,14 @@ final class ScheduledExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
      * @param scheduler    the scheduler to run the internal clearing task
      * @param taskInterval how much time to wait before attempting to clear the cache
      */
-    public ScheduledExpiringMap(final @NotNull ScheduledExecutorService scheduler,
-                                final @NotNull Duration taskInterval) {
+    public ScheduledExpiringMap(
+            final @NotNull ScheduledExecutorService scheduler,
+            final @NotNull Duration taskInterval
+    ) {
         long millis = taskInterval.toMillis();
         if (millis <= 0)
             throw new IllegalArgumentException("task interval must be greater than 0");
         scheduler.scheduleAtFixedRate(this::clearExpired, millis, millis, TimeUnit.MILLISECONDS);
-    }
-
-    @Override
-    protected @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
-        ExpiringEntry<V> entry = delegate.get(key);
-        if (entry == null) return null;
-        else if (entry.isExpired()) {
-            delegate.remove(key);
-            return null;
-        } else return entry;
     }
 
     @Override
@@ -50,25 +42,8 @@ final class ScheduledExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
     }
 
     @Override
-    public boolean isEmpty() {
-        return delegate.isEmpty();
-    }
-
-    @Override
     public boolean containsKey(final Object key) {
         return getExpiring(key) != null;
-    }
-
-    @Override
-    public V get(final Object key) {
-        ExpiringEntry<V> entry = getExpiring(key);
-        return entry == null ? null : entry.getValue();
-    }
-
-    @Override
-    public V remove(final Object key) {
-        ExpiringEntry<V> entry = delegate.remove(key);
-        return entry == null || entry.isExpired() ? null : entry.getValue();
     }
 
     @Override
@@ -85,6 +60,33 @@ final class ScheduledExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
                 .filter(e -> !e.isExpired())
                 .map(ExpiringEntry::getValue)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public V remove(final Object key) {
+        ExpiringEntry<V> entry = delegate.remove(key);
+        return entry == null || entry.isExpired() ? null : entry.getValue();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return delegate.isEmpty();
+    }
+
+    @Override
+    public V get(final Object key) {
+        ExpiringEntry<V> entry = getExpiring(key);
+        return entry == null ? null : entry.getValue();
+    }
+
+    @Override
+    protected @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
+        ExpiringEntry<V> entry = delegate.get(key);
+        if (entry == null) return null;
+        else if (entry.isExpired()) {
+            delegate.remove(key);
+            return null;
+        } else return entry;
     }
 
 }

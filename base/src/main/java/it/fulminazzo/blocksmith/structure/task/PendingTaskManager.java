@@ -18,32 +18,6 @@ public final class PendingTaskManager<E> {
     private final @NotNull ExpiringMap<E, Runnable> tasks = ExpiringMap.passive();
 
     /**
-     * Registers a new pending task with the given entity as owner.
-     *
-     * @param entity  the entity
-     * @param timeout the timeout upon which the task will be considered as expired
-     * @param task    the task
-     */
-    public void register(final @NotNull E entity, final @NotNull Duration timeout, final @NotNull Runnable task) {
-        register(entity, timeout.toMillis(), task);
-    }
-
-    /**
-     * Registers a new pending task with the given entity as owner.
-     *
-     * @param entity  the entity
-     * @param timeout the timeout in milliseconds upon which the task will be considered as expired
-     * @param task    the task
-     */
-    public void register(
-            final @NotNull E entity,
-            final @Range(from = 1, to = Long.MAX_VALUE) long timeout,
-            final @NotNull Runnable task
-    ) {
-        tasks.put(entity, task, timeout);
-    }
-
-    /**
      * Executes the pending task for the given entity.
      *
      * @param entity the owner of the task
@@ -66,6 +40,32 @@ public final class PendingTaskManager<E> {
     public @NotNull Result cancel(final @NotNull E entity) {
         return fetchTask(entity, r -> {
         });
+    }
+
+    /**
+     * Registers a new pending task with the given entity as owner.
+     *
+     * @param entity  the entity
+     * @param timeout the timeout in milliseconds upon which the task will be considered as expired
+     * @param task    the task
+     */
+    public void register(
+            final @NotNull E entity,
+            final @Range(from = 1, to = Long.MAX_VALUE) long timeout,
+            final @NotNull Runnable task
+    ) {
+        tasks.put(entity, task, timeout);
+    }
+
+    /**
+     * Registers a new pending task with the given entity as owner.
+     *
+     * @param entity  the entity
+     * @param timeout the timeout upon which the task will be considered as expired
+     * @param task    the task
+     */
+    public void register(final @NotNull E entity, final @NotNull Duration timeout, final @NotNull Runnable task) {
+        register(entity, timeout.toMillis(), task);
     }
 
     /**

@@ -34,30 +34,19 @@ abstract class AbstractExpiringCollection<E> implements ExpiringCollection<E> {
     }
 
     @Override
-    public boolean add(final @Nullable E element, final @NotNull Duration ttl) {
-        return add(element, ttl.toMillis());
-    }
-
-    @Override
-    public boolean add(final @Nullable E element) {
-        return add(element, ExpiringEntry.NEVER_EXPIRE);
+    public boolean retainAll(final @NotNull Collection<?> collection) {
+        boolean modified = false;
+        for (E element : this)
+            if (!collection.contains(element)) {
+                remove(element);
+                modified = true;
+            }
+        return modified;
     }
 
     @Override
     public boolean addAll(final @NotNull ExpiringCollection<? extends E> collection) {
         return addAllHelper(collection);
-    }
-
-    @Override
-    public boolean addAll(final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl) {
-        return addAll(collection, ttl.toMillis());
-    }
-
-    @Override
-    public boolean addAll(final @NotNull Collection<? extends E> collection, final long ttl) {
-        boolean added = false;
-        for (E e : collection) added |= add(e, ttl);
-        return added;
     }
 
     @Override
@@ -71,14 +60,15 @@ abstract class AbstractExpiringCollection<E> implements ExpiringCollection<E> {
     }
 
     @Override
-    public boolean retainAll(final @NotNull Collection<?> collection) {
-        boolean modified = false;
-        for (E element : this)
-            if (!collection.contains(element)) {
-                remove(element);
-                modified = true;
-            }
-        return modified;
+    public boolean addAll(final @NotNull Collection<? extends E> collection, final long ttl) {
+        boolean added = false;
+        for (E e : collection) added |= add(e, ttl);
+        return added;
+    }
+
+    @Override
+    public boolean addAll(final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl) {
+        return addAll(collection, ttl.toMillis());
     }
 
     @Override
@@ -86,6 +76,16 @@ abstract class AbstractExpiringCollection<E> implements ExpiringCollection<E> {
         boolean removed = false;
         for (Object o : collection) removed |= remove(o);
         return removed;
+    }
+
+    @Override
+    public boolean add(final @Nullable E element) {
+        return add(element, ExpiringEntry.NEVER_EXPIRE);
+    }
+
+    @Override
+    public boolean add(final @Nullable E element, final @NotNull Duration ttl) {
+        return add(element, ttl.toMillis());
     }
 
     @Override

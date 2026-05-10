@@ -19,6 +19,22 @@ public final class CooldownManager<E> implements ICooldownManager<E> {
     private final @NotNull ExpiringMap<E, Boolean> expirations = ExpiringMap.lazy();
 
     /**
+     * Puts the entity on cooldown for the given duration in milliseconds.
+     *
+     * @param entity   the entity
+     * @param cooldown the duration of the cooldown in milliseconds
+     * @return this object (for method chaining)
+     */
+    public @NotNull CooldownManager<E> put(
+            final @NotNull E entity,
+            final @Range(from = 1, to = Long.MAX_VALUE) long cooldown
+    ) {
+        if (cooldown <= 0) throw new IllegalArgumentException("cooldown must be positive");
+        expirations.put(entity, true, cooldown);
+        return this;
+    }
+
+    /**
      * Puts the entity on cooldown for the given duration.
      *
      * @param entity   the entity
@@ -29,19 +45,9 @@ public final class CooldownManager<E> implements ICooldownManager<E> {
         return put(entity, cooldown.toMillis());
     }
 
-    /**
-     * Puts the entity on cooldown for the given duration in milliseconds.
-     *
-     * @param entity   the entity
-     * @param cooldown the duration of the cooldown in milliseconds
-     * @return this object (for method chaining)
-     */
-    public @NotNull CooldownManager<E> put(
-            final @NotNull E entity,
-                                           final @Range(from = 1, to = Long.MAX_VALUE) long cooldown
-    ) {
-        if (cooldown <= 0) throw new IllegalArgumentException("cooldown must be positive");
-        expirations.put(entity, true, cooldown);
+    @Override
+    public @NotNull CooldownManager<E> remove(final @NotNull E entity) {
+        expirations.remove(entity);
         return this;
     }
 
@@ -56,12 +62,6 @@ public final class CooldownManager<E> implements ICooldownManager<E> {
         if (expiration == null)
             throw new IllegalArgumentException(String.format("Entity '%s' is not on cooldown", entity));
         else return expiration.toMillis();
-    }
-
-    @Override
-    public @NotNull CooldownManager<E> remove(final @NotNull E entity) {
-        expirations.remove(entity);
-        return this;
     }
 
 }

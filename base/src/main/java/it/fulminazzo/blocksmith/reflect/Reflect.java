@@ -14,7 +14,10 @@ import java.util.stream.Stream;
 /**
  * A wrapper for Java objects to work with reflections.
  */
-@SuppressWarnings({"unchecked", "CheckStyle", "unused"})
+@SuppressWarnings({
+        "unchecked", "unused",
+        "checkstyle:MethodsOrder", "checkstyle:OverloadMethodsDeclarationOrder"
+})
 @Value
 @EqualsAndHashCode(doNotUseGetters = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -206,8 +209,10 @@ public class Reflect {
      * @return the initialized object
      * @throws ReflectException if an error occurs while getting the value
      */
-    public @NotNull Reflect init(final @NotNull Constructor<?> constructor,
-                                 final @Nullable Object @NotNull ... parameters) {
+    public @NotNull Reflect init(
+            final @NotNull Constructor<?> constructor,
+            final @Nullable Object @NotNull ... parameters
+    ) {
         try {
             constructor.setAccessible(true);
             return new Reflect(
@@ -567,7 +572,9 @@ public class Reflect {
     public @NotNull Field getInstanceField(final @NotNull String name) {
         try {
             final Class<?> type = getObjectClass();
-            return getField(f -> f.getDeclaringClass().equals(type) && !Modifier.isStatic(f.getModifiers()) && f.getName().equals(name));
+            return getField(f -> f.getDeclaringClass().equals(type)
+                    && !Modifier.isStatic(f.getModifiers())
+                    && f.getName().equals(name));
         } catch (ReflectException e) {
             throw ReflectException.cannotFindField(getType(), name);
         }
@@ -709,8 +716,10 @@ public class Reflect {
      * @return the returned value
      * @throws ReflectException if no method was found or an error occurs while getting the value
      */
-    public @NotNull Reflect invoke(final @Nullable String name,
-                                   final @Nullable Object @NotNull ... parameters) {
+    public @NotNull Reflect invoke(
+            final @Nullable String name,
+            final @Nullable Object @NotNull ... parameters
+    ) {
         return invoke(null, name, parameters);
     }
 
@@ -723,9 +732,11 @@ public class Reflect {
      * @return the returned value
      * @throws ReflectException if no method was found or an error occurs while getting the value
      */
-    public @NotNull Reflect invoke(final @Nullable Class<?> returnType,
-                                   final @Nullable String name,
-                                   final @Nullable Object @NotNull ... parameters) {
+    public @NotNull Reflect invoke(
+            final @Nullable Class<?> returnType,
+            final @Nullable String name,
+            final @Nullable Object @NotNull ... parameters
+    ) {
         Class<?>[] parameterTypes = getParameterTypes(parameters);
         Method method = getMethod(returnType, name, parameterTypes);
         return invoke(method, parameters);
@@ -739,8 +750,10 @@ public class Reflect {
      * @return the returned value
      * @throws ReflectException if an error occurs while getting the value
      */
-    public @NotNull Reflect invoke(final @NotNull Method method,
-                                   final @Nullable Object @NotNull ... parameters) {
+    public @NotNull Reflect invoke(
+            final @NotNull Method method,
+            final @Nullable Object @NotNull ... parameters
+    ) {
         try {
             method.setAccessible(true);
             return new Reflect(
@@ -758,7 +771,8 @@ public class Reflect {
     }
 
     /**
-     * Gets the non-static method with the given name, return type and parameter types (not including inherited methods).
+     * Gets the non-static method with the given name, return type and parameter types
+     * (not including inherited methods).
      *
      * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
@@ -802,15 +816,18 @@ public class Reflect {
     }
 
     /**
-     * Gets the non-static method with the given name, return type and parameter types (not including inherited methods).
+     * Gets the non-static method with the given name, return type and parameter types
+     * (not including inherited methods).
      *
      * @param name           the name (if {@code null} any method found will be accepted)
      * @param parameterTypes the parameter types (if a type is {@code null}, it will be considered as wildcard)
      * @return the method
      * @throws ReflectException if no method was found
      */
-    public @NotNull Method getInstanceMethod(final @Nullable String name,
-                                             final @Nullable Class<?> @NotNull ... parameterTypes) {
+    public @NotNull Method getInstanceMethod(
+            final @Nullable String name,
+            final @Nullable Class<?> @NotNull ... parameterTypes
+    ) {
         return getInstanceMethod(null, name, parameterTypes);
     }
 
@@ -822,8 +839,10 @@ public class Reflect {
      * @return the method
      * @throws ReflectException if no method was found
      */
-    public @NotNull Method getNonStaticMethod(final @Nullable String name,
-                                              final @Nullable Class<?> @NotNull ... parameterTypes) {
+    public @NotNull Method getNonStaticMethod(
+            final @Nullable String name,
+            final @Nullable Class<?> @NotNull ... parameterTypes
+    ) {
         return getNonStaticMethod(null, name, parameterTypes);
     }
 
@@ -835,8 +854,10 @@ public class Reflect {
      * @return the method
      * @throws ReflectException if no method was found
      */
-    public @NotNull Method getStaticMethod(final @Nullable String name,
-                                           final @Nullable Class<?> @NotNull ... parameterTypes) {
+    public @NotNull Method getStaticMethod(
+            final @Nullable String name,
+            final @Nullable Class<?> @NotNull ... parameterTypes
+    ) {
         return getStaticMethod(null, name, parameterTypes);
     }
 
@@ -848,13 +869,16 @@ public class Reflect {
      * @return the method
      * @throws ReflectException if no method was found
      */
-    public @NotNull Method getMethod(final @Nullable String name,
-                                     final @Nullable Class<?> @NotNull ... parameterTypes) {
+    public @NotNull Method getMethod(
+            final @Nullable String name,
+            final @Nullable Class<?> @NotNull ... parameterTypes
+    ) {
         return getMethod(null, name, parameterTypes);
     }
 
     /**
-     * Gets the non-static method with the given name, return type and parameter types (not including inherited methods).
+     * Gets the non-static method with the given name, return type and parameter types
+     * (not including inherited methods).
      *
      * @param returnType     the return type (if {@code null} any method found will be accepted)
      * @param name           the name (if {@code null} any method found will be accepted)
@@ -862,11 +886,14 @@ public class Reflect {
      * @return the method
      * @throws ReflectException if no method was found
      */
-    public @NotNull Method getInstanceMethod(final @Nullable Class<?> returnType,
-                                             final @Nullable String name,
-                                             final @Nullable Class<?> @NotNull ... parameterTypes) {
+    public @NotNull Method getInstanceMethod(
+            final @Nullable Class<?> returnType,
+            final @Nullable String name,
+            final @Nullable Class<?> @NotNull ... parameterTypes
+    ) {
         final Class<?> type = getObjectClass();
-        return getMethodHelper(m -> m.getDeclaringClass().equals(type) && !Modifier.isStatic(m.getModifiers()), returnType, name, parameterTypes);
+        return getMethodHelper(m -> m.getDeclaringClass().equals(type)
+                && !Modifier.isStatic(m.getModifiers()), returnType, name, parameterTypes);
     }
 
     /**
@@ -878,9 +905,11 @@ public class Reflect {
      * @return the method
      * @throws ReflectException if no method was found
      */
-    public @NotNull Method getNonStaticMethod(final @Nullable Class<?> returnType,
-                                              final @Nullable String name,
-                                              final @Nullable Class<?> @NotNull ... parameterTypes) {
+    public @NotNull Method getNonStaticMethod(
+            final @Nullable Class<?> returnType,
+            final @Nullable String name,
+            final @Nullable Class<?> @NotNull ... parameterTypes
+    ) {
         return getMethodHelper(m -> !Modifier.isStatic(m.getModifiers()), returnType, name, parameterTypes);
     }
 
@@ -893,9 +922,11 @@ public class Reflect {
      * @return the method
      * @throws ReflectException if no method was found
      */
-    public @NotNull Method getStaticMethod(final @Nullable Class<?> returnType,
-                                           final @Nullable String name,
-                                           final @Nullable Class<?> @NotNull ... parameterTypes) {
+    public @NotNull Method getStaticMethod(
+            final @Nullable Class<?> returnType,
+            final @Nullable String name,
+            final @Nullable Class<?> @NotNull ... parameterTypes
+    ) {
         return getMethodHelper(m -> Modifier.isStatic(m.getModifiers()), returnType, name, parameterTypes);
     }
 
@@ -908,21 +939,25 @@ public class Reflect {
      * @return the method
      * @throws ReflectException if no method was found
      */
-    public @NotNull Method getMethod(final @Nullable Class<?> returnType,
-                                     final @Nullable String name,
-                                     final @Nullable Class<?> @NotNull ... parameterTypes) {
+    public @NotNull Method getMethod(
+            final @Nullable Class<?> returnType,
+            final @Nullable String name,
+            final @Nullable Class<?> @NotNull ... parameterTypes
+    ) {
         return getMethodHelper(m -> true, returnType, name, parameterTypes);
     }
 
-    private @NotNull Method getMethodHelper(final @NotNull Predicate<Method> validator,
-                                            final @Nullable Class<?> returnType,
-                                            final @Nullable String name,
-                                            final @Nullable Class<?> @NotNull ... parameterTypes) {
+    private @NotNull Method getMethodHelper(
+            final @NotNull Predicate<Method> validator,
+            final @Nullable Class<?> returnType,
+            final @Nullable String name,
+            final @Nullable Class<?> @NotNull ... parameterTypes
+    ) {
         return ReflectUtils.findExecutable(
                 getMethods(m ->
-                        (name == null || m.getName().equalsIgnoreCase(name)) &&
-                                (returnType == null || ReflectUtils.extendsType(m.getReturnType(), returnType)) &&
-                                validator.test(m)
+                        (name == null || m.getName().equalsIgnoreCase(name))
+                                && (returnType == null || ReflectUtils.extendsType(m.getReturnType(), returnType))
+                                && validator.test(m)
                 ),
                 parameterTypes
         ).orElseThrow(() -> ReflectException.cannotFindMethod(getType(), returnType, name, parameterTypes));
@@ -936,7 +971,8 @@ public class Reflect {
      * @throws ReflectException if no method was found
      */
     public @NotNull Method getMethod(final @NotNull Predicate<Method> predicate) {
-        return getMethods(predicate).stream().findFirst().orElseThrow(() -> ReflectException.cannotFindMethod(getType()));
+        return getMethods(predicate).stream().findFirst()
+                .orElseThrow(() -> ReflectException.cannotFindMethod(getType()));
     }
 
     /**

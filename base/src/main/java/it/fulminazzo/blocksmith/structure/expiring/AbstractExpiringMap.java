@@ -22,6 +22,14 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     protected final @NotNull Map<K, ExpiringEntry<V>> delegate = new ConcurrentHashMap<>();
 
     /**
+     * Gets the expiring entry associated with a key.
+     *
+     * @param key the key
+     * @return the expiring entry (or {@code null} if not found)
+     */
+    abstract @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key);
+
+    /**
      * Manually removes all the expired entries.
      */
     public void clearExpired() {
@@ -29,14 +37,6 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
             if (entry.getValue().isExpired())
                 delegate.remove(entry.getKey());
     }
-
-    /**
-     * Gets the expiring entry associated with a key.
-     *
-     * @param key the key
-     * @return the expiring entry (or {@code null} if not found)
-     */
-    abstract @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key);
 
     private <K1 extends K, E1 extends V> void putAllHelper(final @NotNull ExpiringMap<K1, E1> map) {
         map.forEach((k, v) -> {
@@ -46,56 +46,29 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     }
 
     @Override
-    public @Nullable V put(final @Nullable K key, final @Nullable V value, final @NotNull Duration ttl) {
-        return put(key, value, ttl.toMillis());
-    }
-
-    @Override
-    public @Nullable V put(final @Nullable K key, final @Nullable V value, final long ttl) {
-        checkTtl(ttl);
-        V previous = get(key);
-        delegate.put(key, new ExpiringEntry<>(value, ttl));
-        return previous;
-    }
-
-    @Override
-    public @Nullable V put(final @Nullable K key, final @Nullable V value) {
-        return put(key, value, ExpiringEntry.NEVER_EXPIRE);
-    }
-
-    @Override
     public boolean containsValue(final Object value) {
         return values().stream().anyMatch(v -> Objects.equals(v, value));
     }
 
     @Override
-    public @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value, final @NotNull Duration ttl) {
-        return putIfAbsent(key, value, ttl.toMillis());
-    }
-
-    @Override
-    public @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value, final long ttl) {
-        checkTtl(ttl);
+    public @Nullable V replace(final @Nullable K key, final @Nullable V value) {
         ExpiringEntry<V> entry = getExpiring(key);
-        if (entry == null) {
-            delegate.put(key, new ExpiringEntry<>(value, ttl));
-            return value;
-        } else return entry.getValue();
+        if (entry != null) {
+            V previous = entry.getValue();
+            entry.setValue(value);
+            return previous;
+        } else return null;
     }
 
     @Override
-    public @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value) {
-        return putIfAbsent(key, value, ExpiringEntry.NEVER_EXPIRE);
-    }
-
-    @Override
-    public boolean replace(
-            final @Nullable K key,
-            final @Nullable V oldValue,
-            final @Nullable V newValue,
-            final @NotNull Duration ttl
-    ) {
-        return replace(key, oldValue, newValue, ttl.toMillis());
+    public boolean replace(final @Nullable K key, final @Nullable V oldValue, final @Nullable V newValue) {
+        ExpiringEntry<V> entry = getExpiring(key);
+        if (entry == null) return false;
+        V currentValue = entry.getValue();
+        if (Objects.equals(currentValue, oldValue)) {
+            entry.setValue(newValue);
+            return true;
+        } else return false;
     }
 
     @Override
@@ -117,33 +90,21 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     }
 
     @Override
-    public boolean replace(final @Nullable K key, final @Nullable V oldValue, final @Nullable V newValue) {
-        ExpiringEntry<V> entry = getExpiring(key);
-        if (entry == null) return false;
-        V currentValue = entry.getValue();
-        if (Objects.equals(currentValue, oldValue)) {
-            entry.setValue(newValue);
-            return true;
-        } else return false;
-    }
-
-    @Override
-    public @Nullable V replace(final @Nullable K key, final @Nullable V value) {
-        ExpiringEntry<V> entry = getExpiring(key);
-        if (entry != null) {
-            V previous = entry.getValue();
-            entry.setValue(value);
-            return previous;
-        } else return null;
+    public boolean replace(
+            final @Nullable K key,
+            final @Nullable V oldValue,
+            final @Nullable V newValue,
+            final @NotNull Duration ttl
+    ) {
+        return replace(key, oldValue, newValue, ttl.toMillis());
     }
 
     @Override
     public @Nullable V computeIfAbsent(
             final @Nullable K key,
-            final @NotNull Function<? super K, ? extends V> mappingFunction,
-            final @NotNull Duration ttl
+            final @NotNull Function<? super K, ? extends V> mappingFunction
     ) {
-        return computeIfAbsent(key, mappingFunction, ttl.toMillis());
+        return computeIfAbsent(key, mappingFunction, ExpiringEntry.NEVER_EXPIRE);
     }
 
     @Override
@@ -164,9 +125,10 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     @Override
     public @Nullable V computeIfAbsent(
             final @Nullable K key,
-            final @NotNull Function<? super K, ? extends V> mappingFunction
+            final @NotNull Function<? super K, ? extends V> mappingFunction,
+            final @NotNull Duration ttl
     ) {
-        return computeIfAbsent(key, mappingFunction, ExpiringEntry.NEVER_EXPIRE);
+        return computeIfAbsent(key, mappingFunction, ttl.toMillis());
     }
 
     @Override
@@ -185,10 +147,10 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     @Override
     public @Nullable V compute(
             final @Nullable K key,
-            final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction,
-            final @NotNull Duration ttl
+            final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction
     ) {
-        return compute(key, remappingFunction, ttl.toMillis());
+        Duration ttl = getTtl(key);
+        return compute(key, remappingFunction, ttl == null ? ExpiringEntry.NEVER_EXPIRE : ttl.toMillis());
     }
 
     @Override
@@ -208,20 +170,20 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     @Override
     public @Nullable V compute(
             final @Nullable K key,
-            final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction
+            final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction,
+            final @NotNull Duration ttl
     ) {
-        Duration ttl = getTtl(key);
-        return compute(key, remappingFunction, ttl == null ? ExpiringEntry.NEVER_EXPIRE : ttl.toMillis());
+        return compute(key, remappingFunction, ttl.toMillis());
     }
 
     @Override
     public @Nullable V merge(
             final @Nullable K key,
             final @NotNull V value,
-            final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction,
-            final @NotNull Duration ttl
+            final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction
     ) {
-        return merge(key, value, remappingFunction, ttl.toMillis());
+        Duration ttl = getTtl(key);
+        return merge(key, value, remappingFunction, ttl == null ? ExpiringEntry.NEVER_EXPIRE : ttl.toMillis());
     }
 
     @Override
@@ -243,32 +205,10 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     public @Nullable V merge(
             final @Nullable K key,
             final @NotNull V value,
-            final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction
+            final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction,
+            final @NotNull Duration ttl
     ) {
-        Duration ttl = getTtl(key);
-        return merge(key, value, remappingFunction, ttl == null ? ExpiringEntry.NEVER_EXPIRE : ttl.toMillis());
-    }
-
-    @Override
-    public void putAll(final @NotNull ExpiringMap<? extends K, ? extends V> map) {
-        putAllHelper(map);
-    }
-
-    @Override
-    public void putAll(final @NotNull Map<? extends K, ? extends V> map, final @NotNull Duration ttl) {
-        putAll(map, ttl.toMillis());
-    }
-
-    @Override
-    public void putAll(final @NotNull Map<? extends K, ? extends V> map, final long ttl) {
-        checkTtl(ttl);
-        map.forEach((k, v) -> delegate.put(k, new ExpiringEntry<>(v, ttl)));
-    }
-
-    @Override
-    public void putAll(final @NotNull Map<? extends K, ? extends V> map) {
-        if (map instanceof ExpiringMap) putAll((ExpiringMap<? extends K, ? extends V>) map);
-        else putAll(map, ExpiringEntry.NEVER_EXPIRE);
+        return merge(key, value, remappingFunction, ttl.toMillis());
     }
 
     @Override
@@ -285,9 +225,11 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     }
 
     @Override
-    public @Nullable Duration getTtl(final @Nullable K key) {
+    public void renew(final @Nullable K key, final long ttl) {
+        checkTtl(ttl);
         ExpiringEntry<V> entry = getExpiring(key);
-        return entry == null ? null : Duration.ofMillis(entry.getExpireTime() - now());
+        if (entry == null) throw new NoSuchElementException("key: " + key);
+        entry.setTimeToLive(ttl);
     }
 
     @Override
@@ -296,11 +238,69 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     }
 
     @Override
-    public void renew(final @Nullable K key, final long ttl) {
+    public void putAll(final @NotNull ExpiringMap<? extends K, ? extends V> map) {
+        putAllHelper(map);
+    }
+
+    @Override
+    public void putAll(final @NotNull Map<? extends K, ? extends V> map) {
+        if (map instanceof ExpiringMap) putAll((ExpiringMap<? extends K, ? extends V>) map);
+        else putAll(map, ExpiringEntry.NEVER_EXPIRE);
+    }
+
+    @Override
+    public void putAll(final @NotNull Map<? extends K, ? extends V> map, final long ttl) {
+        checkTtl(ttl);
+        map.forEach((k, v) -> delegate.put(k, new ExpiringEntry<>(v, ttl)));
+    }
+
+    @Override
+    public void putAll(final @NotNull Map<? extends K, ? extends V> map, final @NotNull Duration ttl) {
+        putAll(map, ttl.toMillis());
+    }
+
+    @Override
+    public @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value) {
+        return putIfAbsent(key, value, ExpiringEntry.NEVER_EXPIRE);
+    }
+
+    @Override
+    public @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value, final long ttl) {
         checkTtl(ttl);
         ExpiringEntry<V> entry = getExpiring(key);
-        if (entry == null) throw new NoSuchElementException("key: " + key);
-        entry.setTimeToLive(ttl);
+        if (entry == null) {
+            delegate.put(key, new ExpiringEntry<>(value, ttl));
+            return value;
+        } else return entry.getValue();
+    }
+
+    @Override
+    public @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value, final @NotNull Duration ttl) {
+        return putIfAbsent(key, value, ttl.toMillis());
+    }
+
+    @Override
+    public @Nullable V put(final @Nullable K key, final @Nullable V value) {
+        return put(key, value, ExpiringEntry.NEVER_EXPIRE);
+    }
+
+    @Override
+    public @Nullable V put(final @Nullable K key, final @Nullable V value, final long ttl) {
+        checkTtl(ttl);
+        V previous = get(key);
+        delegate.put(key, new ExpiringEntry<>(value, ttl));
+        return previous;
+    }
+
+    @Override
+    public @Nullable V put(final @Nullable K key, final @Nullable V value, final @NotNull Duration ttl) {
+        return put(key, value, ttl.toMillis());
+    }
+
+    @Override
+    public @Nullable Duration getTtl(final @Nullable K key) {
+        ExpiringEntry<V> entry = getExpiring(key);
+        return entry == null ? null : Duration.ofMillis(entry.getExpireTime() - now());
     }
 
     @Override
@@ -355,6 +355,11 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
         private final @Nullable K key;
         private final @NotNull ExpiringEntry<V> entry;
 
+        private void checkExpired() {
+            if (entry.isExpired())
+                throw new IllegalStateException(String.format("Entry %s:%s is expired", key, entry.getValue()));
+        }
+
         @Override
         public @Nullable K getKey() {
             checkExpired();
@@ -386,11 +391,6 @@ abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
         @Override
         public int hashCode() {
             return Objects.hash(key, entry.getValue());
-        }
-
-        private void checkExpired() {
-            if (entry.isExpired())
-                throw new IllegalStateException(String.format("Entry %s:%s is expired", key, entry.getValue()));
         }
 
     }

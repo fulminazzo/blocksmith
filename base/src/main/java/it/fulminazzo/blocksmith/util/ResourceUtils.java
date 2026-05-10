@@ -30,37 +30,6 @@ public final class ResourceUtils {
     private static final @NotNull ClassLoader classLoader = ResourceUtils.class.getClassLoader();
 
     /**
-     * Gets a resource from the current classloader.
-     *
-     * @param resource the resource (should NOT have a preceding "/")
-     * @return the resource
-     * @throws IllegalArgumentException if the resource was not found
-     */
-    public static @NotNull InputStream getResource(final @NotNull String resource) {
-        return getResource(classLoader, resource);
-    }
-
-    /**
-     * Gets a resource from the given classloader.
-     *
-     * @param classLoader the classloader to check into
-     * @param resource    the resource (should NOT have a preceding "/")
-     * @return the resource
-     * @throws IllegalArgumentException if the resource was not found
-     */
-    public static @NotNull InputStream getResource(
-            final @NotNull ClassLoader classLoader,
-            final @NotNull String resource
-    ) {
-        InputStream inputStream = classLoader.getResourceAsStream(resource);
-        if (inputStream == null)
-            throw new IllegalArgumentException(
-                    String.format("Could not find resource '%s' from classloader", resource)
-            );
-        return inputStream;
-    }
-
-    /**
      * Extracts a resource to the given directory (only if it is not previously existing).
      *
      * @param resource  the resource (should NOT have a preceding "/")
@@ -78,6 +47,21 @@ public final class ResourceUtils {
     /**
      * Extracts a resource to the given directory (only if it is not previously existing).
      *
+     * @param resource  the resource (should NOT have a preceding "/")
+     * @param directory the directory to extract to
+     * @return the path to the extracted resource
+     * @throws IOException if an error occurs while extracting the resource
+     */
+    public static @NotNull Path extractIfAbsent(
+            final @NotNull String resource,
+            final @NotNull Path directory
+    ) throws IOException {
+        return extractIfAbsent(classLoader, resource, directory);
+    }
+
+    /**
+     * Extracts a resource to the given directory (only if it is not previously existing).
+     *
      * @param classLoader the classloader to check into
      * @param resource    the resource (should NOT have a preceding "/")
      * @param directory   the directory to extract to
@@ -90,21 +74,6 @@ public final class ResourceUtils {
             final @NotNull File directory
     ) throws IOException {
         return extractIfAbsent(classLoader, resource, directory.toPath()).toFile();
-    }
-
-    /**
-     * Extracts a resource to the given directory (only if it is not previously existing).
-     *
-     * @param resource  the resource (should NOT have a preceding "/")
-     * @param directory the directory to extract to
-     * @return the path to the extracted resource
-     * @throws IOException if an error occurs while extracting the resource
-     */
-    public static @NotNull Path extractIfAbsent(
-            final @NotNull String resource,
-            final @NotNull Path directory
-    ) throws IOException {
-        return extractIfAbsent(classLoader, resource, directory);
     }
 
     /**
@@ -144,6 +113,21 @@ public final class ResourceUtils {
     /**
      * Extracts a resource to the given directory.
      *
+     * @param resource  the resource (should NOT have a preceding "/")
+     * @param directory the directory to extract to
+     * @return the path to the extracted resource
+     * @throws IOException if an error occurs while extracting the resource
+     */
+    public static @NotNull Path extract(
+            final @NotNull String resource,
+            final @NotNull Path directory
+    ) throws IOException {
+        return extract(classLoader, resource, directory);
+    }
+
+    /**
+     * Extracts a resource to the given directory.
+     *
      * @param classLoader the classloader to check into
      * @param resource    the resource (should NOT have a preceding "/")
      * @param directory   the directory to extract to
@@ -156,21 +140,6 @@ public final class ResourceUtils {
             final @NotNull File directory
     ) throws IOException {
         return extract(classLoader, resource, directory.toPath()).toFile();
-    }
-
-    /**
-     * Extracts a resource to the given directory.
-     *
-     * @param resource  the resource (should NOT have a preceding "/")
-     * @param directory the directory to extract to
-     * @return the path to the extracted resource
-     * @throws IOException if an error occurs while extracting the resource
-     */
-    public static @NotNull Path extract(
-            final @NotNull String resource,
-            final @NotNull Path directory
-    ) throws IOException {
-        return extract(classLoader, resource, directory);
     }
 
     /**
@@ -443,9 +412,43 @@ public final class ResourceUtils {
      * @param resource the resource
      * @return the name of the resource
      */
+    @SuppressWarnings("checkstyle:MethodsOrder")
     public static @NotNull String getResourceName(final @NotNull String resource) {
         if (resource.contains("/")) return resource.substring(resource.lastIndexOf("/") + 1);
         else return resource;
+    }
+
+    /**
+     * Gets a resource from the current classloader.
+     *
+     * @param resource the resource (should NOT have a preceding "/")
+     * @return the resource
+     * @throws IllegalArgumentException if the resource was not found
+     */
+    @SuppressWarnings("checkstyle:MethodsOrder")
+    public static @NotNull InputStream getResource(final @NotNull String resource) {
+        return getResource(classLoader, resource);
+    }
+
+    /**
+     * Gets a resource from the given classloader.
+     *
+     * @param classLoader the classloader to check into
+     * @param resource    the resource (should NOT have a preceding "/")
+     * @return the resource
+     * @throws IllegalArgumentException if the resource was not found
+     */
+    @SuppressWarnings("checkstyle:MethodsOrder")
+    public static @NotNull InputStream getResource(
+            final @NotNull ClassLoader classLoader,
+            final @NotNull String resource
+    ) {
+        InputStream inputStream = classLoader.getResourceAsStream(resource);
+        if (inputStream == null)
+            throw new IllegalArgumentException(
+                    String.format("Could not find resource '%s' from classloader", resource)
+            );
+        return inputStream;
     }
 
 }
