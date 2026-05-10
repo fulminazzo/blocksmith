@@ -15,7 +15,7 @@ import java.util.List;
  */
 public final class GetterSetterValidator extends AbstractValidator<GetterSetterValidator.Scope, GetterSetterValidator> {
     private static final @NotNull List<String> GETTER_PREFIXES = Arrays.asList("get", "is");
-    private static final @NotNull String SETTER_PREFIX = "set";
+    private static final @NotNull List<String> SETTER_PREFIXEX = Arrays.asList("set");
 
     @Override
     protected @NotNull Scope newScope() {
@@ -28,18 +28,20 @@ public final class GetterSetterValidator extends AbstractValidator<GetterSetterV
         Scope lastScope = getLastScope();
         for (String prefix : GETTER_PREFIXES)
             if (name.startsWith(prefix)) {
-                if (lastScope.getSetters().contains(name.substring(prefix.length())))
+                String unprefixedName = name.substring(prefix.length());
+                if (lastScope.getSetters().contains(unprefixedName))
                     throw new ValidationException(node, "method.getter");
-                else lastScope.registerGetter(name.substring(prefix.length()));
+                else lastScope.registerGetter(unprefixedName);
             }
 
-        if (name.startsWith(SETTER_PREFIX)) {
-            lastScope.registerSetter(name);
-            String unprefixedName = name.substring(SETTER_PREFIX.length());
-            if (unprefixedName.equals(lastScope.getLastGetter())) return;
-            if (lastScope.getGetters().contains(unprefixedName))
-                throw new ValidationException(node, "method.setter");
-        }
+        for (String prefix : SETTER_PREFIXEX)
+            if (name.startsWith(prefix)) {
+                String unprefixedName = name.substring(prefix.length());
+                lastScope.registerSetter(unprefixedName);
+                if (unprefixedName.equals(lastScope.getLastGetter())) return;
+                if (lastScope.getGetters().contains(unprefixedName))
+                    throw new ValidationException(node, "method.setter");
+            }
     }
 
     /**
@@ -73,8 +75,7 @@ public final class GetterSetterValidator extends AbstractValidator<GetterSetterV
          *
          * @param name the name of the setter
          */
-        public void registerSetter(@NotNull String name) {
-            name = name.substring(SETTER_PREFIX.length());
+        public void registerSetter(final @NotNull String name) {
             if (!setters.contains(name)) setters.add(name);
         }
 
