@@ -1,5 +1,5 @@
 /**
- * Plugin for applying uniform Checkstyle conventions across submodules.
+ * Plugin for applying the Blocksmith Checkstyle configuration across submodules.
  */
 
 plugins {

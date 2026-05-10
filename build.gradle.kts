@@ -5,16 +5,8 @@ plugins {
     groovy
 
     `jacoco-report-aggregation`
-    codenarc
-
-    alias(libs.plugins.spotbugs)
-    alias(libs.plugins.buildconfig)
 
     id("blocksmith.java-configuration")
-    id("blocksmith.tests-configuration")
-    id("blocksmith.testing-module-configuration")
-
-    id("blocksmith.checkstyle-convention")
 }
 
 group = "it.fulminazzo"
@@ -23,27 +15,22 @@ version = "0.0.1-SNAPSHOT"
 val testingModuleName: String by extra
 
 allprojects {
+    extra["baseModuleName"] = "base"
+    extra["testingModuleName"] = "testing"
+    extra["projectInfoClassName"] = "ProjectInfo"
+
     apply { plugin("java-library") }
     apply { plugin("groovy") }
-
-    apply { plugin("jacoco") }
-    apply { plugin("codenarc") }
-
-    apply { plugin(rootProject.libs.plugins.spotbugs.get().pluginId) }
-    apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
 
     apply { plugin("blocksmith.java-configuration") }
     apply { plugin("blocksmith.tests-configuration") }
     apply { plugin("blocksmith.testing-module-configuration") }
 
-    apply { plugin("blocksmith.checkstyle-convention") }
-
-    extra["baseModuleName"] = "base"
-    extra["testingModuleName"] = "testing"
-
-    val baseModuleName: String by extra
-
-    val projectInfoClassName = "ProjectInfo"
+    apply { plugin("blocksmith.buildconfig-configuration") }
+    apply { plugin("blocksmith.checkstyle-configuration") }
+    apply { plugin("blocksmith.codenarc-configuration") }
+    apply { plugin("blocksmith.jacoco-configuration") }
+    apply { plugin("blocksmith.spotbugs-configuration") }
 
     val mockitoAgent: Configuration by configurations.creating
 
@@ -80,93 +67,6 @@ allprojects {
                 }
             }
         }
-    }
-
-    tasks.jacocoTestReport {
-        dependsOn(tasks.withType<Test>())
-
-        classDirectories.setFrom(
-            files(classDirectories.files.map {
-                fileTree(it) {
-                    exclude("**/$projectInfoClassName**")
-                }
-            })
-        )
-
-        executionData.setFrom(
-            fileTree(layout.buildDirectory).include("jacoco/*.exec")
-        )
-    }
-
-    tasks.jacocoTestCoverageVerification {
-        dependsOn(tasks.withType<Test>())
-
-        executionData.setFrom(
-            fileTree(layout.buildDirectory).include("jacoco/*.exec")
-        )
-
-        violationRules {
-            rule {
-                excludes = listOf("**/$projectInfoClassName**")
-                limit {
-                    counter = "INSTRUCTION"
-                    value = "COVEREDRATIO"
-                    minimum = "0.97".toBigDecimal()
-                }
-                limit {
-                    counter = "BRANCH"
-                    value = "COVEREDRATIO"
-                    minimum = "0.95".toBigDecimal()
-                }
-            }
-        }
-    }
-
-    codenarc {
-        configFile = rootProject.file("config/codenarc/codenarc.groovy")
-        maxPriority1Violations = 0
-        maxPriority2Violations = 0
-        maxPriority3Violations = 0
-        toolVersion = rootProject.libs.versions.codenarc.get()
-    }
-
-    tasks.withType<CodeNarc> {
-        reports {
-            xml.required = true
-            html.required = true
-        }
-    }
-
-    spotbugs {
-        excludeFilter = rootProject.file("config/spotbugs/exclusions.xml")
-        toolVersion = rootProject.libs.versions.spotbugs.version.get()
-    }
-
-    tasks.withType<com.github.spotbugs.snom.SpotBugsTask> {
-        reports {
-            create("xml") {
-                required.set(true)
-            }
-            create("html") {
-                required.set(true)
-            }
-        }
-    }
-
-    configure<com.github.gmazzo.buildconfig.BuildConfigExtension> {
-        packageName = "${rootProject.group}.${rootProject.name}"
-        className = projectInfoClassName
-
-        var projectName = project.name
-        if (project.name.endsWith("-$baseModuleName")) projectName = project.name.removeSuffix("-$baseModuleName")
-
-        buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
-        buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
-        buildConfigField("String", "MODULE_NAME", "\"${projectName}\"")
-    }
-
-    tasks.check {
-        dependsOn(tasks.jacocoTestCoverageVerification)
     }
 
 }
