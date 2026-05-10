@@ -180,14 +180,18 @@ class DelegateExpiringSetTest extends Specification {
         ['Hello']                                || true
         ['Goodbye']                              || false
         new DelegateExpiringSet(new MockExpiringMap() {
+
             {
                 put('Hello', PRESENT, 10_000L)
             }
+
         })                                       || true
         new DelegateExpiringSet(new MockExpiringMap() {
+
             {
                 put('Goodbye', PRESENT, 10_000L)
             }
+
         })                                       || false
     }
 

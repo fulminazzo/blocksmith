@@ -287,7 +287,7 @@ class AbstractExpiringListTest extends Specification {
         for (def i : list) actual.add(i)
 
         then:
-        actual == EXPECTED_ENTRIES.collect { it.value }
+        actual == EXPECTED_ENTRIES*.value
     }
 
     def 'test that toArray works'() {
@@ -298,7 +298,7 @@ class AbstractExpiringListTest extends Specification {
         def actual = list.toArray()
 
         then:
-        [*actual] == EXPECTED_ENTRIES.collect { it.value }
+        [*actual] == EXPECTED_ENTRIES*.value
     }
 
     def 'test that toArray with smaller array creates new array'() {
@@ -312,7 +312,7 @@ class AbstractExpiringListTest extends Specification {
         def actual = list.toArray(previous)
 
         then:
-        [*actual] == EXPECTED_ENTRIES.collect { it.value }
+        [*actual] == EXPECTED_ENTRIES*.value
         [*previous] == ['1']
     }
 
@@ -324,7 +324,7 @@ class AbstractExpiringListTest extends Specification {
         internal.addAll(EXPECTED_ENTRIES)
 
         and:
-        def expected = EXPECTED_ENTRIES.collect { it.value }
+        def expected = EXPECTED_ENTRIES*.value
         if (size != EXPECTED_ENTRIES.size()) expected.add(null)
 
         when:
@@ -359,7 +359,7 @@ class AbstractExpiringListTest extends Specification {
     }
 
     private static long now() {
-        System.currentTimeMillis()
+        return System.currentTimeMillis()
     }
 
 }

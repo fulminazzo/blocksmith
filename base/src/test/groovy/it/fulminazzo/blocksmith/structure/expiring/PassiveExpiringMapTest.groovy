@@ -32,13 +32,13 @@ class PassiveExpiringMapTest extends Specification {
         internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         expect:
-        !map.isEmpty()
+        !map.empty
 
         when:
         sleep(5L)
 
         then:
-        !map.isEmpty()
+        !map.empty
     }
 
     def 'test that containsKey returns true even for expired key'() {
@@ -141,7 +141,7 @@ class PassiveExpiringMapTest extends Specification {
         sleep(5L)
 
         expect:
-        !map.keySet().isEmpty()
+        !map.keySet().empty
     }
 
     def 'test that keySet includes also expired keys'() {
@@ -168,7 +168,7 @@ class PassiveExpiringMapTest extends Specification {
         sleep(5L)
 
         expect:
-        !map.values().isEmpty()
+        !map.values().empty
     }
 
     def 'test that values includes also expired values'() {
@@ -195,7 +195,7 @@ class PassiveExpiringMapTest extends Specification {
         sleep(5L)
 
         expect:
-        !map.entrySet().isEmpty()
+        !map.entrySet().empty
     }
 
     def 'test that entrySet includes also expired entries'() {

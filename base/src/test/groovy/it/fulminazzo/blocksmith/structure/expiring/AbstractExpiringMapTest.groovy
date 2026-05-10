@@ -574,14 +574,18 @@ class AbstractExpiringMapTest extends Specification {
         ['Hello' : 'world']                     || true
         ['Goodbye' : 'mars']                    || false
         new MockExpiringMap() {
+
             {
                 put('Hello', 'world', 10_000L)
             }
+
         }                                       || true
         new MockExpiringMap() {
+
             {
                 put('Goodbye', 'mars', 10_000L)
             }
+
         }                                       || false
     }
 

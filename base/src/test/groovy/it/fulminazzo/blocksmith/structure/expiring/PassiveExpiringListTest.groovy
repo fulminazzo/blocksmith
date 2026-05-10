@@ -153,13 +153,15 @@ class PassiveExpiringListTest extends Specification {
         sleepTtl()
 
         then:
-        list.containsAll([first].collect { it.value })
-        list.containsAll([second].collect { it.value })
-        list.containsAll([third].collect { it.value })
-        list.containsAll([first, second].collect { it.value })
-        list.containsAll([second, third].collect { it.value })
-        list.containsAll([first, third].collect { it.value })
-        list.containsAll([first, second, third].collect { it.value })
+        list.with {
+            containsAll([this.first]*.value)
+            containsAll([this.second]*.value)
+            containsAll([this.third]*.value)
+            containsAll([this.first, this.second]*.value)
+            containsAll([this.second, this.third]*.value)
+            containsAll([this.first, this.third]*.value)
+            containsAll([this.first, this.second, this.third]*.value)
+        }
     }
 
     def 'test that iterator returns expired entries'() {
@@ -175,7 +177,7 @@ class PassiveExpiringListTest extends Specification {
         for (def i : list) actual.add(i)
 
         then:
-        actual == entries.collect { it.value }
+        actual == entries*.value
     }
 
     private static void sleepTtl() {
