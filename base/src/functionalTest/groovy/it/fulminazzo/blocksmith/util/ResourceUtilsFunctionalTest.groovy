@@ -9,9 +9,9 @@ import java.util.jar.JarEntry
 import java.util.jar.JarOutputStream
 
 class ResourceUtilsFunctionalTest extends Specification {
-    private static final File testResourcesDirectory = new File('src/test/resources')
-    private static final File extractTestsDirectory = new File('build/resources/test/resource_utils/extract')
-    private static final File extractIfAbsentTestsDirectory = new File('build/resources/test/resource_utils/extract_absent')
+    private static final File testResourcesDirectory = new File('src/functionalTest/resources')
+    private static final File extractTestsDirectory = new File('build/resources/functionalTest/resource_utils/extract')
+    private static final File extractIfAbsentTestsDirectory = new File('build/resources/functionalTest/resource_utils/extract_absent')
 
     def 'test that getResource with #arguments does not throw'() {
         when:
