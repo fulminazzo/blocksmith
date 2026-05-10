@@ -2,6 +2,8 @@ package it.fulminazzo.blocksmith.checkstyle.validator.criterion;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -9,6 +11,7 @@ import java.util.Objects;
 /**
  * A collection of utilities for {@link DetailAST}.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CriterionUtils {
 
     /**
