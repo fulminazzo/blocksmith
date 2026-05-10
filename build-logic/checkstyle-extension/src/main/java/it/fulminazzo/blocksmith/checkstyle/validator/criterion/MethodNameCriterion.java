@@ -14,10 +14,10 @@ public enum MethodNameCriterion implements Criterion {
     ANY {
         @Override
         public boolean matches(final @NotNull DetailAST node) {
-            return !PAIRED.matches(node)
-                    && !EQUALS.matches(node)
-                    && !HASH_CODE.matches(node)
-                    && !TO_STRING.matches(node);
+            for (MethodNameCriterion value : MethodNameCriterion.values()) {
+                if (value != this && value.matches(node)) return false;
+            }
+            return true;
         }
 
         @Override
@@ -26,18 +26,63 @@ public enum MethodNameCriterion implements Criterion {
         }
     },
     /**
-     * Methods from {@link PairedMethods}.
+     * All adders and all removers criterion.
      */
-    PAIRED {
+    ALL_ADDERS_AND_ALL_REMOVERS {
         @Override
         public boolean matches(final @NotNull DetailAST node) {
             String methodName = CriterionUtils.getMethodName(node);
-            return PairedMethods.isMethodPaired(methodName);
+            return PairedMethods.isMethodPairedWith(methodName, PairedMethods.getAllAddersAndRemovers());
         }
 
         @Override
         public @NotNull String getErrorMessage() {
-            return "method.name.getterAndSetter";
+            return "method.name.pairedMethods";
+        }
+    },
+    /**
+     * Registerers and unregisterers criterion.
+     */
+    REGISTERER_AND_UNREGISTERER {
+        @Override
+        public boolean matches(final @NotNull DetailAST node) {
+            String methodName = CriterionUtils.getMethodName(node);
+            return PairedMethods.isMethodPairedWith(methodName, PairedMethods.getRegisterersAndUnregisterers());
+        }
+
+        @Override
+        public @NotNull String getErrorMessage() {
+            return "method.name.pairedMethods";
+        }
+    },
+    /**
+     * Adders and removers criterion.
+     */
+    ADDER_AND_REMOVER {
+        @Override
+        public boolean matches(final @NotNull DetailAST node) {
+            String methodName = CriterionUtils.getMethodName(node);
+            return PairedMethods.isMethodPairedWith(methodName, PairedMethods.getAddersAndRemovers());
+        }
+
+        @Override
+        public @NotNull String getErrorMessage() {
+            return "method.name.pairedMethods";
+        }
+    },
+    /**
+     * Getters and setters criterion.
+     */
+    GETTER_AND_SETTER {
+        @Override
+        public boolean matches(final @NotNull DetailAST node) {
+            String methodName = CriterionUtils.getMethodName(node);
+            return PairedMethods.isMethodPairedWith(methodName, PairedMethods.getGettersAndSetters());
+        }
+
+        @Override
+        public @NotNull String getErrorMessage() {
+            return "method.name.pairedMethods";
         }
     },
     /**

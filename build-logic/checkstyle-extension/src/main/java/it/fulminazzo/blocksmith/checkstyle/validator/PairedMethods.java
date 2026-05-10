@@ -31,10 +31,13 @@ public final class PairedMethods {
     public static final @NotNull List<String> SETTERS = List.of("set");
 
     /**
-     * Checks if the method is prefixed with any of the prefixes in this class.
+     * Checks if the method is prefixed with any of the given prefixes.
+     *
+     * @param methodName the method name
+     * @param prefixes   the prefixes
      */
-    public static boolean isMethodPaired(final @NotNull String methodName) {
-        return getAll().stream().anyMatch(methodName::startsWith);
+    public static boolean isMethodPairedWith(final @NotNull String methodName, final @NotNull List<String> prefixes) {
+        return prefixes.stream().anyMatch(methodName::startsWith);
     }
 
     /**
@@ -53,21 +56,51 @@ public final class PairedMethods {
     }
 
     /**
-     * Gets all the prefixes.
+     * Gets all the all adders and all removers.
      *
-     * @return the prefixes
+     * @return the all adders and all removers
      */
-    public static @NotNull List<String> getAll() {
-        List<String> all = new ArrayList<>();
-        all.addAll(ALL_ADDERS);
-        all.addAll(ALL_REMOVERS);
-        all.addAll(REGISTERERS);
-        all.addAll(UNREGISTERERS);
-        all.addAll(ADDERS);
-        all.addAll(REMOVERS);
-        all.addAll(GETTERS);
-        all.addAll(SETTERS);
-        return all;
+    public static @NotNull List<String> getAllAddersAndRemovers() {
+        List<String> allAddersAndRemovers = new ArrayList<>();
+        allAddersAndRemovers.addAll(ALL_ADDERS);
+        allAddersAndRemovers.addAll(ALL_REMOVERS);
+        return allAddersAndRemovers;
+    }
+
+    /**
+     * Gets all the registerers and unregisterers.
+     *
+     * @return the registerers and unregisterers
+     */
+    public static @NotNull List<String> getRegisterersAndUnregisterers() {
+        List<String> registerersAndUnregisterers = new ArrayList<>();
+        registerersAndUnregisterers.addAll(REGISTERERS);
+        registerersAndUnregisterers.addAll(UNREGISTERERS);
+        return registerersAndUnregisterers;
+    }
+
+    /**
+     * Gets all the adders and removers.
+     *
+     * @return the adders and removers
+     */
+    public static @NotNull List<String> getAddersAndRemovers() {
+        List<String> addersAndRemovers = new ArrayList<>();
+        addersAndRemovers.addAll(ADDERS);
+        addersAndRemovers.addAll(REMOVERS);
+        return addersAndRemovers;
+    }
+
+    /**
+     * Gets all the getters and setters.
+     *
+     * @return the getters and setters
+     */
+    public static @NotNull List<String> getGettersAndSetters() {
+        List<String> gettersAndSetters = new ArrayList<>();
+        gettersAndSetters.addAll(GETTERS);
+        gettersAndSetters.addAll(SETTERS);
+        return gettersAndSetters;
     }
 
 }
