@@ -56,7 +56,8 @@ abstract class AbstractValidator<S extends AbstractValidator.Scope, A extends Ab
     @SuppressWarnings("unchecked")
     @Override
     public @NotNull A then(final @NotNull Validator validator) {
-        this.next = validator;
+        if (next != null) next.then(validator);
+        else this.next = validator;
         return (A) this;
     }
 

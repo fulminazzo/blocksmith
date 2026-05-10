@@ -100,7 +100,8 @@ public final class OrderValidator implements Validator, NodeScorer {
 
     @Override
     public @NotNull OrderValidator then(final @NotNull Validator validator) {
-        this.next = validator;
+        if (next != null) next.then(validator);
+        else this.next = validator;
         return this;
     }
 
@@ -114,19 +115,22 @@ public final class OrderValidator implements Validator, NodeScorer {
         if (!scopes.isEmpty()) {
             Scope scope = scopes.pop();
             if (next == null) return;
-            next.enterScope();
             List<ValidationException> exceptions = new ArrayList<>();
             for (int i = 0; i < getMaxScore(); i++) {
                 List<DetailAST> nodes = scope.getCommonScores(i);
-                for (DetailAST node : nodes) {
+                next.enterScope();
+                for (DetailAST node : nodes)
                     try {
                         next.validateNode(node);
                     } catch (ValidationException e) {
                         exceptions.add(e);
                     }
+                try {
+                    next.exitScope();
+                } catch (CompositeValidationException c) {
+                    exceptions.addAll(c.getExceptions());
                 }
             }
-            next.exitScope();
             if (!exceptions.isEmpty()) throw new CompositeValidationException(exceptions);
         }
     }

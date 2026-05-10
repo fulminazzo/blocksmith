@@ -374,7 +374,9 @@
                     RECORD_COMPONENT_DEF"/>
         </module>
         <module name="NoWhitespaceBeforeCaseDefaultColon"/>
-        <module name="OverloadMethodsDeclarationOrder"/>
+        <!-- ALESSANDRO START -->
+        <!--        <module name="OverloadMethodsDeclarationOrder"/>-->
+        <!-- ALESSANDRO END -->
         <module name="ConstructorsDeclarationGrouping"/>
         <module name="VariableDeclarationUsageDistance"/>
         <module name="CustomImportOrder">

@@ -237,13 +237,18 @@ class MethodsOrderCheckFunctionalTest extends Specification {
     }
 
     def 'test that method name #name after #other throws'() {
+        given:
+        final isGetterSetterTest = name =~ /(get|set).*/
+
         when:
         def violations = runCheck('MethodInvalidName', MethodsOrderCheck) {
-            it.replace('%target%', name).replace('%other%', other)
+            it.replace('%target%', name)
+                    .replace('%other%', other)
+                    .replace('%target2%', isGetterSetterTest ? "${name}2" : name)
         }
 
         then:
-        violations.size() == 1
+        violations.size() == (isGetterSetterTest ? 1 : 2)
 
         and:
         def violation = violations[0]
@@ -286,19 +291,21 @@ class MethodsOrderCheckFunctionalTest extends Specification {
         def violations = runCheck('MethodInvalidGetterSetter', MethodsOrderCheck)
 
         then:
-        violations.size() == 2
+        violations.size() == 4
 
         and:
         def getterViolation = violations[0]
         getterViolation.line == 9
         getterViolation.column == 5
-        getterViolation.message == message('it.fulminazzo.blocksmith.checkstyle.method.getter')
+        getterViolation.message == message('it.fulminazzo.blocksmith.checkstyle.method.pair.first')
+                .replace('{0}', 'get').replace('{1}', 'set')
 
         and:
-        def setterViolation = violations[1]
+        def setterViolation = violations[2]
         setterViolation.line == 13
         setterViolation.column == 5
-        setterViolation.message == message('it.fulminazzo.blocksmith.checkstyle.method.setter')
+        setterViolation.message == message('it.fulminazzo.blocksmith.checkstyle.method.pair.second')
+                .replace('{0}', 'set').replace('{1}', 'is, get')
     }
 
     def 'test that methods check works on nested classes'() {

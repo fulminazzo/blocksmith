@@ -5,6 +5,6 @@ public class MethodInvalidName {
     void %target%(String valid1) { }
     void %other%(String valid2) { }
 
-    void %target%(String invalid) { }
+    void %target2%(String invalid) { }
 
 }

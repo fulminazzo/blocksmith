@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serial;
 import java.util.List;
 
 /**
@@ -14,6 +15,7 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public final class CompositeValidationException extends Exception {
+    @Serial
     private static final long serialVersionUID = 8328829751405869982L;
 
     private final @NotNull List<ValidationException> exceptions;
