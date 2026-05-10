@@ -6,7 +6,6 @@ import com.puppycrawl.tools.checkstyle.api.FileText
 import com.puppycrawl.tools.checkstyle.api.TokenTypes
 import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator
 import it.fulminazzo.blocksmith.checkstyle.validator.ValidationException
-import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 class FieldsOrderCheckTest extends Specification {
@@ -28,9 +27,10 @@ class FieldsOrderCheckTest extends Specification {
         check.isScopeChanged(_) >> { callRealMethod() }
         check.getValidator() >> { return validator }
 
-        def reflect = Reflect.on(check)
         validator = Mock(OrderValidator)
-        reflect.set('validator', validator)
+        def validatorField = ValidatorCheck.getDeclaredField('validator')
+        validatorField.accessible = true
+        validatorField.set(check, validator)
 
         def parent = Mock(DetailAST)
         node.parent >> parent
