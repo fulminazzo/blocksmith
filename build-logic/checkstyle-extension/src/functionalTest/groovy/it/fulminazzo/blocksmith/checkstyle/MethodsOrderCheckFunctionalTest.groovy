@@ -292,13 +292,15 @@ class MethodsOrderCheckFunctionalTest extends Specification {
         def getterViolation = violations[0]
         getterViolation.line == 9
         getterViolation.column == 5
-        getterViolation.message == message('it.fulminazzo.blocksmith.checkstyle.method.getter')
+        getterViolation.message == message('it.fulminazzo.blocksmith.checkstyle.method.pair.first')
+                .replace('{0}', 'get').replace('{1}', 'set')
 
         and:
         def setterViolation = violations[1]
         setterViolation.line == 13
         setterViolation.column == 5
-        setterViolation.message == message('it.fulminazzo.blocksmith.checkstyle.method.setter')
+        setterViolation.message == message('it.fulminazzo.blocksmith.checkstyle.method.pair.second')
+                .replace('{0}', 'set').replace('{1}', 'get, is')
     }
 
     def 'test that methods check works on nested classes'() {

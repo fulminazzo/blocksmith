@@ -15,7 +15,7 @@ import java.util.List;
  */
 public final class GetterSetterValidator extends AbstractValidator<GetterSetterValidator.Scope, GetterSetterValidator> {
     private static final @NotNull List<String> GETTER_PREFIXES = Arrays.asList("get", "is");
-    private static final @NotNull List<String> SETTER_PREFIXEX = Arrays.asList("set");
+    private static final @NotNull List<String> SETTER_PREFIXES = Arrays.asList("set");
 
     @Override
     protected @NotNull Scope newScope() {
@@ -30,17 +30,21 @@ public final class GetterSetterValidator extends AbstractValidator<GetterSetterV
             if (name.startsWith(prefix)) {
                 String unprefixedName = name.substring(prefix.length());
                 if (lastScope.getSetters().contains(unprefixedName))
-                    throw new ValidationException(node, "method.getter");
+                    throw new ValidationException(node, "method.pair.first")
+                            .addArgument(prefix)
+                            .addArgument(String.join(", ", SETTER_PREFIXES));
                 else lastScope.registerGetter(unprefixedName);
             }
 
-        for (String prefix : SETTER_PREFIXEX)
+        for (String prefix : SETTER_PREFIXES)
             if (name.startsWith(prefix)) {
                 String unprefixedName = name.substring(prefix.length());
                 lastScope.registerSetter(unprefixedName);
                 if (unprefixedName.equals(lastScope.getLastGetter())) return;
                 if (lastScope.getGetters().contains(unprefixedName))
-                    throw new ValidationException(node, "method.setter");
+                    throw new ValidationException(node, "method.pair.second")
+                            .addArgument(prefix)
+                            .addArgument(String.join(", ", GETTER_PREFIXES));
             }
     }
 
