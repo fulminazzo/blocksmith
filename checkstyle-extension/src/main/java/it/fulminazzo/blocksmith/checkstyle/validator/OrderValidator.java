@@ -85,7 +85,7 @@ public final class OrderValidator implements Validator, NodeScorer {
 
             if (current < last)
                 throw new ValidationException(node, scorer.getCriterion(current).getErrorMessage())
-                        .addArgument(String.join(" ",
+                        .addArgument(String.join(", ",
                                 Arrays.stream(scorer.getCriteria()).map(Object::toString).toArray(String[]::new))
                         );
             else if (current > last) {
