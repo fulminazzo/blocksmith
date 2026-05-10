@@ -9,6 +9,11 @@ import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PairedMethods {
+    /**
+     * REGISTERERS AND UNREGISTERERS
+     */
+    public static final @NotNull List<String> REGISTERERS = List.of("register");
+    public static final @NotNull List<String> UNREGISTERERS = List.of("unregister");
     /*
      * ADDERS AND REMOVERS
      */
@@ -35,6 +40,7 @@ public final class PairedMethods {
     @SuppressWarnings("unchecked")
     public static @NotNull List<List<String>[]> getPairs() {
         List<List<String>[]> pairs = new ArrayList<>();
+        pairs.add(new List[]{REGISTERERS, UNREGISTERERS});
         pairs.add(new List[]{ADDERS, REMOVERS});
         pairs.add(new List[]{GETTERS, SETTERS});
         return pairs;
@@ -47,6 +53,8 @@ public final class PairedMethods {
      */
     public static @NotNull List<String> getAll() {
         List<String> all = new ArrayList<>();
+        all.addAll(REGISTERERS);
+        all.addAll(UNREGISTERERS);
         all.addAll(ADDERS);
         all.addAll(REMOVERS);
         all.addAll(GETTERS);
