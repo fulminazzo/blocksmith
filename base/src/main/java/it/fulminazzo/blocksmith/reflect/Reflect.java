@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.*;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -214,7 +216,7 @@ public class Reflect {
             final @Nullable Object @NotNull ... parameters
     ) {
         try {
-            constructor.setAccessible(true);
+            setAccessible(constructor);
             return new Reflect(
                     constructor.getDeclaringClass(),
                     constructor.newInstance(ReflectUtils.regroup(constructor.getParameters(), parameters))
@@ -393,7 +395,7 @@ public class Reflect {
      */
     public @NotNull Reflect set(final @NotNull Field field, final Object value) {
         try {
-            field.setAccessible(true);
+            setAccessible(field);
             field.set(object, value);
             return this;
         } catch (IllegalAccessException e) {
@@ -555,7 +557,7 @@ public class Reflect {
      */
     public @NotNull Reflect get(final @NotNull Field field) {
         try {
-            field.setAccessible(true);
+            setAccessible(field);
             return new Reflect(field.getGenericType(), field.get(object));
         } catch (IllegalAccessException e) {
             throw new ReflectException(e, "Could not get value of field '%s' from %s", field.getName(), object);
@@ -755,7 +757,7 @@ public class Reflect {
             final @Nullable Object @NotNull ... parameters
     ) {
         try {
-            method.setAccessible(true);
+            setAccessible(method);
             return new Reflect(
                     method.getGenericReturnType(),
                     method.invoke(
@@ -1253,6 +1255,13 @@ public class Reflect {
         return Arrays.stream(parameters)
                 .map(p -> p == null ? null : p.getClass())
                 .toArray(Class<?>[]::new);
+    }
+
+    private static void setAccessible(final @NotNull AccessibleObject object) {
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+            object.setAccessible(true);
+            return null;
+        });
     }
 
 }
