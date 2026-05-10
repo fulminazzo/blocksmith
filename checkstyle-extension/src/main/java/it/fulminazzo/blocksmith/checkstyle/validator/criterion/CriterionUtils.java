@@ -38,10 +38,24 @@ public final class CriterionUtils {
         for (DetailAST annotationNode = modifier.findFirstToken(TokenTypes.ANNOTATION);
                 annotationNode != null;
                 annotationNode = annotationNode.getNextSibling()) {
-            DetailAST ident = annotationNode.findFirstToken(TokenTypes.IDENT);
-            if (ident != null && annotation.equals(ident.getText())) return true;
+            if (isAnnotationName(annotationNode, annotation)) return true;
         }
         return false;
+    }
+
+    /**
+     * Checks if the annotation name is the same of the given one.
+     *
+     * @param annotationNode the annotation node
+     * @param annotationName the annotation name
+     * @return {@code true} if the annotation name is the same, {@code false} otherwise
+     */
+    public static boolean isAnnotationName(
+            final @NotNull DetailAST annotationNode,
+            final @NotNull String annotationName
+    ) {
+        DetailAST ident = annotationNode.findFirstToken(TokenTypes.IDENT);
+        return ident != null && annotationName.equals(ident.getText());
     }
 
     /**
