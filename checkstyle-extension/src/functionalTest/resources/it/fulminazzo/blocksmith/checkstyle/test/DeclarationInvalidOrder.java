@@ -6,6 +6,11 @@ public class DeclarationInvalidOrder {
 
     class Nested { }
 
+    void method() {
+        int variable = 1;
+        Nested nested = new Nested();
+    }
+
     int method();
 
     DeclarationInvalidOrder() { }

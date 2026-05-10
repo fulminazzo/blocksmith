@@ -15,19 +15,25 @@ class DeclarationOrderCheckFunctionalTest extends Specification {
         def violations = runCheck('DeclarationInvalidOrder', DeclarationOrderCheck)
 
         then:
-        violations.size() == 2
+        violations.size() == 3
 
         and:
-        def equalsAndHashCode = violations[0]
-        equalsAndHashCode.line == 9
-        equalsAndHashCode.column == 5
-        equalsAndHashCode.message == expectedMessage
+        def firstMethod = violations[0]
+        firstMethod.line == 9
+        firstMethod.column == 5
+        firstMethod.message == expectedMessage
 
         and:
-        def getter = violations[1]
-        getter.line == 11
-        getter.column == 5
-        getter.message == expectedMessage
+        def secondMethod = violations[1]
+        secondMethod.line == 14
+        secondMethod.column == 5
+        secondMethod.message == expectedMessage
+
+        and:
+        def constructor = violations[2]
+        constructor.line == 16
+        constructor.column == 5
+        constructor.message == expectedMessage
     }
 
 }
