@@ -22,6 +22,7 @@ ruleset {
         'MethodReturnTypeRequired' { enabled = false }
         'ImplicitClosureParameter' { enabled = false }
         'TrailingComma' { enabled = false }
+        'StaticMethodsBeforeInstanceMethods' { enabled = false }
     }
 
     ruleset('rulesets/dry.xml') {
@@ -48,6 +49,7 @@ ruleset {
 
     ruleset('rulesets/unnecessary.xml') {
         'UnnecessaryReturnKeyword' { enabled = false }
+        'UnnecessaryElseStatement' { enabled = false }
         // Interferes with Spock data tables formatting
         'UnnecessaryBooleanExpression' { enabled = false }
     }
