@@ -218,15 +218,15 @@ abstract class ExpiringMapImplTest extends Specification {
         !arguments.empty || internal['Hello'] == null
 
         where:
-        method         | arguments
-        'size'         | []
-        'isEmpty'      | []
-        'containsKey'  | ['Goodbye']
-        'get'          | ['Goodbye']
-        'remove'       | ['Goodbye']
-        'keySet'       | []
-        'values'       | []
-        'entrySet'     | []
+        method        | arguments
+        'size'        | []
+        'isEmpty'     | []
+        'containsKey' | ['Goodbye']
+        'get'         | ['Goodbye']
+        'remove'      | ['Goodbye']
+        'keySet'      | []
+        'values'      | []
+        'entrySet'    | []
     }
 
     def 'test that put treats expired key as absent'() {
@@ -308,8 +308,8 @@ abstract class ExpiringMapImplTest extends Specification {
 
     protected abstract ExpiringMap<String, String> createMap()
 
-    private static void sleepTtl() {
-        sleep(ttl / 2 as long)
+    protected static void sleepTtl() {
+        sleep((long) (ttl / 2))
     }
 
 }

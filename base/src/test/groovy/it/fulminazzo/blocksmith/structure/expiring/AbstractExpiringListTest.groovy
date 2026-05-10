@@ -354,11 +354,11 @@ class AbstractExpiringListTest extends Specification {
         list.expiringEntries() == internal
     }
 
-    private ExpiringEntry<String> find(final String value) {
+    protected ExpiringEntry<String> find(final String value) {
         return internal.find { it.value == value }
     }
 
-    private static long now() {
+    protected static long now() {
         return System.currentTimeMillis()
     }
 

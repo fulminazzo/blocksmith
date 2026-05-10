@@ -238,8 +238,8 @@ class DelegateExpiringSetTest extends Specification {
         third.expireTime == ExpiringEntry.NEVER_EXPIRE
     }
 
-    private static sleepTtl() {
-        sleep(ttl / 2 as long)
+    protected static sleepTtl() {
+        sleep((long) (ttl / 2))
     }
 
 }

@@ -1,7 +1,9 @@
 package it.fulminazzo.blocksmith.reflect;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
@@ -19,7 +21,9 @@ public interface Entity {
      * @return the unique id
      */
     default @NotNull UUID getUniqueId() {
-        return UUID.nameUUIDFromBytes(getName().getBytes());
+        String name = getName();
+        if (name == null) throw new IllegalStateException("Entity has no name");
+        return UUID.nameUUIDFromBytes(name.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -27,6 +31,6 @@ public interface Entity {
      *
      * @return the name
      */
-    @NotNull String getName();
+    @Nullable String getName();
 
 }

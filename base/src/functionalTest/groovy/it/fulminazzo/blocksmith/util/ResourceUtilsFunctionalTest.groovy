@@ -227,7 +227,7 @@ class ResourceUtilsFunctionalTest extends Specification {
         (Predicate<String>) ((f) -> false)                  || []
     }
 
-    private static Path createTestJar() {
+    protected static Path createTestJar() {
         final Map<String, String> entries = [
                 'test.txt'        : 'Hello, world!',
                 'data/schema.sql' : 'CREATE TABLE secret (id INT);'

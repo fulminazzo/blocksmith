@@ -180,8 +180,8 @@ class PassiveExpiringListTest extends Specification {
         actual == entries*.value
     }
 
-    private static void sleepTtl() {
-        sleep(ttl / 2 as long)
+    protected static void sleepTtl() {
+        sleep((long) (ttl / 2))
     }
 
 }

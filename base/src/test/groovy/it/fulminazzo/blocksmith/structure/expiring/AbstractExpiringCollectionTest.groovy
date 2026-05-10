@@ -139,8 +139,8 @@ class AbstractExpiringCollectionTest extends Specification {
         string == '[Goodbye (*), Hello, Ciao (!)]'
     }
 
-    private static sleepTtl() {
-        sleep(ttl.toMillis() / 2 as long)
+    protected static sleepTtl() {
+        sleep((long) (ttl.toMillis() / 2))
     }
 
 }

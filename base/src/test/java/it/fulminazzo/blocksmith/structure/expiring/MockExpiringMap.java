@@ -24,7 +24,7 @@ public class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     public boolean containsKey(final @Nullable Object key) {
-        return delegate.containsKey(key);
+        return key != null && delegate.containsKey(key);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     public @Nullable V remove(final @Nullable Object key) {
-        ExpiringEntry<V> removed = delegate.remove(key);
+        ExpiringEntry<V> removed = key == null ? null : delegate.remove(key);
         return removed == null ? null : removed.getValue();
     }
 
@@ -58,7 +58,7 @@ public class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
-        return delegate.get(key);
+        return key == null ? null : delegate.get(key);
     }
 
 }

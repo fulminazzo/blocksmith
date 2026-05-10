@@ -724,8 +724,8 @@ class AbstractExpiringMapTest extends Specification {
         'setValue' | ['mars']
     }
 
-    private static void sleepTtl() {
-        sleep(ttl / 2 as long)
+    protected static void sleepTtl() {
+        sleep((long) (ttl / 2))
     }
 
 }
