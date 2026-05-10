@@ -32,6 +32,7 @@
         <module name="it.fulminazzo.blocksmith.checkstyle.ConstructorsOrderCheck"/>
         <module name="it.fulminazzo.blocksmith.checkstyle.MethodsOrderCheck"/>
         <module name="it.fulminazzo.blocksmith.checkstyle.TypesOrderCheck"/>
+        <module name="it.fulminazzo.blocksmith.checkstyle.ExecutableParenthesisCheck"/>
     </module>
     <!-- ALESSANDRO END -->
 
