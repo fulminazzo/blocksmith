@@ -4,6 +4,10 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import it.fulminazzo.blocksmith.ProjectInfo;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Exception thrown by {@link OrderValidator}.
@@ -15,6 +19,7 @@ public final class ValidationException extends Exception {
 
     @Getter
     private final @NotNull DetailAST node;
+    private final @NotNull List<Object> arguments = new ArrayList<>();
 
     /**
      * Instantiates a new Validation exception.
@@ -30,6 +35,26 @@ public final class ValidationException extends Exception {
                         + messageCode
         );
         this.node = node;
+    }
+
+    /**
+     * Gets the arguments to format.
+     *
+     * @return the arguments
+     */
+    public @Nullable Object @NotNull [] getArguments() {
+        return arguments.toArray();
+    }
+
+    /**
+     * Adds an argument to format.
+     *
+     * @param argument the argument
+     * @return this object (for method chaining)
+     */
+    public @NotNull ValidationException addArgument(final @Nullable Object argument) {
+        arguments.add(argument);
+        return this;
     }
 
 }
