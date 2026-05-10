@@ -107,7 +107,14 @@ allprojects {
             rule {
                 excludes = listOf("**/$projectInfoClassName**")
                 limit {
-                    minimum = "0.90".toBigDecimal()
+                    counter = "INSTRUCTION"
+                    value = "COVEREDRATIO"
+                    minimum = "0.97".toBigDecimal()
+                }
+                limit {
+                    counter = "BRANCH"
+                    value = "COVEREDRATIO"
+                    minimum = "0.95".toBigDecimal()
                 }
             }
         }
