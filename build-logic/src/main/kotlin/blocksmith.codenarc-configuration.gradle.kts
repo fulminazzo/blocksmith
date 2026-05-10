@@ -11,6 +11,7 @@ codenarc {
     maxPriority1Violations = 0
     maxPriority2Violations = 0
     maxPriority3Violations = 0
+    isIgnoreFailures = false
     toolVersion = rootProject.libs.versions.codenarc.get()
 }
 

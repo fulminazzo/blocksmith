@@ -23,6 +23,7 @@ checkstyle {
     configFile = rootProject.file("config/checkstyle/checkstyle.xml")
     maxErrors = 0
     maxWarnings = 0
+    isIgnoreFailures = false
     toolVersion = rootProject.libs.versions.checkstyle.get()
 }
 

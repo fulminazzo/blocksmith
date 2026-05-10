@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
 
-    <!-- Specifically ignore Groovy/Spock generated closure classes -->
+    <!-- Ignore Groovy/Spock generated closure classes -->
     <Match classregex=".*_(closure|spock)[\d_].*" />
+
+    <!-- Ignore Groovy internal 'MetaClass' related noise -->
+    <Match>
+        <Bug pattern="MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR,MS_CANNOT_BE_FINAL,MS_SHOULD_BE_FINAL" />
+    </Match>
+    <Match>
+        <Or>
+            <Method name="~.*\$getStaticMetaClass.*" />
+            <Field name="~__\$stMC" />
+        </Or>
+    </Match>
+
+    <!-- Ignore Spock Framework lifecycle methods falsely flagged as uncalled -->
+    <Match>
+        <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
+        <Or>
+            <Method name="setup" />
+            <Method name="cleanup" />
+            <Method name="setupSpec" />
+            <Method name="cleanupSpec" />
+        </Or>
+    </Match>
 
 </FindBugsFilter>
