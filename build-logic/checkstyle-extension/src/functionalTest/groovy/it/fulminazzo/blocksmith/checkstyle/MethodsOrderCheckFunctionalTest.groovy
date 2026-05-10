@@ -260,12 +260,12 @@ class MethodsOrderCheckFunctionalTest extends Specification {
         'method'    | 'hashCode'  || MethodNameCriterion.ANY.errorMessage
         'method'    | 'toString'  || MethodNameCriterion.ANY.errorMessage
         // getter and setter
-        'getString' | 'equals'    || MethodNameCriterion.GETTER_AND_SETTER.errorMessage
-        'getString' | 'hashCode'  || MethodNameCriterion.GETTER_AND_SETTER.errorMessage
-        'getString' | 'toString'  || MethodNameCriterion.GETTER_AND_SETTER.errorMessage
-        'setString' | 'equals'    || MethodNameCriterion.GETTER_AND_SETTER.errorMessage
-        'setString' | 'hashCode'  || MethodNameCriterion.GETTER_AND_SETTER.errorMessage
-        'setString' | 'toString'  || MethodNameCriterion.GETTER_AND_SETTER.errorMessage
+        'getString' | 'equals'    || MethodNameCriterion.PAIRED.errorMessage
+        'getString' | 'hashCode'  || MethodNameCriterion.PAIRED.errorMessage
+        'getString' | 'toString'  || MethodNameCriterion.PAIRED.errorMessage
+        'setString' | 'equals'    || MethodNameCriterion.PAIRED.errorMessage
+        'setString' | 'hashCode'  || MethodNameCriterion.PAIRED.errorMessage
+        'setString' | 'toString'  || MethodNameCriterion.PAIRED.errorMessage
         // equals
         'equals'    | 'hashCode'  || MethodNameCriterion.EQUALS.errorMessage
         'equals'    | 'toString'  || MethodNameCriterion.EQUALS.errorMessage

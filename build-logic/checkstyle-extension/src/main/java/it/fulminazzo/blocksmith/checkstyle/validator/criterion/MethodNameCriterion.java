@@ -14,7 +14,7 @@ public enum MethodNameCriterion implements Criterion {
     ANY {
         @Override
         public boolean matches(final @NotNull DetailAST node) {
-            return !GETTER_AND_SETTER.matches(node)
+            return !PAIRED.matches(node)
                     && !EQUALS.matches(node)
                     && !HASH_CODE.matches(node)
                     && !TO_STRING.matches(node);
@@ -26,17 +26,13 @@ public enum MethodNameCriterion implements Criterion {
         }
     },
     /**
-     * {@code (get|is)<name>} and {@code set<name>} criterion.
+     * Methods from {@link PairedMethods}.
      */
-    GETTER_AND_SETTER {
+    PAIRED {
         @Override
         public boolean matches(final @NotNull DetailAST node) {
             String methodName = CriterionUtils.getMethodName(node);
-            return PairedMethods.methodNameStartsWith(
-                    methodName,
-                    PairedMethods.GETTERS,
-                    PairedMethods.SETTERS
-            );
+            return PairedMethods.isMethodPaired(methodName);
         }
 
         @Override

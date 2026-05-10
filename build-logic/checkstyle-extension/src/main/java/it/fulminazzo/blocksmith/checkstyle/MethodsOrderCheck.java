@@ -37,12 +37,11 @@ public final class MethodsOrderCheck extends ValidatorCheck {
      */
     public MethodsOrderCheck() {
         super(new OrderValidator(
-                        MethodTraitCriterion.values(),
-                        VisibilityCriterion.values()
-                ).then(new OverloadValidator())
-                        .then(new OrderValidator(MethodNameCriterion.values()))
-                        .then(new PairedMethodsValidator(PairedMethods.GETTERS, PairedMethods.SETTERS))
-        );
+                MethodTraitCriterion.values(),
+                VisibilityCriterion.values()
+        ).then(new OverloadValidator()).then(new OrderValidator(MethodNameCriterion.values())));
+        for (List<String>[] pairs : PairedMethods.getPairs())
+            getValidator().then(new PairedMethodsValidator(pairs[0], pairs[1]));
     }
 
     @Override

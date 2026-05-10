@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -15,20 +16,34 @@ public final class PairedMethods {
     public static final @NotNull List<String> SETTERS = List.of("set");
 
     /**
-     * Checks if the method name starts with any of the given prefixes.
-     *
-     * @param methodName     the method name
-     * @param firstPrefixes  the first prefixes
-     * @param secondPrefixes the second prefixes
-     * @return {@code true} if the method name starts with any of the given prefixes, {@code false} otherwise
+     * Checks if the method is prefixed with any of the prefixes in this class.
      */
-    public static boolean methodNameStartsWith(
-            final @NotNull String methodName,
-            final @NotNull List<String> firstPrefixes,
-            final @NotNull List<String> secondPrefixes
-    ) {
-        return firstPrefixes.stream().anyMatch(methodName::startsWith)
-                || secondPrefixes.stream().anyMatch(methodName::startsWith);
+    public static boolean isMethodPaired(final @NotNull String methodName) {
+        return getAll().stream().anyMatch(methodName::startsWith);
+    }
+
+    /**
+     * Gets all the pairs of prefixes.
+     *
+     * @return a list with arrays of two elements representing the first and second prefixes
+     */
+    @SuppressWarnings("unchecked")
+    public static @NotNull List<List<String>[]> getPairs() {
+        List<List<String>[]> pairs = new ArrayList<>();
+        pairs.add(new List[]{GETTERS, SETTERS});
+        return pairs;
+    }
+
+    /**
+     * Gets all the prefixes.
+     *
+     * @return the prefixes
+     */
+    public static @NotNull List<String> getAll() {
+        List<String> all = new ArrayList<>();
+        all.addAll(GETTERS);
+        all.addAll(SETTERS);
+        return all;
     }
 
 }
