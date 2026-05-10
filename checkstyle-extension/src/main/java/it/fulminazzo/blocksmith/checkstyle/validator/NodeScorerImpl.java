@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.checkstyle.validator;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.Criterion;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +15,7 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 final class NodeScorerImpl implements NodeScorer {
+    @Getter
     private final @NotNull Criterion @NotNull [] criteria;
 
     /**

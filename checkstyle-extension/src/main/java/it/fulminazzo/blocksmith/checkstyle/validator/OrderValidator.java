@@ -84,7 +84,10 @@ public final class OrderValidator implements Validator, NodeScorer {
             int current = (score >> bits) & mask;
 
             if (current < last)
-                throw new ValidationException(node, scorer.getCriterion(current).getErrorMessage());
+                throw new ValidationException(node, scorer.getCriterion(current).getErrorMessage())
+                        .addArgument(String.join(" ",
+                                Arrays.stream(scorer.getCriteria()).map(Object::toString).toArray(String[]::new))
+                        );
             else if (current > last) {
                 setLastScore(score);
                 break;
