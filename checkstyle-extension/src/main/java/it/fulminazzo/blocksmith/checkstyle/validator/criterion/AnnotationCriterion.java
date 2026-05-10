@@ -56,12 +56,12 @@ public enum AnnotationCriterion implements Criterion {
 
     @Override
     public boolean matches(final @NotNull DetailAST node) {
-        return CriterionUtils.isAnnotatedWith(node, annotationName);
+        return CriterionUtils.isAnnotationName(node, annotationName);
     }
 
     @Override
     public @NotNull String getErrorMessage() {
-        return "annotations";
+        return "annotation";
     }
 
     @Override
