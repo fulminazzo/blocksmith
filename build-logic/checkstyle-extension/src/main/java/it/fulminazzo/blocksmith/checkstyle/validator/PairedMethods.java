@@ -10,6 +10,11 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PairedMethods {
     /*
+     * ADDERS AND REMOVERS
+     */
+    public static final @NotNull List<String> ADDERS = List.of("add", "append", "put");
+    public static final @NotNull List<String> REMOVERS = List.of("remove", "delete");
+    /*
      * GETTERS AND SETTERS
      */
     public static final @NotNull List<String> GETTERS = List.of("is", "get");
@@ -30,6 +35,7 @@ public final class PairedMethods {
     @SuppressWarnings("unchecked")
     public static @NotNull List<List<String>[]> getPairs() {
         List<List<String>[]> pairs = new ArrayList<>();
+        pairs.add(new List[]{ADDERS, REMOVERS});
         pairs.add(new List[]{GETTERS, SETTERS});
         return pairs;
     }
@@ -41,6 +47,8 @@ public final class PairedMethods {
      */
     public static @NotNull List<String> getAll() {
         List<String> all = new ArrayList<>();
+        all.addAll(ADDERS);
+        all.addAll(REMOVERS);
         all.addAll(GETTERS);
         all.addAll(SETTERS);
         return all;
