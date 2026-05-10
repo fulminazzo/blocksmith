@@ -39,6 +39,7 @@ public final class DeclarationOrderCheck extends ValidatorCheck {
 
     @Override
     public void visitToken(final @NotNull DetailAST ast) {
+        if (isTopLevel(ast)) return;
         if (ast.getType() != TokenTypes.VARIABLE_DEF || CheckUtils.isField(ast)) visitTokenImpl(ast);
         if (isScopeChanged(ast)) getValidator().enterScope();
     }

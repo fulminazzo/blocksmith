@@ -88,6 +88,7 @@ abstract class ValidatorCheck extends AbstractCheck {
 
     @Override
     public void visitToken(final @NotNull DetailAST ast) {
+        if (isTopLevel(ast)) return;
         if (isScopeChanged(ast)) getValidator().enterScope();
         else visitTokenImpl(ast);
     }
@@ -99,6 +100,16 @@ abstract class ValidatorCheck extends AbstractCheck {
         } catch (CompositeValidationException c) {
             c.getExceptions().forEach(e -> log(e.getNode(), e.getMessage()));
         }
+    }
+
+    /**
+     * Checks if the given node is at the top level.
+     *
+     * @param node the node to check
+     * @return {@code true} if it is
+     */
+    protected static boolean isTopLevel(final @NotNull DetailAST node) {
+        return node.getParent() == null || node.getParent().getType() == TokenTypes.COMPILATION_UNIT;
     }
 
 }

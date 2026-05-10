@@ -42,6 +42,7 @@ public final class TypesOrderCheck extends ValidatorCheck {
 
     @Override
     public void visitToken(final @NotNull DetailAST ast) {
+        if (isTopLevel(ast)) return;
         visitTokenImpl(ast);
         if (isScopeChanged(ast)) getValidator().enterScope();
     }
