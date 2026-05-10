@@ -12,6 +12,10 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor
 public enum AnnotationCriterion implements Criterion {
     /**
+     * {@code @SuppressWarnings} criterion.
+     */
+    SUPPRESS_WARNINGS("SuppressWarnings"),
+    /**
      * {@code @Data} criterion.
      */
     DATA("Data"),
