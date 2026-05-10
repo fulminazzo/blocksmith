@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.checkstyle;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.DeclarationCriterion;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +39,7 @@ public final class DeclarationOrderCheck extends ValidatorCheck {
 
     @Override
     public void visitToken(final @NotNull DetailAST ast) {
-        visitTokenImpl(ast);
+        if (ast.getType() != TokenTypes.VARIABLE_DEF || CheckUtils.isField(ast)) visitTokenImpl(ast);
         if (isScopeChanged(ast)) getValidator().enterScope();
     }
 
