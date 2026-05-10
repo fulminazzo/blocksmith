@@ -109,7 +109,7 @@ class PassiveExpiringListTest extends Specification {
         sublist.size() == 2
     }
 
-    def 'test that #method considers expired entries'() {
+    def 'test that #method returns #expected with expired entries'() {
         given:
         internal.add(second)
 
