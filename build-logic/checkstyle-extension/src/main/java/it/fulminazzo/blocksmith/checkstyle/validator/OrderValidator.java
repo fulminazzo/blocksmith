@@ -100,7 +100,8 @@ public final class OrderValidator implements Validator, NodeScorer {
 
     @Override
     public @NotNull OrderValidator then(final @NotNull Validator validator) {
-        this.next = validator;
+        if (next != null) next.then(validator);
+        else this.next = validator;
         return this;
     }
 

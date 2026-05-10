@@ -1,10 +1,10 @@
 package it.fulminazzo.blocksmith.checkstyle;
 
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import it.fulminazzo.blocksmith.checkstyle.validator.PairedMethods;
-import it.fulminazzo.blocksmith.checkstyle.validator.PairedMethodsValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.OverloadValidator;
+import it.fulminazzo.blocksmith.checkstyle.validator.PairedMethods;
+import it.fulminazzo.blocksmith.checkstyle.validator.PairedMethodsValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.MethodNameCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.MethodTraitCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.VisibilityCriterion;
@@ -37,15 +37,12 @@ public final class MethodsOrderCheck extends ValidatorCheck {
      */
     public MethodsOrderCheck() {
         super(new OrderValidator(
-                MethodTraitCriterion.values(),
-                VisibilityCriterion.values()
-        ).then(
-                new OverloadValidator().then(
-                        new OrderValidator(MethodNameCriterion.values()).then(
-                                new PairedMethodsValidator(PairedMethods.GETTERS, PairedMethods.SETTERS)
-                        )
-                )
-        ));
+                        MethodTraitCriterion.values(),
+                        VisibilityCriterion.values()
+                ).then(new OverloadValidator())
+                        .then(new OrderValidator(MethodNameCriterion.values()))
+                        .then(new PairedMethodsValidator(PairedMethods.GETTERS, PairedMethods.SETTERS))
+        );
     }
 
     @Override
