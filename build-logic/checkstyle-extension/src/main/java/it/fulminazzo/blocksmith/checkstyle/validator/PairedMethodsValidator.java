@@ -17,9 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public final class PairedMethodsValidator
         extends AbstractValidator<PairedMethodsValidator.Scope, PairedMethodsValidator> {
-    public static final @NotNull List<String> GETTERS = List.of("get", "is");
-    public static final @NotNull List<String> SETTERS = List.of("set");
-
     private final @NotNull List<String> firstPrefixes;
     private final @NotNull List<String> secondPrefixes;
 

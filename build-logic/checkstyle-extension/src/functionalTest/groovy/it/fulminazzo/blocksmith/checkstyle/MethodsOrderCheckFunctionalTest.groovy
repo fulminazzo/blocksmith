@@ -300,7 +300,7 @@ class MethodsOrderCheckFunctionalTest extends Specification {
         setterViolation.line == 13
         setterViolation.column == 5
         setterViolation.message == message('it.fulminazzo.blocksmith.checkstyle.method.pair.second')
-                .replace('{0}', 'set').replace('{1}', 'get, is')
+                .replace('{0}', 'set').replace('{1}', 'is, get')
     }
 
     def 'test that methods check works on nested classes'() {

@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.checkstyle.validator.criterion;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import it.fulminazzo.blocksmith.checkstyle.validator.PairedMethods;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,15 +26,17 @@ public enum MethodNameCriterion implements Criterion {
         }
     },
     /**
-     * {@code get<name>} and {@code set<name>} criterion.
+     * {@code (get|is)<name>} and {@code set<name>} criterion.
      */
     GETTER_AND_SETTER {
         @Override
         public boolean matches(final @NotNull DetailAST node) {
             String methodName = CriterionUtils.getMethodName(node);
-            return methodName.startsWith("get")
-                    || methodName.startsWith("is")
-                    || methodName.startsWith("set");
+            return PairedMethods.methodNameStartsWith(
+                    methodName,
+                    PairedMethods.GETTERS,
+                    PairedMethods.SETTERS
+            );
         }
 
         @Override
