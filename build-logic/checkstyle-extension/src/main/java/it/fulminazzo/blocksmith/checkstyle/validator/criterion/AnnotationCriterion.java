@@ -50,7 +50,16 @@ public enum AnnotationCriterion implements Criterion {
     /**
      * {@code @Builder} criterion.
      */
-    BUILDER("Builder");
+    BUILDER("Builder"),
+    /**
+     * Special criterion to match any other annotation.
+     */
+    OTHERS("anything else") {
+        @Override
+        public boolean matches(final @NotNull DetailAST node) {
+            return true;
+        }
+    };
 
     private final @NotNull String annotationName;
 
