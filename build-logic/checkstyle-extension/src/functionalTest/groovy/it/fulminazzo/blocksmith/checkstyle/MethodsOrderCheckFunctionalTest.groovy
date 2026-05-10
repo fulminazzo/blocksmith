@@ -237,13 +237,18 @@ class MethodsOrderCheckFunctionalTest extends Specification {
     }
 
     def 'test that method name #name after #other throws'() {
+        given:
+        final isGetterSetterTest = name =~ /(get|set).*/
+
         when:
         def violations = runCheck('MethodInvalidName', MethodsOrderCheck) {
-            it.replace('%target%', name).replace('%other%', other)
+            it.replace('%target%', name)
+                    .replace('%other%', other)
+                    .replace('%target2%', isGetterSetterTest ? "${name}2" : name)
         }
 
         then:
-        violations.size() == 2
+        violations.size() == (isGetterSetterTest ? 1 : 2)
 
         and:
         def violation = violations[0]
