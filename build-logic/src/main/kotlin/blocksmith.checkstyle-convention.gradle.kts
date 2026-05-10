@@ -6,21 +6,31 @@ plugins {
     checkstyle
 }
 
-allprojects {
-    apply { plugin("checkstyle") }
+val buildLogic = gradle.includedBuild("build-logic")
+val checkstyleExtension: Configuration by configurations.creating
 
-    checkstyle {
-        configFile = rootProject.file("config/checkstyle/checkstyle.xml")
-        maxErrors = 0
-        maxWarnings = 0
-        toolVersion = rootProject.libs.versions.checkstyle.get()
+dependencies {
+    checkstyleExtension(
+        files(
+            buildLogic
+                .projectDir
+                .resolve("checkstyle-extension/build/libs/checkstyle-extension.jar")
+        )
+    )
+}
+
+checkstyle {
+    configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+    maxErrors = 0
+    maxWarnings = 0
+    toolVersion = rootProject.libs.versions.checkstyle.get()
+}
+
+tasks.withType<Checkstyle> {
+    dependsOn(buildLogic.task(":checkstyle-extension:jar"))
+    checkstyleClasspath += checkstyleExtension
+    reports {
+        xml.required = true
+        html.required = true
     }
-
-    tasks.withType<Checkstyle> {
-        reports {
-            xml.required = true
-            html.required = true
-        }
-    }
-
 }
