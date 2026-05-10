@@ -243,7 +243,7 @@ class MethodsOrderCheckFunctionalTest extends Specification {
         }
 
         then:
-        violations.size() == 1
+        violations.size() == 2
 
         and:
         def violation = violations[0]
@@ -286,7 +286,7 @@ class MethodsOrderCheckFunctionalTest extends Specification {
         def violations = runCheck('MethodInvalidGetterSetter', MethodsOrderCheck)
 
         then:
-        violations.size() == 2
+        violations.size() == 4
 
         and:
         def getterViolation = violations[0]
@@ -296,7 +296,7 @@ class MethodsOrderCheckFunctionalTest extends Specification {
                 .replace('{0}', 'get').replace('{1}', 'set')
 
         and:
-        def setterViolation = violations[1]
+        def setterViolation = violations[2]
         setterViolation.line == 13
         setterViolation.column == 5
         setterViolation.message == message('it.fulminazzo.blocksmith.checkstyle.method.pair.second')
