@@ -6,6 +6,7 @@ import lombok.*;
 @Value
 @ToString
 @EqualsAndHashCode
+@SomethingElse
 @Builder
 @Getter
 @Setter

@@ -17,7 +17,7 @@ class AnnotationsOrderCheckFunctionalTest extends Specification {
         def violations = runCheck('AnnotationInvalidOrder', AnnotationsOrderCheck)
 
         then:
-        violations.size() == 3
+        violations.size() == 4
 
         and:
         def equalsAndHashCode = violations[0]
@@ -26,14 +26,20 @@ class AnnotationsOrderCheckFunctionalTest extends Specification {
         equalsAndHashCode.message == expectedMessage
 
         and:
-        def getter = violations[1]
-        getter.line == 10
+        def builder = violations[1]
+        builder.line == 10
+        builder.column == 1
+        builder.message == expectedMessage
+
+        and:
+        def getter = violations[2]
+        getter.line == 11
         getter.column == 1
         getter.message == expectedMessage
 
         and:
-        def setter = violations[2]
-        setter.line == 11
+        def setter = violations[3]
+        setter.line == 12
         setter.column == 1
         setter.message == expectedMessage
     }
