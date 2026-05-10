@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.checkstyle;
 
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import it.fulminazzo.blocksmith.checkstyle.validator.GetterSetterValidator;
+import it.fulminazzo.blocksmith.checkstyle.validator.PairedMethodsValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.OverloadValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.MethodNameCriterion;
@@ -41,7 +41,7 @@ public final class MethodsOrderCheck extends ValidatorCheck {
         ).then(
                 new OverloadValidator().then(
                         new OrderValidator(MethodNameCriterion.values()).then(
-                                new GetterSetterValidator()
+                                new PairedMethodsValidator(PairedMethodsValidator.GETTERS, PairedMethodsValidator.SETTERS)
                         )
                 )
         ));
