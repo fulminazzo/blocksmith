@@ -59,7 +59,7 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
 
     @Override
     public boolean add(final @Nullable E element, final long ttl) {
-        return delegate.put(element, PRESENT, ttl) == null;
+        return element != null && delegate.put(element, PRESENT, ttl) == null;
     }
 
     @Override
@@ -74,7 +74,7 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
 
     @Override
     public @Nullable Duration getTtl(final @Nullable E element) {
-        return delegate.getTtl(element);
+        return element == null ? null : delegate.getTtl(element);
     }
 
     @Override

@@ -25,7 +25,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param key the key of the element
      * @param ttl the new time-to-live in milliseconds
      */
-    void renew(final @Nullable K key, final long ttl);
+    void renew(final @NotNull K key, final long ttl);
 
     /**
      * Updates the time-to-live of the given element.
@@ -34,7 +34,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param key the key of the element
      * @param ttl the new time-to-live
      */
-    void renew(final @Nullable K key, final @NotNull Duration ttl);
+    void renew(final @NotNull K key, final @NotNull Duration ttl);
 
     /**
      * If a pair with the given key and old value is present, it is replaced with the new value.
@@ -46,7 +46,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @return {@code true} if the replacement was successful, {@code false} if no element matching the pair was found
      */
     boolean replace(
-            final @Nullable K key,
+            final @NotNull K key,
             final @Nullable V oldValue,
             final @Nullable V newValue,
             final long ttl
@@ -62,7 +62,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @return {@code true} if the replacement was successful, {@code false} if no element matching the pair was found
      */
     boolean replace(
-            final @Nullable K key,
+            final @NotNull K key,
             final @Nullable V oldValue,
             final @Nullable V newValue,
             final @NotNull Duration ttl
@@ -78,7 +78,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @return the value of the map if present, otherwise the value parameter
      */
     @Nullable V computeIfAbsent(
-            final @Nullable K key,
+            final @NotNull K key,
             final @NotNull Function<? super K, ? extends V> mappingFunction,
             final long ttl
     );
@@ -93,7 +93,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @return the value of the map if present, otherwise the value parameter
      */
     @Nullable V computeIfAbsent(
-            final @Nullable K key,
+            final @NotNull K key,
             final @NotNull Function<? super K, ? extends V> mappingFunction,
             final @NotNull Duration ttl
     );
@@ -107,7 +107,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @return the previous value present in the map
      */
     @Nullable V compute(
-            final @Nullable K key,
+            final @NotNull K key,
             final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction,
             final long ttl
     );
@@ -121,7 +121,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @return the previous value present in the map
      */
     @Nullable V compute(
-            final @Nullable K key,
+            final @NotNull K key,
             final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction,
             final @NotNull Duration ttl
     );
@@ -136,7 +136,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @return the updated value
      */
     @Nullable V merge(
-            final @Nullable K key, final @NotNull V value,
+            final @NotNull K key, final @NotNull V value,
             final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction,
             final long ttl
     );
@@ -151,7 +151,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @return the updated value
      */
     @Nullable V merge(
-            final @Nullable K key, final @NotNull V value,
+            final @NotNull K key, final @NotNull V value,
             final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction,
             final @NotNull Duration ttl
     );
@@ -189,7 +189,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param ttl   the time-to-live (after which it will expire) in milliseconds
      * @return the previous value present in the map
      */
-    @Nullable V put(final @Nullable K key, final @Nullable V value, final long ttl);
+    @Nullable V put(final @NotNull K key, final @Nullable V value, final long ttl);
 
     /**
      * Adds a new key-value pair in the map.
@@ -199,7 +199,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param ttl   the time-to-live (after which it will expire)
      * @return the previous value present in the map
      */
-    @Nullable V put(final @Nullable K key, final @Nullable V value, final @NotNull Duration ttl);
+    @Nullable V put(final @NotNull K key, final @Nullable V value, final @NotNull Duration ttl);
 
     /**
      * Adds a key-value pair in the map (if not already present).
@@ -209,7 +209,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param ttl   the time-to-live (after which it will expire) in milliseconds
      * @return the value of the map if present, otherwise the value parameter
      */
-    @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value, final long ttl);
+    @Nullable V putIfAbsent(final @NotNull K key, final @Nullable V value, final long ttl);
 
     /**
      * Adds a key-value pair in the map (if not already present).
@@ -219,7 +219,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param ttl   the time-to-live (after which it will expire)
      * @return the value of the map if present, otherwise the value parameter
      */
-    @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value, final @NotNull Duration ttl);
+    @Nullable V putIfAbsent(final @NotNull K key, final @Nullable V value, final @NotNull Duration ttl);
 
     /**
      * Gets the remaining time-to-live of the element with the given key.
@@ -227,7 +227,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param key the key
      * @return the TTL ({@code null} if not present)
      */
-    @Nullable Duration getTtl(final @Nullable K key);
+    @Nullable Duration getTtl(final @NotNull K key);
 
     /**
      * If a pair with the given key is present, it is replaced with the new value.
@@ -237,7 +237,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @return the previous value present in the map
      */
     @Override
-    @Nullable V replace(final @Nullable K key, final @Nullable V value);
+    @Nullable V replace(final @NotNull K key, final @Nullable V value);
 
     /**
      * If a pair with the given key and old value is present, it is replaced with the new value.
@@ -250,7 +250,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      *         {@code false} if no element matching the pair was found
      */
     @Override
-    boolean replace(final @Nullable K key, final @Nullable V oldValue, final @Nullable V newValue);
+    boolean replace(final @NotNull K key, final @Nullable V oldValue, final @Nullable V newValue);
 
     /**
      * Adds a new key-value pair computed from the given function in the map
@@ -263,7 +263,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      */
     @Override
     @Nullable V computeIfAbsent(
-            final @Nullable K key,
+            final @NotNull K key,
             final @NotNull Function<? super K, ? extends V> mappingFunction
     );
 
@@ -277,7 +277,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      */
     @Override
     @Nullable V computeIfPresent(
-            final @Nullable K key,
+            final @NotNull K key,
             final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction
     );
 
@@ -292,7 +292,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      */
     @Override
     @Nullable V compute(
-            final @Nullable K key,
+            final @NotNull K key,
             final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction
     );
 
@@ -307,7 +307,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      */
     @Override
     @Nullable V merge(
-            final @Nullable K key,
+            final @NotNull K key,
             final @NotNull V value,
             final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction
     );
@@ -330,7 +330,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @return the previous value present in the map
      */
     @Override
-    @Nullable V put(final @Nullable K key, final @Nullable V value);
+    @Nullable V put(final @NotNull K key, final @Nullable V value);
 
     /**
      * Adds a key-value pair in the map (if not already present).
@@ -341,7 +341,7 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @return the value of the map if present, otherwise the value parameter
      */
     @Override
-    @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value);
+    @Nullable V putIfAbsent(final @NotNull K key, final @Nullable V value);
 
     /**
      * Prints out the contents of this map.

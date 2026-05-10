@@ -68,7 +68,7 @@ final class PassiveExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     protected @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
-        return delegate.get(key);
+        return key == null ? null : delegate.get(key);
     }
 
 }

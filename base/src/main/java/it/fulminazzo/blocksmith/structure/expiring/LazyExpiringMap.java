@@ -69,7 +69,7 @@ final class LazyExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
     protected @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
-        ExpiringEntry<V> entry = delegate.get(key);
+        ExpiringEntry<V> entry = key == null ? null : delegate.get(key);
         if (entry != null && entry.isExpired()) {
             delegate.remove(key);
             return null;

@@ -188,7 +188,7 @@ public final class ReflectUtils {
      */
     static OptionalInt parameterMatches(
             final @NotNull Parameter @NotNull [] parameters,
-            final @Nullable Class<?> @NotNull [] given
+            final Class<?> @NotNull [] given
     ) {
         int total = 0;
         for (int i = 0; i < parameters.length; i++) {
