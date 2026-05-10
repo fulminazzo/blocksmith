@@ -58,6 +58,16 @@ abstract class ValidatorCheck extends AbstractCheck {
         }
     }
 
+    /**
+     * Checks if the scope changed according to the {@link #SCOPE_CHANGE_TOKENS}.
+     *
+     * @param node the node to check
+     * @return {@code true} if the scope changed, {@code false} otherwise
+     */
+    protected boolean isScopeChanged(final @NotNull DetailAST node) {
+        return SCOPE_CHANGE_TOKENS.contains(node.getType());
+    }
+
     @Override
     public int[] getDefaultTokens() {
         return Stream.concat(
@@ -89,16 +99,6 @@ abstract class ValidatorCheck extends AbstractCheck {
         } catch (CompositeValidationException c) {
             c.getExceptions().forEach(e -> log(e.getNode(), e.getMessage()));
         }
-    }
-
-    /**
-     * Checks if the scope changed according to the {@link #SCOPE_CHANGE_TOKENS}.
-     *
-     * @param node the node to check
-     * @return {@code true} if the scope changed, {@code false} otherwise
-     */
-    protected static boolean isScopeChanged(final @NotNull DetailAST node) {
-        return SCOPE_CHANGE_TOKENS.contains(node.getType());
     }
 
 }
