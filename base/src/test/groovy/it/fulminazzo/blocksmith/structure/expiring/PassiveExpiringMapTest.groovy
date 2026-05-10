@@ -4,7 +4,6 @@ import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 class PassiveExpiringMapTest extends Specification {
-
     private ExpiringMap<String, String> map
     private Map<String, ExpiringEntry<String>> internal
 

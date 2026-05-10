@@ -4,7 +4,7 @@ import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 class PassiveExpiringListTest extends Specification {
-    private static final long ttl = 400L
+    private static final long ttl = 1_000L
     private static final long expiringTtl = ttl / 4 as long
 
     private final ExpiringEntry<String> first = new ExpiringEntry<>('Hello', ttl)

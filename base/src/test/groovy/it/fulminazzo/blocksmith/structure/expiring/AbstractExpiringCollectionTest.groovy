@@ -5,7 +5,7 @@ import spock.lang.Specification
 import java.time.Duration
 
 class AbstractExpiringCollectionTest extends Specification {
-    private static final Duration ttl = Duration.ofMillis(200)
+    private static final Duration ttl = Duration.ofMillis(1_000L)
 
     private static final String value = 'Hello, world!'
 

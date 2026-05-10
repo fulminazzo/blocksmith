@@ -9,7 +9,7 @@ import java.util.function.BiFunction
 import java.util.function.Function
 
 class AbstractExpiringMapTest extends Specification {
-    private static final long ttl = 400L
+    private static final long ttl = 1_000L
 
     private static final Function<? super String, ? extends String> function = { k -> 'world' }
     private static final BiFunction<? super String, ? super String, ? extends String> bifunction = { (k, v) -> 'moon' }
@@ -655,7 +655,7 @@ class AbstractExpiringMapTest extends Specification {
 
         where:
         other << [
-                null,
+                new Object[]{null},
                 Map.entry('Goodbye', 'mars'),
                 Map.entry('Hello', 'mars'),
                 Map.entry('Goodbye', 'world')
