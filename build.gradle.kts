@@ -32,15 +32,11 @@ allprojects {
     apply { plugin("blocksmith.jacoco-configuration") }
     apply { plugin("blocksmith.spotbugs-configuration") }
 
-    val mockitoAgent: Configuration by configurations.creating
-
     dependencies {
         compileOnly(rootProject.libs.bundles.annotations)
         annotationProcessor(rootProject.libs.lombok)
 
         if (project.path != rootProject.projects.base.path) api(rootProject.projects.base)
-
-        mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
 
     testing {
@@ -58,7 +54,6 @@ allprojects {
                 targets {
                     all {
                         testTask.configure {
-                            jvmArgs("-javaagent:${mockitoAgent.asPath}")
                             testLogging {
                                 exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
                             }
