@@ -19,6 +19,13 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
     protected final @NotNull List<@NotNull ExpiringEntry<E>> delegate = Collections.synchronizedList(new ArrayList<>());
 
     /**
+     * Manually removes all the expired entries.
+     */
+    public void clearExpired() {
+        delegate.removeIf(ExpiringEntry::isExpired);
+    }
+
+    /**
      * Gets the expiring entry associated with an index.
      *
      * @param index the index
@@ -26,13 +33,12 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
      * @throws IndexOutOfBoundsException if either the index is out of range OR
      *                                   the entry at the given index expired and there is no replacement entry
      */
-    abstract @NotNull ExpiringEntry<E> getExpiring(final int index);
-
-    /**
-     * Manually removes all the expired entries.
-     */
-    public void clearExpired() {
-        delegate.removeIf(ExpiringEntry::isExpired);
+    @NotNull ExpiringEntry<E> getExpiring(final int index) {
+        ExpiringEntry<E> entry = delegate.get(index);
+        if (entry.isExpired()) {
+            delegate.remove(index);
+            return getExpiring(index);
+        } else return entry;
     }
 
     private <E1 extends E> boolean addAllHelper(int index, final @NotNull ExpiringCollection<E1> collection) {

@@ -80,13 +80,4 @@ final class LazyExpiringList<E> extends AbstractExpiringList<E> {
         return delegate.set(index, new ExpiringEntry<>(element, ttl)).getValue();
     }
 
-    @Override
-    @NotNull ExpiringEntry<E> getExpiring(final int index) {
-        ExpiringEntry<E> entry = delegate.get(index);
-        if (entry.isExpired()) {
-            delegate.remove(index);
-            return getExpiring(index);
-        } else return entry;
-    }
-
 }
