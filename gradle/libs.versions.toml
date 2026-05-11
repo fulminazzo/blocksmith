@@ -42,6 +42,7 @@ log4j-slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.r
 # TESTING
 spock-core = { module = "org.spockframework:spock-core", version.ref = "spock-core" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-version" }
 
 # MINECRAFT
 bukkit = { module = "org.spigotmc:spigot-api", version.ref = "bukkit" }
