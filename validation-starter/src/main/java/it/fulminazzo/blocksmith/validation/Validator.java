@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 
 /**
  * The registry of validators used to validate objects.
+ *
+ * @see Constraint
  */
 @SuppressWarnings("unchecked")
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
@@ -28,21 +30,36 @@ public final class Validator {
 
     private static final @NotNull Validator INSTANCE = new Validator();
 
-    private final @NotNull Map<Class<? extends Annotation>, Function<? extends Annotation, ConstraintValidator>> validators = new ConcurrentHashMap<>();
+    private final @NotNull Map<
+            Class<? extends Annotation>,
+            Function<? extends Annotation, ConstraintValidator>
+            > validators = new ConcurrentHashMap<>();
 
     static {
         getInstance()
                 .register(NonNull.class, new ConstraintValidatorImpl(Objects::nonNull))
                 .register(AssertFalse.class, new BooleanConstraintValidator(o -> !o))
                 .register(AssertTrue.class, new BooleanConstraintValidator(o -> o))
-                .registerSupplier(Max.class, a -> new NumberDurationConstraintValidator(o -> o <= a.value()))
-                .registerSupplier(MaxChar.class, a -> new CharacterConstraintValidator(o -> o <= a.value()))
+                .registerSupplier(Max.class,
+                        a -> new NumberDurationConstraintValidator(o -> o <= a.value())
+                )
+                .registerSupplier(MaxChar.class,
+                        a -> new CharacterConstraintValidator(o -> o <= a.value())
+                )
                 .register(Negative.class, new NumberDurationConstraintValidator(o -> o < 0))
-                .registerSupplier(Min.class, a -> new NumberDurationConstraintValidator(o -> o >= a.value()))
-                .registerSupplier(MinChar.class, a -> new CharacterConstraintValidator(o -> o >= a.value()))
+                .registerSupplier(Min.class,
+                        a -> new NumberDurationConstraintValidator(o -> o >= a.value())
+                )
+                .registerSupplier(MinChar.class,
+                        a -> new CharacterConstraintValidator(o -> o >= a.value())
+                )
                 .register(Positive.class, new NumberDurationConstraintValidator(o -> o > 0))
-                .registerSupplier(Range.class, a -> new NumberDurationConstraintValidator(o -> o >= a.min() && o <= a.max()))
-                .registerSupplier(RangeChar.class, a -> new CharacterConstraintValidator(o -> o >= a.min() && o <= a.max()))
+                .registerSupplier(Range.class,
+                        a -> new NumberDurationConstraintValidator(o -> o >= a.min() && o <= a.max())
+                )
+                .registerSupplier(RangeChar.class,
+                        a -> new CharacterConstraintValidator(o -> o >= a.min() && o <= a.max())
+                )
                 .registerSupplier(Size.class, a -> new ConstraintValidatorImpl(o -> {
                     if (o == null) return true;
                     Number size;
@@ -139,9 +156,56 @@ public final class Validator {
         if (!violations.isEmpty()) throw new ValidationException(bean, violations);
     }
 
-    private void validateRec(final @NotNull AnnotatedElement annotatedElement,
-                             final @NotNull String elementName,
-                             final @Nullable Object value) throws ValidationException {
+    /**
+     * Registers a new validator for the provided annotation type.
+     *
+     * @param <A>               the annotation type
+     * @param annotationClass   the annotation class
+     * @param validatorSupplier the function to create a new validator instance from the annotation
+     * @return this object (for method chaining)
+     */
+    public <A extends Annotation> @NotNull Validator registerSupplier(
+            final @NotNull Class<A> annotationClass,
+            final @NotNull Function<A, ConstraintValidator> validatorSupplier
+    ) {
+        validators.put(annotationClass, validatorSupplier);
+        return this;
+    }
+
+    /**
+     * Registers a new validator for the provided annotation type.
+     *
+     * @param <A>             the annotation type
+     * @param annotationClass the annotation class
+     * @param validator       the validator
+     * @return this object (for method chaining)
+     */
+    public <A extends Annotation> @NotNull Validator register(
+            final @NotNull Class<A> annotationClass,
+            final @NotNull ConstraintValidator validator
+    ) {
+        return registerSupplier(annotationClass, a -> validator);
+    }
+
+    /**
+     * Gets the validator associated with the given annotation.
+     *
+     * @param <A>        the annotation type
+     * @param annotation the annotation
+     * @return the validator (if found)
+     */
+    public <A extends Annotation> @Nullable ConstraintValidator getValidator(final @NotNull A annotation) {
+        Function<A, ConstraintValidator> validatorSupplier = (Function<A, ConstraintValidator>)
+                validators.get(annotation.annotationType());
+        if (validatorSupplier == null) return null;
+        else return validatorSupplier.apply(annotation);
+    }
+
+    private void validateRec(
+            final @NotNull AnnotatedElement annotatedElement,
+            final @NotNull String elementName,
+            final @Nullable Object value
+    ) throws ValidationException {
         final Map<Class<? extends Annotation>, ConstraintInfo> parents = new HashMap<>();
         final Set<ConstraintViolation> violations = new HashSet<>();
         final Queue<AnnotatedElement> elements = new LinkedList<>();
@@ -159,7 +223,10 @@ public final class Validator {
                     if (!validator.matches(value))
                         violations.add(ConstraintViolation.invalidType(value, validator.getTypeNames()));
                     else if (!validator.isValid(value)) {
-                        final ConstraintInfo constraintInfo = parents.getOrDefault(annotationType, new ConstraintInfo(annotation));
+                        final ConstraintInfo constraintInfo = parents.getOrDefault(
+                                annotationType,
+                                new ConstraintInfo(annotation)
+                        );
                         violations.add(ConstraintViolation.of(value, constraintInfo));
                     }
                 }
@@ -168,7 +235,10 @@ public final class Validator {
             }
             for (Annotation annotation : annotations) {
                 Class<? extends Annotation> annotationType = annotation.annotationType();
-                final ConstraintInfo constraintInfo = parents.getOrDefault(annotationType, new ConstraintInfo(annotation));
+                final ConstraintInfo constraintInfo = parents.getOrDefault(
+                        annotationType,
+                        new ConstraintInfo(annotation)
+                );
                 Arrays.stream(annotationType.getAnnotations())
                         .map(Annotation::annotationType)
                         .forEach(a -> parents.putIfAbsent(a, constraintInfo));
@@ -176,46 +246,6 @@ public final class Validator {
         }
         if (!violations.isEmpty())
             throw new ValidationException(String.format(PROPERTY_FORMAT, value), Map.of(elementName, violations));
-    }
-
-    /**
-     * Gets the validator associated with the given annotation.
-     *
-     * @param <A>        the annotation type
-     * @param annotation the annotation
-     * @return the validator (if found)
-     */
-    public <A extends Annotation> @Nullable ConstraintValidator getValidator(final @NotNull A annotation) {
-        Function<A, ConstraintValidator> validatorSupplier = (Function<A, ConstraintValidator>) validators.get(annotation.annotationType());
-        if (validatorSupplier == null) return null;
-        else return validatorSupplier.apply(annotation);
-    }
-
-    /**
-     * Registers a new validator for the provided annotation type.
-     *
-     * @param <A>             the annotation type
-     * @param annotationClass the annotation class
-     * @param validator       the validator
-     * @return this object (for method chaining)
-     */
-    public <A extends Annotation> @NotNull Validator register(final @NotNull Class<A> annotationClass,
-                                                              final @NotNull ConstraintValidator validator) {
-        return registerSupplier(annotationClass, a -> validator);
-    }
-
-    /**
-     * Registers a new validator for the provided annotation type.
-     *
-     * @param <A>               the annotation type
-     * @param annotationClass   the annotation class
-     * @param validatorSupplier the function to create a new validator instance from the annotation
-     * @return this object (for method chaining)
-     */
-    public <A extends Annotation> @NotNull Validator registerSupplier(final @NotNull Class<A> annotationClass,
-                                                                      final @NotNull Function<A, ConstraintValidator> validatorSupplier) {
-        validators.put(annotationClass, validatorSupplier);
-        return this;
     }
 
     /**
@@ -239,8 +269,8 @@ public final class Validator {
             method = Reflect.on(stackTrace.getClassName())
                     .getMethod(stackTrace.getMethodName(), Reflect.getParameterTypes(parameters));
         } catch (ReflectException e) {
-            throw new IllegalArgumentException(e.getMessage() +
-                    ". Please include all the parameters of the method to validate it");
+            throw new IllegalArgumentException(e.getMessage()
+                    + ". Please include all the parameters of the method to validate it");
         }
         Map<String, Set<ConstraintViolation>> violations = validateMethod(method, parameters);
         if (!violations.isEmpty())
@@ -254,8 +284,10 @@ public final class Validator {
      * @param parameters the actual values of the parameters
      * @return the violations (empty if none)
      */
-    public static @NotNull Map<String, Set<ConstraintViolation>> validateMethod(final @NotNull Method method,
-                                                                                final @Nullable Object @NotNull ... parameters) {
+    public static @NotNull Map<String, Set<ConstraintViolation>> validateMethod(
+            final @NotNull Method method,
+            final @Nullable Object @NotNull ... parameters
+    ) {
         Parameter[] params = method.getParameters();
         Map<String, Set<ConstraintViolation>> violations = new HashMap<>();
         for (int i = 0; i < params.length; i++) {
@@ -302,7 +334,10 @@ public final class Validator {
      * @param value the value
      * @throws ViolationException an exception containing all the violations
      */
-    public static void validateField(final @NotNull Field field, final @Nullable Object value) throws ViolationException {
+    public static void validateField(
+            final @NotNull Field field,
+            final @Nullable Object value
+    ) throws ViolationException {
         try {
             getInstance().validate(field, value);
         } catch (ValidationException e) {

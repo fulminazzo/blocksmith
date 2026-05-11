@@ -10,8 +10,17 @@ import java.lang.annotation.*;
  * Identifies a {@link CharSequence} parameter or type that represents an IPv6.
  * <br>
  * Accepts {@code null} values.
+ *
+ * @see Constraint
+ * @see NonNull
+ * @see Matches
  */
-@Matches("(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(([0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4})?::(([0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4})?)")
+@Matches("(([0-9a-fA-F]{1,4}:){7}"
+        + "[0-9a-fA-F]{1,4}|"
+        + "(([0-9a-fA-F]{1,4}:)*"
+        + "[0-9a-fA-F]{1,4})?::"
+        + "(([0-9a-fA-F]{1,4}:)*"
+        + "[0-9a-fA-F]{1,4})?)")
 @Constraint
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -24,11 +33,13 @@ public @interface IPv6 {
      * By default, the message is a code that will later be translated by an appropriate translator.
      *
      * @return the message
+     * @see ValidationMessages
      */
     @NotNull String message() default ValidationMessages.REQUIRED_IPV6;
 
     /**
-     * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
+     * Gets the error message that will be shown in the
+     * {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
      *
      * @return the message
      */

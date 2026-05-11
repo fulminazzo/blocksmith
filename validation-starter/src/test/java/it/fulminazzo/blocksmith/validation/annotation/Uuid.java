@@ -18,6 +18,11 @@ import java.lang.annotation.*;
 public @interface Uuid {
     // represents a custom annotation with no message methods
 
+    /**
+     * The regex to validate the UUID.
+     *
+     * @return the regex
+     */
     @NotNull String regex() default "DEFAULT";
 
 }

@@ -7,6 +7,9 @@ import java.util.function.DoublePredicate;
 
 /**
  * A Constraint validator for {@link Number} or {@link Duration} types.
+ *
+ * @see ConstraintValidator
+ * @see ConstraintValidatorImpl
  */
 final class NumberDurationConstraintValidator extends ConstraintValidatorImpl {
 

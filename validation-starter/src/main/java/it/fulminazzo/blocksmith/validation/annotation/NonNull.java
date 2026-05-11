@@ -8,6 +8,8 @@ import java.lang.annotation.*;
 
 /**
  * Identifies a parameter or type that cannot be null.
+ *
+ * @see Constraint
  */
 @Constraint
 @Documented
@@ -21,11 +23,13 @@ public @interface NonNull {
      * By default, the message is a code that will later be translated by an appropriate translator.
      *
      * @return the message
+     * @see ValidationMessages
      */
     @NotNull String message() default ValidationMessages.REQUIRED_NOT_NULL;
 
     /**
-     * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
+     * Gets the error message that will be shown in the
+     * {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
      *
      * @return the message
      */
