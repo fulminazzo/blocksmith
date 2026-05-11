@@ -40,8 +40,8 @@ public final class CaseConverter {
             final @NotNull Convention from,
             final @NotNull Convention to
     ) {
-        NamingConvention fromConvention = from.getConvention();
-        NamingConvention toConvention = to.getConvention();
+        NamingConvention fromConvention = from.getNamingConvention();
+        NamingConvention toConvention = to.getNamingConvention();
         return toConvention.format(fromConvention.tokenize(input));
     }
 

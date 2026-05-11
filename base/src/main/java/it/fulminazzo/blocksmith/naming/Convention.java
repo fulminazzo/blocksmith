@@ -33,6 +33,6 @@ public enum Convention {
     ;
 
     @Getter(AccessLevel.PACKAGE)
-    @NotNull NamingConvention convention;
+    @NotNull NamingConvention namingConvention;
 
 }

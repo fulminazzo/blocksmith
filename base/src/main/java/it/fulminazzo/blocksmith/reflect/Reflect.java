@@ -88,9 +88,9 @@ public class Reflect {
      * @return the actual class of the object
      */
     public @NotNull Class<?> getActualObjectClass() {
-        Type type = getType();
-        if (type.equals(object)) return type.getClass();
-        else return ReflectUtils.toClass(type);
+        Type objectType = getType();
+        if (objectType.equals(object)) return objectType.getClass();
+        else return ReflectUtils.toClass(objectType);
     }
 
     /**
@@ -284,8 +284,8 @@ public class Reflect {
      * @return the values of the fields
      */
     public @NotNull List<Reflect> getInstanceFieldValues() {
-        final Class<?> type = getObjectClass();
-        return getFieldValues(f -> f.getDeclaringClass().equals(type) && !Modifier.isStatic(f.getModifiers()));
+        final Class<?> objectClass = getObjectClass();
+        return getFieldValues(f -> f.getDeclaringClass().equals(objectClass) && !Modifier.isStatic(f.getModifiers()));
     }
 
     /**
@@ -573,8 +573,8 @@ public class Reflect {
      */
     public @NotNull Field getInstanceField(final @NotNull String name) {
         try {
-            final Class<?> type = getObjectClass();
-            return getField(f -> f.getDeclaringClass().equals(type)
+            final Class<?> objectClass = getObjectClass();
+            return getField(f -> f.getDeclaringClass().equals(objectClass)
                     && !Modifier.isStatic(f.getModifiers())
                     && f.getName().equals(name));
         } catch (ReflectException e) {
@@ -644,8 +644,8 @@ public class Reflect {
      * @return the fields
      */
     public @NotNull List<Field> getInstanceFields() {
-        final Class<?> type = getObjectClass();
-        return getFields(f -> f.getDeclaringClass().equals(type) && !Modifier.isStatic(f.getModifiers()));
+        final Class<?> objectClass = getObjectClass();
+        return getFields(f -> f.getDeclaringClass().equals(objectClass) && !Modifier.isStatic(f.getModifiers()));
     }
 
     /**
@@ -683,14 +683,14 @@ public class Reflect {
      */
     public @NotNull List<Field> getFields() {
         List<Field> fields = new ArrayList<>();
-        Class<?> type = getObjectClass();
-        while (type != null) {
-            fields.addAll(Arrays.asList(type.getDeclaredFields()));
-            Arrays.stream(type.getInterfaces())
+        Class<?> objectClass = getObjectClass();
+        while (objectClass != null) {
+            fields.addAll(Arrays.asList(objectClass.getDeclaredFields()));
+            Arrays.stream(objectClass.getInterfaces())
                     .map(Class::getDeclaredFields)
                     .flatMap(Arrays::stream)
                     .forEach(fields::add);
-            type = type.getSuperclass();
+            objectClass = objectClass.getSuperclass();
         }
         return fields;
     }
@@ -893,8 +893,8 @@ public class Reflect {
             final @Nullable String name,
             final @Nullable Class<?> @NotNull ... parameterTypes
     ) {
-        final Class<?> type = getObjectClass();
-        return getMethodHelper(m -> m.getDeclaringClass().equals(type)
+        final Class<?> objectClass = getObjectClass();
+        return getMethodHelper(m -> m.getDeclaringClass().equals(objectClass)
                 && !Modifier.isStatic(m.getModifiers()), returnType, name, parameterTypes);
     }
 
@@ -983,8 +983,8 @@ public class Reflect {
      * @return the methods
      */
     public @NotNull List<Method> getInstanceMethods() {
-        final Class<?> type = getObjectClass();
-        return getMethods(m -> m.getDeclaringClass().equals(type) && !Modifier.isStatic(m.getModifiers()));
+        final Class<?> objectClass = getObjectClass();
+        return getMethods(m -> m.getDeclaringClass().equals(objectClass) && !Modifier.isStatic(m.getModifiers()));
     }
 
     /**
@@ -1022,15 +1022,16 @@ public class Reflect {
      */
     public @NotNull List<Method> getMethods() {
         List<Method> methods = new ArrayList<>();
-        Class<?> type = getObjectClass();
-        while (type != null) {
-            List<Method> list = sortMethods(Arrays.stream(type.getDeclaredMethods())).collect(Collectors.toList());
+        Class<?> objectClass = getObjectClass();
+        while (objectClass != null) {
+            List<Method> list = sortMethods(Arrays.stream(objectClass.getDeclaredMethods()))
+                    .collect(Collectors.toList());
             methods.addAll(list);
-            sortMethods(Arrays.stream(type.getInterfaces())
+            sortMethods(Arrays.stream(objectClass.getInterfaces())
                     .map(Class::getDeclaredMethods)
                     .flatMap(Arrays::stream))
                     .forEach(methods::add);
-            type = type.getSuperclass();
+            objectClass = objectClass.getSuperclass();
         }
         methods.removeIf(Method::isSynthetic);
         return methods;
@@ -1123,9 +1124,9 @@ public class Reflect {
     }
 
     private void checkEnum() {
-        Class<?> type = getObjectClass();
-        if (!Enum.class.isAssignableFrom(type))
-            throw new ReflectException("Type '%s' is not an enum", type);
+        Class<?> objectClass = getObjectClass();
+        if (!Enum.class.isAssignableFrom(objectClass))
+            throw new ReflectException("Type '%s' is not an enum", objectClass);
     }
 
     /*
