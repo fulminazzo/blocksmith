@@ -94,12 +94,30 @@ abstract class ValidatorCheck extends AbstractCheck {
     }
 
     @Override
+    public void beginTree(final DetailAST rootAST) {
+        validator.enterScope();
+    }
+
+    @Override
+    public void finishTree(DetailAST rootAST) {
+        try {
+            validator.exitScope();
+        } catch (CompositeValidationException c) {
+            handle(c);
+        }
+    }
+
+    @Override
     public void leaveToken(final @NotNull DetailAST ast) {
         try {
             if (isScopeChanged(ast)) getValidator().exitScope();
         } catch (CompositeValidationException c) {
-            c.getExceptions().forEach(e -> log(e.getNode(), e.getMessage(), e.getArguments()));
+            handle(c);
         }
+    }
+
+    private void handle(final CompositeValidationException exception) {
+        exception.getExceptions().forEach(e -> log(e.getNode(), e.getMessage(), e.getArguments()));
     }
 
     /**
