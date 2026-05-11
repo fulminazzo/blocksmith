@@ -89,6 +89,7 @@ dependencies {
 
 tasks.register<JacocoReport>("jacocoAggregatedReport") {
     description = "Generates a JaCoCo report aggregating all subprojects reports."
+    group = "Verification"
 
     val subprojects = rootProject.subprojects.filter { !it.name.endsWith(testingModuleName) }
 
