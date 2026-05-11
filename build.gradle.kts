@@ -34,6 +34,7 @@ allprojects {
 
     dependencies {
         compileOnly(rootProject.libs.bundles.annotations)
+        compileOnly(libs.spotbugs.annotations)
         annotationProcessor(rootProject.libs.lombok)
 
         if (project.path != rootProject.projects.base.path) api(rootProject.projects.base)
