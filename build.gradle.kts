@@ -125,3 +125,7 @@ tasks.register<JacocoReport>("jacocoAggregatedReport") {
         csv.required = true
     }
 }
+
+tasks.check {
+    dependsOn(tasks.named("jacocoAggregatedReport"))
+}
