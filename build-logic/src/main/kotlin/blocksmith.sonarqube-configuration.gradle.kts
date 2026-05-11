@@ -74,7 +74,7 @@ private fun getEnvVariable(key: String): String =
         .takeIf { it.exists() }
         ?.readLines()
         ?.firstOrNull { it.startsWith("$key=") }
-        ?.split("=", limit = 2)[0]
+        ?.split("=", limit = 2)[1]
     ?: throw GradleException("Missing environment variable: $key")
 
 abstract class GitBranchValueSource : ValueSource<String, ValueSourceParameters.None> {
