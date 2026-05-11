@@ -20,7 +20,12 @@ sonar {
         property("sonar.projectKey", "fulminazzo_blocksmith")
         property("sonar.organization", "fulminazzo")
         property("sonar.projectName", "blocksmith")
-        property("sonar.branch.name", currentGitBranch.get())
+        /**
+         * Disabled for SonarQube open source policies allowing only default branch analysis.
+         * It should be noted that any execution of this task will OVERRIDE any previous analysis results,
+         * regardless of the branch. Therefore, the CI/CD should be configured to run only on the default branch.
+         */
+//        property("sonar.branch.name", currentGitBranch.get())
 
         property("sonar.language", "java")
 
