@@ -40,7 +40,7 @@ sonar {
         )
         // JaCoCo
         property(
-            "sonar.coverage.jacoco.xmlReportPaths",
+            "sonar.coverage.jacoco.aggregateXmlReportPaths",
             "${rootProject.layout.buildDirectory.get()}/reports/jacoco/jacocoAggregatedReport/jacocoAggregatedReport.xml"
         )
         // SpotBugs
