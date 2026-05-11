@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.validation;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,8 +15,10 @@ public final class ValidationException extends Exception {
     private static final long serialVersionUID = -4425591507230226127L;
 
     @Getter
+    @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
     private final transient @Nullable Object object;
     @Getter
+    @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
     private final transient @NotNull Map<String, Set<ConstraintViolation>> violations;
 
     /**
@@ -31,7 +34,7 @@ public final class ValidationException extends Exception {
     ) {
         super(String.format("Validation failed for object %s: %s constraint(s) violated", object, violations.size()));
         this.object = object;
-        this.violations = violations;
+        this.violations = Map.copyOf(violations);
     }
 
 }
