@@ -9,6 +9,8 @@ plugins {
 val testingModuleName = "testing"
 val subprojects = rootProject.subprojects.filter { !it.name.endsWith(testingModuleName) }
 
+private val currentGitBranch = providers.of(GitBranchValueSource::class) {}
+
 sonar {
     properties {
 
@@ -18,6 +20,7 @@ sonar {
         property("sonar.projectKey", "fulminazzo_blocksmith")
         property("sonar.organization", "fulminazzo")
         property("sonar.projectName", "blocksmith")
+        property("sonar.branch.name", currentGitBranch.get())
 
         property("sonar.language", "java")
 
@@ -67,10 +70,18 @@ subprojects.forEach { project ->
 }
 
 private fun getEnvVariable(key: String): String =
-    System.getenv(key) ?:
-    rootProject.file(".env")
+    System.getenv(key) ?: rootProject.file(".env")
         .takeIf { it.exists() }
         ?.readLines()
         ?.firstOrNull { it.startsWith("$key=") }
         ?.split("=", limit = 2)[0]
     ?: throw GradleException("Missing environment variable: $key")
+
+abstract class GitBranchValueSource : ValueSource<String, ValueSourceParameters.None> {
+    override fun obtain(): String =
+        ProcessBuilder("git", "rev-parse", "--abbrev-ref", "HEAD")
+            .directory(File("."))
+            .start()
+            .inputStream.bufferedReader().readLine()
+            ?.trim() ?: "main"
+}
