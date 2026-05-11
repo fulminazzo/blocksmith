@@ -7,7 +7,6 @@ plugins {
 }
 
 val testingModuleName = "testing"
-val subprojects = rootProject.subprojects.filter { !it.name.endsWith(testingModuleName) }
 
 private val currentGitBranch = providers.of(GitBranchValueSource::class) {}
 
@@ -64,11 +63,10 @@ subprojects.forEach { project ->
             property("sonar.sources", "src/main")
             property(
                 "sonar.tests",
-                listOf(
-                    "src/test",
-                    "src/integrationTest",
-                    "src/functionalTest"
-                ).joinToString(",")
+                listOf("test", "integrationTest", "functionalTest")
+                    .map { "src/$it" }
+                    .filter { project.file(it).isDirectory }
+                    .joinToString(",")
             )
         }
     }
