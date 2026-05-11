@@ -4,8 +4,6 @@ plugins {
     `java-library`
     groovy
 
-    `jacoco-report-aggregation`
-
     id("blocksmith.java-configuration")
 }
 
@@ -13,6 +11,7 @@ group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
 val testingModuleName: String by extra
+val projectInfoClassName: String by extra
 
 allprojects {
     extra["baseModuleName"] = "base"
@@ -92,10 +91,36 @@ dependencies {
         .forEach { implementation(it) }
 }
 
-tasks.testCodeCoverageReport {
-    dependsOn(tasks.test)
+tasks.register<JacocoReport>("jacocoAggregatedReport") {
+    description = "Generates a JaCoCo report aggregating all subprojects reports."
+
+    val subprojects = rootProject.subprojects.filter { !it.name.endsWith(testingModuleName) }
+
+    dependsOn(subprojects.flatMap { it.tasks.withType<Test>() })
+
+    executionData.setFrom(
+        subprojects.map { fileTree(it.layout.buildDirectory).include("jacoco/*.exec") }
+    )
+
+    sourceDirectories.setFrom(
+        subprojects.flatMap {
+            it.extensions.findByType<JavaPluginExtension>()
+                ?.sourceSets?.getByName("main")?.allSource?.srcDirs
+                ?: emptySet()
+        }
+    )
+
+    classDirectories.setFrom(
+        subprojects.flatMap {
+            it.extensions.findByType<JavaPluginExtension>()
+                ?.sourceSets?.getByName("main")?.output?.classesDirs
+                ?: emptyList()
+        }.map { fileTree(it) { exclude("**/$projectInfoClassName**") } }
+    )
+
     reports {
         xml.required = true
+        html.required = true
         csv.required = true
     }
 }
