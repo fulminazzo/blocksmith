@@ -206,7 +206,7 @@ public final class Validator {
             final @NotNull String elementName,
             final @Nullable Object value
     ) throws ValidationException {
-        final Map<Class<? extends Annotation>, ConstraintInfo> parents = new HashMap<>();
+        final Map<Annotation, ConstraintInfo> parents = new HashMap<>();
         final Set<ConstraintViolation> violations = new HashSet<>();
         final Queue<AnnotatedElement> elements = new LinkedList<>();
         final Set<Class<? extends Annotation>> visited = new HashSet<>();
@@ -224,7 +224,7 @@ public final class Validator {
                         violations.add(ConstraintViolation.invalidType(value, validator.getTypeNames()));
                     else if (!validator.isValid(value)) {
                         final ConstraintInfo constraintInfo = parents.getOrDefault(
-                                annotationType,
+                                annotation,
                                 new ConstraintInfo(annotation)
                         );
                         violations.add(ConstraintViolation.of(value, constraintInfo));
@@ -236,11 +236,10 @@ public final class Validator {
             for (Annotation annotation : annotations) {
                 Class<? extends Annotation> annotationType = annotation.annotationType();
                 final ConstraintInfo constraintInfo = parents.getOrDefault(
-                        annotationType,
+                        annotation,
                         new ConstraintInfo(annotation)
                 );
                 Arrays.stream(annotationType.getAnnotations())
-                        .map(Annotation::annotationType)
                         .forEach(a -> parents.putIfAbsent(a, constraintInfo));
             }
         }
