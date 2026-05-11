@@ -1183,7 +1183,7 @@ class ReflectFunctionalTest extends Specification {
         String | new Object()
     }
 
-    private static void resetStaticFields() {
+    protected static void resetStaticFields() {
         SUPER_STATIC_FIELD.set(null, EXPECTED_SUPER_STATIC_FIELD_VALUE)
         STATIC_FIELD.set(null, EXPECTED_STATIC_FIELD_VALUE)
     }
