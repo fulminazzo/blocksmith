@@ -4,9 +4,8 @@ import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 class PassiveExpiringMapTest extends Specification {
-
     private ExpiringMap<String, String> map
-    private Map<String, AbstractExpiringMap.ExpiringEntry<String>> internal
+    private Map<String, ExpiringEntry<String>> internal
 
     void setup() {
         map = new PassiveExpiringMap<>()
@@ -15,8 +14,8 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that size counts also expired entries'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
+        internal['Goodbye'] = new ExpiringEntry<>('mars', 10000L)
 
         expect:
         map.size() == 2
@@ -30,16 +29,16 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that isEmpty returns false even if all entries are expired'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         expect:
-        !map.isEmpty()
+        !map.empty
 
         when:
         sleep(5L)
 
         then:
-        !map.isEmpty()
+        !map.empty
     }
 
     def 'test that containsKey returns true even for expired key'() {
@@ -47,7 +46,7 @@ class PassiveExpiringMapTest extends Specification {
         !map.containsKey('Hello')
 
         when:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         then:
         map.containsKey('Hello')
@@ -64,7 +63,7 @@ class PassiveExpiringMapTest extends Specification {
         map['Hello'] == null
 
         when:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         then:
         map['Hello'] == 'world'
@@ -78,8 +77,8 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that get does not clear other expired entries'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
+        internal['Goodbye'] = new ExpiringEntry<>('mars', 10000L)
 
         and:
         sleep(5L)
@@ -96,7 +95,7 @@ class PassiveExpiringMapTest extends Specification {
         map.remove('Hello') == null
 
         when:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         def actual = map.remove('Hello')
@@ -106,7 +105,7 @@ class PassiveExpiringMapTest extends Specification {
         internal['Hello'] == null
 
         when:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)
@@ -121,8 +120,8 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that remove does not clear other expired entries'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
+        internal['Goodbye'] = new ExpiringEntry<>('mars', 10000L)
 
         and:
         sleep(5L)
@@ -136,19 +135,19 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that keySet includes expired keys'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)
 
         expect:
-        !map.keySet().isEmpty()
+        !map.keySet().empty
     }
 
     def 'test that keySet includes also expired keys'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
+        internal['Goodbye'] = new ExpiringEntry<>('mars', 10000L)
 
         and:
         sleep(5L)
@@ -163,19 +162,19 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that values includes expired values'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)
 
         expect:
-        !map.values().isEmpty()
+        !map.values().empty
     }
 
     def 'test that values includes also expired values'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
+        internal['Goodbye'] = new ExpiringEntry<>('mars', 10000L)
 
         and:
         sleep(5L)
@@ -190,19 +189,19 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that entrySet includes expired entries'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)
 
         expect:
-        !map.entrySet().isEmpty()
+        !map.entrySet().empty
     }
 
     def 'test that entrySet includes also expired entries'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
+        internal['Goodbye'] = new ExpiringEntry<>('mars', 10000L)
 
         and:
         sleep(5L)
@@ -230,8 +229,8 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that #method does not clear expired entries as a side effect'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 10000L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
+        internal['Goodbye'] = new ExpiringEntry<>('mars', 10000L)
 
         and:
         sleep(5L)
@@ -256,7 +255,7 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that put treats expired key as present'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)
@@ -273,7 +272,7 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that putIfAbsent treats expired key as present'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)
@@ -288,7 +287,7 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that replace returns value for expired key'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)
@@ -303,7 +302,7 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that computeIfAbsent treats expired key as present'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)
@@ -318,7 +317,7 @@ class PassiveExpiringMapTest extends Specification {
 
     def 'test that computeIfPresent returns value for expired key'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)

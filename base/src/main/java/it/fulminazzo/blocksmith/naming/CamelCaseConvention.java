@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 final class CamelCaseConvention implements NamingConvention {
@@ -11,7 +12,7 @@ final class CamelCaseConvention implements NamingConvention {
     @Override
     public @NotNull List<String> tokenize(final @NotNull String input) {
         return Arrays.stream(input.split("(?=[A-Z])"))
-                .map(String::toLowerCase)
+                .map(i -> i.toLowerCase(Locale.ROOT))
                 .collect(Collectors.toList());
     }
 
@@ -22,7 +23,7 @@ final class CamelCaseConvention implements NamingConvention {
         for (int i = 1; i < tokens.size(); i++) {
             String token = tokens.get(i);
             if (token.isEmpty()) builder.append(token);
-            else builder.append(token.substring(0, 1).toUpperCase())
+            else builder.append(token.substring(0, 1).toUpperCase(Locale.ROOT))
                     .append(token.substring(1));
         }
         return builder.toString();

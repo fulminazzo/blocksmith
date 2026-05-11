@@ -22,20 +22,20 @@ public final class FixedCooldownManager<E> implements ICooldownManager<E> {
     /**
      * Instantiates a new Fixed cooldown manager.
      *
-     * @param cooldown the duration of the cooldown
-     */
-    public FixedCooldownManager(final @NotNull Duration cooldown) {
-        this(cooldown.toMillis());
-    }
-
-    /**
-     * Instantiates a new Fixed cooldown manager.
-     *
      * @param cooldown the duration of the cooldown in milliseconds
      */
     public FixedCooldownManager(final @Range(from = 1, to = Long.MAX_VALUE) long cooldown) {
         if (cooldown <= 0) throw new IllegalArgumentException("cooldown must be positive");
         this.cooldown = cooldown;
+    }
+
+    /**
+     * Instantiates a new Fixed cooldown manager.
+     *
+     * @param cooldown the duration of the cooldown
+     */
+    public FixedCooldownManager(final @NotNull Duration cooldown) {
+        this(cooldown.toMillis());
     }
 
     /**
@@ -50,6 +50,12 @@ public final class FixedCooldownManager<E> implements ICooldownManager<E> {
     }
 
     @Override
+    public @NotNull FixedCooldownManager<E> remove(final @NotNull E entity) {
+        delegate.remove(entity);
+        return this;
+    }
+
+    @Override
     public boolean isOnCooldown(final @NotNull E entity) {
         return delegate.isOnCooldown(entity);
     }
@@ -57,12 +63,6 @@ public final class FixedCooldownManager<E> implements ICooldownManager<E> {
     @Override
     public long getRemaining(final @NotNull E entity) {
         return delegate.getRemaining(entity);
-    }
-
-    @Override
-    public @NotNull FixedCooldownManager<E> remove(final @NotNull E entity) {
-        delegate.remove(entity);
-        return this;
     }
 
 }
