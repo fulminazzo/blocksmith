@@ -13,6 +13,10 @@ class ResourceUtilsFunctionalTest extends Specification {
     private static final File extractTestsDirectory = new File('build/resources/functionalTest/resource_utils/extract')
     private static final File extractIfAbsentTestsDirectory = new File('build/resources/functionalTest/resource_utils/extract_absent')
 
+    void setup() {
+        extractIfAbsentTestsDirectory.deleteDir()
+    }
+
     def 'test that getResource with #arguments does not throw'() {
         when:
         def resource = ResourceUtils.getResource(*arguments)
@@ -69,9 +73,6 @@ class ResourceUtilsFunctionalTest extends Specification {
     }
 
     def 'test that extractIfAbsent with #arguments stores #expected and does not overwrite'() {
-        given:
-        extractIfAbsentTestsDirectory.deleteDir()
-
         when:
         def first = ResourceUtils.extractIfAbsent(*arguments)
         if (first instanceof Path) first = first.toFile()
@@ -140,10 +141,10 @@ class ResourceUtilsFunctionalTest extends Specification {
 
         where:
         arguments << [
-                [''],
-                [ResourceUtilsFunctionalTest.classLoader, ''],
-                ['', (s) -> true],
-                [ResourceUtilsFunctionalTest.classLoader, '', (s) -> true],
+                ['it'],
+                [ResourceUtilsFunctionalTest.classLoader, 'it'],
+                ['it', (s) -> true],
+                [ResourceUtilsFunctionalTest.classLoader, 'it', (s) -> true],
                 [ResourceUtilsFunctionalTest.packageName],
                 [ResourceUtilsFunctionalTest.classLoader, ResourceUtilsFunctionalTest.packageName],
                 [ResourceUtilsFunctionalTest.packageName, (s) -> true],

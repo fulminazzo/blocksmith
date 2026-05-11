@@ -58,9 +58,9 @@ class ReflectFunctionalTest extends Specification {
     /*
      * TEST RESULTS
      */
-    private static final Object EXPECTED_INTERFACE_STATIC_FIELD_VALUE = INTERFACE_STATIC_FIELD.get(null)
-    private static final Object EXPECTED_SUPER_STATIC_FIELD_VALUE = SUPER_STATIC_FIELD.get(null)
-    private static final Object EXPECTED_STATIC_FIELD_VALUE = STATIC_FIELD.get(null)
+    private static final Object EXPECTED_INTERFACE_STATIC_FIELD_VALUE = 'Steve'
+    private static final Object EXPECTED_SUPER_STATIC_FIELD_VALUE = 'John'
+    private static final Object EXPECTED_STATIC_FIELD_VALUE = 18
 
     private static final List<Method> EXPECTED_INTERFACE_METHODS = [INTERFACE_METHOD_NO_ARGS, INTERFACE_DEFAULT_METHOD_NO_ARGS]
     private static final List<Method> EXPECTED_SUPER_METHODS = [
@@ -77,11 +77,12 @@ class ReflectFunctionalTest extends Specification {
             .findAll { !it.synthetic && !it.bridge && Modifier.isStatic(it.modifiers) }
             .sort { a, b -> a.name <=> b.name ?: a.parameterCount <=> b.parameterCount }
 
-    private static final UUID INTERFACE_VALUE = UUID.nameUUIDFromBytes(SUPER_VALUE.bytes)
     private static final String SUPER_VALUE = 'Alex'
+    private static final UUID INTERFACE_VALUE = UUID.nameUUIDFromBytes(SUPER_VALUE.bytes)
     private static final int VALUE = 23
 
     static {
+        INTERFACE_STATIC_FIELD.accessible = true
         SUPER_STATIC_FIELD.accessible = true
         STATIC_FIELD.accessible = true
     }
@@ -90,6 +91,11 @@ class ReflectFunctionalTest extends Specification {
 
     void setup() {
         reflect = new Reflect(Person, new Person(SUPER_VALUE, VALUE))
+        resetStaticFields()
+    }
+
+    void cleanup() {
+        resetStaticFields()
     }
 
     def 'test that isBaseType returns #expected for #type'() {
@@ -1175,6 +1181,11 @@ class ReflectFunctionalTest extends Specification {
         String | 1
         String | 'a' as char
         String | new Object()
+    }
+
+    private static void resetStaticFields() {
+        SUPER_STATIC_FIELD.set(null, EXPECTED_SUPER_STATIC_FIELD_VALUE)
+        STATIC_FIELD.set(null, EXPECTED_STATIC_FIELD_VALUE)
     }
 
 }
