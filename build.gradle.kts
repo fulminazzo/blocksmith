@@ -5,6 +5,7 @@ plugins {
     groovy
 
     id("blocksmith.java-configuration")
+    id("blocksmith.sonarqube-configuration")
 }
 
 group = "it.fulminazzo"
