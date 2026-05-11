@@ -74,6 +74,22 @@ class ValidatorTest extends Specification {
         e.message =~ '.*Please include all the parameters of the method to validate it.*'
     }
 
+    def 'test that validate field of password field throws multiple exceptions'() {
+        given:
+        final field = Fields.getDeclaredField('password')
+        final value = ''
+
+        when:
+        Validator.validateField(field, value)
+
+        then:
+        def e = thrown(ViolationException)
+        e.message == 'invalid password: ' +
+                'must at least contain one non-space character, ' +
+                "size must be at least 8 and at most ${Integer.MAX_VALUE} elements long, " +
+                '\'\' is not allowed (only letters and digits)'
+    }
+
     def 'test that validate field works'() {
         given:
         def field = Person.getDeclaredField(fieldName)
