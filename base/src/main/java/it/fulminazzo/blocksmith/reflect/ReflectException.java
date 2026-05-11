@@ -59,7 +59,7 @@ public final class ReflectException extends RuntimeException {
      */
     public static @NotNull String formatMessage(
             final @NotNull String format,
-            final @Nullable Object @NotNull ... args
+            final Object @NotNull ... args
     ) {
         for (int i = 0; i < args.length; i++) {
             Object object = args[i];
