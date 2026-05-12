@@ -44,28 +44,28 @@ class ReflectUtilsTest extends Specification {
         actual == expected
 
         where:
-        type1                                                              | type2                      || expected
+        type1                                                              | type2                   || expected
         // Class
-        Mock                                                               | Mock                       || true
-        Mock                                                               | List                       || false
-        List                                                               | Mock                       || false
+        Mock                                                               | Mock                    || true
+        Mock                                                               | List                    || false
+        List                                                               | Mock                    || false
         // ParameterizedType
-        listParameterizedType                                              | listParameterizedType      || true
-        listParameterizedType                                              | List                       || true
-        List                                                               | listParameterizedType      || true
-        Mock.getDeclaredMethod('otherParameterizedType').genericReturnType | listParameterizedType      || false
-        Mock.getDeclaredMethod('dualParameterizedType').genericReturnType  | listParameterizedType      || false
+        listParameterizedType                                              | listParameterizedType   || true
+        listParameterizedType                                              | List                    || true
+        List                                                               | listParameterizedType   || true
+        Mock.getDeclaredMethod('otherParameterizedType').genericReturnType | listParameterizedType   || false
+        Mock.getDeclaredMethod('dualParameterizedType').genericReturnType  | listParameterizedType   || false
         // TypeVariable
-        Integer                                                            | typeVariable || true
-        Number                                                             | typeVariable || false
-        Comparable                                                         | typeVariable || false
-        Mock                                                               | typeVariable || false
+        Integer                                                            | typeVariable            || true
+        Number                                                             | typeVariable            || false
+        Comparable                                                         | typeVariable            || false
+        Mock                                                               | typeVariable            || false
         // GenericArrayType
-        Set[]                                                              | genericArrayType || true
-        Collection[]                                                       | genericArrayType || false
-        Set                                                                | genericArrayType || false
+        Set[]                                                              | genericArrayType        || true
+        Collection[]                                                       | genericArrayType        || false
+        Set                                                                | genericArrayType        || false
         // WildcardType
-        Object                                                             | noBoundsWildcardType || true
+        Object                                                             | noBoundsWildcardType    || true
         Object                                                             | lowerBoundsWildcardType || true
         Collection                                                         | lowerBoundsWildcardType || true
         Object                                                             | upperBoundsWildcardType || false
@@ -90,15 +90,15 @@ class ReflectUtilsTest extends Specification {
         Mock                                                        || Mock
         Mock.typeParameters[0]                                      || Number
         Mock.typeParameters[1]                                      || Object
-        listParameterizedType || List
-        genericArrayType || Set[]
+        listParameterizedType                                       || List
+        genericArrayType                                            || Set[]
         Mock.getDeclaredMethod('wildcard').genericReturnType        || Collection
-        noBoundsWildcardType || Object
+        noBoundsWildcardType                                        || Object
         Mock.getDeclaredMethod('wildcardExtends').genericReturnType || Collection
-        upperBoundsWildcardType || List
+        upperBoundsWildcardType                                     || List
         Mock.getDeclaredMethod('wildcardSuper').genericReturnType   || Collection
-        lowerBoundsWildcardType || Collection
-        typeVariable || Number
+        lowerBoundsWildcardType                                     || Collection
+        typeVariable                                                || Number
     }
 
     def 'test that toClass does not throws for unknown type'() {
@@ -121,8 +121,8 @@ class ReflectUtilsTest extends Specification {
         Mock                                                            || "${Mock.canonicalName}"
         Mock.typeParameters[0]                                          || "T extends ${Number.canonicalName} & ${Comparable.canonicalName}"
         Mock.typeParameters[1]                                          || 'N'
-        listParameterizedType || "${List.canonicalName}<${String.canonicalName}>"
-        genericArrayType || "${Set.canonicalName}<${Boolean.canonicalName}>[]"
+        listParameterizedType                                           || "${List.canonicalName}<${String.canonicalName}>"
+        genericArrayType                                                || "${Set.canonicalName}<${Boolean.canonicalName}>[]"
         Mock.getDeclaredMethod('wildcard').genericReturnType            || "${Collection.canonicalName}<?>"
         Mock.getDeclaredMethod('wildcardExtends').genericReturnType     || "${Collection.canonicalName}<? extends ${List.canonicalName}<${String.canonicalName}>>"
         Mock.getDeclaredMethod('wildcardSuper').genericReturnType       || "${Collection.canonicalName}<? super ${Collection.canonicalName}<T extends ${Number.canonicalName} & ${Comparable.canonicalName}>>"
