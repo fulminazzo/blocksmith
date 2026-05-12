@@ -42,7 +42,7 @@ class CommentUtilsTest extends Specification {
 world"""]
     }
 
-    private Comment newComment(final List<String> commentLines) {
+    protected Comment newComment(final List<String> commentLines) {
         def comment = Mock(Comment)
         comment.value() >> commentLines.toArray(new String[0])
         return comment
