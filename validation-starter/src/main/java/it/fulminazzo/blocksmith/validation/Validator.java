@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public final class Validator {
-    private static final @NotNull String PROPERTY_FORMAT = "property '%s'";
-    private static final @NotNull String PARAMETER_FORMAT = "parameter at position %s";
+    private static final @NotNull String propertyFormat = "property '%s'";
+    private static final @NotNull String parameterFormat = "parameter at position %s";
 
-    private static final @NotNull Validator INSTANCE = new Validator();
+    private static final @NotNull Validator instance = new Validator();
 
     private final @NotNull Map<
             Class<? extends Annotation>,
@@ -145,7 +145,7 @@ public final class Validator {
                 Object value = beanReflect.get(field).get();
                 String fieldPath = (currentPath.isEmpty() ? "" : currentPath + ".") + field.getName();
                 try {
-                    validateRec(field, String.format(PROPERTY_FORMAT, fieldPath), value);
+                    validateRec(field, String.format(propertyFormat, fieldPath), value);
                 } catch (ValidationException e) {
                     violations.putAll(e.getViolations());
                 }
@@ -244,7 +244,7 @@ public final class Validator {
             }
         }
         if (!violations.isEmpty())
-            throw new ValidationException(String.format(PROPERTY_FORMAT, value), Map.of(elementName, violations));
+            throw new ValidationException(String.format(propertyFormat, value), Map.of(elementName, violations));
     }
 
     /**
@@ -300,7 +300,7 @@ public final class Validator {
                     if (key.equals(name)) {
                         Set<ConstraintViolation> value = tmp.get(key);
                         tmp.remove(key, value);
-                        tmp.put(String.format(PARAMETER_FORMAT, i), value);
+                        tmp.put(String.format(parameterFormat, i), value);
                     }
                 }
                 violations.putAll(tmp);
@@ -350,7 +350,7 @@ public final class Validator {
      * @return the instance
      */
     public static @NotNull Validator getInstance() {
-        return INSTANCE;
+        return instance;
     }
 
     private static long now() {
