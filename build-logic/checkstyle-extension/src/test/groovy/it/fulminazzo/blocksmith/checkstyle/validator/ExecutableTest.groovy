@@ -7,26 +7,26 @@ import spock.lang.Specification
 
 @SuppressWarnings('GroovyAccessibility')
 class ExecutableTest extends Specification {
-    private static final Parameter PRIMITIVE_PARAMETER = new Parameter('int', 'a', true)
-    private static final Parameter WRAPPER_PARAMETER = new Parameter('Integer', 'b', false)
+    private static final Parameter primitiveParameter = new Parameter('int', 'a', true)
+    private static final Parameter wrapperParameter = new Parameter('Integer', 'b', false)
 
     def 'test that compareTo with #first and #second returns #expected'() {
         expect:
         first <=> second == expected
 
         where:
-        first                                          | second                                         || expected
+        first                                         | second                                        || expected
         // name
-        new Executable('print', [])                    | new Executable('write', [])                    || 0
+        new Executable('print', [])                   | new Executable('write', [])                   || 0
         // less parameters
-        new Executable('print', [])                    | new Executable('print', [PRIMITIVE_PARAMETER]) || -1
+        new Executable('print', [])                   | new Executable('print', [primitiveParameter]) || -1
         // more parameters
-        new Executable('print', [PRIMITIVE_PARAMETER]) | new Executable('print', [])                    || 1
+        new Executable('print', [primitiveParameter]) | new Executable('print', [])                   || 1
         // same parameters
-        new Executable('print', [PRIMITIVE_PARAMETER]) | new Executable('print', [PRIMITIVE_PARAMETER]) || 0
-        new Executable('print', [PRIMITIVE_PARAMETER]) | new Executable('print', [WRAPPER_PARAMETER])   || -1
-        new Executable('print', [WRAPPER_PARAMETER])   | new Executable('print', [PRIMITIVE_PARAMETER]) || 1
-        new Executable('print', [WRAPPER_PARAMETER])   | new Executable('print', [WRAPPER_PARAMETER])   || 0
+        new Executable('print', [primitiveParameter]) | new Executable('print', [primitiveParameter]) || 0
+        new Executable('print', [primitiveParameter]) | new Executable('print', [wrapperParameter])   || -1
+        new Executable('print', [wrapperParameter])   | new Executable('print', [primitiveParameter]) || 1
+        new Executable('print', [wrapperParameter])   | new Executable('print', [wrapperParameter])   || 0
     }
 
     def 'test that of function works'() {
@@ -76,15 +76,15 @@ class ExecutableTest extends Specification {
         first <=> second == expected
 
         where:
-        first               | second              || expected
+        first              | second             || expected
         // primitive - primitive
-        PRIMITIVE_PARAMETER | PRIMITIVE_PARAMETER || 0
+        primitiveParameter | primitiveParameter || 0
         // primitive - wrapper
-        PRIMITIVE_PARAMETER | WRAPPER_PARAMETER   || -1
+        primitiveParameter | wrapperParameter   || -1
         // wrapper - primitive
-        WRAPPER_PARAMETER   | PRIMITIVE_PARAMETER || 1
+        wrapperParameter   | primitiveParameter || 1
         // wrapper - wrapper
-        WRAPPER_PARAMETER   | WRAPPER_PARAMETER   || 0
+        wrapperParameter   | wrapperParameter   || 0
     }
 
     def 'test that Parameter of function works'() {
