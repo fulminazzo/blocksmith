@@ -13,13 +13,13 @@ abstract class ConfigurationAdapterTest extends Specification {
 
         then:
         actual == [
-                (new CommentKey('commentsEnabled', supportsComments() ? ['Example comment'] : []))          : false,
-                (new CommentKey('name', supportsComments() ? ['This comment should be', 'Multiline!'] : [])): 'Blocksmith',
-                (new CommentKey('description'))                                                             : supportsNull() ? null : '',
-                (new CommentKey('authors'))                                                                 : ['Fulminazzo', 'Camilla', 'Alex'],
-                (new CommentKey('internal'))                                                                : [
-                        (new CommentKey('version', supportsComments() ? ['This comment should be indented'] : [])): true,
-                        (new CommentKey('verified'))                                                              : isProperties() || isToml() ? '' : null
+                (new CommentKey('commentsEnabled', supportsComments() ? ['Example comment'] : []))           : false,
+                (new CommentKey('name', supportsComments() ? ['This comment should be', 'Multiline!'] : [])) : 'Blocksmith',
+                (new CommentKey('description'))                                                              : supportsNull() ? null : '',
+                (new CommentKey('authors'))                                                                  : ['Fulminazzo', 'Camilla', 'Alex'],
+                (new CommentKey('internal'))                                                                 : [
+                        (new CommentKey('version', supportsComments() ? ['This comment should be indented'] : [])) : true,
+                        (new CommentKey('verified'))                                                               : properties || toml ? '' : null
                 ]
         ]
 
@@ -38,9 +38,9 @@ abstract class ConfigurationAdapterTest extends Specification {
         then:
         actual == (supportsComments()
                 ? [
-                'commentsEnabled' : ['Example comment'],
-                'name'            : ['This comment should be', 'Multiline!'],
-                'internal.version': ['This comment should be indented']
+                'commentsEnabled'  : ['Example comment'],
+                'name'             : ['This comment should be', 'Multiline!'],
+                'internal.version' : ['This comment should be indented']
         ] : [:])
 
         where:
@@ -190,19 +190,19 @@ abstract class ConfigurationAdapterTest extends Specification {
 
     def 'test that configuration with #data is correctly migrated'() {
         given:
-        def adapter = getAdapter()
+        def configurationAdapter = adapter
 
         and:
         if (data instanceof Map)
-            data = renameMap(data, adapter.delegate.mapper.propertyNamingStrategy)
+            data = renameMap(data, configurationAdapter.delegate.mapper.propertyNamingStrategy)
 
         and:
         def file = getFile('migration/config')
         Files.deleteIfExists(file.toPath())
-        adapter.store(file, data)
+        configurationAdapter.store(file, data)
 
         when:
-        def loaded = adapter.load(file, MigrationConfig)
+        def loaded = configurationAdapter.load(file, MigrationConfig)
 
         then:
         noExceptionThrown()
@@ -213,26 +213,26 @@ abstract class ConfigurationAdapterTest extends Specification {
         where:
         data << [
                 [
-                        'version' : 1.0d,
-                        'server'  : ['host': '0.0.0.0', 'port': 8080],
-                        'database': [
-                                'host'    : 'localhost',
-                                'port'    : 5432,
-                                'user'    : 'admin',
-                                'password': 'password123'
+                        'version'  : 1.0d,
+                        'server'   : ['host' : '0.0.0.0', 'port' : 8080],
+                        'database' : [
+                                'host'     : 'localhost',
+                                'port'     : 5432,
+                                'user'     : 'admin',
+                                'password' : 'password123'
                         ]
                 ],
                 [
-                        'version' : 2.0d,
-                        'server'  : ['host': '0.0.0.0', 'port': 8080, 'timeoutSeconds': 30],
-                        'database': [
-                                'host'          : 'localhost',
-                                'port'          : 5432,
-                                'user'          : 'admin',
-                                'password'      : 'password123',
-                                'maxConnections': 100
+                        'version'  : 2.0d,
+                        'server'   : ['host' : '0.0.0.0', 'port' : 8080, 'timeoutSeconds' : 30],
+                        'database' : [
+                                'host'           : 'localhost',
+                                'port'           : 5432,
+                                'user'           : 'admin',
+                                'password'       : 'password123',
+                                'maxConnections' : 100
                         ],
-                        'features': ['enableBetaUi': true, 'enableMetrics': false]
+                        'features' : ['enableBetaUi' : true, 'enableMetrics' : false]
                 ],
                 newMigrationConfig(null),
                 newMigrationConfig('invalid'),
@@ -254,7 +254,7 @@ abstract class ConfigurationAdapterTest extends Specification {
                 'Blocksmith',
                 supportsNull() ? null : '',
                 ['Fulminazzo', 'Camilla', 'Alex'],
-                new MockConfig.Internal(1.0, isProperties() ? false : null)
+                new MockConfig.Internal(1.0, properties ? false : null)
         )
     }
 

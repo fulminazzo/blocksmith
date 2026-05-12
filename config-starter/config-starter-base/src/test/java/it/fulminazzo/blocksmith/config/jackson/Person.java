@@ -10,6 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * Mock DTO for testing purposes.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
