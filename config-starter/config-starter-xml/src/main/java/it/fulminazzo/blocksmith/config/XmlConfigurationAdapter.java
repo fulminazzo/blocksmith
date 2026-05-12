@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.fasterxml.jackson.dataformat.xml.util.DefaultXmlPrettyPrinter;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import it.fulminazzo.blocksmith.naming.CaseConverter;
@@ -134,8 +135,8 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
             if (value instanceof Map<?, ?>) {
                 Map<?, ?> innerMap = flattenCollectionMaps((Map<?, ?>) value);
                 if (innerMap.size() == 1) {
-                    final Object innerKey = innerMap.keySet().iterator().next();
-                    if (key.equals(innerKey)) value = innerMap.get(innerKey);
+                    final Map.Entry<?, ?> innerEntry = innerMap.entrySet().iterator().next();
+                    if (key.equals(innerEntry.getKey())) value = innerEntry.getValue();
                 }
             }
             result.put(key, value);
@@ -242,6 +243,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
             super(base, comment);
         }
 
+        @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_INFERRED")
         @Override
         protected void writeComment(
                 final @NotNull JsonGenerator generator,

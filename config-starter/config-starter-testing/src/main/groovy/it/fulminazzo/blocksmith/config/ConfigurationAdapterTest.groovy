@@ -241,13 +241,6 @@ abstract class ConfigurationAdapterTest extends Specification {
         ]
     }
 
-    private Map<String, Object> newMigrationConfig(final Object version) {
-        def properties = (new MigrationConfig()).properties
-        properties.removeAll { it.key in ['version', 'configVersion', 'class'] }
-        properties['version'] = version
-        return properties
-    }
-
     protected MockConfig getExpectedConfig() {
         return new MockConfig(
                 false,
@@ -290,7 +283,14 @@ abstract class ConfigurationAdapterTest extends Specification {
 
     protected abstract List<String> getExpectedStoreLines()
 
-    private static Map<String, Object> renameMap(final Map<String, Object> map, final PropertyNamingStrategy strategy) {
+    protected static Map<String, Object> newMigrationConfig(final Object version) {
+        def properties = (new MigrationConfig()).properties
+        properties.removeAll { it.key in ['version', 'configVersion', 'class'] }
+        properties['version'] = version
+        return properties
+    }
+
+    protected static Map<String, Object> renameMap(final Map<String, Object> map, final PropertyNamingStrategy strategy) {
         if (strategy == null) return map
         for (def key in [*map.keySet()]) {
             def value = map.remove(key)

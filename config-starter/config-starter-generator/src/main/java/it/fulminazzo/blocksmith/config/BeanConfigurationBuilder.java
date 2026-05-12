@@ -140,7 +140,7 @@ public class BeanConfigurationBuilder {
         if (isValidVersionInitializer(versionClass, initializer)) {
             MethodCallExpr methodCall = getFirstCall(initializer.asMethodCallExpr());
             double current = Double.parseDouble(methodCall.getArgument(0).toString());
-            if (current != actualVersion) {
+            if (!Objects.equals(current, actualVersion)) {
                 methodCall.setArgument(0, new DoubleLiteralExpr(actualVersion));
                 field.setLineComment("TODO: auto-updated, handle migrations manually");
             }
@@ -483,7 +483,7 @@ public class BeanConfigurationBuilder {
     }
 
     private static @NotNull String capitalize(final @NotNull String string) {
-        return string.substring(0, 1).toUpperCase() + string.substring(1);
+        return string.substring(0, 1).toUpperCase(Locale.ROOT) + string.substring(1);
     }
 
     /**

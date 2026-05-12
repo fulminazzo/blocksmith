@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.module.SimpleModule
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import org.slf4j.Logger
 import spock.lang.Specification
 
@@ -149,6 +150,7 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
         1 * logger.warn('Using default value: {}', 0.0)
     }
 
+    @SuppressFBWarnings
     private static class StrictIntDeserializer extends StdDeserializer<Integer> {
 
         StrictIntDeserializer() {

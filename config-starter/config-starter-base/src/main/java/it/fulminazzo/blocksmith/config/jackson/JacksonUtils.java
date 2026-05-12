@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.type.MapType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.config.Comment;
 import it.fulminazzo.blocksmith.config.CommentUtils;
 import it.fulminazzo.blocksmith.reflect.Reflect;
@@ -57,26 +58,13 @@ final class JacksonUtils {
             final @NotNull Logger logger,
             final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType
     ) {
-        final SimpleModule module = new SimpleModule() {
-            private static final long serialVersionUID = -7666638854510482920L;
-
-            @Override
-            public void setupModule(final @NotNull SetupContext context) {
-                super.setupModule(context);
-                context.addBeanDeserializerModifier(new JacksonBeanDeserializerModifier(logger));
-                if (commentPropertyWriterType != null)
-                    context.addBeanSerializerModifier(new JacksonBeanSerializerModifier<>(commentPropertyWriterType));
-            }
-
-        };
+        final SimpleModule module = new JacksonUtilsModule(logger, commentPropertyWriterType);
         for (Function<Logger, StdDeserializer<?>> deserializerProvider : customDeserializers) {
             StdDeserializer<?> deserializer = deserializerProvider.apply(logger);
             registerDeserializer(module, deserializer);
         }
         return (M) mapper
-                .registerModule(module
-                        .addSerializer(new DurationSerializer())
-                )
+                .registerModule(module.addSerializer(new DurationSerializer()))
                 .addHandler(new LoggerDeserializationProblemHandler(logger));
     }
 
@@ -126,7 +114,8 @@ final class JacksonUtils {
     private static final class JacksonBeanDeserializerModifier extends BeanDeserializerModifier {
         private static final long serialVersionUID = 59847484471838278L;
 
-        private final @NotNull Logger logger;
+        @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+        private final transient @NotNull Logger logger;
 
         @Override
         public BeanDeserializerBuilder updateBuilder(
@@ -189,6 +178,38 @@ final class JacksonUtils {
                 }
             }
             return beanProperties;
+        }
+
+    }
+
+    private static final class JacksonUtilsModule extends SimpleModule {
+        private static final long serialVersionUID = -7666638854510482920L;
+
+        @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+        private final transient @NotNull Logger logger;
+        @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+        private final transient @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType;
+
+        /**
+         * Instantiates a new Jackson utils module.
+         *
+         * @param logger                    the logger
+         * @param commentPropertyWriterType the comment property writer type
+         */
+        public JacksonUtilsModule(
+                final @NotNull Logger logger,
+                final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType
+        ) {
+            this.logger = logger;
+            this.commentPropertyWriterType = commentPropertyWriterType;
+        }
+
+        @Override
+        public void setupModule(final @NotNull SetupContext context) {
+            super.setupModule(context);
+            context.addBeanDeserializerModifier(new JacksonBeanDeserializerModifier(logger));
+            if (commentPropertyWriterType != null)
+                context.addBeanSerializerModifier(new JacksonBeanSerializerModifier<>(commentPropertyWriterType));
         }
 
     }

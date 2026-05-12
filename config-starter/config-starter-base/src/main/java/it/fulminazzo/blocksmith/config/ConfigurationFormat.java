@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.util.Locale;
 
 /**
  * Identifies the type of data format language to utilize
@@ -56,7 +57,7 @@ public enum ConfigurationFormat {
      */
     @SuppressWarnings("unchecked")
     @NotNull BaseConfigurationAdapter newAdapter(final @NotNull Logger logger) {
-        String type = name().toLowerCase();
+        String type = name().toLowerCase(Locale.ROOT);
         type = Character.toUpperCase(type.charAt(0)) + type.substring(1);
         String className = BaseConfigurationAdapter.class.getCanonicalName()
                 .replace("Base", type);
@@ -68,7 +69,7 @@ public enum ConfigurationFormat {
                     ProjectInfo.GROUP,
                     ProjectInfo.PROJECT_NAME,
                     ProjectInfo.MODULE_NAME,
-                    type.toLowerCase()
+                    type.toLowerCase(Locale.ROOT)
             );
             throw new IllegalStateException(
                     String.format("Could not find suitable %s for %s. ",

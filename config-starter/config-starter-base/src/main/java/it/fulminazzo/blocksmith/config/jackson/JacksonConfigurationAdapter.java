@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.config.BaseConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigUtils;
 import it.fulminazzo.blocksmith.config.ConfigVersion;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -27,8 +29,7 @@ import java.util.*;
  */
 @SuppressWarnings("unchecked")
 public final class JacksonConfigurationAdapter implements BaseConfigurationAdapter {
-    private static final @NotNull SimpleDateFormat backupTimeFormat =
-            new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS");
+    private final @NotNull SimpleDateFormat backupTimeFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS");
 
     private final @NotNull ObjectMapper mapper;
     private final @NotNull Logger logger;
@@ -73,7 +74,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                 key = CaseConverter.convert(key, Convention.KEBAB_CASE, ConfigUtils.javaNamingConvention);
             else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE))
                 key = CaseConverter.convert(key, Convention.SNAKE_CASE, ConfigUtils.javaNamingConvention);
-            else key = key.substring(0, 1).toLowerCase() + key.substring(1);
+            else key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
             data.put(key, value);
         }
     }
@@ -88,9 +89,10 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
 
     @Override
     public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
-        return load(new ByteArrayInputStream(data.getBytes()), type);
+        return load(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)), type);
     }
 
+    @SuppressFBWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
     @Override
     public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         JsonNode tree = mapper.readTree(file);
@@ -104,7 +106,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                 data = MapUtils.flatten(data);
 
                 Object rawVersion = data.get(ConfigVersion.PROPERTY_NAME);
-                double latest = version.getVersion();
+                Double latest = version.getVersion();
                 Double currentVersion = null;
                 if (rawVersion != null)
                     try {
@@ -118,7 +120,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                     currentVersion = latest;
                 }
 
-                if (currentVersion != latest) {
+                if (!currentVersion.equals(latest)) {
                     logger.info("Migrating configuration '{}' from version {} to version {}",
                             file.getName(), currentVersion, latest
                     );
@@ -143,7 +145,9 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                 }
             }
         }
-        return load(new FileInputStream(file), type);
+        try (InputStream input = new FileInputStream(file)) {
+            return load(input, type);
+        }
     }
 
     @Override

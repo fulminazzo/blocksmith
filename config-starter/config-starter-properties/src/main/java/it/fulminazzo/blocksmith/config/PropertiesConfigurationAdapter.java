@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -76,7 +77,7 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
         final Map<String, List<String>> keysComments = new HashMap<>();
         List<String> currentComment = new ArrayList<>();
         try (
-                InputStreamReader streamReader = new InputStreamReader(inputStream);
+                InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
                 BufferedReader reader = new BufferedReader(streamReader)
         ) {
             String line;
@@ -121,10 +122,7 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
          * @param base    the base
          * @param comment the comment
          */
-        public PropertiesCommentPropertyWriter(
-                final @NotNull BeanPropertyWriter base,
-                final @NotNull Comment comment
-        ) {
+        public PropertiesCommentPropertyWriter(final @NotNull BeanPropertyWriter base, final @NotNull Comment comment) {
             super(base, comment);
         }
 
@@ -134,7 +132,7 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
                 final @NotNull Comment comment
         ) throws IOException {
             for (String t : CommentUtils.getText(comment))
-                generator.writeRaw(String.format("# %s\n", t));
+                generator.writeRaw(String.format("# %s%n", t));
         }
 
     }

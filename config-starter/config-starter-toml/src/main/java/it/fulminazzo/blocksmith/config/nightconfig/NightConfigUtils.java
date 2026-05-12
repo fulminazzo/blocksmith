@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.config.nightconfig;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.Config;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.config.Comment;
 import it.fulminazzo.blocksmith.config.CommentUtils;
 import it.fulminazzo.blocksmith.naming.CaseConverter;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A collection of utilities to work with {@link Config} objects.
@@ -29,6 +31,7 @@ public final class NightConfigUtils {
      *
      * @param configuration the configuration
      */
+    @SuppressFBWarnings("DMI_ENTRY_SETS_MAY_REUSE_ENTRY_OBJECTS") // these are NOT maps!
     public static void fixPropertyNames(final @NotNull Config configuration) {
         for (Config.Entry entry : new HashSet<>(configuration.entrySet())) {
             String key = entry.getKey();

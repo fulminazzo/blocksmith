@@ -65,9 +65,10 @@ public class ConfigVersion {
             final double currentVersion,
             @NotNull Map<String, Object> data
     ) {
-        for (double v : migrations.keySet()) {
+        for (Map.Entry<Double, Function<Migration, Migration>> entry : migrations.entrySet()) {
+            final double v = entry.getKey();
+            final Function<Migration, Migration> migration = entry.getValue();
             if (v <= currentVersion) continue;
-            Function<Migration, Migration> migration = migrations.get(v);
             data = migration.apply(new Migration(data)).getData();
         }
         return data;

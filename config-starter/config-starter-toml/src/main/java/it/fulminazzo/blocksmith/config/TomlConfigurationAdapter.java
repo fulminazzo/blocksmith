@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -104,7 +105,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     public <T> @NotNull String serialize(final @NotNull T configuration) throws IOException {
         try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             store(output, configuration);
-            return output.toString();
+            return output.toString(StandardCharsets.UTF_8);
         }
     }
 
@@ -118,7 +119,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
 
     @Override
     public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
-        try (OutputStreamWriter objectWriter = new OutputStreamWriter(stream)) {
+        try (OutputStreamWriter objectWriter = new OutputStreamWriter(stream, StandardCharsets.UTF_8)) {
             Config config = toNightConfig(configuration);
             writer.write(config, objectWriter);
         }
@@ -132,13 +133,13 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     static void indentArrays(final @NotNull File file) throws IOException {
         List<String> lines = new ArrayList<>();
         try (
-                FileReader reader = new FileReader(file);
+                FileReader reader = new FileReader(file, StandardCharsets.UTF_8);
                 BufferedReader bufferedReader = new BufferedReader(reader)
         ) {
             bufferedReader.lines().forEach(lines::add);
         }
         try (
-                FileWriter writer = new FileWriter(file);
+                FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8);
                 BufferedWriter bufferedWriter = new BufferedWriter(writer)
         ) {
             String indent = "";

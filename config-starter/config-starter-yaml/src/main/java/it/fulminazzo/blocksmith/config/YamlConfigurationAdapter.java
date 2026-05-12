@@ -10,6 +10,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactoryBuilder;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.util.StringQuotingChecker;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import it.fulminazzo.blocksmith.naming.CaseConverter;
@@ -32,6 +33,7 @@ import org.yaml.snakeyaml.reader.StreamReader;
 import org.yaml.snakeyaml.resolver.Resolver;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,7 +72,7 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
             final @NotNull InputStream stream
     ) {
         final LoaderOptions options = new LoaderOptions().setProcessComments(true);
-        StreamReader reader = new StreamReader(new InputStreamReader(stream));
+        StreamReader reader = new StreamReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
         Composer composer = new Composer(new ParserImpl(reader, options), new Resolver(), options);
         Node root = composer.getSingleNode();
         if (root instanceof MappingNode) return extractComments((MappingNode) root);
@@ -172,18 +174,13 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
          * @param base    the base
          * @param comment the comment
          */
-        public YamlCommentPropertyWriter(
-                final @NotNull BeanPropertyWriter base,
-                final @NotNull Comment comment
-        ) {
+        public YamlCommentPropertyWriter(final @NotNull BeanPropertyWriter base, final @NotNull Comment comment) {
             super(base, comment);
         }
 
+        @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_INFERRED")
         @Override
-        protected void writeComment(
-                final @NotNull JsonGenerator generator,
-                final @NotNull Comment comment
-        ) {
+        protected void writeComment(final @NotNull JsonGenerator generator, final @NotNull Comment comment) {
             for (String t : CommentUtils.getText(comment))
                 Reflect.on(generator).invoke("_emit",
                         new CommentEvent(CommentType.BLOCK, " " + t, null, null)

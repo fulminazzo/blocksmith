@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.validation.Validator;
 import it.fulminazzo.blocksmith.validation.ViolationException;
 import lombok.AccessLevel;
@@ -22,7 +23,8 @@ import java.io.IOException;
 final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
     private static final long serialVersionUID = -5375227855351483803L;
 
-    @NotNull Logger logger;
+    @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+    transient @NotNull Logger logger;
     @NotNull AnnotatedField field;
 
     /**

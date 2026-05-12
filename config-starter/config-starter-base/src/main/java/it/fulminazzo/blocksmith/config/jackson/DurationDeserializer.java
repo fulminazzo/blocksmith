@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -26,7 +28,8 @@ final class DurationDeserializer extends StdDeserializer<Duration> {
 
     private static final @NotNull Map<String, Function<String, Duration>> parsers = new LinkedHashMap<>();
 
-    private final @NotNull Logger logger;
+    @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+    private final transient @NotNull Logger logger;
 
     static {
         parsers.put("ns", s -> Duration.ofNanos(Long.parseLong(s)));
@@ -61,7 +64,10 @@ final class DurationDeserializer extends StdDeserializer<Duration> {
         JsonNode node = parser.getCodec().readTree(parser);
         String raw = node.asText();
         try {
-            return getParser("s").getValue().apply(raw);
+            return Objects.requireNonNull(
+                    getParser("s"),
+                    "Could not find seconds parser" // should be impossible
+            ).getValue().apply(raw);
         } catch (NumberFormatException ignored) {
             // some time unit was used, we require complete parsing
         }
