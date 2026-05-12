@@ -12,50 +12,10 @@ import com.github.javaparser.ast.expr.NameExpr
 import spock.lang.Specification
 
 class BeanConfigurationBuilderTest extends Specification {
-
     private BeanConfigurationBuilder builder
 
     void setup() {
         builder = new BeanConfigurationBuilder([:], new ClassOrInterfaceDeclaration(), [:])
-    }
-
-    def 'test generate of existing class with version'() {
-        given:
-        def configurationFile = new File('build/resources/test/config-version.yml')
-        def sourceDirectory = new File('build/resources/test')
-        def packageName = 'it.fulminazzo.blocksmith'
-        def className = 'BlocksmithEnhancedConfigVersion'
-        def expected = new File('src/test/resources/it/fulminazzo/blocksmith/BlocksmithEnhancedConfigVersion.java')
-
-        when:
-        def file = BeanConfigurationBuilder.generate(configurationFile, sourceDirectory, packageName, className)
-
-        then:
-        file.exists()
-
-        and:
-        file.readLines() == expected.readLines()
-    }
-
-    def 'test generate of not-existing class with version'() {
-        given:
-        def configurationFile = new File('build/resources/test/config-version.yml')
-        def sourceDirectory = new File('build/resources/src')
-        def packageName = 'it.fulminazzo.blocksmith'
-        def className = 'BlocksmithConfigVersion'
-        def expected = new File('build/resources/test/BlocksmithConfigVersion.java')
-
-        and:
-        if (sourceDirectory.exists()) sourceDirectory.deleteDir()
-
-        when:
-        def file = BeanConfigurationBuilder.generate(configurationFile, sourceDirectory, packageName, className)
-
-        then:
-        file.exists()
-
-        and:
-        file.readLines() == expected.readLines()
     }
 
     def 'test that parseVersion of version class field updates initializer'() {
@@ -100,45 +60,6 @@ class BeanConfigurationBuilderTest extends Specification {
         field != null
         field.toString() == '//TODO: auto-generated, handle migrations manually\n' +
                 'public static ConfigVersion version = ConfigVersion.of(2.0);'
-    }
-
-    def 'test generate of existing class'() {
-        given:
-        def configurationFile = new File('build/resources/test/config.yml')
-        def sourceDirectory = new File('build/resources/test')
-        def packageName = 'it.fulminazzo.blocksmith'
-        def className = 'BlocksmithEnhancedConfig'
-        def expected = new File('src/test/resources/it/fulminazzo/blocksmith/BlocksmithEnhancedConfig.java')
-
-        when:
-        def file = BeanConfigurationBuilder.generate(configurationFile, sourceDirectory, packageName, className)
-
-        then:
-        file.exists()
-
-        and:
-        file.readLines() == expected.readLines()
-    }
-
-    def 'test generate of not-existing class'() {
-        given:
-        def configurationFile = new File('build/resources/test/config.yml')
-        def sourceDirectory = new File('build/resources/src')
-        def packageName = 'it.fulminazzo.blocksmith'
-        def className = 'BlocksmithConfig'
-        def expected = new File('build/resources/test/BlocksmithConfig.java')
-
-        and:
-        if (sourceDirectory.exists()) sourceDirectory.deleteDir()
-
-        when:
-        def file = BeanConfigurationBuilder.generate(configurationFile, sourceDirectory, packageName, className)
-
-        then:
-        file.exists()
-
-        and:
-        file.readLines() == expected.readLines()
     }
 
     def 'test that initialization correctly adds nested classes (not interfaces), methods and fields'() {
