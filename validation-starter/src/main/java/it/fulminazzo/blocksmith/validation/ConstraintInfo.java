@@ -43,7 +43,7 @@ class ConstraintInfo {
                 Object value = reflect.invoke(method).get();
                 if (value instanceof Number) {
                     Number number = (Number) value;
-                    if (number.doubleValue() == number.longValue()) value = number.longValue();
+                    if (number.doubleValue() % 1 == 0) value = number.longValue();
                 }
                 values.put(name, value);
             }

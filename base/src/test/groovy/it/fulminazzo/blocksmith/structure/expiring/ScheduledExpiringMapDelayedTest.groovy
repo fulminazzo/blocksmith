@@ -8,27 +8,23 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 
 class ScheduledExpiringMapDelayedTest extends Specification {
-    private static ScheduledExecutorService scheduler
+    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor()
 
     private ScheduledExpiringMap<String, String> map
-    private Map<String, AbstractExpiringMap.ExpiringEntry<String>> internal
-
-    void setupSpec() {
-        scheduler = Executors.newSingleThreadScheduledExecutor()
-    }
+    private Map<String, ExpiringEntry<String>> internal
 
     void cleanupSpec() {
-        scheduler.close()
+        SCHEDULER.close()
     }
 
     void setup() {
-        map = new ScheduledExpiringMap<>(scheduler, Duration.ofDays(1L))
+        map = new ScheduledExpiringMap<>(SCHEDULER, Duration.ofDays(1L))
         internal = Reflect.on(map).get('delegate').get()
     }
 
     def 'test that initialization of invalid duration throws'() {
         when:
-        new ScheduledExpiringMap<>(scheduler, Duration.ofSeconds(0))
+        new ScheduledExpiringMap<>(SCHEDULER, Duration.ofSeconds(0))
 
         then:
         thrown(IllegalArgumentException)
@@ -36,7 +32,7 @@ class ScheduledExpiringMapDelayedTest extends Specification {
 
     def 'test that getExpiring returns null if expired but not yet removed'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)
@@ -53,7 +49,7 @@ class ScheduledExpiringMapDelayedTest extends Specification {
 
     def 'test that remove returns null if expired but not yet removed'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
 
         and:
         sleep(5L)
@@ -70,8 +66,8 @@ class ScheduledExpiringMapDelayedTest extends Specification {
 
     def 'test that keySet does not return expired but not yet removed keys'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 1000L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
+        internal['Goodbye'] = new ExpiringEntry<>('mars', 1000L)
 
         and:
         sleep(5L)
@@ -85,8 +81,8 @@ class ScheduledExpiringMapDelayedTest extends Specification {
 
     def 'test that values does not return expired but not yet removed values'() {
         given:
-        internal['Hello'] = new AbstractExpiringMap.ExpiringEntry<>('world', 1L)
-        internal['Goodbye'] = new AbstractExpiringMap.ExpiringEntry<>('mars', 1000L)
+        internal['Hello'] = new ExpiringEntry<>('world', 1L)
+        internal['Goodbye'] = new ExpiringEntry<>('mars', 1000L)
 
         and:
         sleep(5L)

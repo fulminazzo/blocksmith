@@ -10,6 +10,14 @@ import org.jetbrains.annotations.NotNull;
 public interface ICooldownManager<E> {
 
     /**
+     * Removes the entity from the cooldown.
+     *
+     * @param entity the entity
+     * @return this object (for method chaining)
+     */
+    @NotNull ICooldownManager<E> remove(final @NotNull E entity);
+
+    /**
      * Checks if the entity is on cooldown.
      *
      * @param entity the entity
@@ -25,13 +33,5 @@ public interface ICooldownManager<E> {
      * @throws IllegalArgumentException if the entity is not on cooldown
      */
     long getRemaining(final @NotNull E entity);
-
-    /**
-     * Removes the entity from the cooldown.
-     *
-     * @param entity the entity
-     * @return this object (for method chaining)
-     */
-    @NotNull ICooldownManager<E> remove(final @NotNull E entity);
 
 }

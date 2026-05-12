@@ -12,6 +12,11 @@ import java.lang.annotation.*;
  * Also supports {@link java.time.Duration}, where the milliseconds are compared.
  * <br>
  * Accepts {@code null} values.
+ *
+ * @see Constraint
+ * @see NonNull
+ * @see Min
+ * @see Max
  */
 @Constraint
 @Documented
@@ -39,11 +44,13 @@ public @interface Range {
      * By default, the message is a code that will later be translated by an appropriate translator.
      *
      * @return the message
+     * @see ValidationMessages
      */
     @NotNull String message() default ValidationMessages.NUMBER_EXCEEDS_RANGE;
 
     /**
-     * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
+     * Gets the error message that will be shown in the
+     * {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
      *
      * @return the message
      */

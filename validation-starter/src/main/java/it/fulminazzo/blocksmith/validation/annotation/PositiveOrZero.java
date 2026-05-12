@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a numeric parameter or type that must positive or at most zero.
  * <br>
  * Accepts {@code null} values.
+ *
+ * @see Constraint
+ * @see NonNull
+ * @see Min
+ * @see Positive
+ * @see Negative
+ * @see NegativeOrZero
  */
 @Min(0)
 @Constraint
@@ -24,11 +31,13 @@ public @interface PositiveOrZero {
      * By default, the message is a code that will later be translated by an appropriate translator.
      *
      * @return the message
+     * @see ValidationMessages
      */
     @NotNull String message() default ValidationMessages.REQUIRED_POSITIVE_OR_ZERO;
 
     /**
-     * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
+     * Gets the error message that will be shown in the
+     * {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
      *
      * @return the message
      */

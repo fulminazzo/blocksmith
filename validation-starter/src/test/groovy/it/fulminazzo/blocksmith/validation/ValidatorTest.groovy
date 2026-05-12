@@ -6,22 +6,25 @@ import spock.lang.Specification
 
 import java.time.*
 
+@SuppressWarnings('NoJavaUtilDate')
 class ValidatorTest extends Specification {
-    private static final Validator validator = Validator.instance
+    private static final int TEST_TIME = 10
 
-    private static final noValuesArray = new Object[0]
-    private static final exceedValuesArray = (1..6).toArray()
+    private static final Validator VALIDATOR = Validator.instance
+
+    private static final NO_VALUES_ARRAY = new Object[0]
+    private static final EXCEED_VALUES_ARRAY = (1..6).toArray()
 
     private static final char A = 'A'
     private static final char Z = 'Z'
 
     static {
-        validator.register(Character, new ConstraintValidatorImpl((o) -> ((CharSequence) o).size() == 1, CharSequence))
+        VALIDATOR.register(Character, new ConstraintValidatorImpl((o) -> ((CharSequence) o).size() == 1, CharSequence))
     }
 
     def 'test that validate method works'() {
         given:
-        def person = new Person('Alex', 23, new Person.School('Galileo'))
+        def person = new Person(23, new Person.School('Galileo'), 'Alex')
 
         when:
         person.setName('Steve', 'name update')
@@ -30,9 +33,10 @@ class ValidatorTest extends Specification {
         noExceptionThrown()
     }
 
+    @SuppressWarnings('UnnecessarySetter')
     def 'test that validate method throws for invalid parameter'() {
         given:
-        def person = new Person('Alex', 23, null)
+        def person = new Person(23, null, 'Alex')
 
         when:
         person.setName(*parameters)
@@ -60,7 +64,7 @@ class ValidatorTest extends Specification {
 
     def 'test that validate method throws if not enough parameters are given'() {
         given:
-        def person = new Person('Alex', 23, null)
+        def person = new Person(23, null, 'Alex')
 
         when:
         person.invalidSetName('Alex', 'name updated')
@@ -68,6 +72,22 @@ class ValidatorTest extends Specification {
         then:
         def e = thrown(IllegalArgumentException)
         e.message =~ '.*Please include all the parameters of the method to validate it.*'
+    }
+
+    def 'test that validate field of password field throws multiple exceptions'() {
+        given:
+        final field = Fields.getDeclaredField('password')
+        final value = ''
+
+        when:
+        Validator.validateField(field, value)
+
+        then:
+        def e = thrown(ViolationException)
+        e.message == 'invalid password: ' +
+                'must at least contain one non-space character, ' +
+                "size must be at least 8 and at most ${Integer.MAX_VALUE} elements long, " +
+                '\'\' is not allowed (only letters and digits)'
     }
 
     def 'test that validate field works'() {
@@ -115,7 +135,7 @@ class ValidatorTest extends Specification {
 
         where:
         bean << [
-                new Person('Alex', 23, new Person.School('Galileo')),
+                new Person(23, new Person.School('Galileo'), 'Alex'),
                 null
         ]
     }
@@ -130,14 +150,14 @@ class ValidatorTest extends Specification {
 
         where:
         bean                                            || expected
-        new Person(null, 23, null)                      || 'invalid property \'name\': cannot be null'
-        new Person('', 23, null)                        || 'invalid property \'name\': \'\' is not allowed (only letters)'
-        new Person('Alex!', 23, null)                   || 'invalid property \'name\': \'Alex!\' is not allowed (only letters)'
-        new Person('Alex', 0, null)                     || 'invalid property \'age\': must be at least 18 and at most 115'
-        new Person('Alex', 13, null)                    || 'invalid property \'age\': must be at least 18 and at most 115'
-        new Person('Alex', 130, null)                   || 'invalid property \'age\': must be at least 18 and at most 115'
-        new Person('Alex', 23, new Person.School(null)) || 'invalid property \'school.name\': cannot be null'
-        new Person(null, 0, new Person.School(null))    ||
+        new Person(23, null, null)                      || 'invalid property \'name\': cannot be null'
+        new Person(23, null, '')                        || 'invalid property \'name\': \'\' is not allowed (only letters)'
+        new Person(23, null, 'Alex!')                   || 'invalid property \'name\': \'Alex!\' is not allowed (only letters)'
+        new Person(0, null, 'Alex')                     || 'invalid property \'age\': must be at least 18 and at most 115'
+        new Person(13, null, 'Alex')                    || 'invalid property \'age\': must be at least 18 and at most 115'
+        new Person(130, null, 'Alex')                   || 'invalid property \'age\': must be at least 18 and at most 115'
+        new Person(23, new Person.School(null), 'Alex') || 'invalid property \'school.name\': cannot be null'
+        new Person(0, new Person.School(null), null)    ||
                 'invalid property \'age\': must be at least 18 and at most 115; ' +
                 'invalid property \'name\': cannot be null; ' +
                 'invalid property \'school.name\': cannot be null'
@@ -153,7 +173,7 @@ class ValidatorTest extends Specification {
             toValidate = value()
 
         when:
-        validator.validate(field, toValidate)
+        VALIDATOR.validate(field, toValidate)
 
         then:
         noExceptionThrown()
@@ -334,56 +354,56 @@ class ValidatorTest extends Specification {
         'character'              | 'a'
         // After
         'afterDate'              | null
-        'afterDate'              | new Date(new Date().getTime() + 3000)
+        'afterDate'              | new Date(new Date().time + TEST_TIME * 1_000)
         'afterCalendar'          | null
-        'afterCalendar'          | Calendar.instance.add(Calendar.SECOND, 3)
+        'afterCalendar'          | Calendar.instance.add(Calendar.SECOND, TEST_TIME)
         'afterTemporal'          | null
-        'afterTemporal'          | Instant.now().plusSeconds(3)
-        'afterTemporal'          | LocalTime.now().plusSeconds(3)
-        'afterTemporal'          | LocalDate.now().plusDays(1)
-        'afterTemporal'          | LocalDateTime.now().plusSeconds(3)
+        'afterTemporal'          | Instant.now().plusSeconds(TEST_TIME)
+        'afterTemporal'          | LocalTime.now().plusSeconds(TEST_TIME)
+        'afterTemporal'          | LocalDate.now().plusDays(TEST_TIME)
+        'afterTemporal'          | LocalDateTime.now().plusSeconds(TEST_TIME)
         // AfterOrNow
         'afterOrNowDate'         | null
-        'afterOrNowDate'         | { new Date(new Date().getTime()) }
-        'afterOrNowDate'         | { new Date(new Date().getTime() + 3000) }
+        'afterOrNowDate'         | { new Date(new Date().time) }
+        'afterOrNowDate'         | { new Date(new Date().time + TEST_TIME * 1_000) }
         'afterOrNowCalendar'     | null
         'afterOrNowCalendar'     | { Calendar.instance }
-        'afterOrNowCalendar'     | { Calendar.instance.add(Calendar.SECOND, 3) }
+        'afterOrNowCalendar'     | { Calendar.instance.add(Calendar.SECOND, TEST_TIME) }
         'afterOrNowTemporal'     | null
         'afterOrNowTemporal'     | { Instant.now() }
-        'afterOrNowTemporal'     | { Instant.now().plusSeconds(3) }
+        'afterOrNowTemporal'     | { Instant.now().plusSeconds(TEST_TIME) }
         'afterOrNowTemporal'     | { LocalTime.now() }
-        'afterOrNowTemporal'     | { LocalTime.now().plusSeconds(3) }
+        'afterOrNowTemporal'     | { LocalTime.now().plusSeconds(TEST_TIME) }
         'afterOrNowTemporal'     | { LocalDate.now() }
-        'afterOrNowTemporal'     | { LocalDate.now().plusDays(1) }
+        'afterOrNowTemporal'     | { LocalDate.now().plusDays(TEST_TIME) }
         'afterOrNowTemporal'     | { LocalDateTime.now() }
-        'afterOrNowTemporal'     | { LocalDateTime.now().plusSeconds(3) }
+        'afterOrNowTemporal'     | { LocalDateTime.now().plusSeconds(TEST_TIME) }
         // Before
         'beforeDate'             | null
-        'beforeDate'             | new Date(new Date().getTime() - 2000)
+        'beforeDate'             | new Date(new Date().time - TEST_TIME * 1_000)
         'beforeCalendar'         | null
-        'beforeCalendar'         | Calendar.instance.add(Calendar.SECOND, -2)
+        'beforeCalendar'         | Calendar.instance.add(Calendar.SECOND, -TEST_TIME)
         'beforeTemporal'         | null
-        'beforeTemporal'         | Instant.now().minusSeconds(3)
-        'beforeTemporal'         | LocalTime.now().minusSeconds(3)
-        'beforeTemporal'         | LocalDate.now().minusDays(1)
-        'beforeTemporal'         | LocalDateTime.now().minusSeconds(3)
+        'beforeTemporal'         | Instant.now().minusSeconds(TEST_TIME)
+        'beforeTemporal'         | LocalTime.now().minusSeconds(TEST_TIME)
+        'beforeTemporal'         | LocalDate.now().minusDays(TEST_TIME)
+        'beforeTemporal'         | LocalDateTime.now().minusSeconds(TEST_TIME)
         // BeforeOrNow
         'beforeOrNowDate'        | null
-        'beforeOrNowDate'        | { new Date(new Date().getTime()) }
-        'beforeOrNowDate'        | { new Date(new Date().getTime() - 2000) }
+        'beforeOrNowDate'        | { new Date(new Date().time) }
+        'beforeOrNowDate'        | { new Date(new Date().time - TEST_TIME * 1_000) }
         'beforeOrNowCalendar'    | null
         'beforeOrNowCalendar'    | { Calendar.instance }
-        'beforeOrNowCalendar'    | { Calendar.instance.add(Calendar.SECOND, -2) }
+        'beforeOrNowCalendar'    | { Calendar.instance.add(Calendar.SECOND, -TEST_TIME) }
         'beforeOrNowTemporal'    | null
         'beforeOrNowTemporal'    | { Instant.now() }
-        'beforeOrNowTemporal'    | { Instant.now().minusSeconds(2) }
+        'beforeOrNowTemporal'    | { Instant.now().minusSeconds(TEST_TIME) }
         'beforeOrNowTemporal'    | { LocalTime.now() }
-        'beforeOrNowTemporal'    | { LocalTime.now().minusSeconds(2) }
+        'beforeOrNowTemporal'    | { LocalTime.now().minusSeconds(TEST_TIME) }
         'beforeOrNowTemporal'    | { LocalDate.now() }
-        'beforeOrNowTemporal'    | { LocalDate.now().minusDays(1) }
+        'beforeOrNowTemporal'    | { LocalDate.now().minusDays(TEST_TIME) }
         'beforeOrNowTemporal'    | { LocalDateTime.now() }
-        'beforeOrNowTemporal'    | { LocalDateTime.now().minusSeconds(2) }
+        'beforeOrNowTemporal'    | { LocalDateTime.now().minusSeconds(TEST_TIME) }
     }
 
     def 'test that validate of field #fieldName and value #value throws'() {
@@ -391,7 +411,7 @@ class ValidatorTest extends Specification {
         def field = Fields.getDeclaredField(fieldName)
 
         when:
-        validator.validate(field, value)
+        VALIDATOR.validate(field, value)
 
         then:
         def e = thrown(ValidationException)
@@ -406,214 +426,396 @@ class ValidatorTest extends Specification {
         where:
         fieldName                | value                                    || expectedViolations
         // NonNull
-        'nonNull'                | null                                     || [new ConstraintViolation(null, 'error.validation.not-null', 'cannot be null', ['value': null])]
+        'nonNull'                | null                                     || [new ConstraintViolation(null, 'error.validation.not-null', 'cannot be null', ['value' : null])]
         // AssertFalse
-        'assertFalse'            | true                                     || [new ConstraintViolation(true, 'error.validation.required-false', String.format('must be false', true), ['value': true])]
+        'assertFalse'            | true                                     || [new ConstraintViolation(true, 'error.validation.required-false', String.format('must be false', true), ['value' : true])]
         'assertFalse'            | 'not-a-boolean'                          || [ConstraintViolation.invalidType('not-a-boolean', 'true or false')]
         // AssertTrue
-        'assertTrue'             | false                                    || [new ConstraintViolation(false, 'error.validation.required-true', String.format('must be true', false), ['value': false])]
+        'assertTrue'             | false                                    || [new ConstraintViolation(false, 'error.validation.required-true', String.format('must be true', false), ['value' : false])]
         'assertTrue'             | 42                                       || [ConstraintViolation.invalidType(42, 'true or false')]
         // Max
-        'max'                    | 1                                        || [new ConstraintViolation(1, 'error.validation.number-too-big', String.format('must be at most %2$s', 1, 0), ['value': 1, 'expected': 0])]
-        'max'                    | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.number-too-big', String.format('must be at most %2$s', Integer.MAX_VALUE, 0), ['value': Integer.MAX_VALUE, 'expected': 0])]
+        'max'                    | 1                                        || [new ConstraintViolation(1, 'error.validation.number-too-big', String.format('must be at most %2$s', 1, 0), ['value' : 1, 'expected' : 0])]
+        'max'                    | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.number-too-big',
+                String.format('must be at most %2$s', Integer.MAX_VALUE, 0), ['value' : Integer.MAX_VALUE, 'expected' : 0])
+        ]
         'max'                    | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Max Duration
-        'maxDuration'            | Duration.ofMillis(1)                     || [new ConstraintViolation(Duration.ofMillis(1), 'error.validation.number-too-big', String.format('must be at most %2$s', Duration.ofMillis(1), 0), ['value': Duration.ofMillis(1), 'expected': 0])]
-        'maxDuration'            | Duration.ofMillis(Integer.MAX_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MAX_VALUE), 'error.validation.number-too-big', String.format('must be at most %2$s', Duration.ofMillis(Integer.MAX_VALUE), 0), ['value': Duration.ofMillis(Integer.MAX_VALUE), 'expected': 0])]
+        'maxDuration'            | Duration.ofMillis(1)                     || [new ConstraintViolation(Duration.ofMillis(1), 'error.validation.number-too-big',
+                String.format('must be at most %2$s', Duration.ofMillis(1), 0), ['value' : Duration.ofMillis(1), 'expected' : 0])
+        ]
+        'maxDuration'            | Duration.ofMillis(Integer.MAX_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MAX_VALUE), 'error.validation.number-too-big',
+                String.format('must be at most %2$s', Duration.ofMillis(Integer.MAX_VALUE), 0), ['value' : Duration.ofMillis(Integer.MAX_VALUE), 'expected' : 0])
+        ]
         'maxDuration'            | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Max Character
-        'maxCharacter'           | 'z' as char                              || [new ConstraintViolation('z' as char, 'error.validation.character-too-big', String.format('must be at most \'%2$s\'', 'z' as char, Z), ['value': 'z' as char, 'expected': Z])]
+        'maxCharacter'           | 'z' as char                              || [new ConstraintViolation('z' as char, 'error.validation.character-too-big',
+                String.format('must be at most \'%2$s\'', 'z' as char, Z), ['value' : 'z' as char, 'expected' : Z])
+        ]
         'maxCharacter'           | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'character')]
         // NegativeOrZero
-        'negativeOrZero'         | 1                                        || [new ConstraintViolation(1, 'error.validation.negative-or-zero', String.format('must be negative or zero', 1), ['value': 1])]
-        'negativeOrZero'         | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.negative-or-zero', String.format('must be negative or zero', Integer.MAX_VALUE), ['value': Integer.MAX_VALUE])]
+        'negativeOrZero'         | 1                                        || [new ConstraintViolation(1, 'error.validation.negative-or-zero', String.format('must be negative or zero', 1), ['value' : 1])]
+        'negativeOrZero'         | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.negative-or-zero',
+                String.format('must be negative or zero', Integer.MAX_VALUE), ['value' : Integer.MAX_VALUE])
+        ]
         'negativeOrZero'         | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // NegativeOrZero Duration
-        'negativeOrZeroDuration' | Duration.ofMillis(1)                     || [new ConstraintViolation(Duration.ofMillis(1), 'error.validation.negative-or-zero', String.format('must be negative or zero', Duration.ofMillis(1)), ['value': Duration.ofMillis(1)])]
-        'negativeOrZeroDuration' | Duration.ofMillis(Integer.MAX_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MAX_VALUE), 'error.validation.negative-or-zero', String.format('must be negative or zero', Duration.ofMillis(Integer.MAX_VALUE)), ['value': Duration.ofMillis(Integer.MAX_VALUE)])]
+        'negativeOrZeroDuration' | Duration.ofMillis(1)                     || [new ConstraintViolation(Duration.ofMillis(1), 'error.validation.negative-or-zero',
+                String.format('must be negative or zero', Duration.ofMillis(1)), ['value' : Duration.ofMillis(1)])
+        ]
+        'negativeOrZeroDuration' | Duration.ofMillis(Integer.MAX_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MAX_VALUE), 'error.validation.negative-or-zero',
+                String.format('must be negative or zero', Duration.ofMillis(Integer.MAX_VALUE)), ['value' : Duration.ofMillis(Integer.MAX_VALUE)])
+        ]
         'negativeOrZeroDuration' | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Negative
-        'negative'               | 0                                        || [new ConstraintViolation(0, 'error.validation.negative', String.format('must be negative', 0), ['value': 0])]
-        'negative'               | 1                                        || [new ConstraintViolation(1, 'error.validation.negative', String.format('must be negative', 1), ['value': 1])]
-        'negative'               | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.negative', String.format('must be negative', Integer.MAX_VALUE), ['value': Integer.MAX_VALUE])]
+        'negative'               | 0                                        || [new ConstraintViolation(0, 'error.validation.negative', String.format('must be negative', 0), ['value' : 0])]
+        'negative'               | 1                                        || [new ConstraintViolation(1, 'error.validation.negative', String.format('must be negative', 1), ['value' : 1])]
+        'negative'               | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.negative', String.format('must be negative', Integer.MAX_VALUE), ['value' : Integer.MAX_VALUE])]
         'negative'               | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Negative Duration
-        'negativeDuration'       | Duration.ofMillis(0)                     || [new ConstraintViolation(Duration.ofMillis(0), 'error.validation.negative', String.format('must be negative', Duration.ofMillis(0)), ['value': Duration.ofMillis(0)])]
-        'negativeDuration'       | Duration.ofMillis(1)                     || [new ConstraintViolation(Duration.ofMillis(1), 'error.validation.negative', String.format('must be negative', Duration.ofMillis(1)), ['value': Duration.ofMillis(1)])]
-        'negativeDuration'       | Duration.ofMillis(Integer.MAX_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MAX_VALUE), 'error.validation.negative', String.format('must be negative', Duration.ofMillis(Integer.MAX_VALUE)), ['value': Duration.ofMillis(Integer.MAX_VALUE)])]
+        'negativeDuration'       | Duration.ofMillis(0)                     || [new ConstraintViolation(Duration.ofMillis(0), 'error.validation.negative',
+                String.format('must be negative', Duration.ofMillis(0)), ['value' : Duration.ofMillis(0)])
+        ]
+        'negativeDuration'       | Duration.ofMillis(1)                     || [new ConstraintViolation(Duration.ofMillis(1), 'error.validation.negative',
+                String.format('must be negative', Duration.ofMillis(1)), ['value' : Duration.ofMillis(1)])
+        ]
+        'negativeDuration'       | Duration.ofMillis(Integer.MAX_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MAX_VALUE), 'error.validation.negative',
+                String.format('must be negative', Duration.ofMillis(Integer.MAX_VALUE)), ['value' : Duration.ofMillis(Integer.MAX_VALUE)])
+        ]
         'negativeDuration'       | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Min
-        'min'                    | -1                                       || [new ConstraintViolation(-1, 'error.validation.number-too-small', String.format('must be at least %2$s', -1, 0), ['value': -1, 'expected': 0])]
-        'min'                    | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.number-too-small', String.format('must be at least %2$s', Integer.MIN_VALUE, 0), ['value': Integer.MIN_VALUE, 'expected': 0])]
+        'min'                    | -1                                       || [new ConstraintViolation(-1, 'error.validation.number-too-small', String.format('must be at least %2$s', -1, 0), ['value' : -1, 'expected' : 0])]
+        'min'                    | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.number-too-small',
+                String.format('must be at least %2$s', Integer.MIN_VALUE, 0), ['value' : Integer.MIN_VALUE, 'expected' : 0])
+        ]
         'min'                    | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Min Duration
-        'minDuration'            | Duration.ofMillis(-1)                    || [new ConstraintViolation(Duration.ofMillis(-1), 'error.validation.number-too-small', String.format('must be at least %2$s', Duration.ofMillis(-1), 0), ['value': Duration.ofMillis(-1), 'expected': 0])]
-        'minDuration'            | Duration.ofMillis(Integer.MIN_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MIN_VALUE), 'error.validation.number-too-small', String.format('must be at least %2$s', Duration.ofMillis(Integer.MIN_VALUE), 0), ['value': Duration.ofMillis(Integer.MIN_VALUE), 'expected': 0])]
+        'minDuration'            | Duration.ofMillis(-1)                    || [new ConstraintViolation(Duration.ofMillis(-1), 'error.validation.number-too-small',
+                String.format('must be at least %2$s', Duration.ofMillis(-1), 0), ['value' : Duration.ofMillis(-1), 'expected' : 0])
+        ]
+        'minDuration'            | Duration.ofMillis(Integer.MIN_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MIN_VALUE), 'error.validation.number-too-small',
+                String.format('must be at least %2$s', Duration.ofMillis(Integer.MIN_VALUE), 0), ['value' : Duration.ofMillis(Integer.MIN_VALUE), 'expected' : 0])
+        ]
         'minDuration'            | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Min Character
-        'minCharacter'           | '\n' as char                             || [new ConstraintViolation('\n' as char, 'error.validation.character-too-small', String.format('must be at least \'%2$s\'', '\n' as char, A), ['value': '\n' as char, 'expected': A])]
+        'minCharacter'           | '\n' as char                             || [new ConstraintViolation('\n' as char, 'error.validation.character-too-small',
+                String.format('must be at least \'%2$s\'', '\n' as char, A), ['value' : '\n' as char, 'expected' : A])
+        ]
         'minCharacter'           | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'character')]
         // PositiveOrZero
-        'positiveOrZero'         | -1                                       || [new ConstraintViolation(-1, 'error.validation.positive-or-zero', String.format('must be positive or zero', -1), ['value': -1])]
-        'positiveOrZero'         | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.positive-or-zero', String.format('must be positive or zero', Integer.MIN_VALUE), ['value': Integer.MIN_VALUE])]
+        'positiveOrZero'         | -1                                       || [new ConstraintViolation(-1, 'error.validation.positive-or-zero', String.format('must be positive or zero', -1), ['value' : -1])]
+        'positiveOrZero'         | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.positive-or-zero',
+                String.format('must be positive or zero', Integer.MIN_VALUE), ['value' : Integer.MIN_VALUE])
+        ]
         'positiveOrZero'         | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // PositiveOrZero Duration
-        'positiveOrZeroDuration' | Duration.ofMillis(-1)                    || [new ConstraintViolation(Duration.ofMillis(-1), 'error.validation.positive-or-zero', String.format('must be positive or zero', Duration.ofMillis(-1)), ['value': Duration.ofMillis(-1)])]
-        'positiveOrZeroDuration' | Duration.ofMillis(Integer.MIN_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MIN_VALUE), 'error.validation.positive-or-zero', String.format('must be positive or zero', Duration.ofMillis(Integer.MIN_VALUE)), ['value': Duration.ofMillis(Integer.MIN_VALUE)])]
+        'positiveOrZeroDuration' | Duration.ofMillis(-1)                    || [new ConstraintViolation(Duration.ofMillis(-1), 'error.validation.positive-or-zero',
+                String.format('must be positive or zero', Duration.ofMillis(-1)), ['value' : Duration.ofMillis(-1)])
+        ]
+        'positiveOrZeroDuration' | Duration.ofMillis(Integer.MIN_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MIN_VALUE), 'error.validation.positive-or-zero',
+                String.format('must be positive or zero', Duration.ofMillis(Integer.MIN_VALUE)), ['value' : Duration.ofMillis(Integer.MIN_VALUE)])
+        ]
         'positiveOrZeroDuration' | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Positive
-        'positive'               | 0                                        || [new ConstraintViolation(0, 'error.validation.positive', String.format('must be positive', 0), ['value': 0])]
-        'positive'               | -1                                       || [new ConstraintViolation(-1, 'error.validation.positive', String.format('must be positive', -1), ['value': -1])]
-        'positive'               | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.positive', String.format('must be positive', Integer.MIN_VALUE), ['value': Integer.MIN_VALUE])]
+        'positive'               | 0                                        || [new ConstraintViolation(0, 'error.validation.positive', String.format('must be positive', 0), ['value' : 0])]
+        'positive'               | -1                                       || [new ConstraintViolation(-1, 'error.validation.positive', String.format('must be positive', -1), ['value' : -1])]
+        'positive'               | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.positive', String.format('must be positive', Integer.MIN_VALUE), ['value' : Integer.MIN_VALUE])]
         'positive'               | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Positive Duration
-        'positiveDuration'       | Duration.ofMillis(0)                     || [new ConstraintViolation(Duration.ofMillis(0), 'error.validation.positive', String.format('must be positive', Duration.ofMillis(0)), ['value': Duration.ofMillis(0)])]
-        'positiveDuration'       | Duration.ofMillis(-1)                    || [new ConstraintViolation(Duration.ofMillis(-1), 'error.validation.positive', String.format('must be positive', Duration.ofMillis(-1)), ['value': Duration.ofMillis(-1)])]
-        'positiveDuration'       | Duration.ofMillis(Integer.MIN_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MIN_VALUE), 'error.validation.positive', String.format('must be positive', Duration.ofMillis(Integer.MIN_VALUE)), ['value': Duration.ofMillis(Integer.MIN_VALUE)])]
+        'positiveDuration'       | Duration.ofMillis(0)                     || [new ConstraintViolation(Duration.ofMillis(0), 'error.validation.positive',
+                String.format('must be positive', Duration.ofMillis(0)), ['value' : Duration.ofMillis(0)])
+        ]
+        'positiveDuration'       | Duration.ofMillis(-1)                    || [new ConstraintViolation(Duration.ofMillis(-1), 'error.validation.positive',
+                String.format('must be positive', Duration.ofMillis(-1)), ['value' : Duration.ofMillis(-1)])
+        ]
+        'positiveDuration'       | Duration.ofMillis(Integer.MIN_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MIN_VALUE), 'error.validation.positive',
+                String.format('must be positive', Duration.ofMillis(Integer.MIN_VALUE)), ['value' : Duration.ofMillis(Integer.MIN_VALUE)])
+        ]
         'positiveDuration'       | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Range
-        'range'                  | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', Integer.MIN_VALUE, 10.5, 0.5), ['value': Integer.MIN_VALUE, 'max': 10.5, 'min': 0.5])]
-        'range'                  | 0                                        || [new ConstraintViolation(0, 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', 0, 10.5, 0.5), ['value': 0, 'max': 10.5, 'min': 0.5])]
-        'range'                  | 11                                       || [new ConstraintViolation(11, 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', 11, 10.5, 0.5), ['value': 11, 'max': 10.5, 'min': 0.5])]
-        'range'                  | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', Integer.MAX_VALUE, 10.5, 0.5), ['value': Integer.MAX_VALUE, 'max': 10.5, 'min': 0.5])]
+        'range'                  | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.number-exceeds-range',
+                String.format('must be at least %3$s and at most %2$s', Integer.MIN_VALUE, 10.5, 0.5), ['value' : Integer.MIN_VALUE, 'max' : 10.5, 'min' : 0.5])
+        ]
+        'range'                  | 0                                        || [new ConstraintViolation(0, 'error.validation.number-exceeds-range',
+                String.format('must be at least %3$s and at most %2$s', 0, 10.5, 0.5), ['value' : 0, 'max' : 10.5, 'min' : 0.5])
+        ]
+        'range'                  | 11                                       || [new ConstraintViolation(11, 'error.validation.number-exceeds-range',
+                String.format('must be at least %3$s and at most %2$s', 11, 10.5, 0.5), ['value' : 11, 'max' : 10.5, 'min' : 0.5])
+        ]
+        'range'                  | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.number-exceeds-range',
+                String.format('must be at least %3$s and at most %2$s', Integer.MAX_VALUE, 10.5, 0.5), ['value' : Integer.MAX_VALUE, 'max' : 10.5, 'min' : 0.5])
+        ]
         'range'                  | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Range Duration
-        'rangeDuration'          | Duration.ofMillis(Integer.MIN_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MIN_VALUE), 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', Duration.ofMillis(Integer.MIN_VALUE), 10.5, 0.5), ['value': Duration.ofMillis(Integer.MIN_VALUE), 'max': 10.5, 'min': 0.5])]
-        'rangeDuration'          | Duration.ofMillis(0)                     || [new ConstraintViolation(Duration.ofMillis(0), 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', Duration.ofMillis(0), 10.5, 0.5), ['value': Duration.ofMillis(0), 'max': 10.5, 'min': 0.5])]
-        'rangeDuration'          | Duration.ofMillis(11)                    || [new ConstraintViolation(Duration.ofMillis(11), 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', Duration.ofMillis(11), 10.5, 0.5), ['value': Duration.ofMillis(11), 'max': 10.5, 'min': 0.5])]
-        'rangeDuration'          | Duration.ofMillis(Integer.MAX_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MAX_VALUE), 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', Duration.ofMillis(Integer.MAX_VALUE), 10.5, 0.5), ['value': Duration.ofMillis(Integer.MAX_VALUE), 'max': 10.5, 'min': 0.5])]
+        'rangeDuration'          | Duration.ofMillis(Integer.MIN_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MIN_VALUE), 'error.validation.number-exceeds-range',
+                String.format('must be at least %3$s and at most %2$s', Duration.ofMillis(Integer.MIN_VALUE), 10.5, 0.5), ['value' : Duration.ofMillis(Integer.MIN_VALUE), 'max' : 10.5, 'min' : 0.5])
+        ]
+        'rangeDuration'          | Duration.ofMillis(0)                     || [new ConstraintViolation(Duration.ofMillis(0), 'error.validation.number-exceeds-range',
+                String.format('must be at least %3$s and at most %2$s', Duration.ofMillis(0), 10.5, 0.5), ['value' : Duration.ofMillis(0), 'max' : 10.5, 'min' : 0.5])
+        ]
+        'rangeDuration'          | Duration.ofMillis(11)                    || [new ConstraintViolation(Duration.ofMillis(11), 'error.validation.number-exceeds-range',
+                String.format('must be at least %3$s and at most %2$s', Duration.ofMillis(11), 10.5, 0.5), ['value' : Duration.ofMillis(11), 'max' : 10.5, 'min' : 0.5])
+        ]
+        'rangeDuration'          | Duration.ofMillis(Integer.MAX_VALUE)     || [new ConstraintViolation(Duration.ofMillis(Integer.MAX_VALUE), 'error.validation.number-exceeds-range',
+                String.format('must be at least %3$s and at most %2$s', Duration.ofMillis(Integer.MAX_VALUE), 10.5, 0.5), ['value' : Duration.ofMillis(Integer.MAX_VALUE), 'max' : 10.5, 'min' : 0.5])
+        ]
         'rangeDuration'          | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Range Character
-        'rangeCharacter'         | '\n' as char                             || [new ConstraintViolation('\n' as char, 'error.validation.character-exceeds-range', String.format('must be at least \'%3$s\' and at most \'%2$s\'', '\n' as char, Z, A), ['value': '\n' as char, 'max': Z, 'min': A])]
-        'rangeCharacter'         | 'z' as char                              || [new ConstraintViolation('z' as char, 'error.validation.character-exceeds-range', String.format('must be at least \'%3$s\' and at most \'%2$s\'', 'z' as char, Z, A), ['value': 'z' as char, 'max': Z, 'min': A])]
+        'rangeCharacter'         | '\n' as char                             || [new ConstraintViolation('\n' as char, 'error.validation.character-exceeds-range',
+                String.format('must be at least \'%3$s\' and at most \'%2$s\'', '\n' as char, Z, A), ['value' : '\n' as char, 'max' : Z, 'min' : A])
+        ]
+        'rangeCharacter'         | 'z' as char                              || [new ConstraintViolation('z' as char, 'error.validation.character-exceeds-range',
+                String.format('must be at least \'%3$s\' and at most \'%2$s\'', 'z' as char, Z, A), ['value' : 'z' as char, 'max' : Z, 'min' : A])
+        ]
         'rangeCharacter'         | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'character')]
         // Port
-        'port'                   | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.invalid-port', String.format('%1$s is not a valid port', Integer.MIN_VALUE), ['value': Integer.MIN_VALUE])]
-        'port'                   | 0                                        || [new ConstraintViolation(0, 'error.validation.invalid-port', String.format('%1$s is not a valid port', 0), ['value': 0])]
-        'port'                   | 65536                                    || [new ConstraintViolation(65536, 'error.validation.invalid-port', String.format('%1$s is not a valid port', 65536), ['value': 65536])]
-        'port'                   | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.invalid-port', String.format('%1$s is not a valid port', Integer.MAX_VALUE), ['value': Integer.MAX_VALUE])]
+        'port'                   | Integer.MIN_VALUE                        || [new ConstraintViolation(Integer.MIN_VALUE, 'error.validation.invalid-port',
+                String.format('%1$s is not a valid port', Integer.MIN_VALUE), ['value' : Integer.MIN_VALUE])
+        ]
+        'port'                   | 0                                        || [new ConstraintViolation(0, 'error.validation.invalid-port',
+                String.format('%1$s is not a valid port', 0), ['value' : 0])
+        ]
+        'port'                   | 65536                                    || [new ConstraintViolation(65536, 'error.validation.invalid-port',
+                String.format('%1$s is not a valid port', 65536), ['value' : 65536])
+        ]
+        'port'                   | Integer.MAX_VALUE                        || [new ConstraintViolation(Integer.MAX_VALUE, 'error.validation.invalid-port',
+                String.format('%1$s is not a valid port', Integer.MAX_VALUE), ['value' : Integer.MAX_VALUE])
+        ]
         'port'                   | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Size (String)
-        'sizeString'             | ''                                       || [new ConstraintViolation('', 'error.validation.argument-exceeds-size', String.format('size must be at least %3$s and at most %2$s elements long', '', 5, 1), ['value': '', 'max': 5, 'min': 1])]
-        'sizeString'             | 'a'.repeat(6)                            || [new ConstraintViolation('a'.repeat(6), 'error.validation.argument-exceeds-size', String.format('size must be at least %3$s and at most %2$s elements long', 'a'.repeat(6), 5, 1), ['value': 'a'.repeat(6), 'max': 5, 'min': 1])]
+        'sizeString'             | ''                                       || [new ConstraintViolation('', 'error.validation.argument-exceeds-size',
+                String.format('size must be at least %3$s and at most %2$s elements long', '', 5, 1), ['value' : '', 'max' : 5, 'min' : 1])
+        ]
+        'sizeString'             | 'a'.repeat(6)                            || [new ConstraintViolation('a'.repeat(6), 'error.validation.argument-exceeds-size',
+                String.format('size must be at least %3$s and at most %2$s elements long', 'a'.repeat(6), 5, 1), ['value' : 'a'.repeat(6), 'max' : 5, 'min' : 1])
+        ]
         // Size (array)
-        'sizeArray'              | noValuesArray                            || [new ConstraintViolation(noValuesArray, 'error.validation.argument-exceeds-size', String.format('size must be at least %3$s and at most %2$s elements long', Arrays.toString(noValuesArray), 5, 1), ['value': noValuesArray, 'max': 5, 'min': 1])]
-        'sizeArray'              | exceedValuesArray                        || [new ConstraintViolation(exceedValuesArray, 'error.validation.argument-exceeds-size', String.format('size must be at least %3$s and at most %2$s elements long', Arrays.toString(exceedValuesArray), 5, 1), ['value': exceedValuesArray, 'max': 5, 'min': 1])]
+        'sizeArray'              | NO_VALUES_ARRAY || [new ConstraintViolation(NO_VALUES_ARRAY, 'error.validation.argument-exceeds-size',
+                String.format('size must be at least %3$s and at most %2$s elements long', Arrays.toString(NO_VALUES_ARRAY), 5, 1), ['value' : NO_VALUES_ARRAY, 'max' : 5, 'min' : 1])
+        ]
+        'sizeArray'              | EXCEED_VALUES_ARRAY || [new ConstraintViolation(EXCEED_VALUES_ARRAY, 'error.validation.argument-exceeds-size',
+                String.format('size must be at least %3$s and at most %2$s elements long', Arrays.toString(EXCEED_VALUES_ARRAY), 5, 1), ['value' : EXCEED_VALUES_ARRAY, 'max' : 5, 'min' : 1])
+        ]
         // Size (Collection)
-        'sizeCollection'         | []                                       || [new ConstraintViolation([], 'error.validation.argument-exceeds-size', String.format('size must be at least %3$s and at most %2$s elements long', [], 5, 1), ['value': [], 'max': 5, 'min': 1])]
-        'sizeCollection'         | (1..6).toList()                          || [new ConstraintViolation((1..6).toList(), 'error.validation.argument-exceeds-size', String.format('size must be at least %3$s and at most %2$s elements long', (1..6).toList(), 5, 1), ['value': (1..6).toList(), 'max': 5, 'min': 1])]
+        'sizeCollection'         | []                                       || [new ConstraintViolation([], 'error.validation.argument-exceeds-size',
+                String.format('size must be at least %3$s and at most %2$s elements long', [], 5, 1), ['value' : [], 'max' : 5, 'min' : 1])
+        ]
+        'sizeCollection'         | (1..6).toList()                          || [new ConstraintViolation((1..6).toList(), 'error.validation.argument-exceeds-size',
+                String.format('size must be at least %3$s and at most %2$s elements long', (1..6).toList(), 5, 1), ['value' : (1..6).toList(), 'max' : 5, 'min' : 1])
+        ]
         // Size (Map)
-        'sizeMap'                | [:]                                      || [new ConstraintViolation([:], 'error.validation.argument-exceeds-size', String.format('size must be at least %3$s and at most %2$s elements long', [:], 5, 1), ['value': [:], 'max': 5, 'min': 1])]
-        'sizeMap'                | (1..6).collectEntries { it -> [it, it] } || [new ConstraintViolation((1..6).collectEntries { it -> [it, it] }, 'error.validation.argument-exceeds-size', String.format('size must be at least %3$s and at most %2$s elements long', (1..6).collectEntries { it -> [it, it] }, 5, 1), ['value': (1..6).collectEntries { it -> [it, it] }, 'max': 5, 'min': 1])]
+        'sizeMap'                | [:]                                      || [new ConstraintViolation([:], 'error.validation.argument-exceeds-size',
+                String.format('size must be at least %3$s and at most %2$s elements long', [:], 5, 1), ['value' : [:], 'max' : 5, 'min' : 1])
+        ]
+        'sizeMap'                | (1..6).collectEntries { it -> [it, it] } || [new ConstraintViolation((1..6).collectEntries { it -> [it, it] }, 'error.validation.argument-exceeds-size',
+                String.format('size must be at least %3$s and at most %2$s elements long', (1..6).collectEntries { it -> [it, it] }, 5, 1), ['value' : (1..6).collectEntries { it -> [it, it] }, 'max' : 5, 'min' : 1])
+        ]
         // Matches
-        'matches'                | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-string', String.format('\'%1$s\' does not match regex \'%2$s\'', '', '[A-Za-z]+'), ['value': '', 'expected': '[A-Za-z]+'])]
-        'matches'                | 'Alessandro!'                            || [new ConstraintViolation('Alessandro!', 'error.validation.invalid-string', String.format('\'%1$s\' does not match regex \'%2$s\'', 'Alessandro!', '[A-Za-z]+'), ['value': 'Alessandro!', 'expected': '[A-Za-z]+'])]
-        'matches'                | '01001'                                  || [new ConstraintViolation('01001', 'error.validation.invalid-string', String.format('\'%1$s\' does not match regex \'%2$s\'', '01001', '[A-Za-z]+'), ['value': '01001', 'expected': '[A-Za-z]+'])]
+        'matches'                | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-string',
+                String.format('\'%1$s\' does not match regex \'%2$s\'', '', '[A-Za-z]+'), ['value' : '', 'expected' : '[A-Za-z]+'])
+        ]
+        'matches'                | 'Alessandro!'                            || [new ConstraintViolation('Alessandro!', 'error.validation.invalid-string',
+                String.format('\'%1$s\' does not match regex \'%2$s\'', 'Alessandro!', '[A-Za-z]+'), ['value' : 'Alessandro!', 'expected' : '[A-Za-z]+'])
+        ]
+        'matches'                | '01001'                                  || [new ConstraintViolation('01001', 'error.validation.invalid-string',
+                String.format('\'%1$s\' does not match regex \'%2$s\'', '01001', '[A-Za-z]+'), ['value' : '01001', 'expected' : '[A-Za-z]+'])
+        ]
         'matches'                | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Port + @Range (minPort)
-        'minPort'                | 1007                                     || [new ConstraintViolation(1007, 'error.validation.number-exceeds-range', String.format('must be at least %3$s and at most %2$s', 1007, 100, 1), ['value': 1007, 'max': 100, 'min': 1])]
+        'minPort'                | 1007                                     || [new ConstraintViolation(1007, 'error.validation.number-exceeds-range',
+                String.format('must be at least %3$s and at most %2$s', 1007, 100, 1), ['value' : 1007, 'max' : 100, 'min' : 1])
+        ]
         'minPort'                | 'hello'                                  || [ConstraintViolation.invalidType('hello', 'number or time duration')]
         // Hostname
-        'hostname'               | '-invalid.com'                           || [new ConstraintViolation('-invalid.com', 'error.validation.invalid-hostname', String.format('\'%1$s\' is not a valid hostname', '-invalid.com'), ['value': '-invalid.com'])]
-        'hostname'               | 'trailing-.com'                          || [new ConstraintViolation('trailing-.com', 'error.validation.invalid-hostname', String.format('\'%1$s\' is not a valid hostname', 'trailing-.com'), ['value': 'trailing-.com'])]
-        'hostname'               | 'example..com'                           || [new ConstraintViolation('example..com', 'error.validation.invalid-hostname', String.format('\'%1$s\' is not a valid hostname', 'example..com'), ['value': 'example..com'])]
+        'hostname'               | '-invalid.com'                           || [new ConstraintViolation('-invalid.com', 'error.validation.invalid-hostname',
+                String.format('\'%1$s\' is not a valid hostname', '-invalid.com'), ['value' : '-invalid.com'])
+        ]
+        'hostname'               | 'trailing-.com'                          || [new ConstraintViolation('trailing-.com', 'error.validation.invalid-hostname',
+                String.format('\'%1$s\' is not a valid hostname', 'trailing-.com'), ['value' : 'trailing-.com'])
+        ]
+        'hostname'               | 'example..com'                           || [new ConstraintViolation('example..com', 'error.validation.invalid-hostname',
+                String.format('\'%1$s\' is not a valid hostname', 'example..com'), ['value' : 'example..com'])
+        ]
         'hostname'               | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Email
-        'email'                  | 'notanemail'                             || [new ConstraintViolation('notanemail', 'error.validation.invalid-email', String.format('\'%1$s\' is not a valid email', 'notanemail'), ['value': 'notanemail'])]
-        'email'                  | '@domain.com'                            || [new ConstraintViolation('@domain.com', 'error.validation.invalid-email', String.format('\'%1$s\' is not a valid email', '@domain.com'), ['value': '@domain.com'])]
-        'email'                  | 'user@'                                  || [new ConstraintViolation('user@', 'error.validation.invalid-email', String.format('\'%1$s\' is not a valid email', 'user@'), ['value': 'user@'])]
-        'email'                  | 'user@domain'                            || [new ConstraintViolation('user@domain', 'error.validation.invalid-email', String.format('\'%1$s\' is not a valid email', 'user@domain'), ['value': 'user@domain'])]
+        'email'                  | 'notanemail'                             || [new ConstraintViolation('notanemail', 'error.validation.invalid-email',
+                String.format('\'%1$s\' is not a valid email', 'notanemail'), ['value' : 'notanemail'])
+        ]
+        'email'                  | '@domain.com'                            || [new ConstraintViolation('@domain.com', 'error.validation.invalid-email',
+                String.format('\'%1$s\' is not a valid email', '@domain.com'), ['value' : '@domain.com'])
+        ]
+        'email'                  | 'user@'                                  || [new ConstraintViolation('user@', 'error.validation.invalid-email', String.format('\'%1$s\' is not a valid email', 'user@'), ['value' : 'user@'])]
+        'email'                  | 'user@domain'                            || [new ConstraintViolation('user@domain', 'error.validation.invalid-email',
+                String.format('\'%1$s\' is not a valid email', 'user@domain'), ['value' : 'user@domain'])
+        ]
         'email'                  | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // IPv4
-        'ipv4'                   | '256.1'                                  || [new ConstraintViolation('256.1', 'error.validation.invalid-ipv4', String.format('\'%1$s\' is not a valid IPv4', '256.1'), ['value': '256.1'])]
-        'ipv4'                   | '192.168.1'                              || [new ConstraintViolation('192.168.1', 'error.validation.invalid-ipv4', String.format('\'%1$s\' is not a valid IPv4', '192.168.1'), ['value': '192.168.1'])]
-        'ipv4'                   | 'not.an.ip.addr'                         || [new ConstraintViolation('not.an.ip.addr', 'error.validation.invalid-ipv4', String.format('\'%1$s\' is not a valid IPv4', 'not.an.ip.addr'), ['value': 'not.an.ip.addr'])]
-        'ipv4'                   | '192.168.1.1.1'                          || [new ConstraintViolation('192.168.1.1.1', 'error.validation.invalid-ipv4', String.format('\'%1$s\' is not a valid IPv4', '192.168.1.1.1'), ['value': '192.168.1.1.1'])]
+        'ipv4'                   | '256.1'                                  || [new ConstraintViolation('256.1', 'error.validation.invalid-ipv4', String.format('\'%1$s\' is not a valid IPv4', '256.1'), ['value' : '256.1'])]
+        'ipv4'                   | '192.168.1'                              || [new ConstraintViolation('192.168.1', 'error.validation.invalid-ipv4', String.format('\'%1$s\' is not a valid IPv4', '192.168.1'), ['value' : '192.168.1'])]
+        'ipv4'                   | 'not.an.ip.addr'                         || [new ConstraintViolation('not.an.ip.addr', 'error.validation.invalid-ipv4',
+                String.format('\'%1$s\' is not a valid IPv4', 'not.an.ip.addr'), ['value' : 'not.an.ip.addr'])
+        ]
+        'ipv4'                   | '192.168.1.1.1'                          || [new ConstraintViolation('192.168.1.1.1', 'error.validation.invalid-ipv4',
+                String.format('\'%1$s\' is not a valid IPv4', '192.168.1.1.1'), ['value' : '192.168.1.1.1'])
+        ]
         'ipv4'                   | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // IPv6
-        'ipv6'                   | '192.168.1.1'                            || [new ConstraintViolation('192.168.1.1', 'error.validation.invalid-ipv6', String.format('\'%1$s\' is not a valid IPv6', '192.168.1.1'), ['value': '192.168.1.1'])]
-        'ipv6'                   | 'gggg::1'                                || [new ConstraintViolation('gggg::1', 'error.validation.invalid-ipv6', String.format('\'%1$s\' is not a valid IPv6', 'gggg::1'), ['value': 'gggg::1'])]
-        'ipv6'                   | '2001:0db8:85a3:0000:0000:8a2e:0370'     || [new ConstraintViolation('2001:0db8:85a3:0000:0000:8a2e:0370', 'error.validation.invalid-ipv6', String.format('\'%1$s\' is not a valid IPv6', '2001:0db8:85a3:0000:0000:8a2e:0370'), ['value': '2001:0db8:85a3:0000:0000:8a2e:0370'])]
+        'ipv6'                   | '192.168.1.1'                            || [new ConstraintViolation('192.168.1.1', 'error.validation.invalid-ipv6',
+                String.format('\'%1$s\' is not a valid IPv6', '192.168.1.1'), ['value' : '192.168.1.1'])
+        ]
+        'ipv6'                   | 'gggg::1'                                || [new ConstraintViolation('gggg::1', 'error.validation.invalid-ipv6',
+                String.format('\'%1$s\' is not a valid IPv6', 'gggg::1'), ['value' : 'gggg::1'])
+        ]
+        'ipv6'                   | '2001:0db8:85a3:0000:0000:8a2e:0370'     || [new ConstraintViolation('2001:0db8:85a3:0000:0000:8a2e:0370', 'error.validation.invalid-ipv6',
+                String.format('\'%1$s\' is not a valid IPv6', '2001:0db8:85a3:0000:0000:8a2e:0370'), ['value' : '2001:0db8:85a3:0000:0000:8a2e:0370'])
+        ]
         'ipv6'                   | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Url
-        'url'                    | 'example.com'                            || [new ConstraintViolation('example.com', 'error.validation.invalid-url', String.format('\'%1$s\' is not a valid URL', 'example.com'), ['value': 'example.com'])]
-        'url'                    | 'not-a-url'                              || [new ConstraintViolation('not-a-url', 'error.validation.invalid-url', String.format('\'%1$s\' is not a valid URL', 'not-a-url'), ['value': 'not-a-url'])]
+        'url'                    | 'example.com'                            || [new ConstraintViolation('example.com', 'error.validation.invalid-url',
+                String.format('\'%1$s\' is not a valid URL', 'example.com'), ['value' : 'example.com'])
+        ]
+        'url'                    | 'not-a-url'                              || [new ConstraintViolation('not-a-url', 'error.validation.invalid-url',
+                String.format('\'%1$s\' is not a valid URL', 'not-a-url'), ['value' : 'not-a-url'])
+        ]
         'url'                    | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // HexColor
-        'hexColor'               | 'FF0000'                                 || [new ConstraintViolation('FF0000', 'error.validation.invalid-hex-color', String.format('\'%1$s\' is not a valid HEX color', 'FF0000'), ['value': 'FF0000'])]
-        'hexColor'               | '#GGG000'                                || [new ConstraintViolation('#GGG000', 'error.validation.invalid-hex-color', String.format('\'%1$s\' is not a valid HEX color', '#GGG000'), ['value': '#GGG000'])]
-        'hexColor'               | '#GG00'                                  || [new ConstraintViolation('#GG00', 'error.validation.invalid-hex-color', String.format('\'%1$s\' is not a valid HEX color', '#GG00'), ['value': '#GG00'])]
-        'hexColor'               | '#GG00GG00'                              || [new ConstraintViolation('#GG00GG00', 'error.validation.invalid-hex-color', String.format('\'%1$s\' is not a valid HEX color', '#GG00GG00'), ['value': '#GG00GG00'])]
+        'hexColor'               | 'FF0000'                                 || [new ConstraintViolation('FF0000', 'error.validation.invalid-hex-color',
+                String.format('\'%1$s\' is not a valid HEX color', 'FF0000'), ['value' : 'FF0000'])
+        ]
+        'hexColor'               | '#GGG000'                                || [new ConstraintViolation('#GGG000', 'error.validation.invalid-hex-color',
+                String.format('\'%1$s\' is not a valid HEX color', '#GGG000'), ['value' : '#GGG000'])
+        ]
+        'hexColor'               | '#GG00'                                  || [new ConstraintViolation('#GG00', 'error.validation.invalid-hex-color',
+                String.format('\'%1$s\' is not a valid HEX color', '#GG00'), ['value' : '#GG00'])
+        ]
+        'hexColor'               | '#GG00GG00'                              || [new ConstraintViolation('#GG00GG00', 'error.validation.invalid-hex-color',
+                String.format('\'%1$s\' is not a valid HEX color', '#GG00GG00'), ['value' : '#GG00GG00'])
+        ]
         'hexColor'               | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Identifier
-        'identifier'             | '1invalid'                               || [new ConstraintViolation('1invalid', 'error.validation.invalid-identifier', String.format('\'%1$s\' is not a valid identifier', '1invalid'), ['value': '1invalid'])]
-        'identifier'             | 'my-var'                                 || [new ConstraintViolation('my-var', 'error.validation.invalid-identifier', String.format('\'%1$s\' is not a valid identifier', 'my-var'), ['value': 'my-var'])]
-        'identifier'             | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-identifier', String.format('\'%1$s\' is not a valid identifier', ''), ['value': ''])]
+        'identifier'             | '1invalid'                               || [new ConstraintViolation('1invalid', 'error.validation.invalid-identifier',
+                String.format('\'%1$s\' is not a valid identifier', '1invalid'), ['value' : '1invalid'])
+        ]
+        'identifier'             | 'my-var'                                 || [new ConstraintViolation('my-var', 'error.validation.invalid-identifier',
+                String.format('\'%1$s\' is not a valid identifier', 'my-var'), ['value' : 'my-var'])
+        ]
+        'identifier'             | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-identifier', String.format('\'%1$s\' is not a valid identifier', ''), ['value' : ''])]
         'identifier'             | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Alphabetical
-        'alphabetical'           | 'Hello1'                                 || [new ConstraintViolation('Hello1', 'error.validation.invalid-alphabetical', String.format('\'%1$s\' is not allowed (only letters)', 'Hello1'), ['value': 'Hello1'])]
-        'alphabetical'           | 'hello world'                            || [new ConstraintViolation('hello world', 'error.validation.invalid-alphabetical', String.format('\'%1$s\' is not allowed (only letters)', 'hello world'), ['value': 'hello world'])]
-        'alphabetical'           | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-alphabetical', String.format('\'%1$s\' is not allowed (only letters)', ''), ['value': ''])]
+        'alphabetical'           | 'Hello1'                                 || [new ConstraintViolation('Hello1', 'error.validation.invalid-alphabetical',
+                String.format('\'%1$s\' is not allowed (only letters)', 'Hello1'), ['value' : 'Hello1'])
+        ]
+        'alphabetical'           | 'hello world'                            || [new ConstraintViolation('hello world', 'error.validation.invalid-alphabetical',
+                String.format('\'%1$s\' is not allowed (only letters)', 'hello world'), ['value' : 'hello world'])
+        ]
+        'alphabetical'           | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-alphabetical', String.format('\'%1$s\' is not allowed (only letters)', ''), ['value' : ''])]
         'alphabetical'           | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // AlphabeticalOrDigit
-        'alphabeticalOrDigit'    | 'Hello!'                                 || [new ConstraintViolation('Hello!', 'error.validation.invalid-alphabetical-or-digit', String.format('\'%1$s\' is not allowed (only letters and digits)', 'Hello!'), ['value': 'Hello!'])]
-        'alphabeticalOrDigit'    | 'user name'                              || [new ConstraintViolation('user name', 'error.validation.invalid-alphabetical-or-digit', String.format('\'%1$s\' is not allowed (only letters and digits)', 'user name'), ['value': 'user name'])]
-        'alphabeticalOrDigit'    | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-alphabetical-or-digit', String.format('\'%1$s\' is not allowed (only letters and digits)', ''), ['value': ''])]
+        'alphabeticalOrDigit'    | 'Hello!'                                 || [new ConstraintViolation('Hello!', 'error.validation.invalid-alphabetical-or-digit',
+                String.format('\'%1$s\' is not allowed (only letters and digits)', 'Hello!'), ['value' : 'Hello!'])
+        ]
+        'alphabeticalOrDigit'    | 'user name'                              || [new ConstraintViolation('user name', 'error.validation.invalid-alphabetical-or-digit',
+                String.format('\'%1$s\' is not allowed (only letters and digits)', 'user name'), ['value' : 'user name'])
+        ]
+        'alphabeticalOrDigit'    | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-alphabetical-or-digit',
+                String.format('\'%1$s\' is not allowed (only letters and digits)', ''), ['value' : ''])
+        ]
         'alphabeticalOrDigit'    | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // NotBlank
-        'notBlank'               | '        '                               || [new ConstraintViolation('        ', 'error.validation.not-blank', String.format('must at least contain one non-space character', '        '), ['value': '        '])]
-        'notBlank'               | ''                                       || [new ConstraintViolation('', 'error.validation.not-blank', String.format('must at least contain one non-space character', ''), ['value': ''])]
+        'notBlank'               | '        '                               || [new ConstraintViolation('        ', 'error.validation.not-blank',
+                String.format('must at least contain one non-space character', '        '), ['value' : '        '])
+        ]
+        'notBlank'               | ''                                       || [new ConstraintViolation('', 'error.validation.not-blank', String.format('must at least contain one non-space character', ''), ['value' : ''])]
         'notBlank'               | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // NotEmpty
-        'notEmpty'               | ''                                       || [new ConstraintViolation('', 'error.validation.not-empty', 'cannot be empty', ['value': ''])]
+        'notEmpty'               | ''                                       || [new ConstraintViolation('', 'error.validation.not-empty', 'cannot be empty', ['value' : ''])]
         'notEmpty'               | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Uuid
-        'uuid'                   | 'Hello, world!'                          || [new ConstraintViolation('Hello, world!', null, "Invalid value for annotation ${Uuid.simpleName}: Hello, world!", ['value': 'Hello, world!', 'regex': 'DEFAULT'])]
-        'uuid'                   | ''                                       || [new ConstraintViolation('', null, "Invalid value for annotation ${Uuid.simpleName}: ", ['value': '', 'regex': 'DEFAULT'])]
+        'uuid'                   | 'Hello, world!'                          || [new ConstraintViolation('Hello, world!', null,
+                "Invalid value for annotation ${Uuid.simpleName}: Hello, world!", ['value' : 'Hello, world!', 'regex' : 'DEFAULT'])
+        ]
+        'uuid'                   | ''                                       || [new ConstraintViolation('', null, "Invalid value for annotation ${Uuid.simpleName}: ", ['value' : '', 'regex' : 'DEFAULT'])]
         'uuid'                   | 42                                       || [ConstraintViolation.invalidType(42, 'string (or any character sequence)')]
         // Character
-        'character'              | 'Hello, world!'                          || [new ConstraintViolation('Hello, world!', 'error.validation.invalid-character', String.format('\'%1$s\' is not a valid character', 'Hello, world!'), ['value': 'Hello, world!'])]
-        'character'              | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-character', String.format('\'%1$s\' is not a valid character', ''), ['value': ''])]
+        'character'              | 'Hello, world!'                          || [new ConstraintViolation('Hello, world!', 'error.validation.invalid-character',
+                String.format('\'%1$s\' is not a valid character', 'Hello, world!'), ['value' : 'Hello, world!'])
+        ]
+        'character'              | ''                                       || [new ConstraintViolation('', 'error.validation.invalid-character', String.format('\'%1$s\' is not a valid character', ''), ['value' : ''])]
         'character'              | 42                                       || [ConstraintViolation.invalidType(42, "$CharSequence.canonicalName")]
         // After
-        'afterDate'              | new Date(0)                              || [new ConstraintViolation(new Date(0), 'error.validation.not-after', 'must be after now', ['value': new Date(0)])]
+        'afterDate'              | new Date(0)                              || [new ConstraintViolation(new Date(0), 'error.validation.not-after', 'must be after now', ['value' : new Date(0)])]
         'afterDate'              | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
-        'afterCalendar'          | new GregorianCalendar(2000, 0, 1)        || [new ConstraintViolation(new GregorianCalendar(2000, 0, 1), 'error.validation.not-after', 'must be after now', ['value': new GregorianCalendar(2000, 0, 1)])]
+        'afterCalendar'          | new GregorianCalendar(2000, 0, 1)        || [new ConstraintViolation(new GregorianCalendar(2000, 0, 1), 'error.validation.not-after',
+                'must be after now', ['value' : new GregorianCalendar(2000, 0, 1)])
+        ]
         'afterCalendar'          | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
-        'afterTemporal'          | Instant.ofEpochMilli(0)                  || [new ConstraintViolation(Instant.ofEpochMilli(0), 'error.validation.not-after', 'must be after now', ['value': Instant.ofEpochMilli(0)])]
-        'afterTemporal'          | LocalTime.of(0, 0)                       || [new ConstraintViolation(LocalTime.of(0, 0), 'error.validation.not-after', 'must be after now', ['value': LocalTime.of(0, 0)])]
-        'afterTemporal'          | LocalDate.of(2000, 1, 1)                 || [new ConstraintViolation(LocalDate.of(2000, 1, 1), 'error.validation.not-after', 'must be after now', ['value': LocalDate.of(2000, 1, 1)])]
-        'afterTemporal'          | LocalDateTime.of(2000, 1, 1, 0, 0)       || [new ConstraintViolation(LocalDateTime.of(2000, 1, 1, 0, 0), 'error.validation.not-after', 'must be after now', ['value': LocalDateTime.of(2000, 1, 1, 0, 0)])]
+        'afterTemporal'          | Instant.ofEpochMilli(0)                  || [new ConstraintViolation(Instant.ofEpochMilli(0), 'error.validation.not-after',
+                'must be after now', ['value' : Instant.ofEpochMilli(0)])
+        ]
+        'afterTemporal'          | LocalTime.of(0, 0)                       || [new ConstraintViolation(LocalTime.of(0, 0), 'error.validation.not-after',
+                'must be after now', ['value' : LocalTime.of(0, 0)])
+        ]
+        'afterTemporal'          | LocalDate.of(2000, 1, 1)                 || [new ConstraintViolation(LocalDate.of(2000, 1, 1), 'error.validation.not-after',
+                'must be after now', ['value' : LocalDate.of(2000, 1, 1)])
+        ]
+        'afterTemporal'          | LocalDateTime.of(2000, 1, 1, 0, 0)       || [new ConstraintViolation(LocalDateTime.of(2000, 1, 1, 0, 0), 'error.validation.not-after',
+                'must be after now', ['value' : LocalDateTime.of(2000, 1, 1, 0, 0)])
+        ]
         'afterTemporal'          | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
         // AfterOrNow
-        'afterOrNowDate'         | new Date(0)                              || [new ConstraintViolation(new Date(0), 'error.validation.not-after-or-now', 'must be now or in the future', ['value': new Date(0)])]
+        'afterOrNowDate'         | new Date(0)                              || [new ConstraintViolation(new Date(0), 'error.validation.not-after-or-now', 'must be now or in the future', ['value' : new Date(0)])]
         'afterOrNowDate'         | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
-        'afterOrNowCalendar'     | new GregorianCalendar(2000, 0, 1)        || [new ConstraintViolation(new GregorianCalendar(2000, 0, 1), 'error.validation.not-after-or-now', 'must be now or in the future', ['value': new GregorianCalendar(2000, 0, 1)])]
+        'afterOrNowCalendar'     | new GregorianCalendar(2000, 0, 1)        || [new ConstraintViolation(new GregorianCalendar(2000, 0, 1), 'error.validation.not-after-or-now', 'must be now or in the future',
+                ['value' : new GregorianCalendar(2000, 0, 1)])
+        ]
         'afterOrNowCalendar'     | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
-        'afterOrNowTemporal'     | Instant.ofEpochMilli(0)                  || [new ConstraintViolation(Instant.ofEpochMilli(0), 'error.validation.not-after-or-now', 'must be now or in the future', ['value': Instant.ofEpochMilli(0)])]
-        'afterOrNowTemporal'     | LocalTime.of(0, 0)                       || [new ConstraintViolation(LocalTime.of(0, 0), 'error.validation.not-after-or-now', 'must be now or in the future', ['value': LocalTime.of(0, 0)])]
-        'afterOrNowTemporal'     | LocalDate.of(2000, 1, 1)                 || [new ConstraintViolation(LocalDate.of(2000, 1, 1), 'error.validation.not-after-or-now', 'must be now or in the future', ['value': LocalDate.of(2000, 1, 1)])]
-        'afterOrNowTemporal'     | LocalDateTime.of(2000, 1, 1, 0, 0)       || [new ConstraintViolation(LocalDateTime.of(2000, 1, 1, 0, 0), 'error.validation.not-after-or-now', 'must be now or in the future', ['value': LocalDateTime.of(2000, 1, 1, 0, 0)])]
+        'afterOrNowTemporal'     | Instant.ofEpochMilli(0)                  || [new ConstraintViolation(Instant.ofEpochMilli(0), 'error.validation.not-after-or-now', 'must be now or in the future', ['value' : Instant.ofEpochMilli(0)])]
+        'afterOrNowTemporal'     | LocalTime.of(0, 0)                       || [new ConstraintViolation(LocalTime.of(0, 0), 'error.validation.not-after-or-now', 'must be now or in the future', ['value' : LocalTime.of(0, 0)])]
+        'afterOrNowTemporal'     | LocalDate.of(2000, 1, 1)                 || [new ConstraintViolation(LocalDate.of(2000, 1, 1), 'error.validation.not-after-or-now', 'must be now or in the future', ['value' : LocalDate.of(2000, 1, 1)])]
+        'afterOrNowTemporal'     | LocalDateTime.of(2000, 1, 1, 0, 0)       || [new ConstraintViolation(LocalDateTime.of(2000, 1, 1, 0, 0), 'error.validation.not-after-or-now', 'must be now or in the future',
+                ['value' : LocalDateTime.of(2000, 1, 1, 0, 0)])
+        ]
         'afterOrNowTemporal'     | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
         // Before
-        'beforeDate'             | new Date(4102444800000L)                 || [new ConstraintViolation(new Date(4102444800000L), 'error.validation.not-before', 'must be before now', ['value': new Date(4102444800000L)])]
+        'beforeDate'             | new Date(4102444800000L)                 || [new ConstraintViolation(new Date(4102444800000L), 'error.validation.not-before', 'must be before now', ['value' : new Date(4102444800000L)])]
         'beforeDate'             | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
-        'beforeCalendar'         | new GregorianCalendar(2100, 0, 1)        || [new ConstraintViolation(new GregorianCalendar(2100, 0, 1), 'error.validation.not-before', 'must be before now', ['value': new GregorianCalendar(2100, 0, 1)])]
+        'beforeCalendar'         | new GregorianCalendar(2100, 0, 1)        || [new ConstraintViolation(new GregorianCalendar(2100, 0, 1), 'error.validation.not-before',
+                'must be before now', ['value' : new GregorianCalendar(2100, 0, 1)])
+        ]
         'beforeCalendar'         | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
-        'beforeTemporal'         | Instant.ofEpochSecond(4102444800L)       || [new ConstraintViolation(Instant.ofEpochSecond(4102444800L), 'error.validation.not-before', 'must be before now', ['value': Instant.ofEpochSecond(4102444800L)])]
-        'beforeTemporal'         | LocalTime.of(23, 59, 59)                 || [new ConstraintViolation(LocalTime.of(23, 59, 59), 'error.validation.not-before', 'must be before now', ['value': LocalTime.of(23, 59, 59)])]
-        'beforeTemporal'         | LocalDate.of(2100, 1, 1)                 || [new ConstraintViolation(LocalDate.of(2100, 1, 1), 'error.validation.not-before', 'must be before now', ['value': LocalDate.of(2100, 1, 1)])]
-        'beforeTemporal'         | LocalDateTime.of(2100, 1, 1, 0, 0)       || [new ConstraintViolation(LocalDateTime.of(2100, 1, 1, 0, 0), 'error.validation.not-before', 'must be before now', ['value': LocalDateTime.of(2100, 1, 1, 0, 0)])]
+        'beforeTemporal'         | Instant.ofEpochSecond(4102444800L)       || [new ConstraintViolation(Instant.ofEpochSecond(4102444800L), 'error.validation.not-before',
+                'must be before now', ['value' : Instant.ofEpochSecond(4102444800L)])
+        ]
+        'beforeTemporal'         | LocalTime.of(23, 59, 59)                 || [new ConstraintViolation(LocalTime.of(23, 59, 59), 'error.validation.not-before',
+                'must be before now', ['value' : LocalTime.of(23, 59, 59)])
+        ]
+        'beforeTemporal'         | LocalDate.of(2100, 1, 1)                 || [new ConstraintViolation(LocalDate.of(2100, 1, 1), 'error.validation.not-before',
+                'must be before now', ['value' : LocalDate.of(2100, 1, 1)])
+        ]
+        'beforeTemporal'         | LocalDateTime.of(2100, 1, 1, 0, 0)       || [new ConstraintViolation(LocalDateTime.of(2100, 1, 1, 0, 0), 'error.validation.not-before',
+                'must be before now', ['value' : LocalDateTime.of(2100, 1, 1, 0, 0)])
+        ]
         'beforeTemporal'         | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
         // BeforeOrNow
-        'beforeOrNowDate'        | new Date(4102444800000L)                 || [new ConstraintViolation(new Date(4102444800000L), 'error.validation.not-before-or-now', 'must be now or in the past', ['value': new Date(4102444800000L)])]
+        'beforeOrNowDate'        | new Date(4102444800000L)                 || [new ConstraintViolation(new Date(4102444800000L), 'error.validation.not-before-or-now',
+                'must be now or in the past', ['value' : new Date(4102444800000L)])
+        ]
         'beforeOrNowDate'        | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
-        'beforeOrNowCalendar'    | new GregorianCalendar(2100, 0, 1)        || [new ConstraintViolation(new GregorianCalendar(2100, 0, 1), 'error.validation.not-before-or-now', 'must be now or in the past', ['value': new GregorianCalendar(2100, 0, 1)])]
+        'beforeOrNowCalendar'    | new GregorianCalendar(2100, 0, 1)        || [new ConstraintViolation(new GregorianCalendar(2100, 0, 1), 'error.validation.not-before-or-now', 'must be now or in the past',
+                ['value' : new GregorianCalendar(2100, 0, 1)])
+        ]
         'beforeOrNowCalendar'    | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
-        'beforeOrNowTemporal'    | Instant.ofEpochSecond(4102444800L)       || [new ConstraintViolation(Instant.ofEpochSecond(4102444800L), 'error.validation.not-before-or-now', 'must be now or in the past', ['value': Instant.ofEpochSecond(4102444800L)])]
-        'beforeOrNowTemporal'    | LocalTime.of(23, 59, 59)                 || [new ConstraintViolation(LocalTime.of(23, 59, 59), 'error.validation.not-before-or-now', 'must be now or in the past', ['value': LocalTime.of(23, 59, 59)])]
-        'beforeOrNowTemporal'    | LocalDate.of(2100, 1, 1)                 || [new ConstraintViolation(LocalDate.of(2100, 1, 1), 'error.validation.not-before-or-now', 'must be now or in the past', ['value': LocalDate.of(2100, 1, 1)])]
-        'beforeOrNowTemporal'    | LocalDateTime.of(2100, 1, 1, 0, 0)       || [new ConstraintViolation(LocalDateTime.of(2100, 1, 1, 0, 0), 'error.validation.not-before-or-now', 'must be now or in the past', ['value': LocalDateTime.of(2100, 1, 1, 0, 0)])]
+        'beforeOrNowTemporal'    | Instant.ofEpochSecond(4102444800L)       || [new ConstraintViolation(Instant.ofEpochSecond(4102444800L), 'error.validation.not-before-or-now', 'must be now or in the past',
+                ['value' : Instant.ofEpochSecond(4102444800L)])
+        ]
+        'beforeOrNowTemporal'    | LocalTime.of(23, 59, 59)                 || [new ConstraintViolation(LocalTime.of(23, 59, 59), 'error.validation.not-before-or-now', 'must be now or in the past',
+                ['value' : LocalTime.of(23, 59, 59)])
+        ]
+        'beforeOrNowTemporal'    | LocalDate.of(2100, 1, 1)                 || [new ConstraintViolation(LocalDate.of(2100, 1, 1), 'error.validation.not-before-or-now', 'must be now or in the past',
+                ['value' : LocalDate.of(2100, 1, 1)])
+        ]
+        'beforeOrNowTemporal'    | LocalDateTime.of(2100, 1, 1, 0, 0)       || [new ConstraintViolation(LocalDateTime.of(2100, 1, 1, 0, 0), 'error.validation.not-before-or-now', 'must be now or in the past',
+                ['value' : LocalDateTime.of(2100, 1, 1, 0, 0)])
+        ]
         'beforeOrNowTemporal'    | 42                                       || [ConstraintViolation.invalidType(42, 'time')]
     }
 
