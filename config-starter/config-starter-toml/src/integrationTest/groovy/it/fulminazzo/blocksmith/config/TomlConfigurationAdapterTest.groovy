@@ -43,7 +43,7 @@ class TomlConfigurationAdapterTest extends ConfigurationAdapterTest {
 
     @Override
     protected File getFile(final String name) {
-        return new File("build/resources/test/${name}.toml")
+        return new File("build/resources/integrationTest/${name}.toml")
     }
 
     @Override

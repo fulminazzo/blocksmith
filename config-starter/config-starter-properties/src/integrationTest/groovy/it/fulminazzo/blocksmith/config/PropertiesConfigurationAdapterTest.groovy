@@ -17,7 +17,7 @@ class PropertiesConfigurationAdapterTest extends ConfigurationAdapterTest {
 
     @Override
     protected File getFile(final String name) {
-        return new File("build/resources/test/${name}.properties")
+        return new File("build/resources/integrationTest/${name}.properties")
     }
 
     @Override

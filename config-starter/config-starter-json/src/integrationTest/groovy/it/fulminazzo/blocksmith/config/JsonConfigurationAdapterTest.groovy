@@ -17,7 +17,7 @@ class JsonConfigurationAdapterTest extends ConfigurationAdapterTest {
 
     @Override
     protected File getFile(final String name) {
-        return new File("build/resources/test/${name}.json")
+        return new File("build/resources/integrationTest/${name}.json")
     }
 
     @Override
