@@ -4,7 +4,7 @@ import groovy.util.logging.Slf4j
 import spock.lang.Specification
 
 @Slf4j
-class ConfigurationAdapterTestImpl extends Specification {
+class ConfigurationAdapterTest extends Specification {
 
     def 'test that newAdapter works'() {
         given:
@@ -14,7 +14,7 @@ class ConfigurationAdapterTestImpl extends Specification {
         def adapter = ConfigurationAdapter.newAdapter(log, format)
 
         then:
-        (adapter instanceof DelegateConfigurationAdapter)
+        DelegateConfigurationAdapter.isInstance(adapter)
     }
 
 }
