@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A mock object to test the {@link NightConfigUtils} class.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,8 +22,8 @@ public class MockObject {
     @Comment("This is the first comment")
     double version = 1.0;
 
-    @Comment("This comment is multiline\n" +
-            "Hope it will work!")
+    @Comment("This comment is multiline\n"
+            + "Hope it will work!")
     int players = 2;
 
     @Comment("This should not be searched")
@@ -31,10 +34,7 @@ public class MockObject {
 
     MockObject current = null;
 
-    Map<String, String> authors = new HashMap<>(){{
-        put("Alex", "Fulminazzo");
-        put("Camilla", "Drinkwater");
-    }};
+    Map<String, String> authors = new HashMap<>(Map.of("Alex", "Fulminazzo", "Camilla", "Drinkwater"));
 
     @Comment("Special mentions")
     List<String> mentions = List.of("Frank");
@@ -42,6 +42,9 @@ public class MockObject {
     @Comment("Internal data, should not be used")
     Internal internal = new Internal();
 
+    /**
+     * A mock object to test the {@link NightConfigUtils} class.
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -54,6 +57,9 @@ public class MockObject {
 
     }
 
+    /**
+     * A mock object to test the {@link NightConfigUtils} class.
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

@@ -27,7 +27,7 @@ class PropertiesConfigurationAdapterTest extends ConfigurationAdapterTest {
 
     @Override
     protected List<String> getExpectedStoreLines() {
-        return  [
+        return [
                 '# Example comment',
                 'commentsEnabled=true',
                 '# This comment should be',

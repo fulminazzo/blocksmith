@@ -11,6 +11,7 @@ import com.github.javaparser.ast.expr.DoubleLiteralExpr
 import com.github.javaparser.ast.expr.Expression
 import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.ast.expr.NameExpr
+import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 class BeanConfigurationBuilderTest extends Specification {
@@ -131,23 +132,23 @@ class BeanConfigurationBuilderTest extends Specification {
         then:
         def field = builder.fields['nested']
         field != null
-        field.toString() == "@Annotation(true)\n" +
-                "@Comment(\"Updated comment\")\n" +
-                "public Nested nested = new Nested();"
+        field.toString() == '@Annotation(true)\n' +
+                '@Comment("Updated comment")\n' +
+                'public Nested nested = new Nested();'
 
         and:
         def getter = builder.methods['getNested']
         getter != null
-        getter.toString() == "protected final Nested getNested() {\n" +
-                "    throw new UnsupportedOperationException();\n" +
-                "}"
+        getter.toString() == 'protected final Nested getNested() {\n' +
+                '    throw new UnsupportedOperationException();\n' +
+                '}'
 
         and:
         def setter = builder.methods['setNested']
         setter != null
-        setter.toString() == "private void setNested(final Nested nested) {\n" +
-                "    throw new UnsupportedOperationException();\n" +
-                "}"
+        setter.toString() == 'private void setNested(final Nested nested) {\n' +
+                '    throw new UnsupportedOperationException();\n' +
+                '}'
 
         and:
         builder.nestedClasses['Nested'].is(existingNestedClass)
@@ -167,29 +168,29 @@ class BeanConfigurationBuilderTest extends Specification {
         then:
         def field = builder.fields['nested']
         field != null
-        field.toString() == "@Comment(\"Nested config\")\n" +
-                "private Nested nested = new Nested();"
+        field.toString() == '@Comment("Nested config")\n' +
+                'private Nested nested = new Nested();'
 
         and:
         def getter = builder.methods['getNested']
         getter != null
-        getter.toString() == "public Nested getNested() {" +
-                "\n    return nested;\n" +
-                "}"
+        getter.toString() == 'public Nested getNested() {' +
+                '\n    return nested;\n' +
+                '}'
 
         and:
         def setter = builder.methods['setNested']
         setter != null
-        setter.toString() == "public void setNested(final Nested nested) {" +
-                "\n    this.nested = nested;\n" +
-                "}"
+        setter.toString() == 'public void setNested(final Nested nested) {' +
+                '\n    this.nested = nested;\n' +
+                '}'
 
         and:
         def nestedClass = builder.nestedClasses['Nested']
         nestedClass != null
         nestedClass.nameAsString == 'Nested'
-        nestedClass.isPublic()
-        nestedClass.isStatic()
+        nestedClass.public
+        nestedClass.static
         builder.root.members.contains(nestedClass)
 
         and:
@@ -232,23 +233,23 @@ class BeanConfigurationBuilderTest extends Specification {
         then:
         def field = builder.fields['object']
         field != null
-        field.toString() == "@Annotation(true)\n" +
-                "@Comment(\"Hello, world!\")\n" +
+        field.toString() == '@Annotation(true)\n' +
+                '@Comment("Hello, world!")\n' +
                 "public $type object = ${builder.getInitializer(value)};"
 
         and:
         def getter = builder.methods['getObject']
         getter != null
         getter.toString() == "protected final $type getObject() {\n" +
-                "    throw new UnsupportedOperationException();\n" +
-                "}"
+                '    throw new UnsupportedOperationException();\n' +
+                '}'
 
         and:
         def setter = builder.methods['setObject']
         setter != null
         setter.toString() == "private void setObject(final $type object) {\n" +
-                "    throw new UnsupportedOperationException();\n" +
-                "}"
+                '    throw new UnsupportedOperationException();\n' +
+                '}'
 
         where:
         value                                                 | type
@@ -273,22 +274,22 @@ class BeanConfigurationBuilderTest extends Specification {
         then:
         def field = builder.fields['object']
         field != null
-        field.toString() == "@Comment(\"Hello, world!\")\n" +
+        field.toString() == '@Comment("Hello, world!")\n' +
                 "private $type object = ${builder.getInitializer(value)};"
 
         and:
         def getter = builder.methods['getObject']
         getter != null
         getter.toString() == "public $type getObject() {\n" +
-                "    return object;\n" +
-                "}"
+                '    return object;\n' +
+                '}'
 
         and:
         def setter = builder.methods['setObject']
         setter != null
         setter.toString() == "public void setObject(final $type object) {\n" +
-                "    this.object = object;\n" +
-                "}"
+                '    this.object = object;\n' +
+                '}'
 
         where:
         value                                                 | type
@@ -313,9 +314,9 @@ class BeanConfigurationBuilderTest extends Specification {
 
         then:
         if (expected instanceof String) {
-            assert annotation.isPresent()
+            assert annotation.present
             assert annotation.get().toString() == expected
-        } else assert !annotation.isPresent()
+        } else assert annotation.empty
 
         where:
         key                                        | field                  || expected
@@ -368,7 +369,7 @@ class BeanConfigurationBuilderTest extends Specification {
         actual == expected
 
         and:
-        builder.imports.isEmpty()
+        Reflect.on(builder.imports).invoke('isEmpty')
 
         where:
         object                                       || expected
@@ -377,20 +378,20 @@ class BeanConfigurationBuilderTest extends Specification {
         1 as Byte                                    || '1'
         1 as short                                   || '1'
         1 as Short                                   || '1'
-        1 as int                                     || '1'
+        1                                            || '1'
         1 as Integer                                 || '1'
-        1 as long                                    || '1'
+        1L                                           || '1'
         1 as Long                                    || '1'
-        1 as float                                   || '1.0'
+        1.0f                                         || '1.0'
         1 as Float                                   || '1.0'
-        1 as double                                  || '1.0'
+        1.0                                          || '1.0'
         1 as Double                                  || '1.0'
         'a' as char                                  || '\'a\''
         'a' as Character                             || '\'a\''
         'Hello, world!'                              || '"Hello, world!"'
         'Hello, "world"!'                            || '"Hello, \\"world\\"!"'
         'Hello, \"world\"!'                          || '"Hello, \\"world\\"!"'
-        "Hello, \"world\"!"                          || '"Hello, \\"world\\"!"'
+        'Hello, \"world\"!'                          || '"Hello, \\"world\\"!"'
         ['Hello', 'world'].toArray(new String[2])    || 'new String[]{"Hello", "world"}'
         new String[0]                                || 'new String[0]'
         new String[0][0]                             || 'new String[0][0]'

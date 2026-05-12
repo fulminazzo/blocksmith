@@ -11,7 +11,7 @@ class TomlConfigurationAdapterTest extends ConfigurationAdapterTest {
         if (file.exists()) file.delete()
 
         when:
-        adapter.store(file, ['data': array])
+        adapter.store(file, ['data' : array])
 
         then:
         noExceptionThrown()
@@ -47,7 +47,7 @@ class TomlConfigurationAdapterTest extends ConfigurationAdapterTest {
     }
 
     @Override
-    protected  BaseConfigurationAdapter getAdapter() {
+    protected BaseConfigurationAdapter getAdapter() {
         return new TomlConfigurationAdapter(log)
     }
 
