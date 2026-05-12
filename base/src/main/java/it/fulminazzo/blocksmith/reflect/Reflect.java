@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 @EqualsAndHashCode(doNotUseGetters = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Reflect {
-    private static final @NotNull Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER = Map.of(
+    private static final @NotNull Map<Class<?>, Class<?>> primitiveToWrapper = Map.of(
             byte.class, Byte.class,
             short.class, Short.class,
             int.class, Integer.class,
@@ -34,26 +34,26 @@ public class Reflect {
             char.class, Character.class,
             boolean.class, Boolean.class
     );
-    private static final @NotNull Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITIVE = PRIMITIVE_TO_WRAPPER.entrySet()
+    private static final @NotNull Map<Class<?>, Class<?>> wrapperToPrimitive = primitiveToWrapper.entrySet()
             .stream()
             .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
-    private static final @NotNull Map<Class<?>, Function<Number, Object>> NUMBERS_CONVERTER = new HashMap<>();
+    private static final @NotNull Map<Class<?>, Function<Number, Object>> numbersConverter = new HashMap<>();
 
     static {
-        NUMBERS_CONVERTER.put(byte.class, Number::byteValue);
-        NUMBERS_CONVERTER.put(Byte.class, Number::byteValue);
-        NUMBERS_CONVERTER.put(char.class, n -> (char) n.intValue());
-        NUMBERS_CONVERTER.put(Character.class, n -> (char) n.intValue());
-        NUMBERS_CONVERTER.put(short.class, Number::shortValue);
-        NUMBERS_CONVERTER.put(Short.class, Number::shortValue);
-        NUMBERS_CONVERTER.put(int.class, Number::intValue);
-        NUMBERS_CONVERTER.put(Integer.class, Number::intValue);
-        NUMBERS_CONVERTER.put(long.class, Number::longValue);
-        NUMBERS_CONVERTER.put(Long.class, Number::longValue);
-        NUMBERS_CONVERTER.put(float.class, Number::floatValue);
-        NUMBERS_CONVERTER.put(Float.class, Number::floatValue);
-        NUMBERS_CONVERTER.put(double.class, Number::doubleValue);
-        NUMBERS_CONVERTER.put(Double.class, Number::doubleValue);
+        numbersConverter.put(byte.class, Number::byteValue);
+        numbersConverter.put(Byte.class, Number::byteValue);
+        numbersConverter.put(char.class, n -> (char) n.intValue());
+        numbersConverter.put(Character.class, n -> (char) n.intValue());
+        numbersConverter.put(short.class, Number::shortValue);
+        numbersConverter.put(Short.class, Number::shortValue);
+        numbersConverter.put(int.class, Number::intValue);
+        numbersConverter.put(Integer.class, Number::intValue);
+        numbersConverter.put(long.class, Number::longValue);
+        numbersConverter.put(Long.class, Number::longValue);
+        numbersConverter.put(float.class, Number::floatValue);
+        numbersConverter.put(Float.class, Number::floatValue);
+        numbersConverter.put(double.class, Number::doubleValue);
+        numbersConverter.put(Double.class, Number::doubleValue);
     }
 
     @Nullable Type type;
@@ -112,7 +112,7 @@ public class Reflect {
      * @return {@code true} if it is
      */
     public boolean isPrimitive() {
-        return PRIMITIVE_TO_WRAPPER.containsKey(getObjectClass());
+        return primitiveToWrapper.containsKey(getObjectClass());
     }
 
     /**
@@ -121,7 +121,7 @@ public class Reflect {
      * @return {@code true} if it is
      */
     public boolean isWrapper() {
-        return WRAPPER_TO_PRIMITIVE.containsKey(getObjectClass());
+        return wrapperToPrimitive.containsKey(getObjectClass());
     }
 
     /**
@@ -156,7 +156,7 @@ public class Reflect {
      */
     public @NotNull Reflect toWrapper() {
         if (isPrimitive()) {
-            Class<?> newType = PRIMITIVE_TO_WRAPPER.get(getObjectClass());
+            Class<?> newType = primitiveToWrapper.get(getObjectClass());
             return cast(newType);
         }
         return this;
@@ -169,7 +169,7 @@ public class Reflect {
      */
     public @NotNull Reflect toPrimitive() {
         if (isWrapper()) {
-            Class<?> newType = WRAPPER_TO_PRIMITIVE.get(getObjectClass());
+            Class<?> newType = wrapperToPrimitive.get(getObjectClass());
             return cast(newType);
         }
         return this;
@@ -1214,7 +1214,7 @@ public class Reflect {
      * @return the wrapper type
      */
     public static @NotNull Class<?> toWrapper(final @NotNull Class<?> type) {
-        return PRIMITIVE_TO_WRAPPER.getOrDefault(type, type);
+        return primitiveToWrapper.getOrDefault(type, type);
     }
 
     /**
@@ -1229,10 +1229,10 @@ public class Reflect {
      */
     public static <T> T cast(final @NotNull Class<T> type, final Object object) {
         if (object instanceof Number) {
-            Function<Number, Object> converter = NUMBERS_CONVERTER.get(type);
+            Function<Number, Object> converter = numbersConverter.get(type);
             if (converter != null) return (T) converter.apply((Number) object);
         } else if (object instanceof Character) {
-            Function<Number, Object> converter = NUMBERS_CONVERTER.get(type);
+            Function<Number, Object> converter = numbersConverter.get(type);
             if (converter != null) return (T) converter.apply((int) (Character) object);
         }
         if (object instanceof Boolean && type.equals(boolean.class)) return (T) object;

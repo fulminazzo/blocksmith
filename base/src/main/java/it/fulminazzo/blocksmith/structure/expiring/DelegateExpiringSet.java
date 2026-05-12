@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> implements ExpiringSet<E> {
-    private static final @NotNull Object PRESENT = new Object();
+    private static final @NotNull Object present = new Object();
     private final AbstractExpiringMap<E, Object> delegate;
 
     @Override
@@ -59,7 +59,7 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
 
     @Override
     public boolean add(final @Nullable E element, final long ttl) {
-        return element != null && delegate.put(element, PRESENT, ttl) == null;
+        return element != null && delegate.put(element, present, ttl) == null;
     }
 
     @Override
