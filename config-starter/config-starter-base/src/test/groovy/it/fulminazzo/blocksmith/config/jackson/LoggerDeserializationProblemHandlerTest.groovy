@@ -16,22 +16,22 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
     void setup() {
         logger = Mock()
         mapper = JacksonUtils.setupMapper(new ObjectMapper(), logger, MockCommentPropertyWrapper)
-        .registerModule(new SimpleModule()
-                .addDeserializer(int.class, new StrictIntDeserializer())
-                .addDeserializer(Integer, new StrictIntDeserializer())
-        )
+                .registerModule(new SimpleModule()
+                        .addDeserializer(int.class, new StrictIntDeserializer())
+                        .addDeserializer(Integer, new StrictIntDeserializer())
+                )
     }
 
     def 'test that handleUnknownProperty logs correctly'() {
         given:
         def json = mapper.writeValueAsString([
-                'person1': [
-                        'name'    : 'Alex',
-                        'lastname': 'Fulminazzo',
-                        'age'     : 23,
-                        'street'  : 'Duomo square'
+                'person1' : [
+                        'name'     : 'Alex',
+                        'lastname' : 'Fulminazzo',
+                        'age'      : 23,
+                        'street'   : 'Duomo square'
                 ],
-                'person2': new Person('Camilla', 'Drinkwater', 20, 118.0)
+                'person2' : new Person('Camilla', 'Drinkwater', 20, 118.0)
         ])
 
         and:
@@ -46,8 +46,8 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
 
         and:
         value == [
-                'person1': new Person(),
-                'person2': new Person('Camilla', 'Drinkwater', 20, 118.0)
+                'person1' : new Person(),
+                'person2' : new Person('Camilla', 'Drinkwater', 20, 118.0)
         ]
 
         and:
@@ -57,9 +57,9 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
     def 'test that handleWeirdKey logs correctly and returns a map without the marker'() {
         given:
         def json = mapper.writeValueAsString([
-                1        : 'Alex',
-                2        : 'Fulminazzo',
-                'invalid': 'invisible'
+                1         : 'Alex',
+                2         : 'Fulminazzo',
+                'invalid' : 'invisible'
         ])
 
         and:
@@ -74,8 +74,8 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
 
         and:
         value == [
-                1: 'Alex',
-                2: 'Fulminazzo'
+                1 : 'Alex',
+                2 : 'Fulminazzo'
         ]
 
         and:
@@ -85,10 +85,10 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
     def 'test that handleWeirdStringValue logs correctly and returns default value on error'() {
         given:
         def json = mapper.writeValueAsString([
-                'name': 'Alex',
-                'lastname': 'Fulminazzo',
-                'age': 23,
-                'income': 'invalid'
+                'name'     : 'Alex',
+                'lastname' : 'Fulminazzo',
+                'age'      : 23,
+                'income'   : 'invalid'
         ])
 
         when:
@@ -108,9 +108,9 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
     def 'test that handleWeirdNumberValue logs correctly and returns default value on error'() {
         given:
         def json = mapper.writeValueAsString([
-                'name': 'Alex',
-                'lastname': 'Fulminazzo',
-                'age': Long.MAX_VALUE
+                'name'     : 'Alex',
+                'lastname' : 'Fulminazzo',
+                'age'      : Long.MAX_VALUE
         ])
 
         when:
@@ -130,10 +130,10 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
     def 'test that handleUnexpectedToken logs correctly and returns default value on error'() {
         given:
         def json = mapper.writeValueAsString([
-                'name': 'Alex',
-                'lastname': 'Fulminazzo',
-                'age': 23,
-                'income': [1, 2, 3]
+                'name'     : 'Alex',
+                'lastname' : 'Fulminazzo',
+                'age'      : 23,
+                'income'   : [1, 2, 3]
         ])
 
         when:
@@ -154,19 +154,19 @@ class LoggerDeserializationProblemHandlerTest extends Specification {
     private static class StrictIntDeserializer extends StdDeserializer<Integer> {
 
         StrictIntDeserializer() {
-            super(Integer.class)
+            super(Integer)
         }
 
         @Override
         Integer deserialize(JsonParser p, DeserializationContext context) throws IOException {
-            def number = p.getNumberValue()
+            def number = p.numberValue
 
             def longValue = number.longValue()
             if (longValue > Integer.MAX_VALUE || longValue < Integer.MIN_VALUE) {
                 def result = context.handleWeirdNumberValue(
                         Integer,
                         number,
-                        "Numeric value (" + number + ") out of range of int"
+                        "Numeric value ($number) out of range of int"
                 )
 
                 if (result instanceof Integer) return (Integer) result

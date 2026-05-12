@@ -24,7 +24,7 @@ class ConfigurationFormatTest extends Specification {
         def e = thrown(IllegalStateException)
         e.message == "Could not find suitable ${ConfigurationAdapter.simpleName} for ${configurationFormat.name().toLowerCase().capitalize()}. " +
                 "Please check that the module it.fulminazzo.blocksmith:config-starter-${configurationFormat.name().toLowerCase()} " +
-                "is correctly installed."
+                'is correctly installed.'
 
         where:
         configurationFormat << ConfigurationFormat.values().findAll { it != FORMAT_UNDER_TEST }
