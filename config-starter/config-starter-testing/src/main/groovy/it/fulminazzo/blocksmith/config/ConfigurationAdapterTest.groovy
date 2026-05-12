@@ -193,8 +193,15 @@ abstract class ConfigurationAdapterTest extends Specification {
         def configurationAdapter = adapter
 
         and:
-        if (data instanceof Map)
-            data = renameMap(data, configurationAdapter.delegate.mapper.propertyNamingStrategy)
+        if (data instanceof Map) {
+            def delegate = configurationAdapter
+            try {
+                delegate = delegate.delegate
+            } catch (MissingPropertyException ignored) {
+                // not a delegate
+            }
+            data = renameMap(data, delegate.mapper.propertyNamingStrategy)
+        }
 
         and:
         def file = getFile('migration/config')
