@@ -569,9 +569,9 @@ public class BeanConfigurationBuilder {
 
     private static int getMemberPriority(final @NotNull BodyDeclaration<?> member) {
         if (member instanceof FieldDeclaration) return 1;
-        if (member instanceof MethodDeclaration) return 2;
-        if (member instanceof ClassOrInterfaceDeclaration) return 3;
-        return 4;
+        else if (member instanceof MethodDeclaration) return 2;
+        else if (member instanceof ClassOrInterfaceDeclaration) return 3;
+        else return 4;
     }
 
     private static boolean isValidVersionInitializer(
