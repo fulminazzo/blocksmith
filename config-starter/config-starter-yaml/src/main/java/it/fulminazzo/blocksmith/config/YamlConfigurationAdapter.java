@@ -164,6 +164,7 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
      * An implementation of {@link CommentPropertyWriter} for handling YAML comments.
      */
     static final class YamlCommentPropertyWriter extends CommentPropertyWriter {
+        private static final long serialVersionUID = 9057875284342872694L;
 
         /**
          * Instantiates a new YAML comment property writer.
@@ -196,6 +197,7 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
      */
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     static class SingleQuoteYAMLFactory extends YAMLFactory {
+        private static final long serialVersionUID = -3245052211831523442L;
 
         /**
          * Instantiates a new Single quote YAML factory.

@@ -12,6 +12,8 @@ import java.time.Duration;
  * A Jackson serializer for {@link Duration} objects.
  */
 final class DurationSerializer extends StdSerializer<Duration> {
+    private static final long serialVersionUID = 1977004924180711288L;
+
     private static final int daysInYear = 365;
     private static final int daysInMonth = 30;
     private static final int secondsInDay = 86400;

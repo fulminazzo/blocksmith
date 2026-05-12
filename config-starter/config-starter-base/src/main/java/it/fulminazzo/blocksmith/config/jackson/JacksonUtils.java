@@ -58,6 +58,7 @@ final class JacksonUtils {
             final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType
     ) {
         final SimpleModule module = new SimpleModule() {
+            private static final long serialVersionUID = -7666638854510482920L;
 
             @Override
             public void setupModule(final @NotNull SetupContext context) {
@@ -123,6 +124,8 @@ final class JacksonUtils {
 
     @RequiredArgsConstructor
     private static final class JacksonBeanDeserializerModifier extends BeanDeserializerModifier {
+        private static final long serialVersionUID = 59847484471838278L;
+
         private final @NotNull Logger logger;
 
         @Override
@@ -165,6 +168,8 @@ final class JacksonUtils {
     @RequiredArgsConstructor
     private static final class JacksonBeanSerializerModifier<W extends CommentPropertyWriter>
             extends BeanSerializerModifier {
+        private static final long serialVersionUID = -1175460700899374084L;
+
         private final @NotNull Class<W> commentPropertyWriterType;
 
         @Override

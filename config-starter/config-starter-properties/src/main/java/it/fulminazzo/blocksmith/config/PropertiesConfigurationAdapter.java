@@ -113,6 +113,7 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
      * An implementation of {@link CommentPropertyWriter} for handling Properties comments.
      */
     static final class PropertiesCommentPropertyWriter extends CommentPropertyWriter {
+        private static final long serialVersionUID = 4634124233040387040L;
 
         /**
          * Instantiates a new Properties comment property writer.

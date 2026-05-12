@@ -13,6 +13,8 @@ import java.io.IOException;
  * writing of comments for a property.
  */
 public abstract class CommentPropertyWriter extends BeanPropertyWriter {
+    private static final long serialVersionUID = -8517628066134376003L;
+
     private final @NotNull Comment comment;
 
     /**

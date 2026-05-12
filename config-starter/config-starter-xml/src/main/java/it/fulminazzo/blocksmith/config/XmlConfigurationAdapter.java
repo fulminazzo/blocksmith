@@ -227,6 +227,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
      * An implementation of {@link CommentPropertyWriter} for handling XML comments.
      */
     static final class XmlCommentPropertyWriter extends CommentPropertyWriter {
+        private static final long serialVersionUID = 2513405897020486623L;
 
         /**
          * Instantiates a new XML comment property writer.
@@ -267,6 +268,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static final class PascalCaseStrategy extends PropertyNamingStrategies.NamingBase {
         public static final @NotNull PascalCaseStrategy INSTANCE = new PascalCaseStrategy();
+        private static final long serialVersionUID = 6392463185254713738L;
 
         @Override
         public @NotNull String translate(final @NotNull String propertyName) {

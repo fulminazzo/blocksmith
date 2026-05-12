@@ -29,6 +29,7 @@ interface VersionMixin {
 
     @SuppressWarnings("unused")
     final class VersionPropertyWriter extends VirtualBeanPropertyWriter {
+        private static final long serialVersionUID = -3399916575150071300L;
 
         public VersionPropertyWriter() {
         }

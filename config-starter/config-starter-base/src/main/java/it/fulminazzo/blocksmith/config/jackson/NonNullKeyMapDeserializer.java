@@ -24,6 +24,7 @@ import java.util.Set;
  * deserialization errors.
  */
 final class NonNullKeyMapDeserializer extends MapDeserializer {
+    private static final long serialVersionUID = 7466523438413327325L;
 
     /**
      * Instantiates a new Lenient map deserializer.

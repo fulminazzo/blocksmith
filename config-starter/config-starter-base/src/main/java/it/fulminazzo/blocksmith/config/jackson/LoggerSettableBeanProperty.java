@@ -20,6 +20,8 @@ import java.io.IOException;
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
+    private static final long serialVersionUID = -5375227855351483803L;
+
     @NotNull Logger logger;
     @NotNull AnnotatedField field;
 

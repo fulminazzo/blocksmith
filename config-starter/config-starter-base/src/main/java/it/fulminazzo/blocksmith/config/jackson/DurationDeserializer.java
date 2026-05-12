@@ -18,6 +18,8 @@ import java.util.function.Function;
  * A Jackson deserializer for {@link Duration} objects.
  */
 final class DurationDeserializer extends StdDeserializer<Duration> {
+    private static final long serialVersionUID = 5211295652933578090L;
+
     private static final long daysInMonth = 30;
     private static final long daysInYear = 365;
     private static final long millisInSecond = 1000;
