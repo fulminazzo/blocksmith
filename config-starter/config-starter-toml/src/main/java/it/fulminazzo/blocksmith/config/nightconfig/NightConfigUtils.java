@@ -49,10 +49,14 @@ public final class NightConfigUtils {
      * @param reference     the reference object
      * @param configuration the configuration
      */
-    public static void setComments(final @NotNull Object reference,
-                                   final @NotNull CommentedConfig configuration) {
+    public static void setComments(
+            final @NotNull Object reference,
+            final @NotNull CommentedConfig configuration
+    ) {
         Reflect reflect = Reflect.on(reference);
-        for (Field field : reflect.getFields(f -> !Modifier.isStatic(f.getModifiers()) && !Modifier.isTransient(f.getModifiers()))) {
+        for (Field field : reflect.getFields(f -> !Modifier.isStatic(f.getModifiers())
+                && !Modifier.isTransient(f.getModifiers()))
+        ) {
             String propertyName = CaseConverter.convert(field.getName(), namingConvention);
             if (field.isAnnotationPresent(Comment.class)) {
                 Comment comment = field.getAnnotation(Comment.class);

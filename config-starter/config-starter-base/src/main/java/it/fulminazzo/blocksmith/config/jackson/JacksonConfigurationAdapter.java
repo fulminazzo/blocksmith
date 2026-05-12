@@ -39,15 +39,48 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
      * @param logger                    the logger
      * @param commentPropertyWriterType the type of {@link CommentPropertyWriter} responsible for writing comments
      */
-    public JacksonConfigurationAdapter(final @NotNull ObjectMapper mapper,
-                                       final @NotNull Logger logger,
-                                       final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
+    public JacksonConfigurationAdapter(
+            final @NotNull ObjectMapper mapper,
+            final @NotNull Logger logger,
+            final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType
+    ) {
         this.mapper = JacksonUtils.setupMapper(mapper, logger, commentPropertyWriterType);
         this.logger = logger;
     }
 
+    private void applyNamingStrategy(
+            final @NotNull Map<String, Object> data,
+            final @Nullable PropertyNamingStrategy strategy
+    ) {
+        if (strategy == null) return;
+        for (String key : new ArrayList<>(data.keySet())) {
+            Object value = data.remove(key);
+            if (value instanceof Map) applyNamingStrategy((Map<String, Object>) value, strategy);
+            data.put(strategy.nameForField(null, null, key), value);
+        }
+    }
+
+    private void unapplyNamingStrategy(
+            final @NotNull Map<String, Object> data,
+            final @Nullable PropertyNamingStrategy strategy
+    ) {
+        if (strategy == null) return;
+        for (String key : new ArrayList<>(data.keySet())) {
+            Object value = data.remove(key);
+            if (value instanceof Map) unapplyNamingStrategy((Map<String, Object>) value, strategy);
+            if (strategy.equals(PropertyNamingStrategies.KEBAB_CASE))
+                key = CaseConverter.convert(key, Convention.KEBAB_CASE, ConfigUtils.javaNamingConvention);
+            else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE))
+                key = CaseConverter.convert(key, Convention.SNAKE_CASE, ConfigUtils.javaNamingConvention);
+            else key = key.substring(0, 1).toLowerCase() + key.substring(1);
+            data.put(key, value);
+        }
+    }
+
     @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) {
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(
+            final @NotNull InputStream stream
+    ) {
         // JSON does not support comments
         return Collections.emptyMap();
     }
@@ -76,6 +109,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                     try {
                         currentVersion = Double.parseDouble(rawVersion.toString());
                     } catch (NumberFormatException ignored) {
+                        // could not parse version
                     }
                 if (currentVersion == null) {
                     logger.warn("Invalid version '{}'. Expected a decimal number.", rawVersion);
@@ -84,7 +118,9 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                 }
 
                 if (currentVersion != latest) {
-                    logger.info("Migrating configuration '{}' from version {} to version {}", file.getName(), currentVersion, latest);
+                    logger.info("Migrating configuration '{}' from version {} to version {}",
+                            file.getName(), currentVersion, latest
+                    );
 
                     String tmp = file.getName();
                     String name = tmp.substring(0, tmp.lastIndexOf('.'));
@@ -109,6 +145,7 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
         return load(new FileInputStream(file), type);
     }
 
+    @Override
     public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
         return mapper.readValue(stream, type);
     }
@@ -130,31 +167,6 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
     @Override
     public <T> void store(@NotNull OutputStream stream, @NotNull T configuration) throws IOException {
         mapper.writeValue(stream, configuration);
-    }
-
-    private void applyNamingStrategy(final @NotNull Map<String, Object> data,
-                                     final @Nullable PropertyNamingStrategy strategy) {
-        if (strategy == null) return;
-        for (String key : new ArrayList<>(data.keySet())) {
-            Object value = data.remove(key);
-            if (value instanceof Map) applyNamingStrategy((Map<String, Object>) value, strategy);
-            data.put(strategy.nameForField(null, null, key), value);
-        }
-    }
-
-    private void unapplyNamingStrategy(final @NotNull Map<String, Object> data,
-                                       final @Nullable PropertyNamingStrategy strategy) {
-        if (strategy == null) return;
-        for (String key : new ArrayList<>(data.keySet())) {
-            Object value = data.remove(key);
-            if (value instanceof Map) unapplyNamingStrategy((Map<String, Object>) value, strategy);
-            if (strategy.equals(PropertyNamingStrategies.KEBAB_CASE))
-                key = CaseConverter.convert(key, Convention.KEBAB_CASE, ConfigUtils.javaNamingConvention);
-            else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE))
-                key = CaseConverter.convert(key, Convention.SNAKE_CASE, ConfigUtils.javaNamingConvention);
-            else key = key.substring(0, 1).toLowerCase() + key.substring(1);
-            data.put(key, value);
-        }
     }
 
 }

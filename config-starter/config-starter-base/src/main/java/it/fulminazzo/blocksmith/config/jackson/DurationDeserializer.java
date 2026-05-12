@@ -52,13 +52,17 @@ final class DurationDeserializer extends StdDeserializer<Duration> {
     }
 
     @Override
-    public Duration deserialize(final @NotNull JsonParser parser,
-                                final @NotNull DeserializationContext context) throws IOException {
+    public Duration deserialize(
+            final @NotNull JsonParser parser,
+            final @NotNull DeserializationContext context
+    ) throws IOException {
         JsonNode node = parser.getCodec().readTree(parser);
         String raw = node.asText();
         try {
             return getParser("s").getValue().apply(raw);
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException ignored) {
+            // some time unit was used, we require complete parsing
+        }
         Duration duration = null;
 
         for (String r : raw.split("[ \r\n\t]+")) {
@@ -70,10 +74,14 @@ final class DurationDeserializer extends StdDeserializer<Duration> {
                     Duration d = durationParser.getValue().apply(rawValue);
                     duration = duration == null ? d : duration.plus(d);
                 } catch (NumberFormatException e) {
-                    logger.warn("Invalid time value '{}' for unit {} (path: {})", rawValue, unit, JacksonUtils.getCurrentPath(parser));
+                    logger.warn("Invalid time value '{}' for unit {} (path: {})",
+                            rawValue, unit, JacksonUtils.getCurrentPath(parser)
+                    );
                 }
             } else
-                logger.warn("Unrecognized time notation '{}'. Supported units: {} (path: {})", r, getSupportedUnits(), JacksonUtils.getCurrentPath(parser));
+                logger.warn("Unrecognized time notation '{}'. Supported units: {} (path: {})",
+                        r, getSupportedUnits(), JacksonUtils.getCurrentPath(parser)
+                );
         }
 
         if (duration == null) {

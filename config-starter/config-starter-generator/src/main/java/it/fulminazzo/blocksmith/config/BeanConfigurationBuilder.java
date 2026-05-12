@@ -41,8 +41,8 @@ import static com.github.javaparser.utils.Utils.isNullOrEmpty;
 /**
  * A builder to generate a Java bean from a configuration file.
  */
-@Slf4j
 @SuppressWarnings("unchecked")
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BeanConfigurationBuilder {
     private static final @NotNull PrinterConfiguration printConfiguration = new DefaultPrinterConfiguration()
@@ -81,9 +81,11 @@ public class BeanConfigurationBuilder {
      * @param root    the root
      * @param imports the imports
      */
-    BeanConfigurationBuilder(final @NotNull Map<CommentKey, Object> data,
-                             final @NotNull ClassOrInterfaceDeclaration root,
-                             final @NotNull Map<String, ImportDeclaration> imports) {
+    BeanConfigurationBuilder(
+            final @NotNull Map<CommentKey, Object> data,
+            final @NotNull ClassOrInterfaceDeclaration root,
+            final @NotNull Map<String, ImportDeclaration> imports
+    ) {
         this.data = data;
         this.root = root;
         this.imports = imports;
@@ -199,8 +201,150 @@ public class BeanConfigurationBuilder {
         }
     }
 
-    private @NotNull VariableDeclarator generateField(final @NotNull CommentKey key,
-                                                      final @NotNull String fieldClassName) {
+    /**
+     * Converts the comments of the key to a {@link Comment} annotation for the field.
+     *
+     * @param key   the key to pull the comments from
+     * @param field the field to add the annotation to
+     */
+    void convertComments(final @NotNull CommentKey key, final @NotNull FieldDeclaration field) {
+        final Expression initializer;
+        final @NotNull List<String> comments = key.getComments();
+        if (comments.isEmpty()) {
+            field.getAnnotationByClass(Comment.class).ifPresent(Node::remove);
+            return;
+        } else if (comments.size() == 1) initializer = new StringLiteralExpr(comments.get(0));
+        else
+            initializer = new ArrayInitializerExpr(NodeList.nodeList(
+                    comments.stream().map(StringLiteralExpr::new).collect(Collectors.toList())
+            ));
+
+        Optional<SingleMemberAnnotationExpr> annotation = field.getAnnotationByClass(Comment.class)
+                .map(Expression::asSingleMemberAnnotationExpr);
+        annotation.ifPresentOrElse(
+                a -> a.setMemberValue(initializer),
+                () -> field.addSingleMemberAnnotation(Comment.class, initializer)
+        );
+    }
+
+    /**
+     * Adds an import to the imports list.
+     * If the import belongs to defaultJavaPackage,
+     * then nothing is done (as already imported by default).
+     *
+     * @param value the value to get the type from (if {@code null}, nothing is done)
+     */
+    void addImport(final @Nullable Object value) {
+        addImport(getTypeFromObject(value));
+    }
+
+    /**
+     * Adds an import to the imports list.
+     * If the import belongs to defaultJavaPackage,
+     * then nothing is done (as already imported by default).
+     *
+     * @param type the type to add
+     */
+    void addImport(final @NotNull Class<?> type) {
+        addImport(type.getCanonicalName());
+    }
+
+    /**
+     * Adds an import to the imports list.
+     * If the import belongs to {@link #DEFAULT_JAVA_PACKAGE},
+     * then nothing is done (as already imported by default).
+     *
+     * @param classCanonicalName the canonical name of the class to add
+     */
+    void addImport(final @NotNull String classCanonicalName) {
+        if (!classCanonicalName.startsWith(DEFAULT_JAVA_PACKAGE))
+            imports.computeIfAbsent(
+                    classCanonicalName,
+                    c -> new ImportDeclaration(c, false, false)
+            );
+    }
+
+    /**
+     * Checks if an annotation with any of the given names is present
+     * in the root class or field.
+     *
+     * @param field       the field declaration
+     * @param annotations the annotation names
+     * @return {@code true} if at least one is
+     */
+    boolean isAnnotationPresent(
+            final @NotNull FieldDeclaration field,
+            final @NotNull String @NotNull ... annotations
+    ) {
+        for (String name : annotations) {
+            if (root.isAnnotationPresent(name) || field.isAnnotationPresent(name))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Gets the initializer value for the given value.
+     * <br>
+     * For example, for strings the initializer is {@code "value"}.
+     * <br>
+     * If collections are given, they are imported and initialized properly.
+     *
+     * @param value the value
+     * @return the initializer value
+     */
+    @NotNull String getInitializer(final @Nullable Object value) {
+        if (value == null) return "null";
+        else if (value instanceof Collection<?>) {
+            Collection<?> collection = (Collection<?>) value;
+            addImport(collection);
+            addImport(Arrays.class);
+            return String.format("new %s<>(Arrays.asList(%s))",
+                    collection.getClass().getSimpleName(),
+                    collection.stream().map(this::getInitializer).collect(Collectors.joining(", "))
+            );
+        } else if (value instanceof String) return String.format("\"%s\"", value.toString()
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t")
+        );
+        else if (value instanceof Character) return String.format(String.format("'%s'", value));
+        else if (value.getClass().isArray()) {
+            Object[] array = (Object[]) value;
+            String initializer = String.format("new %s[]", array.getClass().getComponentType().getSimpleName());
+            if (array.length == 0) return initializer.replace("[]", "[0]");
+            else return String.format("%s{%s}", initializer, Arrays.stream(array)
+                    .map(this::getInitializer)
+                    .collect(Collectors.joining(", ")));
+        } else return value.toString();
+    }
+
+    /**
+     * Gets the type name of the given object.
+     * If the object is a collection, the generic type is returned.
+     *
+     * @param object the object
+     * @return the type name
+     */
+    @NotNull String getGenericTypeNameFromObject(final @Nullable Object object) {
+        if (object instanceof Collection<?>) {
+            Collection<?> collection = (Collection<?>) object;
+            String typeName;
+            if (collection instanceof List) typeName = List.class.getCanonicalName();
+            else if (collection instanceof Set) typeName = Set.class.getCanonicalName();
+            else typeName = object.getClass().getCanonicalName();
+            typeName += String.format(GENERICS_FORMAT, guessCollectionGenericType(collection));
+            typeName = parseGenericTypesImports(typeName);
+            return typeName.substring(typeName.lastIndexOf('.') + 1);
+        } else return getTypeFromObject(object).getSimpleName();
+    }
+
+    private @NotNull VariableDeclarator generateField(
+            final @NotNull CommentKey key,
+            final @NotNull String fieldClassName
+    ) {
         final String propertyName = key.getKey();
         final Type type = StaticJavaParser.parseType(fieldClassName);
 
@@ -246,144 +390,6 @@ public class BeanConfigurationBuilder {
         return field.getVariable(0).setType(type);
     }
 
-    /**
-     * Converts the comments of the key to a {@link Comment} annotation for the field.
-     *
-     * @param key   the key to pull the comments from
-     * @param field the field to add the annotation to
-     */
-    void convertComments(final @NotNull CommentKey key, final @NotNull FieldDeclaration field) {
-        final Expression initializer;
-        final @NotNull List<String> comments = key.getComments();
-        if (comments.isEmpty()) {
-            field.getAnnotationByClass(Comment.class).ifPresent(Node::remove);
-            return;
-        } else if (comments.size() == 1) initializer = new StringLiteralExpr(comments.get(0));
-        else
-            initializer = new ArrayInitializerExpr(NodeList.nodeList(
-                    comments.stream().map(StringLiteralExpr::new).collect(Collectors.toList())
-            ));
-
-        Optional<SingleMemberAnnotationExpr> annotation = field.getAnnotationByClass(Comment.class)
-                .map(Expression::asSingleMemberAnnotationExpr);
-        annotation.ifPresentOrElse(
-                a -> a.setMemberValue(initializer),
-                () -> field.addSingleMemberAnnotation(Comment.class, initializer)
-        );
-    }
-
-    /**
-     * Gets the initializer value for the given value.
-     * <br>
-     * For example, for strings the initializer is {@code "value"}.
-     * <br>
-     * If collections are given, they are imported and initialized properly.
-     *
-     * @param value the value
-     * @return the initializer value
-     */
-    @NotNull String getInitializer(final @Nullable Object value) {
-        if (value == null) return "null";
-        else if (value instanceof Collection<?>) {
-            Collection<?> collection = (Collection<?>) value;
-            addImport(collection);
-            addImport(Arrays.class);
-            return String.format("new %s<>(Arrays.asList(%s))",
-                    collection.getClass().getSimpleName(),
-                    collection.stream().map(this::getInitializer).collect(Collectors.joining(", "))
-            );
-        } else if (value instanceof String) return String.format("\"%s\"", value.toString()
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t")
-        );
-        else if (value instanceof Character) return String.format(String.format("'%s'", value));
-        else if (value.getClass().isArray()) {
-            Object[] array = (Object[]) value;
-            String initializer = String.format("new %s[]", array.getClass().getComponentType().getSimpleName());
-            if (array.length == 0) return initializer.replace("[]", "[0]");
-            else return String.format("%s{%s}", initializer, Arrays.stream(array)
-                    .map(this::getInitializer)
-                    .collect(Collectors.joining(", ")));
-        } else return value.toString();
-    }
-
-    /**
-     * Checks if an annotation with any of the given names is present
-     * in the root class or field.
-     *
-     * @param field       the field declaration
-     * @param annotations the annotation names
-     * @return {@code true} if at least one is
-     */
-    boolean isAnnotationPresent(final @NotNull FieldDeclaration field,
-                                final @NotNull String @NotNull ... annotations) {
-        for (String name : annotations) {
-            if (root.isAnnotationPresent(name) || field.isAnnotationPresent(name))
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Adds an import to the imports list.
-     * If the import belongs to defaultJavaPackage,
-     * then nothing is done (as already imported by default).
-     *
-     * @param value the value to get the type from (if {@code null}, nothing is done)
-     */
-    void addImport(final @Nullable Object value) {
-        addImport(getTypeFromObject(value));
-    }
-
-    /**
-     * Adds an import to the imports list.
-     * If the import belongs to defaultJavaPackage,
-     * then nothing is done (as already imported by default).
-     *
-     * @param type the type to add
-     */
-    void addImport(final @NotNull Class<?> type) {
-        addImport(type.getCanonicalName());
-    }
-
-    /**
-     * Adds an import to the imports list.
-     * If the import belongs to {@link #DEFAULT_JAVA_PACKAGE},
-     * then nothing is done (as already imported by default).
-     *
-     * @param classCanonicalName the canonical name of the class to add
-     */
-    void addImport(final @NotNull String classCanonicalName) {
-        if (!classCanonicalName.startsWith(DEFAULT_JAVA_PACKAGE))
-            imports.computeIfAbsent(
-                    classCanonicalName,
-                    c -> new ImportDeclaration(c, false, false)
-            );
-    }
-
-    /**
-     * Gets the type name of the given object.
-     * If the object is a collection, the generic type is returned.
-     *
-     * @param object the object
-     * @return the type name
-     */
-    @NotNull String getGenericTypeNameFromObject(final @Nullable Object object) {
-        if (object instanceof Collection<?>) {
-            Collection<?> collection = (Collection<?>) object;
-            String typeName;
-            if (collection instanceof List) typeName = List.class.getCanonicalName();
-            else if (collection instanceof Set) typeName = Set.class.getCanonicalName();
-            else typeName = object.getClass().getCanonicalName();
-            typeName += String.format(GENERICS_FORMAT, guessCollectionGenericType(collection));
-            typeName = parseGenericTypesImports(typeName);
-            return typeName.substring(typeName.lastIndexOf('.') + 1);
-        } else return getTypeFromObject(object).getSimpleName();
-    }
-
     private @NotNull String parseGenericTypesImports(final @NotNull String genericType) {
         int index = genericType.indexOf('<');
         if (index == -1) return genericType.substring(genericType.lastIndexOf('.') + 1);
@@ -415,19 +421,21 @@ public class BeanConfigurationBuilder {
      * @return the newly created bean
      * @throws IOException in case of any errors
      */
-    public static @NotNull File generate(final @NotNull File configurationFile,
-                                         final @NotNull File sourceDirectory,
-                                         final @NotNull String packageName,
-                                         final @NotNull String className) throws IOException {
+    public static @NotNull File generate(
+            final @NotNull File configurationFile,
+            final @NotNull File sourceDirectory,
+            final @NotNull String packageName,
+            final @NotNull String className
+    ) throws IOException {
         ConfigurationAdapter configurationAdapter = ConfigurationAdapter.newAdapter(
                 log,
                 ConfigurationFormat.fromExtension(configurationFile.getName())
         );
         final Map<CommentKey, Object> data = configurationAdapter.loadWithComments(configurationFile);
 
-        final File beanFile = new File(sourceDirectory,
-                packageName.replace(".", File.separator) +
-                        File.separator + className + ".java"
+        final File beanFile = new File(
+                sourceDirectory,
+                packageName.replace(".", File.separator) + File.separator + className + ".java"
         );
         Files.createDirectories(beanFile.getParentFile().toPath());
 
@@ -513,8 +521,10 @@ public class BeanConfigurationBuilder {
      * @param base the type to get the types of
      * @return the name of the types
      */
-    private static @NotNull Set<String> getBasicTypeNames(final @Nullable Class<?> type,
-                                                          final @NotNull Class<?> base) {
+    private static @NotNull Set<String> getBasicTypeNames(
+            final @Nullable Class<?> type,
+            final @NotNull Class<?> base
+    ) {
         final Set<String> typeNames = new LinkedHashSet<>();
         if (type == null) return typeNames;
         String typeName = type.getCanonicalName();
@@ -535,8 +545,10 @@ public class BeanConfigurationBuilder {
      * @param genericType the generic type
      * @return the name of the types
      */
-    private static @NotNull Set<String> getCollectionTypeNames(final @Nullable Class<?> type,
-                                                               final @NotNull String genericType) {
+    private static @NotNull Set<String> getCollectionTypeNames(
+            final @Nullable Class<?> type,
+            final @NotNull String genericType
+    ) {
         final Set<String> typeNames = new LinkedHashSet<>();
         if (type == null || type.equals(Object.class)) return typeNames;
         String typeName = type.getCanonicalName();
@@ -562,8 +574,10 @@ public class BeanConfigurationBuilder {
         return 4;
     }
 
-    private static boolean isValidVersionInitializer(final @NotNull Class<?> classVersion,
-                                                     final @Nullable Expression expression) {
+    private static boolean isValidVersionInitializer(
+            final @NotNull Class<?> classVersion,
+            final @Nullable Expression expression
+    ) {
         if (!(expression instanceof MethodCallExpr)) return false;
         MethodCallExpr methodCall = (MethodCallExpr) expression;
         methodCall = getFirstCall(methodCall);
@@ -581,7 +595,9 @@ public class BeanConfigurationBuilder {
         NodeList<Expression> arguments = methodCall.getArguments();
         if (arguments.size() != 1) return false;
         Expression argument = arguments.get(0);
-        return numberExpressions.stream().anyMatch(t -> t.isAssignableFrom(argument.getClass()));
+        return numberExpressions.stream().anyMatch(t ->
+                t.isAssignableFrom(argument.getClass())
+        );
     }
 
     private static @NotNull MethodCallExpr getFirstCall(@NotNull MethodCallExpr expression) {
@@ -609,8 +625,7 @@ public class BeanConfigurationBuilder {
         }
 
         @Override
-        public void visit(final @NotNull ArrayInitializerExpr expression,
-                          final @NotNull Void argument) {
+        public void visit(final @NotNull ArrayInitializerExpr expression, final @NotNull Void argument) {
             printOrphanCommentsBeforeThisChildNode(expression);
             printComment(expression.getComment(), argument);
             printer.print("{");
@@ -644,8 +659,7 @@ public class BeanConfigurationBuilder {
         }
 
         @Override
-        public void visit(final @NotNull MethodCallExpr expression,
-                          final @NotNull Void argument) {
+        public void visit(final @NotNull MethodCallExpr expression, final @NotNull Void argument) {
             printOrphanCommentsBeforeThisChildNode(expression);
             printComment(expression.getComment(), argument);
             // we are at the last method call of a call chain
@@ -682,17 +696,19 @@ public class BeanConfigurationBuilder {
             expression.getScope().ifPresent(scope -> {
                 scope.accept(this, argument);
                 if (methodCallWithScopeInScope.get()) {
-                    /* We're a method call on the result of something (method call, property access, ...) that is not stand alone,
-                    and not the first one with scope, like:
+                    /* We're a method call on the result of something (method call, property access, ...)
+                    that is not stand alone, and not the first one with scope, like:
                     we're x() in a.b().x(), or in a=b().c[15].d.e().x().
-                    That means that the "else" has been executed by one of the methods in the scope chain, so that the alignment
-                    is set to the "." of that method.
+                    That means that the "else" has been executed by one of the methods in the scope chain,
+                    so that the alignment is set to the "." of that method.
                     That means we will align to that "." when we start a new line: */
                     printer.println();
                 } else if (!lastMethodInCallChain.get()) {
-                    /* We're the first method call on the result of something in the chain (method call, property access, ...),
-                    but we are not at the same time the last method call in that chain, like:
-                    we're x() in a().x().y(), or in Long.x().y.z(). That means we get to dictate the indent of following method
+                    /* We're the first method call on the result of something in
+                    the chain (method call, property access, ...), but we are not at the same time
+                    the last method call in that chain, like:
+                    we're x() in a().x().y(), or in Long.x().y.z().
+                    That means we get to dictate the indent of following method
                     calls in this chain by setting the cursor to where we are now: just before the "."
                     that start this method call. */
                     printer.indent();

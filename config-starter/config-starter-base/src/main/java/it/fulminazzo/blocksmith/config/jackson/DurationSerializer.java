@@ -27,9 +27,11 @@ final class DurationSerializer extends StdSerializer<Duration> {
     }
 
     @Override
-    public void serialize(final @NotNull Duration value,
-                          final @NotNull JsonGenerator gen,
-                          final @NotNull SerializerProvider provider) throws IOException {
+    public void serialize(
+            final @NotNull Duration value,
+            final @NotNull JsonGenerator gen,
+            final @NotNull SerializerProvider provider
+    ) throws IOException {
         Duration abs = value.abs();
         final long totalSeconds = abs.getSeconds();
         final int nanosOfSecond = abs.getNano();
@@ -52,7 +54,8 @@ final class DurationSerializer extends StdSerializer<Duration> {
         long millis = nanosOfSecond / nanosInMillis;
         long nanos = nanosOfSecond % nanosInMillis;
 
-        if (years == 0 && months == 0 && days == 0 && hours == 0 && minutes == 0 && nanos == 0 && (seconds != 0 || millis != 0)) {
+        if (years == 0 && months == 0 && days == 0 && hours == 0 && minutes == 0 && nanos == 0
+                && (seconds != 0 || millis != 0)) {
             gen.writeNumber((value.isNegative() ? "-" : "") + formatSeconds(seconds, millis));
             return;
         }
@@ -61,19 +64,33 @@ final class DurationSerializer extends StdSerializer<Duration> {
 
         if (years != 0) builder.append(value.isNegative() ? "-" : "").append(years).append("y");
         if (months != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(months).append("M");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(months).append("M");
         if (days != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(days).append("d");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(days).append("d");
         if (hours != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(hours).append("h");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(hours).append("h");
         if (minutes != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(minutes).append("m");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(minutes).append("m");
         if (seconds != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(seconds).append("s");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(seconds).append("s");
         if (millis != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(millis).append("ms");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(millis).append("ms");
         if (nanos != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(nanos).append("ns");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(nanos).append("ns");
 
         if (builder.length() == 0) gen.writeNumber(0);
         else gen.writeString(builder.toString());
