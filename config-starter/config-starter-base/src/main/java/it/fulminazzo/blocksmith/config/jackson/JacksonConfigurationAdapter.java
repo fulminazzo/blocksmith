@@ -50,35 +50,6 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
         this.logger = logger;
     }
 
-    private void applyNamingStrategy(
-            final @NotNull Map<String, Object> data,
-            final @Nullable PropertyNamingStrategy strategy
-    ) {
-        if (strategy == null) return;
-        for (String key : new ArrayList<>(data.keySet())) {
-            Object value = data.remove(key);
-            if (value instanceof Map) applyNamingStrategy((Map<String, Object>) value, strategy);
-            data.put(strategy.nameForField(null, null, key), value);
-        }
-    }
-
-    private void unapplyNamingStrategy(
-            final @NotNull Map<String, Object> data,
-            final @Nullable PropertyNamingStrategy strategy
-    ) {
-        if (strategy == null) return;
-        for (String key : new ArrayList<>(data.keySet())) {
-            Object value = data.remove(key);
-            if (value instanceof Map) unapplyNamingStrategy((Map<String, Object>) value, strategy);
-            if (strategy.equals(PropertyNamingStrategies.KEBAB_CASE))
-                key = CaseConverter.convert(key, Convention.KEBAB_CASE, ConfigUtils.javaNamingConvention);
-            else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE))
-                key = CaseConverter.convert(key, Convention.SNAKE_CASE, ConfigUtils.javaNamingConvention);
-            else key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
-            data.put(key, value);
-        }
-    }
-
     @Override
     public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(
             final @NotNull InputStream stream
@@ -172,6 +143,35 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
     @Override
     public <T> void store(@NotNull OutputStream stream, @NotNull T configuration) throws IOException {
         mapper.writeValue(stream, configuration);
+    }
+
+    private static void applyNamingStrategy(
+            final @NotNull Map<String, Object> data,
+            final @Nullable PropertyNamingStrategy strategy
+    ) {
+        if (strategy == null) return;
+        for (String key : new ArrayList<>(data.keySet())) {
+            Object value = data.remove(key);
+            if (value instanceof Map) applyNamingStrategy((Map<String, Object>) value, strategy);
+            data.put(strategy.nameForField(null, null, key), value);
+        }
+    }
+
+    private static void unapplyNamingStrategy(
+            final @NotNull Map<String, Object> data,
+            final @Nullable PropertyNamingStrategy strategy
+    ) {
+        if (strategy == null) return;
+        for (String key : new ArrayList<>(data.keySet())) {
+            Object value = data.remove(key);
+            if (value instanceof Map) unapplyNamingStrategy((Map<String, Object>) value, strategy);
+            if (strategy.equals(PropertyNamingStrategies.KEBAB_CASE))
+                key = CaseConverter.convert(key, Convention.KEBAB_CASE, ConfigUtils.javaNamingConvention);
+            else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE))
+                key = CaseConverter.convert(key, Convention.SNAKE_CASE, ConfigUtils.javaNamingConvention);
+            else key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
+            data.put(key, value);
+        }
     }
 
 }
