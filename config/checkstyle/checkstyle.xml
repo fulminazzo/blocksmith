@@ -134,12 +134,14 @@
                     LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, METHOD_DEF,
                     OBJBLOCK, STATIC_INIT, RECORD_DEF, COMPACT_CTOR_DEF, SWITCH_RULE"/>
         </module>
-        <module name="LeftCurly">
-            <property name="id" value="LeftCurlyNl"/>
-            <property name="option" value="nl"/>
-            <property name="tokens"
-                      value="LITERAL_CASE, LITERAL_DEFAULT"/>
-        </module>
+        <!-- ALESSANDRO START -->
+        <!--        <module name="LeftCurly">-->
+        <!--            <property name="id" value="LeftCurlyNl"/>-->
+        <!--            <property name="option" value="nl"/>-->
+        <!--            <property name="tokens"-->
+        <!--                      value="LITERAL_CASE, LITERAL_DEFAULT"/>-->
+        <!--        </module>-->
+        <!-- ALESSANDRO END -->
         <module name="SuppressionXpathSingleFilter">
             <!-- LITERAL_CASE, LITERAL_DEFAULT are reused in SWITCH_RULE  -->
             <property name="id" value="LeftCurlyNl"/>
