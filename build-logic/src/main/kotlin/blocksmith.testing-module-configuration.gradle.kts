@@ -15,31 +15,30 @@ plugins {
 afterEvaluate {
     val baseModuleName: String by extra
     val testingModuleName: String by extra
+    val path = project.path
+    val moduleName = project.name
 
-    dependencies {
-        val path = project.path
+    findProject("$path:$moduleName-$testingModuleName")?.let { testingModule ->
 
-        findProject("$path:$path-$testingModuleName")?.let { testingModule ->
+        testingModule.dependencies {
+            api(project(":$baseModuleName:$testingModuleName"))
+        }
 
-            testingModule.dependencies {
-                api(project(":$baseModuleName:$testingModuleName"))
-            }
+        allprojects {
+            if (this.path != testingModule.path)
+                afterEvaluate {
 
-            allprojects {
-
-                testing {
-                    suites {
-                        withType<JvmTestSuite> {
-                            val projectPath = project.path
-                            dependencies {
-                                if (projectPath != testingModule.path)
-                                    implementation(testingModule)
+                    testing {
+                        suites {
+                            withType<JvmTestSuite> {
+                                dependencies {
+                                    implementation(project(testingModule.path))
+                                }
                             }
                         }
                     }
-                }
 
-            }
+                }
 
         }
 
