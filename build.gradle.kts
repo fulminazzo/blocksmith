@@ -47,6 +47,7 @@ allprojects {
                 dependencies {
                     rootProject.libs.bundles.annotations.get().forEach { implementation(it) }
                     annotationProcessor(rootProject.libs.lombok.get())
+                    compileOnly(libs.spotbugs.annotations)
 
                     implementation(libs.mockito)
 
