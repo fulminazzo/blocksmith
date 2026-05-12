@@ -5,7 +5,7 @@ import spock.lang.Specification
 
 import java.nio.file.Files
 
-abstract class ConfigurationAdapterTest extends Specification {
+abstract class ConfigurationAdapterIntegrationTest extends Specification {
 
     def 'test that loadWithComments of #data returns expected data'() {
         when:

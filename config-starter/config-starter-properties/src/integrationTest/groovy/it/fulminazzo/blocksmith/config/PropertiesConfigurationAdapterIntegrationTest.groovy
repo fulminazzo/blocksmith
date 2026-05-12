@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.config
 import groovy.util.logging.Slf4j
 
 @Slf4j
-class PropertiesConfigurationAdapterTest extends ConfigurationAdapterTest {
+class PropertiesConfigurationAdapterIntegrationTest extends ConfigurationAdapterIntegrationTest {
 
     @Override
     protected boolean isProperties() {

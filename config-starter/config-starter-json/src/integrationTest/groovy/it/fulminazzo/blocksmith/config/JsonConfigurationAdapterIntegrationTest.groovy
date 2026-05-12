@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.config
 import groovy.util.logging.Slf4j
 
 @Slf4j
-class JsonConfigurationAdapterTest extends ConfigurationAdapterTest {
+class JsonConfigurationAdapterIntegrationTest extends ConfigurationAdapterIntegrationTest {
 
     @Override
     protected boolean supportsComments() {

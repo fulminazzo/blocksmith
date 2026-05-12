@@ -3,10 +3,10 @@ package it.fulminazzo.blocksmith.config.jackson
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.util.logging.Slf4j
 import it.fulminazzo.blocksmith.config.BaseConfigurationAdapter
-import it.fulminazzo.blocksmith.config.ConfigurationAdapterTest
+import it.fulminazzo.blocksmith.config.ConfigurationAdapterIntegrationTest
 
 @Slf4j
-class JacksonConfigurationAdapterTest extends ConfigurationAdapterTest {
+class JacksonConfigurationAdapterIntegrationTest extends ConfigurationAdapterIntegrationTest {
 
     @Override
     protected boolean supportsComments() {

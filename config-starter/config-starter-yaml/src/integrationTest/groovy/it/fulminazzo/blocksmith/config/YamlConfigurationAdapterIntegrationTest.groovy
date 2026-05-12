@@ -6,7 +6,7 @@ import org.yaml.snakeyaml.comments.CommentType
 import org.yaml.snakeyaml.nodes.Node
 
 @Slf4j
-class YamlConfigurationAdapterTest extends ConfigurationAdapterTest {
+class YamlConfigurationAdapterIntegrationTest extends ConfigurationAdapterIntegrationTest {
 
     def 'test that loadComments does not throw for non-root node'() {
         when:

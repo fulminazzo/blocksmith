@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.config
 import groovy.util.logging.Slf4j
 
 @Slf4j
-class XmlConfigurationAdapterTest extends ConfigurationAdapterTest {
+class XmlConfigurationAdapterIntegrationTest extends ConfigurationAdapterIntegrationTest {
 
     def 'test that loadComments with invalid data throws IOException'() {
         when:

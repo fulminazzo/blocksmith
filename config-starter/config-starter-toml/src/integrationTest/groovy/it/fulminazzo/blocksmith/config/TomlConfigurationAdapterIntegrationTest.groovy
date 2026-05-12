@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.config
 import groovy.util.logging.Slf4j
 
 @Slf4j
-class TomlConfigurationAdapterTest extends ConfigurationAdapterTest {
+class TomlConfigurationAdapterIntegrationTest extends ConfigurationAdapterIntegrationTest {
 
     def 'test that store with #array returns #expected'() {
         given:
