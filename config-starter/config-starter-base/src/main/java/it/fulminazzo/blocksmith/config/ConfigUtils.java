@@ -71,17 +71,6 @@ public final class ConfigUtils {
         return result;
     }
 
-    private static @Nullable Object convertValue(final @Nullable Object value) {
-        if (value == null) return null;
-        for (Function<String, Object> converter : primitiveConverters) {
-            try {
-                return converter.apply(value.toString());
-            } catch (Exception ignored) {
-            }
-        }
-        return value;
-    }
-
     /**
      * Checks if the given configuration is a {@link Map}.
      * If it is, its keys are converted based on the given {@link Convention}s.
@@ -92,9 +81,11 @@ public final class ConfigUtils {
      * @param to            the convention to convert to
      * @return the updated configuration
      */
-    static <T> @NotNull T checkMap(final @NotNull T configuration,
-                                   final @NotNull Convention from,
-                                   final @NotNull Convention to) {
+    static <T> @NotNull T checkMap(
+            final @NotNull T configuration,
+            final @NotNull Convention from,
+            final @NotNull Convention to
+    ) {
         try {
             return (T) convertKeysFormat((Map<String, ?>) configuration, from, to);
         } catch (ClassCastException e) {
@@ -102,9 +93,11 @@ public final class ConfigUtils {
         }
     }
 
-    private static @NotNull Map<String, Object> convertKeysFormat(final @NotNull Map<String, ?> configuration,
-                                                                  final @NotNull Convention from,
-                                                                  final @NotNull Convention to) {
+    private static @NotNull Map<String, Object> convertKeysFormat(
+            final @NotNull Map<String, ?> configuration,
+            final @NotNull Convention from,
+            final @NotNull Convention to
+    ) {
         final Map<String, Object> converted = new LinkedHashMap<>();
         for (final Map.Entry<String, ?> entry : configuration.entrySet()) {
             String key = entry.getKey();
@@ -117,6 +110,18 @@ public final class ConfigUtils {
             );
         }
         return converted;
+    }
+
+    private static @Nullable Object convertValue(final @Nullable Object value) {
+        if (value == null) return null;
+        for (Function<String, Object> converter : primitiveConverters) {
+            try {
+                return converter.apply(value.toString());
+            } catch (Exception ignored) {
+                // value was not of the converter primitive type
+            }
+        }
+        return value;
     }
 
 }

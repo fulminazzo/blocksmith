@@ -40,14 +40,6 @@ final class JacksonUtils {
         addCustomDeserializer(DurationDeserializer.class.getSimpleName());
     }
 
-    private static void addCustomDeserializer(final @NotNull String deserializerName) {
-        try {
-            Reflect reflect = Reflect.on(JacksonUtils.class.getPackageName() + "." + deserializerName);
-            customDeserializers.add(l -> reflect.init(l).get());
-        } catch (ReflectException ignored) {
-        }
-    }
-
     /**
      * Sets up the given {@link ObjectMapper} so that many exceptions
      * (like missing property, extra property or invalid key/property type)
@@ -60,9 +52,11 @@ final class JacksonUtils {
      * @return the updated mapper
      */
     @SuppressWarnings("unchecked")
-    public static <M extends ObjectMapper> M setupMapper(final @NotNull M mapper,
-                                                         final @NotNull Logger logger,
-                                                         final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
+    public static <M extends ObjectMapper> M setupMapper(
+            final @NotNull M mapper,
+            final @NotNull Logger logger,
+            final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType
+    ) {
         final SimpleModule module = new SimpleModule() {
 
             @Override
@@ -83,12 +77,6 @@ final class JacksonUtils {
                         .addSerializer(new DurationSerializer())
                 )
                 .addHandler(new LoggerDeserializationProblemHandler(logger));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> void registerDeserializer(final @NotNull SimpleModule module, final @NotNull StdDeserializer<?> deserializer) {
-        Class<T> type = (Class<T>) deserializer.handledType();
-        module.addDeserializer(type, (JsonDeserializer<? extends T>) deserializer);
     }
 
     /**
@@ -115,14 +103,34 @@ final class JacksonUtils {
         return finalPath;
     }
 
+    @SuppressWarnings("unchecked")
+    private static <T> void registerDeserializer(
+            final @NotNull SimpleModule module,
+            final @NotNull StdDeserializer<?> deserializer
+    ) {
+        Class<T> type = (Class<T>) deserializer.handledType();
+        module.addDeserializer(type, (JsonDeserializer<? extends T>) deserializer);
+    }
+
+    private static void addCustomDeserializer(final @NotNull String deserializerName) {
+        try {
+            Reflect reflect = Reflect.on(JacksonUtils.class.getPackageName() + "." + deserializerName);
+            customDeserializers.add(l -> reflect.init(l).get());
+        } catch (ReflectException ignored) {
+            // Could not initialize deserializer because of missing module
+        }
+    }
+
     @RequiredArgsConstructor
     private static final class JacksonBeanDeserializerModifier extends BeanDeserializerModifier {
         private final @NotNull Logger logger;
 
         @Override
-        public BeanDeserializerBuilder updateBuilder(final DeserializationConfig config,
-                                                     final BeanDescription beanDescription,
-                                                     final BeanDeserializerBuilder builder) {
+        public BeanDeserializerBuilder updateBuilder(
+                final DeserializationConfig config,
+                final BeanDescription beanDescription,
+                final BeanDeserializerBuilder builder
+        ) {
             Iterator<SettableBeanProperty> it = builder.getProperties();
             while (it.hasNext()) {
                 SettableBeanProperty property = it.next();
@@ -141,10 +149,12 @@ final class JacksonUtils {
         }
 
         @Override
-        public JsonDeserializer<?> modifyMapDeserializer(final DeserializationConfig config,
-                                                         final MapType type,
-                                                         final BeanDescription beanDesc,
-                                                         final JsonDeserializer<?> deserializer) {
+        public JsonDeserializer<?> modifyMapDeserializer(
+                final DeserializationConfig config,
+                final MapType type,
+                final BeanDescription beanDesc,
+                final JsonDeserializer<?> deserializer
+        ) {
             if (deserializer instanceof MapDeserializer)
                 return new NonNullKeyMapDeserializer((MapDeserializer) deserializer);
             else return deserializer;
@@ -153,13 +163,16 @@ final class JacksonUtils {
     }
 
     @RequiredArgsConstructor
-    private static final class JacksonBeanSerializerModifier<W extends CommentPropertyWriter> extends BeanSerializerModifier {
+    private static final class JacksonBeanSerializerModifier<W extends CommentPropertyWriter>
+            extends BeanSerializerModifier {
         private final @NotNull Class<W> commentPropertyWriterType;
 
         @Override
-        public List<BeanPropertyWriter> changeProperties(final SerializationConfig config,
-                                                         final BeanDescription beanDescription,
-                                                         final List<BeanPropertyWriter> beanProperties) {
+        public List<BeanPropertyWriter> changeProperties(
+                final SerializationConfig config,
+                final BeanDescription beanDescription,
+                final List<BeanPropertyWriter> beanProperties
+        ) {
             for (int i = 0; i < beanProperties.size(); i++) {
                 BeanPropertyWriter beanProperty = beanProperties.get(i);
                 Comment comment = beanProperty.getAnnotation(Comment.class);

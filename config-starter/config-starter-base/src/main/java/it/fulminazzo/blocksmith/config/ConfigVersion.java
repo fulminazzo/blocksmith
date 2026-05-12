@@ -61,7 +61,10 @@ public class ConfigVersion {
      * @param data           the data
      * @return the updated data
      */
-    public @NotNull Map<String, Object> applyMigrations(final double currentVersion, @NotNull Map<String, Object> data) {
+    public @NotNull Map<String, Object> applyMigrations(
+            final double currentVersion,
+            @NotNull Map<String, Object> data
+    ) {
         for (double v : migrations.keySet()) {
             if (v <= currentVersion) continue;
             Function<Migration, Migration> migration = migrations.get(v);
@@ -77,7 +80,10 @@ public class ConfigVersion {
      * @param migration the migration logic
      * @return this object (for method chaining)
      */
-    public @NotNull ConfigVersion migrate(final double version, final @NotNull Function<Migration, Migration> migration) {
+    public @NotNull ConfigVersion migrate(
+            final double version,
+            final @NotNull Function<Migration, Migration> migration
+    ) {
         if (migrations.containsKey(version))
             throw new IllegalArgumentException("Migration already present for version " + version);
         migrations.put(version, migration);
@@ -93,7 +99,8 @@ public class ConfigVersion {
      */
     public static @NotNull Optional<ConfigVersion> getVersion(final @NotNull Class<?> type) {
         Reflect reflect = Reflect.on(type);
-        return reflect.getFields(f -> Modifier.isStatic(f.getModifiers()) && f.getType().equals(ConfigVersion.class))
+        return reflect.getFields(f -> Modifier.isStatic(f.getModifiers())
+                        && f.getType().equals(ConfigVersion.class))
                 .stream()
                 .findFirst()
                 .map(f -> reflect.get(f).get());

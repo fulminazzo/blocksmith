@@ -66,7 +66,9 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) {
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(
+            final @NotNull InputStream stream
+    ) {
         final LoaderOptions options = new LoaderOptions().setProcessComments(true);
         StreamReader reader = new StreamReader(new InputStreamReader(stream));
         Composer composer = new Composer(new ParserImpl(reader, options), new Resolver(), options);
@@ -77,39 +79,63 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
 
     @Override
     public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
-        return ConfigUtils.checkMap(delegate.load(data, type), yamlNamingConvention, ConfigUtils.javaNamingConvention);
+        return ConfigUtils.checkMap(
+                delegate.load(data, type),
+                yamlNamingConvention,
+                ConfigUtils.javaNamingConvention
+        );
     }
 
     @Override
     public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
-        return ConfigUtils.checkMap(delegate.load(file, type), yamlNamingConvention, ConfigUtils.javaNamingConvention);
+        return ConfigUtils.checkMap(
+                delegate.load(file, type),
+                yamlNamingConvention,
+                ConfigUtils.javaNamingConvention
+        );
     }
 
     @Override
     public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
-        return ConfigUtils.checkMap(delegate.load(stream, type), yamlNamingConvention, ConfigUtils.javaNamingConvention);
+        return ConfigUtils.checkMap(
+                delegate.load(stream, type),
+                yamlNamingConvention,
+                ConfigUtils.javaNamingConvention
+        );
     }
 
     @Override
     public <T> @NotNull String serialize(final @NotNull T configuration) throws IOException {
-        return delegate.serialize(ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention));
+        return delegate.serialize(
+                ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention)
+        );
     }
 
     @Override
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
-        delegate.store(file, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention));
+        delegate.store(
+                file,
+                ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention)
+        );
     }
 
     @Override
     public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
-        delegate.store(stream, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention));
+        delegate.store(
+                stream,
+                ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention)
+        );
     }
 
     private static @NotNull Map<String, List<String>> extractComments(final @NotNull MappingNode node) {
         final Map<String, List<String>> nodesComments = new HashMap<>();
         for (NodeTuple nodeTuple : node.getValue()) {
             ScalarNode keyNode = (ScalarNode) nodeTuple.getKeyNode();
-            String key = CaseConverter.convert(keyNode.getValue(), yamlNamingConvention, ConfigUtils.javaNamingConvention);
+            String key = CaseConverter.convert(
+                    keyNode.getValue(),
+                    yamlNamingConvention,
+                    ConfigUtils.javaNamingConvention
+            );
             @NotNull List<String> comments = extractComments(keyNode);
             if (!comments.isEmpty()) nodesComments.put(key, comments);
             Node value = nodeTuple.getValueNode();
@@ -145,14 +171,18 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
          * @param base    the base
          * @param comment the comment
          */
-        public YamlCommentPropertyWriter(final @NotNull BeanPropertyWriter base,
-                                         final @NotNull Comment comment) {
+        public YamlCommentPropertyWriter(
+                final @NotNull BeanPropertyWriter base,
+                final @NotNull Comment comment
+        ) {
             super(base, comment);
         }
 
         @Override
-        protected void writeComment(final @NotNull JsonGenerator generator,
-                                    final @NotNull Comment comment) {
+        protected void writeComment(
+                final @NotNull JsonGenerator generator,
+                final @NotNull Comment comment
+        ) {
             for (String t : CommentUtils.getText(comment))
                 Reflect.on(generator).invoke("_emit",
                         new CommentEvent(CommentType.BLOCK, " " + t, null, null)
@@ -164,6 +194,7 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
     /**
      * A special {@link YAMLFactory} that uses {@link SingleQuoteYAMLGenerator} as generator.
      */
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     static class SingleQuoteYAMLFactory extends YAMLFactory {
 
         /**
@@ -180,8 +211,15 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
         }
 
         @Override
-        protected YAMLGenerator _createGenerator(final Writer out,
-                                                 final IOContext context) throws IOException {
+        public YAMLFactory copy() {
+            return new SingleQuoteYAMLFactory(this);
+        }
+
+        @Override
+        protected YAMLGenerator _createGenerator(
+                final Writer out,
+                final IOContext context
+        ) throws IOException {
             int feats = _yamlGeneratorFeatures;
             if (_dumperOptions == null) {
                 return new SingleQuoteYAMLGenerator(context, _generatorFeatures, feats,
@@ -192,17 +230,13 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
             }
         }
 
-        @Override
-        public YAMLFactory copy() {
-            return new SingleQuoteYAMLFactory(this);
-        }
-
     }
 
     /**
      * A special {@link YAMLGenerator} that writes {@link String} values
      * in {@link DumperOptions.ScalarStyle#SINGLE_QUOTED} format.
      */
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     static class SingleQuoteYAMLGenerator extends YAMLGenerator {
 
         /**
@@ -217,13 +251,15 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
          * @param version        the version
          * @throws IOException the io exception
          */
-        public SingleQuoteYAMLGenerator(final IOContext context,
-                                        final int jsonFeatures,
-                                        final int yamlFeatures,
-                                        final StringQuotingChecker quotingChecker,
-                                        final ObjectCodec codec,
-                                        final Writer out,
-                                        final DumperOptions.Version version) throws IOException {
+        public SingleQuoteYAMLGenerator(
+                final IOContext context,
+                final int jsonFeatures,
+                final int yamlFeatures,
+                final StringQuotingChecker quotingChecker,
+                final ObjectCodec codec,
+                final Writer out,
+                final DumperOptions.Version version
+        ) throws IOException {
             super(context, jsonFeatures, yamlFeatures, quotingChecker, codec, out, version);
         }
 
@@ -239,20 +275,24 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
          * @param dumperOptions  the dumper options
          * @throws IOException the io exception
          */
-        public SingleQuoteYAMLGenerator(final IOContext context,
-                                        final int jsonFeatures,
-                                        final int yamlFeatures,
-                                        final StringQuotingChecker quotingChecker,
-                                        final ObjectCodec codec,
-                                        final Writer out,
-                                        final DumperOptions dumperOptions) throws IOException {
+        public SingleQuoteYAMLGenerator(
+                final IOContext context,
+                final int jsonFeatures,
+                final int yamlFeatures,
+                final StringQuotingChecker quotingChecker,
+                final ObjectCodec codec,
+                final Writer out,
+                final DumperOptions dumperOptions
+        ) throws IOException {
             super(context, jsonFeatures, yamlFeatures, quotingChecker, codec, out, dumperOptions);
         }
 
         @Override
-        protected void _writeScalar(final @NotNull String value,
-                                    final @NotNull String type,
-                                    @NotNull DumperOptions.ScalarStyle style) throws IOException {
+        protected void _writeScalar(
+                final @NotNull String value,
+                final @NotNull String type,
+                @NotNull DumperOptions.ScalarStyle style
+        ) throws IOException {
             if (type.equals("string") && style == DumperOptions.ScalarStyle.DOUBLE_QUOTED)
                 style = DumperOptions.ScalarStyle.SINGLE_QUOTED;
             super._writeScalar(value, type, style);

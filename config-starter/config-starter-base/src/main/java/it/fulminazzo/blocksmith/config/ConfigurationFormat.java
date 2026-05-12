@@ -28,6 +28,27 @@ public enum ConfigurationFormat {
     @NotNull String fileExtension;
 
     /**
+     * Checks if the file name matches the current format.
+     *
+     * @param fileName the file name
+     * @return {@code true} if it matches
+     */
+    public boolean matches(final @NotNull String fileName) {
+        return fileName.endsWith("." + fileExtension);
+    }
+
+    /**
+     * Gets the corresponding file with the extension of the current format.
+     *
+     * @param parentDir the parent folder
+     * @param fileName  the file name
+     * @return the file
+     */
+    public @NotNull File getFile(final @NotNull File parentDir, final @NotNull String fileName) {
+        return new File(parentDir, fileName + "." + fileExtension);
+    }
+
+    /**
      * Gets the adapter for the corresponding format.
      *
      * @param logger the logger
@@ -50,32 +71,11 @@ public enum ConfigurationFormat {
                     type.toLowerCase()
             );
             throw new IllegalStateException(
-                    String.format("Could not find suitable %s for %s. ", ConfigurationAdapter.class.getSimpleName(), type) +
-                            String.format("Please check that the module %s is correctly installed.", moduleName)
+                    String.format("Could not find suitable %s for %s. ",
+                            ConfigurationAdapter.class.getSimpleName(), type)
+                            + String.format("Please check that the module %s is correctly installed.", moduleName)
             );
         }
-    }
-
-    /**
-     * Checks if the file name matches the current format.
-     *
-     * @param fileName the file name
-     * @return {@code true} if it matches
-     */
-    public boolean matches(final @NotNull String fileName) {
-        return fileName.endsWith("." + fileExtension);
-    }
-
-    /**
-     * Gets the corresponding file with the extension of the current format.
-     *
-     * @param parentDir the parent folder
-     * @param fileName  the file name
-     * @return the file
-     */
-    public @NotNull File getFile(final @NotNull File parentDir,
-                                 final @NotNull String fileName) {
-        return new File(parentDir, fileName + "." + fileExtension);
     }
 
     /**

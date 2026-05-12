@@ -34,7 +34,9 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) throws IOException {
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(
+            final @NotNull InputStream stream
+    ) throws IOException {
         return toCommentedMap(stream);
     }
 
@@ -68,11 +70,15 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
         delegate.store(stream, configuration);
     }
 
-    private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull InputStream inputStream) throws IOException {
+    private static @NotNull Map<String, List<String>> toCommentedMap(
+            final @NotNull InputStream inputStream
+    ) throws IOException {
         final Map<String, List<String>> keysComments = new HashMap<>();
         List<String> currentComment = new ArrayList<>();
-        try (InputStreamReader streamReader = new InputStreamReader(inputStream);
-             BufferedReader reader = new BufferedReader(streamReader)) {
+        try (
+                InputStreamReader streamReader = new InputStreamReader(inputStream);
+                BufferedReader reader = new BufferedReader(streamReader)
+        ) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String identifier = getCommentIdentifier(line);
@@ -114,14 +120,18 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
          * @param base    the base
          * @param comment the comment
          */
-        public PropertiesCommentPropertyWriter(final @NotNull BeanPropertyWriter base,
-                                               final @NotNull Comment comment) {
+        public PropertiesCommentPropertyWriter(
+                final @NotNull BeanPropertyWriter base,
+                final @NotNull Comment comment
+        ) {
             super(base, comment);
         }
 
         @Override
-        protected void writeComment(final @NotNull JsonGenerator generator,
-                                    final @NotNull Comment comment) throws IOException {
+        protected void writeComment(
+                final @NotNull JsonGenerator generator,
+                final @NotNull Comment comment
+        ) throws IOException {
             for (String t : CommentUtils.getText(comment))
                 generator.writeRaw(String.format("# %s\n", t));
         }

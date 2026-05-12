@@ -24,7 +24,8 @@ public interface BaseConfigurationAdapter {
      * @param data the raw data
      * @return the load configuration with comments
      */
-    default @NotNull Map<@NotNull CommentKey, @Nullable Object> loadWithComments(final @NotNull String data) throws IOException {
+    default @NotNull Map<@NotNull CommentKey, @Nullable Object> loadWithComments(final @NotNull String data)
+            throws IOException {
         return loadWithComments(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
     }
 
@@ -36,7 +37,8 @@ public interface BaseConfigurationAdapter {
      * @param file the file
      * @return the load configuration with comments
      */
-    default @NotNull Map<@NotNull CommentKey, @Nullable Object> loadWithComments(final @NotNull File file) throws IOException {
+    default @NotNull Map<@NotNull CommentKey, @Nullable Object> loadWithComments(final @NotNull File file)
+            throws IOException {
         try (InputStream inputStream = new FileInputStream(file)) {
             return loadWithComments(inputStream);
         }
@@ -51,7 +53,8 @@ public interface BaseConfigurationAdapter {
      * @return the load configuration with comments
      */
     @SuppressWarnings("unchecked")
-    default @NotNull Map<@NotNull CommentKey, @Nullable Object> loadWithComments(final @NotNull InputStream stream) throws IOException {
+    default @NotNull Map<@NotNull CommentKey, @Nullable Object> loadWithComments(final @NotNull InputStream stream)
+            throws IOException {
         InputStream buffered = new ByteArrayInputStream(stream.readAllBytes());
         Map<String, Object> data = load(buffered, Map.class);
         buffered.reset();
@@ -81,7 +84,8 @@ public interface BaseConfigurationAdapter {
      * @param data the raw data
      * @return the comments
      */
-    default @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull String data) throws IOException {
+    default @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull String data)
+            throws IOException {
         return loadComments(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
     }
 
@@ -107,7 +111,8 @@ public interface BaseConfigurationAdapter {
      * @param file the file
      * @return the comments
      */
-    default @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull File file) throws IOException {
+    default @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull File file)
+            throws IOException {
         try (InputStream inputStream = new FileInputStream(file)) {
             return loadComments(inputStream);
         }
@@ -135,7 +140,8 @@ public interface BaseConfigurationAdapter {
      * @param stream the stream of data to load from
      * @return the comments
      */
-    @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) throws IOException;
+    @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream)
+            throws IOException;
 
     /**
      * Attempts to load the configuration to the specified type.
@@ -187,7 +193,8 @@ public interface BaseConfigurationAdapter {
      * @return the loaded configuration
      * @throws IOException in case of any errors
      */
-    default <T> @NotNull T loadFromResource(final @NotNull String resource, final @NotNull Class<T> type) throws IOException {
+    default <T> @NotNull T loadFromResource(final @NotNull String resource, final @NotNull Class<T> type)
+            throws IOException {
         return load(ResourceUtils.getResource(BaseConfigurationAdapter.class.getClassLoader(), resource), type);
     }
 
@@ -234,9 +241,11 @@ public interface BaseConfigurationAdapter {
      * @return the loaded configuration
      * @throws IOException in case of any errors
      */
-    default <T> @NotNull T extractAndLoad(final @NotNull String resource,
-                                          final @NotNull File directory,
-                                          final @NotNull Class<T> type) throws IOException {
+    default <T> @NotNull T extractAndLoad(
+            final @NotNull String resource,
+            final @NotNull File directory,
+            final @NotNull Class<T> type
+    ) throws IOException {
         File file = ResourceUtils.extractIfAbsent(BaseConfigurationAdapter.class.getClassLoader(), resource, directory);
         return load(file, type);
     }

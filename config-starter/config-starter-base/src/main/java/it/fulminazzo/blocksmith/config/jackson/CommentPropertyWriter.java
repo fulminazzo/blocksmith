@@ -21,18 +21,12 @@ public abstract class CommentPropertyWriter extends BeanPropertyWriter {
      * @param base    the base
      * @param comment the comment
      */
-    public CommentPropertyWriter(final @NotNull BeanPropertyWriter base,
-                                 final @NotNull Comment comment) {
+    public CommentPropertyWriter(
+            final @NotNull BeanPropertyWriter base,
+            final @NotNull Comment comment
+    ) {
         super(base);
         this.comment = comment;
-    }
-
-    @Override
-    public void serializeAsField(final Object bean,
-                                 final JsonGenerator generator,
-                                 final SerializerProvider provider) throws Exception {
-        writeComment(generator, comment);
-        super.serializeAsField(bean, generator, provider);
     }
 
     /**
@@ -42,7 +36,19 @@ public abstract class CommentPropertyWriter extends BeanPropertyWriter {
      * @param comment   the comment
      * @throws IOException in case of any errors
      */
-    protected abstract void writeComment(final @NotNull JsonGenerator generator,
-                                         final @NotNull Comment comment) throws IOException;
+    protected abstract void writeComment(
+            final @NotNull JsonGenerator generator,
+            final @NotNull Comment comment
+    ) throws IOException;
+
+    @Override
+    public void serializeAsField(
+            final Object bean,
+            final JsonGenerator generator,
+            final SerializerProvider provider
+    ) throws Exception {
+        writeComment(generator, comment);
+        super.serializeAsField(bean, generator, provider);
+    }
 
 }

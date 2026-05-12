@@ -53,25 +53,51 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         writer.setIndentArrayElementsPredicate(l -> !l.isEmpty());
     }
 
+    private <T> @NotNull Config toNightConfig(@NotNull T configuration) {
+        configuration = ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, tomlNamingConvention);
+        CommentedConfig config = (CommentedConfig) ObjectSerializer.standard()
+                .serialize(configuration, CommentedConfig::inMemory);
+        removeNulls(config);
+        NightConfigUtils.fixPropertyNames(config);
+        NightConfigUtils.setComments(configuration, config);
+        ConfigVersion.getVersion(configuration.getClass())
+                .ifPresent(v -> config.set(ConfigVersion.PROPERTY_NAME, v.getVersion()));
+        return config;
+    }
+
     @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) {
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(
+            final @NotNull InputStream stream
+    ) {
         CommentedConfig config = parser.parse(stream);
         return toCommentedMap(config.getComments());
     }
 
     @Override
     public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
-        return ConfigUtils.checkMap(delegate.load(data, type), tomlNamingConvention, ConfigUtils.javaNamingConvention);
+        return ConfigUtils.checkMap(
+                delegate.load(data, type),
+                tomlNamingConvention,
+                ConfigUtils.javaNamingConvention
+        );
     }
 
     @Override
     public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
-        return ConfigUtils.checkMap(delegate.load(file, type), tomlNamingConvention, ConfigUtils.javaNamingConvention);
+        return ConfigUtils.checkMap(
+                delegate.load(file, type),
+                tomlNamingConvention,
+                ConfigUtils.javaNamingConvention
+        );
     }
 
     @Override
     public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
-        return ConfigUtils.checkMap(delegate.load(stream, type), tomlNamingConvention, ConfigUtils.javaNamingConvention);
+        return ConfigUtils.checkMap(
+                delegate.load(stream, type),
+                tomlNamingConvention,
+                ConfigUtils.javaNamingConvention
+        );
     }
 
     @Override
@@ -98,10 +124,42 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         }
     }
 
-    private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull Map<String, UnmodifiableCommentedConfig.CommentNode> nodes) {
+    /**
+     * Manually indents arrays in the given TOML file.
+     *
+     * @param file the file
+     */
+    static void indentArrays(final @NotNull File file) throws IOException {
+        List<String> lines = new ArrayList<>();
+        try (
+                FileReader reader = new FileReader(file);
+                BufferedReader bufferedReader = new BufferedReader(reader)
+        ) {
+            bufferedReader.lines().forEach(lines::add);
+        }
+        try (
+                FileWriter writer = new FileWriter(file);
+                BufferedWriter bufferedWriter = new BufferedWriter(writer)
+        ) {
+            String indent = "";
+            for (String line : lines) {
+                if (!indent.isEmpty() && line.matches(" *] *")) indent = "";
+                bufferedWriter.write(indent + line + "\n");
+                if (line.matches("^ *[A-Za-z.0-9_-]+ *= *\\[ *$")) indent = "    ";
+            }
+        }
+    }
+
+    private static @NotNull Map<String, List<String>> toCommentedMap(
+            final @NotNull Map<String, UnmodifiableCommentedConfig.CommentNode> nodes
+    ) {
         final Map<String, List<String>> keysComments = new HashMap<>();
         for (Map.Entry<String, UnmodifiableCommentedConfig.CommentNode> entry : nodes.entrySet()) {
-            String key = CaseConverter.convert(entry.getKey(), tomlNamingConvention, it.fulminazzo.blocksmith.config.ConfigUtils.javaNamingConvention);
+            String key = CaseConverter.convert(
+                    entry.getKey(),
+                    tomlNamingConvention,
+                    it.fulminazzo.blocksmith.config.ConfigUtils.javaNamingConvention
+            );
             UnmodifiableCommentedConfig.CommentNode value = entry.getValue();
             String comment = value.getComment();
             if (comment != null) keysComments.put(key, Arrays.stream(comment.split("\n"))
@@ -115,43 +173,11 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         return keysComments;
     }
 
-    private <T> @NotNull Config toNightConfig(@NotNull T configuration) {
-        configuration = ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, tomlNamingConvention);
-        CommentedConfig config = (CommentedConfig) ObjectSerializer.standard().serialize(configuration, CommentedConfig::inMemory);
-        removeNulls(config);
-        NightConfigUtils.fixPropertyNames(config);
-        NightConfigUtils.setComments(configuration, config);
-        ConfigVersion.getVersion(configuration.getClass()).ifPresent(v -> config.set(ConfigVersion.PROPERTY_NAME, v.getVersion()));
-        return config;
-    }
-
     private static void removeNulls(final @NotNull Config config) {
         for (Config.Entry entry : new ArrayList<>(config.entrySet())) {
             Object value = entry.getValue();
             if (value == null) config.remove(entry.getKey());
             if (value instanceof Config) removeNulls((Config) value);
-        }
-    }
-
-    /**
-     * Manually indents arrays in the given TOML file.
-     *
-     * @param file the file
-     */
-    static void indentArrays(final @NotNull File file) throws IOException {
-        List<String> lines = new ArrayList<>();
-        try (FileReader reader = new FileReader(file);
-             BufferedReader bufferedReader = new BufferedReader(reader)) {
-            bufferedReader.lines().forEach(lines::add);
-        }
-        try (FileWriter writer = new FileWriter(file);
-             BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
-            String indent = "";
-            for (String line : lines) {
-                if (!indent.isEmpty() && line.matches(" *] *")) indent = "";
-                bufferedWriter.write(indent + line + "\n");
-                if (line.matches("^ *[A-Za-z.0-9_-]+ *= *\\[ *$")) indent = "    ";
-            }
         }
     }
 

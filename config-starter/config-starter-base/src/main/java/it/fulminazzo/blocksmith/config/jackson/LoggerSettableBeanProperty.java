@@ -30,49 +30,20 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
      * @param logger   the logger to warn about any errors
      * @param field    the field that this property represents
      */
-    public LoggerSettableBeanProperty(final @NotNull SettableBeanProperty delegate,
-                                      @NotNull Logger logger,
-                                      @NotNull AnnotatedField field) {
+    public LoggerSettableBeanProperty(
+            final @NotNull SettableBeanProperty delegate,
+            final @NotNull Logger logger,
+            final @NotNull AnnotatedField field
+    ) {
         super(delegate);
         this.logger = logger;
         this.field = field;
     }
 
-    @Override
-    protected SettableBeanProperty withDelegate(final @NotNull SettableBeanProperty delegate) {
-        return new LoggerSettableBeanProperty(delegate, logger, field);
-    }
-
-    @Override
-    public void set(final @NotNull Object instance, final Object value) throws IOException {
-        Validator.validateField(field.getAnnotated(), value);
-        super.set(instance, value);
-    }
-
-    @Override
-    public void deserializeAndSet(final @NotNull JsonParser parser,
-                                  final @NotNull DeserializationContext context,
-                                  final @NotNull Object instance) {
-        deserializeSetAndReturn(parser, context, instance);
-    }
-
-    @Override
-    public Object deserializeSetAndReturn(final @NotNull JsonParser parser,
-                                          final @NotNull DeserializationContext context,
-                                          final @NotNull Object instance) {
-        try {
-            Object value = deserialize(parser, context);
-            set(instance, value);
-            return value;
-        } catch (DeserializationException e) {
-            return handleDeserializationException(instance, e);
-        } catch (Exception e) {
-            return handleGeneralException(parser, instance, e);
-        }
-    }
-
-    private Object handleDeserializationException(final @NotNull Object instance,
-                                                  final @NotNull DeserializationException exception) {
+    private Object handleDeserializationException(
+            final @NotNull Object instance,
+            final @NotNull DeserializationException exception
+    ) {
         logger.warn(exception.getMessage()
                 .replace("<name>", field.getName())
                 .replace("<type>", field.getRawType().getCanonicalName())
@@ -80,9 +51,11 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
         return getAndLogDefaultValueUsage(instance);
     }
 
-    private Object handleGeneralException(final @NotNull JsonParser parser,
-                                          final @NotNull Object instance,
-                                          final @NotNull Exception exception) {
+    private Object handleGeneralException(
+            final @NotNull JsonParser parser,
+            final @NotNull Object instance,
+            final @NotNull Exception exception
+    ) {
         String path = JacksonUtils.getCurrentPath(parser);
         String message = exception.getMessage();
         if (message == null) message = "unknown error";
@@ -100,6 +73,43 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
         return defaultValue;
     }
 
+    @Override
+    public void deserializeAndSet(
+            final @NotNull JsonParser parser,
+            final @NotNull DeserializationContext context,
+            final @NotNull Object instance
+    ) {
+        deserializeSetAndReturn(parser, context, instance);
+    }
+
+    @Override
+    public Object deserializeSetAndReturn(
+            final @NotNull JsonParser parser,
+            final @NotNull DeserializationContext context,
+            final @NotNull Object instance
+    ) {
+        try {
+            Object value = deserialize(parser, context);
+            set(instance, value);
+            return value;
+        } catch (DeserializationException e) {
+            return handleDeserializationException(instance, e);
+        } catch (Exception e) {
+            return handleGeneralException(parser, instance, e);
+        }
+    }
+
+    @Override
+    public void set(final @NotNull Object instance, final Object value) throws IOException {
+        Validator.validateField(field.getAnnotated(), value);
+        super.set(instance, value);
+    }
+
+    @Override
+    protected SettableBeanProperty withDelegate(final @NotNull SettableBeanProperty delegate) {
+        return new LoggerSettableBeanProperty(delegate, logger, field);
+    }
+
     /**
      * Represents an exception during deserialization.
      */
@@ -111,8 +121,10 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
          * @param message   the message
          * @param arguments the arguments to format in the message
          */
-        public DeserializationException(final @NotNull String message,
-                                        final Object @NotNull ... arguments) {
+        public DeserializationException(
+                final @NotNull String message,
+                final Object @NotNull ... arguments
+        ) {
             super(String.format(message, arguments));
         }
 
