@@ -1,4 +1,5 @@
 # Example comment
+#
 comments_enabled = false
 # This comment should be
 # Multiline!

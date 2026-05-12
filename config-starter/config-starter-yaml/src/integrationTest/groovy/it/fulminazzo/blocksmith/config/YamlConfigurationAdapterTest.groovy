@@ -1,6 +1,9 @@
 package it.fulminazzo.blocksmith.config
 
 import groovy.util.logging.Slf4j
+import org.yaml.snakeyaml.comments.CommentLine
+import org.yaml.snakeyaml.comments.CommentType
+import org.yaml.snakeyaml.nodes.Node
 
 @Slf4j
 class YamlConfigurationAdapterTest extends ConfigurationAdapterTest {
@@ -11,6 +14,27 @@ class YamlConfigurationAdapterTest extends ConfigurationAdapterTest {
 
         then:
         actual == [:]
+    }
+
+    def 'test that extractComments reads inline comments'() {
+        given:
+        def node = Mock(Node)
+        node.inLineComments >> inlineComments
+
+        when:
+        def comments = YamlConfigurationAdapter.extractComments(node)
+
+        then:
+        comments == expected
+
+        where:
+        inlineComments                                                    || expected
+        null                                                              || []
+        [
+                new CommentLine(null, null, 'Hello', CommentType.BLOCK),
+                new CommentLine(null, null, 'mars', CommentType.IN_LINE),
+                new CommentLine(null, null, 'world', CommentType.BLOCK)
+        ]                                                                 || ['Hello', 'world']
     }
 
     @Override

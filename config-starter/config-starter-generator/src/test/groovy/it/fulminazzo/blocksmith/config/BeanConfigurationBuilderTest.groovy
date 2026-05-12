@@ -2,11 +2,13 @@ package it.fulminazzo.blocksmith.config
 
 import com.github.javaparser.StaticJavaParser
 import com.github.javaparser.ast.NodeList
+import com.github.javaparser.ast.body.BodyDeclaration
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.body.VariableDeclarator
 import com.github.javaparser.ast.expr.DoubleLiteralExpr
+import com.github.javaparser.ast.expr.Expression
 import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.ast.expr.NameExpr
 import spock.lang.Specification
@@ -84,7 +86,7 @@ class BeanConfigurationBuilderTest extends Specification {
     def 'test that parseNestedConfig of existing field and getter correctly updates nodes and nested class'() {
         given:
         def key = new CommentKey('nested', ['Updated comment'])
-        def data = [(new CommentKey('value', [])): 1]
+        def data = [(new CommentKey('value', [])) : 1]
 
         and:
         def f = new FieldDeclaration()
@@ -157,7 +159,7 @@ class BeanConfigurationBuilderTest extends Specification {
     def 'test that parseNestedConfig of non-existing field and getter correctly creates nodes and nested class'() {
         given:
         def key = new CommentKey('nested', ['Nested config'])
-        def data = [(new CommentKey('value', [])): 1]
+        def data = [(new CommentKey('value', [])) : 1]
 
         when:
         builder.parseNestedConfig(key, data)
@@ -393,6 +395,90 @@ class BeanConfigurationBuilderTest extends Specification {
         new String[0]                                || 'new String[0]'
         new String[0][0]                             || 'new String[0][0]'
         new String[][]{new String[0], new String[0]} || 'new String[][]{new String[0], new String[0]}'
+    }
+
+    def 'test that getMemberPriority of #type returns #expected'() {
+        given:
+        def member = Mock(type)
+
+        expect:
+        BeanConfigurationBuilder.getMemberPriority(member) == expected
+
+        where:
+        type                        || expected
+        FieldDeclaration            || 1
+        MethodDeclaration           || 2
+        ClassOrInterfaceDeclaration || 3
+        BodyDeclaration             || 4
+    }
+
+    def 'test that isValidVersionInitializer does not throw if method call name matches but arguments are #arguments'() {
+        given:
+        def expression = Mock(MethodCallExpr)
+        expression.scope >> {
+            def scope = Mock(NameExpr)
+            scope.nameExpr >> true
+            scope.asNameExpr() >> scope
+            scope.nameAsString >> Object.simpleName
+            return Optional.of(scope)
+        }
+
+        and:
+        expression.nameAsString >> 'of'
+
+        and:
+        expression.arguments >> new NodeList<>([Mock(Expression)] * arguments)
+
+        expect:
+        !BeanConfigurationBuilder.isValidVersionInitializer(Object, expression)
+
+        where:
+        arguments << [0, 2, 4]
+    }
+
+    def 'test that isValidVersionInitializer does not throw if method call name is not of'() {
+        given:
+        def expression = Mock(MethodCallExpr)
+        expression.scope >> {
+            def scope = Mock(NameExpr)
+            scope.nameExpr >> true
+            scope.asNameExpr() >> scope
+            scope.nameAsString >> Object.simpleName
+            return Optional.of(scope)
+        }
+
+        and:
+        expression.nameAsString >> 'somethingElse'
+
+        expect:
+        !BeanConfigurationBuilder.isValidVersionInitializer(Object, expression)
+    }
+
+    def 'test that isValidVersionInitializer does not throw if scope name is #name'() {
+        given:
+        def expression = Mock(MethodCallExpr)
+        expression.scope >> {
+            def scope = Mock(NameExpr)
+            scope.nameExpr >> (name != null)
+            scope.asNameExpr() >> scope
+            scope.nameAsString >> name
+            return Optional.of(scope)
+        }
+
+        expect:
+        !BeanConfigurationBuilder.isValidVersionInitializer(Object, expression)
+
+        where:
+        name << [null, 'Mock']
+    }
+
+    def 'test that isValidVersionInitializer does not throw if scope is missing'() {
+        given:
+        def expression = Mock(MethodCallExpr)
+        expression.scope >> Optional.empty()
+
+        expect:
+        !BeanConfigurationBuilder.isValidVersionInitializer(Object, expression)
     }
 
 }

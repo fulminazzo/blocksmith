@@ -2,7 +2,11 @@ package it.fulminazzo.blocksmith.config.jackson
 
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonStreamContext
+import com.fasterxml.jackson.databind.BeanDescription
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationConfig
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter
+import it.fulminazzo.blocksmith.config.Comment
 import org.slf4j.Logger
 import spock.lang.Specification
 import spock.mock.MockMakers
@@ -122,7 +126,6 @@ class JacksonUtilsTest extends Specification {
         def parser = Mock(JsonParser)
 
         and:
-
         def root = Mock(JsonStreamContext, mockMaker : MockMakers.mockito)
         root.inArray() >> false
         root.currentName >> null
@@ -133,6 +136,40 @@ class JacksonUtilsTest extends Specification {
 
         then:
         path == ''
+    }
+
+    def 'test that JacksonBeanSerializerModifier replaces a BeanPropertyWriter with its comment if available'() {
+        given:
+        def modifier = new JacksonUtils.JacksonBeanSerializerModifier(MockCommentPropertyWrapper)
+
+        and:
+        def first = Mock(BeanPropertyWriter)
+        def second = Mock(BeanPropertyWriter) {
+            it.getAnnotation(Comment) >> {
+                def comment = Mock(Comment)
+                comment.value() >> new String[0]
+                return comment
+            }
+        }
+        def third = Mock(BeanPropertyWriter) {
+            it.getAnnotation(Comment) >> {
+                def comment = Mock(Comment)
+                comment.value() >> new String[]{'Hello', 'world!'}
+                return comment
+            }
+        }
+        def properties = [first, second, third]
+
+        when:
+        modifier.changeProperties(Mock(SerializationConfig), Mock(BeanDescription), properties)
+
+        then:
+        properties[0] == first
+        properties[1] == second
+
+        and:
+        def injected = properties[2]
+        (injected instanceof MockCommentPropertyWrapper)
     }
 
 }

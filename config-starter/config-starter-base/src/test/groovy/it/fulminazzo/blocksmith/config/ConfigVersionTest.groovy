@@ -65,4 +65,17 @@ class ConfigVersionTest extends Specification {
         thrown(IllegalArgumentException)
     }
 
+    def 'test that getVersion of #type returns #expected'() {
+        when:
+        def actual = ConfigVersion.getVersion(type).orElse(null)
+
+        then:
+        actual == expected
+
+        where:
+        type                 || expected
+        ConfigVersionAbsent  || null
+        ConfigVersionPresent || ConfigVersion.of(1.0)
+    }
+
 }
