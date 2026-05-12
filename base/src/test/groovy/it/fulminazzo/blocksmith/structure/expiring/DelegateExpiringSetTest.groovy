@@ -6,7 +6,7 @@ class DelegateExpiringSetTest extends Specification {
     private static final long ttl = 1_000L
 
     private static final String value = 'Hello, world!'
-    private static final Object PRESENT = DelegateExpiringSet.PRESENT
+    private static final Object present = DelegateExpiringSet.present
 
     private DelegateExpiringSet<String> set
     private ExpiringMap<String, Object> internal
@@ -60,7 +60,7 @@ class DelegateExpiringSetTest extends Specification {
 
     def 'test that remove works'() {
         given:
-        internal[value] = PRESENT
+        internal[value] = present
 
         when:
         def result = set.remove(value)
@@ -83,7 +83,7 @@ class DelegateExpiringSetTest extends Specification {
 
     def 'test that containsAll works'() {
         given:
-        internal[value] = PRESENT
+        internal[value] = present
 
         when:
         def result = set.containsAll(collection)
@@ -149,7 +149,7 @@ class DelegateExpiringSetTest extends Specification {
 
     def 'test that set is equal to self'() {
         given:
-        internal['Hello'] = PRESENT
+        internal['Hello'] = present
 
         expect:
         Object.getMethod('equals', Object).invoke(set, set)
@@ -160,8 +160,8 @@ class DelegateExpiringSetTest extends Specification {
 
     def 'test that equals with #object returns #expected'() {
         given:
-        internal.put('Hello', PRESENT, 10_000L)
-        internal.put('Goodbye', PRESENT, 1L)
+        internal.put('Hello', present, 10_000L)
+        internal.put('Goodbye', present, 1L)
 
         and:
         sleepTtl()
@@ -182,14 +182,14 @@ class DelegateExpiringSetTest extends Specification {
         new DelegateExpiringSet(new MockExpiringMap() {
 
             {
-                put('Hello', PRESENT, 10_000L)
+                put('Hello', present, 10_000L)
             }
 
         })                                       || true
         new DelegateExpiringSet(new MockExpiringMap() {
 
             {
-                put('Goodbye', PRESENT, 10_000L)
+                put('Goodbye', present, 10_000L)
             }
 
         })                                       || false
@@ -197,9 +197,9 @@ class DelegateExpiringSetTest extends Specification {
 
     def 'test that toString correctly prints expired entries'() {
         given:
-        internal.put('Hello', PRESENT, ttl)
-        internal.put('Goodbye', PRESENT, 1L)
-        internal.put('Ciao', PRESENT, ExpiringEntry.NEVER_EXPIRE)
+        internal.put('Hello', present, ttl)
+        internal.put('Goodbye', present, 1L)
+        internal.put('Ciao', present, ExpiringEntry.NEVER_EXPIRE)
 
         and:
         sleepTtl()
@@ -214,9 +214,9 @@ class DelegateExpiringSetTest extends Specification {
     def 'test that expiringEntries returns correct entries'() {
         given:
         def now = System.currentTimeMillis()
-        internal.put('Hello', PRESENT, ttl)
-        internal.put('Goodbye', PRESENT, 1L)
-        internal.put('Ciao', PRESENT, ExpiringEntry.NEVER_EXPIRE)
+        internal.put('Hello', present, ttl)
+        internal.put('Goodbye', present, 1L)
+        internal.put('Ciao', present, ExpiringEntry.NEVER_EXPIRE)
 
         when:
         def data = set.expiringEntries()
