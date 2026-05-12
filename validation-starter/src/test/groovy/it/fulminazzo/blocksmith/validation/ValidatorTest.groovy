@@ -8,18 +8,18 @@ import java.time.*
 
 @SuppressWarnings('NoJavaUtilDate')
 class ValidatorTest extends Specification {
-    private static final int TEST_TIME = 10
+    private static final int testTime = 10
 
-    private static final Validator VALIDATOR = Validator.instance
+    private static final Validator validator = Validator.instance
 
-    private static final NO_VALUES_ARRAY = new Object[0]
-    private static final EXCEED_VALUES_ARRAY = (1..6).toArray()
+    private static final noValuesArray = new Object[0]
+    private static final exceedValuesArray = (1..6).toArray()
 
     private static final char A = 'A'
     private static final char Z = 'Z'
 
     static {
-        VALIDATOR.register(Character, new ConstraintValidatorImpl((o) -> ((CharSequence) o).size() == 1, CharSequence))
+        validator.register(Character, new ConstraintValidatorImpl((o) -> ((CharSequence) o).size() == 1, CharSequence))
     }
 
     def 'test that validate method works'() {
@@ -173,7 +173,7 @@ class ValidatorTest extends Specification {
             toValidate = value()
 
         when:
-        VALIDATOR.validate(field, toValidate)
+        validator.validate(field, toValidate)
 
         then:
         noExceptionThrown()
@@ -354,56 +354,56 @@ class ValidatorTest extends Specification {
         'character'              | 'a'
         // After
         'afterDate'              | null
-        'afterDate'              | new Date(new Date().time + TEST_TIME * 1_000)
+        'afterDate'              | new Date(new Date().time + testTime * 1_000)
         'afterCalendar'          | null
-        'afterCalendar'          | Calendar.instance.add(Calendar.SECOND, TEST_TIME)
+        'afterCalendar'          | Calendar.instance.add(Calendar.SECOND, testTime)
         'afterTemporal'          | null
-        'afterTemporal'          | Instant.now().plusSeconds(TEST_TIME)
-        'afterTemporal'          | LocalTime.now().plusSeconds(TEST_TIME)
-        'afterTemporal'          | LocalDate.now().plusDays(TEST_TIME)
-        'afterTemporal'          | LocalDateTime.now().plusSeconds(TEST_TIME)
+        'afterTemporal'          | Instant.now().plusSeconds(testTime)
+        'afterTemporal'          | LocalTime.now().plusSeconds(testTime)
+        'afterTemporal'          | LocalDate.now().plusDays(testTime)
+        'afterTemporal'          | LocalDateTime.now().plusSeconds(testTime)
         // AfterOrNow
         'afterOrNowDate'         | null
         'afterOrNowDate'         | { new Date(new Date().time) }
-        'afterOrNowDate'         | { new Date(new Date().time + TEST_TIME * 1_000) }
+        'afterOrNowDate'         | { new Date(new Date().time + testTime * 1_000) }
         'afterOrNowCalendar'     | null
         'afterOrNowCalendar'     | { Calendar.instance }
-        'afterOrNowCalendar'     | { Calendar.instance.add(Calendar.SECOND, TEST_TIME) }
+        'afterOrNowCalendar'     | { Calendar.instance.add(Calendar.SECOND, testTime) }
         'afterOrNowTemporal'     | null
         'afterOrNowTemporal'     | { Instant.now() }
-        'afterOrNowTemporal'     | { Instant.now().plusSeconds(TEST_TIME) }
+        'afterOrNowTemporal'     | { Instant.now().plusSeconds(testTime) }
         'afterOrNowTemporal'     | { LocalTime.now() }
-        'afterOrNowTemporal'     | { LocalTime.now().plusSeconds(TEST_TIME) }
+        'afterOrNowTemporal'     | { LocalTime.now().plusSeconds(testTime) }
         'afterOrNowTemporal'     | { LocalDate.now() }
-        'afterOrNowTemporal'     | { LocalDate.now().plusDays(TEST_TIME) }
+        'afterOrNowTemporal'     | { LocalDate.now().plusDays(testTime) }
         'afterOrNowTemporal'     | { LocalDateTime.now() }
-        'afterOrNowTemporal'     | { LocalDateTime.now().plusSeconds(TEST_TIME) }
+        'afterOrNowTemporal'     | { LocalDateTime.now().plusSeconds(testTime) }
         // Before
         'beforeDate'             | null
-        'beforeDate'             | new Date(new Date().time - TEST_TIME * 1_000)
+        'beforeDate'             | new Date(new Date().time - testTime * 1_000)
         'beforeCalendar'         | null
-        'beforeCalendar'         | Calendar.instance.add(Calendar.SECOND, -TEST_TIME)
+        'beforeCalendar'         | Calendar.instance.add(Calendar.SECOND, -testTime)
         'beforeTemporal'         | null
-        'beforeTemporal'         | Instant.now().minusSeconds(TEST_TIME)
-        'beforeTemporal'         | LocalTime.now().minusSeconds(TEST_TIME)
-        'beforeTemporal'         | LocalDate.now().minusDays(TEST_TIME)
-        'beforeTemporal'         | LocalDateTime.now().minusSeconds(TEST_TIME)
+        'beforeTemporal'         | Instant.now().minusSeconds(testTime)
+        'beforeTemporal'         | LocalTime.now().minusSeconds(testTime)
+        'beforeTemporal'         | LocalDate.now().minusDays(testTime)
+        'beforeTemporal'         | LocalDateTime.now().minusSeconds(testTime)
         // BeforeOrNow
         'beforeOrNowDate'        | null
         'beforeOrNowDate'        | { new Date(new Date().time) }
-        'beforeOrNowDate'        | { new Date(new Date().time - TEST_TIME * 1_000) }
+        'beforeOrNowDate'        | { new Date(new Date().time - testTime * 1_000) }
         'beforeOrNowCalendar'    | null
         'beforeOrNowCalendar'    | { Calendar.instance }
-        'beforeOrNowCalendar'    | { Calendar.instance.add(Calendar.SECOND, -TEST_TIME) }
+        'beforeOrNowCalendar'    | { Calendar.instance.add(Calendar.SECOND, -testTime) }
         'beforeOrNowTemporal'    | null
         'beforeOrNowTemporal'    | { Instant.now() }
-        'beforeOrNowTemporal'    | { Instant.now().minusSeconds(TEST_TIME) }
+        'beforeOrNowTemporal'    | { Instant.now().minusSeconds(testTime) }
         'beforeOrNowTemporal'    | { LocalTime.now() }
-        'beforeOrNowTemporal'    | { LocalTime.now().minusSeconds(TEST_TIME) }
+        'beforeOrNowTemporal'    | { LocalTime.now().minusSeconds(testTime) }
         'beforeOrNowTemporal'    | { LocalDate.now() }
-        'beforeOrNowTemporal'    | { LocalDate.now().minusDays(TEST_TIME) }
+        'beforeOrNowTemporal'    | { LocalDate.now().minusDays(testTime) }
         'beforeOrNowTemporal'    | { LocalDateTime.now() }
-        'beforeOrNowTemporal'    | { LocalDateTime.now().minusSeconds(TEST_TIME) }
+        'beforeOrNowTemporal'    | { LocalDateTime.now().minusSeconds(testTime) }
     }
 
     def 'test that validate of field #fieldName and value #value throws'() {
@@ -411,7 +411,7 @@ class ValidatorTest extends Specification {
         def field = Fields.getDeclaredField(fieldName)
 
         when:
-        VALIDATOR.validate(field, value)
+        validator.validate(field, value)
 
         then:
         def e = thrown(ValidationException)
@@ -589,11 +589,11 @@ class ValidatorTest extends Specification {
                 String.format('size must be at least %3$s and at most %2$s elements long', 'a'.repeat(6), 5, 1), ['value' : 'a'.repeat(6), 'max' : 5, 'min' : 1])
         ]
         // Size (array)
-        'sizeArray'              | NO_VALUES_ARRAY || [new ConstraintViolation(NO_VALUES_ARRAY, 'error.validation.argument-exceeds-size',
-                String.format('size must be at least %3$s and at most %2$s elements long', Arrays.toString(NO_VALUES_ARRAY), 5, 1), ['value' : NO_VALUES_ARRAY, 'max' : 5, 'min' : 1])
+        'sizeArray'              | noValuesArray || [new ConstraintViolation(noValuesArray, 'error.validation.argument-exceeds-size',
+                String.format('size must be at least %3$s and at most %2$s elements long', Arrays.toString(noValuesArray), 5, 1), ['value' : noValuesArray, 'max' : 5, 'min' : 1])
         ]
-        'sizeArray'              | EXCEED_VALUES_ARRAY || [new ConstraintViolation(EXCEED_VALUES_ARRAY, 'error.validation.argument-exceeds-size',
-                String.format('size must be at least %3$s and at most %2$s elements long', Arrays.toString(EXCEED_VALUES_ARRAY), 5, 1), ['value' : EXCEED_VALUES_ARRAY, 'max' : 5, 'min' : 1])
+        'sizeArray'              | exceedValuesArray || [new ConstraintViolation(exceedValuesArray, 'error.validation.argument-exceeds-size',
+                String.format('size must be at least %3$s and at most %2$s elements long', Arrays.toString(exceedValuesArray), 5, 1), ['value' : exceedValuesArray, 'max' : 5, 'min' : 1])
         ]
         // Size (Collection)
         'sizeCollection'         | []                                       || [new ConstraintViolation([], 'error.validation.argument-exceeds-size',

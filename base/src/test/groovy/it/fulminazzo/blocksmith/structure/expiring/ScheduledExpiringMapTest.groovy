@@ -5,15 +5,15 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 
 class ScheduledExpiringMapTest extends ExpiringMapImplTest {
-    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor()
+    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor()
 
     void cleanupSpec() {
-        SCHEDULER.close()
+        scheduler.close()
     }
 
     @Override
     protected ExpiringMap<String, String> createMap() {
-        return new ScheduledExpiringMap<>(SCHEDULER, Duration.ofMillis(1L))
+        return new ScheduledExpiringMap<>(scheduler, Duration.ofMillis(1L))
     }
 
 }

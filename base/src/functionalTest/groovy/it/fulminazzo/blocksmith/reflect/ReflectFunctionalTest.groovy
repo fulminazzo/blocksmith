@@ -12,85 +12,85 @@ import java.util.function.Predicate
 
 @SuppressWarnings('GroovyAccessibility')
 class ReflectFunctionalTest extends Specification {
-    private static final Constructor<?> CONSTRUCTOR = Person.getDeclaredConstructor(String, Integer)
+    private static final Constructor<?> constructor = Person.getDeclaredConstructor(String, Integer)
 
     /*
      * TEST SUBJECTS
      */
-    private static final Field INTERFACE_STATIC_FIELD = Entity.getDeclaredField('ENTITIES_DEFAULT_NAME')
-    private static final Field SUPER_STATIC_FIELD = NamedEntity.getDeclaredField('defaultName')
-    private static final Field STATIC_FIELD = Person.getDeclaredField('defaultAge')
-    private static final Field SUPER_FIELD = NamedEntity.getDeclaredField('name')
-    private static final Field FIELD = Person.getDeclaredField('age')
+    private static final Field interfaceStaticField = Entity.getDeclaredField('ENTITIES_DEFAULT_NAME')
+    private static final Field superStaticField = NamedEntity.getDeclaredField('defaultName')
+    private static final Field staticField = Person.getDeclaredField('defaultAge')
+    private static final Field superField = NamedEntity.getDeclaredField('name')
+    private static final Field field = Person.getDeclaredField('age')
 
-    private static final Method INTERFACE_DEFAULT_METHOD_NO_ARGS = Entity.getDeclaredMethod('getUniqueId')
-    private static final Method INTERFACE_METHOD_NO_ARGS = Entity.getDeclaredMethod('getName')
-    private static final Method SUPER_STATIC_METHOD_NO_ARGS = NamedEntity.getDeclaredMethod('getDefaultName')
-    private static final Method STATIC_METHOD_NO_ARGS = Person.getDeclaredMethod('getDefaultAge')
-    private static final Method SUPER_METHOD_NO_ARGS = NamedEntity.getDeclaredMethod('getName')
-    private static final Method METHOD_NO_ARGS = Person.getDeclaredMethod('getAge')
+    private static final Method interfaceDefaultMethodNoArgs = Entity.getDeclaredMethod('getUniqueId')
+    private static final Method interfaceMethodNoArgs = Entity.getDeclaredMethod('getName')
+    private static final Method superStaticMethodNoArgs = NamedEntity.getDeclaredMethod('getDefaultName')
+    private static final Method staticMethodNoArgs = Person.getDeclaredMethod('getDefaultAge')
+    private static final Method superMethodNoArgs = NamedEntity.getDeclaredMethod('getName')
+    private static final Method methodNoArgs = Person.getDeclaredMethod('getAge')
 
-    private static final Method SUPER_STATIC_METHOD = NamedEntity.getDeclaredMethod('setDefaultName', String)
-    private static final Method STATIC_METHOD = Person.getDeclaredMethod('setDefaultAge', Integer)
-    private static final Method SUPER_METHOD = NamedEntity.getDeclaredMethod('setName', String)
-    private static final Method METHOD = Person.getDeclaredMethod('setAge', Integer)
+    private static final Method superStaticMethod = NamedEntity.getDeclaredMethod('setDefaultName', String)
+    private static final Method staticMethod = Person.getDeclaredMethod('setDefaultAge', Integer)
+    private static final Method superMethod = NamedEntity.getDeclaredMethod('setName', String)
+    private static final Method objectMethod = Person.getDeclaredMethod('setAge', Integer)
 
-    private static final Method SUPER_EQUALS = NamedEntity.getDeclaredMethod('equals', Object)
-    private static final Method SUPER_HASH_CODE = NamedEntity.getDeclaredMethod('hashCode')
-    private static final Method SUPER_TO_STRING = NamedEntity.getDeclaredMethod('toString')
-    private static final Method SUPER_LOMBOK_CAN_EQUAL = NamedEntity.getDeclaredMethod('canEqual', Object)
+    private static final Method superEquals = NamedEntity.getDeclaredMethod('equals', Object)
+    private static final Method superHashCode = NamedEntity.getDeclaredMethod('hashCode')
+    private static final Method superToString = NamedEntity.getDeclaredMethod('toString')
+    private static final Method superLombokCanEqual = NamedEntity.getDeclaredMethod('canEqual', Object)
 
-    private static final Method EQUALS = Person.getDeclaredMethod('equals', Object)
-    private static final Method HASH_CODE = Person.getDeclaredMethod('hashCode')
-    private static final Method TO_STRING = Person.getDeclaredMethod('toString')
-    private static final Method LOMBOK_CAN_EQUAL = Person.getDeclaredMethod('canEqual', Object)
+    private static final Method equals = Person.getDeclaredMethod('equals', Object)
+    private static final Method hashCode = Person.getDeclaredMethod('hashCode')
+    private static final Method toString = Person.getDeclaredMethod('toString')
+    private static final Method lombokCanEqual = Person.getDeclaredMethod('canEqual', Object)
 
     /*
      * TEST ARGUMENTS
      */
-    private static final Predicate<Field> IN_INTERFACE = (Predicate<Field>) (f) -> f.declaringClass == Entity
-    private static final Predicate<Field> IN_SUPER = (Predicate<Field>) (f) -> f.declaringClass == NamedEntity
-    private static final Predicate<Field> IN_INSTANCE = (Predicate<Field>) (f) -> f.declaringClass == Person
-    private static final Predicate<Field> TRUE_PREDICATE = (Predicate<Field>) (f) -> true
-    private static final Predicate<Field> FALSE_PREDICATE = (Predicate<Field>) (f) -> false
-    private static final Predicate<Field> IN_OTHER = (Predicate<Field>) (f) -> f.declaringClass == String
+    private static final Predicate<Field> inInterface = (Predicate<Field>) (f) -> f.declaringClass == Entity
+    private static final Predicate<Field> inSuper = (Predicate<Field>) (f) -> f.declaringClass == NamedEntity
+    private static final Predicate<Field> inInstance = (Predicate<Field>) (f) -> f.declaringClass == Person
+    private static final Predicate<Field> truePredicate = (Predicate<Field>) (f) -> true
+    private static final Predicate<Field> falsePredicate = (Predicate<Field>) (f) -> false
+    private static final Predicate<Field> inOther = (Predicate<Field>) (f) -> f.declaringClass == String
 
     /*
      * TEST RESULTS
      */
-    private static final Object EXPECTED_INTERFACE_STATIC_FIELD_VALUE = 'Steve'
-    private static final Object EXPECTED_SUPER_STATIC_FIELD_VALUE = 'John'
-    private static final Object EXPECTED_STATIC_FIELD_VALUE = 18
+    private static final Object expectedInterfaceStaticFieldValue = 'Steve'
+    private static final Object expectedSuperStaticFieldValue = 'John'
+    private static final Object expectedStaticFieldValue = 18
 
-    private static final List<Method> EXPECTED_INTERFACE_METHODS = [INTERFACE_METHOD_NO_ARGS, INTERFACE_DEFAULT_METHOD_NO_ARGS]
-    private static final List<Method> EXPECTED_SUPER_METHODS = [
-            SUPER_LOMBOK_CAN_EQUAL, SUPER_EQUALS, SUPER_METHOD_NO_ARGS, SUPER_HASH_CODE, SUPER_METHOD, SUPER_TO_STRING
+    private static final List<Method> expectedInterfaceMethods = [interfaceMethodNoArgs, interfaceDefaultMethodNoArgs]
+    private static final List<Method> expectedSuperMethods = [
+            superLombokCanEqual, superEquals, superMethodNoArgs, superHashCode, superMethod, superToString
     ]
-    private static final List<Method> EXPECTED_METHODS = [LOMBOK_CAN_EQUAL, EQUALS, METHOD_NO_ARGS, HASH_CODE, METHOD, TO_STRING]
-    private static final List<Method> OBJECT_METHODS = Object.declaredMethods
+    private static final List<Method> expectedMethods = [lombokCanEqual, equals, methodNoArgs, hashCode, objectMethod, toString]
+    private static final List<Method> objectMethods = Object.declaredMethods
             .findAll { !it.synthetic && !it.bridge && !Modifier.isStatic(it.modifiers) }
             .sort { a, b -> a.name <=> b.name ?: a.parameterCount <=> b.parameterCount }
 
-    private static final List<Method> EXPECTED_SUPER_STATIC_METHODS = [SUPER_STATIC_METHOD_NO_ARGS, SUPER_STATIC_METHOD]
-    private static final List<Method> EXPECTED_STATIC_METHODS = [STATIC_METHOD_NO_ARGS, STATIC_METHOD]
-    private static final List<Method> OBJECT_STATIC_METHODS = Object.declaredMethods
+    private static final List<Method> expectedSuperStaticMethods = [superStaticMethodNoArgs, superStaticMethod]
+    private static final List<Method> expectedStaticMethods = [staticMethodNoArgs, staticMethod]
+    private static final List<Method> objectStaticMethods = Object.declaredMethods
             .findAll { !it.synthetic && !it.bridge && Modifier.isStatic(it.modifiers) }
             .sort { a, b -> a.name <=> b.name ?: a.parameterCount <=> b.parameterCount }
 
-    private static final String SUPER_VALUE = 'Alex'
-    private static final UUID INTERFACE_VALUE = UUID.nameUUIDFromBytes(SUPER_VALUE.bytes)
-    private static final int VALUE = 23
+    private static final String superValue = 'Alex'
+    private static final UUID interfaceValue = UUID.nameUUIDFromBytes(superValue.bytes)
+    private static final int objectValue = 23
 
     static {
-        INTERFACE_STATIC_FIELD.accessible = true
-        SUPER_STATIC_FIELD.accessible = true
-        STATIC_FIELD.accessible = true
+        interfaceStaticField.accessible = true
+        superStaticField.accessible = true
+        staticField.accessible = true
     }
 
     private Reflect reflect
 
     void setup() {
-        reflect = new Reflect(Person, new Person(SUPER_VALUE, VALUE))
+        reflect = new Reflect(Person, new Person(superValue, objectValue))
         resetStaticFields()
     }
 
@@ -307,383 +307,383 @@ class ReflectFunctionalTest extends Specification {
         actual == expected
 
         where:
-        method                    | arguments                                         || expected
+        method                    | arguments                                     || expected
         // init
-        'init'                    | ['Camilla', 21]                                   || new Reflect(Person, new Person('Camilla', 21))
-        'init'                    | [[null, 21].toArray()]                            || new Reflect(Person, new Person(null, 21))
-        'init'                    | ['Camilla', null]                                 || new Reflect(Person, new Person('Camilla', null))
-        'init'                    | [[null, null].toArray()]                          || new Reflect(Person, new Person(null, null))
+        'init'                    | ['Camilla', 21]                               || new Reflect(Person, new Person('Camilla', 21))
+        'init'                    | [[null, 21].toArray()]                        || new Reflect(Person, new Person(null, 21))
+        'init'                    | ['Camilla', null]                             || new Reflect(Person, new Person('Camilla', null))
+        'init'                    | [[null, null].toArray()]                      || new Reflect(Person, new Person(null, null))
         // getConstructor
-        'getConstructor'          | [String, Integer]                                 || CONSTRUCTOR
-        'getConstructor'          | [IN_INSTANCE]                                     || CONSTRUCTOR
-        'getConstructor'          | [TRUE_PREDICATE]                                  || CONSTRUCTOR
+        'getConstructor'          | [String, Integer]                             || constructor
+        'getConstructor'          | [inInstance]                                  || constructor
+        'getConstructor'          | [truePredicate]                               || constructor
         // getConstructors
-        'getConstructors'         | [FALSE_PREDICATE]                                 || []
-        'getConstructors'         | [IN_SUPER]                                        || []
-        'getConstructors'         | [IN_INSTANCE]                                     || [CONSTRUCTOR]
-        'getConstructors'         | [TRUE_PREDICATE]                                  || [CONSTRUCTOR]
-        'getConstructors'         | []                                                || [CONSTRUCTOR]
+        'getConstructors'         | [falsePredicate]                              || []
+        'getConstructors'         | [inSuper]                                     || []
+        'getConstructors'         | [inInstance]                                  || [constructor]
+        'getConstructors'         | [truePredicate]                               || [constructor]
+        'getConstructors'         | []                                            || [constructor]
         // getFieldValues
-        'getInstanceFieldValues'  | []                                                || [VALUE].collect { new Reflect(it.getClass(), it) }
-        'getNonStaticFieldValues' | []                                                || [VALUE, SUPER_VALUE]
+        'getInstanceFieldValues'  | []                                            || [objectValue].collect { new Reflect(it.getClass(), it) }
+        'getNonStaticFieldValues' | []                                            || [objectValue, superValue]
                 .collect { new Reflect(it.getClass(), it) }
-        'getStaticFieldValues'    | []                                                || [
-                EXPECTED_STATIC_FIELD_VALUE,
-                EXPECTED_SUPER_STATIC_FIELD_VALUE,
-                EXPECTED_INTERFACE_STATIC_FIELD_VALUE].collect { new Reflect(it.getClass(), it) }
-        'getFieldValues'          | [FALSE_PREDICATE]                                 || [].collect { new Reflect(it.getClass(), it) }
-        'getFieldValues'          | [IN_INTERFACE]                                    || [EXPECTED_INTERFACE_STATIC_FIELD_VALUE].collect { new Reflect(it.getClass(), it) }
-        'getFieldValues'          | [IN_SUPER]                                        || [EXPECTED_SUPER_STATIC_FIELD_VALUE, SUPER_VALUE].collect { new Reflect(it.getClass(), it) }
-        'getFieldValues'          | [IN_INSTANCE]                                     || [EXPECTED_STATIC_FIELD_VALUE, VALUE].collect { new Reflect(it.getClass(), it) }
-        'getFieldValues'          | [TRUE_PREDICATE]                                  || [
-                EXPECTED_STATIC_FIELD_VALUE, VALUE,
-                EXPECTED_SUPER_STATIC_FIELD_VALUE, SUPER_VALUE,
-                EXPECTED_INTERFACE_STATIC_FIELD_VALUE].collect { new Reflect(it.getClass(), it) }
-        'getFieldValues'          | []                                                || [
-                EXPECTED_STATIC_FIELD_VALUE, VALUE,
-                EXPECTED_SUPER_STATIC_FIELD_VALUE, SUPER_VALUE,
-                EXPECTED_INTERFACE_STATIC_FIELD_VALUE].collect { new Reflect(it.getClass(), it) }
+        'getStaticFieldValues'    | []                                            || [
+                expectedStaticFieldValue,
+                expectedSuperStaticFieldValue,
+                expectedInterfaceStaticFieldValue].collect { new Reflect(it.getClass(), it) }
+        'getFieldValues'          | [falsePredicate]                              || [].collect { new Reflect(it.getClass(), it) }
+        'getFieldValues'          | [inInterface]                                 || [expectedInterfaceStaticFieldValue].collect { new Reflect(it.getClass(), it) }
+        'getFieldValues'          | [inSuper]                                     || [expectedSuperStaticFieldValue, superValue].collect { new Reflect(it.getClass(), it) }
+        'getFieldValues'          | [inInstance]                                  || [expectedStaticFieldValue, objectValue].collect { new Reflect(it.getClass(), it) }
+        'getFieldValues'          | [truePredicate]                               || [
+                expectedStaticFieldValue, objectValue,
+                expectedSuperStaticFieldValue, superValue,
+                expectedInterfaceStaticFieldValue].collect { new Reflect(it.getClass(), it) }
+        'getFieldValues'          | []                                            || [
+                expectedStaticFieldValue, objectValue,
+                expectedSuperStaticFieldValue, superValue,
+                expectedInterfaceStaticFieldValue].collect { new Reflect(it.getClass(), it) }
         // set
-        'setInstance'             | [FIELD.name, VALUE]                               || new Reflect(Person, new Person(SUPER_VALUE, VALUE))
-        'setNonStatic'            | [SUPER_FIELD.name, SUPER_VALUE]                   || new Reflect(Person, new Person(SUPER_VALUE, VALUE))
-        'setNonStatic'            | [FIELD.name, VALUE]                               || new Reflect(Person, new Person(SUPER_VALUE, VALUE))
-        'setStatic'               | [SUPER_STATIC_FIELD.name,
-                                     EXPECTED_SUPER_STATIC_FIELD_VALUE]               || new Reflect(Person, new Person(SUPER_VALUE, VALUE))
-        'setStatic'               | [STATIC_FIELD.name, EXPECTED_STATIC_FIELD_VALUE]  || new Reflect(Person, new Person(SUPER_VALUE, VALUE))
-        'set'                     | [SUPER_STATIC_FIELD.name,
-                                     EXPECTED_SUPER_STATIC_FIELD_VALUE]               || new Reflect(Person, new Person(SUPER_VALUE, VALUE))
-        'set'                     | [STATIC_FIELD.name,
-                                     EXPECTED_STATIC_FIELD_VALUE]                     || new Reflect(Person, new Person(SUPER_VALUE, VALUE))
-        'set'                     | [SUPER_FIELD.name, SUPER_VALUE]                   || new Reflect(Person, new Person(SUPER_VALUE, VALUE))
-        'set'                     | [FIELD.name, VALUE]                               || new Reflect(Person, new Person(SUPER_VALUE, VALUE))
-        'set'                     | [IN_SUPER,
-                                     EXPECTED_SUPER_STATIC_FIELD_VALUE]               || new Reflect(Person, new Person(SUPER_VALUE, VALUE))
-        'set'                     | [IN_INSTANCE,
-                                     EXPECTED_STATIC_FIELD_VALUE]                     || new Reflect(Person, new Person(SUPER_VALUE, VALUE))
-        'set'                     | [TRUE_PREDICATE,
-                                     EXPECTED_STATIC_FIELD_VALUE]                     || new Reflect(Person, new Person(SUPER_VALUE, VALUE))
+        'setInstance'             | [field.name, objectValue]                     || new Reflect(Person, new Person(superValue, objectValue))
+        'setNonStatic'            | [superField.name, superValue]                 || new Reflect(Person, new Person(superValue, objectValue))
+        'setNonStatic'            | [field.name, objectValue]                     || new Reflect(Person, new Person(superValue, objectValue))
+        'setStatic'               | [superStaticField.name,
+                                     expectedSuperStaticFieldValue]               || new Reflect(Person, new Person(superValue, objectValue))
+        'setStatic'               | [staticField.name, expectedStaticFieldValue]  || new Reflect(Person, new Person(superValue, objectValue))
+        'set'                     | [superStaticField.name,
+                                     expectedSuperStaticFieldValue]               || new Reflect(Person, new Person(superValue, objectValue))
+        'set'                     | [staticField.name,
+                                     expectedStaticFieldValue]                    || new Reflect(Person, new Person(superValue, objectValue))
+        'set'                     | [superField.name, superValue]                 || new Reflect(Person, new Person(superValue, objectValue))
+        'set'                     | [field.name, objectValue]                     || new Reflect(Person, new Person(superValue, objectValue))
+        'set'                     | [inSuper,
+                                     expectedSuperStaticFieldValue]               || new Reflect(Person, new Person(superValue, objectValue))
+        'set'                     | [inInstance,
+                                     expectedStaticFieldValue]                    || new Reflect(Person, new Person(superValue, objectValue))
+        'set'                     | [truePredicate,
+                                     expectedStaticFieldValue]                    || new Reflect(Person, new Person(superValue, objectValue))
         // get orElse
-        'getInstance'             | [SUPER_STATIC_FIELD.name, 'unknown']              || new Reflect(String, 'unknown')
-        'getInstance'             | [SUPER_STATIC_FIELD.name, null]                   || new Reflect(null, null)
-        'getInstance'             | [STATIC_FIELD.name, 15]                           || new Reflect(Integer, 15)
-        'getInstance'             | [STATIC_FIELD.name, null]                         || new Reflect(null, null)
-        'getInstance'             | [SUPER_FIELD.name, 'unknown']                     || new Reflect(String, 'unknown')
-        'getInstance'             | [SUPER_FIELD.name, null]                          || new Reflect(null, null)
-        'getInstance'             | [FIELD.name, 15]                                  || new Reflect(FIELD.type, VALUE)
-        'getInstance'             | [FIELD.name, null]                                || new Reflect(FIELD.type, VALUE)
-        'getNonStatic'            | [SUPER_STATIC_FIELD.name, 'unknown']              || new Reflect(String, 'unknown')
-        'getNonStatic'            | [SUPER_STATIC_FIELD.name, null]                   || new Reflect(null, null)
-        'getNonStatic'            | [STATIC_FIELD.name, 15]                           || new Reflect(Integer, 15)
-        'getNonStatic'            | [STATIC_FIELD.name, null]                         || new Reflect(null, null)
-        'getNonStatic'            | [SUPER_FIELD.name, 'unknown']                     || new Reflect(SUPER_FIELD.type, SUPER_VALUE)
-        'getNonStatic'            | [SUPER_FIELD.name, null]                          || new Reflect(SUPER_FIELD.type, SUPER_VALUE)
-        'getNonStatic'            | [FIELD.name, 15]                                  || new Reflect(FIELD.type, VALUE)
-        'getNonStatic'            | [FIELD.name, null]                                || new Reflect(FIELD.type, VALUE)
-        'getStatic'               | [SUPER_STATIC_FIELD.name, 'unknown']              || new Reflect(SUPER_STATIC_FIELD.type, EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'getStatic'               | [SUPER_STATIC_FIELD.name, null]                   || new Reflect(SUPER_STATIC_FIELD.type, EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'getStatic'               | [INTERFACE_STATIC_FIELD.name, 'unknown']          || new Reflect(INTERFACE_STATIC_FIELD.type, EXPECTED_INTERFACE_STATIC_FIELD_VALUE)
-        'getStatic'               | [INTERFACE_STATIC_FIELD.name, null]               || new Reflect(INTERFACE_STATIC_FIELD.type, EXPECTED_INTERFACE_STATIC_FIELD_VALUE)
-        'getStatic'               | [STATIC_FIELD.name, 15]                           || new Reflect(STATIC_FIELD.type, EXPECTED_STATIC_FIELD_VALUE)
-        'getStatic'               | [STATIC_FIELD.name, null]                         || new Reflect(STATIC_FIELD.type, EXPECTED_STATIC_FIELD_VALUE)
-        'getStatic'               | [SUPER_FIELD.name, 'unknown']                     || new Reflect(String, 'unknown')
-        'getStatic'               | [SUPER_FIELD.name, null]                          || new Reflect(null, null)
-        'getStatic'               | [FIELD.name, 15]                                  || new Reflect(Integer, 15)
-        'getStatic'               | [FIELD.name, null]                                || new Reflect(null, null)
-        'get'                     | [INTERFACE_STATIC_FIELD.name, 'unknown']          || new Reflect(INTERFACE_STATIC_FIELD.type, EXPECTED_INTERFACE_STATIC_FIELD_VALUE)
-        'get'                     | [INTERFACE_STATIC_FIELD.name, null]               || new Reflect(INTERFACE_STATIC_FIELD.type, EXPECTED_INTERFACE_STATIC_FIELD_VALUE)
-        'get'                     | [SUPER_STATIC_FIELD.name, 'unknown']              || new Reflect(SUPER_STATIC_FIELD.type, EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'get'                     | [SUPER_STATIC_FIELD.name, null]                   || new Reflect(SUPER_STATIC_FIELD.type, EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'get'                     | [STATIC_FIELD.name, 15]                           || new Reflect(STATIC_FIELD.type, EXPECTED_STATIC_FIELD_VALUE)
-        'get'                     | [STATIC_FIELD.name, null]                         || new Reflect(STATIC_FIELD.type, EXPECTED_STATIC_FIELD_VALUE)
-        'get'                     | [SUPER_FIELD.name, 'unknown']                     || new Reflect(SUPER_FIELD.type, SUPER_VALUE)
-        'get'                     | [SUPER_FIELD.name, null]                          || new Reflect(SUPER_FIELD.type, SUPER_VALUE)
-        'get'                     | [FIELD.name, 15]                                  || new Reflect(FIELD.type, VALUE)
-        'get'                     | [FIELD.name, null]                                || new Reflect(FIELD.type, VALUE)
-        'get'                     | ['unknown', 'unknown']                            || new Reflect(String, 'unknown')
-        'get'                     | ['unknown', null]                                 || new Reflect(null, null)
-        'get'                     | [FALSE_PREDICATE, 'unknown']                      || new Reflect(String, 'unknown')
-        'get'                     | [FALSE_PREDICATE, null]                           || new Reflect(null, null)
-        'get'                     | [IN_INTERFACE, 'unknown']                         || new Reflect(INTERFACE_STATIC_FIELD.type, EXPECTED_INTERFACE_STATIC_FIELD_VALUE)
-        'get'                     | [IN_INTERFACE, null]                              || new Reflect(INTERFACE_STATIC_FIELD.type, EXPECTED_INTERFACE_STATIC_FIELD_VALUE)
-        'get'                     | [IN_SUPER, 'unknown']                             || new Reflect(SUPER_STATIC_FIELD.type, EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'get'                     | [IN_SUPER, null]                                  || new Reflect(SUPER_STATIC_FIELD.type, EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'get'                     | [IN_INSTANCE, 'unknown']                          || new Reflect(STATIC_FIELD.type, EXPECTED_STATIC_FIELD_VALUE)
-        'get'                     | [IN_INSTANCE, null]                               || new Reflect(STATIC_FIELD.type, EXPECTED_STATIC_FIELD_VALUE)
-        'get'                     | [TRUE_PREDICATE, 'unknown']                       || new Reflect(STATIC_FIELD.type, EXPECTED_STATIC_FIELD_VALUE)
-        'get'                     | [TRUE_PREDICATE, null]                            || new Reflect(STATIC_FIELD.type, EXPECTED_STATIC_FIELD_VALUE)
+        'getInstance'             | [superStaticField.name, 'unknown']            || new Reflect(String, 'unknown')
+        'getInstance'             | [superStaticField.name, null]                 || new Reflect(null, null)
+        'getInstance'             | [staticField.name, 15]                        || new Reflect(Integer, 15)
+        'getInstance'             | [staticField.name, null]                      || new Reflect(null, null)
+        'getInstance'             | [superField.name, 'unknown']                  || new Reflect(String, 'unknown')
+        'getInstance'             | [superField.name, null]                       || new Reflect(null, null)
+        'getInstance'             | [field.name, 15]                              || new Reflect(field.type, objectValue)
+        'getInstance'             | [field.name, null]                            || new Reflect(field.type, objectValue)
+        'getNonStatic'            | [superStaticField.name, 'unknown']            || new Reflect(String, 'unknown')
+        'getNonStatic'            | [superStaticField.name, null]                 || new Reflect(null, null)
+        'getNonStatic'            | [staticField.name, 15]                        || new Reflect(Integer, 15)
+        'getNonStatic'            | [staticField.name, null]                      || new Reflect(null, null)
+        'getNonStatic'            | [superField.name, 'unknown']                  || new Reflect(superField.type, superValue)
+        'getNonStatic'            | [superField.name, null]                       || new Reflect(superField.type, superValue)
+        'getNonStatic'            | [field.name, 15]                              || new Reflect(field.type, objectValue)
+        'getNonStatic'            | [field.name, null]                            || new Reflect(field.type, objectValue)
+        'getStatic'               | [superStaticField.name, 'unknown']            || new Reflect(superStaticField.type, expectedSuperStaticFieldValue)
+        'getStatic'               | [superStaticField.name, null]                 || new Reflect(superStaticField.type, expectedSuperStaticFieldValue)
+        'getStatic'               | [interfaceStaticField.name, 'unknown']        || new Reflect(interfaceStaticField.type, expectedInterfaceStaticFieldValue)
+        'getStatic'               | [interfaceStaticField.name, null]             || new Reflect(interfaceStaticField.type, expectedInterfaceStaticFieldValue)
+        'getStatic'               | [staticField.name, 15]                        || new Reflect(staticField.type, expectedStaticFieldValue)
+        'getStatic'               | [staticField.name, null]                      || new Reflect(staticField.type, expectedStaticFieldValue)
+        'getStatic'               | [superField.name, 'unknown']                  || new Reflect(String, 'unknown')
+        'getStatic'               | [superField.name, null]                       || new Reflect(null, null)
+        'getStatic'               | [field.name, 15]                              || new Reflect(Integer, 15)
+        'getStatic'               | [field.name, null]                            || new Reflect(null, null)
+        'get'                     | [interfaceStaticField.name, 'unknown']        || new Reflect(interfaceStaticField.type, expectedInterfaceStaticFieldValue)
+        'get'                     | [interfaceStaticField.name, null]             || new Reflect(interfaceStaticField.type, expectedInterfaceStaticFieldValue)
+        'get'                     | [superStaticField.name, 'unknown']            || new Reflect(superStaticField.type, expectedSuperStaticFieldValue)
+        'get'                     | [superStaticField.name, null]                 || new Reflect(superStaticField.type, expectedSuperStaticFieldValue)
+        'get'                     | [staticField.name, 15]                        || new Reflect(staticField.type, expectedStaticFieldValue)
+        'get'                     | [staticField.name, null]                      || new Reflect(staticField.type, expectedStaticFieldValue)
+        'get'                     | [superField.name, 'unknown']                  || new Reflect(superField.type, superValue)
+        'get'                     | [superField.name, null]                       || new Reflect(superField.type, superValue)
+        'get'                     | [field.name, 15]                              || new Reflect(field.type, objectValue)
+        'get'                     | [field.name, null]                            || new Reflect(field.type, objectValue)
+        'get'                     | ['unknown', 'unknown']                        || new Reflect(String, 'unknown')
+        'get'                     | ['unknown', null]                             || new Reflect(null, null)
+        'get'                     | [falsePredicate, 'unknown']                   || new Reflect(String, 'unknown')
+        'get'                     | [falsePredicate, null]                        || new Reflect(null, null)
+        'get'                     | [inInterface, 'unknown']                      || new Reflect(interfaceStaticField.type, expectedInterfaceStaticFieldValue)
+        'get'                     | [inInterface, null]                           || new Reflect(interfaceStaticField.type, expectedInterfaceStaticFieldValue)
+        'get'                     | [inSuper, 'unknown']                          || new Reflect(superStaticField.type, expectedSuperStaticFieldValue)
+        'get'                     | [inSuper, null]                               || new Reflect(superStaticField.type, expectedSuperStaticFieldValue)
+        'get'                     | [inInstance, 'unknown']                       || new Reflect(staticField.type, expectedStaticFieldValue)
+        'get'                     | [inInstance, null]                            || new Reflect(staticField.type, expectedStaticFieldValue)
+        'get'                     | [truePredicate, 'unknown']                    || new Reflect(staticField.type, expectedStaticFieldValue)
+        'get'                     | [truePredicate, null]                         || new Reflect(staticField.type, expectedStaticFieldValue)
         // get
-        'getInstance'             | [FIELD.name]                                      || new Reflect(FIELD.type, VALUE)
-        'getNonStatic'            | [SUPER_FIELD.name]                                || new Reflect(SUPER_FIELD.type, SUPER_VALUE)
-        'getNonStatic'            | [FIELD.name]                                      || new Reflect(FIELD.type, VALUE)
-        'getStatic'               | [INTERFACE_STATIC_FIELD.name]                     || new Reflect(INTERFACE_STATIC_FIELD.type, EXPECTED_INTERFACE_STATIC_FIELD_VALUE)
-        'getStatic'               | [SUPER_STATIC_FIELD.name]                         || new Reflect(SUPER_STATIC_FIELD.type, EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'getStatic'               | [STATIC_FIELD.name]                               || new Reflect(STATIC_FIELD.type, EXPECTED_STATIC_FIELD_VALUE)
-        'get'                     | [INTERFACE_STATIC_FIELD.name]                     || new Reflect(INTERFACE_STATIC_FIELD.type, EXPECTED_INTERFACE_STATIC_FIELD_VALUE)
-        'get'                     | [SUPER_STATIC_FIELD.name]                         || new Reflect(SUPER_STATIC_FIELD.type, EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'get'                     | [STATIC_FIELD.name]                               || new Reflect(STATIC_FIELD.type, EXPECTED_STATIC_FIELD_VALUE)
-        'get'                     | [SUPER_FIELD.name]                                || new Reflect(SUPER_FIELD.type, SUPER_VALUE)
-        'get'                     | [FIELD.name]                                      || new Reflect(FIELD.type, VALUE)
-        'get'                     | [IN_SUPER]                                        || new Reflect(SUPER_STATIC_FIELD.type, EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'get'                     | [IN_INSTANCE]                                     || new Reflect(STATIC_FIELD.type, EXPECTED_STATIC_FIELD_VALUE)
-        'get'                     | [TRUE_PREDICATE]                                  || new Reflect(STATIC_FIELD.type, EXPECTED_STATIC_FIELD_VALUE)
+        'getInstance'             | [field.name]                                  || new Reflect(field.type, objectValue)
+        'getNonStatic'            | [superField.name]                             || new Reflect(superField.type, superValue)
+        'getNonStatic'            | [field.name]                                  || new Reflect(field.type, objectValue)
+        'getStatic'               | [interfaceStaticField.name]                   || new Reflect(interfaceStaticField.type, expectedInterfaceStaticFieldValue)
+        'getStatic'               | [superStaticField.name]                       || new Reflect(superStaticField.type, expectedSuperStaticFieldValue)
+        'getStatic'               | [staticField.name]                            || new Reflect(staticField.type, expectedStaticFieldValue)
+        'get'                     | [interfaceStaticField.name]                   || new Reflect(interfaceStaticField.type, expectedInterfaceStaticFieldValue)
+        'get'                     | [superStaticField.name]                       || new Reflect(superStaticField.type, expectedSuperStaticFieldValue)
+        'get'                     | [staticField.name]                            || new Reflect(staticField.type, expectedStaticFieldValue)
+        'get'                     | [superField.name]                             || new Reflect(superField.type, superValue)
+        'get'                     | [field.name]                                  || new Reflect(field.type, objectValue)
+        'get'                     | [inSuper]                                     || new Reflect(superStaticField.type, expectedSuperStaticFieldValue)
+        'get'                     | [inInstance]                                  || new Reflect(staticField.type, expectedStaticFieldValue)
+        'get'                     | [truePredicate]                               || new Reflect(staticField.type, expectedStaticFieldValue)
         // getField
-        'getInstanceField'        | [FIELD.name]                                      || FIELD
-        'getNonStaticField'       | [SUPER_FIELD.name]                                || SUPER_FIELD
-        'getNonStaticField'       | [FIELD.name]                                      || FIELD
-        'getStaticField'          | [INTERFACE_STATIC_FIELD.name]                     || INTERFACE_STATIC_FIELD
-        'getStaticField'          | [SUPER_STATIC_FIELD.name]                         || SUPER_STATIC_FIELD
-        'getStaticField'          | [STATIC_FIELD.name]                               || STATIC_FIELD
-        'getField'                | [INTERFACE_STATIC_FIELD.name]                     || INTERFACE_STATIC_FIELD
-        'getField'                | [SUPER_STATIC_FIELD.name]                         || SUPER_STATIC_FIELD
-        'getField'                | [STATIC_FIELD.name]                               || STATIC_FIELD
-        'getField'                | [SUPER_FIELD.name]                                || SUPER_FIELD
-        'getField'                | [FIELD.name]                                      || FIELD
-        'getField'                | [IN_SUPER]                                        || SUPER_STATIC_FIELD
-        'getField'                | [IN_INSTANCE]                                     || STATIC_FIELD
-        'getField'                | [TRUE_PREDICATE]                                  || STATIC_FIELD
+        'getInstanceField'        | [field.name]                                  || field
+        'getNonStaticField'       | [superField.name]                             || superField
+        'getNonStaticField'       | [field.name]                                  || field
+        'getStaticField'          | [interfaceStaticField.name]                   || interfaceStaticField
+        'getStaticField'          | [superStaticField.name]                       || superStaticField
+        'getStaticField'          | [staticField.name]                            || staticField
+        'getField'                | [interfaceStaticField.name]                   || interfaceStaticField
+        'getField'                | [superStaticField.name]                       || superStaticField
+        'getField'                | [staticField.name]                            || staticField
+        'getField'                | [superField.name]                             || superField
+        'getField'                | [field.name]                                  || field
+        'getField'                | [inSuper]                                     || superStaticField
+        'getField'                | [inInstance]                                  || staticField
+        'getField'                | [truePredicate]                               || staticField
         // getFields
-        'getInstanceFields'       | []                                                || [FIELD]
-        'getNonStaticFields'      | []                                                || [FIELD, SUPER_FIELD]
-        'getStaticFields'         | []                                                || [STATIC_FIELD, SUPER_STATIC_FIELD, INTERFACE_STATIC_FIELD]
-        'getFields'               | [FALSE_PREDICATE]                                 || []
-        'getFields'               | [IN_INTERFACE]                                    || [INTERFACE_STATIC_FIELD]
-        'getFields'               | [IN_SUPER]                                        || [SUPER_STATIC_FIELD, SUPER_FIELD]
-        'getFields'               | [IN_INSTANCE]                                     || [STATIC_FIELD, FIELD]
-        'getFields'               | [TRUE_PREDICATE]                                  || [STATIC_FIELD, FIELD, SUPER_STATIC_FIELD, SUPER_FIELD, INTERFACE_STATIC_FIELD]
-        'getFields'               | []                                                || [STATIC_FIELD, FIELD, SUPER_STATIC_FIELD, SUPER_FIELD, INTERFACE_STATIC_FIELD]
+        'getInstanceFields'       | []                                            || [field]
+        'getNonStaticFields'      | []                                            || [field, superField]
+        'getStaticFields'         | []                                            || [staticField, superStaticField, interfaceStaticField]
+        'getFields'               | [falsePredicate]                              || []
+        'getFields'               | [inInterface]                                 || [interfaceStaticField]
+        'getFields'               | [inSuper]                                     || [superStaticField, superField]
+        'getFields'               | [inInstance]                                  || [staticField, field]
+        'getFields'               | [truePredicate]                               || [staticField, field, superStaticField, superField, interfaceStaticField]
+        'getFields'               | []                                            || [staticField, field, superStaticField, superField, interfaceStaticField]
         // invoke
-        'invoke'                  | [INTERFACE_DEFAULT_METHOD_NO_ARGS.name,
-                                     [].toArray()]                                    || new Reflect(INTERFACE_VALUE.getClass(), INTERFACE_VALUE)
-        'invoke'                  | [INTERFACE_DEFAULT_METHOD_NO_ARGS.name]           || new Reflect(INTERFACE_VALUE.getClass(), INTERFACE_VALUE)
-        'invoke'                  | [INTERFACE_DEFAULT_METHOD_NO_ARGS.returnType,
-                                     INTERFACE_DEFAULT_METHOD_NO_ARGS.name,
-                                     [].toArray()]                                    || new Reflect(INTERFACE_VALUE.getClass(), INTERFACE_VALUE)
-        'invoke'                  | [INTERFACE_DEFAULT_METHOD_NO_ARGS.returnType,
-                                     INTERFACE_DEFAULT_METHOD_NO_ARGS.name]           || new Reflect(INTERFACE_VALUE.getClass(), INTERFACE_VALUE)
-        'invoke'                  | [SUPER_STATIC_METHOD_NO_ARGS.name,
-                                     [].toArray()]                                    || new Reflect(EXPECTED_SUPER_STATIC_FIELD_VALUE.getClass(), EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'invoke'                  | [SUPER_STATIC_METHOD_NO_ARGS.name]                || new Reflect(EXPECTED_SUPER_STATIC_FIELD_VALUE.getClass(), EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'invoke'                  | [SUPER_STATIC_METHOD_NO_ARGS.returnType,
-                                     SUPER_STATIC_METHOD_NO_ARGS.name,
-                                     [].toArray()]                                    || new Reflect(EXPECTED_SUPER_STATIC_FIELD_VALUE.getClass(), EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'invoke'                  | [SUPER_STATIC_METHOD_NO_ARGS.returnType,
-                                     SUPER_STATIC_METHOD_NO_ARGS.name]                || new Reflect(EXPECTED_SUPER_STATIC_FIELD_VALUE.getClass(), EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        'invoke'                  | [SUPER_STATIC_METHOD.name,
-                                     [EXPECTED_SUPER_STATIC_FIELD_VALUE].toArray()]   || new Reflect(void, null)
-        'invoke'                  | [SUPER_STATIC_METHOD.returnType,
-                                     SUPER_STATIC_METHOD.name,
-                                     [EXPECTED_SUPER_STATIC_FIELD_VALUE].toArray()]   || new Reflect(void, null)
-        'invoke'                  | [SUPER_METHOD_NO_ARGS.name,
-                                     [].toArray()]                                    || new Reflect(SUPER_VALUE.getClass(), SUPER_VALUE)
-        'invoke'                  | [SUPER_METHOD_NO_ARGS.name]                       || new Reflect(SUPER_VALUE.getClass(), SUPER_VALUE)
-        'invoke'                  | [SUPER_METHOD_NO_ARGS.returnType,
-                                     SUPER_METHOD_NO_ARGS.name,
-                                     [].toArray()]                                    || new Reflect(SUPER_VALUE.getClass(), SUPER_VALUE)
-        'invoke'                  | [SUPER_METHOD_NO_ARGS.returnType,
-                                     SUPER_METHOD_NO_ARGS.name]                       || new Reflect(SUPER_VALUE.getClass(), SUPER_VALUE)
-        'invoke'                  | [[SUPER_VALUE].toArray()]                         || new Reflect(void, null)
-        'invoke'                  | [SUPER_METHOD.name,
-                                     [SUPER_VALUE].toArray()]                         || new Reflect(void, null)
-        'invoke'                  | [SUPER_METHOD.returnType,
-                                     SUPER_METHOD.name,
-                                     [SUPER_VALUE].toArray()]                         || new Reflect(void, null)
-        'invoke'                  | [STATIC_METHOD_NO_ARGS.name,
-                                     [].toArray()]                                    || new Reflect(EXPECTED_STATIC_FIELD_VALUE.getClass(), EXPECTED_STATIC_FIELD_VALUE)
-        'invoke'                  | [STATIC_METHOD_NO_ARGS.name]                      || new Reflect(EXPECTED_STATIC_FIELD_VALUE.getClass(), EXPECTED_STATIC_FIELD_VALUE)
-        'invoke'                  | [STATIC_METHOD_NO_ARGS.returnType,
-                                     STATIC_METHOD_NO_ARGS.name,
-                                     [].toArray()]                                    || new Reflect(EXPECTED_STATIC_FIELD_VALUE.getClass(), EXPECTED_STATIC_FIELD_VALUE)
-        'invoke'                  | [STATIC_METHOD_NO_ARGS.returnType,
-                                     STATIC_METHOD_NO_ARGS.name]                      || new Reflect(EXPECTED_STATIC_FIELD_VALUE.getClass(), EXPECTED_STATIC_FIELD_VALUE)
-        'invoke'                  | [STATIC_METHOD.name,
-                                     [EXPECTED_STATIC_FIELD_VALUE].toArray()]         || new Reflect(void, null)
-        'invoke'                  | [STATIC_METHOD.returnType,
-                                     STATIC_METHOD.name,
-                                     [EXPECTED_STATIC_FIELD_VALUE].toArray()]         || new Reflect(void, null)
-        'invoke'                  | [METHOD_NO_ARGS.name,
-                                     [].toArray()]                                    || new Reflect(VALUE.getClass(), VALUE)
-        'invoke'                  | [METHOD_NO_ARGS.name]                             || new Reflect(VALUE.getClass(), VALUE)
-        'invoke'                  | [METHOD_NO_ARGS.returnType,
-                                     METHOD_NO_ARGS.name,
-                                     [].toArray()]                                    || new Reflect(VALUE.getClass(), VALUE)
-        'invoke'                  | [METHOD_NO_ARGS.returnType,
-                                     METHOD_NO_ARGS.name]                             || new Reflect(VALUE.getClass(), VALUE)
-        'invoke'                  | [[VALUE].toArray()]                               || new Reflect(void, null)
-        'invoke'                  | [METHOD.name,
-                                     [VALUE].toArray()]                               || new Reflect(void, null)
-        'invoke'                  | [METHOD.returnType,
-                                     METHOD.name,
-                                     [VALUE].toArray()]                               || new Reflect(void, null)
-        'invoke'                  | []                                                || new Reflect(VALUE.getClass(), VALUE)
+        'invoke'                  | [interfaceDefaultMethodNoArgs.name,
+                                     [].toArray()]                                || new Reflect(interfaceValue.getClass(), interfaceValue)
+        'invoke'                  | [interfaceDefaultMethodNoArgs.name]           || new Reflect(interfaceValue.getClass(), interfaceValue)
+        'invoke'                  | [interfaceDefaultMethodNoArgs.returnType,
+                                     interfaceDefaultMethodNoArgs.name,
+                                     [].toArray()]                                || new Reflect(interfaceValue.getClass(), interfaceValue)
+        'invoke'                  | [interfaceDefaultMethodNoArgs.returnType,
+                                     interfaceDefaultMethodNoArgs.name]           || new Reflect(interfaceValue.getClass(), interfaceValue)
+        'invoke'                  | [superStaticMethodNoArgs.name,
+                                     [].toArray()]                                || new Reflect(expectedSuperStaticFieldValue.getClass(), expectedSuperStaticFieldValue)
+        'invoke'                  | [superStaticMethodNoArgs.name]                || new Reflect(expectedSuperStaticFieldValue.getClass(), expectedSuperStaticFieldValue)
+        'invoke'                  | [superStaticMethodNoArgs.returnType,
+                                     superStaticMethodNoArgs.name,
+                                     [].toArray()]                                || new Reflect(expectedSuperStaticFieldValue.getClass(), expectedSuperStaticFieldValue)
+        'invoke'                  | [superStaticMethodNoArgs.returnType,
+                                     superStaticMethodNoArgs.name]                || new Reflect(expectedSuperStaticFieldValue.getClass(), expectedSuperStaticFieldValue)
+        'invoke'                  | [superStaticMethod.name,
+                                     [expectedSuperStaticFieldValue].toArray()]   || new Reflect(void, null)
+        'invoke'                  | [superStaticMethod.returnType,
+                                     superStaticMethod.name,
+                                     [expectedSuperStaticFieldValue].toArray()]   || new Reflect(void, null)
+        'invoke'                  | [superMethodNoArgs.name,
+                                     [].toArray()]                                || new Reflect(superValue.getClass(), superValue)
+        'invoke'                  | [superMethodNoArgs.name]                      || new Reflect(superValue.getClass(), superValue)
+        'invoke'                  | [superMethodNoArgs.returnType,
+                                     superMethodNoArgs.name,
+                                     [].toArray()]                                || new Reflect(superValue.getClass(), superValue)
+        'invoke'                  | [superMethodNoArgs.returnType,
+                                     superMethodNoArgs.name]                      || new Reflect(superValue.getClass(), superValue)
+        'invoke'                  | [[superValue].toArray()]                      || new Reflect(void, null)
+        'invoke'                  | [superMethod.name,
+                                     [superValue].toArray()]                      || new Reflect(void, null)
+        'invoke'                  | [superMethod.returnType,
+                                     superMethod.name,
+                                     [superValue].toArray()]                      || new Reflect(void, null)
+        'invoke'                  | [staticMethodNoArgs.name,
+                                     [].toArray()]                                || new Reflect(expectedStaticFieldValue.getClass(), expectedStaticFieldValue)
+        'invoke'                  | [staticMethodNoArgs.name]                     || new Reflect(expectedStaticFieldValue.getClass(), expectedStaticFieldValue)
+        'invoke'                  | [staticMethodNoArgs.returnType,
+                                     staticMethodNoArgs.name,
+                                     [].toArray()]                                || new Reflect(expectedStaticFieldValue.getClass(), expectedStaticFieldValue)
+        'invoke'                  | [staticMethodNoArgs.returnType,
+                                     staticMethodNoArgs.name]                     || new Reflect(expectedStaticFieldValue.getClass(), expectedStaticFieldValue)
+        'invoke'                  | [staticMethod.name,
+                                     [expectedStaticFieldValue].toArray()]        || new Reflect(void, null)
+        'invoke'                  | [staticMethod.returnType,
+                                     staticMethod.name,
+                                     [expectedStaticFieldValue].toArray()]        || new Reflect(void, null)
+        'invoke'                  | [methodNoArgs.name,
+                                     [].toArray()]                                || new Reflect(objectValue.getClass(), objectValue)
+        'invoke'                  | [methodNoArgs.name]                           || new Reflect(objectValue.getClass(), objectValue)
+        'invoke'                  | [methodNoArgs.returnType,
+                                     methodNoArgs.name,
+                                     [].toArray()]                                || new Reflect(objectValue.getClass(), objectValue)
+        'invoke'                  | [methodNoArgs.returnType,
+                                     methodNoArgs.name]                           || new Reflect(objectValue.getClass(), objectValue)
+        'invoke'                  | [[objectValue].toArray()]                     || new Reflect(void, null)
+        'invoke'                  | [objectMethod.name,
+                                     [objectValue].toArray()]                     || new Reflect(void, null)
+        'invoke'                  | [objectMethod.returnType,
+                                     objectMethod.name,
+                                     [objectValue].toArray()]                     || new Reflect(void, null)
+        'invoke'                  | []                                            || new Reflect(objectValue.getClass(), objectValue)
         // getMethod
-        'getInstanceMethod'       | [METHOD_NO_ARGS.name,
-                                     METHOD_NO_ARGS.parameterTypes]                   || METHOD_NO_ARGS
-        'getInstanceMethod'       | [METHOD_NO_ARGS.name]                             || METHOD_NO_ARGS
-        'getInstanceMethod'       | [METHOD_NO_ARGS.returnType,
-                                     METHOD_NO_ARGS.name,
-                                     METHOD_NO_ARGS.parameterTypes]                   || METHOD_NO_ARGS
-        'getInstanceMethod'       | [METHOD_NO_ARGS.returnType,
-                                     METHOD_NO_ARGS.name]                             || METHOD_NO_ARGS
-        'getInstanceMethod'       | [METHOD.parameterTypes]                           || METHOD
-        'getInstanceMethod'       | [METHOD.name,
-                                     METHOD.parameterTypes]                           || METHOD
-        'getInstanceMethod'       | [METHOD.returnType,
-                                     METHOD.name,
-                                     METHOD.parameterTypes]                           || METHOD
-        'getInstanceMethod'       | []                                                || METHOD_NO_ARGS
-        'getNonStaticMethod'      | [INTERFACE_DEFAULT_METHOD_NO_ARGS.name,
-                                     INTERFACE_DEFAULT_METHOD_NO_ARGS.parameterTypes] || INTERFACE_DEFAULT_METHOD_NO_ARGS
-        'getNonStaticMethod'      | [INTERFACE_DEFAULT_METHOD_NO_ARGS.name]           || INTERFACE_DEFAULT_METHOD_NO_ARGS
-        'getNonStaticMethod'      | [INTERFACE_DEFAULT_METHOD_NO_ARGS.returnType,
-                                     INTERFACE_DEFAULT_METHOD_NO_ARGS.name,
-                                     INTERFACE_DEFAULT_METHOD_NO_ARGS.parameterTypes] || INTERFACE_DEFAULT_METHOD_NO_ARGS
-        'getNonStaticMethod'      | [INTERFACE_DEFAULT_METHOD_NO_ARGS.returnType,
-                                     INTERFACE_DEFAULT_METHOD_NO_ARGS.name]           || INTERFACE_DEFAULT_METHOD_NO_ARGS
-        'getNonStaticMethod'      | [SUPER_METHOD_NO_ARGS.name,
-                                     SUPER_METHOD_NO_ARGS.parameterTypes]             || SUPER_METHOD_NO_ARGS
-        'getNonStaticMethod'      | [SUPER_METHOD_NO_ARGS.name]                       || SUPER_METHOD_NO_ARGS
-        'getNonStaticMethod'      | [SUPER_METHOD_NO_ARGS.returnType,
-                                     SUPER_METHOD_NO_ARGS.name,
-                                     SUPER_METHOD_NO_ARGS.parameterTypes]             || SUPER_METHOD_NO_ARGS
-        'getNonStaticMethod'      | [SUPER_METHOD_NO_ARGS.returnType,
-                                     SUPER_METHOD_NO_ARGS.name]                       || SUPER_METHOD_NO_ARGS
-        'getNonStaticMethod'      | [SUPER_METHOD.parameterTypes]                     || SUPER_METHOD
-        'getNonStaticMethod'      | [SUPER_METHOD.name,
-                                     SUPER_METHOD.parameterTypes]                     || SUPER_METHOD
-        'getNonStaticMethod'      | [SUPER_METHOD.returnType,
-                                     SUPER_METHOD.name,
-                                     SUPER_METHOD.parameterTypes]                     || SUPER_METHOD
-        'getNonStaticMethod'      | [METHOD_NO_ARGS.name,
-                                     METHOD_NO_ARGS.parameterTypes]                   || METHOD_NO_ARGS
-        'getNonStaticMethod'      | [METHOD_NO_ARGS.name]                             || METHOD_NO_ARGS
-        'getNonStaticMethod'      | [METHOD_NO_ARGS.returnType,
-                                     METHOD_NO_ARGS.name,
-                                     METHOD_NO_ARGS.parameterTypes]                   || METHOD_NO_ARGS
-        'getNonStaticMethod'      | [METHOD_NO_ARGS.returnType,
-                                     METHOD_NO_ARGS.name]                             || METHOD_NO_ARGS
-        'getNonStaticMethod'      | [METHOD.parameterTypes]                           || METHOD
-        'getNonStaticMethod'      | [METHOD.name,
-                                     METHOD.parameterTypes]                           || METHOD
-        'getNonStaticMethod'      | [METHOD.returnType,
-                                     METHOD.name,
-                                     METHOD.parameterTypes]                           || METHOD
-        'getNonStaticMethod'      | []                                                || METHOD_NO_ARGS
-        'getStaticMethod'         | [SUPER_STATIC_METHOD_NO_ARGS.name,
-                                     SUPER_STATIC_METHOD_NO_ARGS.parameterTypes]      || SUPER_STATIC_METHOD_NO_ARGS
-        'getStaticMethod'         | [SUPER_STATIC_METHOD_NO_ARGS.name]                || SUPER_STATIC_METHOD_NO_ARGS
-        'getStaticMethod'         | [SUPER_STATIC_METHOD_NO_ARGS.returnType,
-                                     SUPER_STATIC_METHOD_NO_ARGS.name,
-                                     SUPER_STATIC_METHOD_NO_ARGS.parameterTypes]      || SUPER_STATIC_METHOD_NO_ARGS
-        'getStaticMethod'         | [SUPER_STATIC_METHOD_NO_ARGS.returnType,
-                                     SUPER_STATIC_METHOD_NO_ARGS.name]                || SUPER_STATIC_METHOD_NO_ARGS
-        'getStaticMethod'         | [SUPER_STATIC_METHOD.parameterTypes]              || SUPER_STATIC_METHOD
-        'getStaticMethod'         | [SUPER_STATIC_METHOD.name,
-                                     SUPER_STATIC_METHOD.parameterTypes]              || SUPER_STATIC_METHOD
-        'getStaticMethod'         | [SUPER_STATIC_METHOD.returnType,
-                                     SUPER_STATIC_METHOD.name,
-                                     SUPER_STATIC_METHOD.parameterTypes]              || SUPER_STATIC_METHOD
-        'getStaticMethod'         | [STATIC_METHOD_NO_ARGS.name,
-                                     STATIC_METHOD_NO_ARGS.parameterTypes]            || STATIC_METHOD_NO_ARGS
-        'getStaticMethod'         | [STATIC_METHOD_NO_ARGS.name]                      || STATIC_METHOD_NO_ARGS
-        'getStaticMethod'         | [STATIC_METHOD_NO_ARGS.returnType,
-                                     STATIC_METHOD_NO_ARGS.name,
-                                     STATIC_METHOD_NO_ARGS.parameterTypes]            || STATIC_METHOD_NO_ARGS
-        'getStaticMethod'         | [STATIC_METHOD_NO_ARGS.returnType,
-                                     STATIC_METHOD_NO_ARGS.name]                      || STATIC_METHOD_NO_ARGS
-        'getStaticMethod'         | [STATIC_METHOD.parameterTypes]                    || STATIC_METHOD
-        'getStaticMethod'         | [STATIC_METHOD.name,
-                                     STATIC_METHOD.parameterTypes]                    || STATIC_METHOD
-        'getStaticMethod'         | [STATIC_METHOD.returnType,
-                                     STATIC_METHOD.name,
-                                     STATIC_METHOD.parameterTypes]                    || STATIC_METHOD
-        'getStaticMethod'         | []                                                || STATIC_METHOD_NO_ARGS
-        'getMethod'               | [INTERFACE_DEFAULT_METHOD_NO_ARGS.name,
-                                     INTERFACE_DEFAULT_METHOD_NO_ARGS.parameterTypes] || INTERFACE_DEFAULT_METHOD_NO_ARGS
-        'getMethod'               | [INTERFACE_DEFAULT_METHOD_NO_ARGS.name]           || INTERFACE_DEFAULT_METHOD_NO_ARGS
-        'getMethod'               | [INTERFACE_DEFAULT_METHOD_NO_ARGS.returnType,
-                                     INTERFACE_DEFAULT_METHOD_NO_ARGS.name,
-                                     INTERFACE_DEFAULT_METHOD_NO_ARGS.parameterTypes] || INTERFACE_DEFAULT_METHOD_NO_ARGS
-        'getMethod'               | [INTERFACE_DEFAULT_METHOD_NO_ARGS.returnType,
-                                     INTERFACE_DEFAULT_METHOD_NO_ARGS.name]           || INTERFACE_DEFAULT_METHOD_NO_ARGS
-        'getMethod'               | [SUPER_STATIC_METHOD_NO_ARGS.name,
-                                     SUPER_STATIC_METHOD_NO_ARGS.parameterTypes]      || SUPER_STATIC_METHOD_NO_ARGS
-        'getMethod'               | [SUPER_STATIC_METHOD_NO_ARGS.name]                || SUPER_STATIC_METHOD_NO_ARGS
-        'getMethod'               | [SUPER_STATIC_METHOD_NO_ARGS.returnType,
-                                     SUPER_STATIC_METHOD_NO_ARGS.name,
-                                     SUPER_STATIC_METHOD_NO_ARGS.parameterTypes]      || SUPER_STATIC_METHOD_NO_ARGS
-        'getMethod'               | [SUPER_STATIC_METHOD_NO_ARGS.returnType,
-                                     SUPER_STATIC_METHOD_NO_ARGS.name]                || SUPER_STATIC_METHOD_NO_ARGS
-        'getMethod'               | [SUPER_STATIC_METHOD.name,
-                                     SUPER_STATIC_METHOD.parameterTypes]              || SUPER_STATIC_METHOD
-        'getMethod'               | [SUPER_STATIC_METHOD.returnType,
-                                     SUPER_STATIC_METHOD.name,
-                                     SUPER_STATIC_METHOD.parameterTypes]              || SUPER_STATIC_METHOD
-        'getMethod'               | [SUPER_METHOD_NO_ARGS.name,
-                                     SUPER_METHOD_NO_ARGS.parameterTypes]             || SUPER_METHOD_NO_ARGS
-        'getMethod'               | [SUPER_METHOD_NO_ARGS.name]                       || SUPER_METHOD_NO_ARGS
-        'getMethod'               | [SUPER_METHOD_NO_ARGS.returnType,
-                                     SUPER_METHOD_NO_ARGS.name,
-                                     SUPER_METHOD_NO_ARGS.parameterTypes]             || SUPER_METHOD_NO_ARGS
-        'getMethod'               | [SUPER_METHOD_NO_ARGS.returnType,
-                                     SUPER_METHOD_NO_ARGS.name]                       || SUPER_METHOD_NO_ARGS
-        'getMethod'               | [SUPER_METHOD.parameterTypes]                     || SUPER_METHOD
-        'getMethod'               | [SUPER_METHOD.name,
-                                     SUPER_METHOD.parameterTypes]                     || SUPER_METHOD
-        'getMethod'               | [SUPER_METHOD.returnType,
-                                     SUPER_METHOD.name,
-                                     SUPER_METHOD.parameterTypes]                     || SUPER_METHOD
-        'getMethod'               | [STATIC_METHOD_NO_ARGS.name,
-                                     STATIC_METHOD_NO_ARGS.parameterTypes]            || STATIC_METHOD_NO_ARGS
-        'getMethod'               | [STATIC_METHOD_NO_ARGS.name]                      || STATIC_METHOD_NO_ARGS
-        'getMethod'               | [STATIC_METHOD_NO_ARGS.returnType,
-                                     STATIC_METHOD_NO_ARGS.name,
-                                     STATIC_METHOD_NO_ARGS.parameterTypes]            || STATIC_METHOD_NO_ARGS
-        'getMethod'               | [STATIC_METHOD_NO_ARGS.returnType,
-                                     STATIC_METHOD_NO_ARGS.name]                      || STATIC_METHOD_NO_ARGS
-        'getMethod'               | [STATIC_METHOD.name,
-                                     STATIC_METHOD.parameterTypes]                    || STATIC_METHOD
-        'getMethod'               | [STATIC_METHOD.returnType,
-                                     STATIC_METHOD.name,
-                                     STATIC_METHOD.parameterTypes]                    || STATIC_METHOD
-        'getMethod'               | [METHOD_NO_ARGS.name,
-                                     METHOD_NO_ARGS.parameterTypes]                   || METHOD_NO_ARGS
-        'getMethod'               | [METHOD_NO_ARGS.name]                             || METHOD_NO_ARGS
-        'getMethod'               | [METHOD_NO_ARGS.returnType,
-                                     METHOD_NO_ARGS.name,
-                                     METHOD_NO_ARGS.parameterTypes]                   || METHOD_NO_ARGS
-        'getMethod'               | [METHOD_NO_ARGS.returnType,
-                                     METHOD_NO_ARGS.name]                             || METHOD_NO_ARGS
-        'getMethod'               | [METHOD.parameterTypes]                           || METHOD
-        'getMethod'               | [METHOD.name,
-                                     METHOD.parameterTypes]                           || METHOD
-        'getMethod'               | [METHOD.returnType,
-                                     METHOD.name,
-                                     METHOD.parameterTypes]                           || METHOD
-        'getMethod'               | [IN_SUPER]                                        || SUPER_LOMBOK_CAN_EQUAL
-        'getMethod'               | [IN_INSTANCE]                                     || LOMBOK_CAN_EQUAL
-        'getMethod'               | [TRUE_PREDICATE]                                  || LOMBOK_CAN_EQUAL
-        'getMethod'               | []                                                || METHOD_NO_ARGS
+        'getInstanceMethod'       | [methodNoArgs.name,
+                                     methodNoArgs.parameterTypes]                 || methodNoArgs
+        'getInstanceMethod'       | [methodNoArgs.name]                           || methodNoArgs
+        'getInstanceMethod'       | [methodNoArgs.returnType,
+                                     methodNoArgs.name,
+                                     methodNoArgs.parameterTypes]                 || methodNoArgs
+        'getInstanceMethod'       | [methodNoArgs.returnType,
+                                     methodNoArgs.name]                           || methodNoArgs
+        'getInstanceMethod'       | [objectMethod.parameterTypes]                 || objectMethod
+        'getInstanceMethod'       | [objectMethod.name,
+                                     objectMethod.parameterTypes]                 || objectMethod
+        'getInstanceMethod'       | [objectMethod.returnType,
+                                     objectMethod.name,
+                                     objectMethod.parameterTypes]                 || objectMethod
+        'getInstanceMethod'       | []                                            || methodNoArgs
+        'getNonStaticMethod'      | [interfaceDefaultMethodNoArgs.name,
+                                     interfaceDefaultMethodNoArgs.parameterTypes] || interfaceDefaultMethodNoArgs
+        'getNonStaticMethod'      | [interfaceDefaultMethodNoArgs.name]           || interfaceDefaultMethodNoArgs
+        'getNonStaticMethod'      | [interfaceDefaultMethodNoArgs.returnType,
+                                     interfaceDefaultMethodNoArgs.name,
+                                     interfaceDefaultMethodNoArgs.parameterTypes] || interfaceDefaultMethodNoArgs
+        'getNonStaticMethod'      | [interfaceDefaultMethodNoArgs.returnType,
+                                     interfaceDefaultMethodNoArgs.name]           || interfaceDefaultMethodNoArgs
+        'getNonStaticMethod'      | [superMethodNoArgs.name,
+                                     superMethodNoArgs.parameterTypes]            || superMethodNoArgs
+        'getNonStaticMethod'      | [superMethodNoArgs.name]                      || superMethodNoArgs
+        'getNonStaticMethod'      | [superMethodNoArgs.returnType,
+                                     superMethodNoArgs.name,
+                                     superMethodNoArgs.parameterTypes]            || superMethodNoArgs
+        'getNonStaticMethod'      | [superMethodNoArgs.returnType,
+                                     superMethodNoArgs.name]                      || superMethodNoArgs
+        'getNonStaticMethod'      | [superMethod.parameterTypes]                  || superMethod
+        'getNonStaticMethod'      | [superMethod.name,
+                                     superMethod.parameterTypes]                  || superMethod
+        'getNonStaticMethod'      | [superMethod.returnType,
+                                     superMethod.name,
+                                     superMethod.parameterTypes]                  || superMethod
+        'getNonStaticMethod'      | [methodNoArgs.name,
+                                     methodNoArgs.parameterTypes]                 || methodNoArgs
+        'getNonStaticMethod'      | [methodNoArgs.name]                           || methodNoArgs
+        'getNonStaticMethod'      | [methodNoArgs.returnType,
+                                     methodNoArgs.name,
+                                     methodNoArgs.parameterTypes]                 || methodNoArgs
+        'getNonStaticMethod'      | [methodNoArgs.returnType,
+                                     methodNoArgs.name]                           || methodNoArgs
+        'getNonStaticMethod'      | [objectMethod.parameterTypes]                 || objectMethod
+        'getNonStaticMethod'      | [objectMethod.name,
+                                     objectMethod.parameterTypes]                 || objectMethod
+        'getNonStaticMethod'      | [objectMethod.returnType,
+                                     objectMethod.name,
+                                     objectMethod.parameterTypes]                 || objectMethod
+        'getNonStaticMethod'      | []                                            || methodNoArgs
+        'getStaticMethod'         | [superStaticMethodNoArgs.name,
+                                     superStaticMethodNoArgs.parameterTypes]      || superStaticMethodNoArgs
+        'getStaticMethod'         | [superStaticMethodNoArgs.name]                || superStaticMethodNoArgs
+        'getStaticMethod'         | [superStaticMethodNoArgs.returnType,
+                                     superStaticMethodNoArgs.name,
+                                     superStaticMethodNoArgs.parameterTypes]      || superStaticMethodNoArgs
+        'getStaticMethod'         | [superStaticMethodNoArgs.returnType,
+                                     superStaticMethodNoArgs.name]                || superStaticMethodNoArgs
+        'getStaticMethod'         | [superStaticMethod.parameterTypes]            || superStaticMethod
+        'getStaticMethod'         | [superStaticMethod.name,
+                                     superStaticMethod.parameterTypes]            || superStaticMethod
+        'getStaticMethod'         | [superStaticMethod.returnType,
+                                     superStaticMethod.name,
+                                     superStaticMethod.parameterTypes]            || superStaticMethod
+        'getStaticMethod'         | [staticMethodNoArgs.name,
+                                     staticMethodNoArgs.parameterTypes]           || staticMethodNoArgs
+        'getStaticMethod'         | [staticMethodNoArgs.name]                     || staticMethodNoArgs
+        'getStaticMethod'         | [staticMethodNoArgs.returnType,
+                                     staticMethodNoArgs.name,
+                                     staticMethodNoArgs.parameterTypes]           || staticMethodNoArgs
+        'getStaticMethod'         | [staticMethodNoArgs.returnType,
+                                     staticMethodNoArgs.name]                     || staticMethodNoArgs
+        'getStaticMethod'         | [staticMethod.parameterTypes]                 || staticMethod
+        'getStaticMethod'         | [staticMethod.name,
+                                     staticMethod.parameterTypes]                 || staticMethod
+        'getStaticMethod'         | [staticMethod.returnType,
+                                     staticMethod.name,
+                                     staticMethod.parameterTypes]                 || staticMethod
+        'getStaticMethod'         | []                                            || staticMethodNoArgs
+        'getMethod'               | [interfaceDefaultMethodNoArgs.name,
+                                     interfaceDefaultMethodNoArgs.parameterTypes] || interfaceDefaultMethodNoArgs
+        'getMethod'               | [interfaceDefaultMethodNoArgs.name]           || interfaceDefaultMethodNoArgs
+        'getMethod'               | [interfaceDefaultMethodNoArgs.returnType,
+                                     interfaceDefaultMethodNoArgs.name,
+                                     interfaceDefaultMethodNoArgs.parameterTypes] || interfaceDefaultMethodNoArgs
+        'getMethod'               | [interfaceDefaultMethodNoArgs.returnType,
+                                     interfaceDefaultMethodNoArgs.name]           || interfaceDefaultMethodNoArgs
+        'getMethod'               | [superStaticMethodNoArgs.name,
+                                     superStaticMethodNoArgs.parameterTypes]      || superStaticMethodNoArgs
+        'getMethod'               | [superStaticMethodNoArgs.name]                || superStaticMethodNoArgs
+        'getMethod'               | [superStaticMethodNoArgs.returnType,
+                                     superStaticMethodNoArgs.name,
+                                     superStaticMethodNoArgs.parameterTypes]      || superStaticMethodNoArgs
+        'getMethod'               | [superStaticMethodNoArgs.returnType,
+                                     superStaticMethodNoArgs.name]                || superStaticMethodNoArgs
+        'getMethod'               | [superStaticMethod.name,
+                                     superStaticMethod.parameterTypes]            || superStaticMethod
+        'getMethod'               | [superStaticMethod.returnType,
+                                     superStaticMethod.name,
+                                     superStaticMethod.parameterTypes]            || superStaticMethod
+        'getMethod'               | [superMethodNoArgs.name,
+                                     superMethodNoArgs.parameterTypes]            || superMethodNoArgs
+        'getMethod'               | [superMethodNoArgs.name]                      || superMethodNoArgs
+        'getMethod'               | [superMethodNoArgs.returnType,
+                                     superMethodNoArgs.name,
+                                     superMethodNoArgs.parameterTypes]            || superMethodNoArgs
+        'getMethod'               | [superMethodNoArgs.returnType,
+                                     superMethodNoArgs.name]                      || superMethodNoArgs
+        'getMethod'               | [superMethod.parameterTypes]                  || superMethod
+        'getMethod'               | [superMethod.name,
+                                     superMethod.parameterTypes]                  || superMethod
+        'getMethod'               | [superMethod.returnType,
+                                     superMethod.name,
+                                     superMethod.parameterTypes]                  || superMethod
+        'getMethod'               | [staticMethodNoArgs.name,
+                                     staticMethodNoArgs.parameterTypes]           || staticMethodNoArgs
+        'getMethod'               | [staticMethodNoArgs.name]                     || staticMethodNoArgs
+        'getMethod'               | [staticMethodNoArgs.returnType,
+                                     staticMethodNoArgs.name,
+                                     staticMethodNoArgs.parameterTypes]           || staticMethodNoArgs
+        'getMethod'               | [staticMethodNoArgs.returnType,
+                                     staticMethodNoArgs.name]                     || staticMethodNoArgs
+        'getMethod'               | [staticMethod.name,
+                                     staticMethod.parameterTypes]                 || staticMethod
+        'getMethod'               | [staticMethod.returnType,
+                                     staticMethod.name,
+                                     staticMethod.parameterTypes]                 || staticMethod
+        'getMethod'               | [methodNoArgs.name,
+                                     methodNoArgs.parameterTypes]                 || methodNoArgs
+        'getMethod'               | [methodNoArgs.name]                           || methodNoArgs
+        'getMethod'               | [methodNoArgs.returnType,
+                                     methodNoArgs.name,
+                                     methodNoArgs.parameterTypes]                 || methodNoArgs
+        'getMethod'               | [methodNoArgs.returnType,
+                                     methodNoArgs.name]                           || methodNoArgs
+        'getMethod'               | [objectMethod.parameterTypes]                 || objectMethod
+        'getMethod'               | [objectMethod.name,
+                                     objectMethod.parameterTypes]                 || objectMethod
+        'getMethod'               | [objectMethod.returnType,
+                                     objectMethod.name,
+                                     objectMethod.parameterTypes]                 || objectMethod
+        'getMethod'               | [inSuper]                                     || superLombokCanEqual
+        'getMethod'               | [inInstance]                                  || lombokCanEqual
+        'getMethod'               | [truePredicate]                               || lombokCanEqual
+        'getMethod'               | []                                            || methodNoArgs
         // getMethods
-        'getInstanceMethods'      | []                                                || [*EXPECTED_METHODS]
-        'getNonStaticMethods'     | []                                                ||
-                [*EXPECTED_METHODS, *EXPECTED_SUPER_METHODS, *EXPECTED_INTERFACE_METHODS, *OBJECT_METHODS]
-        'getStaticMethods'        | []                                                ||
-                [*EXPECTED_STATIC_METHODS, *EXPECTED_SUPER_STATIC_METHODS, *OBJECT_STATIC_METHODS]
-        'getMethods'              | [FALSE_PREDICATE]                                 || []
-        'getMethods'              | [IN_INTERFACE]                                    || [*EXPECTED_INTERFACE_METHODS]
-        'getMethods'              | [IN_SUPER]                                        ||
-                [*EXPECTED_SUPER_METHODS, *EXPECTED_SUPER_STATIC_METHODS]
-        'getMethods'              | [IN_INSTANCE]                                     || [*EXPECTED_METHODS, *EXPECTED_STATIC_METHODS]
-        'getMethods'              | [TRUE_PREDICATE]                                  ||
-                [*EXPECTED_METHODS, *EXPECTED_STATIC_METHODS,
-                 *EXPECTED_SUPER_METHODS, *EXPECTED_SUPER_STATIC_METHODS,
-                 *EXPECTED_INTERFACE_METHODS,
-                 *OBJECT_METHODS, *OBJECT_STATIC_METHODS]
-        'getMethods'              | []                                                ||
-                [*EXPECTED_METHODS, *EXPECTED_STATIC_METHODS,
-                 *EXPECTED_SUPER_METHODS, *EXPECTED_SUPER_STATIC_METHODS,
-                 *EXPECTED_INTERFACE_METHODS,
-                 *OBJECT_METHODS, *OBJECT_STATIC_METHODS]
+        'getInstanceMethods'      | []                                            || [*expectedMethods]
+        'getNonStaticMethods'     | []                                            ||
+                [*expectedMethods, *expectedSuperMethods, *expectedInterfaceMethods, *objectMethods]
+        'getStaticMethods'        | []                                            ||
+                [*expectedStaticMethods, *expectedSuperStaticMethods, *objectStaticMethods]
+        'getMethods'              | [falsePredicate]                              || []
+        'getMethods'              | [inInterface]                                 || [*expectedInterfaceMethods]
+        'getMethods'              | [inSuper]                                     ||
+                [*expectedSuperMethods, *expectedSuperStaticMethods]
+        'getMethods'              | [inInstance]                                  || [*expectedMethods, *expectedStaticMethods]
+        'getMethods'              | [truePredicate]                               ||
+                [*expectedMethods, *expectedStaticMethods,
+                 *expectedSuperMethods, *expectedSuperStaticMethods,
+                 *expectedInterfaceMethods,
+                 *objectMethods, *objectStaticMethods]
+        'getMethods'              | []                                            ||
+                [*expectedMethods, *expectedStaticMethods,
+                 *expectedSuperMethods, *expectedSuperStaticMethods,
+                 *expectedInterfaceMethods,
+                 *objectMethods, *objectStaticMethods]
     }
 
     def 'test that #method with #arguments throws ReflectException with #expected'() {
@@ -702,90 +702,90 @@ class ReflectFunctionalTest extends Specification {
         // getConstructor
         'getConstructor'     | []                                                                        || ReflectException.cannotFindConstructor(Person, new Class[0])
         'getConstructor'     | [Integer, String]                                                         || ReflectException.cannotFindConstructor(Person, Integer, String)
-        'getConstructor'     | [FALSE_PREDICATE]                                                         || ReflectException.cannotFindConstructor(Person)
+        'getConstructor'     | [falsePredicate]                                                          || ReflectException.cannotFindConstructor(Person)
         // get
-        'getInstance'        | [SUPER_STATIC_FIELD.name]                                                 || ReflectException.cannotFindField(Person, SUPER_STATIC_FIELD.name)
-        'getInstance'        | [STATIC_FIELD.name]                                                       || ReflectException.cannotFindField(Person, STATIC_FIELD.name)
-        'getInstance'        | [SUPER_FIELD.name]                                                        || ReflectException.cannotFindField(Person, SUPER_FIELD.name)
+        'getInstance'        | [superStaticField.name]                                                   || ReflectException.cannotFindField(Person, superStaticField.name)
+        'getInstance'        | [staticField.name]                                                        || ReflectException.cannotFindField(Person, staticField.name)
+        'getInstance'        | [superField.name]                                                         || ReflectException.cannotFindField(Person, superField.name)
         'getInstance'        | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
-        'getNonStatic'       | [SUPER_STATIC_FIELD.name]                                                 || ReflectException.cannotFindField(Person, SUPER_STATIC_FIELD.name)
-        'getNonStatic'       | [STATIC_FIELD.name]                                                       || ReflectException.cannotFindField(Person, STATIC_FIELD.name)
+        'getNonStatic'       | [superStaticField.name]                                                   || ReflectException.cannotFindField(Person, superStaticField.name)
+        'getNonStatic'       | [staticField.name]                                                        || ReflectException.cannotFindField(Person, staticField.name)
         'getNonStatic'       | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
-        'getStatic'          | [SUPER_FIELD.name]                                                        || ReflectException.cannotFindField(Person, SUPER_FIELD.name)
-        'getStatic'          | [FIELD.name]                                                              || ReflectException.cannotFindField(Person, FIELD.name)
+        'getStatic'          | [superField.name]                                                         || ReflectException.cannotFindField(Person, superField.name)
+        'getStatic'          | [field.name]                                                              || ReflectException.cannotFindField(Person, field.name)
         'getStatic'          | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
         'get'                | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
         'get'                | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
         'get'                | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
         'get'                | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
-        'get'                | [IN_OTHER]                                                                || ReflectException.cannotFindField(Person)
+        'get'                | [inOther]                                                                 || ReflectException.cannotFindField(Person)
         // getField
-        'getInstanceField'   | [SUPER_STATIC_FIELD.name]                                                 || ReflectException.cannotFindField(Person, SUPER_STATIC_FIELD.name)
-        'getInstanceField'   | [STATIC_FIELD.name]                                                       || ReflectException.cannotFindField(Person, STATIC_FIELD.name)
-        'getInstanceField'   | [SUPER_FIELD.name]                                                        || ReflectException.cannotFindField(Person, SUPER_FIELD.name)
+        'getInstanceField'   | [superStaticField.name]                                                   || ReflectException.cannotFindField(Person, superStaticField.name)
+        'getInstanceField'   | [staticField.name]                                                        || ReflectException.cannotFindField(Person, staticField.name)
+        'getInstanceField'   | [superField.name]                                                         || ReflectException.cannotFindField(Person, superField.name)
         'getInstanceField'   | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
-        'getNonStaticField'  | [SUPER_STATIC_FIELD.name]                                                 || ReflectException.cannotFindField(Person, SUPER_STATIC_FIELD.name)
-        'getNonStaticField'  | [STATIC_FIELD.name]                                                       || ReflectException.cannotFindField(Person, STATIC_FIELD.name)
+        'getNonStaticField'  | [superStaticField.name]                                                   || ReflectException.cannotFindField(Person, superStaticField.name)
+        'getNonStaticField'  | [staticField.name]                                                        || ReflectException.cannotFindField(Person, staticField.name)
         'getNonStaticField'  | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
-        'getStaticField'     | [SUPER_FIELD.name]                                                        || ReflectException.cannotFindField(Person, SUPER_FIELD.name)
-        'getStaticField'     | [FIELD.name]                                                              || ReflectException.cannotFindField(Person, FIELD.name)
+        'getStaticField'     | [superField.name]                                                         || ReflectException.cannotFindField(Person, superField.name)
+        'getStaticField'     | [field.name]                                                              || ReflectException.cannotFindField(Person, field.name)
         'getStaticField'     | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
         'getField'           | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
         'getField'           | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
         'getField'           | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
         'getField'           | ['notExisting']                                                           || ReflectException.cannotFindField(Person, 'notExisting')
-        'getField'           | [IN_OTHER]                                                                || ReflectException.cannotFindField(Person)
-        'getField'           | [FALSE_PREDICATE]                                                         || ReflectException.cannotFindField(Person)
+        'getField'           | [inOther]                                                                 || ReflectException.cannotFindField(Person)
+        'getField'           | [falsePredicate]                                                          || ReflectException.cannotFindField(Person)
         // invoke
         'invoke'             | [['Hello, world!', null, new Object()].toArray()]                         || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
         'invoke'             | ['notExisting', ['Hello, world!', null, new Object()].toArray()]          || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
         'invoke'             | [boolean, 'notExisting', ['Hello, world!', null, new Object()].toArray()] || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
         // getMethod
-        'getInstanceMethod'  | [SUPER_STATIC_METHOD_NO_ARGS.name,
-                                SUPER_STATIC_METHOD_NO_ARGS.parameterTypes]                              ||
-                ReflectException.cannotFindMethod(Person, null, SUPER_STATIC_METHOD_NO_ARGS.name, SUPER_STATIC_METHOD_NO_ARGS.parameterTypes)
-        'getInstanceMethod'  | [SUPER_STATIC_METHOD_NO_ARGS.returnType,
-                                SUPER_STATIC_METHOD_NO_ARGS.name,
-                                SUPER_STATIC_METHOD_NO_ARGS.parameterTypes]                              ||
-                ReflectException.cannotFindMethod(Person, SUPER_STATIC_METHOD_NO_ARGS.returnType, SUPER_STATIC_METHOD_NO_ARGS.name, SUPER_STATIC_METHOD_NO_ARGS.parameterTypes)
-        'getInstanceMethod'  | [SUPER_METHOD_NO_ARGS.name,
-                                SUPER_METHOD_NO_ARGS.parameterTypes]                                     ||
-                ReflectException.cannotFindMethod(Person, null, SUPER_METHOD_NO_ARGS.name, SUPER_METHOD_NO_ARGS.parameterTypes)
-        'getInstanceMethod'  | [SUPER_METHOD_NO_ARGS.returnType,
-                                SUPER_METHOD_NO_ARGS.name,
-                                SUPER_METHOD_NO_ARGS.parameterTypes]                                     ||
-                ReflectException.cannotFindMethod(Person, SUPER_METHOD_NO_ARGS.returnType, SUPER_METHOD_NO_ARGS.name, SUPER_METHOD_NO_ARGS.parameterTypes)
+        'getInstanceMethod'  | [superStaticMethodNoArgs.name,
+                                superStaticMethodNoArgs.parameterTypes]                                  ||
+                ReflectException.cannotFindMethod(Person, null, superStaticMethodNoArgs.name, superStaticMethodNoArgs.parameterTypes)
+        'getInstanceMethod'  | [superStaticMethodNoArgs.returnType,
+                                superStaticMethodNoArgs.name,
+                                superStaticMethodNoArgs.parameterTypes]                                  ||
+                ReflectException.cannotFindMethod(Person, superStaticMethodNoArgs.returnType, superStaticMethodNoArgs.name, superStaticMethodNoArgs.parameterTypes)
+        'getInstanceMethod'  | [superMethodNoArgs.name,
+                                superMethodNoArgs.parameterTypes]                                        ||
+                ReflectException.cannotFindMethod(Person, null, superMethodNoArgs.name, superMethodNoArgs.parameterTypes)
+        'getInstanceMethod'  | [superMethodNoArgs.returnType,
+                                superMethodNoArgs.name,
+                                superMethodNoArgs.parameterTypes]                                        ||
+                ReflectException.cannotFindMethod(Person, superMethodNoArgs.returnType, superMethodNoArgs.name, superMethodNoArgs.parameterTypes)
         'getInstanceMethod'  | [[String, null, Object].toArray(new Class[3])]                            || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
         'getInstanceMethod'  | ['notExisting', [String, null, Object].toArray(new Class[3])]             || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
         'getInstanceMethod'  | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]    || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
-        'getNonStaticMethod' | [SUPER_STATIC_METHOD_NO_ARGS.name,
-                                SUPER_STATIC_METHOD_NO_ARGS.parameterTypes]                              ||
-                ReflectException.cannotFindMethod(Person, null, SUPER_STATIC_METHOD_NO_ARGS.name, SUPER_STATIC_METHOD_NO_ARGS.parameterTypes)
-        'getNonStaticMethod' | [SUPER_STATIC_METHOD_NO_ARGS.returnType,
-                                SUPER_STATIC_METHOD_NO_ARGS.name,
-                                SUPER_STATIC_METHOD_NO_ARGS.parameterTypes]                              ||
-                ReflectException.cannotFindMethod(Person, SUPER_STATIC_METHOD_NO_ARGS.returnType, SUPER_STATIC_METHOD_NO_ARGS.name, SUPER_STATIC_METHOD_NO_ARGS.parameterTypes)
+        'getNonStaticMethod' | [superStaticMethodNoArgs.name,
+                                superStaticMethodNoArgs.parameterTypes]                                  ||
+                ReflectException.cannotFindMethod(Person, null, superStaticMethodNoArgs.name, superStaticMethodNoArgs.parameterTypes)
+        'getNonStaticMethod' | [superStaticMethodNoArgs.returnType,
+                                superStaticMethodNoArgs.name,
+                                superStaticMethodNoArgs.parameterTypes]                                  ||
+                ReflectException.cannotFindMethod(Person, superStaticMethodNoArgs.returnType, superStaticMethodNoArgs.name, superStaticMethodNoArgs.parameterTypes)
         'getNonStaticMethod' | [[String, null, Object].toArray(new Class[3])]                            || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
         'getNonStaticMethod' | ['notExisting', [String, null, Object].toArray(new Class[3])]             || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
         'getNonStaticMethod' | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]    || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
-        'getStaticMethod'    | [SUPER_METHOD_NO_ARGS.name,
-                                SUPER_METHOD_NO_ARGS.parameterTypes]                                     ||
-                ReflectException.cannotFindMethod(Person, null, SUPER_METHOD_NO_ARGS.name, SUPER_METHOD_NO_ARGS.parameterTypes)
-        'getStaticMethod'    | [SUPER_METHOD_NO_ARGS.returnType,
-                                SUPER_METHOD_NO_ARGS.name,
-                                SUPER_METHOD_NO_ARGS.parameterTypes]                                     ||
-                ReflectException.cannotFindMethod(Person, SUPER_METHOD_NO_ARGS.returnType, SUPER_METHOD_NO_ARGS.name, SUPER_METHOD_NO_ARGS.parameterTypes)
+        'getStaticMethod'    | [superMethodNoArgs.name,
+                                superMethodNoArgs.parameterTypes]                                        ||
+                ReflectException.cannotFindMethod(Person, null, superMethodNoArgs.name, superMethodNoArgs.parameterTypes)
+        'getStaticMethod'    | [superMethodNoArgs.returnType,
+                                superMethodNoArgs.name,
+                                superMethodNoArgs.parameterTypes]                                        ||
+                ReflectException.cannotFindMethod(Person, superMethodNoArgs.returnType, superMethodNoArgs.name, superMethodNoArgs.parameterTypes)
         'getStaticMethod'    | [[String, null, Object].toArray(new Class[3])]                            || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
         'getStaticMethod'    | ['notExisting', [String, null, Object].toArray(new Class[3])]             || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
         'getStaticMethod'    | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]    || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
         'getMethod'          | [[String, null, Object].toArray(new Class[3])]                            || ReflectException.cannotFindMethod(Person, null, null, String, null, Object)
         'getMethod'          | ['notExisting', [String, null, Object].toArray(new Class[3])]             || ReflectException.cannotFindMethod(Person, null, 'notExisting', String, null, Object)
         'getMethod'          | [boolean, 'notExisting', [String, null, Object].toArray(new Class[3])]    || ReflectException.cannotFindMethod(Person, boolean, 'notExisting', String, null, Object)
-        'getMethod'          | [FALSE_PREDICATE]                                                         || ReflectException.cannotFindMethod(Person)
+        'getMethod'          | [falsePredicate]                                                          || ReflectException.cannotFindMethod(Person)
         // enum
-        'name'               | []                                                                        || new ReflectException('%s is not an enum', new Person(SUPER_VALUE, VALUE))
-        'ordinal'            | []                                                                        || new ReflectException('%s is not an enum', new Person(SUPER_VALUE, VALUE))
-        'getEnum'            | []                                                                        || new ReflectException('%s is not an enum', new Person(SUPER_VALUE, VALUE))
+        'name'               | []                                                                        || new ReflectException('%s is not an enum', new Person(superValue, objectValue))
+        'ordinal'            | []                                                                        || new ReflectException('%s is not an enum', new Person(superValue, objectValue))
+        'getEnum'            | []                                                                        || new ReflectException('%s is not an enum', new Person(superValue, objectValue))
         'valueOf'            | ['invalid']                                                               || new ReflectException('Type \'%s\' is not an enum', Person)
         'values'             | []                                                                        || new ReflectException('Type \'%s\' is not an enum', Person)
         'getEnumClass'       | []                                                                        || new ReflectException('Type \'%s\' is not an enum', Person)
@@ -1184,8 +1184,8 @@ class ReflectFunctionalTest extends Specification {
     }
 
     protected static void resetStaticFields() {
-        SUPER_STATIC_FIELD.set(null, EXPECTED_SUPER_STATIC_FIELD_VALUE)
-        STATIC_FIELD.set(null, EXPECTED_STATIC_FIELD_VALUE)
+        superStaticField.set(null, expectedSuperStaticFieldValue)
+        staticField.set(null, expectedStaticFieldValue)
     }
 
 }

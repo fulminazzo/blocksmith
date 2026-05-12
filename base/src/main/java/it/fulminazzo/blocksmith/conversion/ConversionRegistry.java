@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unchecked")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class ConversionRegistry {
-    private static final @NotNull Map<Class<?>, ConverterRegistry<?>> CONVERTERS = new ConcurrentHashMap<>();
+    private static final @NotNull Map<Class<?>, ConverterRegistry<?>> converters = new ConcurrentHashMap<>();
 
     /**
      * Registers a new conversion function from the given type to the given target type.
@@ -52,7 +52,7 @@ final class ConversionRegistry {
     }
 
     private static <T> @NotNull ConverterRegistry<T> getConverter(final @NotNull Class<T> type) {
-        return (ConverterRegistry<T>) CONVERTERS.computeIfAbsent(type, k -> new ConverterRegistry<>());
+        return (ConverterRegistry<T>) converters.computeIfAbsent(type, k -> new ConverterRegistry<>());
     }
 
     /**

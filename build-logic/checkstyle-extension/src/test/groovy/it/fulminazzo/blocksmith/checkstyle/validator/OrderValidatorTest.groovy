@@ -8,7 +8,7 @@ import it.fulminazzo.blocksmith.checkstyle.validator.criterion.VisibilityCriteri
 import spock.lang.Specification
 
 class OrderValidatorTest extends Specification {
-    private static final Map<Integer, List<String>> ENCODED_MODIFIERS = [
+    private static final Map<Integer, List<String>> encodedModifiers = [
             0  : ['LITERAL_STATIC', 'FINAL', 'LITERAL_PUBLIC'],
             1  : ['LITERAL_STATIC', 'FINAL', 'LITERAL_PROTECTED'],
             2  : ['LITERAL_STATIC', 'FINAL'],
@@ -50,8 +50,8 @@ class OrderValidatorTest extends Specification {
         validator.lastScore == expected
 
         where:
-        [lastScore, modifiers, expected] << ENCODED_MODIFIERS.keySet().collectMany { score ->
-            ENCODED_MODIFIERS.findAll { it.key >= score }
+        [lastScore, modifiers, expected] << encodedModifiers.keySet().collectMany { score ->
+            encodedModifiers.findAll { it.key >= score }
                     .collect { [score, it.value, it.key] }
         }
     }
@@ -70,8 +70,8 @@ class OrderValidatorTest extends Specification {
         thrown(ValidationException)
 
         where:
-        [lastScore, modifiers] << ENCODED_MODIFIERS.keySet().collectMany { score ->
-            ENCODED_MODIFIERS.findAll { it.key < score }
+        [lastScore, modifiers] << encodedModifiers.keySet().collectMany { score ->
+            encodedModifiers.findAll { it.key < score }
                     .collect { [score, it.value] }
         }
     }
@@ -116,7 +116,7 @@ class OrderValidatorTest extends Specification {
         score == expected
 
         where:
-        [modifiers, expected] << ENCODED_MODIFIERS.collect { [it.value, it.key] }
+        [modifiers, expected] << encodedModifiers.collect { [it.value, it.key] }
     }
 
     def 'test that getMaxScore returns correct value'() {
