@@ -12,7 +12,7 @@ class DelegateConfigurationAdapterTest extends Specification {
 
         and:
         def adapter = new DelegateConfigurationAdapter(log)
-        adapter.format = ConfigurationFormat.JSON
+        adapter.format = Mock(ConfigurationFormat)
         adapter.delegate = delegate
 
         when:
