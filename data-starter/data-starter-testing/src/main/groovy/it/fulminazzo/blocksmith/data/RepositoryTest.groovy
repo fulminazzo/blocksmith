@@ -24,7 +24,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         def actual = repository.findById(expected.id).get()
 
         then:
-        actual.isPresent()
+        actual.present
         actual.get() == expected
 
         where:
@@ -36,7 +36,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         def actual = repository.findById(3L).get()
 
         then:
-        !actual.isPresent()
+        !actual.present
     }
 
     def 'test that existsById of #user returns #expected'() {
@@ -65,7 +65,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         def actual = repository.findById(entity.id).get()
 
         then:
-        actual.isPresent()
+        actual.present
         actual.get() == entity
 
         where:
@@ -188,7 +188,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         saved == entity
 
         when:
-        def actual = repository.findAllById(entity.collect { it.id }).get()
+        def actual = repository.findAllById(entity*.id).get()
 
         then:
         actual == entity
