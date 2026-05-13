@@ -220,9 +220,9 @@ abstract class ConfigurationAdapterIntegrationTest extends Specification {
         where:
         data << [
                 [
-                        'version'  : 1.0d,
-                        'server'   : ['host' : '0.0.0.0', 'port' : 8080],
-                        'database' : [
+                        (ConfigVersion.PROPERTY_NAME) : 1.0d,
+                        'server'                      : ['host' : '0.0.0.0', 'port' : 8080],
+                        'database'                    : [
                                 'host'     : 'localhost',
                                 'port'     : 5432,
                                 'user'     : 'admin',
@@ -230,16 +230,16 @@ abstract class ConfigurationAdapterIntegrationTest extends Specification {
                         ]
                 ],
                 [
-                        'version'  : 2.0d,
-                        'server'   : ['host' : '0.0.0.0', 'port' : 8080, 'timeoutSeconds' : 30],
-                        'database' : [
+                        (ConfigVersion.PROPERTY_NAME) : 2.0d,
+                        'server'                      : ['host' : '0.0.0.0', 'port' : 8080, 'timeoutSeconds' : 30],
+                        'database'                    : [
                                 'host'           : 'localhost',
                                 'port'           : 5432,
                                 'user'           : 'admin',
                                 'password'       : 'password123',
                                 'maxConnections' : 100
                         ],
-                        'features' : ['enableBetaUi' : true, 'enableMetrics' : false]
+                        'features'                    : ['enableBetaUi' : true, 'enableMetrics' : false]
                 ],
                 newMigrationConfig(null),
                 newMigrationConfig('invalid'),
@@ -292,8 +292,8 @@ abstract class ConfigurationAdapterIntegrationTest extends Specification {
 
     protected static Map<String, Object> newMigrationConfig(final Object version) {
         def properties = (new MigrationConfig()).properties
-        properties.removeAll { it.key in ['version', 'configVersion', 'class'] }
-        properties['version'] = version
+        properties.removeAll { it.key in [ConfigVersion.PROPERTY_NAME, 'configVersion', 'class'] }
+        properties[ConfigVersion.PROPERTY_NAME] = version
         return properties
     }
 
