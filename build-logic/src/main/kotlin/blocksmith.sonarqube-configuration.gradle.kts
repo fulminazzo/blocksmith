@@ -7,7 +7,9 @@ plugins {
 }
 
 val testingModuleName = "testing"
-val testSourceSets = listOf("test", "integrationTest", "functionalTest")
+
+private val mainLanguages = listOf("groovy", "java", "kotlin")
+private val testSourceSets = listOf("test", "integrationTest", "functionalTest")
 
 private val currentGitBranch = providers.of(GitBranchValueSource::class) {}
 
@@ -67,9 +69,23 @@ subprojects.forEach { project ->
         properties {
             property("sonar.sources", "src/main")
             property(
+                "sonar.java.binaries",
+                mainLanguages
+                    .map { "${project.layout.buildDirectory.get()}/classes/$it/main" }
+                    .filter { project.file(it).isDirectory }
+                    .joinToString(",")
+            )
+            property(
                 "sonar.tests",
                 testSourceSets
                     .map { "src/$it" }
+                    .filter { project.file(it).isDirectory }
+                    .joinToString(",")
+            )
+            property(
+                "sonar.java.test.binaries",
+                testSourceSets
+                    .map { "${project.layout.buildDirectory.get()}/classes/java/$it" }
                     .filter { project.file(it).isDirectory }
                     .joinToString(",")
             )
