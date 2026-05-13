@@ -68,7 +68,7 @@ include(
 
     "data-starter:data-starter-memory",
     "data-starter:data-starter-file",
-//    "data-starter:data-starter-sql", //TODO: re-enable
+    "data-starter:data-starter-sql",
     "data-starter:data-starter-redis",
     "data-starter:data-starter-mongo",
 
