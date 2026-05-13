@@ -70,7 +70,7 @@ include(
     "data-starter:data-starter-file",
 //    "data-starter:data-starter-sql", //TODO: re-enable
     "data-starter:data-starter-redis",
-//    "data-starter:data-starter-mongo", //TODO: re-enable
+    "data-starter:data-starter-mongo",
 
 //    "data-starter:data-starter-cache", //TODO: re-enable
 
