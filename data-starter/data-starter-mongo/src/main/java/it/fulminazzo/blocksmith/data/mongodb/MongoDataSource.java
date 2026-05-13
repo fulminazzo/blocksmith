@@ -62,45 +62,49 @@ import java.util.function.Function;
  *         );
  *         }</pre>
  *         where CustomMongoRepository extends MongoRepository and adds custom behavior
- *         such as batch operations, aggregation pipelines, or change stream monitoring.
+ *         such as batch operations, aggregation pipelines or change stream monitoring.
  *     </li>
  * </ul>
+ *
+ * @see MongoRepositorySettings
+ * @see MongoRepository
+ * @see MongoQueryEngine
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MongoDataSource implements RepositoryDataSource<MongoRepositorySettings> {
     private final @NotNull MongoClient client;
-
-    @Override
-    public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull EntityMapper<T, ID> entityMapper,
-            final @NotNull MongoRepositorySettings settings
-    ) {
-        return newRepository(
-                e -> new MongoRepository<>(e, entityMapper),
-                settings.withEntityMapperIfNotSet(entityMapper)
-        );
-    }
 
     /**
      * Creates a new custom repository.
      *
      * @param <R>               the type parameter
      * @param <T>               the type of the entities
-     * @param <ID>              the type of the id of the entities
+     * @param <I>               the type of the id of the entities
      * @param repositoryBuilder the repository creation function
      * @param settings          the settings to build the repository with
      * @return the repository
      */
     @SuppressWarnings("unchecked")
-    public <T, ID, R extends MongoRepository<T, ID>> @NotNull R newRepository(
-            final @NotNull Function<MongoQueryEngine<T, ID>, R> repositoryBuilder,
+    public <T, I, R extends MongoRepository<T, I>> @NotNull R newRepository(
+            final @NotNull Function<MongoQueryEngine<T, I>, R> repositoryBuilder,
             final @NotNull MongoRepositorySettings settings
     ) {
-        MongoQueryEngine<T, ID> engine = new MongoQueryEngine<>(
+        MongoQueryEngine<T, I> engine = new MongoQueryEngine<>(
                 client.getDatabase(settings.getDatabaseName())
                         .getCollection(settings.getCollectionName(), (Class<T>) settings.getEntityMapper().getType())
         );
         return repositoryBuilder.apply(engine);
+    }
+
+    @Override
+    public <T, I> @NotNull Repository<T, I> newRepository(
+            final @NotNull EntityMapper<T, I> entityMapper,
+            final @NotNull MongoRepositorySettings settings
+    ) {
+        return newRepository(
+                e -> new MongoRepository<>(e, entityMapper),
+                settings.withEntityMapperIfNotSet(entityMapper)
+        );
     }
 
     @Override

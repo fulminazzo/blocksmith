@@ -5,32 +5,30 @@ import com.mongodb.client.model.Filters
 import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.MongoClients
 import com.mongodb.reactivestreams.client.MongoCollection
-import de.flapdoodle.embed.mongo.transitions.RunningMongodProcess
-import de.flapdoodle.reverse.TransitionWalker
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.Users
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.pojo.PojoCodecProvider
 import reactor.core.publisher.Mono
+import spock.lang.Shared
 import spock.lang.Specification
 
-class MongoQueryEngineTest extends Specification {
-    private static final int port = 47016
+class MongoQueryEngineTest extends Specification implements MongoIntegrationTest {
+    @Shared
+    private MongoClient client
 
-    private static TransitionWalker.ReachedState<RunningMongodProcess> server
-    private static MongoClient client
-    private static MongoCollection<User> collection
+    @Shared
+    private MongoCollection<User> collection
 
-    private static MongoQueryEngine<?, ?> queryEngine
+    @Shared
+    private MongoQueryEngine<?, ?> queryEngine
 
     void setupSpec() {
-        server = TestUtils.startServer(port)
-
         def pojoCodec = CodecRegistries.fromRegistries(MongoClientSettings.defaultCodecRegistry,
                 CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
         )
 
-        client = MongoClients.create("mongodb://localhost:$port")
+        client = MongoClients.create(connectionString)
         def database = client.getDatabase('test').withCodecRegistry(pojoCodec)
         collection = database.getCollection('users', User)
 
@@ -39,12 +37,6 @@ class MongoQueryEngineTest extends Specification {
 
     void cleanupSpec() {
         client?.close()
-        server?.close()
-    }
-
-    def 'test that server is online'() {
-        expect:
-        TestUtils.isRunning(server)
     }
 
     def 'test that queryMany returns all data'() {
@@ -64,7 +56,7 @@ class MongoQueryEngineTest extends Specification {
 
         cleanup:
         Mono.from(
-                collection.deleteMany(Filters.in('_id', users.collect { it.id }))
+                collection.deleteMany(Filters.in('_id', users*.id))
         ).block()
     }
 

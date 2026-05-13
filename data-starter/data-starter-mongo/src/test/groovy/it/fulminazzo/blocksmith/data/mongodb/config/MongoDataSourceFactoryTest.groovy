@@ -1,22 +1,9 @@
 package it.fulminazzo.blocksmith.data.mongodb.config
 
-import de.flapdoodle.embed.mongo.transitions.RunningMongodProcess
-import de.flapdoodle.reverse.TransitionWalker
-import it.fulminazzo.blocksmith.data.mongodb.TestUtils
+import it.fulminazzo.blocksmith.data.mongodb.MongoIntegrationTest
 import spock.lang.Specification
 
-class MongoDataSourceFactoryTest extends Specification {
-    private static final int serverPort = 47020
-
-    private static TransitionWalker.ReachedState<RunningMongodProcess> server
-
-    void setupSpec() {
-        server = TestUtils.startServer(serverPort)
-    }
-
-    void cleanupSpec() {
-        server?.close()
-    }
+class MongoDataSourceFactoryTest extends Specification implements MongoIntegrationTest {
 
     def 'test build with #config'() {
         when:
@@ -31,27 +18,27 @@ class MongoDataSourceFactoryTest extends Specification {
         where:
         config << [
                 MongoDataSourceConfig.builder()
-                        .host('0.0.0.0')
+                        .host(serverHost)
                         .port(serverPort)
                         .build(),
                 MongoDataSourceConfig.builder()
-                        .host('0.0.0.0')
+                        .host(serverHost)
                         .port(serverPort)
                         .srvMaxHosts(1)
                         .srvServiceName('test')
                         .build(),
                 MongoDataSourceConfig.builder()
-                        .host('0.0.0.0')
+                        .host(serverHost)
                         .port(serverPort)
                         .replicaSetName('replica')
                         .build(),
                 MongoDataSourceConfig.builder()
-                        .host('0.0.0.0')
+                        .host(serverHost)
                         .port(serverPort)
                         .applicationName('test')
                         .build(),
                 MongoDataSourceConfig.builder()
-                        .host('0.0.0.0')
+                        .host(serverHost)
                         .port(serverPort)
                         .credentials(MongoDataSourceConfig.MongoCredentialConfig.builder()
                                 .username('test')

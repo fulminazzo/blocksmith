@@ -67,9 +67,13 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
  *         )
  *         .build();
  * }</pre>
+ *
+ * @see MongoDataSource
+ * @see MongoClientSettings
+ * @see CodecRegistry
  */
 public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder<MongoDataSource> {
-    private static final @NotNull CodecRegistry pojoCodecRegistry = fromRegistries(
+    private static final @NotNull CodecRegistry POJO_CODEC_REGISTRY = fromRegistries(
             MongoClientSettings.getDefaultCodecRegistry(),
             fromProviders(PojoCodecProvider.builder().automatic(true).build())
     );
@@ -84,14 +88,7 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
     MongoDataSourceBuilder() {
         this.clientSettings = MongoClientSettings.builder();
         this.hosts = new ArrayList<>();
-        codecRegistry(pojoCodecRegistry);
-    }
-
-    @Override
-    public @NotNull MongoDataSource build() {
-        if (hosts.isEmpty()) hosts.add(new ServerAddress());
-        clientSettings.applyToClusterSettings(c -> c.hosts(hosts));
-        return new MongoDataSource(MongoClients.create(clientSettings.build()));
+        codecRegistry(POJO_CODEC_REGISTRY);
     }
 
     /**
@@ -110,10 +107,12 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
      * @param maxHosts the max hosts
      * @return this object (for method chaining)
      */
-    public @NotNull MongoDataSourceBuilder srvMaxHosts(final
-                                                       @Range(from = 1, to = Integer.MAX_VALUE)
-                                                       @Positive(exceptionMessage = "server maximum number of hosts must be at least 1")
-                                                       int maxHosts) {
+    public @NotNull MongoDataSourceBuilder srvMaxHosts(
+            final
+            @Range(from = 1, to = Integer.MAX_VALUE)
+            @Positive(exceptionMessage = "server maximum number of hosts must be at least 1")
+            int maxHosts
+    ) {
         Validator.validateMethod(maxHosts);
         return clusterSettings(c -> c.srvMaxHosts(maxHosts));
     }
@@ -137,8 +136,10 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
      * @param port    the port
      * @return this object (for method chaining)
      */
-    public @NotNull MongoDataSourceBuilder host(final @NotNull String address,
-                                                final @Range(from = 1, to = 65535) @Port int port) {
+    public @NotNull MongoDataSourceBuilder host(
+            final @NotNull String address,
+            final @Range(from = 1, to = 65535) @Port int port
+    ) {
         Validator.validateMethod(address, port);
         hosts.add(new ServerAddress(address, port));
         return this;
@@ -153,7 +154,6 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
     public @NotNull MongoDataSourceBuilder replicaSetName(final @NotNull String replicaSetName) {
         return clusterSettings(c -> c.requiredReplicaSetName(replicaSetName));
     }
-
 
     /**
      * Sets the credentials for the client.
@@ -201,7 +201,6 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
         return this;
     }
 
-
     /**
      * Applies the given function to the logger settings (to update the options with new settings).
      *
@@ -245,7 +244,9 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
      * @param function the function
      * @return this object (for method chaining)
      */
-    public @NotNull MongoDataSourceBuilder connectionPoolSettings(final @NotNull Consumer<ConnectionPoolSettings.Builder> function) {
+    public @NotNull MongoDataSourceBuilder connectionPoolSettings(
+            final @NotNull Consumer<ConnectionPoolSettings.Builder> function
+    ) {
         clientSettings.applyToConnectionPoolSettings(function::accept);
         return this;
     }
@@ -270,6 +271,13 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
     public @NotNull MongoDataSourceBuilder sslSettings(final @NotNull Consumer<SslSettings.Builder> function) {
         clientSettings.applyToSslSettings(function::accept);
         return this;
+    }
+
+    @Override
+    public @NotNull MongoDataSource build() {
+        if (hosts.isEmpty()) hosts.add(new ServerAddress());
+        clientSettings.applyToClusterSettings(c -> c.hosts(hosts));
+        return new MongoDataSource(MongoClients.create(clientSettings.build()));
     }
 
 }
