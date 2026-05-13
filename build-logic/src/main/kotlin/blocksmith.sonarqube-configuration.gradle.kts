@@ -1,5 +1,11 @@
 /**
  * Plugin for applying the Blocksmith SonarQube configuration across submodules.
+ * <br>
+ * Because the `sonar` task relies on pre-compiled build directories,
+ * it is advised to run two Gradle tasks separately in order to get the complete reports:
+ * - `gradle check`
+ * - `gradle sonar` (to this point the sources should have been compiled, so sonar will be able to determine
+ * which ones to include)
  */
 
 plugins {
