@@ -20,7 +20,7 @@ import java.util.concurrent.Executors
 
 import static org.jooq.impl.DSL.constraint
 
-class SqlDataSourceTest extends Specification {
+class SqlDataSourceIntegrationTest extends Specification {
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor()
 
     @Shared
@@ -114,8 +114,8 @@ class SqlDataSourceTest extends Specification {
 
         where:
         argument << [
-                'build/resources/test/h2_schema.sql',
-                new File('build/resources/test/h2_schema.sql')
+                'build/resources/integrationTest/h2_schema.sql',
+                new File('build/resources/integrationTest/h2_schema.sql')
         ]
     }
 
@@ -236,7 +236,7 @@ class SqlDataSourceTest extends Specification {
 
     def 'test initialize sqlite disk connection'() {
         given:
-        def expected = new File('build/resources/test/sqlite_data_source/sqlite_data_source.db')
+        def expected = new File('build/resources/integrationTest/sqlite_data_source/sqlite_data_source.db')
         expected.parentFile.mkdirs()
 
         when:
@@ -246,7 +246,7 @@ class SqlDataSourceTest extends Specification {
                 .username('sa')
                 .password('')
                 .sqlite()
-                .disk('./build/resources/test/sqlite_data_source')
+                .disk('./build/resources/integrationTest/sqlite_data_source')
                 .build()
 
         then:
@@ -297,7 +297,7 @@ class SqlDataSourceTest extends Specification {
 
     def 'test initialize h2 disk connection'() {
         given:
-        def expected = new File('build/resources/test/h2_data_source/h2_data_source.mv.db')
+        def expected = new File('build/resources/integrationTest/h2_data_source/h2_data_source.mv.db')
 
         when:
         def source = SqlDataSource.builder()
@@ -306,7 +306,7 @@ class SqlDataSourceTest extends Specification {
                 .username('sa')
                 .password('')
                 .h2()
-                .disk('./build/resources/test/h2_data_source')
+                .disk('./build/resources/integrationTest/h2_data_source')
                 .allowSimultaneousFileConnections()
                 .build()
 
@@ -328,7 +328,7 @@ class SqlDataSourceTest extends Specification {
                 .username('sa')
                 .password('')
                 .h2()
-                .disk('./build/resources/test/h2_data_source_invalid/')
+                .disk('./build/resources/integrationTest/h2_data_source_invalid/')
                 .allowSimultaneousFileConnections()
                 .preventConnectionOnNonExistingFile()
                 .build()

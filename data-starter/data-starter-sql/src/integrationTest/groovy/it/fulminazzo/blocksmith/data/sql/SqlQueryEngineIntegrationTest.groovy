@@ -19,7 +19,7 @@ import java.util.concurrent.Executors
 import static org.jooq.impl.DSL.constraint
 import static org.jooq.impl.DSL.using
 
-class SqlQueryEngineTest extends Specification {
+class SqlQueryEngineIntegrationTest extends Specification {
     private static final String H2_PATH = 'jdbc:h2:mem:testdb'
     private static final String TABLE_NAME = 'USERS'
     private static final String ID_COLUMN = 'ID'

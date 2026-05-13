@@ -6,7 +6,7 @@ import spock.lang.Specification
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class H2DataSourceBuilderTest extends Specification {
+class H2DataSourceBuilderIntegrationTest extends Specification {
     private final ExecutorService executor = Executors.newSingleThreadExecutor()
     private final HikariConfig config = new HikariConfig()
 
@@ -38,7 +38,7 @@ class H2DataSourceBuilderTest extends Specification {
         given:
         def builder = new H2DataSourceBuilder(config, 'test', executor)
                 .memory()
-                .initScript('build/resources/test/h2_schema.sql')
+                .initScript('build/resources/integrationTest/h2_schema.sql')
 
         when:
         def dataSource = builder.build()
