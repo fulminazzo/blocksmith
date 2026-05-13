@@ -15,7 +15,6 @@ private val currentGitBranch = providers.of(GitBranchValueSource::class) {}
 
 sonar {
     properties {
-
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.token", getEnvVariable("SONAR_TOKEN"))
 
@@ -29,23 +28,15 @@ sonar {
          */
 //        property("sonar.branch.name", currentGitBranch.get())
 
-        property("sonar.language", "java")
-
         // Checkstyle
         property(
             "sonar.java.checkstyle.reportPaths",
-            subprojects.joinToString(",") {
-                "${it.layout.buildDirectory.get()}/reports/checkstyle/main.xml"
-            }
+            subprojects.joinToString(",") { it.getAllReportPaths("checkstyle") }
         )
         // CodeNarc
         property(
             "sonar.groovy.codenarc.reportPaths",
-            subprojects.joinToString(",") { subproject ->
-                testSourceSets.joinToString(",") {
-                    "${subproject.layout.buildDirectory.get()}/reports/codenarc/$it.xml"
-                }
-            }
+            subprojects.joinToString(",") { it.getAllReportPaths("codenarc") }
         )
         // JaCoCo
         property(
@@ -55,11 +46,7 @@ sonar {
         // SpotBugs
         property(
             "sonar.java.spotbugs.reportPaths",
-            subprojects.joinToString(",") { subproject ->
-                testSourceSets.joinToString(",") {
-                    "${subproject.layout.buildDirectory.get()}/reports/spotbugs/$it.xml"
-                }
-            }
+            subprojects.joinToString(",") { it.getAllReportPaths("spotbugs") }
         )
     }
 }
@@ -67,31 +54,40 @@ sonar {
 subprojects.forEach { project ->
     project.sonar {
         properties {
-            property("sonar.sources", "src/main")
-            property(
-                "sonar.java.binaries",
-                mainLanguages
-                    .map { "${project.layout.buildDirectory.get()}/classes/$it/main" }
-                    .filter { project.file(it).isDirectory }
-                    .joinToString(",")
-            )
-            property(
-                "sonar.tests",
-                testSourceSets
-                    .map { "src/$it" }
-                    .filter { project.file(it).isDirectory }
-                    .joinToString(",")
-            )
-            property(
-                "sonar.java.test.binaries",
-                testSourceSets
-                    .map { "${project.layout.buildDirectory.get()}/classes/java/$it" }
-                    .filter { project.file(it).isDirectory }
-                    .joinToString(",")
-            )
+            property("sonar.sources", project.getSourceSetPaths("main").joinToString(","))
+            property("sonar.java.binaries", project.getSourceSetBuildPaths("main").joinToString(","))
+            property("sonar.tests", project.testSourceSetsPaths.joinToString(","))
+            property("sonar.java.test.binaries", project.testSourceSetsBuildPaths.joinToString(","))
         }
     }
 }
+
+private fun Project.getAllReportPaths(reportName: String): String =
+    getReportPath("main", reportName) + "," + getTestReportPaths(reportName)
+
+private fun Project.getTestReportPaths(reportName: String): String =
+    testSourceSets.joinToString(",") { getReportPath(it, reportName) }
+
+private fun Project.getReportPath(sourceSet: String, reportName: String): String =
+    "${layout.buildDirectory.get()}/reports/$reportName/$sourceSet.xml"
+
+private val Project.testSourceSetsPaths: List<String>
+    get() = testSourceSets.flatMap { getSourceSetPaths(it) }
+
+private fun Project.getSourceSetPaths(sourceSet: String): List<String> =
+    mainLanguages
+        .map { "src/$sourceSet/$it" }
+        .filter { file(it).isDirectory }
+        .filter { file(it).listFiles().isNotEmpty() }
+
+private val Project.testSourceSetsBuildPaths: List<String>
+    get() = testSourceSets.flatMap { getSourceSetBuildPaths(it) }
+
+private fun Project.getSourceSetBuildPaths(sourceSet: String): List<String> =
+    mainLanguages
+        .map { "${layout.buildDirectory.get()}/classes/$it/$sourceSet" }
+        .filter { file(it).isDirectory }
+        .filter { file(it).listFiles().isNotEmpty() }
 
 private fun getEnvVariable(key: String): String =
     System.getenv(key) ?: rootProject.file(".env")
