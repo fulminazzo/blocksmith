@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono
 import spock.lang.Shared
 import spock.lang.Specification
 
-class MongoQueryEngineTest extends Specification implements MongoIntegrationTest {
+class MongoQueryEngineIntegrationTest extends Specification implements MongoIntegrationTest {
     @Shared
     private MongoClient client
 

@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.data.mongodb
 import it.fulminazzo.blocksmith.data.User
 import spock.lang.Specification
 
-class MongoDataSourceTest extends Specification implements MongoIntegrationTest {
+class MongoDataSourceIntegrationTest extends Specification implements MongoIntegrationTest {
 
     def 'test datasource life cycle'() {
         given:

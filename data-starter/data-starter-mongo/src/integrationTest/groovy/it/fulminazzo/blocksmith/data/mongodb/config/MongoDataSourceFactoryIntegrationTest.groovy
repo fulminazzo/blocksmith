@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.data.mongodb.config
 import it.fulminazzo.blocksmith.data.mongodb.MongoIntegrationTest
 import spock.lang.Specification
 
-class MongoDataSourceFactoryTest extends Specification implements MongoIntegrationTest {
+class MongoDataSourceFactoryIntegrationTest extends Specification implements MongoIntegrationTest {
 
     def 'test build with #config'() {
         when:
