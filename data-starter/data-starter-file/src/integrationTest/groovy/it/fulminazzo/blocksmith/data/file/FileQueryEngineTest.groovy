@@ -14,7 +14,7 @@ import java.util.concurrent.Executors
 @Slf4j
 class FileQueryEngineTest extends Specification {
     private static final ConfigurationFormat FORMAT = ConfigurationFormat.JSON
-    private static final File WORKING_DIR = new File('build/resources/test/file_query_engine')
+    private static final File WORKING_DIR = new File('build/resources/integrationTest/file_query_engine')
 
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor()
 

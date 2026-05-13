@@ -21,7 +21,7 @@ class FileDataSourceTest extends Specification {
         def repository = dataSource.newRepository(
                 User,
                 new FileRepositorySettings()
-                        .withDataDirectory(new File('build/resources/test'))
+                        .withDataDirectory(new File('build/resources/integrationTest'))
                         .withLogger(log)
                         .withFormat(ConfigurationFormat.JSON)
         )

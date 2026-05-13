@@ -15,7 +15,7 @@ import java.util.concurrent.Executors
 @Slf4j
 class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
     private static final ConfigurationFormat FORMAT = ConfigurationFormat.JSON
-    private static final File WORKING_DIR = new File('build/resources/test/file_repository')
+    private static final File WORKING_DIR = new File('build/resources/integrationTest/file_repository')
 
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor()
 
