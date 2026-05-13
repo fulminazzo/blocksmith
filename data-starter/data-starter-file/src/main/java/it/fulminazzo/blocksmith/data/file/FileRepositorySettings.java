@@ -26,14 +26,29 @@ public final class FileRepositorySettings extends RepositorySettings {
     private @Nullable Logger logger;
     private @Nullable ConfigurationFormat format;
 
+    /**
+     * Gets the data directory.
+     *
+     * @return the data directory
+     */
     public @NotNull File getDataDirectory() {
         return Objects.requireNonNull(dataDirectory, "dataDirectory has not been specified yet");
     }
 
+    /**
+     * Gets the logger.
+     *
+     * @return the logger
+     */
     public @NotNull Logger getLogger() {
         return Objects.requireNonNull(logger, "logger has not been specified yet");
     }
 
+    /**
+     * Gets the configuration format to save the data with.
+     *
+     * @return the format
+     */
     public @NotNull ConfigurationFormat getFormat() {
         return Objects.requireNonNull(format, "Configuration format has not been specified yet");
     }
