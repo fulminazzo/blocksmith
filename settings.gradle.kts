@@ -53,6 +53,3 @@ include(
     "config-starter:config-starter-testing",
     "config-starter:config-starter-generator"
 )
-
-// example
-include("example")
