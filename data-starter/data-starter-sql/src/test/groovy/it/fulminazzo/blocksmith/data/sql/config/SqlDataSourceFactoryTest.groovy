@@ -6,7 +6,6 @@ import org.h2.jdbc.JdbcSQLNonTransientConnectionException
 import spock.lang.Specification
 
 class SqlDataSourceFactoryTest extends Specification {
-
     private final SqlDataSourceFactory factory = new SqlDataSourceFactory()
 
     def 'test build with all parameters'() {
@@ -20,7 +19,7 @@ class SqlDataSourceFactoryTest extends Specification {
                 .connectionTimeout(30 * 1000)
                 .idleTimeout(10 * 60 * 1000)
                 .maxLifeTime(30 * 60 * 1000)
-                .properties(['prepStmtCacheSize': 250])
+                .properties(['prepStmtCacheSize' : 250])
                 .databaseType(DatabaseType.H2)
                 .build()
 

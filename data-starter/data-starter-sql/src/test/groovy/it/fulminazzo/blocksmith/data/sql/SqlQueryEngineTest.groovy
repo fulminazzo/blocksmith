@@ -10,6 +10,7 @@ import org.jooq.SQLDialect
 import org.jooq.Table
 import org.jooq.impl.DSL
 import org.jooq.impl.SQLDataType
+import spock.lang.Shared
 import spock.lang.Specification
 
 import java.util.concurrent.ExecutorService
@@ -23,14 +24,19 @@ class SqlQueryEngineTest extends Specification {
     private static final String TABLE_NAME = 'USERS'
     private static final String ID_COLUMN = 'ID'
 
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor()
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor()
 
-    private static HikariDataSource dataSource
-    private static DSLContext dsl
+    @Shared
+    private HikariDataSource dataSource
 
-    private static Table<? extends Record> table
+    @Shared
+    private DSLContext dsl
 
-    private static SqlQueryEngine<?, ?, ?> queryEngine
+    @Shared
+    private Table<? extends Record> table
+
+    @Shared
+    private SqlQueryEngine<?, ?, ?> queryEngine
 
     void setupSpec() {
         def config = new HikariConfig()
@@ -45,9 +51,7 @@ class SqlQueryEngineTest extends Specification {
                 .column(ID_COLUMN, SQLDataType.BIGINT.notNull().identity(true))
                 .column('USERNAME', SQLDataType.VARCHAR(16).notNull())
                 .column('AGE', SQLDataType.INTEGER.notNull())
-                .constraints(
-                        constraint("PK_$TABLE_NAME").primaryKey(ID_COLUMN)
-                )
+                .constraints(constraint("PK_$TABLE_NAME").primaryKey(ID_COLUMN))
                 .execute()
 
         table = dsl.meta().getTables(TABLE_NAME)[1]
@@ -56,12 +60,12 @@ class SqlQueryEngineTest extends Specification {
                 dsl,
                 table,
                 table.field(ID_COLUMN),
-                executor
+                EXECUTOR
         )
     }
 
     void cleanupSpec() {
-        executor?.shutdown()
+        EXECUTOR?.shutdown()
         dataSource?.close()
     }
 

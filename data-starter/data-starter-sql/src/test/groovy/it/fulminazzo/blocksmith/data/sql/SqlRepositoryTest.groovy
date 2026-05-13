@@ -11,6 +11,7 @@ import org.jooq.Record
 import org.jooq.SQLDialect
 import org.jooq.Table
 import org.jooq.impl.SQLDataType
+import spock.lang.Shared
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -22,10 +23,13 @@ class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<?
     private static final String TABLE_NAME = 'USERS'
     private static final String ID_COLUMN = 'ID'
 
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor()
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor()
 
-    private static HikariDataSource dataSource
-    private static DSLContext dsl
+    @Shared
+    private HikariDataSource dataSource
+
+    @Shared
+    private DSLContext dsl
 
     void setupSpec() {
         def config = new HikariConfig()
@@ -40,9 +44,7 @@ class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<?
                 .column(ID_COLUMN, SQLDataType.BIGINT.notNull().identity(true))
                 .column('USERNAME', SQLDataType.VARCHAR(16).notNull())
                 .column('AGE', SQLDataType.INTEGER.notNull())
-                .constraints(
-                        constraint("PK_$TABLE_NAME").primaryKey(ID_COLUMN)
-                )
+                .constraints(constraint("PK_$TABLE_NAME").primaryKey(ID_COLUMN))
                 .execute()
     }
 
@@ -55,7 +57,7 @@ class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<?
     }
 
     void cleanupSpec() {
-        executor?.shutdown()
+        EXECUTOR?.shutdown()
         dataSource?.close()
     }
 
@@ -67,7 +69,7 @@ class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<?
                         dsl,
                         table,
                         table.field(ID_COLUMN, Long),
-                        executor
+                        EXECUTOR
                 ),
                 EntityMapper.create(User)
         )

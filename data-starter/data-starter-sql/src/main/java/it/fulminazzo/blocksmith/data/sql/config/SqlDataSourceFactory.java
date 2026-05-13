@@ -11,29 +11,10 @@ import java.util.concurrent.Executors;
 
 final class SqlDataSourceFactory implements DataSourceFactory {
 
-    @Override
-    public @NotNull RepositoryDataSource<?> build(final @NotNull DataSourceConfig config) {
-        SqlDataSourceConfig dsConfig = (SqlDataSourceConfig) config;
-        SqlDataSourceBuilder builder = SqlDataSource.builder()
-                .executor(Executors.newCachedThreadPool())
-                .database(dsConfig.getDatabase())
-                .username(dsConfig.getUsername())
-                .password(dsConfig.getPassword())
-                .maximumPoolSize(dsConfig.getMaximumPoolSize())
-                .minimumIdle(dsConfig.getMinimumIdle())
-                .connectionTimeout(dsConfig.getConnectionTimeout())
-                .idleTimeout(dsConfig.getIdleTimeout())
-                .maxLifeTime(dsConfig.getMaxLifeTime());
-        dsConfig.getProperties().forEach((k, v) -> builder.addDataSourceProperty(k, v));
-
-        IDatabaseType type = dsConfig.getDatabaseType();
-        if (type == DatabaseType.H2) return buildH2(builder, dsConfig);
-        else if (type == DatabaseType.SQLITE) return buildSQLite(builder, dsConfig);
-        else return buildRemote(builder, dsConfig);
-    }
-
-    @NotNull SqlDataSource buildH2(final @NotNull SqlDataSourceBuilder dataSourceBuilder,
-                                   final @NotNull SqlDataSourceConfig config) {
+    @NotNull SqlDataSource buildH2(
+            final @NotNull SqlDataSourceBuilder dataSourceBuilder,
+            final @NotNull SqlDataSourceConfig config
+    ) {
         final DatabaseType type = DatabaseType.H2;
 
         H2DataSourceBuilder builder = dataSourceBuilder.h2();
@@ -65,8 +46,11 @@ final class SqlDataSourceFactory implements DataSourceFactory {
         return builder.build();
     }
 
-    @NotNull SqlDataSource buildSQLite(final @NotNull SqlDataSourceBuilder dataSourceBuilder,
-                                       final @NotNull SqlDataSourceConfig config) {
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
+    @NotNull SqlDataSource buildSQLite(
+            final @NotNull SqlDataSourceBuilder dataSourceBuilder,
+            final @NotNull SqlDataSourceConfig config
+    ) {
         final DatabaseType type = DatabaseType.SQLITE;
 
         SqliteDataSourceBuilder builder = dataSourceBuilder.sqlite();
@@ -88,8 +72,10 @@ final class SqlDataSourceFactory implements DataSourceFactory {
         return builder.build();
     }
 
-    @NotNull SqlDataSource buildRemote(final @NotNull SqlDataSourceBuilder dataSourceBuilder,
-                                       final @NotNull SqlDataSourceConfig config) {
+    @NotNull SqlDataSource buildRemote(
+            final @NotNull SqlDataSourceBuilder dataSourceBuilder,
+            final @NotNull SqlDataSourceConfig config
+    ) {
         final IDatabaseType type = config.getDatabaseType();
         RemoteDataSourceBuilder builder = dataSourceBuilder.databaseType(type);
         if (type == DatabaseType.MYSQL || type == DatabaseType.MARIADB) builder.mysql();
@@ -98,6 +84,27 @@ final class SqlDataSourceFactory implements DataSourceFactory {
                 .host(config.getHost())
                 .port(config.getPort())
                 .build();
+    }
+
+    @Override
+    public @NotNull RepositoryDataSource<?> build(final @NotNull DataSourceConfig config) {
+        SqlDataSourceConfig dsConfig = (SqlDataSourceConfig) config;
+        SqlDataSourceBuilder builder = SqlDataSource.builder()
+                .executor(Executors.newCachedThreadPool())
+                .database(dsConfig.getDatabase())
+                .username(dsConfig.getUsername())
+                .password(dsConfig.getPassword())
+                .maximumPoolSize(dsConfig.getMaximumPoolSize())
+                .minimumIdle(dsConfig.getMinimumIdle())
+                .connectionTimeout(dsConfig.getConnectionTimeout())
+                .idleTimeout(dsConfig.getIdleTimeout())
+                .maxLifeTime(dsConfig.getMaxLifeTime());
+        dsConfig.getProperties().forEach((k, v) -> builder.addDataSourceProperty(k, v));
+
+        IDatabaseType type = dsConfig.getDatabaseType();
+        if (type == DatabaseType.H2) return buildH2(builder, dsConfig);
+        else if (type == DatabaseType.SQLITE) return buildSQLite(builder, dsConfig);
+        else return buildRemote(builder, dsConfig);
     }
 
 }

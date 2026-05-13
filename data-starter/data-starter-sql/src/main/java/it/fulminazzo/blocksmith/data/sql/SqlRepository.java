@@ -15,12 +15,14 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Implementation of {@link Repository} for SQL databases.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities (should be unique)
- * @param <TB> the type of the table
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities (should be unique)
+ * @param <E> the type of the table
+ * @see SqlRepositorySettings
+ * @see SqlQueryEngine
  */
 @SuppressWarnings({"resource"})
-public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepository<T, ID, SqlQueryEngine<T, ID, TB>> {
+public class SqlRepository<T, I, E extends Table<?>> extends AbstractRepository<T, I, SqlQueryEngine<T, I, E>> {
 
     /**
      * Instantiates a new SQL repository.
@@ -28,13 +30,42 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
      * @param queryEngine  the query engine
      * @param entityMapper the entity mapper
      */
-    protected SqlRepository(final @NotNull SqlQueryEngine<T, ID, TB> queryEngine,
-                            final @NotNull EntityMapper<T, ID> entityMapper) {
+    protected SqlRepository(
+            final @NotNull SqlQueryEngine<T, I, E> queryEngine,
+            final @NotNull EntityMapper<T, I> entityMapper
+    ) {
         super(queryEngine, entityMapper);
     }
 
+    private @NotNull T saveSingle(
+            final @NotNull DSLContext dsl,
+            final @NotNull Table<?> table,
+            final @NotNull T entity
+    ) {
+        Record record = dsl.newRecord(table, entity);
+        return Objects.requireNonNull(dsl.insertInto(table)
+                        .set(record)
+                        .onConflict(queryEngine.getIdColumn())
+                        .doUpdate()
+                        .set(record)
+                        .returning()
+                        .fetchOneInto(
+                                entityMapper.getType()),
+                "The insertInto query did not return the stored entity accordingly"
+        );
+    }
+
     @Override
-    public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
+    public @NotNull CompletableFuture<Long> count() {
+        return queryEngine.query((dsl, table) ->
+                dsl.selectCount()
+                        .from(table)
+                        .fetchOne(0, Long.class)
+        );
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull I id) {
         return queryEngine.query((dsl, table) ->
                 dsl.selectFrom(table)
                         .where(queryEngine.idEquals(id))
@@ -43,7 +74,7 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
     }
 
     @Override
-    public @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id) {
+    public @NotNull CompletableFuture<Boolean> existsById(final @NotNull I id) {
         return queryEngine.query((dsl, table) -> dsl.fetchExists(
                 dsl.selectOne()
                         .from(table)
@@ -52,25 +83,16 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
     }
 
     @Override
-    public @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
-        return queryEngine.query((dsl, table) -> saveSingle(dsl, table, entity));
-    }
-
-    @Override
-    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id) {
-        return queryEngine.query((dsl, table) ->
-                dsl.deleteFrom(table)
-                        .where(queryEngine.idEquals(id))
-                        .execute()
-        );
-    }
-
-    @Override
     public @NotNull CompletableFuture<Collection<T>> findAll() {
         return queryEngine.query((dsl, table) ->
                 dsl.selectFrom(table)
                         .fetchInto(entityMapper.getType())
         );
+    }
+
+    @Override
+    protected @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
+        return queryEngine.query((dsl, table) -> saveSingle(dsl, table, entity));
     }
 
     @Override
@@ -84,7 +106,7 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
     }
 
     @Override
-    protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
+    protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<I> ids) {
         return queryEngine.query((dsl, table) -> dsl.selectFrom(table)
                 .where(queryEngine.idIn(ids))
                 .fetchInto(entityMapper.getType())
@@ -102,7 +124,7 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
     }
 
     @Override
-    protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids) {
+    protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<I> ids) {
         return queryEngine.query((dsl, table) ->
                 dsl.deleteFrom(table)
                         .where(queryEngine.idIn(ids))
@@ -111,25 +133,12 @@ public class SqlRepository<T, ID, TB extends Table<?>> extends AbstractRepositor
     }
 
     @Override
-    public @NotNull CompletableFuture<Long> count() {
+    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull I id) {
         return queryEngine.query((dsl, table) ->
-                dsl.selectCount()
-                        .from(table)
-                        .fetchOne(0, Long.class)
+                dsl.deleteFrom(table)
+                        .where(queryEngine.idEquals(id))
+                        .execute()
         );
-    }
-
-    private @NotNull T saveSingle(final @NotNull DSLContext dsl,
-                                  final @NotNull Table<?> table,
-                                  final @NotNull T entity) {
-        Record record = dsl.newRecord(table, entity);
-        return Objects.requireNonNull(dsl.insertInto(table)
-                .set(record)
-                .onConflict(queryEngine.getIdColumn())
-                .doUpdate()
-                .set(record)
-                .returning()
-                .fetchOneInto(entityMapper.getType()), "The insertInto query did not return the stored entity accordingly");
     }
 
 }

@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.data.sql.config;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import it.fulminazzo.blocksmith.data.sql.DatabaseType;
+import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
 import it.fulminazzo.blocksmith.validation.annotation.*;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import lombok.*;
@@ -14,11 +15,17 @@ import org.jetbrains.annotations.Range;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * {@link SqlDataSourceConfig} for {@link SqlDataSource}.
+ *
+ * @see DataSourceConfig
+ * @see SqlDataSource
+ */
 @Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public final class SqlDataSourceConfig implements DataSourceConfig {
 
     static {
@@ -101,11 +108,21 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     @Builder.Default
     ConnectionMode connectionMode = ConnectionMode.builder().build();
 
+    /**
+     * Defines the connection mode type.
+     */
+    public enum ConnectionModeType {
+        MEMORY, DISK, SERVER
+    }
+
+    /**
+     * Defines the connection mode.
+     */
     @Data
-    @FieldDefaults(level = AccessLevel.PRIVATE)
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class ConnectionMode {
 
         @NotNull
@@ -123,10 +140,6 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
         @Nullable
         Integer port;
 
-    }
-
-    public enum ConnectionModeType {
-        MEMORY, DISK, SERVER
     }
 
 }

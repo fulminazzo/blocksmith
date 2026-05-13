@@ -62,6 +62,12 @@ import java.util.stream.Collectors;
  *          </pre>
  *     </li>
  * </ul>
+ *
+ * @see SqlDataSource
+ * @see SqlDataSourceBuilder
+ * @see H2DataSourceBuilder
+ * @see SqliteDataSourceBuilder
+ * @see RemoteDataSourceBuilder
  */
 public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourceBuilder> {
     private static final String INITIAL_SETUP_KEY = "INIT";
@@ -78,31 +84,12 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      * @param database the database
      * @param executor the executor
      */
-    H2DataSourceBuilder(final @NotNull HikariConfig config,
-                        final @Nullable String database,
-                        final @Nullable ExecutorService executor) {
+    H2DataSourceBuilder(
+            final @NotNull HikariConfig config,
+            final @Nullable String database,
+            final @Nullable ExecutorService executor
+    ) {
         super(config, database, executor);
-    }
-
-    @Override
-    protected @NotNull String getJdbcUrl() {
-        String schemaName = this.schemaName;
-        if (schemaName == null) schemaName = getDatabase();
-        setParameters(INITIAL_SETUP_KEY, "CREATE SCHEMA IF NOT EXISTS " + schemaName);
-        setParameters(INITIAL_SETUP_KEY, "SET SCHEMA " + schemaName);
-        return String.format("jdbc:h2:%s",
-                Objects.requireNonNull(connectionMode, "The connection mode has not been specified yet. " +
-                        "Please choose between memory, disk or server before building")
-        ) + parameters.entrySet().stream()
-                .map(e ->
-                        String.format(";%s=%s", e.getKey(), String.join("\\;", e.getValue()))
-                )
-                .collect(Collectors.joining());
-    }
-
-    @Override
-    protected @NotNull SQLDialect getSQLDialect() {
-        return SQLDialect.H2;
     }
 
     /**
@@ -134,8 +121,10 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      * @param port the port
      * @return this object (for method chaining)
      */
-    public @NotNull H2DataSourceBuilder server(final @NotNull String host,
-                                               final @Range(from = 1, to = 65535) @Port int port) {
+    public @NotNull H2DataSourceBuilder server(
+            final @NotNull String host,
+            final @Range(from = 1, to = 65535) @Port int port
+    ) {
         Validator.validateMethod(host, port);
         connectionMode = String.format("tcp://%s:%s/%s", host, port, getDatabase());
         return this;
@@ -210,8 +199,10 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      * @param value the value
      * @return this object (for method chaining)
      */
-    public @NotNull H2DataSourceBuilder setParameters(final @NotNull String name,
-                                                      final @NotNull Object value) {
+    public @NotNull H2DataSourceBuilder setParameters(
+            final @NotNull String name,
+            final @NotNull Object value
+    ) {
         return setParameters(name, value.toString().toUpperCase());
     }
 
@@ -222,10 +213,33 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      * @param value the value
      * @return this object (for method chaining)
      */
-    public @NotNull H2DataSourceBuilder setParameters(final @NotNull String name,
-                                                      final @NotNull String value) {
+    public @NotNull H2DataSourceBuilder setParameters(
+            final @NotNull String name,
+            final @NotNull String value
+    ) {
         parameters.computeIfAbsent(name, v -> new ArrayList<>()).add(value);
         return this;
+    }
+
+    @Override
+    protected @NotNull String getJdbcUrl() {
+        String schemaName = this.schemaName;
+        if (schemaName == null) schemaName = getDatabase();
+        setParameters(INITIAL_SETUP_KEY, "CREATE SCHEMA IF NOT EXISTS " + schemaName);
+        setParameters(INITIAL_SETUP_KEY, "SET SCHEMA " + schemaName);
+        return String.format("jdbc:h2:%s",
+                Objects.requireNonNull(connectionMode, "The connection mode has not been specified yet. "
+                        + "Please choose between memory, disk or server before building")
+        ) + parameters.entrySet().stream()
+                .map(e ->
+                        String.format(";%s=%s", e.getKey(), String.join("\\;", e.getValue()))
+                )
+                .collect(Collectors.joining());
+    }
+
+    @Override
+    protected @NotNull SQLDialect getSQLDialect() {
+        return SQLDialect.H2;
     }
 
 }
