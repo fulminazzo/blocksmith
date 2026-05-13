@@ -1,25 +1,25 @@
 package it.fulminazzo.blocksmith.data.memory;
 
 import it.fulminazzo.blocksmith.data.CacheRepositorySettings;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-import org.jetbrains.annotations.NotNull;
+import lombok.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 
+/**
+ * Repository settings for in-memory repositories.
+ *
+ * @see MemoryRepository
+ * @see MemoryDataSource
+ */
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@With
 public final class MemoryRepositorySettings extends CacheRepositorySettings<MemoryRepositorySettings> {
-
     @Getter
-    private @Nullable ExpiryStrategy strategy;
-
-    public @NotNull MemoryRepositorySettings withExpirationStrategy(final @NotNull ExpiryStrategy strategy) {
-        this.strategy = strategy;
-        return this;
-    }
+    private @Nullable ExpiryStrategy expirationStrategy;
 
     /**
      * Identifies the strategy to use to clear out expired entities.

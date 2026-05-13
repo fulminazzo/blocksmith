@@ -16,12 +16,14 @@ import java.util.function.Function;
  * Although this is not properly linked to a database,
  * the engine still provides a {@link #query(Function)} method for familiarity.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities
+ * @see MemoryRepository
+ * @see MemoryDataSource
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class MemoryQueryEngine<T, ID> implements QueryEngine<T, ID> {
-    private final @NotNull ExpiringMap<ID, T> internalMap;
+public final class MemoryQueryEngine<T, I> implements QueryEngine<T, I> {
+    private final @NotNull ExpiringMap<I, T> internalMap;
 
     private final @NotNull Executor executor;
 
@@ -33,7 +35,7 @@ public final class MemoryQueryEngine<T, ID> implements QueryEngine<T, ID> {
      * @return the result
      */
     public <R> @NotNull CompletableFuture<R> query(
-            final @NotNull Function<ExpiringMap<ID, T>, R> queryFunction
+            final @NotNull Function<ExpiringMap<I, T>, R> queryFunction
     ) {
         return CompletableFuture.supplyAsync(() -> queryFunction.apply(internalMap), executor);
     }

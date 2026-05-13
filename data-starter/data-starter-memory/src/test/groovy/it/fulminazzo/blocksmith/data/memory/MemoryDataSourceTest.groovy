@@ -1,11 +1,9 @@
 package it.fulminazzo.blocksmith.data.memory
 
-
 import it.fulminazzo.blocksmith.data.User
 import spock.lang.Specification
 
 import java.time.Duration
-import java.util.concurrent.Executors
 
 class MemoryDataSourceTest extends Specification {
 
@@ -28,7 +26,7 @@ class MemoryDataSourceTest extends Specification {
         dataSource.close()
 
         then:
-        dataSource.executor.isShutdown()
+        dataSource.executor.shutdown
     }
 
 }
