@@ -22,7 +22,7 @@ mockito = "5.23.0"
 
 # DATA FORMATS
 jackson = "2.21.2"
-night_config = "3.8.4"
+night-config = "3.8.4"
 
 # MINECRAFT
 bukkit = "1.16.5-R0.1-SNAPSHOT"
@@ -31,7 +31,7 @@ bungeecord = "1.16-R0.2"
 velocity = "3.0.0-SNAPSHOT"
 
 # PROJECT
-java_parser = "3.28.0"
+java-parser = "3.28.0"
 
 [libraries]
 checkstyle = { module = "com.puppycrawl.tools:checkstyle", version.ref = "checkstyle" }
@@ -52,13 +52,13 @@ mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-version" }
 
 # DATA FORMATS
-jackson_json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-jackson_yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
-jackson_toml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-toml", version.ref = "jackson" }
-jackson_xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
-jackson_properties = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-properties", version.ref = "jackson" }
+jackson-json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
+jackson-toml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-toml", version.ref = "jackson" }
+jackson-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
+jackson-properties = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-properties", version.ref = "jackson" }
 
-night_config_toml = { module = "com.electronwill.night-config:toml", version.ref = "night_config" }
+night-config-toml = { module = "com.electronwill.night-config:toml", version.ref = "night-config" }
 
 # MINECRAFT
 bukkit = { module = "org.spigotmc:spigot-api", version.ref = "bukkit" }
@@ -67,7 +67,7 @@ bungeecord = { module = "net.md-5:bungeecord-api", version.ref = "bungeecord" }
 velocity = { module = "com.velocitypowered:velocity-api", version.ref = "velocity" }
 
 # PROJECT
-java_parser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "java_parser" }
+java-parser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "java-parser" }
 
 [bundles]
 # ANNOTATIONS
@@ -80,7 +80,7 @@ log4j = ["log4j-api", "log4j-core", "log4j-slf4j"]
 test-framework = ["spock-core", "mockito"]
 
 # DATA FORMATS
-toml = ["jackson_toml", "night_config_toml"]
+toml = ["jackson-toml", "night-config-toml"]
 
 [plugins]
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
