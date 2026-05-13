@@ -7,24 +7,18 @@ import it.fulminazzo.blocksmith.data.Users
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
-import redis.embedded.RedisServer
 import spock.lang.Specification
 
-class RedisQueryEngineTest extends Specification {
+class RedisQueryEngineTest extends Specification implements RedisIntegrationTest {
     private static final Mapper mapper = MapperFormat.JSON.newMapper()
-    private static final int serverPort = 16378
 
-    private static RedisServer server
     private static RedisClient client
     private static StatefulRedisConnection<String, String> connection
 
     private static RedisQueryEngine<User, Long> engine
 
     void setupSpec() {
-        server = new RedisServer(serverPort)
-        server.start()
-
-        client = RedisClient.create("redis://localhost:$serverPort")
+        client = RedisClient.create("redis://$serverHost:$serverPort")
         connection = client.connect()
 
         connection.async().mset(
@@ -45,12 +39,6 @@ class RedisQueryEngineTest extends Specification {
     void cleanupSpec() {
         connection?.close()
         client?.shutdown()
-        server?.stop()
-    }
-
-    def 'test that server is online'() {
-        expect:
-        server.active
     }
 
     def 'test that getValues returns #expected'() {

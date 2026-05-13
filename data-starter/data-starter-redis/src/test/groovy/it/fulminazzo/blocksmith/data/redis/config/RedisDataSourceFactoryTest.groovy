@@ -1,26 +1,14 @@
 package it.fulminazzo.blocksmith.data.redis.config
 
-import redis.embedded.RedisServer
+import it.fulminazzo.blocksmith.data.redis.RedisIntegrationTest
 import spock.lang.Specification
 
-class RedisDataSourceFactoryTest extends Specification {
-    private static final int serverPort = 16381
-
-    private static RedisServer server
-
-    void setupSpec() {
-        server = new RedisServer(serverPort)
-        server.start()
-    }
-
-    void cleanupSpec() {
-        server?.stop()
-    }
+class RedisDataSourceFactoryTest extends Specification implements RedisIntegrationTest {
 
     def 'test build with #database'() {
         given:
         def config = RedisDataSourceConfig.builder()
-                .host('0.0.0.0')
+                .host(serverHost)
                 .port(serverPort)
                 .clientName('config-test')
                 .ssl(false)

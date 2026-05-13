@@ -9,23 +9,17 @@ import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import org.jetbrains.annotations.NotNull
-import redis.embedded.RedisServer
 
 import java.time.Duration
 
-class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
+class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> implements RedisIntegrationTest {
     private static final Mapper mapper = MapperFormat.JSON.newMapper()
-    private static final int serverPort = 16379
 
-    private static RedisServer server
     private static RedisClient client
     private static StatefulRedisConnection<String, String> connection
 
     void setupSpec() {
-        server = new RedisServer(serverPort)
-        server.start()
-
-        client = RedisClient.create("redis://localhost:$serverPort")
+        client = RedisClient.create("redis://$serverHost:$serverPort")
         connection = client.connect()
     }
 
@@ -40,12 +34,6 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> {
     void cleanupSpec() {
         connection?.close()
         client?.shutdown()
-        server?.stop()
-    }
-
-    def 'test that server is online'() {
-        expect:
-        server.active
     }
 
     def 'test that save respects expiration time'() {
