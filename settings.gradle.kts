@@ -62,10 +62,9 @@ include(
 
     "data-starter:data-starter-base",
 
-//    "data-starter:data-starter-mapper", //TODO: re-enable
-
-//    "data-starter:data-starter-mapper:data-starter-mapper-base", //TODO: re-enable
-//    "data-starter:data-starter-mapper:data-starter-mapper-json", //TODO: re-enable
+    "data-starter:data-starter-mapper",
+    "data-starter:data-starter-mapper:data-starter-mapper-base",
+    "data-starter:data-starter-mapper:data-starter-mapper-json",
 
 //    "data-starter:data-starter-file", //TODO: re-enable
 //    "data-starter:data-starter-memory", //TODO: re-enable
