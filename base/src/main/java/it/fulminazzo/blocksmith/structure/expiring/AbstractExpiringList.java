@@ -154,7 +154,7 @@ abstract class AbstractExpiringList<E> extends AbstractExpiringCollection<E> imp
     }
 
     @Override
-    public boolean add(final @Nullable E element, final long ttl) {
+    public synchronized boolean add(final @Nullable E element, final long ttl) {
         return delegate.add(new ExpiringEntry<>(element, ttl));
     }
 

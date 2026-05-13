@@ -40,7 +40,7 @@ final class LazyExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
     }
 
     @Override
-    public @NotNull Set<Entry<K, V>> entrySet() {
+    public synchronized @NotNull Set<Entry<K, V>> entrySet() {
         clearExpired();
         return super.entrySet();
     }

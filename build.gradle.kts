@@ -47,6 +47,7 @@ allprojects {
                 dependencies {
                     rootProject.libs.bundles.annotations.get().forEach { implementation(it) }
                     annotationProcessor(rootProject.libs.lombok.get())
+                    compileOnly(libs.spotbugs.annotations)
 
                     implementation(libs.mockito)
 
@@ -117,12 +118,8 @@ tasks.register<JacocoReport>("jacocoAggregatedReport") {
     )
 
     reports {
-        xml.required = true
         html.required = true
+        xml.required = false
         csv.required = true
     }
-}
-
-tasks.check {
-    dependsOn(tasks.named("jacocoAggregatedReport"))
 }
