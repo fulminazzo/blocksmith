@@ -47,13 +47,13 @@ class ConstraintInfo {
                 }
                 values.put(name, value);
             }
-        String message;
+        String actualMessage;
         try {
-            message = reflect.invoke("message").get();
+            actualMessage = reflect.invoke("message").get();
         } catch (ReflectException e) {
-            message = null;
+            actualMessage = null;
         }
-        this.message = message;
+        this.message = actualMessage;
         String exceptionMessage;
         try {
             exceptionMessage = reflect.invoke("exceptionMessage").get();
