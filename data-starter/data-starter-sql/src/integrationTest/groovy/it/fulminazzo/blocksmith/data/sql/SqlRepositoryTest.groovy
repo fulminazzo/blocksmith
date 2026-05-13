@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.data.sql
 
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
+
 import it.fulminazzo.blocksmith.data.RepositoryTest
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
@@ -13,34 +12,33 @@ import org.jooq.Table
 import org.jooq.impl.SQLDataType
 import spock.lang.Shared
 
+import javax.sql.DataSource
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 import static org.jooq.impl.DSL.*
 
-class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<? extends Record>>> {
-    private static final String H2_PATH = 'jdbc:h2:mem:testdb'
+abstract class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<? extends Record>>> {
     private static final String TABLE_NAME = 'USERS'
     private static final String ID_COLUMN = 'ID'
 
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor()
 
     @Shared
-    private HikariDataSource dataSource
+    private DataSource dataSource
 
     @Shared
     private DSLContext dsl
 
-    void setupSpec() {
-        def config = new HikariConfig()
-        config.jdbcUrl = H2_PATH
-        config.username = 'sa'
-        config.password = ''
+    protected abstract DataSource newDataSource()
 
-        dataSource = new HikariDataSource(config)
+    protected abstract SQLDialect getDialect()
 
-        dsl = using(dataSource, SQLDialect.H2)
-        dsl.createTable(TABLE_NAME)
+    void setupSuite() {
+        dataSource = newDataSource()
+
+        dsl = using(dataSource, dialect)
+        dsl.createTableIfNotExists(TABLE_NAME)
                 .column(ID_COLUMN, SQLDataType.BIGINT.notNull().identity(true))
                 .column('USERNAME', SQLDataType.VARCHAR(16).notNull())
                 .column('AGE', SQLDataType.INTEGER.notNull())
@@ -48,22 +46,22 @@ class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<?
                 .execute()
     }
 
-    void setup() {
-        setupRepository()
-    }
-
-    void cleanup() {
-        clearData()
-    }
-
-    void cleanupSpec() {
+    void cleanupSuite() {
         EXECUTOR?.shutdown()
         dataSource?.close()
     }
 
+    void setupSingle() {
+        setupRepository()
+    }
+
+    void cleanupSingle() {
+        clearData()
+    }
+
     @Override
     SqlRepository<User, Long, Table<? extends Record>> initializeRepository() {
-        def table = dsl.meta().getTables(TABLE_NAME)[1]
+        def table = dsl.meta().getTables(TABLE_NAME).last
         return new SqlRepository<>(
                 new SqlQueryEngine<User, Long, Table<? extends Record>>(
                         dsl,
