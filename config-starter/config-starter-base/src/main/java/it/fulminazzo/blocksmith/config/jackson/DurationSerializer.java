@@ -101,8 +101,9 @@ final class DurationSerializer extends StdSerializer<Duration> {
     private static @NotNull String formatSeconds(final long integerPart, long decimalPart) {
         if (decimalPart == 0) return String.valueOf(integerPart);
         String decStr = String.format("%03d", decimalPart);
-        decStr = decStr.replaceAll("0+$", "");
-        return integerPart + "." + decStr;
+        int lastIndex = decStr.length() - 1;
+        while (lastIndex >= 0 && decStr.charAt(lastIndex) == '0') lastIndex--;
+        return integerPart + "." + decStr.substring(0, lastIndex + 1);
     }
 
 }
