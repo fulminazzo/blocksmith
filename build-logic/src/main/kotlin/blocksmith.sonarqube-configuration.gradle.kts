@@ -27,41 +27,23 @@ sonar {
          * regardless of the branch. Therefore, the CI/CD should be configured to run only on the default branch.
          */
 //        property("sonar.branch.name", currentGitBranch.get())
-
-        // Checkstyle
-        property(
-            "sonar.java.checkstyle.reportPaths",
-            allprojects.joinToString(",") { it.getAllReportPaths("checkstyle") }
-        )
-        // CodeNarc
-        property(
-            "sonar.groovy.codenarc.reportPaths",
-            allprojects.joinToString(",") { it.getAllReportPaths("codenarc") }
-        )
-        // JaCoCo
-        property(
-            "sonar.coverage.jacoco.xmlReportPaths",
-            allprojects.joinToString(",") { project ->
-                testSourceSets.joinToString(",") { sourceSet ->
-                    "${project.layout.buildDirectory.get()}/reports/jacoco/$sourceSet/jacocoTestReport.xml"
-                }
-            }
-        )
-        // SpotBugs
-        property(
-            "sonar.java.spotbugs.reportPaths",
-            allprojects.joinToString(",") { it.getAllReportPaths("spotbugs") }
-        )
     }
 }
 
-subprojects.forEach { project ->
+allprojects.forEach { project ->
     project.sonar {
         properties {
             property("sonar.sources", project.getSourceSetPaths("main").joinToString(","))
             property("sonar.java.binaries", project.getSourceSetBuildPaths("main").joinToString(","))
             property("sonar.tests", project.testSourceSetsPaths.joinToString(","))
             property("sonar.java.test.binaries", project.testSourceSetsBuildPaths.joinToString(","))
+
+            // Checkstyle
+            property("sonar.java.checkstyle.reportPaths", project.getAllReportPaths("checkstyle"))
+            // CodeNarc
+            property("sonar.groovy.codenarc.reportPaths", project.getAllReportPaths("codenarc"))
+            // SpotBugs
+            property("sonar.java.spotbugs.reportPaths", project.getAllReportPaths("spotbugs"))
         }
     }
 }
