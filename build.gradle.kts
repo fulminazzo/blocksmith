@@ -50,6 +50,7 @@ allprojects {
                     compileOnly(libs.spotbugs.annotations)
 
                     implementation(libs.mockito)
+                    implementation(libs.test.containers)
 
                     implementation(rootProject.projects.base.testing)
                 }
