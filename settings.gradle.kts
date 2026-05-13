@@ -66,8 +66,8 @@ include(
     "data-starter:data-starter-mapper:data-starter-mapper-base",
     "data-starter:data-starter-mapper:data-starter-mapper-json",
 
+    "data-starter:data-starter-memory",
 //    "data-starter:data-starter-file", //TODO: re-enable
-//    "data-starter:data-starter-memory", //TODO: re-enable
 //    "data-starter:data-starter-mongo", //TODO: re-enable
 //    "data-starter:data-starter-redis", //TODO: re-enable
 //    "data-starter:data-starter-sql", //TODO: re-enable
