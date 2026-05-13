@@ -6,7 +6,7 @@ import spock.lang.Specification
 
 import java.time.Duration
 
-class RedisDataSourceTest extends Specification implements RedisIntegrationTest {
+class RedisDataSourceIntegrationTest extends Specification implements RedisIntegrationTest {
 
     def 'test datasource life cycle'() {
         given:

@@ -10,7 +10,7 @@ import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import spock.lang.Shared
 import spock.lang.Specification
 
-class RedisQueryEngineTest extends Specification implements RedisIntegrationTest {
+class RedisQueryEngineIntegrationTest extends Specification implements RedisIntegrationTest {
     private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
     @Shared

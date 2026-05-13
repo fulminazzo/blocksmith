@@ -5,7 +5,7 @@ import org.testcontainers.containers.GenericContainer
 interface RedisIntegrationTest {
     int REDIS_PORT = 6379
 
-    GenericContainer REDIS = new GenericContainer('redis:7-alpine').withExposedPorts(REDIS_PORT)
+    GenericContainer REDIS_SERVER = new GenericContainer('redis:7-alpine').withExposedPorts(REDIS_PORT)
 
     default String getServerHost() {
         return container.host
@@ -16,8 +16,8 @@ interface RedisIntegrationTest {
     }
 
     default GenericContainer getContainer() {
-        if (!REDIS.created) REDIS.start()
-        return REDIS
+        if (!REDIS_SERVER.created) REDIS_SERVER.start()
+        return REDIS_SERVER
     }
 
 }

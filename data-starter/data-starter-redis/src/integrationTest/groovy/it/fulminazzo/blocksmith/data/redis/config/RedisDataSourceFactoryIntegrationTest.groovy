@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.data.redis.config
 import it.fulminazzo.blocksmith.data.redis.RedisIntegrationTest
 import spock.lang.Specification
 
-class RedisDataSourceFactoryTest extends Specification implements RedisIntegrationTest {
+class RedisDataSourceFactoryIntegrationTest extends Specification implements RedisIntegrationTest {
 
     def 'test build with #database'() {
         given:
