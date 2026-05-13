@@ -21,7 +21,7 @@ import java.util.stream.Stream;
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 abstract class ValidatorCheck extends AbstractCheck {
-    private static final @NotNull List<Integer> scopeChangeTokens = List.of(
+    private static final @NotNull List<Integer> SCOPE_CHANGE_TOKENS = List.of(
             TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF, TokenTypes.ENUM_DEF, TokenTypes.RECORD_DEF,
             TokenTypes.SLIST
     );
@@ -60,20 +60,20 @@ abstract class ValidatorCheck extends AbstractCheck {
     }
 
     /**
-     * Checks if the scope changed according to the {@link #scopeChangeTokens}.
+     * Checks if the scope changed according to the {@link #SCOPE_CHANGE_TOKENS}.
      *
      * @param node the node to check
      * @return {@code true} if the scope changed, {@code false} otherwise
      */
     protected boolean isScopeChanged(final @NotNull DetailAST node) {
-        return scopeChangeTokens.contains(node.getType());
+        return SCOPE_CHANGE_TOKENS.contains(node.getType());
     }
 
     @Override
     public int[] getDefaultTokens() {
         return Stream.concat(
                 getTokens().stream(),
-                scopeChangeTokens.stream()
+                SCOPE_CHANGE_TOKENS.stream()
         ).mapToInt(i -> i).distinct().toArray();
     }
 
