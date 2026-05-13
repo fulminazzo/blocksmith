@@ -54,13 +54,13 @@ class ConstraintInfo {
             actualMessage = null;
         }
         this.message = actualMessage;
-        String exceptionMessage;
+        String actualExceptionMessage;
         try {
-            exceptionMessage = reflect.invoke("exceptionMessage").get();
+            actualExceptionMessage = reflect.invoke("exceptionMessage").get();
         } catch (ReflectException e) {
-            exceptionMessage = "Invalid value for annotation " + constraint.annotationType().getSimpleName() + ": %s";
+            actualExceptionMessage = "Invalid value for annotation " + constraint.annotationType().getSimpleName() + ": %s";
         }
-        this.exceptionMessage = exceptionMessage;
+        this.exceptionMessage = actualExceptionMessage;
     }
 
     /**
