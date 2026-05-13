@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Contains all the default {@link Mapper}s.
+ *
+ * @see Mapper
  */
 public enum MapperFormat {
     /**
@@ -40,8 +42,8 @@ public enum MapperFormat {
                     type.toLowerCase()
             );
             throw new IllegalStateException(
-                    String.format("Could not find suitable %s for %s. ", Mapper.class.getSimpleName(), type) +
-                            String.format("Please check that the module %s is correctly installed.", moduleName)
+                    String.format("Could not find suitable %s for %s. ", Mapper.class.getSimpleName(), type)
+                            + String.format("Please check that the module %s is correctly installed.", moduleName)
             );
         }
     }

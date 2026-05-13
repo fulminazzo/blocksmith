@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * A mapper supports serialization and deserialization for a general Java bean.
+ *
+ * @see MapperFormat
  */
 public interface Mapper {
 
@@ -23,7 +25,6 @@ public interface Mapper {
      * @param serialized the serialized
      * @return the data
      */
-    <T> @NotNull T deserialize(final @NotNull String serialized,
-                               final @NotNull Class<T> dataType);
+    <T> @NotNull T deserialize(final @NotNull String serialized, final @NotNull Class<T> dataType);
 
 }
