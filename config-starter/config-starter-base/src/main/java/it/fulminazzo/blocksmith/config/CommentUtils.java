@@ -35,7 +35,7 @@ public final class CommentUtils {
     public static @NotNull Collection<String> getText(final @NotNull Comment comment) {
         List<String> text = new ArrayList<>();
         for (String t : comment.value()) {
-            String[] raw = t.replaceAll("\\n", "\n").split("\n");
+            String[] raw = t.replace("\\n", "\n").split("\n");
             text.addAll(Arrays.asList(raw));
         }
         return text;

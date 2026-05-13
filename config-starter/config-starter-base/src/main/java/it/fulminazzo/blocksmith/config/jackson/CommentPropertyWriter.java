@@ -15,7 +15,7 @@ import java.io.IOException;
 public abstract class CommentPropertyWriter extends BeanPropertyWriter {
     private static final long serialVersionUID = -8517628066134376003L;
 
-    private final @NotNull Comment comment;
+    private final transient @NotNull Comment comment;
 
     /**
      * Instantiates a new Comment property writer.
@@ -23,7 +23,7 @@ public abstract class CommentPropertyWriter extends BeanPropertyWriter {
      * @param base    the base
      * @param comment the comment
      */
-    public CommentPropertyWriter(
+    protected CommentPropertyWriter(
             final @NotNull BeanPropertyWriter base,
             final @NotNull Comment comment
     ) {
