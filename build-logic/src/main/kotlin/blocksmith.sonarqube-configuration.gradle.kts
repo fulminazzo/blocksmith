@@ -31,22 +31,26 @@ sonar {
         // Checkstyle
         property(
             "sonar.java.checkstyle.reportPaths",
-            subprojects.joinToString(",") { it.getAllReportPaths("checkstyle") }
+            allprojects.joinToString(",") { it.getAllReportPaths("checkstyle") }
         )
         // CodeNarc
         property(
             "sonar.groovy.codenarc.reportPaths",
-            subprojects.joinToString(",") { it.getAllReportPaths("codenarc") }
+            allprojects.joinToString(",") { it.getAllReportPaths("codenarc") }
         )
         // JaCoCo
         property(
-            "sonar.coverage.jacoco.aggregateXmlReportPaths",
-            "${rootProject.layout.buildDirectory.get()}/reports/jacoco/jacocoAggregatedReport/jacocoAggregatedReport.xml"
+            "sonar.coverage.jacoco.xmlReportPaths",
+            allprojects.joinToString(",") { project ->
+                testSourceSets.joinToString(",") { sourceSet ->
+                    "${project.layout.buildDirectory.get()}/reports/jacoco/$sourceSet/jacocoTestReport.xml"
+                }
+            }
         )
         // SpotBugs
         property(
             "sonar.java.spotbugs.reportPaths",
-            subprojects.joinToString(",") { it.getAllReportPaths("spotbugs") }
+            allprojects.joinToString(",") { it.getAllReportPaths("spotbugs") }
         )
     }
 }
