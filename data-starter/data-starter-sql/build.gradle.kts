@@ -1,10 +1,20 @@
+@file:Suppress("UnstableApiUsage")
+
 dependencies {
     api(libs.jooq)
     api(libs.hikaricp)
+}
 
-    testImplementation(libs.h2)
-    testImplementation(libs.sqlite)
-    testImplementation(libs.mysql)
-    testImplementation(libs.mariadb)
-    testImplementation(libs.postgresql)
+testing {
+    suites {
+        withType<JvmTestSuite> {
+            dependencies {
+                implementation(libs.h2)
+                implementation(libs.sqlite)
+                implementation(libs.mysql)
+                implementation(libs.mariadb)
+                implementation(libs.postgresql)
+            }
+        }
+    }
 }
