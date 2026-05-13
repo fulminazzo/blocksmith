@@ -25,8 +25,8 @@ class DurationDeserializerTest extends Specification {
         def data = '"1y 2Y 2M ABCM 3d 33e  4h 10i 5m 6s        7ms 8ns"'
 
         and:
-        def expected = Duration.ofDays(3 * DurationDeserializer.daysInYear)
-                .plusDays(2 * DurationDeserializer.daysInMonth)
+        def expected = Duration.ofDays(3 * DurationDeserializer.DAYS_IN_YEAR)
+                .plusDays(2 * DurationDeserializer.DAYS_IN_MONTH)
                 .plusDays(3)
                 .plusHours(4)
                 .plusMinutes(5)

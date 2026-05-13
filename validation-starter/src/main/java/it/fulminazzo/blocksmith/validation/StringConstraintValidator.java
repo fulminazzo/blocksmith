@@ -6,6 +6,9 @@ import java.util.function.Predicate;
 
 /**
  * A Constraint validator for {@link CharSequence} types.
+ *
+ * @see ConstraintValidator
+ * @see ConstraintValidatorImpl
  */
 final class StringConstraintValidator extends ConstraintValidatorImpl {
 

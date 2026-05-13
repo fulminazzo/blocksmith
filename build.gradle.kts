@@ -1,75 +1,69 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
     `java-library`
     groovy
-    `jacoco-report-aggregation`
 
-    alias(libs.plugins.buildconfig)
+    id("blocksmith.java-configuration")
+    id("blocksmith.sonarqube-configuration")
 }
 
 group = "it.fulminazzo"
 version = "0.0.1-SNAPSHOT"
 
 val testingModuleName: String by extra
+val projectInfoClassName: String by extra
 
 allprojects {
-    apply { plugin("java-library") }
-    apply { plugin("groovy") }
-    apply { plugin("jacoco") }
-    apply { plugin(rootProject.libs.plugins.buildconfig.get().pluginId) }
-
-    apply { plugin("blocksmith.java-configuration")}
-    apply { plugin("blocksmith.testing-module-configuration")}
-
     extra["baseModuleName"] = "base"
     extra["testingModuleName"] = "testing"
+    extra["projectInfoClassName"] = "ProjectInfo"
 
-    val baseModuleName: String by extra
+    apply { plugin("java-library") }
+    apply { plugin("groovy") }
 
-    val projectInfoClassName = "ProjectInfo"
+    apply { plugin("blocksmith.java-configuration") }
+    apply { plugin("blocksmith.tests-configuration") }
+    apply { plugin("blocksmith.testing-module-configuration") }
 
-    val mockitoAgent: Configuration by configurations.creating
+    apply { plugin("blocksmith.buildconfig-configuration") }
+    apply { plugin("blocksmith.checkstyle-configuration") }
+    apply { plugin("blocksmith.codenarc-configuration") }
+    apply { plugin("blocksmith.jacoco-configuration") }
+    apply { plugin("blocksmith.spotbugs-configuration") }
 
     dependencies {
         compileOnly(rootProject.libs.bundles.annotations)
+        compileOnly(libs.spotbugs.annotations)
         annotationProcessor(rootProject.libs.lombok)
 
         if (project.path != rootProject.projects.base.path) api(rootProject.projects.base)
-
-        testImplementation(rootProject.libs.bundles.annotations)
-        testRuntimeOnly(rootProject.libs.junit.platform)
-        testAnnotationProcessor(rootProject.libs.lombok)
-        testImplementation(rootProject.libs.bundles.test.framework)
-
-        testImplementation(rootProject.projects.base.testing)
-
-        mockitoAgent(rootProject.libs.mockito) { isTransitive = false }
     }
 
-    tasks.test {
-        useJUnitPlatform()
-        jvmArgs("-javaagent:${mockitoAgent.asPath}")
-    }
+    testing {
+        suites {
+            withType<JvmTestSuite> {
+                useSpock(rootProject.libs.versions.spock.core.get())
+                dependencies {
+                    rootProject.libs.bundles.annotations.get().forEach { implementation(it) }
+                    annotationProcessor(rootProject.libs.lombok.get())
+                    compileOnly(libs.spotbugs.annotations)
 
-    configure<com.github.gmazzo.buildconfig.BuildConfigExtension> {
-        packageName = "${rootProject.group}.${rootProject.name}"
-        className = projectInfoClassName
+                    implementation(libs.mockito)
 
-        var projectName = project.name
-        if (project.name.endsWith("-$baseModuleName")) projectName = project.name.removeSuffix("-$baseModuleName")
-
-        buildConfigField("String", "GROUP", "\"${rootProject.group}\"")
-        buildConfigField("String", "PROJECT_NAME", "\"${rootProject.name}\"")
-        buildConfigField("String", "MODULE_NAME", "\"${projectName}\"")
-    }
-
-    tasks.withType<JacocoReport>().configureEach {
-        classDirectories.setFrom(
-            files(classDirectories.files.map {
-                fileTree(it) {
-                    exclude("**/$projectInfoClassName**", "**/data/jooq/**")
+                    implementation(rootProject.projects.base.testing)
                 }
-            })
-        )
+                targets {
+                    all {
+                        testTask.configure {
+                            testLogging {
+                                exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }
@@ -95,10 +89,37 @@ dependencies {
         .forEach { implementation(it) }
 }
 
-tasks.testCodeCoverageReport {
-    dependsOn(tasks.test)
+tasks.register<JacocoReport>("jacocoAggregatedReport") {
+    description = "Generates a JaCoCo report aggregating all subprojects reports."
+    group = "Verification"
+
+    val subprojects = rootProject.subprojects.filter { !it.name.endsWith(testingModuleName) }
+
+    dependsOn(subprojects.flatMap { it.tasks.withType<Test>() })
+
+    executionData.setFrom(
+        subprojects.map { fileTree(it.layout.buildDirectory).include("jacoco/*.exec") }
+    )
+
+    sourceDirectories.setFrom(
+        subprojects.flatMap {
+            it.extensions.findByType<JavaPluginExtension>()
+                ?.sourceSets?.getByName("main")?.allSource?.srcDirs
+                ?: emptySet()
+        }
+    )
+
+    classDirectories.setFrom(
+        subprojects.flatMap {
+            it.extensions.findByType<JavaPluginExtension>()
+                ?.sourceSets?.getByName("main")?.output?.classesDirs
+                ?: emptyList()
+        }.map { fileTree(it) { exclude("**/$projectInfoClassName**") } }
+    )
+
     reports {
-        xml.required = true
+        html.required = true
+        xml.required = false
         csv.required = true
     }
 }

@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.config.nightconfig;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.Config;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.config.Comment;
 import it.fulminazzo.blocksmith.config.CommentUtils;
 import it.fulminazzo.blocksmith.naming.CaseConverter;
@@ -21,7 +22,7 @@ import java.util.HashSet;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NightConfigUtils {
-    private static final @NotNull Convention namingConvention = Convention.SNAKE_CASE;
+    private static final @NotNull Convention NAMING_CONVENTION = Convention.SNAKE_CASE;
 
     /**
      * Updates all the properties names of the given configuration
@@ -29,11 +30,12 @@ public final class NightConfigUtils {
      *
      * @param configuration the configuration
      */
+    @SuppressFBWarnings("DMI_ENTRY_SETS_MAY_REUSE_ENTRY_OBJECTS") // these are NOT maps!
     public static void fixPropertyNames(final @NotNull Config configuration) {
         for (Config.Entry entry : new HashSet<>(configuration.entrySet())) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            String translation = CaseConverter.convert(key, namingConvention);
+            String translation = CaseConverter.convert(key, NAMING_CONVENTION);
             if (!key.equals(translation)) {
                 configuration.remove(key);
                 configuration.set(translation, value);
@@ -49,11 +51,15 @@ public final class NightConfigUtils {
      * @param reference     the reference object
      * @param configuration the configuration
      */
-    public static void setComments(final @NotNull Object reference,
-                                   final @NotNull CommentedConfig configuration) {
+    public static void setComments(
+            final @NotNull Object reference,
+            final @NotNull CommentedConfig configuration
+    ) {
         Reflect reflect = Reflect.on(reference);
-        for (Field field : reflect.getFields(f -> !Modifier.isStatic(f.getModifiers()) && !Modifier.isTransient(f.getModifiers()))) {
-            String propertyName = CaseConverter.convert(field.getName(), namingConvention);
+        for (Field field : reflect.getFields(f -> !Modifier.isStatic(f.getModifiers())
+                && !Modifier.isTransient(f.getModifiers()))
+        ) {
+            String propertyName = CaseConverter.convert(field.getName(), NAMING_CONVENTION);
             if (field.isAnnotationPresent(Comment.class)) {
                 Comment comment = field.getAnnotation(Comment.class);
                 configuration.setComment(propertyName, getCommentValue(comment));

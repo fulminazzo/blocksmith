@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Config bean for testing purposes.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,13 +25,16 @@ public class MockConfig {
     String name = "blocksmith";
 
     @Comment("") // this comment should not appear
-    String description = "This is the description for the configuration file.\n" +
-            "Should be written in multiline format.";
+    String description = "This is the description for the configuration file.\n"
+            + "Should be written in multiline format.";
 
     List<String> authors = Arrays.asList("Fulminazzo", "Camilla");
 
     Internal internal = new Internal();
 
+    /**
+     * Config bean for testing purposes.
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

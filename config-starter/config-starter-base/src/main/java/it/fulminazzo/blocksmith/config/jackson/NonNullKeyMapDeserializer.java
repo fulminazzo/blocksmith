@@ -24,6 +24,7 @@ import java.util.Set;
  * deserialization errors.
  */
 final class NonNullKeyMapDeserializer extends MapDeserializer {
+    private static final long serialVersionUID = 7466523438413327325L;
 
     /**
      * Instantiates a new Lenient map deserializer.
@@ -35,12 +36,31 @@ final class NonNullKeyMapDeserializer extends MapDeserializer {
     }
 
     @Override
-    protected MapDeserializer withResolved(final KeyDeserializer keyDeserializer,
-                                           final TypeDeserializer valueTypeDeserializer,
-                                           final JsonDeserializer<?> valueDeserializer,
-                                           final NullValueProvider nuller,
-                                           final Set<String> ignorable,
-                                           final Set<String> includable) {
+    public Map<Object, Object> deserialize(
+            final JsonParser parser,
+            final DeserializationContext context
+    ) throws IOException {
+        return cleanupMap(super.deserialize(parser, context));
+    }
+
+    @Override
+    public Map<Object, Object> deserialize(
+            final JsonParser parser,
+            final DeserializationContext context,
+            final Map<Object, Object> result
+    ) throws IOException {
+        return cleanupMap(super.deserialize(parser, context, result));
+    }
+
+    @Override
+    protected MapDeserializer withResolved(
+            final KeyDeserializer keyDeserializer,
+            final TypeDeserializer valueTypeDeserializer,
+            final JsonDeserializer<?> valueDeserializer,
+            final NullValueProvider nuller,
+            final Set<String> ignorable,
+            final Set<String> includable
+    ) {
         return new NonNullKeyMapDeserializer(super.withResolved(
                 keyDeserializer,
                 valueTypeDeserializer,
@@ -49,19 +69,6 @@ final class NonNullKeyMapDeserializer extends MapDeserializer {
                 ignorable,
                 includable
         ));
-    }
-
-    @Override
-    public Map<Object, Object> deserialize(final JsonParser parser,
-                                           final DeserializationContext context) throws IOException {
-        return cleanupMap(super.deserialize(parser, context));
-    }
-
-    @Override
-    public Map<Object, Object> deserialize(final JsonParser parser,
-                                           final DeserializationContext context,
-                                           final Map<Object, Object> result) throws IOException {
-        return cleanupMap(super.deserialize(parser, context, result));
     }
 
     /**

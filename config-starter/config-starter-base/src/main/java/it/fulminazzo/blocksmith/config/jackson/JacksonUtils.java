@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.type.MapType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.config.Comment;
 import it.fulminazzo.blocksmith.config.CommentUtils;
 import it.fulminazzo.blocksmith.reflect.Reflect;
@@ -34,19 +35,11 @@ import java.util.function.Function;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class JacksonUtils {
-    private static final @NotNull List<Function<Logger, StdDeserializer<?>>> customDeserializers = new ArrayList<>();
+    private static final @NotNull List<Function<Logger, StdDeserializer<?>>> CUSTOM_DESERIALIZERS = new ArrayList<>();
 
     static {
         addCustomDeserializer(DurationDeserializer.class.getSimpleName());
         addCustomDeserializer("DataSourceConfigDeserializer"); // for data-starter module configurations serialization
-    }
-
-    private static void addCustomDeserializer(final @NotNull String deserializerName) {
-        try {
-            Reflect reflect = Reflect.on(JacksonUtils.class.getPackageName() + "." + deserializerName);
-            customDeserializers.add(l -> reflect.init(l).get());
-        } catch (ReflectException ignored) {
-        }
     }
 
     /**
@@ -61,35 +54,19 @@ final class JacksonUtils {
      * @return the updated mapper
      */
     @SuppressWarnings("unchecked")
-    public static <M extends ObjectMapper> M setupMapper(final @NotNull M mapper,
-                                                         final @NotNull Logger logger,
-                                                         final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
-        final SimpleModule module = new SimpleModule() {
-
-            @Override
-            public void setupModule(final @NotNull SetupContext context) {
-                super.setupModule(context);
-                context.addBeanDeserializerModifier(new JacksonBeanDeserializerModifier(logger));
-                if (commentPropertyWriterType != null)
-                    context.addBeanSerializerModifier(new JacksonBeanSerializerModifier<>(commentPropertyWriterType));
-            }
-
-        };
-        for (Function<Logger, StdDeserializer<?>> deserializerProvider : customDeserializers) {
+    public static <M extends ObjectMapper> M setupMapper(
+            final @NotNull M mapper,
+            final @NotNull Logger logger,
+            final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType
+    ) {
+        final SimpleModule module = new JacksonUtilsModule(logger, commentPropertyWriterType);
+        for (Function<Logger, StdDeserializer<?>> deserializerProvider : CUSTOM_DESERIALIZERS) {
             StdDeserializer<?> deserializer = deserializerProvider.apply(logger);
             registerDeserializer(module, deserializer);
         }
         return (M) mapper
-                .registerModule(module
-                        .addSerializer(new DurationSerializer())
-                )
+                .registerModule(module.addSerializer(new DurationSerializer()))
                 .addHandler(new LoggerDeserializationProblemHandler(logger));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> void registerDeserializer(final @NotNull SimpleModule module, final @NotNull StdDeserializer<?> deserializer) {
-        Class<T> type = (Class<T>) deserializer.handledType();
-        module.addDeserializer(type, (JsonDeserializer<? extends T>) deserializer);
     }
 
     /**
@@ -116,14 +93,37 @@ final class JacksonUtils {
         return finalPath;
     }
 
+    @SuppressWarnings("unchecked")
+    private static <T> void registerDeserializer(
+            final @NotNull SimpleModule module,
+            final @NotNull StdDeserializer<?> deserializer
+    ) {
+        Class<T> type = (Class<T>) deserializer.handledType();
+        module.addDeserializer(type, (JsonDeserializer<? extends T>) deserializer);
+    }
+
+    private static void addCustomDeserializer(final @NotNull String deserializerName) {
+        try {
+            Reflect reflect = Reflect.on(JacksonUtils.class.getPackageName() + "." + deserializerName);
+            CUSTOM_DESERIALIZERS.add(l -> reflect.init(l).get());
+        } catch (ReflectException ignored) {
+            // Could not initialize deserializer because of missing module
+        }
+    }
+
     @RequiredArgsConstructor
     private static final class JacksonBeanDeserializerModifier extends BeanDeserializerModifier {
-        private final @NotNull Logger logger;
+        private static final long serialVersionUID = 59847484471838278L;
+
+        @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+        private final transient @NotNull Logger logger;
 
         @Override
-        public BeanDeserializerBuilder updateBuilder(final DeserializationConfig config,
-                                                     final BeanDescription beanDescription,
-                                                     final BeanDeserializerBuilder builder) {
+        public BeanDeserializerBuilder updateBuilder(
+                final DeserializationConfig config,
+                final BeanDescription beanDescription,
+                final BeanDeserializerBuilder builder
+        ) {
             Iterator<SettableBeanProperty> it = builder.getProperties();
             while (it.hasNext()) {
                 SettableBeanProperty property = it.next();
@@ -142,10 +142,12 @@ final class JacksonUtils {
         }
 
         @Override
-        public JsonDeserializer<?> modifyMapDeserializer(final DeserializationConfig config,
-                                                         final MapType type,
-                                                         final BeanDescription beanDesc,
-                                                         final JsonDeserializer<?> deserializer) {
+        public JsonDeserializer<?> modifyMapDeserializer(
+                final DeserializationConfig config,
+                final MapType type,
+                final BeanDescription beanDesc,
+                final JsonDeserializer<?> deserializer
+        ) {
             if (deserializer instanceof MapDeserializer)
                 return new NonNullKeyMapDeserializer((MapDeserializer) deserializer);
             else return deserializer;
@@ -154,13 +156,18 @@ final class JacksonUtils {
     }
 
     @RequiredArgsConstructor
-    private static final class JacksonBeanSerializerModifier<W extends CommentPropertyWriter> extends BeanSerializerModifier {
+    private static final class JacksonBeanSerializerModifier<W extends CommentPropertyWriter>
+            extends BeanSerializerModifier {
+        private static final long serialVersionUID = -1175460700899374084L;
+
         private final @NotNull Class<W> commentPropertyWriterType;
 
         @Override
-        public List<BeanPropertyWriter> changeProperties(final SerializationConfig config,
-                                                         final BeanDescription beanDescription,
-                                                         final List<BeanPropertyWriter> beanProperties) {
+        public List<BeanPropertyWriter> changeProperties(
+                final SerializationConfig config,
+                final BeanDescription beanDescription,
+                final List<BeanPropertyWriter> beanProperties
+        ) {
             for (int i = 0; i < beanProperties.size(); i++) {
                 BeanPropertyWriter beanProperty = beanProperties.get(i);
                 Comment comment = beanProperty.getAnnotation(Comment.class);
@@ -172,6 +179,38 @@ final class JacksonUtils {
                 }
             }
             return beanProperties;
+        }
+
+    }
+
+    private static final class JacksonUtilsModule extends SimpleModule {
+        private static final long serialVersionUID = -7666638854510482920L;
+
+        @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+        private final transient @NotNull Logger logger;
+        @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+        private final transient @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType;
+
+        /**
+         * Instantiates a new Jackson utils module.
+         *
+         * @param logger                    the logger
+         * @param commentPropertyWriterType the comment property writer type
+         */
+        public JacksonUtilsModule(
+                final @NotNull Logger logger,
+                final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType
+        ) {
+            this.logger = logger;
+            this.commentPropertyWriterType = commentPropertyWriterType;
+        }
+
+        @Override
+        public void setupModule(final @NotNull SetupContext context) {
+            super.setupModule(context);
+            context.addBeanDeserializerModifier(new JacksonBeanDeserializerModifier(logger));
+            if (commentPropertyWriterType != null)
+                context.addBeanSerializerModifier(new JacksonBeanSerializerModifier<>(commentPropertyWriterType));
         }
 
     }

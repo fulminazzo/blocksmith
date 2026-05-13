@@ -43,24 +43,26 @@ class ConstraintInfo {
                 Object value = reflect.invoke(method).get();
                 if (value instanceof Number) {
                     Number number = (Number) value;
-                    if (number.doubleValue() == number.longValue()) value = number.longValue();
+                    if (number.doubleValue() % 1 == 0) value = number.longValue();
                 }
                 values.put(name, value);
             }
-        String message;
+        String actualMessage;
         try {
-            message = reflect.invoke("message").get();
+            actualMessage = reflect.invoke("message").get();
         } catch (ReflectException e) {
-            message = null;
+            actualMessage = null;
         }
-        this.message = message;
-        String exceptionMessage;
+        this.message = actualMessage;
+        String actualExceptionMessage;
         try {
-            exceptionMessage = reflect.invoke("exceptionMessage").get();
+            actualExceptionMessage = reflect.invoke("exceptionMessage").get();
         } catch (ReflectException e) {
-            exceptionMessage = "Invalid value for annotation " + constraint.annotationType().getSimpleName() + ": %s";
+            actualExceptionMessage = "Invalid value for annotation "
+                    + constraint.annotationType().getSimpleName()
+                    + ": %s";
         }
-        this.exceptionMessage = exceptionMessage;
+        this.exceptionMessage = actualExceptionMessage;
     }
 
     /**

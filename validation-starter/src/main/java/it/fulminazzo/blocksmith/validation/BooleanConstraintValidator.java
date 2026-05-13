@@ -6,6 +6,9 @@ import java.util.function.Predicate;
 
 /**
  * A Constraint validator for {@link Boolean} types.
+ *
+ * @see ConstraintValidator
+ * @see ConstraintValidatorImpl
  */
 final class BooleanConstraintValidator extends ConstraintValidatorImpl {
 

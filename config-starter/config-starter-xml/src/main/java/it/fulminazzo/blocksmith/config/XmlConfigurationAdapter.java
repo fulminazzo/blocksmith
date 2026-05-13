@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.fasterxml.jackson.dataformat.xml.util.DefaultXmlPrettyPrinter;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.config.jackson.CommentPropertyWriter;
 import it.fulminazzo.blocksmith.config.jackson.JacksonConfigurationAdapter;
 import it.fulminazzo.blocksmith.naming.CaseConverter;
@@ -19,22 +20,22 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 /**
  * Implementation of {@link BaseConfigurationAdapter} for XML.
  */
 final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
-    private static final @NotNull Convention xmlNamingConvention = Convention.PASCAL_CASE;
+    private static final @NotNull Convention XML_NAMING_CONVENTION = Convention.PASCAL_CASE;
 
     private final @NotNull BaseConfigurationAdapter delegate;
 
@@ -56,7 +57,9 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) throws IOException {
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(
+            final @NotNull InputStream stream
+    ) throws IOException {
         try {
             return toCommentedMap(stream);
         } catch (XMLStreamException e) {
@@ -81,24 +84,25 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
 
     @Override
     public <T> @NotNull String serialize(final @NotNull T configuration) throws IOException {
-        return delegate.serialize(ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention));
+        return delegate.serialize(
+                ConfigUtils.checkMap(configuration, ConfigUtils.JAVA_NAMING_CONVENTION, XML_NAMING_CONVENTION)
+        );
     }
 
     @Override
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
-        delegate.store(file, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention));
+        delegate.store(
+                file,
+                ConfigUtils.checkMap(configuration, ConfigUtils.JAVA_NAMING_CONVENTION, XML_NAMING_CONVENTION)
+        );
     }
 
     @Override
     public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
-        delegate.store(stream, ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> @NotNull T checkLoaded(final @NotNull T loaded) {
-        T actual = ConfigUtils.checkMap(loaded, xmlNamingConvention, ConfigUtils.javaNamingConvention);
-        if (actual instanceof Map<?, ?>) return (T) flattenCollectionMaps((Map<?, ?>) actual);
-        else return actual;
+        delegate.store(
+                stream,
+                ConfigUtils.checkMap(configuration, ConfigUtils.JAVA_NAMING_CONVENTION, XML_NAMING_CONVENTION)
+        );
     }
 
     /**
@@ -131,8 +135,8 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
             if (value instanceof Map<?, ?>) {
                 Map<?, ?> innerMap = flattenCollectionMaps((Map<?, ?>) value);
                 if (innerMap.size() == 1) {
-                    final Object innerKey = innerMap.keySet().iterator().next();
-                    if (key.equals(innerKey)) value = innerMap.get(innerKey);
+                    final Map.Entry<?, ?> innerEntry = innerMap.entrySet().iterator().next();
+                    if (key.equals(innerEntry.getKey())) value = innerEntry.getValue();
                 }
             }
             result.put(key, value);
@@ -140,7 +144,16 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
         return result;
     }
 
-    private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull InputStream stream) throws XMLStreamException {
+    @SuppressWarnings("unchecked")
+    private static <T> @NotNull T checkLoaded(final @NotNull T loaded) {
+        T actual = ConfigUtils.checkMap(loaded, XML_NAMING_CONVENTION, ConfigUtils.JAVA_NAMING_CONVENTION);
+        if (actual instanceof Map<?, ?>) return (T) flattenCollectionMaps((Map<?, ?>) actual);
+        else return actual;
+    }
+
+    private static @NotNull Map<String, List<String>> toCommentedMap(
+            final @NotNull InputStream stream
+    ) throws XMLStreamException {
         final XMLInputFactory factory = new WstxInputFactory();
         final XMLStreamReader reader = factory.createXMLStreamReader(stream);
 
@@ -156,8 +169,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
             switch (event) {
                 case XMLStreamConstants.COMMENT: {
                     for (String line : reader.getText().split("\\r?\\n")) {
-                        String t = line.trim();
-                        if (!t.isEmpty()) pending.add(t);
+                        pending.add(line.trim());
                     }
                     break;
                 }
@@ -191,6 +203,10 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
                     childCounts.pop();
                     isCollection.pop();
                     pending.clear();
+                    break;
+                }
+                default: {
+                    // do nothing
                 }
             }
         }
@@ -203,7 +219,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
         List<String> parts = new ArrayList<>(path);
         Collections.reverse(parts);
         return parts.stream()
-                .map(p -> CaseConverter.convert(p, xmlNamingConvention, ConfigUtils.javaNamingConvention))
+                .map(p -> CaseConverter.convert(p, XML_NAMING_CONVENTION, ConfigUtils.JAVA_NAMING_CONVENTION))
                 .collect(Collectors.joining("."));
     }
 
@@ -211,6 +227,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
      * An implementation of {@link CommentPropertyWriter} for handling XML comments.
      */
     static final class XmlCommentPropertyWriter extends CommentPropertyWriter {
+        private static final long serialVersionUID = 2513405897020486623L;
 
         /**
          * Instantiates a new XML comment property writer.
@@ -218,14 +235,19 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
          * @param base    the base
          * @param comment the comment
          */
-        public XmlCommentPropertyWriter(final @NotNull BeanPropertyWriter base,
-                                        final @NotNull Comment comment) {
+        public XmlCommentPropertyWriter(
+                final @NotNull BeanPropertyWriter base,
+                final @NotNull Comment comment
+        ) {
             super(base, comment);
         }
 
+        @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_INFERRED")
         @Override
-        protected void writeComment(final @NotNull JsonGenerator generator,
-                                    final @NotNull Comment comment) throws IOException {
+        protected void writeComment(
+                final @NotNull JsonGenerator generator,
+                final @NotNull Comment comment
+        ) throws IOException {
             PrettyPrinter prettyPrinter = generator.getPrettyPrinter();
             for (String t : CommentUtils.getText(comment)) {
                 if (prettyPrinter instanceof DefaultXmlPrettyPrinter)
@@ -247,10 +269,11 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static final class PascalCaseStrategy extends PropertyNamingStrategies.NamingBase {
         public static final @NotNull PascalCaseStrategy INSTANCE = new PascalCaseStrategy();
+        private static final long serialVersionUID = 6392463185254713738L;
 
         @Override
         public @NotNull String translate(final @NotNull String propertyName) {
-            return CaseConverter.convert(propertyName, xmlNamingConvention);
+            return CaseConverter.convert(propertyName, XML_NAMING_CONVENTION);
         }
 
     }

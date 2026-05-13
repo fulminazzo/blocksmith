@@ -119,4 +119,10 @@ final class Fields {
     @BeforeOrNow
     private TemporalAccessor beforeOrNowTemporal;
 
+    @AlphabeticalOrDigit
+    @Size(min = 8, max = Integer.MAX_VALUE)
+    @NonNull
+    @NotBlank
+    private String password;
+
 }

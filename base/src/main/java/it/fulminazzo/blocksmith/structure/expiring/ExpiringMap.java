@@ -11,8 +11,7 @@ import java.util.function.Function;
 
 /**
  * An expiring map is a special {@link Map} whose elements are subject to expiration.
- * Each must be defined with a time-to-live (TTL) period after which they will not be
- * present anymore.
+ * Each can be defined with a time-to-live (TTL) period after which they will not be present anymore.
  *
  * @param <K> the type of the keys
  * @param <V> the type of the values
@@ -20,80 +19,22 @@ import java.util.function.Function;
 public interface ExpiringMap<K, V> extends Map<K, V> {
 
     /**
-     * Adds a new key-value pair in the map.
+     * Updates the time-to-live of the given element.
+     * Requires the key to be present and not expired.
      *
-     * @param key   the key
-     * @param value the value
-     * @param ttl   the time-to-live (after which it will expire)
-     * @return the previous value present in the map
+     * @param key the key of the element
+     * @param ttl the new time-to-live in milliseconds
      */
-    @Nullable V put(final @Nullable K key, final @Nullable V value, final @NotNull Duration ttl);
+    void renew(final @NotNull K key, final long ttl);
 
     /**
-     * Adds a new key-value pair in the map.
+     * Updates the time-to-live of the given element.
+     * Requires the key to be present and not expired.
      *
-     * @param key   the key
-     * @param value the value
-     * @param ttl   the time-to-live (after which it will expire) in milliseconds
-     * @return the previous value present in the map
+     * @param key the key of the element
+     * @param ttl the new time-to-live
      */
-    @Nullable V put(final @Nullable K key, final @Nullable V value, final long ttl);
-
-    /**
-     * Adds a new key-value pair in the map.
-     * The pair will have no expiration time.
-     *
-     * @param key   the key
-     * @param value the value
-     * @return the previous value present in the map
-     */
-    @Override
-    @Nullable V put(final @Nullable K key, final @Nullable V value);
-
-    /**
-     * Adds a key-value pair in the map (if not already present).
-     *
-     * @param key   the key
-     * @param value the value
-     * @param ttl   the time-to-live (after which it will expire)
-     * @return the value of the map if present, otherwise the value parameter
-     */
-    @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value, final @NotNull Duration ttl);
-
-    /**
-     * Adds a key-value pair in the map (if not already present).
-     *
-     * @param key   the key
-     * @param value the value
-     * @param ttl   the time-to-live (after which it will expire) in milliseconds
-     * @return the value of the map if present, otherwise the value parameter
-     */
-    @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value, final long ttl);
-
-    /**
-     * Adds a key-value pair in the map (if not already present).
-     * The pair will have no expiration time.
-     *
-     * @param key   the key
-     * @param value the value
-     * @return the value of the map if present, otherwise the value parameter
-     */
-    @Override
-    @Nullable V putIfAbsent(final @Nullable K key, final @Nullable V value);
-
-    /**
-     * If a pair with the given key and old value is present, it is replaced with the new value.
-     *
-     * @param key      the key
-     * @param oldValue the old value
-     * @param newValue the new value
-     * @param ttl      the time-to-live (after which it will expire)
-     * @return {@code true} if the replacement was successful, {@code false} if no element matching the pair was found
-     */
-    boolean replace(final @Nullable K key,
-                    final @Nullable V oldValue,
-                    final @Nullable V newValue,
-                    final @NotNull Duration ttl);
+    void renew(final @NotNull K key, final @NotNull Duration ttl);
 
     /**
      * If a pair with the given key and old value is present, it is replaced with the new value.
@@ -104,46 +45,28 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param ttl      the time-to-live (after which it will expire) in milliseconds
      * @return {@code true} if the replacement was successful, {@code false} if no element matching the pair was found
      */
-    boolean replace(final @Nullable K key,
-                    final @Nullable V oldValue,
-                    final @Nullable V newValue,
-                    final long ttl);
+    boolean replace(
+            final @NotNull K key,
+            final @Nullable V oldValue,
+            final @Nullable V newValue,
+            final long ttl
+    );
 
     /**
      * If a pair with the given key and old value is present, it is replaced with the new value.
-     * The time-to-live is <b>not</b> refreshed.
      *
      * @param key      the key
      * @param oldValue the old value
      * @param newValue the new value
-     * @return {@code true} if the replacement was successful,
-     * {@code false} if no element matching the pair was found
+     * @param ttl      the time-to-live (after which it will expire)
+     * @return {@code true} if the replacement was successful, {@code false} if no element matching the pair was found
      */
-    @Override
-    boolean replace(final @Nullable K key, final @Nullable V oldValue, final @Nullable V newValue);
-
-    /**
-     * If a pair with the given key is present, it is replaced with the new value.
-     *
-     * @param key   the key
-     * @param value the new value
-     * @return the previous value present in the map
-     */
-    @Override
-    @Nullable V replace(final @Nullable K key, final @Nullable V value);
-
-    /**
-     * Adds a new key-value pair computed from the given function in the map
-     * only if an element with the given key is not present.
-     *
-     * @param key             the key
-     * @param mappingFunction the function to get the new value from
-     * @param ttl             the time-to-live (after which it will expire)
-     * @return the value of the map if present, otherwise the value parameter
-     */
-    @Nullable V computeIfAbsent(final @Nullable K key,
-                                final @NotNull Function<? super K, ? extends V> mappingFunction,
-                                final @NotNull Duration ttl);
+    boolean replace(
+            final @NotNull K key,
+            final @Nullable V oldValue,
+            final @Nullable V newValue,
+            final @NotNull Duration ttl
+    );
 
     /**
      * Adds a new key-value pair computed from the given function in the map
@@ -154,44 +77,26 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param ttl             the time-to-live (after which it will expire) in milliseconds
      * @return the value of the map if present, otherwise the value parameter
      */
-    @Nullable V computeIfAbsent(final @Nullable K key,
-                                final @NotNull Function<? super K, ? extends V> mappingFunction,
-                                final long ttl);
+    @Nullable V computeIfAbsent(
+            final @NotNull K key,
+            final @NotNull Function<? super K, ? extends V> mappingFunction,
+            final long ttl
+    );
 
     /**
      * Adds a new key-value pair computed from the given function in the map
      * only if an element with the given key is not present.
-     * The pair will have no expiration time.
      *
      * @param key             the key
      * @param mappingFunction the function to get the new value from
+     * @param ttl             the time-to-live (after which it will expire)
      * @return the value of the map if present, otherwise the value parameter
      */
-    @Override
-    @Nullable V computeIfAbsent(final @Nullable K key, final @NotNull Function<? super K, ? extends V> mappingFunction);
-
-    /**
-     * Updates an element in the map with a new value computed from the given function.
-     * The time-to-live is <b>not</b> refreshed.
-     *
-     * @param key               the key
-     * @param remappingFunction the function to get the new value from
-     * @return the value of the map if present, otherwise {@code null}
-     */
-    @Override
-    @Nullable V computeIfPresent(final @Nullable K key, final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction);
-
-    /**
-     * Adds, updates or removes a key-value pair in the map.
-     *
-     * @param key               the key
-     * @param remappingFunction the function to update the value from
-     * @param ttl               the time-to-live (after which it will expire)
-     * @return the previous value present in the map
-     */
-    @Nullable V compute(final @Nullable K key,
-                        final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction,
-                        final @NotNull Duration ttl);
+    @Nullable V computeIfAbsent(
+            final @NotNull K key,
+            final @NotNull Function<? super K, ? extends V> mappingFunction,
+            final @NotNull Duration ttl
+    );
 
     /**
      * Adds, updates or removes a key-value pair in the map.
@@ -201,34 +106,25 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param ttl               the time-to-live (after which it will expire) in milliseconds
      * @return the previous value present in the map
      */
-    @Nullable V compute(final @Nullable K key,
-                        final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction,
-                        final long ttl);
+    @Nullable V compute(
+            final @NotNull K key,
+            final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction,
+            final long ttl
+    );
 
     /**
      * Adds, updates or removes a key-value pair in the map.
-     * If the pair was added, it will have no expiration time.
-     * If the pair was updated, it will keep its expiration time.
      *
      * @param key               the key
      * @param remappingFunction the function to update the value from
+     * @param ttl               the time-to-live (after which it will expire)
      * @return the previous value present in the map
      */
-    @Override
-    @Nullable V compute(final @Nullable K key, final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction);
-
-    /**
-     * Updates an element in the map.
-     *
-     * @param key               the key
-     * @param value             the value inserted if the pair was not present
-     * @param remappingFunction the function used to update an existing pair value
-     * @param ttl               the time-to-live (after which it will expire)
-     * @return the updated value
-     */
-    @Nullable V merge(final @Nullable K key, final @NotNull V value,
-                      final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction,
-                      final @NotNull Duration ttl);
+    @Nullable V compute(
+            final @NotNull K key,
+            final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction,
+            final @NotNull Duration ttl
+    );
 
     /**
      * Updates an element in the map.
@@ -239,21 +135,26 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param ttl               the time-to-live (after which it will expire) in milliseconds
      * @return the updated value
      */
-    @Nullable V merge(final @Nullable K key, final @NotNull V value,
-                      final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction,
-                      final long ttl);
+    @Nullable V merge(
+            final @NotNull K key, final @NotNull V value,
+            final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction,
+            final long ttl
+    );
 
     /**
      * Updates an element in the map.
-     * The element will maintain its expiration time.
      *
      * @param key               the key
      * @param value             the value inserted if the pair was not present
      * @param remappingFunction the function used to update an existing pair value
+     * @param ttl               the time-to-live (after which it will expire)
      * @return the updated value
      */
-    @Override
-    @Nullable V merge(final @Nullable K key, final @NotNull V value, final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction);
+    @Nullable V merge(
+            final @NotNull K key, final @NotNull V value,
+            final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction,
+            final @NotNull Duration ttl
+    );
 
     /**
      * Adds all the elements of the given map to the current one.
@@ -267,18 +168,149 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * Each element will have the same expiration time.
      *
      * @param map the map to take elements from
-     * @param ttl the time-to-live (after which the elements will expire)
+     * @param ttl the time-to-live (after which the elements will expire) in milliseconds
      */
-    void putAll(final @NotNull Map<? extends K, ? extends V> map, final @NotNull Duration ttl);
+    void putAll(final @NotNull Map<? extends K, ? extends V> map, final long ttl);
 
     /**
      * Adds all the elements of the given map to the current one.
      * Each element will have the same expiration time.
      *
      * @param map the map to take elements from
-     * @param ttl the time-to-live (after which the elements will expire) in milliseconds
+     * @param ttl the time-to-live (after which the elements will expire)
      */
-    void putAll(final @NotNull Map<? extends K, ? extends V> map, final long ttl);
+    void putAll(final @NotNull Map<? extends K, ? extends V> map, final @NotNull Duration ttl);
+
+    /**
+     * Adds a new key-value pair in the map.
+     *
+     * @param key   the key
+     * @param value the value
+     * @param ttl   the time-to-live (after which it will expire) in milliseconds
+     * @return the previous value present in the map
+     */
+    @Nullable V put(final @NotNull K key, final @Nullable V value, final long ttl);
+
+    /**
+     * Adds a new key-value pair in the map.
+     *
+     * @param key   the key
+     * @param value the value
+     * @param ttl   the time-to-live (after which it will expire)
+     * @return the previous value present in the map
+     */
+    @Nullable V put(final @NotNull K key, final @Nullable V value, final @NotNull Duration ttl);
+
+    /**
+     * Adds a key-value pair in the map (if not already present).
+     *
+     * @param key   the key
+     * @param value the value
+     * @param ttl   the time-to-live (after which it will expire) in milliseconds
+     * @return the value of the map if present, otherwise the value parameter
+     */
+    @Nullable V putIfAbsent(final @NotNull K key, final @Nullable V value, final long ttl);
+
+    /**
+     * Adds a key-value pair in the map (if not already present).
+     *
+     * @param key   the key
+     * @param value the value
+     * @param ttl   the time-to-live (after which it will expire)
+     * @return the value of the map if present, otherwise the value parameter
+     */
+    @Nullable V putIfAbsent(final @NotNull K key, final @Nullable V value, final @NotNull Duration ttl);
+
+    /**
+     * Gets the remaining time-to-live of the element with the given key.
+     *
+     * @param key the key
+     * @return the TTL ({@code null} if not present)
+     */
+    @Nullable Duration getTtl(final @NotNull K key);
+
+    /**
+     * If a pair with the given key is present, it is replaced with the new value.
+     *
+     * @param key   the key
+     * @param value the new value
+     * @return the previous value present in the map
+     */
+    @Override
+    @Nullable V replace(final @NotNull K key, final @Nullable V value);
+
+    /**
+     * If a pair with the given key and old value is present, it is replaced with the new value.
+     * The time-to-live is <b>not</b> refreshed.
+     *
+     * @param key      the key
+     * @param oldValue the old value
+     * @param newValue the new value
+     * @return {@code true} if the replacement was successful,
+     *         {@code false} if no element matching the pair was found
+     */
+    @Override
+    boolean replace(final @NotNull K key, final @Nullable V oldValue, final @Nullable V newValue);
+
+    /**
+     * Adds a new key-value pair computed from the given function in the map
+     * only if an element with the given key is not present.
+     * The pair will have no expiration time.
+     *
+     * @param key             the key
+     * @param mappingFunction the function to get the new value from
+     * @return the value of the map if present, otherwise the value parameter
+     */
+    @Override
+    @Nullable V computeIfAbsent(
+            final @NotNull K key,
+            final @NotNull Function<? super K, ? extends V> mappingFunction
+    );
+
+    /**
+     * Updates an element in the map with a new value computed from the given function.
+     * The time-to-live is <b>not</b> refreshed.
+     *
+     * @param key               the key
+     * @param remappingFunction the function to get the new value from
+     * @return the value of the map if present, otherwise {@code null}
+     */
+    @Override
+    @Nullable V computeIfPresent(
+            final @NotNull K key,
+            final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction
+    );
+
+    /**
+     * Adds, updates or removes a key-value pair in the map.
+     * If the pair was added, it will have no expiration time.
+     * If the pair was updated, it will keep its expiration time.
+     *
+     * @param key               the key
+     * @param remappingFunction the function to update the value from
+     * @return the previous value present in the map
+     */
+    @Override
+    @Nullable V compute(
+            final @NotNull K key,
+            final @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction
+    );
+
+    /**
+     * Updates an element in the map.
+     * The element will maintain its expiration time.
+     *
+     * @param key               the key
+     * @param value             the value inserted if the pair was not present
+     * @param remappingFunction the function used to update an existing pair value
+     * @return the updated value
+     */
+    @Override
+    @Nullable V merge(
+            final @NotNull K key,
+            final @NotNull V value,
+            final @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction
+    );
 
     /**
      * Adds all the elements of the given map to the current one.
@@ -290,30 +322,26 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
     void putAll(final @NotNull Map<? extends K, ? extends V> map);
 
     /**
-     * Gets the remaining time-to-live of the element with the given key.
+     * Adds a new key-value pair in the map.
+     * The pair will have no expiration time.
      *
-     * @param key the key
-     * @return the TTL ({@code null} if not present)
+     * @param key   the key
+     * @param value the value
+     * @return the previous value present in the map
      */
-    @Nullable Duration getTtl(final @Nullable K key);
+    @Override
+    @Nullable V put(final @NotNull K key, final @Nullable V value);
 
     /**
-     * Updates the time-to-live of the given element.
-     * Requires the key to be present and not expired.
+     * Adds a key-value pair in the map (if not already present).
+     * The pair will have no expiration time.
      *
-     * @param key the key of the element
-     * @param ttl the new time-to-live
+     * @param key   the key
+     * @param value the value
+     * @return the value of the map if present, otherwise the value parameter
      */
-    void renew(final @Nullable K key, final @NotNull Duration ttl);
-
-    /**
-     * Updates the time-to-live of the given element.
-     * Requires the key to be present and not expired.
-     *
-     * @param key the key of the element
-     * @param ttl the new time-to-live in milliseconds
-     */
-    void renew(final @Nullable K key, final long ttl);
+    @Override
+    @Nullable V putIfAbsent(final @NotNull K key, final @Nullable V value);
 
     /**
      * Prints out the contents of this map.
@@ -368,8 +396,10 @@ public interface ExpiringMap<K, V> extends Map<K, V> {
      * @param taskInterval the interval upon which to check expirations
      * @return the map
      */
-    static <K, V> @NotNull ExpiringMap<K, V> scheduled(final @NotNull ScheduledExecutorService scheduler,
-                                                       final @NotNull Duration taskInterval) {
+    static <K, V> @NotNull ExpiringMap<K, V> scheduled(
+            final @NotNull ScheduledExecutorService scheduler,
+            final @NotNull Duration taskInterval
+    ) {
         return new ScheduledExpiringMap<>(scheduler, taskInterval);
     }
 

@@ -64,7 +64,7 @@ class DurationSerializerTest extends Specification {
                 .plusMillis(7)
                 .plusNanos(8)                                  || '3d 4h 5m 6s 7ms 8ns'
         Duration.ofSeconds(0)
-                .plusDays(2 * DurationSerializer.daysInMonth)
+                .plusDays(2 * DurationSerializer.DAYS_IN_MONTH)
                 .plusDays(3)
                 .plusHours(4)
                 .plusMinutes(5)
@@ -72,8 +72,8 @@ class DurationSerializerTest extends Specification {
                 .plusMillis(7)
                 .plusNanos(8)                                  || '2M 3d 4h 5m 6s 7ms 8ns'
         Duration.ofSeconds(0)
-                .plusDays(DurationSerializer.daysInYear)
-                .plusDays(2 * DurationSerializer.daysInMonth)
+                .plusDays(DurationSerializer.DAYS_IN_YEAR)
+                .plusDays(2 * DurationSerializer.DAYS_IN_MONTH)
                 .plusDays(3)
                 .plusHours(4)
                 .plusMinutes(5)
@@ -108,7 +108,7 @@ class DurationSerializerTest extends Specification {
                 .minusMillis(7)
                 .minusNanos(8)                                 || '-3d -4h -5m -6s -7ms -8ns'
         Duration.ofSeconds(0)
-                .minusDays(2 * DurationSerializer.daysInMonth)
+                .minusDays(2 * DurationSerializer.DAYS_IN_MONTH)
                 .minusDays(3)
                 .minusHours(4)
                 .minusMinutes(5)
@@ -116,8 +116,8 @@ class DurationSerializerTest extends Specification {
                 .minusMillis(7)
                 .minusNanos(8)                                 || '-2M -3d -4h -5m -6s -7ms -8ns'
         Duration.ofSeconds(0)
-                .minusDays(DurationSerializer.daysInYear)
-                .minusDays(2 * DurationSerializer.daysInMonth)
+                .minusDays(DurationSerializer.DAYS_IN_YEAR)
+                .minusDays(2 * DurationSerializer.DAYS_IN_MONTH)
                 .minusDays(3)
                 .minusHours(4)
                 .minusMinutes(5)

@@ -10,6 +10,10 @@ import java.lang.annotation.*;
  * Identifies a parameter or type that must be {@code false}.
  * <br>
  * Accepts {@code null} values.
+ *
+ * @see Constraint
+ * @see NonNull
+ * @see AssertTrue
  */
 @Constraint
 @Documented
@@ -23,11 +27,13 @@ public @interface AssertFalse {
      * By default, the message is a code that will later be translated by an appropriate translator.
      *
      * @return the message
+     * @see ValidationMessages
      */
     @NotNull String message() default ValidationMessages.REQUIRED_FALSE;
 
     /**
-     * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
+     * Gets the error message that will be shown in the
+     * {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
      *
      * @return the message
      */

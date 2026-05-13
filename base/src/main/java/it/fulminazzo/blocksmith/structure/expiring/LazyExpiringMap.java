@@ -17,41 +17,14 @@ import java.util.stream.Collectors;
 final class LazyExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
-    protected @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
-        clearExpired();
-        return delegate.get(key);
-    }
-
-    @Override
     public int size() {
         clearExpired();
         return delegate.size();
     }
 
     @Override
-    public boolean isEmpty() {
-        clearExpired();
-        return delegate.isEmpty();
-    }
-
-    @Override
     public boolean containsKey(final Object key) {
-        clearExpired();
-        return delegate.containsKey(key);
-    }
-
-    @Override
-    public V get(final Object key) {
-        clearExpired();
-        ExpiringEntry<V> entry = delegate.get(key);
-        return entry == null ? null : entry.getValue();
-    }
-
-    @Override
-    public V remove(final Object key) {
-        clearExpired();
-        ExpiringEntry<V> entry = delegate.remove(key);
-        return entry == null ? null : entry.getValue();
+        return getExpiring(key) != null;
     }
 
     @Override
@@ -67,9 +40,40 @@ final class LazyExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
     }
 
     @Override
-    public @NotNull Set<Entry<K, V>> entrySet() {
+    public synchronized @NotNull Set<Entry<K, V>> entrySet() {
         clearExpired();
         return super.entrySet();
+    }
+
+    @Override
+    public V remove(final Object key) {
+        ExpiringEntry<V> entry = getExpiring(key);
+        if (entry == null) return null;
+        else {
+            delegate.remove(key);
+            return entry.getValue();
+        }
+    }
+
+    @Override
+    public boolean isEmpty() {
+        clearExpired();
+        return delegate.isEmpty();
+    }
+
+    @Override
+    public V get(final Object key) {
+        ExpiringEntry<V> entry = getExpiring(key);
+        return entry == null ? null : entry.getValue();
+    }
+
+    @Override
+    protected @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
+        ExpiringEntry<V> entry = key == null ? null : delegate.get(key);
+        if (entry != null && entry.isExpired()) {
+            delegate.remove(key);
+            return null;
+        } else return entry;
     }
 
 }

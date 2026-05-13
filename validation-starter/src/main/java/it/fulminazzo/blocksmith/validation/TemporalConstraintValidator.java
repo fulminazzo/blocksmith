@@ -11,6 +11,9 @@ import java.util.function.LongPredicate;
 
 /**
  * A Constraint validator for {@link TemporalAccessor} and time related types.
+ *
+ * @see ConstraintValidator
+ * @see ConstraintValidatorImpl
  */
 final class TemporalConstraintValidator extends ConstraintValidatorImpl {
 
@@ -20,7 +23,8 @@ final class TemporalConstraintValidator extends ConstraintValidatorImpl {
      * @param validPredicate the valid predicate
      */
     public TemporalConstraintValidator(final @NotNull LongPredicate validPredicate) {
-        super(o -> o == null || validPredicate.test(toMillis(o)), Date.class, Calendar.class, TemporalAccessor.class);
+        super(o -> o == null
+                || validPredicate.test(toMillis(o)), Date.class, Calendar.class, TemporalAccessor.class);
     }
 
     @Override

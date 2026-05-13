@@ -12,25 +12,29 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 final class Person {
 
-    @Alphabetical
-    @NonNull
-    String name;
-
     @Range(min = 18, max = 115)
     final int age;
 
     final Person.School school;
 
-    void setName(final @Alphabetical @NonNull String name,
-                 final @NotEmpty @NonNull String reason) {
-        Validator.validateMethod(name, reason);
+    @Alphabetical
+    @NonNull
+    String name;
+
+    void invalidSetName(
+            final @Alphabetical @NonNull String name,
+            final @NotEmpty @NonNull String reason
+    ) {
+        Validator.validateMethod(name);
         this.name = name;
         System.out.println("updated name because: " + reason);
     }
 
-    void invalidSetName(final @Alphabetical @NonNull String name,
-                        final @NotEmpty @NonNull String reason) {
-        Validator.validateMethod(name);
+    void setName(
+            final @Alphabetical @NonNull String name,
+            final @NotEmpty @NonNull String reason
+    ) {
+        Validator.validateMethod(name, reason);
         this.name = name;
         System.out.println("updated name because: " + reason);
     }

@@ -6,12 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Config bean for testing purposes.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public final class MigrationConfig {
-
     private static final double version = 4.0; // should be ignored
 
     private static final @NotNull ConfigVersion configVersion = ConfigVersion.of(3.0)
@@ -44,7 +46,10 @@ public final class MigrationConfig {
                         .remove("features.enableBetaUi")
                         .remove("features.enableMetrics")
                         .add("features.rollouts.newDashboard", defaultConfig.features.rollouts.newDashboard)
-                        .add("features.rollouts.legacyApiDeprecation", defaultConfig.features.rollouts.legacyApiDeprecation);
+                        .add(
+                                "features.rollouts.legacyApiDeprecation",
+                                defaultConfig.features.rollouts.legacyApiDeprecation
+                        );
             });
 
     @NotNull String environment = "production";
@@ -57,6 +62,9 @@ public final class MigrationConfig {
 
     @NotNull Features features = new Features();
 
+    /**
+     * Config bean for testing purposes.
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -69,6 +77,9 @@ public final class MigrationConfig {
 
         @NotNull Ssl ssl = new Ssl();
 
+        /**
+         * Config bean for testing purposes.
+         */
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
@@ -81,6 +92,9 @@ public final class MigrationConfig {
 
         }
 
+        /**
+         * Config bean for testing purposes.
+         */
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
@@ -97,6 +111,9 @@ public final class MigrationConfig {
 
     }
 
+    /**
+     * Config bean for testing purposes.
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -109,6 +126,9 @@ public final class MigrationConfig {
 
         @NotNull Pool pool = new Pool();
 
+        /**
+         * Config bean for testing purposes.
+         */
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
@@ -121,6 +141,9 @@ public final class MigrationConfig {
 
         }
 
+        /**
+         * Config bean for testing purposes.
+         */
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
@@ -135,6 +158,9 @@ public final class MigrationConfig {
 
     }
 
+    /**
+     * Config bean for testing purposes.
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -149,6 +175,9 @@ public final class MigrationConfig {
 
     }
 
+    /**
+     * Config bean for testing purposes.
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -157,6 +186,9 @@ public final class MigrationConfig {
 
         @NotNull Rollouts rollouts = new Rollouts();
 
+        /**
+         * Config bean for testing purposes.
+         */
         @Data
         @NoArgsConstructor
         @AllArgsConstructor

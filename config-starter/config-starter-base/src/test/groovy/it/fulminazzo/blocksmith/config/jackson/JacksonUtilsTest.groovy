@@ -2,7 +2,11 @@ package it.fulminazzo.blocksmith.config.jackson
 
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonStreamContext
+import com.fasterxml.jackson.databind.BeanDescription
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationConfig
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter
+import it.fulminazzo.blocksmith.config.Comment
 import org.slf4j.Logger
 import spock.lang.Specification
 import spock.mock.MockMakers
@@ -36,16 +40,16 @@ class JacksonUtilsTest extends Specification {
         1 * logger.warn('Using default value: {}', defaultValue)
 
         where:
-        data                                                                 || message                                      | defaultValue
-        ['name': null, 'lastname': null, 'age': 17, 'income': -1]            || 'invalid name: name cannot be null'          | 'Alex'
-        ['name': '', 'lastname': null, 'age': 17, 'income': -1]              || 'invalid name: name cannot be empty'         | 'Alex'
-        ['name': '     ', 'lastname': null, 'age': 17, 'income': -1]         || 'invalid name: name cannot be empty'         | 'Alex'
-        ['name': 'Alex', 'lastname': null, 'age': 17, 'income': -1]          || 'invalid lastname: lastname cannot be null'  | 'Fulminazzo'
-        ['name': 'Alex', 'lastname': '', 'age': 17, 'income': -1]            || 'invalid lastname: lastname cannot be empty' | 'Fulminazzo'
-        ['name': 'Alex', 'lastname': '     ', 'age': 17, 'income': -1]       || 'invalid lastname: lastname cannot be empty' | 'Fulminazzo'
-        ['name': 'Alex', 'lastname': 'Fulminazzo', 'age': 17, 'income': -1]  || 'invalid age: minimum age must be 18 years'  | 23
-        ['name': 'Alex', 'lastname': 'Fulminazzo', 'age': 111, 'income': -1] || 'invalid age: maximum age must be 110 years' | 23
-        ['name': 'Alex', 'lastname': 'Fulminazzo', 'age': 23, 'income': -1]  || 'invalid income: income cannot be negative'  | 0.0
+        data                                                                     || message                                      | defaultValue
+        ['name' : null, 'lastname' : null, 'age' : 17, 'income' : -1]            || 'invalid name: name cannot be null'          | 'Alex'
+        ['name' : '', 'lastname' : null, 'age' : 17, 'income' : -1]              || 'invalid name: name cannot be empty'         | 'Alex'
+        ['name' : '     ', 'lastname' : null, 'age' : 17, 'income' : -1]         || 'invalid name: name cannot be empty'         | 'Alex'
+        ['name' : 'Alex', 'lastname' : null, 'age' : 17, 'income' : -1]          || 'invalid lastname: lastname cannot be null'  | 'Fulminazzo'
+        ['name' : 'Alex', 'lastname' : '', 'age' : 17, 'income' : -1]            || 'invalid lastname: lastname cannot be empty' | 'Fulminazzo'
+        ['name' : 'Alex', 'lastname' : '     ', 'age' : 17, 'income' : -1]       || 'invalid lastname: lastname cannot be empty' | 'Fulminazzo'
+        ['name' : 'Alex', 'lastname' : 'Fulminazzo', 'age' : 17, 'income' : -1]  || 'invalid age: minimum age must be 18 years'  | 23
+        ['name' : 'Alex', 'lastname' : 'Fulminazzo', 'age' : 111, 'income' : -1] || 'invalid age: maximum age must be 110 years' | 23
+        ['name' : 'Alex', 'lastname' : 'Fulminazzo', 'age' : 23, 'income' : -1]  || 'invalid income: income cannot be negative'  | 0.0
     }
 
     def 'test that mapper does not throw on exception'() {
@@ -55,10 +59,10 @@ class JacksonUtilsTest extends Specification {
 
         and:
         def json = mapper.writeValueAsString([
-                'name'    : 'Alex',
-                'lastname': 'Fulminazzo',
-                'age'     : 9999999999999999,
-                'income'  : 0.0
+                'name'     : 'Alex',
+                'lastname' : 'Fulminazzo',
+                'age'      : 9999999999999999,
+                'income'   : 0.0
         ])
 
         when:
@@ -85,27 +89,27 @@ class JacksonUtilsTest extends Specification {
         def parser = Mock(JsonParser)
 
         and:
-        def property = Mock(JsonStreamContext, mockMaker: MockMakers.mockito)
+        def property = Mock(JsonStreamContext, mockMaker : MockMakers.mockito)
         property.inArray() >> false
         property.currentName >> 'property'
         parser.parsingContext >> property
 
-        def object = Mock(JsonStreamContext, mockMaker: MockMakers.mockito)
+        def object = Mock(JsonStreamContext, mockMaker : MockMakers.mockito)
         object.inArray() >> false
         object.currentName >> 'object'
         property.parent >> object
 
-        def array = Mock(JsonStreamContext, mockMaker: MockMakers.mockito)
+        def array = Mock(JsonStreamContext, mockMaker : MockMakers.mockito)
         array.inArray() >> true
         array.currentIndex >> 3
         object.parent >> array
 
-        def container = Mock(JsonStreamContext, mockMaker: MockMakers.mockito)
+        def container = Mock(JsonStreamContext, mockMaker : MockMakers.mockito)
         container.inArray() >> false
         container.currentName >> 'container'
         array.parent >> container
 
-        def root = Mock(JsonStreamContext, mockMaker: MockMakers.mockito)
+        def root = Mock(JsonStreamContext, mockMaker : MockMakers.mockito)
         root.inArray() >> false
         root.currentName >> null
         container.parent >> root
@@ -122,8 +126,7 @@ class JacksonUtilsTest extends Specification {
         def parser = Mock(JsonParser)
 
         and:
-
-        def root = Mock(JsonStreamContext, mockMaker: MockMakers.mockito)
+        def root = Mock(JsonStreamContext, mockMaker : MockMakers.mockito)
         root.inArray() >> false
         root.currentName >> null
         parser.parsingContext >> root
@@ -133,6 +136,40 @@ class JacksonUtilsTest extends Specification {
 
         then:
         path == ''
+    }
+
+    def 'test that JacksonBeanSerializerModifier replaces a BeanPropertyWriter with its comment if available'() {
+        given:
+        def modifier = new JacksonUtils.JacksonBeanSerializerModifier(MockCommentPropertyWrapper)
+
+        and:
+        def first = Mock(BeanPropertyWriter)
+        def second = Mock(BeanPropertyWriter) {
+            it.getAnnotation(Comment) >> {
+                def comment = Mock(Comment)
+                comment.value() >> new String[0]
+                return comment
+            }
+        }
+        def third = Mock(BeanPropertyWriter) {
+            it.getAnnotation(Comment) >> {
+                def comment = Mock(Comment)
+                comment.value() >> new String[]{'Hello', 'world!'}
+                return comment
+            }
+        }
+        def properties = [first, second, third]
+
+        when:
+        modifier.changeProperties(Mock(SerializationConfig), Mock(BeanDescription), properties)
+
+        then:
+        properties[0] == first
+        properties[1] == second
+
+        and:
+        def injected = properties[2]
+        (injected instanceof MockCommentPropertyWrapper)
     }
 
 }

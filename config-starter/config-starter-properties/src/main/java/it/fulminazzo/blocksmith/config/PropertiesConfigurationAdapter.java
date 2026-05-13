@@ -10,13 +10,14 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
  * Implementation of {@link BaseConfigurationAdapter} for Properties.
  */
 final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
-    private static final @NotNull List<String> commentIdentifiers = Arrays.asList("#", "!");
+    private static final @NotNull List<String> COMMENT_IDENTIFIERS = Arrays.asList("#", "!");
 
     private final @NotNull BaseConfigurationAdapter delegate;
 
@@ -34,7 +35,9 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) throws IOException {
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(
+            final @NotNull InputStream stream
+    ) throws IOException {
         return toCommentedMap(stream);
     }
 
@@ -68,11 +71,15 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
         delegate.store(stream, configuration);
     }
 
-    private static @NotNull Map<String, List<String>> toCommentedMap(final @NotNull InputStream inputStream) throws IOException {
+    private static @NotNull Map<String, List<String>> toCommentedMap(
+            final @NotNull InputStream inputStream
+    ) throws IOException {
         final Map<String, List<String>> keysComments = new HashMap<>();
         List<String> currentComment = new ArrayList<>();
-        try (InputStreamReader streamReader = new InputStreamReader(inputStream);
-             BufferedReader reader = new BufferedReader(streamReader)) {
+        try (
+                InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(streamReader)
+        ) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String identifier = getCommentIdentifier(line);
@@ -97,7 +104,7 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     private static @Nullable String getCommentIdentifier(final @NotNull String line) {
-        for (String identifier : commentIdentifiers)
+        for (String identifier : COMMENT_IDENTIFIERS)
             if (line.startsWith(identifier))
                 return identifier;
         return null;
@@ -107,6 +114,7 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
      * An implementation of {@link CommentPropertyWriter} for handling Properties comments.
      */
     static final class PropertiesCommentPropertyWriter extends CommentPropertyWriter {
+        private static final long serialVersionUID = 4634124233040387040L;
 
         /**
          * Instantiates a new Properties comment property writer.
@@ -114,16 +122,17 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
          * @param base    the base
          * @param comment the comment
          */
-        public PropertiesCommentPropertyWriter(final @NotNull BeanPropertyWriter base,
-                                               final @NotNull Comment comment) {
+        public PropertiesCommentPropertyWriter(final @NotNull BeanPropertyWriter base, final @NotNull Comment comment) {
             super(base, comment);
         }
 
         @Override
-        protected void writeComment(final @NotNull JsonGenerator generator,
-                                    final @NotNull Comment comment) throws IOException {
+        protected void writeComment(
+                final @NotNull JsonGenerator generator,
+                final @NotNull Comment comment
+        ) throws IOException {
             for (String t : CommentUtils.getText(comment))
-                generator.writeRaw(String.format("# %s\n", t));
+                generator.writeRaw(String.format("# %s%n", t));
         }
 
     }
