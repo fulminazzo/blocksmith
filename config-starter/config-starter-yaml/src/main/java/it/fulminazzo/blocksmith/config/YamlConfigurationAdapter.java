@@ -159,7 +159,6 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
                 .filter(c -> c.getCommentType() == CommentType.BLOCK)
                 .map(CommentLine::getValue)
                 .map(String::trim)
-                .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
     }
 

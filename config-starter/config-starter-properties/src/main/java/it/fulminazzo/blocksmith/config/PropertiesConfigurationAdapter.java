@@ -83,10 +83,8 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
             String line;
             while ((line = reader.readLine()) != null) {
                 String identifier = getCommentIdentifier(line);
-                if (identifier != null) {
-                    String comment = line.substring(identifier.length()).trim();
-                    if (!comment.isEmpty()) currentComment.add(comment);
-                } else if (!currentComment.isEmpty()) {
+                if (identifier != null) currentComment.add(line.substring(identifier.length()).trim());
+                else if (!currentComment.isEmpty()) {
                     String key = line.split("=")[0].trim();
                     int index = key.lastIndexOf('.');
                     if (index != -1) {

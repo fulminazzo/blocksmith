@@ -169,8 +169,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
             switch (event) {
                 case XMLStreamConstants.COMMENT: {
                     for (String line : reader.getText().split("\\r?\\n")) {
-                        String t = line.trim();
-                        if (!t.isEmpty()) pending.add(t);
+                        pending.add(line.trim());
                     }
                     break;
                 }
