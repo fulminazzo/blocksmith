@@ -118,12 +118,8 @@ tasks.register<JacocoReport>("jacocoAggregatedReport") {
     )
 
     reports {
-        xml.required = true
         html.required = true
+        xml.required = false
         csv.required = true
     }
-}
-
-tasks.check {
-    dependsOn(tasks.named("jacocoAggregatedReport"))
 }
