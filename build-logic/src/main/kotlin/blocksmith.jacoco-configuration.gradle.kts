@@ -22,6 +22,11 @@ tasks.withType<JacocoReport>().configureEach {
     executionData.setFrom(
         fileTree(layout.buildDirectory).include("jacoco/*.exec")
     )
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
 }
 
 tasks.withType<JacocoCoverageVerification>().configureEach {
@@ -49,5 +54,6 @@ tasks.withType<JacocoCoverageVerification>().configureEach {
 }
 
 tasks.named("check") {
+    dependsOn(tasks.withType<JacocoReport>())
     dependsOn(tasks.withType<JacocoCoverageVerification>())
 }

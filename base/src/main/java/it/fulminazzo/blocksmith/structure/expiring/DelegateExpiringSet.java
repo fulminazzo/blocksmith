@@ -93,7 +93,7 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
 
     @SuppressWarnings("unchecked")
     @Override
-    @NotNull Collection<ExpiringEntry<E>> expiringEntries() {
+    synchronized @NotNull Collection<ExpiringEntry<E>> expiringEntries() {
         return delegate.delegate.entrySet().stream()
                 .map(e ->
                         (ExpiringEntry<E>) Reflect.on(new ExpiringEntry<>(e.getKey(), 1))
