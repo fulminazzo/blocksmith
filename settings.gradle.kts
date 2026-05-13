@@ -50,7 +50,7 @@ include(
     "config-starter:config-starter-xml",
     "config-starter:config-starter-yaml",
 
-    "config-starter:config-starter-data",
+//    "config-starter:config-starter-data", //TODO: re-enable
 
     "config-starter:config-starter-testing",
     "config-starter:config-starter-generator"
@@ -62,18 +62,18 @@ include(
 
     "data-starter:data-starter-base",
 
-    "data-starter:data-starter-mapper",
+//    "data-starter:data-starter-mapper", //TODO: re-enable
 
-    "data-starter:data-starter-mapper:data-starter-mapper-base",
-    "data-starter:data-starter-mapper:data-starter-mapper-json",
+//    "data-starter:data-starter-mapper:data-starter-mapper-base", //TODO: re-enable
+//    "data-starter:data-starter-mapper:data-starter-mapper-json", //TODO: re-enable
 
-    "data-starter:data-starter-file",
-    "data-starter:data-starter-memory",
-    "data-starter:data-starter-mongo",
-    "data-starter:data-starter-redis",
-    "data-starter:data-starter-sql",
+//    "data-starter:data-starter-file", //TODO: re-enable
+//    "data-starter:data-starter-memory", //TODO: re-enable
+//    "data-starter:data-starter-mongo", //TODO: re-enable
+//    "data-starter:data-starter-redis", //TODO: re-enable
+//    "data-starter:data-starter-sql", //TODO: re-enable
 
-    "data-starter:data-starter-cache",
+//    "data-starter:data-starter-cache", //TODO: re-enable
 
     "data-starter:data-starter-testing"
 )
