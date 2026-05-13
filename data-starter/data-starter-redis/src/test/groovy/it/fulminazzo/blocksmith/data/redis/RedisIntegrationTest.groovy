@@ -16,7 +16,7 @@ interface RedisIntegrationTest {
     }
 
     default GenericContainer getContainer() {
-        if (!REDIS.isCreated()) REDIS.start()
+        if (!REDIS.created) REDIS.start()
         return REDIS
     }
 

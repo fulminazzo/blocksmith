@@ -7,15 +7,20 @@ import it.fulminazzo.blocksmith.data.Users
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
+import spock.lang.Shared
 import spock.lang.Specification
 
 class RedisQueryEngineTest extends Specification implements RedisIntegrationTest {
-    private static final Mapper mapper = MapperFormat.JSON.newMapper()
+    private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
-    private static RedisClient client
-    private static StatefulRedisConnection<String, String> connection
+    @Shared
+    private RedisClient client
 
-    private static RedisQueryEngine<User, Long> engine
+    @Shared
+    private StatefulRedisConnection<String, String> connection
+
+    @Shared
+    private RedisQueryEngine<User, Long> engine
 
     void setupSpec() {
         client = RedisClient.create("redis://$serverHost:$serverPort")
@@ -23,14 +28,14 @@ class RedisQueryEngineTest extends Specification implements RedisIntegrationTest
 
         connection.async().mset(
                 [Users.SAVED1, Users.SAVED2].collectEntries {
-                    [("database:users:$it.id".toString()): mapper.serialize(it)]
+                    [("database:users:$it.id".toString()) : MAPPER.serialize(it)]
                 }
         ).get()
 
         engine = new RedisQueryEngine<>(
                 connection,
                 EntityMapper.create(User),
-                mapper,
+                MAPPER,
                 'database',
                 'users'
         )

@@ -3,19 +3,27 @@ package it.fulminazzo.blocksmith.data.redis.config;
 import io.lettuce.core.RedisURI;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
-import it.fulminazzo.blocksmith.validation.annotation.*;
+import it.fulminazzo.blocksmith.data.redis.RedisDataSource;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
+import it.fulminazzo.blocksmith.validation.annotation.Port;
+import it.fulminazzo.blocksmith.validation.annotation.PositiveOrZero;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
+/**
+ * {@link DataSourceConfig} for {@link RedisDataSource}.
+ *
+ * @see DataSourceConfig
+ * @see RedisDataSource
+ */
 @Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public final class RedisDataSourceConfig implements DataSourceConfig {
 
     static {

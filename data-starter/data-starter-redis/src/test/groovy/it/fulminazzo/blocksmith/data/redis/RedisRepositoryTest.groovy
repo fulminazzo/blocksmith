@@ -9,14 +9,18 @@ import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import org.jetbrains.annotations.NotNull
+import spock.lang.Shared
 
 import java.time.Duration
 
 class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> implements RedisIntegrationTest {
-    private static final Mapper mapper = MapperFormat.JSON.newMapper()
+    private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
-    private static RedisClient client
-    private static StatefulRedisConnection<String, String> connection
+    @Shared
+    private RedisClient client
+
+    @Shared
+    private StatefulRedisConnection<String, String> connection
 
     void setupSpec() {
         client = RedisClient.create("redis://$serverHost:$serverPort")
@@ -53,7 +57,7 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> im
         def first = repository.findById(expected.id).get()
 
         then:
-        first.isPresent()
+        first.present
         first.get() == expected
 
         when:
@@ -63,7 +67,7 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> im
         def second = repository.findById(expected.id).get()
 
         then:
-        !second.isPresent()
+        second.empty
     }
 
     def 'test that saveAll respects expiration time'() {
@@ -80,7 +84,7 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> im
         actual == expected
 
         when:
-        def first = repository.findAllById(expected.collect { it.id }).get()
+        def first = repository.findAllById(expected*.id).get()
 
         then:
         first == expected
@@ -89,10 +93,10 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> im
         Thread.sleep(1001)
 
         and:
-        def second = repository.findAllById(expected.collect { it.id }).get()
+        def second = repository.findAllById(expected*.id).get()
 
         then:
-        second.isEmpty()
+        second.empty
     }
 
     @Override
@@ -101,7 +105,7 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> im
                 new RedisQueryEngine<>(
                         connection,
                         EntityMapper.create(User),
-                        mapper,
+                        MAPPER,
                         'database',
                         'users'
                 ),
@@ -116,7 +120,7 @@ class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> im
 
     @Override
     void insert(final @NotNull User entity) {
-        connection.sync().set("database:users:$entity.id".toString(), mapper.serialize(entity))
+        connection.sync().set("database:users:$entity.id".toString(), MAPPER.serialize(entity))
     }
 
     @Override

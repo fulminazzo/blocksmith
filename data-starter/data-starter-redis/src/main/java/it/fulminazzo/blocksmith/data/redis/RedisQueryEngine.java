@@ -30,63 +30,21 @@ import java.util.stream.Collectors;
  * Given an {@code ID}, the key format will be:
  * `&lt;databaseName&gt;:&lt;collectionName&gt;:&lt;ID&gt;`
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities
+ * @see RedisRepository
+ * @see RedisDataSource
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class RedisQueryEngine<T, ID> implements QueryEngine<T, ID> {
+public final class RedisQueryEngine<T, I> implements QueryEngine<T, I> {
     private static final @NotNull String SEPARATOR = ":";
 
     private final @NotNull StatefulRedisConnection<String, String> connection;
-    private final @NotNull EntityMapper<T, ID> entityMapper;
+    private final @NotNull EntityMapper<T, I> entityMapper;
     private final @NotNull Mapper mapper;
 
     private final @NotNull String databaseName;
     private final @NotNull String collectionName;
-
-    /**
-     * Queries the database to get all the values of the corresponding keys.
-     *
-     * @param keys the keys
-     * @return the values
-     */
-    public @NotNull CompletableFuture<Collection<T>> getValues(final @NotNull Collection<String> keys) {
-        if (keys.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
-        return query(async ->
-                async.mget(keys.toArray(String[]::new))
-        ).thenApply(l -> l.stream()
-                .filter(KeyValue::hasValue)
-                .map(KeyValue::getValue)
-                .map(v -> mapper.deserialize(v, entityMapper.getType()))
-                .collect(Collectors.toList())
-        );
-    }
-
-    /**
-     * Gets all the currently stored keys in the database.
-     *
-     * @return the keys
-     */
-    public @NotNull CompletableFuture<Collection<String>> getAllKeys() {
-        return scanAllKeys(connection.async(), new ArrayList<>(), ScanCursor.INITIAL);
-    }
-
-    private @NotNull CompletableFuture<Collection<String>> scanAllKeys(
-            final @NotNull RedisAsyncCommands<String, String> async,
-            final @NotNull List<String> keys,
-            final @Nullable ScanCursor cursor
-    ) {
-        return (cursor == null ? async.scan() : async.scan(cursor))
-                .toCompletableFuture()
-                .thenCompose(c -> {
-                    keys.addAll(c.getKeys());
-                    if (c.isFinished()) return CompletableFuture.completedFuture(keys
-                            .stream()
-                            .sorted(Comparator.comparing(k -> k))
-                            .collect(Collectors.toList()));
-                    else return scanAllKeys(async, keys, c);
-                });
-    }
 
     /**
      * Executes a Redis query asynchronously.
@@ -122,6 +80,33 @@ public final class RedisQueryEngine<T, ID> implements QueryEngine<T, ID> {
     }
 
     /**
+     * Gets all the currently stored keys in the database.
+     *
+     * @return the keys
+     */
+    public @NotNull CompletableFuture<Collection<String>> getAllKeys() {
+        return scanAllKeys(connection.async(), new ArrayList<>(), ScanCursor.INITIAL);
+    }
+
+    /**
+     * Queries the database to get all the values of the corresponding keys.
+     *
+     * @param keys the keys
+     * @return the values
+     */
+    public @NotNull CompletableFuture<Collection<T>> getValues(final @NotNull Collection<String> keys) {
+        if (keys.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
+        return query(async ->
+                async.mget(keys.toArray(String[]::new))
+        ).thenApply(l -> l.stream()
+                .filter(KeyValue::hasValue)
+                .map(KeyValue::getValue)
+                .map(v -> mapper.deserialize(v, entityMapper.getType()))
+                .collect(Collectors.toList())
+        );
+    }
+
+    /**
      * Gets the ID of an entity.
      *
      * @param entity the entity
@@ -139,8 +124,25 @@ public final class RedisQueryEngine<T, ID> implements QueryEngine<T, ID> {
      * @param id the id
      * @return the id
      */
-    public @NotNull String getId(final @NotNull ID id) {
+    public @NotNull String getId(final @NotNull I id) {
         return databaseName + SEPARATOR + collectionName + SEPARATOR + id;
+    }
+
+    private @NotNull CompletableFuture<Collection<String>> scanAllKeys(
+            final @NotNull RedisAsyncCommands<String, String> async,
+            final @NotNull List<String> keys,
+            final @Nullable ScanCursor cursor
+    ) {
+        return (cursor == null ? async.scan() : async.scan(cursor))
+                .toCompletableFuture()
+                .thenCompose(c -> {
+                    keys.addAll(c.getKeys());
+                    if (c.isFinished()) return CompletableFuture.completedFuture(keys
+                            .stream()
+                            .sorted(Comparator.comparing(k -> k))
+                            .collect(Collectors.toList()));
+                    else return scanAllKeys(async, keys, c);
+                });
     }
 
 }

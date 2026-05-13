@@ -40,12 +40,16 @@ import java.util.function.Consumer;
  *         .mapper(MapperFormat.SERIALIZABLE.newMapper()) // defaults to JSON
  *         .build();
  * }</pre>
+ *
+ * @see RedisDataSource
+ * @see Mapper
+ * @see MapperFormat
  */
 public final class RedisDataSourceBuilder implements RepositoryDataSourceBuilder<RedisDataSource> {
     private final @NotNull ClientOptions.Builder clientOptions = ClientOptions.builder();
     private final @NotNull SocketOptions.Builder socketOptions = SocketOptions.builder();
 
-    private final @NotNull RedisURI.Builder redisURIbuilder;
+    private final @NotNull RedisURI.Builder redisUribuilder;
 
     private @NotNull Mapper mapper = MapperFormat.JSON.newMapper();
 
@@ -53,27 +57,17 @@ public final class RedisDataSourceBuilder implements RepositoryDataSourceBuilder
      * Instantiates a new Redis data source builder.
      */
     RedisDataSourceBuilder() {
-        this.redisURIbuilder = RedisURI.builder(RedisURI.create("redis://127.0.0.1:6379/0"));
-    }
-
-    @Override
-    public @NotNull RedisDataSource build() {
-        final RedisClient client = RedisClient.create(redisURIbuilder.build());
-        client.setOptions(clientOptions
-                .socketOptions(socketOptions.build())
-                .build()
-        );
-        return new RedisDataSource(client, mapper);
+        this.redisUribuilder = RedisURI.builder(RedisURI.create("redis://127.0.0.1:6379/0"));
     }
 
     /**
-     * Allows editing the internal redis URI using the lettuce provided builder.
+     * Allows editing the internal redis URI using the Lettuce provided builder.
      *
      * @param editFunction the function to edit the URI
      * @return this object (for method chaining)
      */
     public @NotNull RedisDataSourceBuilder uri(final @NotNull Consumer<RedisURI.Builder> editFunction) {
-        editFunction.accept(redisURIbuilder);
+        editFunction.accept(redisUribuilder);
         return this;
     }
 
@@ -102,8 +96,7 @@ public final class RedisDataSourceBuilder implements RepositoryDataSourceBuilder
     /**
      * Sets the data mapper.
      * <br>
-     * Because of Redis structure, it is necessary to serialize
-     * and deserialize data before accessing to it.
+     * Because of Redis structure, it is necessary to serialize and deserialize data before accessing it.
      * The mapper is the component responsible for serialization.
      * <br>
      * Default: {@link MapperFormat#JSON}
@@ -114,6 +107,16 @@ public final class RedisDataSourceBuilder implements RepositoryDataSourceBuilder
     public @NotNull RedisDataSourceBuilder mapper(final @NotNull Mapper mapper) {
         this.mapper = mapper;
         return this;
+    }
+
+    @Override
+    public @NotNull RedisDataSource build() {
+        final RedisClient client = RedisClient.create(redisUribuilder.build());
+        client.setOptions(clientOptions
+                .socketOptions(socketOptions.build())
+                .build()
+        );
+        return new RedisDataSource(client, mapper);
     }
 
 }
