@@ -7,6 +7,7 @@ plugins {
 }
 
 val testingModuleName = "testing"
+val testSourceSets = listOf("test", "integrationTest", "functionalTest")
 
 private val currentGitBranch = providers.of(GitBranchValueSource::class) {}
 
@@ -38,8 +39,10 @@ sonar {
         // CodeNarc
         property(
             "sonar.groovy.codenarc.reportPaths",
-            subprojects.joinToString(",") {
-                "${it.layout.buildDirectory.get()}/reports/codenarc/test.xml"
+            subprojects.joinToString(",") { subproject ->
+                testSourceSets.joinToString(",") {
+                    "${subproject.layout.buildDirectory.get()}/reports/codenarc/$it.xml"
+                }
             }
         )
         // JaCoCo
@@ -50,8 +53,10 @@ sonar {
         // SpotBugs
         property(
             "sonar.java.spotbugs.reportPaths",
-            subprojects.joinToString(",") {
-                "${it.layout.buildDirectory.get()}/reports/spotbugs/main.xml"
+            subprojects.joinToString(",") { subproject ->
+                testSourceSets.joinToString(",") {
+                    "${subproject.layout.buildDirectory.get()}/reports/spotbugs/$it.xml"
+                }
             }
         )
     }
@@ -63,7 +68,7 @@ subprojects.forEach { project ->
             property("sonar.sources", "src/main")
             property(
                 "sonar.tests",
-                listOf("test", "integrationTest", "functionalTest")
+                testSourceSets
                     .map { "src/$it" }
                     .filter { project.file(it).isDirectory }
                     .joinToString(",")
