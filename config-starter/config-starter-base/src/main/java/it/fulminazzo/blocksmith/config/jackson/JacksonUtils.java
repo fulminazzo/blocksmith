@@ -35,7 +35,7 @@ import java.util.function.Function;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class JacksonUtils {
-    private static final @NotNull List<Function<Logger, StdDeserializer<?>>> customDeserializers = new ArrayList<>();
+    private static final @NotNull List<Function<Logger, StdDeserializer<?>>> CUSTOM_DESERIALIZERS = new ArrayList<>();
 
     static {
         addCustomDeserializer(DurationDeserializer.class.getSimpleName());
@@ -59,7 +59,7 @@ final class JacksonUtils {
             final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType
     ) {
         final SimpleModule module = new JacksonUtilsModule(logger, commentPropertyWriterType);
-        for (Function<Logger, StdDeserializer<?>> deserializerProvider : customDeserializers) {
+        for (Function<Logger, StdDeserializer<?>> deserializerProvider : CUSTOM_DESERIALIZERS) {
             StdDeserializer<?> deserializer = deserializerProvider.apply(logger);
             registerDeserializer(module, deserializer);
         }
@@ -104,7 +104,7 @@ final class JacksonUtils {
     private static void addCustomDeserializer(final @NotNull String deserializerName) {
         try {
             Reflect reflect = Reflect.on(JacksonUtils.class.getPackageName() + "." + deserializerName);
-            customDeserializers.add(l -> reflect.init(l).get());
+            CUSTOM_DESERIALIZERS.add(l -> reflect.init(l).get());
         } catch (ReflectException ignored) {
             // Could not initialize deserializer because of missing module
         }

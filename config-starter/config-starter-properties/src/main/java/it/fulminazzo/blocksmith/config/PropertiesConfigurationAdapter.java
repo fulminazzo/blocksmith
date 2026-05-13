@@ -17,7 +17,7 @@ import java.util.*;
  * Implementation of {@link BaseConfigurationAdapter} for Properties.
  */
 final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
-    private static final @NotNull List<String> commentIdentifiers = Arrays.asList("#", "!");
+    private static final @NotNull List<String> COMMENT_IDENTIFIERS = Arrays.asList("#", "!");
 
     private final @NotNull BaseConfigurationAdapter delegate;
 
@@ -104,7 +104,7 @@ final class PropertiesConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     private static @Nullable String getCommentIdentifier(final @NotNull String line) {
-        for (String identifier : commentIdentifiers)
+        for (String identifier : COMMENT_IDENTIFIERS)
             if (line.startsWith(identifier))
                 return identifier;
         return null;

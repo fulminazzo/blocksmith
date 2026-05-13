@@ -16,14 +16,13 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * A collection of utilities to work with {@link Config} objects.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NightConfigUtils {
-    private static final @NotNull Convention namingConvention = Convention.SNAKE_CASE;
+    private static final @NotNull Convention NAMING_CONVENTION = Convention.SNAKE_CASE;
 
     /**
      * Updates all the properties names of the given configuration
@@ -36,7 +35,7 @@ public final class NightConfigUtils {
         for (Config.Entry entry : new HashSet<>(configuration.entrySet())) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            String translation = CaseConverter.convert(key, namingConvention);
+            String translation = CaseConverter.convert(key, NAMING_CONVENTION);
             if (!key.equals(translation)) {
                 configuration.remove(key);
                 configuration.set(translation, value);
@@ -60,7 +59,7 @@ public final class NightConfigUtils {
         for (Field field : reflect.getFields(f -> !Modifier.isStatic(f.getModifiers())
                 && !Modifier.isTransient(f.getModifiers()))
         ) {
-            String propertyName = CaseConverter.convert(field.getName(), namingConvention);
+            String propertyName = CaseConverter.convert(field.getName(), NAMING_CONVENTION);
             if (field.isAnnotationPresent(Comment.class)) {
                 Comment comment = field.getAnnotation(Comment.class);
                 configuration.setComment(propertyName, getCommentValue(comment));

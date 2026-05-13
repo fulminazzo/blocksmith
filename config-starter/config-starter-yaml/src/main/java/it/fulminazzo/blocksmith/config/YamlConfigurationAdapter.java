@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * Implementation of {@link BaseConfigurationAdapter} for YAML.
  */
 final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
-    private static final @NotNull Convention yamlNamingConvention = Convention.KEBAB_CASE;
+    private static final @NotNull Convention YAML_NAMING_CONVENTION = Convention.KEBAB_CASE;
 
     private final @NotNull BaseConfigurationAdapter delegate;
 
@@ -60,7 +60,7 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
                         .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
                         .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE)
                         .setPropertyNamingStrategy(Reflect.on(PropertyNamingStrategies.class)
-                                .get(yamlNamingConvention.name())
+                                .get(YAML_NAMING_CONVENTION.name())
                                 .get()),
                 logger,
                 YamlCommentPropertyWriter.class
@@ -83,8 +83,8 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
     public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
         return ConfigUtils.checkMap(
                 delegate.load(data, type),
-                yamlNamingConvention,
-                ConfigUtils.javaNamingConvention
+                YAML_NAMING_CONVENTION,
+                ConfigUtils.JAVA_NAMING_CONVENTION
         );
     }
 
@@ -92,8 +92,8 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
     public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         return ConfigUtils.checkMap(
                 delegate.load(file, type),
-                yamlNamingConvention,
-                ConfigUtils.javaNamingConvention
+                YAML_NAMING_CONVENTION,
+                ConfigUtils.JAVA_NAMING_CONVENTION
         );
     }
 
@@ -101,15 +101,15 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
     public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
         return ConfigUtils.checkMap(
                 delegate.load(stream, type),
-                yamlNamingConvention,
-                ConfigUtils.javaNamingConvention
+                YAML_NAMING_CONVENTION,
+                ConfigUtils.JAVA_NAMING_CONVENTION
         );
     }
 
     @Override
     public <T> @NotNull String serialize(final @NotNull T configuration) throws IOException {
         return delegate.serialize(
-                ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention)
+                ConfigUtils.checkMap(configuration, ConfigUtils.JAVA_NAMING_CONVENTION, YAML_NAMING_CONVENTION)
         );
     }
 
@@ -117,7 +117,7 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
         delegate.store(
                 file,
-                ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention)
+                ConfigUtils.checkMap(configuration, ConfigUtils.JAVA_NAMING_CONVENTION, YAML_NAMING_CONVENTION)
         );
     }
 
@@ -125,7 +125,7 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
     public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
         delegate.store(
                 stream,
-                ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, yamlNamingConvention)
+                ConfigUtils.checkMap(configuration, ConfigUtils.JAVA_NAMING_CONVENTION, YAML_NAMING_CONVENTION)
         );
     }
 
@@ -135,8 +135,8 @@ final class YamlConfigurationAdapter implements BaseConfigurationAdapter {
             ScalarNode keyNode = (ScalarNode) nodeTuple.getKeyNode();
             String key = CaseConverter.convert(
                     keyNode.getValue(),
-                    yamlNamingConvention,
-                    ConfigUtils.javaNamingConvention
+                    YAML_NAMING_CONVENTION,
+                    ConfigUtils.JAVA_NAMING_CONVENTION
             );
             @NotNull List<String> comments = extractComments(keyNode);
             if (!comments.isEmpty()) nodesComments.put(key, comments);

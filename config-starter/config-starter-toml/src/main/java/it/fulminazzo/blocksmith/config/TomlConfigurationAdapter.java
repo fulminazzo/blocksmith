@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * Implementation of {@link BaseConfigurationAdapter} for TOML.
  */
 final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
-    private static final @NotNull Convention tomlNamingConvention = Convention.SNAKE_CASE;
+    private static final @NotNull Convention TOML_NAMING_CONVENTION = Convention.SNAKE_CASE;
 
     private final @NotNull BaseConfigurationAdapter delegate;
     private final @NotNull TomlParser parser;
@@ -43,7 +43,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         this.delegate = new JacksonConfigurationAdapter(
                 new TomlMapper()
                         .setPropertyNamingStrategy(Reflect.on(PropertyNamingStrategies.class)
-                                .get(tomlNamingConvention.name())
+                                .get(TOML_NAMING_CONVENTION.name())
                                 .get()),
                 logger,
                 null // will be handled by night-config
@@ -55,7 +55,7 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     }
 
     private <T> @NotNull Config toNightConfig(@NotNull T configuration) {
-        configuration = ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, tomlNamingConvention);
+        configuration = ConfigUtils.checkMap(configuration, ConfigUtils.JAVA_NAMING_CONVENTION, TOML_NAMING_CONVENTION);
         CommentedConfig config = (CommentedConfig) ObjectSerializer.standard()
                 .serialize(configuration, CommentedConfig::inMemory);
         removeNulls(config);
@@ -78,8 +78,8 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
         return ConfigUtils.checkMap(
                 delegate.load(data, type),
-                tomlNamingConvention,
-                ConfigUtils.javaNamingConvention
+                TOML_NAMING_CONVENTION,
+                ConfigUtils.JAVA_NAMING_CONVENTION
         );
     }
 
@@ -87,8 +87,8 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         return ConfigUtils.checkMap(
                 delegate.load(file, type),
-                tomlNamingConvention,
-                ConfigUtils.javaNamingConvention
+                TOML_NAMING_CONVENTION,
+                ConfigUtils.JAVA_NAMING_CONVENTION
         );
     }
 
@@ -96,8 +96,8 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
     public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
         return ConfigUtils.checkMap(
                 delegate.load(stream, type),
-                tomlNamingConvention,
-                ConfigUtils.javaNamingConvention
+                TOML_NAMING_CONVENTION,
+                ConfigUtils.JAVA_NAMING_CONVENTION
         );
     }
 
@@ -158,8 +158,8 @@ final class TomlConfigurationAdapter implements BaseConfigurationAdapter {
         for (Map.Entry<String, UnmodifiableCommentedConfig.CommentNode> entry : nodes.entrySet()) {
             String key = CaseConverter.convert(
                     entry.getKey(),
-                    tomlNamingConvention,
-                    it.fulminazzo.blocksmith.config.ConfigUtils.javaNamingConvention
+                    TOML_NAMING_CONVENTION,
+                    it.fulminazzo.blocksmith.config.ConfigUtils.JAVA_NAMING_CONVENTION
             );
             UnmodifiableCommentedConfig.CommentNode value = entry.getValue();
             String comment = value.getComment();

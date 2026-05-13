@@ -14,12 +14,12 @@ import java.time.Duration;
 final class DurationSerializer extends StdSerializer<Duration> {
     private static final long serialVersionUID = 1977004924180711288L;
 
-    private static final int daysInYear = 365;
-    private static final int daysInMonth = 30;
-    private static final int secondsInDay = 86400;
-    private static final int secondsInHour = 3600;
-    private static final int secondsInMinute = 60;
-    private static final long nanosInMillis = 1_000_000;
+    private static final int DAYS_IN_YEAR = 365;
+    private static final int DAYS_IN_MONTH = 30;
+    private static final int SECONDS_IN_DAY = 86400;
+    private static final int SECONDS_IN_HOUR = 3600;
+    private static final int SECONDS_IN_MINUTE = 60;
+    private static final long NANOS_IN_MILLIS = 1_000_000;
 
     /**
      * Instantiates a new Duration serializer.
@@ -38,23 +38,23 @@ final class DurationSerializer extends StdSerializer<Duration> {
         final long totalSeconds = abs.getSeconds();
         final int nanosOfSecond = abs.getNano();
 
-        long totalDays = totalSeconds / secondsInDay;
+        long totalDays = totalSeconds / SECONDS_IN_DAY;
 
-        long years = totalDays / daysInYear;
-        long daysRemainder = totalDays % daysInYear;
+        long years = totalDays / DAYS_IN_YEAR;
+        long daysRemainder = totalDays % DAYS_IN_YEAR;
 
-        long months = daysRemainder / daysInMonth;
-        long days = daysRemainder % daysInMonth;
+        long months = daysRemainder / DAYS_IN_MONTH;
+        long days = daysRemainder % DAYS_IN_MONTH;
 
-        long secondsRemainder = totalSeconds % secondsInDay;
-        long hours = secondsRemainder / secondsInHour;
-        secondsRemainder %= secondsInHour;
+        long secondsRemainder = totalSeconds % SECONDS_IN_DAY;
+        long hours = secondsRemainder / SECONDS_IN_HOUR;
+        secondsRemainder %= SECONDS_IN_HOUR;
 
-        long minutes = secondsRemainder / secondsInMinute;
-        long seconds = secondsRemainder % secondsInMinute;
+        long minutes = secondsRemainder / SECONDS_IN_MINUTE;
+        long seconds = secondsRemainder % SECONDS_IN_MINUTE;
 
-        long millis = nanosOfSecond / nanosInMillis;
-        long nanos = nanosOfSecond % nanosInMillis;
+        long millis = nanosOfSecond / NANOS_IN_MILLIS;
+        long nanos = nanosOfSecond % NANOS_IN_MILLIS;
 
         if (years == 0 && months == 0 && days == 0 && hours == 0 && minutes == 0 && nanos == 0
                 && (seconds != 0 || millis != 0)) {

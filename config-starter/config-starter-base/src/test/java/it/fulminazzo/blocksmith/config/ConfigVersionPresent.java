@@ -5,7 +5,7 @@ package it.fulminazzo.blocksmith.config;
  */
 @SuppressWarnings("unused")
 public class ConfigVersionPresent {
-    private static final Object ignore = null;
+    private static final Object IGNORE = null;
 
     private static final ConfigVersion configVersion = ConfigVersion.of(1.0);
 

@@ -35,7 +35,7 @@ import javax.xml.stream.XMLStreamReader;
  * Implementation of {@link BaseConfigurationAdapter} for XML.
  */
 final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
-    private static final @NotNull Convention xmlNamingConvention = Convention.PASCAL_CASE;
+    private static final @NotNull Convention XML_NAMING_CONVENTION = Convention.PASCAL_CASE;
 
     private final @NotNull BaseConfigurationAdapter delegate;
 
@@ -85,7 +85,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
     @Override
     public <T> @NotNull String serialize(final @NotNull T configuration) throws IOException {
         return delegate.serialize(
-                ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention)
+                ConfigUtils.checkMap(configuration, ConfigUtils.JAVA_NAMING_CONVENTION, XML_NAMING_CONVENTION)
         );
     }
 
@@ -93,7 +93,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
     public <T> void store(final @NotNull File file, final @NotNull T configuration) throws IOException {
         delegate.store(
                 file,
-                ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention)
+                ConfigUtils.checkMap(configuration, ConfigUtils.JAVA_NAMING_CONVENTION, XML_NAMING_CONVENTION)
         );
     }
 
@@ -101,7 +101,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
     public <T> void store(final @NotNull OutputStream stream, final @NotNull T configuration) throws IOException {
         delegate.store(
                 stream,
-                ConfigUtils.checkMap(configuration, ConfigUtils.javaNamingConvention, xmlNamingConvention)
+                ConfigUtils.checkMap(configuration, ConfigUtils.JAVA_NAMING_CONVENTION, XML_NAMING_CONVENTION)
         );
     }
 
@@ -146,7 +146,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
 
     @SuppressWarnings("unchecked")
     private static <T> @NotNull T checkLoaded(final @NotNull T loaded) {
-        T actual = ConfigUtils.checkMap(loaded, xmlNamingConvention, ConfigUtils.javaNamingConvention);
+        T actual = ConfigUtils.checkMap(loaded, XML_NAMING_CONVENTION, ConfigUtils.JAVA_NAMING_CONVENTION);
         if (actual instanceof Map<?, ?>) return (T) flattenCollectionMaps((Map<?, ?>) actual);
         else return actual;
     }
@@ -219,7 +219,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
         List<String> parts = new ArrayList<>(path);
         Collections.reverse(parts);
         return parts.stream()
-                .map(p -> CaseConverter.convert(p, xmlNamingConvention, ConfigUtils.javaNamingConvention))
+                .map(p -> CaseConverter.convert(p, XML_NAMING_CONVENTION, ConfigUtils.JAVA_NAMING_CONVENTION))
                 .collect(Collectors.joining("."));
     }
 
@@ -273,7 +273,7 @@ final class XmlConfigurationAdapter implements BaseConfigurationAdapter {
 
         @Override
         public @NotNull String translate(final @NotNull String propertyName) {
-            return CaseConverter.convert(propertyName, xmlNamingConvention);
+            return CaseConverter.convert(propertyName, XML_NAMING_CONVENTION);
         }
 
     }

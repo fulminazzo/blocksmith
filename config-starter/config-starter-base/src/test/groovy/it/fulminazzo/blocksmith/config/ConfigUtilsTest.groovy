@@ -4,7 +4,7 @@ import it.fulminazzo.blocksmith.naming.Convention
 import spock.lang.Specification
 
 class ConfigUtilsTest extends Specification {
-    private static final Object mockConfiguration = new Object()
+    private static final Object MOCK_CONFIGURATION = new Object()
 
     def 'test that mergeDataMaps works'() {
         given:
@@ -50,7 +50,7 @@ class ConfigUtilsTest extends Specification {
 
         where:
         configuration                                                                || expected
-        mockConfiguration                                                            || mockConfiguration
+        MOCK_CONFIGURATION                                                           || MOCK_CONFIGURATION
         ['first-value' : 1]                                                          || ['firstValue' : 1]
         ['first-value' : 1, 'second-value' : true]                                   || ['firstValue' : 1, 'secondValue' : true]
         [

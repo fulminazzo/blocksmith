@@ -22,9 +22,9 @@ public final class ConfigUtils {
     /**
      * Java default naming convention for properties (fields).
      */
-    public static final @NotNull Convention javaNamingConvention = Convention.CAMEL_CASE;
+    public static final @NotNull Convention JAVA_NAMING_CONVENTION = Convention.CAMEL_CASE;
 
-    private static final @NotNull List<Function<String, Object>> primitiveConverters = List.of(
+    private static final @NotNull List<Function<String, Object>> PRIMITIVE_CONVERTERS = List.of(
             Integer::valueOf,
             Long::valueOf,
             Float::valueOf,
@@ -114,7 +114,7 @@ public final class ConfigUtils {
 
     private static @Nullable Object convertValue(final @Nullable Object value) {
         if (value == null) return null;
-        for (Function<String, Object> converter : primitiveConverters) {
+        for (Function<String, Object> converter : PRIMITIVE_CONVERTERS) {
             try {
                 return converter.apply(value.toString());
             } catch (Exception ignored) {

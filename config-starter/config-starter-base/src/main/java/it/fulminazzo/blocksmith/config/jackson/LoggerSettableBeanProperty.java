@@ -118,6 +118,7 @@ final class LoggerSettableBeanProperty extends SettableBeanProperty.Delegating {
      * Represents an exception during deserialization.
      */
     static final class DeserializationException extends RuntimeException {
+        private static final long serialVersionUID = 8529266615243593736L;
 
         /**
          * Instantiates a new Deserialization exception.

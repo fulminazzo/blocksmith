@@ -166,9 +166,9 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
             Object value = data.remove(key);
             if (value instanceof Map) unapplyNamingStrategy((Map<String, Object>) value, strategy);
             if (strategy.equals(PropertyNamingStrategies.KEBAB_CASE))
-                key = CaseConverter.convert(key, Convention.KEBAB_CASE, ConfigUtils.javaNamingConvention);
+                key = CaseConverter.convert(key, Convention.KEBAB_CASE, ConfigUtils.JAVA_NAMING_CONVENTION);
             else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE))
-                key = CaseConverter.convert(key, Convention.SNAKE_CASE, ConfigUtils.javaNamingConvention);
+                key = CaseConverter.convert(key, Convention.SNAKE_CASE, ConfigUtils.JAVA_NAMING_CONVENTION);
             else key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
             data.put(key, value);
         }

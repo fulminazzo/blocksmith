@@ -45,24 +45,24 @@ import static com.github.javaparser.utils.Utils.isNullOrEmpty;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BeanConfigurationBuilder {
-    private static final @NotNull PrinterConfiguration printConfiguration = new DefaultPrinterConfiguration()
+    private static final @NotNull PrinterConfiguration PRINTER_CONFIGURATION = new DefaultPrinterConfiguration()
             .addOption(new DefaultConfigurationOption(
                     DefaultPrinterConfiguration.ConfigOption.SORT_IMPORTS_STRATEGY,
                     new IntelliJImportOrderingStrategy()
             ));
 
-    private static final @NotNull List<Class<? extends Expression>> numberExpressions = Arrays.asList(
+    private static final @NotNull List<Class<? extends Expression>> NUMBER_EXPRESSIONS = Arrays.asList(
             IntegerLiteralExpr.class, LongLiteralExpr.class, DoubleLiteralExpr.class
     );
 
     private static final @NotNull String DEFAULT_JAVA_PACKAGE = "java.lang";
     private static final @NotNull String GENERICS_FORMAT = "<%s>";
-    private static final @NotNull Class<?> nullClass = Object.class;
+    private static final @NotNull Class<?> NULL_CLASS = Object.class;
 
-    private static final @NotNull String[] lombokGetterAnnotations = Stream.of(
+    private static final @NotNull String[] LOMBOK_GETTER_ANNOTATIONS = Stream.of(
             Getter.class, Data.class, Value.class
     ).map(Class::getSimpleName).toArray(String[]::new);
-    private static final @NotNull String[] lombokSetterAnnotations = Stream.of(
+    private static final @NotNull String[] LOMBOK_SETTER_ANNOTATIONS = Stream.of(
             Setter.class, Data.class, Value.class
     ).map(Class::getSimpleName).toArray(String[]::new);
 
@@ -359,7 +359,7 @@ public class BeanConfigurationBuilder {
         convertComments(key, field);
 
         // getter
-        if (!isAnnotationPresent(field, lombokGetterAnnotations))
+        if (!isAnnotationPresent(field, LOMBOK_GETTER_ANNOTATIONS))
             methods.computeIfAbsent(
                     "get" + capitalize(propertyName),
                     k -> {
@@ -370,7 +370,7 @@ public class BeanConfigurationBuilder {
             ).setType(fieldClassName).setAbstract(false);
 
         // setter
-        if (!isAnnotationPresent(field, lombokSetterAnnotations)) {
+        if (!isAnnotationPresent(field, LOMBOK_SETTER_ANNOTATIONS)) {
             MethodDeclaration setter = methods.computeIfAbsent(
                     "set" + capitalize(propertyName),
                     k -> {
@@ -461,7 +461,8 @@ public class BeanConfigurationBuilder {
         builder.imports.values().forEach(compilationUnit::addImport);
         sortClass(root);
 
-        final String code = new DefaultPrettyPrinter(BlocksmithVisitor::new, printConfiguration).print(compilationUnit);
+        final String code = new DefaultPrettyPrinter(BlocksmithVisitor::new, PRINTER_CONFIGURATION)
+                .print(compilationUnit);
 
         try (FileOutputStream output = new FileOutputStream(beanFile)) {
             output.write(code.getBytes(StandardCharsets.UTF_8));
@@ -479,7 +480,7 @@ public class BeanConfigurationBuilder {
      */
     static @NotNull Class<?> getTypeFromObject(final @Nullable Object value) {
         if (value instanceof Float) return Double.class; // Floats suck
-        return value == null ? nullClass : value.getClass();
+        return value == null ? NULL_CLASS : value.getClass();
     }
 
     private static @NotNull String capitalize(final @NotNull String string) {
@@ -509,7 +510,7 @@ public class BeanConfigurationBuilder {
                 .filter(e -> e.getValue() == collection.size())
                 .map(Map.Entry::getKey)
                 .findFirst()
-                .orElse(nullClass.getCanonicalName());
+                .orElse(NULL_CLASS.getCanonicalName());
     }
 
     /**
@@ -595,7 +596,7 @@ public class BeanConfigurationBuilder {
         NodeList<Expression> arguments = methodCall.getArguments();
         if (arguments.size() != 1) return false;
         Expression argument = arguments.get(0);
-        return numberExpressions.stream().anyMatch(t ->
+        return NUMBER_EXPRESSIONS.stream().anyMatch(t ->
                 t.isAssignableFrom(argument.getClass())
         );
     }

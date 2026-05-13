@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public final class MigrationConfig {
-
     private static final double version = 4.0; // should be ignored
 
     private static final @NotNull ConfigVersion configVersion = ConfigVersion.of(3.0)
