@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -79,9 +79,9 @@ public final class Validator {
                 ))
                 .register(Url.class, new StringConstraintValidator(o -> {
                     try {
-                        new URL(o.toString());
+                        URI.create(o.toString()).toURL();
                         return true;
-                    } catch (MalformedURLException e) {
+                    } catch (IllegalArgumentException | MalformedURLException e) {
                         return false;
                     }
                 }))
