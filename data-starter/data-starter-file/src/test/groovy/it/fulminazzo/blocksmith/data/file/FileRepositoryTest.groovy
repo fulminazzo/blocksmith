@@ -17,9 +17,9 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
     private static final ConfigurationFormat FORMAT = ConfigurationFormat.JSON
     private static final File WORKING_DIR = new File('build/resources/test/file_repository')
 
-    private final ConfigurationAdapter adapter = ConfigurationAdapter.newAdapter(log, FORMAT)
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor()
 
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor()
+    private final ConfigurationAdapter adapter = ConfigurationAdapter.newAdapter(log, FORMAT)
 
     void setupSpec() {
         WORKING_DIR.deleteDir()
@@ -36,7 +36,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
     }
 
     void cleanupSpec() {
-        executor.shutdown()
+        EXECUTOR.shutdown()
     }
 
     @Override
@@ -46,7 +46,7 @@ class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
                         adapter,
                         FORMAT,
                         WORKING_DIR,
-                        executor
+                        EXECUTOR
                 ),
                 EntityMapper.create(User)
         )

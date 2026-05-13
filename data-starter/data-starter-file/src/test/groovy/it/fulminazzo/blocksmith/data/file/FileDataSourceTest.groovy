@@ -33,7 +33,7 @@ class FileDataSourceTest extends Specification {
         dataSource.close()
 
         then:
-        executor.isShutdown()
+        executor.shutdown
     }
 
 }

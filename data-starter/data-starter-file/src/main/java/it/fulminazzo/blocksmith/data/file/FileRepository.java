@@ -19,10 +19,12 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Implementation of {@link Repository} that stores data on disk.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities (will be used as files names)
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities (will be used as files names)
+ * @see FileRepositorySettings
+ * @see FileQueryEngine
  */
-public class FileRepository<T, ID> extends AbstractRepository<T, ID, FileQueryEngine<T, ID>> {
+public class FileRepository<T, I> extends AbstractRepository<T, I, FileQueryEngine<T, I>> {
 
     /**
      * Instantiates a new File repository.
@@ -30,13 +32,26 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID, FileQueryEn
      * @param queryEngine  the query engine
      * @param entityMapper the entity mapper
      */
-    protected FileRepository(final @NotNull FileQueryEngine<T, ID> queryEngine,
-                             final @NotNull EntityMapper<T, ID> entityMapper) {
+    protected FileRepository(
+            final @NotNull FileQueryEngine<T, I> queryEngine,
+            final @NotNull EntityMapper<T, I> entityMapper
+    ) {
         super(queryEngine, entityMapper);
     }
 
+    private void saveSingle(final @NotNull ConfigurationAdapter adapter, final @NotNull T entity) throws IOException {
+        I id = entityMapper.getId(entity);
+        File file = queryEngine.getDataFile(id);
+        adapter.store(file, entity);
+    }
+
     @Override
-    public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
+    public @NotNull CompletableFuture<Long> count() {
+        return queryEngine.query(a -> (long) queryEngine.getFiles().size());
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull I id) {
         return queryEngine.query(a -> {
             File file = queryEngine.getDataFile(id);
             if (file.exists()) return Optional.of(a.load(file, entityMapper.getType()));
@@ -45,24 +60,8 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID, FileQueryEn
     }
 
     @Override
-    public @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id) {
+    public @NotNull CompletableFuture<Boolean> existsById(final @NotNull I id) {
         return queryEngine.query(a -> queryEngine.getDataFile(id).exists());
-    }
-
-    @Override
-    public @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
-        return queryEngine.query(a -> {
-            saveSingle(a, entity);
-            return entity;
-        });
-    }
-
-    @Override
-    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id) {
-        return queryEngine.query(a -> {
-            File file = queryEngine.getDataFile(id);
-            return Files.deleteIfExists(file.toPath());
-        });
     }
 
     @Override
@@ -72,6 +71,14 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID, FileQueryEn
             for (File file : queryEngine.getFiles())
                 result.add(a.load(file, entityMapper.getType()));
             return result;
+        });
+    }
+
+    @Override
+    protected @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
+        return queryEngine.query(a -> {
+            saveSingle(a, entity);
+            return entity;
         });
     }
 
@@ -93,10 +100,10 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID, FileQueryEn
     }
 
     @Override
-    protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
+    protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<I> ids) {
         return queryEngine.query(a -> {
             List<File> files = new ArrayList<>();
-            for (ID id : ids)
+            for (I id : ids)
                 files.add(queryEngine.getDataFile(id));
             List<T> result = new ArrayList<>();
             for (File file : files)
@@ -115,9 +122,9 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID, FileQueryEn
     }
 
     @Override
-    protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids) {
+    protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<I> ids) {
         return queryEngine.query(a -> {
-            for (ID id : ids) {
+            for (I id : ids) {
                 File file = queryEngine.getDataFile(id);
                 Files.deleteIfExists(file.toPath());
             }
@@ -126,15 +133,11 @@ public class FileRepository<T, ID> extends AbstractRepository<T, ID, FileQueryEn
     }
 
     @Override
-    public @NotNull CompletableFuture<Long> count() {
-        return queryEngine.query(a -> (long) queryEngine.getFiles().size());
-    }
-
-    private void saveSingle(final @NotNull ConfigurationAdapter adapter,
-                            final @NotNull T entity) throws IOException {
-        ID id = entityMapper.getId(entity);
-        File file = queryEngine.getDataFile(id);
-        adapter.store(file, entity);
+    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull I id) {
+        return queryEngine.query(a -> {
+            File file = queryEngine.getDataFile(id);
+            return Files.deleteIfExists(file.toPath());
+        });
     }
 
 }

@@ -16,18 +16,18 @@ class FileQueryEngineTest extends Specification {
     private static final ConfigurationFormat FORMAT = ConfigurationFormat.JSON
     private static final File WORKING_DIR = new File('build/resources/test/file_query_engine')
 
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor()
+
     private final ConfigurationAdapter adapter = ConfigurationAdapter.newAdapter(log, FORMAT)
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor()
-
-    private FileQueryEngine<User, Long> engine = new FileQueryEngine<>(adapter, FORMAT, WORKING_DIR, executor)
+    private final FileQueryEngine<User, Long> engine = new FileQueryEngine<>(adapter, FORMAT, WORKING_DIR, EXECUTOR)
 
     void setup() {
         WORKING_DIR.deleteDir()
     }
 
     void cleanup() {
-        executor.shutdown()
+        EXECUTOR.shutdown()
     }
 
     def 'test that query throws CompletionException on IOException'() {
@@ -56,8 +56,7 @@ class FileQueryEngineTest extends Specification {
 
         and:
         (10..20).collect { "tmp${it}.yml" }
-                .collect { new File(WORKING_DIR, it) }
-                .collect { it.toPath() }
+                .collect { new File(WORKING_DIR, it) }*.toPath()
                 .collect { Files.createFile(it) }
 
         when:
@@ -76,7 +75,7 @@ class FileQueryEngineTest extends Specification {
 
         then:
         WORKING_DIR.exists()
-        WORKING_DIR.isDirectory()
+        WORKING_DIR.directory
     }
 
 }

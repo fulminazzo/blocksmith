@@ -26,11 +26,13 @@ import java.util.stream.Collectors;
  * Although this is not properly linked to a database,
  * the engine still provides a {@link #query(FunctionException)} method for familiarity.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities
+ * @see FileRepository
+ * @see FileDataSource
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class FileQueryEngine<T, ID> implements QueryEngine<T, ID> {
+public final class FileQueryEngine<T, I> implements QueryEngine<T, I> {
     private final @NotNull ConfigurationAdapter adapter;
     private final @NotNull ConfigurationFormat format;
 
@@ -80,7 +82,7 @@ public final class FileQueryEngine<T, ID> implements QueryEngine<T, ID> {
      * @return the data file (existence is NOT guaranteed)
      * @throws IOException in case of any exception
      */
-    public @NotNull File getDataFile(final @NotNull ID id) throws IOException {
+    public @NotNull File getDataFile(final @NotNull I id) throws IOException {
         if (!dataDirectory.isDirectory())
             Files.createDirectories(dataDirectory.toPath());
         return format.getFile(dataDirectory, id.toString());

@@ -7,6 +7,12 @@ import lombok.Value;
 
 import java.util.concurrent.Executors;
 
+/**
+ * {@link DataSourceConfig} for {@link FileDataSource}.
+ *
+ * @see DataSourceConfig
+ * @see FileDataSource
+ */
 @Value
 public class FileDataSourceConfig implements DataSourceConfig {
 

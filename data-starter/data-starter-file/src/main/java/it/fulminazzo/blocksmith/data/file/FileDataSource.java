@@ -55,43 +55,47 @@ import java.util.function.Function;
  *         such as backup on save, or encryption of sensitive fields.
  *     </li>
  * </ul>
+ *
+ * @see FileRepositorySettings
+ * @see FileRepository
+ * @see FileQueryEngine
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class FileDataSource implements RepositoryDataSource<FileRepositorySettings> {
     private final @NotNull ExecutorService executor;
-
-    @Override
-    public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull EntityMapper<T, ID> entityMapper,
-            final @NotNull FileRepositorySettings settings
-    ) {
-        return newRepository(
-                e -> new FileRepository<>(e, entityMapper),
-                settings
-        );
-    }
 
     /**
      * Creates a new custom repository.
      *
      * @param <R>               the type of the repository
      * @param <T>               the type of the entities
-     * @param <ID>              the type of the id of the entities
+     * @param <I>               the type of the id of the entities
      * @param repositoryBuilder the repository creation function
      * @param settings          the settings to build the repository with
      * @return the repository
      */
-    public <T, ID, R extends FileRepository<T, ID>> @NotNull R newRepository(
-            final @NotNull Function<FileQueryEngine<T, ID>, R> repositoryBuilder,
+    public <T, I, R extends FileRepository<T, I>> @NotNull R newRepository(
+            final @NotNull Function<FileQueryEngine<T, I>, R> repositoryBuilder,
             final @NotNull FileRepositorySettings settings
     ) {
-        FileQueryEngine<T, ID> engine = new FileQueryEngine<>(
+        FileQueryEngine<T, I> engine = new FileQueryEngine<>(
                 ConfigurationAdapter.newAdapter(settings.getLogger(), settings.getFormat()),
                 settings.getFormat(),
                 settings.getDataDirectory(),
                 executor
         );
         return repositoryBuilder.apply(engine);
+    }
+
+    @Override
+    public <T, I> @NotNull Repository<T, I> newRepository(
+            final @NotNull EntityMapper<T, I> entityMapper,
+            final @NotNull FileRepositorySettings settings
+    ) {
+        return newRepository(
+                e -> new FileRepository<>(e, entityMapper),
+                settings
+        );
     }
 
     @Override

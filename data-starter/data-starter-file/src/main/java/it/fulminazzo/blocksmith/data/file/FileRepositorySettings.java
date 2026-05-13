@@ -2,8 +2,7 @@ package it.fulminazzo.blocksmith.data.file;
 
 import it.fulminazzo.blocksmith.config.ConfigurationFormat;
 import it.fulminazzo.blocksmith.data.RepositorySettings;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -11,8 +10,17 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.util.Objects;
 
+/**
+ * Repository settings for filesystem repositories.
+ *
+ * @see FileRepository
+ * @see FileDataSource
+ */
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@With
 public final class FileRepositorySettings extends RepositorySettings {
     private @Nullable File dataDirectory;
     private @Nullable Logger logger;
@@ -30,19 +38,4 @@ public final class FileRepositorySettings extends RepositorySettings {
         return Objects.requireNonNull(format, "Configuration format has not been specified yet");
     }
 
-    public @NotNull FileRepositorySettings withDataDirectory(final @NotNull File dataDirectory) {
-        this.dataDirectory = dataDirectory;
-        return this;
-    }
-
-    public @NotNull FileRepositorySettings withLogger(final @NotNull Logger logger) {
-        this.logger = logger;
-        return this;
-    }
-
-    public @NotNull FileRepositorySettings withFormat(final @NotNull ConfigurationFormat format) {
-        this.format = format;
-        return this;
-    }
-    
 }
