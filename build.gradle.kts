@@ -119,6 +119,7 @@ tasks.register<JacocoReport>("jacocoAggregatedReport") {
 
     reports {
         html.required = true
+        xml.required = false
         csv.required = true
     }
 }
