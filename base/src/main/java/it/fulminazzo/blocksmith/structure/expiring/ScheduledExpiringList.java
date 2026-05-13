@@ -58,7 +58,7 @@ final class ScheduledExpiringList<E> extends AbstractExpiringList<E> {
     }
 
     @Override
-    public void add(final int index, final @Nullable E element, final long ttl) {
+    public synchronized void add(final int index, final @Nullable E element, final long ttl) {
         delegate.add(index, new ExpiringEntry<>(element, ttl));
     }
 
@@ -80,12 +80,12 @@ final class ScheduledExpiringList<E> extends AbstractExpiringList<E> {
     }
 
     @Override
-    public E get(final int index) {
+    public synchronized E get(final int index) {
         return getExpiring(index).getValue();
     }
 
     @Override
-    public E set(final int index, final @Nullable E element, final long ttl) {
+    public synchronized E set(final int index, final @Nullable E element, final long ttl) {
         return delegate.set(index, new ExpiringEntry<>(element, ttl)).getValue();
     }
 

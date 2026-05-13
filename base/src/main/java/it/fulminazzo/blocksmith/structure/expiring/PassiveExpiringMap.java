@@ -43,7 +43,7 @@ final class PassiveExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
     }
 
     @Override
-    public @NotNull Set<Entry<K, V>> entrySet() {
+    public synchronized @NotNull Set<Entry<K, V>> entrySet() {
         return delegate.entrySet().stream()
                 .map(e -> new ExpiringEntryMapEntry<>(e.getKey(), e.getValue()))
                 .collect(Collectors.toSet());

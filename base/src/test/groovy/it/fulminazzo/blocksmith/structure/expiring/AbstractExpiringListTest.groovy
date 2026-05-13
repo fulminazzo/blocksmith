@@ -8,11 +8,11 @@ import java.time.Duration
 class AbstractExpiringListTest extends Specification {
     private static final long ttl = 120_000L
 
-    private static final String value = 'Hello, world!'
+    private static final String VALUE = 'Hello, world!'
 
-    private static final ExpiringEntry<?> first = new ExpiringEntry<>('First value', ttl)
-    private static final ExpiringEntry<?> second = new ExpiringEntry<>('Second value', Long.MAX_VALUE)
-    private static final List<ExpiringEntry<?>> expectedEntries = [first, second, first]
+    private static final ExpiringEntry<?> FIRST = new ExpiringEntry<>('First value', ttl)
+    private static final ExpiringEntry<?> SECOND = new ExpiringEntry<>('Second value', Long.MAX_VALUE)
+    private static final List<ExpiringEntry<?>> EXPECTED_ENTRIES = [FIRST, SECOND, FIRST]
 
     private AbstractExpiringList<String> list
     private List<ExpiringEntry<String>> internal
@@ -24,11 +24,11 @@ class AbstractExpiringListTest extends Specification {
 
     def 'test that getTtl works'() {
         given:
-        list.add(value)
+        list.add(VALUE)
 
         expect:
-        list.getTtl(value) != null
-        list.getTtl(first.value) == null
+        list.getTtl(VALUE) != null
+        list.getTtl(FIRST.value) == null
     }
 
     def 'test that getTtl does not throw if element is removed mid-execution'() {
@@ -38,16 +38,16 @@ class AbstractExpiringListTest extends Specification {
         list.getExpiring(_) >> null
 
         expect:
-        list.getTtl(value) == null
+        list.getTtl(VALUE) == null
     }
 
     def 'test that add correctly adds new entry'() {
         when:
-        list.add(value, ttl)
+        list.add(VALUE, ttl)
         def now = now()
 
         then:
-        def entry = find(value)
+        def entry = find(VALUE)
         entry != null
 
         and:
@@ -58,16 +58,16 @@ class AbstractExpiringListTest extends Specification {
 
     def 'test that add with index correctly adds shifted entry'() {
         given:
-        internal.addAll([first, second])
+        internal.addAll([FIRST, SECOND])
 
         when:
-        if (expire == null) list.add(1, value)
-        else list.add(1, value, expire)
+        if (expire == null) list.add(1, VALUE)
+        else list.add(1, VALUE, expire)
 
         then:
-        internal[0] == first
-        internal[1].value == value
-        internal[2] == second
+        internal[0] == FIRST
+        internal[1].value == VALUE
+        internal[2] == SECOND
 
         where:
         expire << [null, Duration.ofSeconds(1)]
@@ -75,19 +75,19 @@ class AbstractExpiringListTest extends Specification {
 
     def 'test that addAll adds every element with the same TTL of the collection'() {
         given:
-        internal.addAll([first, first])
+        internal.addAll([FIRST, FIRST])
 
         and:
         def other = Mock(ExpiringCollection)
         other.iterator() >> [
-                second.value,
-                value,
+                SECOND.value,
+                VALUE,
                 'INVALID'
         ].iterator()
         other.getTtl(_) >> { a ->
             def val = a[0]
-            if (val == second.value) return Duration.ofMillis(ttl)
-            else if (val == value) return Duration.ofMillis(ExpiringEntry.NEVER_EXPIRE)
+            if (val == SECOND.value) return Duration.ofMillis(ttl)
+            else if (val == VALUE) return Duration.ofMillis(ExpiringEntry.NEVER_EXPIRE)
             else return null
         }
 
@@ -95,10 +95,10 @@ class AbstractExpiringListTest extends Specification {
         list.addAll(1, (Collection<String>) other)
 
         then:
-        internal[0] == first
-        internal[1].value == second.value
-        internal[2].value == value
-        internal[3] == first
+        internal[0] == FIRST
+        internal[1].value == SECOND.value
+        internal[2].value == VALUE
+        internal[3] == FIRST
 
         and:
         internal.size() == 4
@@ -106,19 +106,19 @@ class AbstractExpiringListTest extends Specification {
 
     def 'test that addAll adds every element of expiring collection'() {
         given:
-        internal.addAll([first, first])
+        internal.addAll([FIRST, FIRST])
 
         and:
         def other = Mock(ExpiringCollection)
         other.iterator() >> [
-                second.value,
-                value,
+                SECOND.value,
+                VALUE,
                 'INVALID'
         ].iterator()
         other.getTtl(_) >> { a ->
             def val = a[0]
-            if (val == second.value) return Duration.ofMillis(ttl)
-            else if (val == value) return Duration.ofMillis(ExpiringEntry.NEVER_EXPIRE)
+            if (val == SECOND.value) return Duration.ofMillis(ttl)
+            else if (val == VALUE) return Duration.ofMillis(ExpiringEntry.NEVER_EXPIRE)
             else return null
         }
 
@@ -127,12 +127,12 @@ class AbstractExpiringListTest extends Specification {
         def now = now()
 
         then:
-        internal[0] == first
+        internal[0] == FIRST
 
         and:
         def first = internal[1]
         first != null
-        first.value == second.value
+        first.value == SECOND.value
         def actualTtl = first.expireTime - now
         actualTtl <= ttl
         actualTtl >= ttl * 0.9
@@ -140,11 +140,11 @@ class AbstractExpiringListTest extends Specification {
         and:
         def second = internal[2]
         second != null
-        second.value == value
+        second.value == VALUE
         second.neverExpires()
 
         and:
-        internal[3] == AbstractExpiringListTest.first
+        internal[3] == FIRST
 
         and:
         internal.size() == 4
@@ -152,22 +152,22 @@ class AbstractExpiringListTest extends Specification {
 
     def 'test that addAll adds every element with the same TTL'() {
         given:
-        internal.addAll([first, first])
+        internal.addAll([FIRST, FIRST])
 
         and:
-        def other = [second.value, value]
+        def other = [SECOND.value, VALUE]
 
         when:
         list.addAll(1, other, Duration.ofMillis(ttl))
         def now = now()
 
         then:
-        internal[0] == first
+        internal[0] == FIRST
 
         and:
         def first = internal[1]
         first != null
-        first.value == second.value
+        first.value == SECOND.value
         def actualTtl1 = first.expireTime - now
         actualTtl1 >= ttl * 0.9
         actualTtl1 <= ttl
@@ -175,13 +175,13 @@ class AbstractExpiringListTest extends Specification {
         and:
         def second = internal[2]
         second != null
-        second.value == value
+        second.value == VALUE
         def actualTtl2 = second.expireTime - now
         actualTtl2 <= ttl
         actualTtl2 >= ttl * 0.9
 
         and:
-        internal[3] == AbstractExpiringListTest.first
+        internal[3] == FIRST
 
         and:
         internal.size() == 4
@@ -189,31 +189,31 @@ class AbstractExpiringListTest extends Specification {
 
     def 'test that addAll adds every element with no expiration time'() {
         given:
-        internal.addAll([first, first])
+        internal.addAll([FIRST, FIRST])
 
         and:
-        def other = [second.value, value]
+        def other = [SECOND.value, VALUE]
 
         when:
         list.addAll(1, other)
 
         then:
-        internal[0] == first
+        internal[0] == FIRST
 
         and:
         def first = internal[1]
         first != null
-        first.value == second.value
+        first.value == SECOND.value
         first.neverExpires()
 
         and:
         def second = internal[2]
         second != null
-        second.value == value
+        second.value == VALUE
         second.neverExpires()
 
         and:
-        internal[3] == AbstractExpiringListTest.first
+        internal[3] == FIRST
 
         and:
         internal.size() == 4
@@ -221,16 +221,16 @@ class AbstractExpiringListTest extends Specification {
 
     def 'test that set correctly overwrites value in list'() {
         given:
-        internal.addAll([first, first])
+        internal.addAll([FIRST, FIRST])
 
         when:
-        list.set(1, second.value, Duration.ofMillis(ttl))
+        list.set(1, SECOND.value, Duration.ofMillis(ttl))
         def now = now()
 
         then:
         def actual = internal[1]
         actual != null
-        actual.value == second.value
+        actual.value == SECOND.value
         def actualTtl = actual.expireTime - now
         actualTtl >= ttl - 20
         actualTtl <= ttl + 20
@@ -238,67 +238,67 @@ class AbstractExpiringListTest extends Specification {
 
     def 'test that set of never expiring works'() {
         given:
-        internal.addAll([first, first])
+        internal.addAll([FIRST, FIRST])
 
         when:
-        list.set(1, second.value)
+        list.set(1, SECOND.value)
 
         then:
         def actual = internal[1]
         actual != null
-        actual.value == second.value
+        actual.value == SECOND.value
         actual.neverExpires()
     }
 
     def 'test that indexOf works'() {
         given:
         internal.addAll([
-                first,
-                second,
-                first
+                FIRST,
+                SECOND,
+                FIRST
         ])
 
         expect:
-        list.indexOf(first.value) == 0
-        list.indexOf(second.value) == 1
+        list.indexOf(FIRST.value) == 0
+        list.indexOf(SECOND.value) == 1
         list.indexOf('INVALID') == -1
     }
 
     def 'test that lastIndexOf works'() {
         given:
         internal.addAll([
-                first,
-                second,
-                first
+                FIRST,
+                SECOND,
+                FIRST
         ])
 
         expect:
-        list.lastIndexOf(first.value) == 2
-        list.lastIndexOf(second.value) == 1
+        list.lastIndexOf(FIRST.value) == 2
+        list.lastIndexOf(SECOND.value) == 1
         list.lastIndexOf('INVALID') == -1
     }
 
     def 'test that iterator works'() {
         given:
-        internal.addAll(expectedEntries)
+        internal.addAll(EXPECTED_ENTRIES)
 
         when:
         def actual = []
         for (def i : list) actual.add(i)
 
         then:
-        actual == expectedEntries*.value
+        actual == EXPECTED_ENTRIES*.value
     }
 
     def 'test that toArray works'() {
         given:
-        internal.addAll(expectedEntries)
+        internal.addAll(EXPECTED_ENTRIES)
 
         when:
         def actual = list.toArray()
 
         then:
-        [*actual] == expectedEntries*.value
+        [*actual] == EXPECTED_ENTRIES*.value
     }
 
     def 'test that toArray with smaller array creates new array'() {
@@ -306,13 +306,13 @@ class AbstractExpiringListTest extends Specification {
         def previous = new String[]{'1'}
 
         and:
-        internal.addAll(expectedEntries)
+        internal.addAll(EXPECTED_ENTRIES)
 
         when:
         def actual = list.toArray(previous)
 
         then:
-        [*actual] == expectedEntries*.value
+        [*actual] == EXPECTED_ENTRIES*.value
         [*previous] == ['1']
     }
 
@@ -321,11 +321,11 @@ class AbstractExpiringListTest extends Specification {
         def previous = new String[size]
 
         and:
-        internal.addAll(expectedEntries)
+        internal.addAll(EXPECTED_ENTRIES)
 
         and:
-        def expected = expectedEntries*.value
-        if (size != expectedEntries.size()) expected.add(null)
+        def expected = EXPECTED_ENTRIES*.value
+        if (size != EXPECTED_ENTRIES.size()) expected.add(null)
 
         when:
         def actual = list.toArray(previous)
@@ -340,7 +340,7 @@ class AbstractExpiringListTest extends Specification {
 
     def 'test that clear clears delegate'() {
         given:
-        internal.addAll(expectedEntries)
+        internal.addAll(EXPECTED_ENTRIES)
 
         when:
         list.clear()
