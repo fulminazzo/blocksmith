@@ -22,7 +22,7 @@ spock-core = "2.4-groovy-5.0"
 mockito = "5.23.0"
 
 test-containers = "2.0.5"
-test-containers-mongodb = "1.21.4"
+test-containers-module = "1.21.4"
 
 # DATA FORMATS
 jackson = "2.21.2"
@@ -71,7 +71,10 @@ mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-version" }
 
 test-containers = { module = "org.testcontainers:testcontainers", version.ref = "test-containers" }
-test-containers-mongodb = { module = "org.testcontainers:mongodb", version.ref = "test-containers-mongodb" }
+test-containers-mysql = { module = "org.testcontainers:mysql", version.ref = "test-containers-module" }
+test-containers-mariadb = { module = "org.testcontainers:mariadb", version.ref = "test-containers-module" }
+test-containers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "test-containers-module" }
+test-containers-mongodb = { module = "org.testcontainers:mongodb", version.ref = "test-containers-module" }
 
 # DATA FORMATS
 jackson-json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
