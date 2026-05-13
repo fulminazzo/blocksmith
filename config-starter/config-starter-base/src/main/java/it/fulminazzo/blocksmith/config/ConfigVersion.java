@@ -9,7 +9,7 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Identifies a configuration version along with migrations to update previous versions.
@@ -52,7 +52,7 @@ public class ConfigVersion {
 
     @Getter
     double version;
-    @NotNull Map<Double, Function<Migration, Migration>> migrations = new TreeMap<>();
+    @NotNull Map<Double, UnaryOperator<Migration>> migrations = new TreeMap<>();
 
     /**
      * Applies the migrations for the specified version to the data.
@@ -65,9 +65,9 @@ public class ConfigVersion {
             final double currentVersion,
             @NotNull Map<String, Object> data
     ) {
-        for (Map.Entry<Double, Function<Migration, Migration>> entry : migrations.entrySet()) {
+        for (Map.Entry<Double, UnaryOperator<Migration>> entry : migrations.entrySet()) {
             final double v = entry.getKey();
-            final Function<Migration, Migration> migration = entry.getValue();
+            final UnaryOperator<Migration> migration = entry.getValue();
             if (v <= currentVersion) continue;
             data = migration.apply(new Migration(data)).getData();
         }
@@ -83,7 +83,7 @@ public class ConfigVersion {
      */
     public @NotNull ConfigVersion migrate(
             final double version,
-            final @NotNull Function<Migration, Migration> migration
+            final @NotNull UnaryOperator<Migration> migration
     ) {
         if (migrations.containsKey(version))
             throw new IllegalArgumentException("Migration already present for version " + version);
