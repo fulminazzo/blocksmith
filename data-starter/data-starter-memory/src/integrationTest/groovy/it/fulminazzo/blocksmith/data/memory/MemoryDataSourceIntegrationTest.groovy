@@ -5,7 +5,7 @@ import spock.lang.Specification
 
 import java.time.Duration
 
-class MemoryDataSourceTest extends Specification {
+class MemoryDataSourceIntegrationTest extends Specification {
 
     def 'test datasource life cycle'() {
         given:

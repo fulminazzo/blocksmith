@@ -5,7 +5,7 @@ import spock.lang.Specification
 
 import java.util.concurrent.Executors
 
-class MemoryQueryEngineTest extends Specification {
+class MemoryQueryEngineIntegrationTest extends Specification {
 
     def 'test query method'() {
         given:
