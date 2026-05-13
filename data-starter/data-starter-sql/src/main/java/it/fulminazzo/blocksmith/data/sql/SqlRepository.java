@@ -42,16 +42,22 @@ public class SqlRepository<T, I, E extends Table<?>> extends AbstractRepository<
             final @NotNull Table<?> table,
             final @NotNull T entity
     ) {
-        Record record = dsl.newRecord(table, entity);
-        return Objects.requireNonNull(dsl.insertInto(table)
-                        .set(record)
-                        .onConflict(queryEngine.getIdColumn())
-                        .doUpdate()
-                        .set(record)
-                        .returning()
-                        .fetchOneInto(
-                                entityMapper.getType()),
-                "The insertInto query did not return the stored entity accordingly"
+        Record insertRecord = dsl.newRecord(table, entity);
+        Record updateRecord = dsl.newRecord(table, entity);
+        updateRecord.reset(queryEngine.getIdColumn());
+
+        dsl.insertInto(table)
+                .set(insertRecord)
+                .onDuplicateKeyUpdate()
+                .set(updateRecord)
+                .execute();
+
+        I id = insertRecord.get(queryEngine.getIdColumn());
+        return Objects.requireNonNull(
+                dsl.selectFrom(table)
+                        .where(queryEngine.idEquals(id))
+                        .fetchOneInto(entityMapper.getType()),
+                "Could not retrieve entity after upsert"
         );
     }
 
