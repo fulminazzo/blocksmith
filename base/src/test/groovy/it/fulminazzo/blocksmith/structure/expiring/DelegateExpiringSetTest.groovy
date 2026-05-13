@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.structure.expiring
 import spock.lang.Specification
 
 class DelegateExpiringSetTest extends Specification {
-    private static final long ttl = 1_000L
+    private static final long ttl = 2_000L
 
     private static final String value = 'Hello, world!'
     private static final Object PRESENT = DelegateExpiringSet.PRESENT

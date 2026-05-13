@@ -4,7 +4,7 @@ import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 abstract class ExpiringMapImplTest extends Specification {
-    private static final long ttl = 1_000L
+    private static final long ttl = 2_000L
     private static final long expiringTtl = ttl / 4 as long
 
     private ExpiringMap<String, String> map
