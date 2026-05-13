@@ -46,8 +46,8 @@ abstract class ConfigurationAdapterIntegrationTest extends Specification {
         where:
         data << [
                 getFile('load').readLines().join('\n'),
-//                getFile('load'),
-//                new FileInputStream(getFile('load'))
+                getFile('load'),
+                new FileInputStream(getFile('load'))
         ]
     }
 
