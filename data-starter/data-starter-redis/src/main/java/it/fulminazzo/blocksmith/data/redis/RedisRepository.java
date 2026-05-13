@@ -70,18 +70,18 @@ public class RedisRepository<T, I> extends AbstractRepository<T, I, RedisQueryEn
     }
 
     @Override
-    public @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
+    public @NotNull CompletableFuture<Collection<T>> findAll() {
+        return queryEngine.getAllKeys().thenCompose(queryEngine::getValues);
+    }
+
+    @Override
+    protected @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
         return queryEngine.query(async -> {
             String id = queryEngine.getEntityId(entity);
             String serEntity = queryEngine.serialize(entity);
             if (expiry > 0) return async.psetex(id, expiry, serEntity);
             else return async.set(id, serEntity);
         }).thenApply(s -> entity);
-    }
-
-    @Override
-    public @NotNull CompletableFuture<Collection<T>> findAll() {
-        return queryEngine.getAllKeys().thenCompose(queryEngine::getValues);
     }
 
     @Override
