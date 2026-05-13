@@ -16,6 +16,9 @@ import java.util.stream.Collectors;
  */
 public final class MockRepository extends AbstractRepository<Cat, String, MockQueryEngine> {
 
+    /**
+     * Instantiates a new Mock repository.
+     */
     public MockRepository() {
         super(new MockQueryEngine(), EntityMapper.create(Cat.class, "name"));
     }
@@ -31,21 +34,21 @@ public final class MockRepository extends AbstractRepository<Cat, String, MockQu
     }
 
     @Override
+    public @NotNull CompletableFuture<Collection<Cat>> findAll() {
+        return queryEngine.query(Map::values);
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Long> count() {
+        return queryEngine.query(m -> (long) m.size());
+    }
+
+    @Override
     protected @NotNull CompletableFuture<Cat> saveImpl(final @NotNull Cat entity) {
         return queryEngine.query(m -> {
             m.put(entity.getName(), entity);
             return entity;
         });
-    }
-
-    @Override
-    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull String s) {
-        return queryEngine.query(m -> m.remove(s));
-    }
-
-    @Override
-    public @NotNull CompletableFuture<Collection<Cat>> findAll() {
-        return queryEngine.query(Map::values);
     }
 
     @Override
@@ -83,8 +86,8 @@ public final class MockRepository extends AbstractRepository<Cat, String, MockQu
     }
 
     @Override
-    public @NotNull CompletableFuture<Long> count() {
-        return queryEngine.query(m -> (long) m.size());
+    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull String s) {
+        return queryEngine.query(m -> m.remove(s));
     }
 
 }

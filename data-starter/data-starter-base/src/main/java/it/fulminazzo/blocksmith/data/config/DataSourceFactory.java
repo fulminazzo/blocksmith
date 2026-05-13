@@ -5,6 +5,9 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * A factory to create a new {@link RepositoryDataSource} from a configuration.
+ *
+ * @see DataSourceConfig
+ * @see RepositoryDataSource
  */
 @FunctionalInterface
 public interface DataSourceFactory {

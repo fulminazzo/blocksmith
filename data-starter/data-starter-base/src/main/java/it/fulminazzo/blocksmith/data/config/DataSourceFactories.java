@@ -9,20 +9,48 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Collects all the {@link DataSourceFactory} implementations.
+ *
+ * @see DataSourceConfig
+ * @see DataSourceFactory
+ * @see RepositoryDataSource
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DataSourceFactories {
-    private static final @NotNull Map<Class<? extends DataSourceConfig>, DataSourceFactory> factories = new ConcurrentHashMap<>();
+    private static final @NotNull Map<
+            Class<? extends DataSourceConfig>,
+            DataSourceFactory
+            > factories = new ConcurrentHashMap<>();
 
+    /**
+     * Instantiates a new {@link RepositoryDataSource} from the given configuration.
+     *
+     * @param dataSourceConfig the data source configuration
+     * @return the repository data source
+     */
     @SuppressWarnings("unchecked")
-    public static @NotNull RepositoryDataSource<RepositorySettings> build(final @NotNull DataSourceConfig dataSourceConfig) {
+    public static @NotNull RepositoryDataSource<RepositorySettings> build(
+            final @NotNull DataSourceConfig dataSourceConfig
+    ) {
         DataSourceFactory dataSourceFactory = factories.get(dataSourceConfig.getClass());
-        if (dataSourceFactory == null)
-            throw new IllegalArgumentException("No RepositoryDataSource factory currently registered for configuration type: " + dataSourceConfig.getClass().getSimpleName());
-        return (RepositoryDataSource<RepositorySettings>) dataSourceFactory.build(dataSourceConfig);
+        if (dataSourceFactory == null) throw new IllegalArgumentException(
+                "No RepositoryDataSource factory currently registered for configuration type: "
+                        + dataSourceConfig.getClass().getSimpleName()
+        );
+        else return (RepositoryDataSource<RepositorySettings>) dataSourceFactory.build(dataSourceConfig);
     }
 
-    public static void registerFactory(final @NotNull Class<? extends DataSourceConfig> configClass,
-                                       final @NotNull DataSourceFactory factory) {
+    /**
+     * Registers a new factory for the given {@link DataSourceConfig} type.
+     *
+     * @param configClass the config class
+     * @param factory     the factory
+     */
+    public static void registerFactory(
+            final @NotNull Class<? extends DataSourceConfig> configClass,
+            final @NotNull DataSourceFactory factory
+    ) {
         factories.put(configClass, factory);
     }
 

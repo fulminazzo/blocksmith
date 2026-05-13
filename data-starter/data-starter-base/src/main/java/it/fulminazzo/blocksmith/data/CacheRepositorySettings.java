@@ -14,7 +14,10 @@ import java.time.Duration;
 /**
  * Abstract implementation of {@link RepositorySettings} for {@link CacheRepository}.
  *
- * @param <S> the type of this settings
+ * @param <S> the type of this object
+ * @see RepositorySettings
+ * @see CacheRepository
+ * @see CacheRepositoryDataSource
  */
 @SuppressWarnings("unchecked")
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
@@ -29,11 +32,11 @@ public abstract class CacheRepositorySettings<S extends CacheRepositorySettings<
      * @param expiry the expiration time
      * @return this object (for method chaining)
      */
-    public @NotNull S withTtl(final
-                              @Range(from = 0, to = Long.MAX_VALUE)
-                              @PositiveOrZero(exceptionMessage = "cache expire time must be at least 0")
-                              @NotNull
-                              Duration expiry) {
+    public @NotNull S withTtl(
+            @Range(from = 0, to = Long.MAX_VALUE)
+            @PositiveOrZero(exceptionMessage = "cache expire time must be at least 0")
+            @NotNull final Duration expiry
+    ) {
         Validator.validateMethod(expiry);
         this.ttl = expiry;
         return (S) this;

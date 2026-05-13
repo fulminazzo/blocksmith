@@ -6,13 +6,19 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Closeable;
 
 /**
- * Common interface for all repositories data sources.
+ * Common interface for all the data sources of the repositories.
  * <br>
  * Identifies all objects that can create repositories for entities.
  * This is a marker interface - each implementation varies in its methods
  * because each backend has different requirements.
  *
  * @param <S> the type of the repository settings (to build new repositories)
+ * @see CacheRepositoryDataSource
+ * @see RepositoryDataSourceBuilder
+ * @see Repository
+ * @see RepositorySettings
+ * @see QueryEngine
+ * @see EntityMapper
  */
 public interface RepositoryDataSource<S extends RepositorySettings> extends Closeable {
 
@@ -20,12 +26,12 @@ public interface RepositoryDataSource<S extends RepositorySettings> extends Clos
      * Creates a new repository.
      *
      * @param <T>        the type of the entities
-     * @param <ID>       the type of the id of the entities
+     * @param <I>        the type of the id of the entities
      * @param entityType the entity Java class
      * @param settings   the settings to build the repository with
      * @return the repository
      */
-    default <T, ID> @NotNull Repository<T, ID> newRepository(
+    default <T, I> @NotNull Repository<T, I> newRepository(
             final @NotNull Class<T> entityType,
             final @NotNull S settings
     ) {
@@ -36,13 +42,13 @@ public interface RepositoryDataSource<S extends RepositorySettings> extends Clos
      * Creates a new repository.
      *
      * @param <T>          the type of the entities
-     * @param <ID>         the type of the id of the entities
+     * @param <I>          the type of the id of the entities
      * @param entityMapper the entity mapper
      * @param settings     the settings to build the repository with
      * @return the repository
      */
-    <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull EntityMapper<T, ID> entityMapper,
+    <T, I> @NotNull Repository<T, I> newRepository(
+            final @NotNull EntityMapper<T, I> entityMapper,
             final @NotNull S settings
     );
 

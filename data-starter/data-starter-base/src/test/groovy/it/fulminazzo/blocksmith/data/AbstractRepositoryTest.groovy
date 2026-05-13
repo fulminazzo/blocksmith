@@ -84,9 +84,7 @@ class AbstractRepositoryTest extends Specification {
         repository.saveAll(expected).get()
 
         when:
-        def actual = repository.findAllById([
-                null, *expected.collect { it.name }, null
-        ]).get()
+        def actual = repository.findAllById([null, *expected*.name, null]).get()
 
         then:
         actual == expected
@@ -139,20 +137,16 @@ class AbstractRepositoryTest extends Specification {
         repository.saveAll(expected).get()
 
         when:
-        def actual = repository.deleteAll([
-                null, *expected.collect { it.name }, null
-        ]).get()
+        def actual = repository.deleteAll([null, *expected*.name, null]).get()
 
         then:
         actual == null
 
         when:
-        def data = repository.findAllById(
-                expected.collect { it.name }
-        ).get()
+        def data = repository.findAllById(expected*.name).get()
 
         then:
-        data.isEmpty()
+        data.empty
     }
 
 }
