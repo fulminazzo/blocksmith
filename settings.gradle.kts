@@ -78,9 +78,6 @@ include(
     "data-starter:data-starter-testing"
 )
 
-// example
-include("example")
-
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
