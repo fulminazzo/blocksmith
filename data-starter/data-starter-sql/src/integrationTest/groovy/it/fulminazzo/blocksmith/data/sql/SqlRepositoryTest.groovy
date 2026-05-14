@@ -75,23 +75,23 @@ abstract class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long
 
     @Override
     boolean exists(final @NotNull Long id) {
-        return dsl.selectFrom(table(TABLE_NAME))
-                .where(field(ID_COLUMN).eq(id))
+        return dsl.selectFrom(repository.queryEngine.table)
+                .where(repository.queryEngine.idEquals(id))
                 .fetch()
                 .notEmpty
     }
 
     @Override
     void insert(final @NotNull User entity) {
-        dsl.insertInto(table(TABLE_NAME))
+        dsl.insertInto(repository.queryEngine.table)
                 .values(entity.id, entity.username, entity.age)
                 .execute()
     }
 
     @Override
     void remove(final @NotNull Long id) {
-        dsl.deleteFrom(table(TABLE_NAME))
-                .where(field(ID_COLUMN).eq(id))
+        dsl.deleteFrom(repository.queryEngine.table)
+                .where(repository.queryEngine.idEquals(id))
                 .execute()
     }
 
