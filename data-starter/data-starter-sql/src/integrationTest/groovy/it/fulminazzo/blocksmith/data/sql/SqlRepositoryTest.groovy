@@ -22,7 +22,7 @@ abstract class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long
     private static final String TABLE_NAME = 'USERS'
     private static final String ID_COLUMN = 'ID'
 
-    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor()
+    private final ExecutorService executor = Executors.newSingleThreadExecutor()
 
     @Shared
     private DataSource dataSource
@@ -47,7 +47,6 @@ abstract class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long
     }
 
     void cleanupSuite() {
-        EXECUTOR?.shutdown()
         dataSource?.close()
     }
 
@@ -56,6 +55,7 @@ abstract class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long
     }
 
     void cleanupSingle() {
+        executor?.shutdown()
         clearData()
     }
 
@@ -67,7 +67,7 @@ abstract class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long
                         dsl,
                         table,
                         table.field(ID_COLUMN, Long),
-                        EXECUTOR
+                        executor
                 ),
                 EntityMapper.create(User)
         )
