@@ -1,6 +1,5 @@
 package it.fulminazzo.blocksmith.data.sql
 
-
 import it.fulminazzo.blocksmith.data.RepositoryTest
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
@@ -29,10 +28,6 @@ abstract class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long
 
     @Shared
     private DSLContext dsl
-
-    protected abstract DataSource newDataSource()
-
-    protected abstract SQLDialect getDialect()
 
     void setupSuite() {
         dataSource = newDataSource()
@@ -94,5 +89,9 @@ abstract class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long
                 .where(repository.queryEngine.idEquals(id))
                 .execute()
     }
+
+    protected abstract DataSource newDataSource()
+
+    protected abstract SQLDialect getDialect()
 
 }
