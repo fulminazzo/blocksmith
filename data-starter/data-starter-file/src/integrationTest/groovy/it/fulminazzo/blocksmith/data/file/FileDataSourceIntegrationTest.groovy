@@ -8,7 +8,7 @@ import spock.lang.Specification
 import java.util.concurrent.Executors
 
 @Slf4j
-class FileDataSourceTest extends Specification {
+class FileDataSourceIntegrationTest extends Specification {
 
     def 'test datasource life cycle'() {
         given:
