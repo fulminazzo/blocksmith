@@ -140,6 +140,9 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
         @Nullable
         Integer port;
 
+        @Nullable
+        String path;
+
     }
 
 }

@@ -38,7 +38,8 @@ final class SqlDataSourceFactory implements DataSourceFactory {
                     Objects.requireNonNull(
                             mode.getPort(),
                             "connection mode port must be declared"
-                    )
+                    ),
+                    mode.getPath() == null ? "" : mode.getPath()
             );
 
         builder.schemaName(config.getSchemaName());

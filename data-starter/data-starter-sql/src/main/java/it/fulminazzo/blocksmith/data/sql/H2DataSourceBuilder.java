@@ -119,14 +119,17 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      *
      * @param host the host
      * @param port the port
+     * @param path the path of the database in the filesystem (without the database name)
      * @return this object (for method chaining)
      */
     public @NotNull H2DataSourceBuilder server(
             final @NotNull String host,
-            final @Range(from = 1, to = 65535) @Port int port
+            final @Range(from = 1, to = 65535) @Port int port,
+            final @NotNull String path
     ) {
-        Validator.validateMethod(host, port);
-        connectionMode = String.format("tcp://%s:%s/%s", host, port, getDatabase());
+        Validator.validateMethod(host, port, path);
+        File databaseFile = new File(path, getDatabase());
+        connectionMode = String.format("tcp://%s:%s/%s", host, port, databaseFile.getPath());
         return this;
     }
 
