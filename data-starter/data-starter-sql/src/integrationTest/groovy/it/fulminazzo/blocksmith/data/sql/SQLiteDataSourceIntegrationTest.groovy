@@ -15,8 +15,9 @@ class SQLiteDataSourceIntegrationTest extends SqlDataSourceIntegrationTest {
 
     @Override
     protected <B extends ASqlDataSourceBuilder<B>> B newDataSourceBuilderImpl() {
-        return SqlDataSource.builder().database('sqlite')
+        return SqlDataSource.builder()
                 .sqlite()
+                .database('sqlite')
                 .disk('./build/resources/integrationTest')
     }
 
