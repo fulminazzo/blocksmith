@@ -17,6 +17,7 @@ abstract class SqlDataSourceIntegrationTest extends DataSourceIntegrationTest<Sq
 
     void setupSuite() {
         testHelper = newTestHelper()
+        testHelper.context.dropTableIfExists('logins').execute()
     }
 
     void cleanupSuite() {
