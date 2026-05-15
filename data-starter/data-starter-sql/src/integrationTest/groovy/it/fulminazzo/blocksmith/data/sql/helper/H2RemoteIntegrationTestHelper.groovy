@@ -12,7 +12,7 @@ import javax.sql.DataSource
 class H2RemoteIntegrationTestHelper extends SqlIntegrationTestHelper {
     private static final String SERVER_HOST = 'localhost'
     private static final int SERVER_PORT = DatabaseType.H2.port
-    private static final String H2_PATH = "jdbc:h2:tcp://$SERVER_HOST:${SERVER_PORT}/./build/resources/integrationTest/h2_remote"
+    private static final String H2_PATH = "jdbc:h2:tcp://$SERVER_HOST:${SERVER_PORT}/./build/resources/integrationTest/h2_remote;DATABASE_TO_LOWER=TRUE"
 
     private Server server
 

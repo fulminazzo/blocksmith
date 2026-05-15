@@ -19,6 +19,8 @@ class H2RemoteDataSourceIntegrationTest extends SqlDataSourceIntegrationTest {
                 .h2()
                 .database('h2_remote')
                 .server(testHelper.serverHost, testHelper.serverPort, './build/resources/integrationTest')
+                .schemaName('PUBLIC')
+                .lowercaseNames(true)
     }
 
     @Override

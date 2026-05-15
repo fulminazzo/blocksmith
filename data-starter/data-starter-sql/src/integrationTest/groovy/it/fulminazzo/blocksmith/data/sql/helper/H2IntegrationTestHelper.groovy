@@ -7,7 +7,7 @@ import org.jooq.SQLDialect
 import javax.sql.DataSource
 
 final class H2IntegrationTestHelper extends SqlIntegrationTestHelper {
-    private static final String H2_PATH = 'jdbc:h2:file:./build/resources/integrationTest/h2'
+    private static final String H2_PATH = 'jdbc:h2:file:./build/resources/integrationTest/h2;DATABASE_TO_LOWER=TRUE'
 
     @Override
     SQLDialect getDialect() {

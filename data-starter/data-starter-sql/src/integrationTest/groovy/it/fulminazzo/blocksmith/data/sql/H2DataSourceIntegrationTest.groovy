@@ -85,6 +85,8 @@ class H2DataSourceIntegrationTest extends SqlDataSourceIntegrationTest {
                 .database('h2')
                 .disk('./build/resources/integrationTest')
                 .allowSimultaneousFileConnections()
+                .schemaName('PUBLIC')
+                .lowercaseNames(true)
     }
 
     @Override
