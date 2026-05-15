@@ -17,7 +17,7 @@ public enum DatabaseType implements IDatabaseType {
     MARIADB(3306),
     POSTGRESQL(5432),
     H2(8082),
-    SQLITE(8191)
+    SQLITE(-1)
     ;
 
     @Getter
