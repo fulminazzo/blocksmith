@@ -7,13 +7,13 @@ import org.testcontainers.containers.MariaDBContainer
 final class MariaDBIntegrationTestHelper extends RemoteSqlIntegrationTestHelper {
 
     @Override
-    protected JdbcDatabaseContainer newContainer() {
-        return new MariaDBContainer('mariadb:11.4.10')
+    SQLDialect getDialect() {
+        return SQLDialect.MARIADB
     }
 
     @Override
-    protected SQLDialect getDialect() {
-        return SQLDialect.MARIADB
+    protected JdbcDatabaseContainer newContainer() {
+        return new MariaDBContainer('mariadb:11.4.10')
     }
 
 }

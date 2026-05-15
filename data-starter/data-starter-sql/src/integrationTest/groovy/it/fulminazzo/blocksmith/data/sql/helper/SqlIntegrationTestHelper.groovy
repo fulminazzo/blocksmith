@@ -39,18 +39,18 @@ abstract class SqlIntegrationTestHelper implements Closeable {
     }
 
     /**
+     * Gets the dialect of the database.
+     *
+     * @return the dialect
+     */
+    abstract SQLDialect getDialect()
+
+    /**
      * Initializes a new {@link DataSource} connection to the database.
      *
      * @return the data source
      */
     protected abstract DataSource newDataSource()
-
-    /**
-     * Gets the dialect of the database.
-     *
-     * @return the dialect
-     */
-    protected abstract SQLDialect getDialect()
 
     @Override
     void close() throws IOException {

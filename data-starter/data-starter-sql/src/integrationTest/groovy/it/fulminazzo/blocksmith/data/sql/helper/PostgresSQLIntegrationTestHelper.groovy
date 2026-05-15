@@ -7,15 +7,15 @@ import org.testcontainers.containers.PostgreSQLContainer
 final class PostgresSQLIntegrationTestHelper extends RemoteSqlIntegrationTestHelper {
 
     @Override
+    SQLDialect getDialect() {
+        return SQLDialect.POSTGRES
+    }
+
+    @Override
     protected JdbcDatabaseContainer newContainer() {
         return new PostgreSQLContainer('postgres:18.3')
                 .withUsername('root')
                 .withPassword('test')
-    }
-
-    @Override
-    protected SQLDialect getDialect() {
-        return SQLDialect.POSTGRES
     }
 
 }

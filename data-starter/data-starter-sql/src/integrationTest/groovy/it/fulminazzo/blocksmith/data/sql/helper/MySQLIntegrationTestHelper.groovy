@@ -7,13 +7,13 @@ import org.testcontainers.containers.MySQLContainer
 final class MySQLIntegrationTestHelper extends RemoteSqlIntegrationTestHelper {
 
     @Override
-    protected JdbcDatabaseContainer newContainer() {
-        return new MySQLContainer('mysql:8.0.36')
+    SQLDialect getDialect() {
+        return SQLDialect.MYSQL
     }
 
     @Override
-    protected SQLDialect getDialect() {
-        return SQLDialect.MYSQL
+    protected JdbcDatabaseContainer newContainer() {
+        return new MySQLContainer('mysql:8.0.36')
     }
 
 }

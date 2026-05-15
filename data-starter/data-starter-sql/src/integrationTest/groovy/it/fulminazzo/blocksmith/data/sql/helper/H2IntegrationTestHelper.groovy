@@ -10,6 +10,11 @@ final class H2IntegrationTestHelper extends SqlIntegrationTestHelper {
     private static final String H2_PATH = 'jdbc:h2:file:./build/resources/integrationTest/h2'
 
     @Override
+    SQLDialect getDialect() {
+        return SQLDialect.H2
+    }
+
+    @Override
     protected DataSource newDataSource() {
         def config = new HikariConfig()
         config.jdbcUrl = H2_PATH
@@ -17,11 +22,6 @@ final class H2IntegrationTestHelper extends SqlIntegrationTestHelper {
         config.password = 'test'
 
         return new HikariDataSource(config)
-    }
-
-    @Override
-    protected SQLDialect getDialect() {
-        return SQLDialect.H2
     }
 
 }

@@ -9,6 +9,11 @@ import javax.sql.DataSource
 final class SQLiteIntegrationTestHelper extends SqlIntegrationTestHelper {
 
     @Override
+    SQLDialect getDialect() {
+        return SQLDialect.SQLITE
+    }
+
+    @Override
     protected DataSource newDataSource() {
         def databaseFile = new File('build/resources/integrationTest/sqlite.db')
         databaseFile.parentFile.mkdirs()
@@ -17,11 +22,6 @@ final class SQLiteIntegrationTestHelper extends SqlIntegrationTestHelper {
         config.jdbcUrl = "jdbc:sqlite:$databaseFile"
 
         return new HikariDataSource(config)
-    }
-
-    @Override
-    protected SQLDialect getDialect() {
-        return SQLDialect.SQLITE
     }
 
 }
