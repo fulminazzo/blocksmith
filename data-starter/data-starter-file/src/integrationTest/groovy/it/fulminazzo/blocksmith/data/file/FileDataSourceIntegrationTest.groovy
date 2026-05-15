@@ -30,6 +30,12 @@ class FileDataSourceIntegrationTest extends Specification {
         repository != null
 
         when:
+        def user = repository.findById(1L).join()
+
+        then:
+        user.empty
+
+        when:
         dataSource.close()
 
         then:
