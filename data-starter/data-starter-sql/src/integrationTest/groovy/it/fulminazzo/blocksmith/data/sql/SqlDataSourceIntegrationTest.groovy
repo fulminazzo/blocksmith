@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 abstract class SqlDataSourceIntegrationTest extends DataSourceIntegrationTest<SqlRepositorySettings> {
-    private final ExecutorService executor = Executors.newSingleThreadExecutor()
+    protected final ExecutorService executor = Executors.newSingleThreadExecutor()
 
     @Shared
     protected SqlIntegrationTestHelper testHelper
