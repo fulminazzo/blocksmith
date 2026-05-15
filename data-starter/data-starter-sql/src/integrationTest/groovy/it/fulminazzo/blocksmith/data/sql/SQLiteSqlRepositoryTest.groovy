@@ -1,10 +1,7 @@
 package it.fulminazzo.blocksmith.data.sql
 
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
-import org.jooq.SQLDialect
-
-import javax.sql.DataSource
+import it.fulminazzo.blocksmith.data.sql.helper.SQLiteIntegrationTestHelper
+import it.fulminazzo.blocksmith.data.sql.helper.SqlIntegrationTestHelper
 
 class SQLiteSqlRepositoryTest extends SqlRepositoryTest {
 
@@ -25,19 +22,8 @@ class SQLiteSqlRepositoryTest extends SqlRepositoryTest {
     }
 
     @Override
-    protected DataSource newDataSource() {
-        def databaseFile = new File('build/resources/integrationTest/sqlite.db')
-        databaseFile.parentFile.mkdirs()
-
-        def config = new HikariConfig()
-        config.jdbcUrl = "jdbc:sqlite:$databaseFile"
-
-        return new HikariDataSource(config)
-    }
-
-    @Override
-    protected SQLDialect getDialect() {
-        return SQLDialect.SQLITE
+    protected SqlIntegrationTestHelper newTestHelper() {
+        return new SQLiteIntegrationTestHelper()
     }
 
 }

@@ -1,10 +1,9 @@
 package it.fulminazzo.blocksmith.data.sql
 
-import org.jooq.SQLDialect
-import org.testcontainers.containers.JdbcDatabaseContainer
-import org.testcontainers.containers.MariaDBContainer
+import it.fulminazzo.blocksmith.data.sql.helper.MariaDBIntegrationTestHelper
+import it.fulminazzo.blocksmith.data.sql.helper.SqlIntegrationTestHelper
 
-class MariaDBRepositoryTest extends RemoteSqlRepositoryTest {
+class MariaDBRepositoryTest extends SqlRepositoryTest {
 
     void setupSpec() {
         setupSuite()
@@ -23,13 +22,8 @@ class MariaDBRepositoryTest extends RemoteSqlRepositoryTest {
     }
 
     @Override
-    protected JdbcDatabaseContainer newContainer() {
-        return new MariaDBContainer('mariadb:11.4.10')
-    }
-
-    @Override
-    protected SQLDialect getDialect() {
-        return SQLDialect.MARIADB
+    protected SqlIntegrationTestHelper newTestHelper() {
+        return new MariaDBIntegrationTestHelper()
     }
 
 }

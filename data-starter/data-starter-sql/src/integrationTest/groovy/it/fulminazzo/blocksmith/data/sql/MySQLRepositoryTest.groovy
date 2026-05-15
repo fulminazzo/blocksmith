@@ -1,10 +1,9 @@
 package it.fulminazzo.blocksmith.data.sql
 
-import org.jooq.SQLDialect
-import org.testcontainers.containers.JdbcDatabaseContainer
-import org.testcontainers.containers.MySQLContainer
+import it.fulminazzo.blocksmith.data.sql.helper.MySQLIntegrationTestHelper
+import it.fulminazzo.blocksmith.data.sql.helper.SqlIntegrationTestHelper
 
-class MySQLRepositoryTest extends RemoteSqlRepositoryTest {
+class MySQLRepositoryTest extends SqlRepositoryTest {
 
     void setupSpec() {
         setupSuite()
@@ -23,13 +22,8 @@ class MySQLRepositoryTest extends RemoteSqlRepositoryTest {
     }
 
     @Override
-    protected JdbcDatabaseContainer newContainer() {
-        return new MySQLContainer('mysql:8.0.36')
-    }
-
-    @Override
-    protected SQLDialect getDialect() {
-        return SQLDialect.MYSQL
+    protected SqlIntegrationTestHelper newTestHelper() {
+        return new MySQLIntegrationTestHelper()
     }
 
 }
