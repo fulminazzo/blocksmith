@@ -21,13 +21,7 @@ abstract class SqlIntegrationTestHelper implements Closeable {
     SqlIntegrationTestHelper() {
         dataSource = newDataSource()
 
-        context = using(dataSource, dialect)
-        context.createTableIfNotExists(TABLE_NAME)
-                .column(ID_COLUMN, SQLDataType.BIGINT.notNull().identity(true))
-                .column('USERNAME', SQLDataType.VARCHAR(16).notNull())
-                .column('AGE', SQLDataType.INTEGER.notNull())
-                .constraints(constraint("PK_$TABLE_NAME").primaryKey(ID_COLUMN))
-                .execute()
+        context = initializeContextAndTable(dataSource, dialect)
     }
 
     Table<? extends Record> getTable() {
@@ -55,6 +49,17 @@ abstract class SqlIntegrationTestHelper implements Closeable {
     @Override
     void close() throws IOException {
         dataSource?.close()
+    }
+
+    static DSLContext initializeContextAndTable(final DataSource dataSource, final SQLDialect dialect) {
+        def context = using(dataSource, dialect)
+        context.createTableIfNotExists(TABLE_NAME)
+                .column(ID_COLUMN, SQLDataType.BIGINT.notNull().identity(true))
+                .column('USERNAME', SQLDataType.VARCHAR(16).notNull())
+                .column('AGE', SQLDataType.INTEGER.notNull())
+                .constraints(constraint("PK_$TABLE_NAME").primaryKey(ID_COLUMN))
+                .execute()
+        return context
     }
 
 }
