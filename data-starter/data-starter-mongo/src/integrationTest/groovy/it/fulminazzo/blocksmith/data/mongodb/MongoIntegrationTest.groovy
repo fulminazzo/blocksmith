@@ -20,7 +20,19 @@ interface MongoIntegrationTest {
     }
 
     default MongoDBContainer getContainer() {
-        if (!MONGO_SERVER.created) MONGO_SERVER.start()
+        if (!MONGO_SERVER.created) {
+            MONGO_SERVER.start()
+            MONGO_SERVER.execInContainer(
+                    'mongosh', '--quiet', '--eval',
+                    """
+        db.getSiblingDB('admin').createUser({
+            user: 'root',
+            pwd:  'test',
+            roles: [{ role: 'root', db: 'admin' }]
+        })
+        """
+            )
+        }
         return MONGO_SERVER
     }
 
