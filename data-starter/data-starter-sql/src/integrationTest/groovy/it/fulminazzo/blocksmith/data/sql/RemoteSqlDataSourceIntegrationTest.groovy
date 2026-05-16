@@ -10,7 +10,6 @@ abstract class RemoteSqlDataSourceIntegrationTest extends SqlDataSourceIntegrati
                 .databaseType(databaseType)
                 .host(testHelper.serverHost)
                 .port(testHelper.serverPort)
-                .mysql()
     }
 
 }
