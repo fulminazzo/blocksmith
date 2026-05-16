@@ -5,23 +5,41 @@ import it.fulminazzo.blocksmith.data.RepositorySettings;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Repository settings for cached repositories.
+ *
+ * @param <C> the type of the cache repository settings
+ * @param <S> the type of the repository settings
+ * @see CachedRepository
+ * @see CachedDataSource
+ * @see HybridCachedDataSource
+ */
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CachedRepositorySettings<
-        CS extends CacheRepositorySettings<CS>,
+        C extends CacheRepositorySettings<C>,
         S extends RepositorySettings
         > extends RepositorySettings {
 
-    private final @NotNull CS cacheRepositorySettings;
+    private final @NotNull C cacheRepositorySettings;
     private final @NotNull S repositorySettings;
 
+    /**
+     * Instantiates a new Cached repository settings.
+     *
+     * @param <C>                     the type of the cache repository settings
+     * @param <S>                     the type of the repository settings
+     * @param cacheRepositorySettings the repository settings for the repository to use as cache
+     * @param repositorySettings      the repository settings for the main repository
+     * @return the cached repository settings
+     */
     public static <
-            CS extends CacheRepositorySettings<CS>,
+            C extends CacheRepositorySettings<C>,
             S extends RepositorySettings
-            > @NotNull CachedRepositorySettings<CS, S> combine(
-            final @NotNull CS cacheRepositorySettings,
+            > @NotNull CachedRepositorySettings<C, S> combine(
+            final @NotNull C cacheRepositorySettings,
             final @NotNull S repositorySettings
     ) {
         return new CachedRepositorySettings<>(

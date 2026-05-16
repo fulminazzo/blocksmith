@@ -12,13 +12,17 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.Executors;
-
+/**
+ * {@link DataSourceConfig} for {@link CachedDataSource}.
+ *
+ * @see DataSourceConfig
+ * @see CachedDataSource
+ */
 @Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public final class CachedDataSourceConfig implements DataSourceConfig {
 
     static {
@@ -26,11 +30,15 @@ public final class CachedDataSourceConfig implements DataSourceConfig {
                 CachedDataSourceConfig.class,
                 c -> {
                     CachedDataSourceConfig config = (CachedDataSourceConfig) c;
-                    CacheRepositoryDataSource<?> cache = (CacheRepositoryDataSource<?>) DataSourceFactories.build(config.getCache());
+                    CacheRepositoryDataSource<?> cache = (CacheRepositoryDataSource<?>)
+                            DataSourceFactories.build(config.getCache());
                     RepositoryDataSource<?> repository = DataSourceFactories.build(config.getRepository());
                     return Boolean.TRUE.equals(config.getHybrid())
-                            ? CachedDataSource.hybrid(MemoryDataSource.create(Executors.newCachedThreadPool()), cache, repository)
-                            : CachedDataSource.create(cache, repository);
+                            ? CachedDataSource.hybrid(
+                            MemoryDataSource.createAsync(),
+                            cache,
+                            repository
+                    ) : CachedDataSource.create(cache, repository);
                 }
         );
     }

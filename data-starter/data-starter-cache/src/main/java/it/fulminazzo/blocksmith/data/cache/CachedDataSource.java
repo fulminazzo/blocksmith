@@ -120,34 +120,25 @@ import java.util.function.Function;
  *     </li>
  * </ul>
  *
- * @param <CS> the repository settings of the cache repository data source
- * @param <S>  the repository settings of the internal repository data source
+ * @param <C> the repository settings of the cache repository data source
+ * @param <S> the repository settings of the internal repository data source
+ * @see HybridCachedDataSource
+ * @see CachedRepositorySettings
+ * @see CachedRepository
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class CachedDataSource<
-        CS extends CacheRepositorySettings<CS>,
+        C extends CacheRepositorySettings<C>,
         S extends RepositorySettings
-        > implements RepositoryDataSource<CachedRepositorySettings<CS, S>> {
-    private final @NotNull CacheRepositoryDataSource<CS> cacheRepositoryDataSource;
+        > implements RepositoryDataSource<CachedRepositorySettings<C, S>> {
+    private final @NotNull CacheRepositoryDataSource<C> cacheRepositoryDataSource;
     private final @NotNull RepositoryDataSource<S> repositoryDataSource;
-
-    @Override
-    public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull EntityMapper<T, ID> entityMapper,
-            final @NotNull CachedRepositorySettings<CS, S> settings
-    ) {
-        return newRepository(
-                ds -> ds.newRepository(entityMapper, settings.getCacheRepositorySettings()),
-                ds -> ds.newRepository(entityMapper, settings.getRepositorySettings()),
-                (cr, r) -> new CachedRepository<>(cr, r, entityMapper)
-        );
-    }
 
     /**
      * Creates a new custom repository.
      *
      * @param <T>                       the type of the entities
-     * @param <ID>                      the type of the id of the entities
+     * @param <I>                       the type of the id of the entities
      * @param <CR>                      the type of the cache repository
      * @param <IR>                      the type of the internal repository
      * @param <R>                       the type of the repository
@@ -156,18 +147,31 @@ public class CachedDataSource<
      * @param repositoryBuilder         the repository creation function
      * @return the repository
      */
-    public <T, ID,
-            CR extends CacheRepository<T, ID>,
-            IR extends Repository<T, ID>,
-            R extends CachedRepository<T, ID>
+    @SuppressWarnings("checkstyle:MethodTypeParameterName")
+    public <T, I,
+            CR extends CacheRepository<T, I>,
+            IR extends Repository<T, I>,
+            R extends CachedRepository<T, I>
             > @NotNull R newRepository(
-            final @NotNull Function<CacheRepositoryDataSource<CS>, CR> cacheRepositoryBuilder,
+            final @NotNull Function<CacheRepositoryDataSource<C>, CR> cacheRepositoryBuilder,
             final @NotNull Function<RepositoryDataSource<S>, IR> internalRepositoryBuilder,
             final @NotNull BiFunction<CR, IR, R> repositoryBuilder
     ) {
         CR cacheRepository = cacheRepositoryBuilder.apply(cacheRepositoryDataSource);
         IR repository = internalRepositoryBuilder.apply(repositoryDataSource);
         return repositoryBuilder.apply(cacheRepository, repository);
+    }
+
+    @Override
+    public <T, I> @NotNull Repository<T, I> newRepository(
+            final @NotNull EntityMapper<T, I> entityMapper,
+            final @NotNull CachedRepositorySettings<C, S> settings
+    ) {
+        return newRepository(
+                ds -> ds.newRepository(entityMapper, settings.getCacheRepositorySettings()),
+                ds -> ds.newRepository(entityMapper, settings.getRepositorySettings()),
+                (cr, r) -> new CachedRepository<>(cr, r, entityMapper)
+        );
     }
 
     @Override
@@ -188,7 +192,7 @@ public class CachedDataSource<
      * </ol>
      * This process allows for faster lookups when querying multiple data.
      *
-     * @param <CS>                 the type of the settings for the cache repository
+     * @param <C>                  the type of the settings for the cache repository
      * @param <S>                  the type of the settings for the actual repository
      * @param memoryDataSource     the in-memory repositories data source
      * @param cacheDataSource      the cache repositories data source
@@ -196,11 +200,11 @@ public class CachedDataSource<
      * @return the hybrid data source
      */
     public static <
-            CS extends CacheRepositorySettings<CS>,
+            C extends CacheRepositorySettings<C>,
             S extends RepositorySettings
-            > @NotNull HybridCachedDataSource<CS, S> hybrid(
+            > @NotNull HybridCachedDataSource<C, S> hybrid(
             final @NotNull MemoryDataSource memoryDataSource,
-            final @NotNull CacheRepositoryDataSource<CS> cacheDataSource,
+            final @NotNull CacheRepositoryDataSource<C> cacheDataSource,
             final @NotNull RepositoryDataSource<S> repositoryDataSource
     ) {
         return new HybridCachedDataSource<>(
@@ -212,17 +216,17 @@ public class CachedDataSource<
     /**
      * Creates a new Cached data source.
      *
-     * @param <CS>                 the type of the settings for the cache repository
+     * @param <C>                  the type of the settings for the cache repository
      * @param <S>                  the type of the settings for the actual repository
      * @param cacheDataSource      the cache repositories data source
      * @param repositoryDataSource the actual repositories data source
      * @return the data source
      */
     public static <
-            CS extends CacheRepositorySettings<CS>,
+            C extends CacheRepositorySettings<C>,
             S extends RepositorySettings
-            > @NotNull CachedDataSource<CS, S> create(
-            final @NotNull CacheRepositoryDataSource<CS> cacheDataSource,
+            > @NotNull CachedDataSource<C, S> create(
+            final @NotNull CacheRepositoryDataSource<C> cacheDataSource,
             final @NotNull RepositoryDataSource<S> repositoryDataSource
     ) {
         return new CachedDataSource<>(cacheDataSource, repositoryDataSource);
