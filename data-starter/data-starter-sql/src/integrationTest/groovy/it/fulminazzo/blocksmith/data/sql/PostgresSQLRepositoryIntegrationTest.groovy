@@ -1,9 +1,9 @@
 package it.fulminazzo.blocksmith.data.sql
 
-import it.fulminazzo.blocksmith.data.sql.helper.H2IntegrationTestHelper
+import it.fulminazzo.blocksmith.data.sql.helper.PostgresSQLIntegrationTestHelper
 import it.fulminazzo.blocksmith.data.sql.helper.SqlIntegrationTestHelper
 
-class H2SqlRepositoryTest extends SqlRepositoryTest {
+class PostgresSQLRepositoryIntegrationTest extends SqlRepositoryIntegrationTest {
 
     void setupSpec() {
         setupSuite()
@@ -23,7 +23,7 @@ class H2SqlRepositoryTest extends SqlRepositoryTest {
 
     @Override
     protected SqlIntegrationTestHelper newTestHelper() {
-        return new H2IntegrationTestHelper()
+        return new PostgresSQLIntegrationTestHelper()
     }
 
 }

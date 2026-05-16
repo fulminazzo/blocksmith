@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.data.memory
 
-import it.fulminazzo.blocksmith.data.RepositoryTest
+import it.fulminazzo.blocksmith.data.RepositoryIntegrationTest
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.structure.expiring.ExpiringMap
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class MemoryRepositoryTest extends RepositoryTest<MemoryRepository<User, Long>> {
+class MemoryRepositoryIntegrationTest extends RepositoryIntegrationTest<MemoryRepository<User, Long>> {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor()
     private static final MemoryQueryEngine<User, Long> engine = new MemoryQueryEngine<>(ExpiringMap.lazy(), executor)
 

@@ -5,7 +5,7 @@ import com.mongodb.client.model.Filters
 import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.MongoClients
 import com.mongodb.reactivestreams.client.MongoCollection
-import it.fulminazzo.blocksmith.data.RepositoryTest
+import it.fulminazzo.blocksmith.data.RepositoryIntegrationTest
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import org.bson.codecs.configuration.CodecRegistries
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull
 import reactor.core.publisher.Mono
 import spock.lang.Shared
 
-class MongoRepositoryTest extends RepositoryTest<MongoRepository<User, Long>> implements MongoIntegrationTest {
+class MongoRepositoryIntegrationTest extends RepositoryIntegrationTest<MongoRepository<User, Long>> implements MongoIntegrationTest {
     private static final String ID_FIELD_NAME = '_id'
 
     @Shared

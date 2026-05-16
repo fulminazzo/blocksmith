@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.data.file
 import groovy.util.logging.Slf4j
 import it.fulminazzo.blocksmith.config.ConfigurationAdapter
 import it.fulminazzo.blocksmith.config.ConfigurationFormat
-import it.fulminazzo.blocksmith.data.RepositoryTest
+import it.fulminazzo.blocksmith.data.RepositoryIntegrationTest
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import org.jetbrains.annotations.NotNull
@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 @Slf4j
-class FileRepositoryTest extends RepositoryTest<FileRepository<User, Long>> {
+class FileRepositoryIntegrationTest extends RepositoryIntegrationTest<FileRepository<User, Long>> {
     private static final ConfigurationFormat FORMAT = ConfigurationFormat.JSON
     private static final File WORKING_DIR = new File('build/resources/integrationTest/file_repository')
 

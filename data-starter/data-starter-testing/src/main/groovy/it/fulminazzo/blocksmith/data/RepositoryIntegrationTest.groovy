@@ -2,8 +2,10 @@ package it.fulminazzo.blocksmith.data
 
 import org.jetbrains.annotations.NotNull
 import spock.lang.Specification
+import spock.lang.Stepwise
 
-abstract class RepositoryTest<R extends Repository<User, Long>> extends Specification {
+@Stepwise
+abstract class RepositoryIntegrationTest<R extends Repository<User, Long>> extends Specification {
     protected R repository
 
     void setupRepository() {
@@ -36,7 +38,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         def actual = repository.findById(3L).get()
 
         then:
-        !actual.present
+        actual.empty
     }
 
     def 'test that existsById of #user returns #expected'() {
@@ -114,7 +116,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         noExceptionThrown()
     }
 
-    def 'test that findAll returns all loaded entity'() {
+    def 'test that findAll returns all loaded entities'() {
         when:
         def result = repository.findAll().get()
 
@@ -141,7 +143,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         Page.of(0, 3)  || [Users.SAVED1, Users.SAVED2]
     }
 
-    def 'test that findAllById correctly returns all entity'() {
+    def 'test that findAllById correctly returns all entities'() {
         given:
         def expected = [Users.SAVED1, Users.SAVED2]
 
@@ -152,7 +154,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         actual.sort() == expected.sort()
     }
 
-    def 'test that findAllById does not throw on null entity'() {
+    def 'test that findAllById does not throw on null entities'() {
         given:
         def expected = [Users.SAVED1, Users.SAVED2]
 
@@ -174,7 +176,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         actual == expected
     }
 
-    def 'test that saveAll correctly updates all entity'() {
+    def 'test that saveAll correctly updates all entities'() {
         given:
         def entity = [
                 new User(Users.SAVED1.id, Users.SAVED1.username + '_', Users.SAVED1.age + 1),
@@ -194,7 +196,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         actual == entity
     }
 
-    def 'test that saveAll correctly saves all entity'() {
+    def 'test that saveAll correctly saves all entities'() {
         given:
         def entity = [Users.NEW1, Users.NEW2]
 
@@ -211,7 +213,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         entity.every { exists(it.id) }
     }
 
-    def 'test that saveAll does not throw on null entity'() {
+    def 'test that saveAll does not throw on null entities'() {
         given:
         def entity = [Users.NEW1, Users.NEW2]
 
@@ -239,7 +241,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         saved == entity
     }
 
-    def 'test that deleteAll correctly deletes all entity'() {
+    def 'test that deleteAll correctly deletes all entities'() {
         given:
         def entity = [Users.SAVED1, Users.SAVED2]
 
@@ -247,13 +249,13 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         entity.every { exists(it.id) }
 
         when:
-        repository.deleteAll([Users.SAVED1.id, Users.SAVED2.id, 3L])
+        repository.deleteAll([Users.SAVED1.id, Users.SAVED2.id, 3L]).join()
 
         then:
         entity.every { !exists(it.id) }
     }
 
-    def 'test that deleteAll does not throw on null entity'() {
+    def 'test that deleteAll does not throw on null entities'() {
         given:
         def entity = [Users.SAVED1, Users.SAVED2]
 
@@ -261,7 +263,7 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
         entity.every { exists(it.id) }
 
         when:
-        repository.deleteAll([null, Users.SAVED1.id, null, Users.SAVED2.id, null])
+        repository.deleteAll([null, Users.SAVED1.id, null, Users.SAVED2.id, null]).join()
 
         then:
         entity.every { !exists(it.id) }
@@ -269,13 +271,13 @@ abstract class RepositoryTest<R extends Repository<User, Long>> extends Specific
 
     def 'test that deleteAll of empty does not throw'() {
         when:
-        repository.deleteAll([])
+        repository.deleteAll([]).join()
 
         then:
         noExceptionThrown()
     }
 
-    def 'test that count correctly returns number of entity'() {
+    def 'test that count correctly returns number of entities'() {
         when:
         def actual = repository.count().get()
 

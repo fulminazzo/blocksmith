@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.data.sql
 import it.fulminazzo.blocksmith.data.sql.helper.MariaDBIntegrationTestHelper
 import it.fulminazzo.blocksmith.data.sql.helper.SqlIntegrationTestHelper
 
-class MariaDBRepositoryTest extends SqlRepositoryTest {
+class MariaDBRepositoryIntegrationTest extends SqlRepositoryIntegrationTest {
 
     void setupSpec() {
         setupSuite()

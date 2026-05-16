@@ -1,9 +1,9 @@
 package it.fulminazzo.blocksmith.data.sql
 
-import it.fulminazzo.blocksmith.data.sql.helper.MySQLIntegrationTestHelper
+import it.fulminazzo.blocksmith.data.sql.helper.H2RemoteIntegrationTestHelper
 import it.fulminazzo.blocksmith.data.sql.helper.SqlIntegrationTestHelper
 
-class MySQLRepositoryTest extends SqlRepositoryTest {
+class H2RemoteSqlRepositoryIntegrationTest extends SqlRepositoryIntegrationTest {
 
     void setupSpec() {
         setupSuite()
@@ -23,7 +23,7 @@ class MySQLRepositoryTest extends SqlRepositoryTest {
 
     @Override
     protected SqlIntegrationTestHelper newTestHelper() {
-        return new MySQLIntegrationTestHelper()
+        return new H2RemoteIntegrationTestHelper()
     }
 
 }

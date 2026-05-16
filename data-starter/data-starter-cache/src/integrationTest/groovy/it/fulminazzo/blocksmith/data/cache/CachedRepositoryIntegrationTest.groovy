@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.data.cache
 
 import it.fulminazzo.blocksmith.data.Repository
-import it.fulminazzo.blocksmith.data.RepositoryTest
+import it.fulminazzo.blocksmith.data.RepositoryIntegrationTest
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.Users
 import it.fulminazzo.blocksmith.data.cache.helper.CachedIntegrationTestHelper
@@ -16,7 +16,7 @@ import spock.lang.Shared
 
 import java.time.Duration
 
-class CachedRepositoryTest extends RepositoryTest<CachedRepository<User, Long>> {
+class CachedRepositoryIntegrationTest extends RepositoryIntegrationTest<CachedRepository<User, Long>> {
     private static final CachedIntegrationTestHelper TEST_HELPER = new CachedIntegrationTestHelper()
 
     @Shared

@@ -2,7 +2,7 @@ package it.fulminazzo.blocksmith.data.redis
 
 import io.lettuce.core.RedisClient
 import io.lettuce.core.api.StatefulRedisConnection
-import it.fulminazzo.blocksmith.data.RepositoryTest
+import it.fulminazzo.blocksmith.data.RepositoryIntegrationTest
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.Users
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
@@ -13,7 +13,7 @@ import spock.lang.Shared
 
 import java.time.Duration
 
-class RedisRepositoryTest extends RepositoryTest<RedisRepository<User, Long>> implements RedisIntegrationTest {
+class RedisRepositoryIntegrationTest extends RepositoryIntegrationTest<RedisRepository<User, Long>> implements RedisIntegrationTest {
     private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
     @Shared

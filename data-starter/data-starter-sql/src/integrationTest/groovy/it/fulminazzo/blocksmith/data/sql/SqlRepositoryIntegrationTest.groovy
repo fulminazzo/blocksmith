@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.data.sql
 
-import it.fulminazzo.blocksmith.data.RepositoryTest
+import it.fulminazzo.blocksmith.data.RepositoryIntegrationTest
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.data.sql.helper.SqlIntegrationTestHelper
@@ -12,7 +12,7 @@ import spock.lang.Shared
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-abstract class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<? extends Record>>> {
+abstract class SqlRepositoryIntegrationTest extends RepositoryIntegrationTest<SqlRepository<User, Long, Table<? extends Record>>> {
     private final ExecutorService executor = Executors.newSingleThreadExecutor()
 
     @Shared
