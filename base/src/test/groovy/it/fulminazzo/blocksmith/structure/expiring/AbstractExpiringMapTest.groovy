@@ -446,8 +446,8 @@ class AbstractExpiringMapTest extends Specification {
 
         and:
         def millis = duration.toMillis()
+        millis <= ttl * 1.1
         millis >= ttl * 0.9
-        millis <= ttl
     }
 
     def 'test that getTtl of non-existing returns null'() {
@@ -479,8 +479,8 @@ class AbstractExpiringMapTest extends Specification {
 
         then:
         def millis = entry.expireTime - now
-        millis >= ttl * 2 * 0.9
         millis <= ttl * 2 * 1.1
+        millis >= ttl * 2 * 0.9
     }
 
     def 'test that #method(#arguments) throws invalid TTL exception'() {

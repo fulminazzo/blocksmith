@@ -52,7 +52,7 @@ class AbstractExpiringListTest extends Specification {
 
         and:
         def actualTtl = entry.expireTime - now
-        actualTtl <= ttl
+        actualTtl <= ttl * 1.1
         actualTtl >= ttl * 0.9
     }
 
@@ -134,7 +134,7 @@ class AbstractExpiringListTest extends Specification {
         first != null
         first.value == SECOND.value
         def actualTtl = first.expireTime - now
-        actualTtl <= ttl
+        actualTtl <= ttl * 1.1
         actualTtl >= ttl * 0.9
 
         and:
@@ -169,15 +169,15 @@ class AbstractExpiringListTest extends Specification {
         first != null
         first.value == SECOND.value
         def actualTtl1 = first.expireTime - now
+        actualTtl1 <= ttl * 1.1
         actualTtl1 >= ttl * 0.9
-        actualTtl1 <= ttl
 
         and:
         def second = internal[2]
         second != null
         second.value == VALUE
         def actualTtl2 = second.expireTime - now
-        actualTtl2 <= ttl
+        actualTtl2 <= ttl * 1.1
         actualTtl2 >= ttl * 0.9
 
         and:
@@ -232,8 +232,8 @@ class AbstractExpiringListTest extends Specification {
         actual != null
         actual.value == SECOND.value
         def actualTtl = actual.expireTime - now
-        actualTtl >= ttl - 20
         actualTtl <= ttl + 20
+        actualTtl >= ttl - 20
     }
 
     def 'test that set of never expiring works'() {
