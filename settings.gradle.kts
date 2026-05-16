@@ -50,7 +50,7 @@ include(
     "config-starter:config-starter-xml",
     "config-starter:config-starter-yaml",
 
-//    "config-starter:config-starter-data", //TODO: re-enable
+    "config-starter:config-starter-data",
 
     "config-starter:config-starter-testing",
     "config-starter:config-starter-generator"
