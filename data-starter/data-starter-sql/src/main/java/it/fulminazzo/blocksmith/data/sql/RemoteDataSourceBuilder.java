@@ -134,7 +134,7 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
         } catch (IllegalArgumentException e) {
             if (databaseName.equals(DatabaseType.POSTGRESQL.name()))
                 return SQLDialect.POSTGRES;
-            else return SQLDialect.DEFAULT;
+            else throw new IllegalArgumentException("Unsupported database type: " + databaseType.getJdbcName());
         }
     }
 
