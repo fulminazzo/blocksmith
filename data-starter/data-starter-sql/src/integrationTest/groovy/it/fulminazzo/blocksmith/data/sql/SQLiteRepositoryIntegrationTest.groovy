@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.data.sql
 import it.fulminazzo.blocksmith.data.sql.helper.SQLiteIntegrationTestHelper
 import it.fulminazzo.blocksmith.data.sql.helper.SqlIntegrationTestHelper
 
-class SQLiteSqlRepositoryIntegrationTest extends SqlRepositoryIntegrationTest {
+class SQLiteRepositoryIntegrationTest extends SqlRepositoryIntegrationTest {
 
     void setupSpec() {
         setupSuite()
