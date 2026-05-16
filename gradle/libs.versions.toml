@@ -37,6 +37,7 @@ sqlite = "3.51.3.0"
 mysql = "9.6.0"
 mariadb = "3.5.7"
 postgresql = "42.7.10"
+yugabytedb = "42.7.3-yb-4"
 
 lettuce = "7.5.0.RELEASE"
 
@@ -74,6 +75,7 @@ test-containers = { module = "org.testcontainers:testcontainers", version.ref = 
 test-containers-mysql = { module = "org.testcontainers:mysql", version.ref = "test-containers-module" }
 test-containers-mariadb = { module = "org.testcontainers:mariadb", version.ref = "test-containers-module" }
 test-containers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "test-containers-module" }
+test-containers-yugabytedb = { module = "org.testcontainers:yugabytedb", version.ref = "test-containers-module" }
 test-containers-mongodb = { module = "org.testcontainers:mongodb", version.ref = "test-containers-module" }
 
 # DATA FORMATS
@@ -94,6 +96,7 @@ sqlite = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite" }
 mysql = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
 mariadb = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "mariadb" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+yugabytedb = { module = "com.yugabyte:jdbc-yugabytedb", version.ref = "yugabytedb" }
 
 lettuce = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
 

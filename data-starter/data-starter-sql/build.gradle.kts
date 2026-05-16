@@ -15,4 +15,7 @@ dependencies {
 
     integrationTestImplementation(libs.postgresql)
     integrationTestImplementation(libs.test.containers.postgresql)
+
+    integrationTestImplementation(libs.yugabytedb)
+    integrationTestImplementation(libs.test.containers.yugabytedb)
 }
