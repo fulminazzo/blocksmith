@@ -31,6 +31,7 @@ tasks.withType<JacocoReport>().configureEach {
 
 tasks.withType<JacocoCoverageVerification>().configureEach {
     dependsOn(tasks.withType<Test>())
+    dependsOn(tasks.withType<JacocoReport>())
 
     executionData.setFrom(
         fileTree(layout.buildDirectory).include("jacoco/*.exec")
