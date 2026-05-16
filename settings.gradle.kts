@@ -72,7 +72,7 @@ include(
     "data-starter:data-starter-redis",
     "data-starter:data-starter-mongo",
 
-//    "data-starter:data-starter-cache", //TODO: re-enable
+    "data-starter:data-starter-cache",
 
     "data-starter:data-starter-testing"
 )
