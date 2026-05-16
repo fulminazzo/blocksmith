@@ -132,11 +132,7 @@ public final class CachedRepositoryBuilder<T, I> {
             final @NotNull CacheRepositoryDataSource<MemoryRepositorySettings> memoryDataSource,
             final @NotNull MemoryRepositorySettings memoryRepositorySettings
     ) {
-        return new CachedRepository<>(
-                memoryDataSource.newRepository(getEntityMapper(), memoryRepositorySettings),
-                build(),
-                getEntityMapper()
-        );
+        return hybrid(memoryDataSource.newRepository(getEntityMapper(), memoryRepositorySettings));
     }
 
     /**
