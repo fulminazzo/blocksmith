@@ -1,8 +1,8 @@
 dependencies {
     api(projects.dataStarter.dataStarterBase)
 
-    testImplementation(projects.configStarter.configStarterYaml)
-    testImplementation(projects.dataStarter.dataStarterCache)
-    testImplementation(projects.dataStarter.dataStarterRedis)
-    testImplementation(projects.dataStarter.dataStarterSql)
+    integrationTestImplementation(projects.configStarter.configStarterYaml)
+    integrationTestImplementation(projects.dataStarter.dataStarterCache)
+    integrationTestImplementation(projects.dataStarter.dataStarterRedis)
+    integrationTestImplementation(projects.dataStarter.dataStarterSql)
 }
