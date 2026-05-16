@@ -3,24 +3,16 @@
 dependencies {
     api(libs.jooq)
     api(libs.hikaricp)
-}
+    
+    integrationTestImplementation(libs.h2)
+    integrationTestImplementation(libs.sqlite)
 
-testing {
-    suites {
-        withType<JvmTestSuite> {
-            dependencies {
-                implementation(libs.h2)
-                implementation(libs.sqlite)
+    integrationTestImplementation(libs.mysql)
+    integrationTestImplementation(libs.test.containers.mysql)
 
-                implementation(libs.mysql)
-                implementation(libs.test.containers.mysql)
+    integrationTestImplementation(libs.mariadb)
+    integrationTestImplementation(libs.test.containers.mariadb)
 
-                implementation(libs.mariadb)
-                implementation(libs.test.containers.mariadb)
-
-                implementation(libs.postgresql)
-                implementation(libs.test.containers.postgresql)
-            }
-        }
-    }
+    integrationTestImplementation(libs.postgresql)
+    integrationTestImplementation(libs.test.containers.postgresql)
 }

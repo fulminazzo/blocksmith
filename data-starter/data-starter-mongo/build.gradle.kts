@@ -5,14 +5,6 @@ dependencies {
 
     api(libs.mongodb.driver.async)
     api(libs.reactor)
-}
 
-testing {
-    suites {
-        withType<JvmTestSuite> {
-            dependencies {
-                implementation(libs.test.containers.mongodb)
-            }
-        }
-    }
+    integrationTestImplementation(libs.test.containers.mongodb)
 }
