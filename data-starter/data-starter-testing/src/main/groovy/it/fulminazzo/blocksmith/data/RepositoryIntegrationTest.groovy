@@ -41,15 +41,32 @@ abstract class RepositoryIntegrationTest<R extends Repository<User, Long>> exten
         actual.empty
     }
 
-    def 'test that existsById of #user returns #expected'() {
+    def 'test that findByIdOrCreate of #entity saves if not existing'() {
         when:
-        def actual = repository.existsById(user.id).get()
+        def first = repository.findByIdOrCreate(
+                entity.id,
+                entity
+        ).get()
+
+        then:
+        first == entity
+
+        and:
+        exists(entity.id)
+
+        where:
+        entity << [Users.SAVED1, Users.SAVED2, Users.NEW1, Users.NEW2]
+    }
+
+    def 'test that existsById of #entity returns #expected'() {
+        when:
+        def actual = repository.existsById(entity.id).get()
 
         then:
         actual == expected
 
         where:
-        user         || expected
+        entity       || expected
         Users.SAVED1 || true
         Users.SAVED2 || true
         Users.NEW1   || false
@@ -178,95 +195,95 @@ abstract class RepositoryIntegrationTest<R extends Repository<User, Long>> exten
 
     def 'test that saveAll correctly updates all entities'() {
         given:
-        def entity = [
+        def entities = [
                 new User(Users.SAVED1.id, Users.SAVED1.username + '_', Users.SAVED1.age + 1),
                 new User(Users.SAVED2.id, Users.SAVED2.username + '_', Users.SAVED2.age + 1)
         ]
 
         when:
-        def saved = repository.saveAll(entity).get()
+        def saved = repository.saveAll(entities).get()
 
         then:
-        saved == entity
+        saved == entities
 
         when:
-        def actual = repository.findAllById(entity*.id).get()
+        def actual = repository.findAllById(entities*.id).get()
 
         then:
-        actual == entity
+        actual == entities
     }
 
     def 'test that saveAll correctly saves all entities'() {
         given:
-        def entity = [Users.NEW1, Users.NEW2]
+        def entities = [Users.NEW1, Users.NEW2]
 
         expect:
-        entity.every { !exists(it.id) }
+        entities.every { !exists(it.id) }
 
         when:
-        def saved = repository.saveAll(entity).get()
+        def saved = repository.saveAll(entities).get()
 
         then:
-        saved.sort() == entity.sort()
+        saved.sort() == entities.sort()
 
         and:
-        entity.every { exists(it.id) }
+        entities.every { exists(it.id) }
     }
 
     def 'test that saveAll does not throw on null entities'() {
         given:
-        def entity = [Users.NEW1, Users.NEW2]
+        def entities = [Users.NEW1, Users.NEW2]
 
         expect:
-        entity.every { !exists(it.id) }
+        entities.every { !exists(it.id) }
 
         when:
         def saved = repository.saveAll([null, Users.NEW1, null, Users.NEW2, null]).get()
 
         then:
-        saved.sort() == entity.sort()
+        saved.sort() == entities.sort()
 
         and:
-        entity.every { exists(it.id) }
+        entities.every { exists(it.id) }
     }
 
     def 'test that saveAll of empty returns empty'() {
         given:
-        def entity = []
+        def entities = []
 
         when:
-        def saved = repository.saveAll(entity).get()
+        def saved = repository.saveAll(entities).get()
 
         then:
-        saved == entity
+        saved == entities
     }
 
     def 'test that deleteAll correctly deletes all entities'() {
         given:
-        def entity = [Users.SAVED1, Users.SAVED2]
+        def entities = [Users.SAVED1, Users.SAVED2]
 
         expect:
-        entity.every { exists(it.id) }
+        entities.every { exists(it.id) }
 
         when:
         repository.deleteAll([Users.SAVED1.id, Users.SAVED2.id, 3L]).join()
 
         then:
-        entity.every { !exists(it.id) }
+        entities.every { !exists(it.id) }
     }
 
     def 'test that deleteAll does not throw on null entities'() {
         given:
-        def entity = [Users.SAVED1, Users.SAVED2]
+        def entities = [Users.SAVED1, Users.SAVED2]
 
         expect:
-        entity.every { exists(it.id) }
+        entities.every { exists(it.id) }
 
         when:
         repository.deleteAll([null, Users.SAVED1.id, null, Users.SAVED2.id, null]).join()
 
         then:
-        entity.every { !exists(it.id) }
+        entities.every { !exists(it.id) }
     }
 
     def 'test that deleteAll of empty does not throw'() {
