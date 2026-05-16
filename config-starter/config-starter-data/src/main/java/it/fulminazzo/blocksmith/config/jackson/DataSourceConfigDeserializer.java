@@ -42,15 +42,15 @@ final class DataSourceConfigDeserializer extends StdDeserializer<DataSourceConfi
     ) throws IOException {
         final JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
-        String rawType = node.get("type").asText();
+        JsonNode typeNode = node.get("type");
+        final String rawType = typeNode == null ? "null" : typeNode.asText();
         try {
-            if (rawType == null) throw new IllegalArgumentException();
             DataSourceType type = DataSourceType.valueOf(rawType.toUpperCase(Locale.ROOT));
             ((ObjectNode) node).remove("type");
             return deserializationContext.readTreeAsValue(node, type.getConfigClass());
         } catch (IllegalArgumentException e) {
-            logger.warn("Invalid database configuration: unidentified type '{}'", rawType);
-            return null;
+            logger.warn("Invalid database configuration: unrecognized type '{}'", rawType);
+            throw new IOException(String.format("Invalid database configuration: unrecognized type '%s'", rawType));
         }
     }
 
