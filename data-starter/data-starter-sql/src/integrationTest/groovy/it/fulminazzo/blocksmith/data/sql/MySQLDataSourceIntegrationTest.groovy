@@ -14,7 +14,7 @@ class MySQLDataSourceIntegrationTest extends RemoteSqlDataSourceIntegrationTest 
     }
 
     @Override
-    protected DatabaseType getDatabaseType() {
+    protected IDatabaseType getDatabaseType() {
         return DatabaseType.MYSQL
     }
 

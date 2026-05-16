@@ -14,7 +14,7 @@ class MariaDBDataSourceIntegrationTest extends RemoteSqlDataSourceIntegrationTes
     }
 
     @Override
-    protected DatabaseType getDatabaseType() {
+    protected IDatabaseType getDatabaseType() {
         return DatabaseType.MARIADB
     }
 

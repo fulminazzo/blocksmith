@@ -2,7 +2,7 @@ package it.fulminazzo.blocksmith.data.sql
 
 abstract class RemoteSqlDataSourceIntegrationTest extends SqlDataSourceIntegrationTest {
 
-    protected abstract DatabaseType getDatabaseType()
+    protected abstract IDatabaseType getDatabaseType()
 
     @Override
     protected <B extends ASqlDataSourceBuilder<B>> B newDataSourceBuilderImpl() {

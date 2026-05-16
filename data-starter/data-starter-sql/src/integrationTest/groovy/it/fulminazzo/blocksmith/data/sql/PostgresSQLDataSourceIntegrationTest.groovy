@@ -14,7 +14,7 @@ class PostgresSQLDataSourceIntegrationTest extends RemoteSqlDataSourceIntegratio
     }
 
     @Override
-    protected DatabaseType getDatabaseType() {
+    protected IDatabaseType getDatabaseType() {
         return DatabaseType.POSTGRESQL
     }
 
