@@ -129,7 +129,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
     ) {
         Validator.validateMethod(host, port, path);
         File databaseFile = new File(path, getDatabase());
-        connectionMode = String.format("tcp://%s:%s/%s", host, port, databaseFile.getPath());
+        connectionMode = String.format("tcp://%s:%s/%s", host, port, databaseFile.getAbsolutePath());
         return this;
     }
 
