@@ -17,18 +17,18 @@ class H2RemoteDataSourceFactoryIntegrationTest extends SqlDataSourceFactoryInteg
     @Override
     protected SqlDataSourceConfig newConfig() {
         return new SqlDataSourceConfig()
-                .withDatabaseType(DatabaseType.H2)
-                .withHost(testHelper.serverHost)
-                .withPort(testHelper.serverPort)
-                .withDatabase('h2_remote')
-                .withSchemaName('PUBLIC')
-                .withParameters([
+                .setDatabaseType(DatabaseType.H2)
+                .setHost(testHelper.serverHost)
+                .setPort(testHelper.serverPort)
+                .setDatabase('h2_remote')
+                .setSchemaName('PUBLIC')
+                .setParameters([
                         'DB_CLOSE_ON_EXIT' : true
                 ])
-                .withConnectionMode(
+                .setConnectionMode(
                         new SqlDataSourceConfig.ConnectionMode()
-                                .withType(SqlDataSourceConfig.ConnectionModeType.SERVER)
-                                .withDirectoryPath('build/resources/integrationTest')
+                                .setType(SqlDataSourceConfig.ConnectionModeType.SERVER)
+                                .setDirectoryPath('build/resources/integrationTest')
                 )
     }
 

@@ -17,11 +17,11 @@ class H2DataSourceFactoryIntegrationTest extends SqlDataSourceFactoryIntegration
     def 'test build in-memory from config'() {
         given:
         def config = newConfig()
-                .withUsername('sa')
-                .withPassword('')
-                .withConnectionMode(
+                .setUsername('sa')
+                .setPassword('')
+                .setConnectionMode(
                         new SqlDataSourceConfig.ConnectionMode()
-                                .withType(SqlDataSourceConfig.ConnectionModeType.MEMORY)
+                                .setType(SqlDataSourceConfig.ConnectionModeType.MEMORY)
                 )
 
         when:
@@ -37,16 +37,16 @@ class H2DataSourceFactoryIntegrationTest extends SqlDataSourceFactoryIntegration
     @Override
     protected SqlDataSourceConfig newConfig() {
         return new SqlDataSourceConfig()
-                .withDatabaseType(DatabaseType.H2)
-                .withDatabase('h2')
-                .withSchemaName('PUBLIC')
-                .withParameters([
+                .setDatabaseType(DatabaseType.H2)
+                .setDatabase('h2')
+                .setSchemaName('PUBLIC')
+                .setParameters([
                         'DB_CLOSE_ON_EXIT' : true
                 ])
-                .withConnectionMode(
+                .setConnectionMode(
                         new SqlDataSourceConfig.ConnectionMode()
-                                .withType(SqlDataSourceConfig.ConnectionModeType.DISK)
-                                .withDirectoryPath('build/resources/integrationTest')
+                                .setType(SqlDataSourceConfig.ConnectionModeType.DISK)
+                                .setDirectoryPath('build/resources/integrationTest')
                 )
     }
 

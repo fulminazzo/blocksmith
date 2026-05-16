@@ -17,9 +17,9 @@ class MySQLDataSourceFactoryIntegrationTest extends SqlDataSourceFactoryIntegrat
     @Override
     protected SqlDataSourceConfig newConfig() {
         return new SqlDataSourceConfig()
-                .withDatabaseType(DatabaseType.MYSQL)
-                .withHost(testHelper.serverHost)
-                .withPort(testHelper.serverPort)
+                .setDatabaseType(DatabaseType.MYSQL)
+                .setHost(testHelper.serverHost)
+                .setPort(testHelper.serverPort)
     }
 
     @Override

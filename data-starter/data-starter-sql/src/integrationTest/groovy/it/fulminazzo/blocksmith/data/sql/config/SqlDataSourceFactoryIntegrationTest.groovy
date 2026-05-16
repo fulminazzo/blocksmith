@@ -20,14 +20,14 @@ abstract class SqlDataSourceFactoryIntegrationTest extends Specification {
     def 'test build from config'() {
         given:
         def config = newConfig()
-                .withUsername('root')
-                .withPassword('test')
-                .withMaximumPoolSize(20)
-                .withMinimumIdle(5)
-                .withConnectionTimeout(30_000)
-                .withIdleTimeout(10 * 60_000)
-                .withMaxLifeTime(30 * 60_000)
-                .withProperties(['prepStmtCacheSize' : 250])
+                .setUsername('root')
+                .setPassword('test')
+                .setMaximumPoolSize(20)
+                .setMinimumIdle(5)
+                .setConnectionTimeout(30_000)
+                .setIdleTimeout(10 * 60_000)
+                .setMaxLifeTime(30 * 60_000)
+                .setProperties(['prepStmtCacheSize' : 250])
         config.database = config.database ?: 'test'
 
         when:

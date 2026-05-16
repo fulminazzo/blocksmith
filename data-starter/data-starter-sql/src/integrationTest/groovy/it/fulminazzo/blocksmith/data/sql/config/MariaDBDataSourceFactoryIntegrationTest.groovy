@@ -17,9 +17,9 @@ class MariaDBDataSourceFactoryIntegrationTest extends SqlDataSourceFactoryIntegr
     @Override
     protected SqlDataSourceConfig newConfig() {
         return new SqlDataSourceConfig()
-                .withDatabaseType(DatabaseType.MARIADB)
-                .withHost(testHelper.serverHost)
-                .withPort(testHelper.serverPort)
+                .setDatabaseType(DatabaseType.MARIADB)
+                .setHost(testHelper.serverHost)
+                .setPort(testHelper.serverPort)
     }
 
     @Override

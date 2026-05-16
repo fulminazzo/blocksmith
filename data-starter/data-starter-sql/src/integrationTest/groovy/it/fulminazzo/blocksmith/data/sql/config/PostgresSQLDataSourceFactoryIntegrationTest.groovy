@@ -17,9 +17,9 @@ class PostgresSQLDataSourceFactoryIntegrationTest extends SqlDataSourceFactoryIn
     @Override
     protected SqlDataSourceConfig newConfig() {
         return new SqlDataSourceConfig()
-                .withDatabaseType(DatabaseType.POSTGRESQL)
-                .withHost(testHelper.serverHost)
-                .withPort(testHelper.serverPort)
+                .setDatabaseType(DatabaseType.POSTGRESQL)
+                .setHost(testHelper.serverHost)
+                .setPort(testHelper.serverPort)
     }
 
     @Override
