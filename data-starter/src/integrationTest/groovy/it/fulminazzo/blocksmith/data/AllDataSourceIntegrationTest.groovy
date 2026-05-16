@@ -114,39 +114,39 @@ class AllDataSourceIntegrationTest extends Specification {
         memoryDataSourceConfig = new MemoryDataSourceConfig()
         fileDataSourceConfig = new FileDataSourceConfig()
         sqlDataSourceConfig = new SqlDataSourceConfig()
-                .withDatabaseType(DatabaseType.POSTGRESQL)
-                .withDatabase('test')
-                .withUsername('root')
-                .withPassword('test')
-                .withMaximumPoolSize(20)
-                .withMinimumIdle(5)
-                .withConnectionTimeout(30_000)
-                .withIdleTimeout(10 * 60_0000)
-                .withMaxLifeTime(30 * 60_000)
-                .withProperties([
+                .setDatabaseType(DatabaseType.POSTGRESQL)
+                .setDatabase('test')
+                .setUsername('root')
+                .setPassword('test')
+                .setMaximumPoolSize(20)
+                .setMinimumIdle(5)
+                .setConnectionTimeout(30_000)
+                .setIdleTimeout(10 * 60_0000)
+                .setMaxLifeTime(30 * 60_000)
+                .setProperties([
                         'tcpKeepAlive'     : true,
                         'prepareThreshold' : 5
                 ])
-                .withHost(sqlServerHost)
-                .withPort(sqlServerPort)
+                .setHost(sqlServerHost)
+                .setPort(sqlServerPort)
         redisDataSourceConfig = new RedisDataSourceConfig()
-                .withHost(redisServerHost)
-                .withPort(redisServerPort)
-                .withClientName(ProjectInfo.PROJECT_NAME)
-                .withDatabase(0)
-                .withSsl(false)
+                .setHost(redisServerHost)
+                .setPort(redisServerPort)
+                .setClientName(ProjectInfo.PROJECT_NAME)
+                .setDatabase(0)
+                .setSsl(false)
         mongoDataSourceConfig = new MongoDataSourceConfig()
-                .withHost(mongoServerHost)
-                .withPort(mongoServerPort)
-                .withSrvHost(null)
-                .withSrvMaxHosts(1)
-                .withSrvServiceName(null)
-                .withReplicaSetName('rs0')
-                .withApplicationName(ProjectInfo.PROJECT_NAME)
-                .withCredentials(new MongoDataSourceConfig.MongoCredentialConfig()
-                        .withUsername('root')
-                        .withPassword('test')
-                        .withMechanism(AuthenticationMechanism.SCRAM_SHA_256.name())
+                .setHost(mongoServerHost)
+                .setPort(mongoServerPort)
+                .setSrvHost(null)
+                .setSrvMaxHosts(1)
+                .setSrvServiceName(null)
+                .setReplicaSetName('rs0')
+                .setApplicationName(ProjectInfo.PROJECT_NAME)
+                .setCredentials(new MongoDataSourceConfig.MongoCredentialConfig()
+                        .setUsername('root')
+                        .setPassword('test')
+                        .setMechanism(AuthenticationMechanism.SCRAM_SHA_256.name())
                 )
     }
 
@@ -217,86 +217,86 @@ class AllDataSourceIntegrationTest extends Specification {
                 fileDataSourceConfig,
                 sqlDataSourceConfig,
                 new SqlDataSourceConfig()
-                        .withDatabaseType(DatabaseType.H2)
-                        .withDatabase('h2')
-                        .withUsername('root')
-                        .withPassword('test')
-                        .withMaximumPoolSize(20)
-                        .withMinimumIdle(5)
-                        .withConnectionTimeout(30_000)
-                        .withIdleTimeout(10 * 60_0000)
-                        .withMaxLifeTime(30 * 60_000)
-                        .withParameters([
+                        .setDatabaseType(DatabaseType.H2)
+                        .setDatabase('h2')
+                        .setUsername('root')
+                        .setPassword('test')
+                        .setMaximumPoolSize(20)
+                        .setMinimumIdle(5)
+                        .setConnectionTimeout(30_000)
+                        .setIdleTimeout(10 * 60_0000)
+                        .setMaxLifeTime(30 * 60_000)
+                        .setParameters([
                                 'DATABASE_TO_LOWER' : true
                         ])
-                        .withSchemaName('PUBLIC')
-                        .withConnectionMode(new SqlDataSourceConfig.ConnectionMode()
-                                .withType(SqlDataSourceConfig.ConnectionModeType.DISK)
-                                .withDirectoryPath('build/resources/integrationTest')
+                        .setSchemaName('PUBLIC')
+                        .setConnectionMode(new SqlDataSourceConfig.ConnectionMode()
+                                .setType(SqlDataSourceConfig.ConnectionModeType.DISK)
+                                .setDirectoryPath('build/resources/integrationTest')
                         ),
                 redisDataSourceConfig,
                 mongoDataSourceConfig,
                 // In-memory cached
                 new CachedDataSourceConfig()
-                        .withCache(memoryDataSourceConfig)
-                        .withRepository(fileDataSourceConfig)
-                        .withHybrid(false),
+                        .setCache(memoryDataSourceConfig)
+                        .setRepository(fileDataSourceConfig)
+                        .setHybrid(false),
                 new CachedDataSourceConfig()
-                        .withCache(memoryDataSourceConfig)
-                        .withRepository(sqlDataSourceConfig)
-                        .withHybrid(false),
+                        .setCache(memoryDataSourceConfig)
+                        .setRepository(sqlDataSourceConfig)
+                        .setHybrid(false),
                 new CachedDataSourceConfig()
-                        .withCache(memoryDataSourceConfig)
-                        .withRepository(redisDataSourceConfig)
-                        .withHybrid(false),
+                        .setCache(memoryDataSourceConfig)
+                        .setRepository(redisDataSourceConfig)
+                        .setHybrid(false),
                 new CachedDataSourceConfig()
-                        .withCache(memoryDataSourceConfig)
-                        .withRepository(mongoDataSourceConfig)
-                        .withHybrid(false),
+                        .setCache(memoryDataSourceConfig)
+                        .setRepository(mongoDataSourceConfig)
+                        .setHybrid(false),
                 // Redis cached
                 new CachedDataSourceConfig()
-                        .withCache(redisDataSourceConfig)
-                        .withRepository(memoryDataSourceConfig)
-                        .withHybrid(false),
+                        .setCache(redisDataSourceConfig)
+                        .setRepository(memoryDataSourceConfig)
+                        .setHybrid(false),
                 new CachedDataSourceConfig()
-                        .withCache(redisDataSourceConfig)
-                        .withRepository(fileDataSourceConfig)
-                        .withHybrid(false),
+                        .setCache(redisDataSourceConfig)
+                        .setRepository(fileDataSourceConfig)
+                        .setHybrid(false),
                 new CachedDataSourceConfig()
-                        .withCache(redisDataSourceConfig)
-                        .withRepository(sqlDataSourceConfig)
-                        .withHybrid(false),
+                        .setCache(redisDataSourceConfig)
+                        .setRepository(sqlDataSourceConfig)
+                        .setHybrid(false),
                 new CachedDataSourceConfig()
-                        .withCache(redisDataSourceConfig)
-                        .withRepository(mongoDataSourceConfig)
-                        .withHybrid(false),
+                        .setCache(redisDataSourceConfig)
+                        .setRepository(mongoDataSourceConfig)
+                        .setHybrid(false),
                 // In-memory, Redis cached
                 new CachedDataSourceConfig()
-                        .withCache(redisDataSourceConfig)
-                        .withRepository(memoryDataSourceConfig)
-                        .withHybrid(true),
+                        .setCache(redisDataSourceConfig)
+                        .setRepository(memoryDataSourceConfig)
+                        .setHybrid(true),
                 new CachedDataSourceConfig()
-                        .withCache(redisDataSourceConfig)
-                        .withRepository(fileDataSourceConfig)
-                        .withHybrid(true),
+                        .setCache(redisDataSourceConfig)
+                        .setRepository(fileDataSourceConfig)
+                        .setHybrid(true),
                 new CachedDataSourceConfig()
-                        .withCache(redisDataSourceConfig)
-                        .withRepository(sqlDataSourceConfig)
-                        .withHybrid(true),
+                        .setCache(redisDataSourceConfig)
+                        .setRepository(sqlDataSourceConfig)
+                        .setHybrid(true),
                 new CachedDataSourceConfig()
-                        .withCache(redisDataSourceConfig)
-                        .withRepository(mongoDataSourceConfig)
-                        .withHybrid(true),
+                        .setCache(redisDataSourceConfig)
+                        .setRepository(mongoDataSourceConfig)
+                        .setHybrid(true),
                 // Weird wrapping cached
                 new CachedDataSourceConfig()
-                        .withCache(redisDataSourceConfig)
-                        .withRepository(
+                        .setCache(redisDataSourceConfig)
+                        .setRepository(
                                 new CachedDataSourceConfig()
-                                        .withCache(redisDataSourceConfig)
-                                        .withRepository(sqlDataSourceConfig)
-                                        .withHybrid(false)
+                                        .setCache(redisDataSourceConfig)
+                                        .setRepository(sqlDataSourceConfig)
+                                        .setHybrid(false)
                         )
-                        .withHybrid(true)
+                        .setHybrid(true)
         ]
     }
 

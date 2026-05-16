@@ -7,6 +7,7 @@ import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
 import it.fulminazzo.blocksmith.validation.annotation.*;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -24,7 +25,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@With
+@Accessors(chain = true)
 public final class SqlDataSourceConfig implements DataSourceConfig {
 
     static {
@@ -113,7 +114,7 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     @NoArgsConstructor
     @AllArgsConstructor
     @FieldDefaults(level = AccessLevel.PRIVATE)
-    @With
+    @Accessors(chain = true)
     public static class ConnectionMode {
 
         ConnectionModeType type = ConnectionModeType.MEMORY;

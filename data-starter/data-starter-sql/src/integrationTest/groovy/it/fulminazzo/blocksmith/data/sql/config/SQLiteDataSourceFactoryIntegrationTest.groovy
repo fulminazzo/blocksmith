@@ -17,11 +17,11 @@ class SQLiteDataSourceFactoryIntegrationTest extends SqlDataSourceFactoryIntegra
     def 'test build in-memory from config'() {
         given:
         def config = newConfig()
-                .withUsername('root')
-                .withPassword('test')
-                .withConnectionMode(
+                .setUsername('root')
+                .setPassword('test')
+                .setConnectionMode(
                         new SqlDataSourceConfig.ConnectionMode()
-                                .withType(SqlDataSourceConfig.ConnectionModeType.MEMORY)
+                                .setType(SqlDataSourceConfig.ConnectionModeType.MEMORY)
                 )
 
         when:
@@ -37,15 +37,15 @@ class SQLiteDataSourceFactoryIntegrationTest extends SqlDataSourceFactoryIntegra
     @Override
     protected SqlDataSourceConfig newConfig() {
         return new SqlDataSourceConfig()
-                .withDatabaseType(DatabaseType.SQLITE)
-                .withDatabase('sqlite')
-                .withParameters([
+                .setDatabaseType(DatabaseType.SQLITE)
+                .setDatabase('sqlite')
+                .setParameters([
                         'DB_CLOSE_ON_EXIT' : true
                 ])
-                .withConnectionMode(
+                .setConnectionMode(
                         new SqlDataSourceConfig.ConnectionMode()
-                                .withType(SqlDataSourceConfig.ConnectionModeType.DISK)
-                                .withDirectoryPath('build/resources/integrationTest')
+                                .setType(SqlDataSourceConfig.ConnectionModeType.DISK)
+                                .setDirectoryPath('build/resources/integrationTest')
                 )
     }
 

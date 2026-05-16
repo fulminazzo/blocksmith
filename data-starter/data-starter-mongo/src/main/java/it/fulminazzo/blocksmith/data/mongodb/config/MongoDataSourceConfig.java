@@ -9,6 +9,7 @@ import it.fulminazzo.blocksmith.validation.annotation.NotEmpty;
 import it.fulminazzo.blocksmith.validation.annotation.Port;
 import it.fulminazzo.blocksmith.validation.annotation.Positive;
 import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.Range;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@With
+@Accessors(chain = true)
 public final class MongoDataSourceConfig implements DataSourceConfig {
 
     static {
@@ -69,7 +70,7 @@ public final class MongoDataSourceConfig implements DataSourceConfig {
     @AllArgsConstructor
     @Builder
     @FieldDefaults(level = AccessLevel.PRIVATE)
-    @With
+    @Accessors(chain = true)
     public static class MongoCredentialConfig {
 
         @NotEmpty(exceptionMessage = "'username' must not be empty")

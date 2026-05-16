@@ -18,29 +18,29 @@ class MongoDataSourceIntegrationTest extends Specification implements MongoInteg
         where:
         config << [
                 new MongoDataSourceConfig()
-                        .withHost(serverHost)
-                        .withPort(serverPort),
+                        .setHost(serverHost)
+                        .setPort(serverPort),
                 new MongoDataSourceConfig()
-                        .withHost(serverHost)
-                        .withPort(serverPort)
-                        .withSrvMaxHosts(1)
-                        .withSrvServiceName('test'),
+                        .setHost(serverHost)
+                        .setPort(serverPort)
+                        .setSrvMaxHosts(1)
+                        .setSrvServiceName('test'),
                 new MongoDataSourceConfig()
-                        .withHost(serverHost)
-                        .withPort(serverPort)
-                        .withReplicaSetName('rs0'),
+                        .setHost(serverHost)
+                        .setPort(serverPort)
+                        .setReplicaSetName('rs0'),
                 new MongoDataSourceConfig()
-                        .withHost(serverHost)
-                        .withPort(serverPort)
-                        .withApplicationName('test'),
+                        .setHost(serverHost)
+                        .setPort(serverPort)
+                        .setApplicationName('test'),
                 new MongoDataSourceConfig()
-                        .withHost(serverHost)
-                        .withPort(serverPort)
-                        .withCredentials(
+                        .setHost(serverHost)
+                        .setPort(serverPort)
+                        .setCredentials(
                                 new MongoDataSourceConfig.MongoCredentialConfig()
-                                        .withUsername('root')
-                                        .withPassword('test')
-                                        .withMechanism('SCRAM_SHA_256')
+                                        .setUsername('root')
+                                        .setPassword('test')
+                                        .setMechanism('SCRAM_SHA_256')
                         )
         ]
     }

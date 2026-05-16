@@ -9,11 +9,11 @@ class RedisDataSourceFactoryIntegrationTest extends Specification implements Red
     def 'test build with #database'() {
         given:
         def config = new RedisDataSourceConfig()
-                .withHost(serverHost)
-                .withPort(serverPort)
-                .withClientName(ProjectInfo.PROJECT_NAME)
-                .withSsl(false)
-                .withDatabase(database)
+                .setHost(serverHost)
+                .setPort(serverPort)
+                .setClientName(ProjectInfo.PROJECT_NAME)
+                .setSsl(false)
+                .setDatabase(database)
 
         when:
         def dataSource = new RedisDataSourceFactory().build(config)

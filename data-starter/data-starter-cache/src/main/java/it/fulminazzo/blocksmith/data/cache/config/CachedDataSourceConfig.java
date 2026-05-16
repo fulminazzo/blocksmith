@@ -7,7 +7,11 @@ import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import it.fulminazzo.blocksmith.data.memory.MemoryDataSource;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@With
+@Accessors(chain = true)
 public final class CachedDataSourceConfig implements DataSourceConfig {
 
     static {

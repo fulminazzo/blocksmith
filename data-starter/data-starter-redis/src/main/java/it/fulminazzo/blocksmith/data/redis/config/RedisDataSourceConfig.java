@@ -7,7 +7,11 @@ import it.fulminazzo.blocksmith.data.redis.RedisDataSource;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import it.fulminazzo.blocksmith.validation.annotation.Port;
 import it.fulminazzo.blocksmith.validation.annotation.PositiveOrZero;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -22,7 +26,7 @@ import org.jetbrains.annotations.Range;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@With
+@Accessors(chain = true)
 public final class RedisDataSourceConfig implements DataSourceConfig {
 
     static {

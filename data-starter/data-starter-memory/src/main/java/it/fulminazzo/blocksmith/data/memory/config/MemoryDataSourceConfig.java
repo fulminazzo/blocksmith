@@ -4,7 +4,7 @@ import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import it.fulminazzo.blocksmith.data.memory.MemoryDataSource;
 import lombok.Value;
-import lombok.With;
+import lombok.experimental.Accessors;
 
 import java.util.concurrent.Executors;
 
@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
  * @see MemoryDataSource
  */
 @Value
-@With
+@Accessors(chain = true)
 public class MemoryDataSourceConfig implements DataSourceConfig {
 
     static {
