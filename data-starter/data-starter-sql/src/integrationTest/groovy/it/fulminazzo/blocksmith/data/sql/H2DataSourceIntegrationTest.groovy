@@ -1,11 +1,13 @@
 package it.fulminazzo.blocksmith.data.sql
 
+import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.pool.HikariPool
 import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.sql.helper.H2IntegrationTestHelper
 import it.fulminazzo.blocksmith.data.sql.helper.SqlIntegrationTestHelper
 
 class H2DataSourceIntegrationTest extends SqlDataSourceIntegrationTest {
+    private final HikariConfig config = new HikariConfig()
 
     void setupSpec() {
         setupSuite()
@@ -13,6 +15,11 @@ class H2DataSourceIntegrationTest extends SqlDataSourceIntegrationTest {
 
     void cleanupSpec() {
         cleanupSuite()
+    }
+
+    void setup() {
+        config.username = 'sa'
+        config.password = ''
     }
 
     def 'test initialize h2 disk connection throws on non-existing'() {
@@ -76,6 +83,54 @@ class H2DataSourceIntegrationTest extends SqlDataSourceIntegrationTest {
 
         then:
         noExceptionThrown()
+    }
+
+    def 'test init script works'() {
+        given:
+        final context = testHelper.context
+
+        and:
+        def dataSource = (newDataSourceBuilder() as H2DataSourceBuilder)
+                .initScript('build/resources/integrationTest/schema.sql')
+
+        when:
+        dataSource.build()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        def results = context.selectFrom('logins').fetchMany()
+
+        then:
+        results.size() == 1
+
+        and:
+        def result = results[0]
+        result.getValue(0, 'name') == 'Alex'
+        result.getValue(0, 'count') == 3
+
+        cleanup:
+        context.dropTableIfExists('logins').execute()
+    }
+
+    def 'test that database is initialized with custom schema'() {
+        given:
+        def builder = new H2DataSourceBuilder(config, 'test', executor)
+                .memory()
+                .schemaName('custom')
+
+        when:
+        def dataSource = builder.build()
+        def connection = dataSource.dataSource.connection
+
+        then:
+        connection.catalog == 'TEST'
+        connection.schema == 'CUSTOM'
+
+        cleanup:
+        connection?.close()
+        dataSource?.close()
     }
 
     @Override
