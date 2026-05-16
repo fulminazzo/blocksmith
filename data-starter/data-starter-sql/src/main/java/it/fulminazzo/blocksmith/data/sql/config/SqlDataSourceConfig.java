@@ -94,7 +94,7 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     Map<String, Object> parameters = new HashMap<>();
 
     /*
-     * SqliteDataSource
+     * H2DataSource and SqliteDataSource
      */
 
     ConnectionMode connectionMode = new ConnectionMode();
@@ -118,19 +118,12 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
 
         ConnectionModeType type = ConnectionModeType.MEMORY;
 
+        /**
+         * The path of the directory where the database should be saved.
+         * The database will be saved in the form {@code <directory_path>/<database_name>.mv.db}
+         */
         @Nullable
         String directoryPath;
-
-        @Nullable
-        String host;
-
-        @Port
-        @Range(from = 1, to = 65535)
-        @Nullable
-        Integer port;
-
-        @Nullable
-        String path;
 
     }
 
