@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data.memory
 
 import it.fulminazzo.blocksmith.data.CacheRepositoryIntegrationTest
 import it.fulminazzo.blocksmith.data.User
+import it.fulminazzo.blocksmith.data.Users
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.structure.expiring.ExpiringMap
 import org.jetbrains.annotations.NotNull
@@ -23,6 +24,27 @@ class MemoryRepositoryIntegrationTest extends CacheRepositoryIntegrationTest<Mem
 
     void cleanupSpec() {
         EXECUTOR?.shutdown()
+    }
+
+    def 'test that create method correctly initializes working repository'() {
+        given:
+        final entity = Users.SAVED1
+
+        and:
+        def repository = MemoryRepository.create(User)
+
+        when:
+        def saved = repository.save(entity).get()
+
+        then:
+        saved == entity
+
+        when:
+        def first = repository.findById(entity.id).get()
+
+        then:
+        first.present
+        first.get() == entity
     }
 
     @Override

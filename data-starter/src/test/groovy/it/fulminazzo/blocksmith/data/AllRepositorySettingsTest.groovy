@@ -47,4 +47,12 @@ class AllRepositorySettingsTest extends Specification {
         new CachedDataSource<>(Mock(MemoryDataSource), Mock(MongoDataSource)) || CachedRepositorySettings.combine(memory, mongo)
     }
 
+    def 'test that getRepositorySettings throws for unrecognized data source'() {
+        when:
+        settings.getRepositorySettings(Mock(RepositoryDataSource))
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
 }
