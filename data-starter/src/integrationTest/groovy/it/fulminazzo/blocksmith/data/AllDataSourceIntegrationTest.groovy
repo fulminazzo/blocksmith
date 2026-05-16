@@ -46,14 +46,14 @@ class AllDataSourceIntegrationTest extends Specification {
     private static final int REDIS_PORT = 6379
     private static final int MONGO_PORT = 27017
 
-    private static final JdbcDatabaseContainer SQL_SERVER = new PostgreSQLContainer('postgres:18.3')
+    private static final GenericContainer SQL_SERVER = new PostgreSQLContainer('postgres:18.3')
             .withUsername('root')
             .withPassword('test')
             .withReuse(true)
     private static final GenericContainer REDIS_SERVER = new GenericContainer('redis:7-alpine')
             .withExposedPorts(REDIS_PORT)
             .withReuse(true)
-    private static final MongoDBContainer MONGO_SERVER = new MongoDBContainer('mongo:7.0')
+    private static final GenericContainer MONGO_SERVER = new MongoDBContainer('mongo:7.0')
             .withReuse(true)
 
     @Shared
@@ -198,7 +198,7 @@ class AllDataSourceIntegrationTest extends Specification {
         repository != null
 
         when:
-        def user = repository.findById(1L).join()
+        def user = repository.findById(100L).join()
 
         then:
         user.empty

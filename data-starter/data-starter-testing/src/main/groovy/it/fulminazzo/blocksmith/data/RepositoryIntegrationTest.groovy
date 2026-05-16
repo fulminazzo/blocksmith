@@ -10,6 +10,7 @@ abstract class RepositoryIntegrationTest<R extends Repository<User, Long>> exten
 
     void setupRepository() {
         repository = initializeRepository()
+        clearData()
         insert(Users.SAVED1)
         insert(Users.SAVED2)
     }
