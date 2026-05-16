@@ -20,7 +20,6 @@ testing {
 
                 implementation(libs.postgresql)
                 implementation(libs.test.containers.postgresql)
-
             }
         }
     }
