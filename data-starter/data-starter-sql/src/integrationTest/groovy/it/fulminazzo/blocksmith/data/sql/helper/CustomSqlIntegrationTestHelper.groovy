@@ -10,16 +10,8 @@ final class CustomSqlIntegrationTestHelper extends RemoteSqlIntegrationTestHelpe
     @Override
     IDatabaseType getDatabaseType() {
         return new IDatabaseType() {
-
-            @Override
-            String getJdbcName() {
-                return 'yugabytedb'
-            }
-
-            @Override
-            int getPort() {
-                return 5433
-            }
+            final String jdbcName = 'yugabytedb'
+            final int port = 5433
 
         }
     }

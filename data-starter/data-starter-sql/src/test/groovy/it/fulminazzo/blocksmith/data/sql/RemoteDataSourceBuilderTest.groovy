@@ -7,21 +7,18 @@ import java.util.concurrent.Executors
 class RemoteDataSourceBuilderTest extends Specification {
 
     def 'test that build throws for unknown database type'() {
+        given:
+        final databaseType = new IDatabaseType() {
+            final String jdbcName = 'clickhouse'
+            final int port = 9000
+
+        }
+
         when:
         SqlDataSource.builder()
                 .database('test')
-        .executor(Executors.newSingleThreadExecutor())
-                .databaseType(new IDatabaseType() {
-                    @Override
-                    String getJdbcName() {
-                        return 'clickhouse'
-                    }
-
-                    @Override
-                    int getPort() {
-                        return 9000
-                    }
-                })
+                .executor(Executors.newSingleThreadExecutor())
+                .databaseType(databaseType)
                 .build()
 
         then:
