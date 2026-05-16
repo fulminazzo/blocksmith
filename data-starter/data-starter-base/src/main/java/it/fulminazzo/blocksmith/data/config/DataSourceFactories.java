@@ -34,10 +34,11 @@ public final class DataSourceFactories {
             final @NotNull DataSourceConfig dataSourceConfig
     ) {
         DataSourceFactory dataSourceFactory = factories.get(dataSourceConfig.getClass());
-        if (dataSourceFactory == null) throw new IllegalArgumentException(
-                "No RepositoryDataSource factory currently registered for configuration type: "
-                        + dataSourceConfig.getClass().getSimpleName()
-        );
+        if (dataSourceFactory == null)
+            throw new IllegalArgumentException(
+                    "No RepositoryDataSource factory currently registered for configuration type: "
+                            + dataSourceConfig.getClass().getSimpleName()
+            );
         else return (RepositoryDataSource<RepositorySettings>) dataSourceFactory.build(dataSourceConfig);
     }
 
