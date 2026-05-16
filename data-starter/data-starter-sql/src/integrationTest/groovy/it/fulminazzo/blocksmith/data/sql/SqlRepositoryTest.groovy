@@ -5,18 +5,12 @@ import it.fulminazzo.blocksmith.data.User
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import it.fulminazzo.blocksmith.data.sql.helper.SqlIntegrationTestHelper
 import org.jetbrains.annotations.NotNull
-import org.jooq.DSLContext
 import org.jooq.Record
-import org.jooq.SQLDialect
 import org.jooq.Table
-import org.jooq.impl.SQLDataType
 import spock.lang.Shared
 
-import javax.sql.DataSource
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-import static org.jooq.impl.DSL.*
 
 abstract class SqlRepositoryTest extends RepositoryTest<SqlRepository<User, Long, Table<? extends Record>>> {
     private final ExecutorService executor = Executors.newSingleThreadExecutor()

@@ -14,10 +14,12 @@ abstract class RemoteSqlIntegrationTestHelper extends SqlIntegrationTestHelper {
 
     protected abstract JdbcDatabaseContainer newContainer()
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     String getServerHost() {
         return container.host
     }
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     int getServerPort() {
         return container.getMappedPort((
                 dialect == SQLDialect.POSTGRES
@@ -27,7 +29,7 @@ abstract class RemoteSqlIntegrationTestHelper extends SqlIntegrationTestHelper {
     }
 
     private JdbcDatabaseContainer getContainer() {
-        CONTAINERS.computeIfAbsent(
+        return CONTAINERS.computeIfAbsent(
                 dialect,
                 d -> {
                     def c = newContainer()

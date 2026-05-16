@@ -9,20 +9,16 @@ import org.jooq.SQLDialect
 
 import javax.sql.DataSource
 
+@SuppressWarnings('CloseWithoutCloseable')
 class H2RemoteIntegrationTestHelper extends SqlIntegrationTestHelper {
     private static final String SERVER_HOST = 'localhost'
     private static final int SERVER_PORT = DatabaseType.H2.port
     private static final String H2_PATH = "jdbc:h2:tcp://$SERVER_HOST:${SERVER_PORT}/./build/resources/integrationTest/h2_remote;DATABASE_TO_LOWER=TRUE"
 
+    final String serverHost = SERVER_HOST
+    final int serverPort = SERVER_PORT
+
     private Server server
-
-    String getServerHost() {
-        return SERVER_HOST
-    }
-
-    int getServerPort() {
-        return SERVER_PORT
-    }
 
     @Override
     SQLDialect getDialect() {

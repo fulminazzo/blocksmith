@@ -15,21 +15,13 @@ abstract class SqlIntegrationTestHelper implements Closeable {
     private static final String TABLE_NAME = 'USERS'
     private static final String ID_COLUMN = 'ID'
 
-    public final DSLContext context
+    final DSLContext context
     private final DataSource dataSource
 
-    SqlIntegrationTestHelper() {
+    protected SqlIntegrationTestHelper() {
         dataSource = newDataSource()
 
         context = initializeContextAndTable(dataSource, dialect)
-    }
-
-    Table<? extends Record> getTable() {
-        return context.meta().getTables(TABLE_NAME).last
-    }
-
-    TableField<? extends Record, Long> getColumn() {
-        return table.field(ID_COLUMN) as TableField<? extends Record, Long>
     }
 
     /**
@@ -46,11 +38,23 @@ abstract class SqlIntegrationTestHelper implements Closeable {
      */
     protected abstract DataSource newDataSource()
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
+    Table<? extends Record> getTable() {
+        return context.meta().getTables(TABLE_NAME).last
+    }
+
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
+    TableField<? extends Record, Long> getColumn() {
+        return table.field(ID_COLUMN) as TableField<? extends Record, Long>
+    }
+
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     @Override
     void close() throws IOException {
         dataSource?.close()
     }
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static DSLContext initializeContextAndTable(final DataSource dataSource, final SQLDialect dialect) {
         def context = using(dataSource, dialect)
         context.createTableIfNotExists(TABLE_NAME)

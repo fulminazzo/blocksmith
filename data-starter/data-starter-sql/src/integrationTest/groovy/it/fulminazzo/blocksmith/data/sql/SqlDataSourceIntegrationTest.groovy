@@ -73,7 +73,7 @@ abstract class SqlDataSourceIntegrationTest extends DataSourceIntegrationTest<Sq
         ASqlDataSourceBuilder builder = newDataSourceBuilderImpl()
         try {
             builder.database
-        } catch (NullPointerException ignored) {
+        } catch (Exception ignored) {
             builder.database('test')
         }
         return builder
