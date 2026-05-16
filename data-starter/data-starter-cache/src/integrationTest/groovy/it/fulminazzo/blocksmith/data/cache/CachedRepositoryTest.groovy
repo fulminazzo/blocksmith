@@ -12,7 +12,6 @@ import it.fulminazzo.blocksmith.data.memory.MemoryRepositorySettings
 import it.fulminazzo.blocksmith.data.redis.RedisRepository
 import it.fulminazzo.blocksmith.data.sql.SqlRepository
 import org.jetbrains.annotations.NotNull
-import org.spockframework.util.Pair
 import spock.lang.Shared
 
 import java.time.Duration
@@ -105,17 +104,6 @@ class CachedRepositoryTest extends RepositoryTest<CachedRepository<User, Long>> 
     void remove(final @NotNull Long id) {
         cache.delete(id).get()
         base.delete(id).get()
-    }
-
-    private static <E> Pair<E, Long> timed(final Closure<E> function) {
-        def start = now
-        def e = function()
-        def end = now
-        return Pair.of(e, end - start)
-    }
-
-    private static long getNow() {
-        return System.nanoTime()
     }
 
 }

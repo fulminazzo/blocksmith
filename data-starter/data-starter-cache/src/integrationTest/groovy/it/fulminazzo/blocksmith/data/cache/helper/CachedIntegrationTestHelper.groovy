@@ -54,7 +54,6 @@ final class CachedIntegrationTestHelper implements Closeable {
                 .postgres()
                 .build()
 
-
         context = using(baseDataSource.dataSource, SQLDialect.POSTGRES)
         context.createTableIfNotExists(TABLE_NAME)
                 .column(ID_COLUMN, SQLDataType.BIGINT.notNull().identity(true))
@@ -85,18 +84,17 @@ final class CachedIntegrationTestHelper implements Closeable {
                 .withIdColumn(column)
     }
 
-    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods')
-    // enforce our ordering
-    protected Table<? extends Record> getTable() {
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
+    private Table<? extends Record> getTable() {
         return context.meta().getTables(TABLE_NAME).last
     }
 
-    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods')
-    // enforce our ordering
-    protected TableField<? extends Record, Long> getColumn() {
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
+    private TableField<? extends Record, Long> getColumn() {
         return table.field(ID_COLUMN) as TableField<? extends Record, Long>
     }
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     @Override
     void close() throws IOException {
         cacheDataSource?.close()
@@ -104,25 +102,29 @@ final class CachedIntegrationTestHelper implements Closeable {
         executor?.close()
     }
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static String getCacheServerHost() {
         return cacheContainer.host
     }
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static int getCacheServerPort() {
         return cacheContainer.getMappedPort(CACHE_PORT)
+    }
+
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
+    static String getBaseServerHost() {
+        return baseContainer.host
+    }
+
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
+    static int getBaseServerPort() {
+        return baseContainer.getMappedPort(BASE_PORT)
     }
 
     private static GenericContainer getCacheContainer() {
         if (!CACHE_SERVER.created) CACHE_SERVER.start()
         return CACHE_SERVER
-    }
-
-    static String getBaseServerHost() {
-        return baseContainer.host
-    }
-
-    static int getBaseServerPort() {
-        return baseContainer.getMappedPort(BASE_PORT)
     }
 
     private static GenericContainer getBaseContainer() {
