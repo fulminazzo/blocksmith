@@ -46,15 +46,15 @@ abstract class SqlDataSourceIntegrationTest extends DataSourceIntegrationTest<Sq
         noExceptionThrown()
 
         when:
-        def results = context.selectFrom('logins').fetchMany()
+        def results = context.selectFrom('logins').fetch()
 
         then:
         results.size() == 1
 
         and:
         def result = results[0]
-        result.getValue(0, 'name') == 'Alex'
-        result.getValue(0, 'count') == 3
+        result.getValue(0) == 'Alex'
+        result.getValue(1) == 3
 
         cleanup:
         context.dropTableIfExists('logins').execute()
