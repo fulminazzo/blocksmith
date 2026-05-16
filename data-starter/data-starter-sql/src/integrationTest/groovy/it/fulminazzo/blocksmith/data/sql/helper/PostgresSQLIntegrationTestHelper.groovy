@@ -1,5 +1,7 @@
 package it.fulminazzo.blocksmith.data.sql.helper
 
+import it.fulminazzo.blocksmith.data.sql.DatabaseType
+import it.fulminazzo.blocksmith.data.sql.IDatabaseType
 import org.jooq.SQLDialect
 import org.testcontainers.containers.JdbcDatabaseContainer
 import org.testcontainers.containers.PostgreSQLContainer
@@ -9,6 +11,11 @@ final class PostgresSQLIntegrationTestHelper extends RemoteSqlIntegrationTestHel
     @Override
     SQLDialect getDialect() {
         return SQLDialect.POSTGRES
+    }
+
+    @Override
+    protected IDatabaseType getDatabaseType() {
+        return DatabaseType.POSTGRESQL
     }
 
     @Override

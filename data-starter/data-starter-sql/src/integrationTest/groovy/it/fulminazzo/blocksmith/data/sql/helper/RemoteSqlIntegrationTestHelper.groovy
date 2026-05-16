@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.data.sql.helper
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import it.fulminazzo.blocksmith.data.sql.DatabaseType
+import it.fulminazzo.blocksmith.data.sql.IDatabaseType
 import org.jooq.SQLDialect
 import org.testcontainers.containers.JdbcDatabaseContainer
 
@@ -21,18 +22,18 @@ abstract class RemoteSqlIntegrationTestHelper extends SqlIntegrationTestHelper {
 
     @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     int getServerPort() {
-        return container.getMappedPort((
-                dialect == SQLDialect.POSTGRES
-                        ? DatabaseType.POSTGRESQL
-                        : DatabaseType.valueOf(dialect.name.toUpperCase())
-        ).port)
+        return container.getMappedPort(databaseType.port)
+    }
+
+    protected IDatabaseType getDatabaseType() {
+        return DatabaseType.valueOf(dialect.name.toUpperCase())
     }
 
     protected JdbcDatabaseContainer getContainer() {
         return CONTAINERS.computeIfAbsent(
                 dialect,
                 d -> {
-                    def c = newContainer()
+                    def c = newContainer().withReuse(true)
                     c.start()
                     return c
                 }
