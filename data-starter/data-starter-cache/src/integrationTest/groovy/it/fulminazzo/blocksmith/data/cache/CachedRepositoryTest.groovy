@@ -10,7 +10,6 @@ import it.fulminazzo.blocksmith.data.memory.MemoryDataSource
 import it.fulminazzo.blocksmith.data.memory.MemoryRepository
 import it.fulminazzo.blocksmith.data.memory.MemoryRepositorySettings
 import it.fulminazzo.blocksmith.data.redis.RedisRepository
-import it.fulminazzo.blocksmith.data.redis.RedisRepositorySettings
 import it.fulminazzo.blocksmith.data.sql.SqlRepository
 import org.jetbrains.annotations.NotNull
 import org.spockframework.util.Pair
@@ -57,13 +56,7 @@ class CachedRepositoryTest extends RepositoryTest<CachedRepository<User, Long>> 
         when:
         def repository = CachedRepository.wrap(base)
                 ."$entityMapperMethod"(*entityMapperArguments)
-                .cacheRepository(
-                        TEST_HELPER.cacheDataSource,
-                        new RedisRepositorySettings()
-                                .withDatabaseName('test')
-                                .withCollectionName('users')
-                                .withTtl(Duration.ofMinutes(1L))
-                )
+                .cacheRepository(TEST_HELPER.cacheDataSource, TEST_HELPER.cacheSettings)
                 .hybrid(
                         memoryDataSource,
                         new MemoryRepositorySettings()
@@ -102,9 +95,7 @@ class CachedRepositoryTest extends RepositoryTest<CachedRepository<User, Long>> 
                 .entityType(User)
                 .cacheRepository(
                         TEST_HELPER.cacheDataSource,
-                        new RedisRepositorySettings()
-                                .withDatabaseName('test')
-                                .withCollectionName('users')
+                        TEST_HELPER.cacheSettings
                                 .withTtl(Duration.ofSeconds(cacheTtl))
                 )
                 .hybrid(
