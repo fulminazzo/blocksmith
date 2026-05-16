@@ -10,8 +10,8 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class MemoryRepositoryIntegrationTest extends RepositoryIntegrationTest<MemoryRepository<User, Long>> {
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor()
-    private static final MemoryQueryEngine<User, Long> engine = new MemoryQueryEngine<>(ExpiringMap.lazy(), executor)
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor()
+    private static final MemoryQueryEngine<User, Long> ENGINE = new MemoryQueryEngine<>(ExpiringMap.lazy(), EXECUTOR)
 
     void setup() {
         setupRepository()
@@ -22,30 +22,30 @@ class MemoryRepositoryIntegrationTest extends RepositoryIntegrationTest<MemoryRe
     }
 
     void cleanupSpec() {
-        executor?.shutdown()
+        EXECUTOR?.shutdown()
     }
 
     @Override
     MemoryRepository<User, Long> initializeRepository() {
         return new MemoryRepository<>(
-                engine,
+                ENGINE,
                 EntityMapper.create(User)
         )
     }
 
     @Override
     boolean exists(final @NotNull Long id) {
-        return engine.internalMap.containsKey(id)
+        return ENGINE.internalMap.containsKey(id)
     }
 
     @Override
     void insert(final @NotNull User entity) {
-        engine.internalMap.put(entity.id, entity, 3600_000)
+        ENGINE.internalMap.put(entity.id, entity, 3600_000)
     }
 
     @Override
     void remove(final @NotNull Long id) {
-        engine.internalMap.remove(id)
+        ENGINE.internalMap.remove(id)
     }
 
 }

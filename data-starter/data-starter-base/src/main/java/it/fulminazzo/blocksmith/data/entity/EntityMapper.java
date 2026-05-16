@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EntityMapper<T, I> {
-    private static final @NotNull String defaultIdFieldName = "id";
+    private static final @NotNull String DEFAULT_ID_FIELD_NAME = "id";
 
     @Getter
     private final @NotNull Class<T> type;
@@ -45,7 +45,7 @@ public final class EntityMapper<T, I> {
      * The ID lookup will follow the logic:
      * <ol>
      *     <li>attempts to find a field annotated with {@link Id} (only ONE field must be annotated);</li>
-     *     <li>if it fails, attempts to find a field named {@link #defaultIdFieldName};</li>
+     *     <li>if it fails, attempts to find a field named {@link #DEFAULT_ID_FIELD_NAME};</li>
      *     <li>if it fails, an exception is thrown notifying the user.</li>
      * </ol>
      *
@@ -68,12 +68,12 @@ public final class EntityMapper<T, I> {
             return create(type, fields.get(0).getName());
         }
         try {
-            reflect.getNonStaticField(defaultIdFieldName);
-            return create(type, defaultIdFieldName);
+            reflect.getNonStaticField(DEFAULT_ID_FIELD_NAME);
+            return create(type, DEFAULT_ID_FIELD_NAME);
         } catch (ReflectException e) {
             throw new IllegalArgumentException(String.format(
                     "Invalid entity '%s'. Could not find field '%s' and no field annotated with %s was present",
-                    type.getCanonicalName(), defaultIdFieldName, Id.class.getSimpleName()
+                    type.getCanonicalName(), DEFAULT_ID_FIELD_NAME, Id.class.getSimpleName()
             ));
         }
     }

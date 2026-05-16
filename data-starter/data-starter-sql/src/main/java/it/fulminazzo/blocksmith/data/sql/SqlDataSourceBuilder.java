@@ -64,22 +64,22 @@ import org.jooq.SQLDialect;
  * @see RemoteDataSourceBuilder
  */
 public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSourceBuilder> {
-    private static final int maximumPoolSize = 20;
-    private static final int minimumIdle = 5;
-    private static final long connectionTimeout = 30 * 1000;
-    private static final long idleTimeout = 10 * 60 * 1000;
-    private static final long maxLifeTime = 30 * 60 * 1000;
+    private static final int MAXIMUM_POOL_SIZE = 20;
+    private static final int MINIMUM_IDLE = 5;
+    private static final long CONNECTION_TIMEOUT = 30 * 1000;
+    private static final long IDLE_TIMEOUT = 10 * 60 * 1000;
+    private static final long MAX_LIFE_TIME = 30 * 60 * 1000;
 
     /**
      * Instantiates a new SQL data source builder.
      */
     SqlDataSourceBuilder() {
         super(new HikariConfig(), null, null);
-        maximumPoolSize(maximumPoolSize)
-                .minimumIdle(minimumIdle)
-                .connectionTimeout(connectionTimeout)
-                .idleTimeout(idleTimeout)
-                .maxLifeTime(maxLifeTime);
+        maximumPoolSize(MAXIMUM_POOL_SIZE)
+                .minimumIdle(MINIMUM_IDLE)
+                .connectionTimeout(CONNECTION_TIMEOUT)
+                .idleTimeout(IDLE_TIMEOUT)
+                .maxLifeTime(MAX_LIFE_TIME);
     }
 
     /**
