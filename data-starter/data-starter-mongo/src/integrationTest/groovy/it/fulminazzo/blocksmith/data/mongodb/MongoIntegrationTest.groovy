@@ -5,7 +5,7 @@ import org.testcontainers.containers.MongoDBContainer
 interface MongoIntegrationTest {
     int MONGO_PORT = 27017
 
-    MongoDBContainer MONGO_SERVER = new MongoDBContainer('mongo:7.0')
+    MongoDBContainer MONGO_SERVER = new MongoDBContainer('mongo:7.0').withReuse(true)
 
     default String getConnectionString() {
         return container.connectionString

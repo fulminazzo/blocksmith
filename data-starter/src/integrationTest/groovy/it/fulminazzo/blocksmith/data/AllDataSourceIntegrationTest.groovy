@@ -27,7 +27,6 @@ import org.jooq.TableField
 import org.jooq.SQLDialect
 import org.jooq.impl.SQLDataType
 import org.testcontainers.containers.GenericContainer
-import org.testcontainers.containers.JdbcDatabaseContainer
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.containers.PostgreSQLContainer
 import spock.lang.Shared
@@ -50,8 +49,12 @@ class AllDataSourceIntegrationTest extends Specification {
     private static final JdbcDatabaseContainer SQL_SERVER = new PostgreSQLContainer('postgres:18.3')
             .withUsername('root')
             .withPassword('test')
-    private static final GenericContainer REDIS_SERVER = new GenericContainer('redis:7-alpine').withExposedPorts(REDIS_PORT)
+            .withReuse(true)
+    private static final GenericContainer REDIS_SERVER = new GenericContainer('redis:7-alpine')
+            .withExposedPorts(REDIS_PORT)
+            .withReuse(true)
     private static final MongoDBContainer MONGO_SERVER = new MongoDBContainer('mongo:7.0')
+            .withReuse(true)
 
     @Shared
     private HikariDataSource remoteSqlDataSource
@@ -152,10 +155,6 @@ class AllDataSourceIntegrationTest extends Specification {
 
     void cleanupSpec() {
         remoteSqlDataSource?.close()
-
-        SQL_SERVER.stop()
-        REDIS_SERVER.stop()
-        MONGO_SERVER.stop()
     }
 
     def 'test #dataSourceConfig datasource life cycle'() {

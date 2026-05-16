@@ -26,10 +26,13 @@ final class CachedIntegrationTestHelper implements Closeable {
     private static final String TABLE_NAME = 'USERS'
     private static final String ID_COLUMN = 'ID'
 
-    private static final GenericContainer CACHE_SERVER = new GenericContainer('redis:7-alpine').withExposedPorts(CACHE_PORT)
+    private static final GenericContainer CACHE_SERVER = new GenericContainer('redis:7-alpine')
+            .withExposedPorts(CACHE_PORT)
+            .withReuse(true)
     private static final JdbcDatabaseContainer BASE_SERVER = new PostgreSQLContainer('postgres:18.3')
             .withUsername('root')
             .withPassword('test')
+            .withReuse(true)
 
     final ExecutorService executor = Executors.newCachedThreadPool()
 
