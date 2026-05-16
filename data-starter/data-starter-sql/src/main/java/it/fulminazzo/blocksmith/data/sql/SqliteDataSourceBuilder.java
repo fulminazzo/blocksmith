@@ -6,6 +6,9 @@ import org.jetbrains.annotations.Nullable;
 import org.jooq.SQLDialect;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
@@ -76,7 +79,11 @@ public final class SqliteDataSourceBuilder extends ASqlDataSourceBuilder<SqliteD
      */
     public @NotNull SqliteDataSourceBuilder disk(final @NotNull String directoryPath) {
         File directory = new File(directoryPath);
-        if (!directory.exists()) directory.mkdirs();
+        try {
+            Files.createDirectories(directory.toPath());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         connectionMode = new File(directory, getDatabase() + ".db").getAbsolutePath();
         return this;
     }

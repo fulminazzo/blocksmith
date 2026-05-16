@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.data.cache.helper
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import it.fulminazzo.blocksmith.data.*
 import it.fulminazzo.blocksmith.data.redis.RedisDataSource
 import it.fulminazzo.blocksmith.data.redis.RedisRepositorySettings
@@ -85,12 +86,12 @@ final class CachedIntegrationTestHelper implements Closeable {
     }
 
     @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
-    private Table<? extends Record> getTable() {
+    Table<? extends Record> getTable() {
         return context.meta().getTables(TABLE_NAME).last
     }
 
     @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
-    private TableField<? extends Record, Long> getColumn() {
+    TableField<? extends Record, Long> getColumn() {
         return table.field(ID_COLUMN) as TableField<? extends Record, Long>
     }
 
@@ -122,12 +123,14 @@ final class CachedIntegrationTestHelper implements Closeable {
         return baseContainer.getMappedPort(BASE_PORT)
     }
 
-    private static GenericContainer getCacheContainer() {
+    @SuppressFBWarnings('MS_EXPOSE_REP')
+    static GenericContainer getCacheContainer() {
         if (!CACHE_SERVER.created) CACHE_SERVER.start()
         return CACHE_SERVER
     }
 
-    private static GenericContainer getBaseContainer() {
+    @SuppressFBWarnings('MS_EXPOSE_REP')
+    static GenericContainer getBaseContainer() {
         if (!BASE_SERVER.created) BASE_SERVER.start()
         return BASE_SERVER
     }

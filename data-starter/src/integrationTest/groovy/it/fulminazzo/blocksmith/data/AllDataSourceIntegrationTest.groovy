@@ -300,38 +300,38 @@ class AllDataSourceIntegrationTest extends Specification {
         ]
     }
 
-    private Table<? extends Record> getSqlTable(final DatabaseType databaseType) {
+    protected Table<? extends Record> getSqlTable(final DatabaseType databaseType) {
         final DSLContext context
         if (databaseType == DatabaseType.H2) context = h2SqlConnection
         else context = remoteSqlConnection
         return context.meta().getTables(TABLE_NAME).last
     }
 
-    private TableField<? extends Record, Long> getSqlColumn(final DatabaseType databaseType) {
+    protected TableField<? extends Record, Long> getSqlColumn(final DatabaseType databaseType) {
         return getSqlTable(databaseType).field(ID_COLUMN) as TableField<? extends Record, Long>
     }
 
-    private static String getSqlServerHost() {
+    protected static String getSqlServerHost() {
         return SQL_SERVER.host
     }
 
-    private static int getSqlServerPort() {
+    protected static int getSqlServerPort() {
         return SQL_SERVER.getMappedPort(DatabaseType.POSTGRESQL.port)
     }
 
-    private static String getRedisServerHost() {
+    protected static String getRedisServerHost() {
         return REDIS_SERVER.host
     }
 
-    private static int getRedisServerPort() {
+    protected static int getRedisServerPort() {
         return REDIS_SERVER.getMappedPort(REDIS_PORT)
     }
 
-    private static String getMongoServerHost() {
+    protected static String getMongoServerHost() {
         return MONGO_SERVER.host
     }
 
-    private static int getMongoServerPort() {
+    protected static int getMongoServerPort() {
         return MONGO_SERVER.getMappedPort(MONGO_PORT)
     }
 

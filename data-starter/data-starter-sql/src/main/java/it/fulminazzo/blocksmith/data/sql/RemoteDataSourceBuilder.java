@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 import org.jooq.SQLDialect;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
@@ -127,7 +128,7 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
 
     @Override
     protected @NotNull SQLDialect getSQLDialect() {
-        String databaseName = databaseType.getJdbcName().toUpperCase();
+        String databaseName = databaseType.getJdbcName().toUpperCase(Locale.ROOT);
         try {
             return SQLDialect.valueOf(databaseName);
         } catch (IllegalArgumentException e) {

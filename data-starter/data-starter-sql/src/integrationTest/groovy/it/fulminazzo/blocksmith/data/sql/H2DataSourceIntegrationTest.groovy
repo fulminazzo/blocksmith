@@ -24,7 +24,7 @@ class H2DataSourceIntegrationTest extends SqlDataSourceIntegrationTest {
 
     def 'test initialize h2 disk connection throws on non-existing'() {
         when:
-        def source = SqlDataSource.builder()
+        SqlDataSource.builder()
                 .executor(executor)
                 .database('h2')
                 .username('sa')
@@ -37,9 +37,6 @@ class H2DataSourceIntegrationTest extends SqlDataSourceIntegrationTest {
 
         then:
         thrown(HikariPool.PoolInitializationException)
-
-        cleanup:
-        source?.close()
     }
 
     def 'test memory datasource life cycle'() {

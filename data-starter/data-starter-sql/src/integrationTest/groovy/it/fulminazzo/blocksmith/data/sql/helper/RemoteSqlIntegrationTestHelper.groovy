@@ -28,7 +28,7 @@ abstract class RemoteSqlIntegrationTestHelper extends SqlIntegrationTestHelper {
         ).port)
     }
 
-    private JdbcDatabaseContainer getContainer() {
+    protected JdbcDatabaseContainer getContainer() {
         return CONTAINERS.computeIfAbsent(
                 dialect,
                 d -> {

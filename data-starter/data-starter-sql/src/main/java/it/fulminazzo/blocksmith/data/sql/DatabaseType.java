@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+
 /**
  * Most commonly used SQL databases.
  * For each one of them, an optimization method is present in {@link RemoteDataSourceBuilder}.
@@ -25,7 +27,7 @@ public enum DatabaseType implements IDatabaseType {
 
     @Override
     public @NotNull String getJdbcName() {
-        return name().toLowerCase();
+        return name().toLowerCase(Locale.ROOT);
     }
 
 }

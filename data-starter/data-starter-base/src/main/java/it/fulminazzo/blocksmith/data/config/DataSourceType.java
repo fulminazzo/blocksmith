@@ -3,6 +3,8 @@ package it.fulminazzo.blocksmith.data.config;
 import it.fulminazzo.blocksmith.ProjectInfo;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+
 /**
  * The supported types of data source configurations.
  *
@@ -43,10 +45,10 @@ public enum DataSourceType {
      */
     @SuppressWarnings("unchecked")
     public @NotNull Class<DataSourceConfig> getConfigClass() {
-        String type = name().toLowerCase();
+        String type = name().toLowerCase(Locale.ROOT);
         type = Character.toUpperCase(type.charAt(0)) + type.substring(1);
 
-        String lowercaseType = type.toLowerCase();
+        String lowercaseType = type.toLowerCase(Locale.ROOT);
         if (this == CACHED) lowercaseType = "cache";
 
         String packageName = lowercaseType;

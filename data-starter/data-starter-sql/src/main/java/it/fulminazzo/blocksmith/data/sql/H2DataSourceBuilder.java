@@ -206,7 +206,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
             final @NotNull String name,
             final @NotNull Object value
     ) {
-        return setParameters(name, value.toString().toUpperCase());
+        return setParameters(name, value.toString().toUpperCase(Locale.ROOT));
     }
 
     /**

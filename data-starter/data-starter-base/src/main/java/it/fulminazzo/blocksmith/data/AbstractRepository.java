@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.data;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.validation.Validator;
 import it.fulminazzo.blocksmith.validation.ViolationException;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 public abstract class AbstractRepository<T, I, E extends QueryEngine<T, I>> implements Repository<T, I> {
+    @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
     protected final @NotNull E queryEngine;
     @Getter
     protected final @NotNull EntityMapper<T, I> entityMapper;
