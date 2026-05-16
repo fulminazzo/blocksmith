@@ -20,11 +20,43 @@ import java.util.Objects;
 @ToString(callSuper = true, doNotUseGetters = true)
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@With
 public final class FileRepositorySettings extends RepositorySettings {
     private @Nullable File dataDirectory;
     private @Nullable Logger logger;
     private @Nullable ConfigurationFormat format;
+
+    /**
+     * Sets the data directory.
+     *
+     * @param dataDirectory the data directory
+     * @return this object (for method chaining)
+     */
+    public @NotNull FileRepositorySettings withDataDirectory(final @NotNull File dataDirectory) {
+        this.dataDirectory = dataDirectory;
+        return this;
+    }
+
+    /**
+     * Sets the logger.
+     *
+     * @param logger the logger
+     * @return this object (for method chaining)
+     */
+    public @NotNull FileRepositorySettings withLogger(final @NotNull Logger logger) {
+        this.logger = logger;
+        return this;
+    }
+
+    /**
+     * Sets the configuration format to save the data with.
+     *
+     * @param format the format
+     * @return this object (for method chaining)
+     */
+    public @NotNull FileRepositorySettings withFormat(final @NotNull ConfigurationFormat format) {
+        this.format = format;
+        return this;
+    }
 
     /**
      * Gets the data directory.

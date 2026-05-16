@@ -18,11 +18,32 @@ import java.util.Objects;
 @ToString(callSuper = true, doNotUseGetters = true)
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@With
 public final class RedisRepositorySettings extends CacheRepositorySettings<RedisRepositorySettings> {
     private @Nullable String databaseName;
     private @Nullable String collectionName;
     private @Nullable EntityMapper<?, ?> entityMapper;
+
+    /**
+     * Sets the name of the database.
+     *
+     * @param databaseName the database name
+     * @return this object (for method chaining)
+     */
+    public @NotNull RedisRepositorySettings withDatabaseName(final @NotNull String databaseName) {
+        this.databaseName = databaseName;
+        return this;
+    }
+
+    /**
+     * Sets the name of the collection.
+     *
+     * @param collectionName the collection name
+     * @return this object (for method chaining)
+     */
+    public @NotNull RedisRepositorySettings withCollectionName(final @NotNull String collectionName) {
+        this.collectionName = collectionName;
+        return this;
+    }
 
     /**
      * Sets the entity mapper.

@@ -18,11 +18,32 @@ import java.util.Objects;
 @ToString(callSuper = true, doNotUseGetters = true)
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@With
 public final class MongoRepositorySettings extends RepositorySettings {
     private @Nullable String databaseName;
     private @Nullable String collectionName;
     private @Nullable EntityMapper<?, ?> entityMapper;
+
+    /**
+     * Sets the name of the database.
+     *
+     * @param databaseName the database name
+     * @return this object (for method chaining)
+     */
+    public @NotNull MongoRepositorySettings withDatabaseName(final @NotNull String databaseName) {
+        this.databaseName = databaseName;
+        return this;
+    }
+
+    /**
+     * Sets the name of the collection.
+     *
+     * @param collectionName the collection name
+     * @return this object (for method chaining)
+     */
+    public @NotNull MongoRepositorySettings withCollectionName(final @NotNull String collectionName) {
+        this.collectionName = collectionName;
+        return this;
+    }
 
     /**
      * Sets the entity mapper.
