@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -64,7 +65,7 @@ import java.util.function.Function;
 public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryRepositorySettings> {
     private static int threadsCount = 1;
 
-    private final @NotNull ExecutorService executor;
+    private final @NotNull Executor executor;
     private final @NotNull ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
             r -> {
                 Thread thread = new Thread(r);
@@ -113,20 +114,17 @@ public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryR
     @Override
     public void close() {
         scheduler.shutdown();
-        executor.shutdown();
+        if (executor instanceof ExecutorService) ((ExecutorService) executor).shutdown();
     }
 
     /**
      * Creates a new Memory data source.
+     * The queries will be run synchronously.
      *
      * @return the memory data source
      */
     public static @NotNull MemoryDataSource create() {
-        return new MemoryDataSource(Executors.newCachedThreadPool(r -> {
-            Thread thread = new Thread(r);
-            thread.setName(String.format("%s-%s", MemoryQueryEngine.class.getSimpleName(), threadsCount++));
-            return thread;
-        }));
+        return create(Runnable::run);
     }
 
     /**
@@ -135,8 +133,22 @@ public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryR
      * @param executor the executor
      * @return the memory data source
      */
-    public static @NotNull MemoryDataSource create(final @NotNull ExecutorService executor) {
+    public static @NotNull MemoryDataSource create(final @NotNull Executor executor) {
         return new MemoryDataSource(executor);
+    }
+
+    /**
+     * Creates a new Memory data source.
+     * The queries will be run asynchronously.
+     *
+     * @return the memory data source
+     */
+    public static @NotNull MemoryDataSource createAsync() {
+        return create(Executors.newCachedThreadPool(r -> {
+            Thread thread = new Thread(r);
+            thread.setName(String.format("%s-%s", MemoryQueryEngine.class.getSimpleName(), threadsCount++));
+            return thread;
+        }));
     }
 
 }
