@@ -14,9 +14,13 @@ import java.io.IOException;
 
 /**
  * Jackson deserializer for {@link DataSourceConfig} objects.
+ *
+ * @see DataSourceConfig
  */
 final class DataSourceConfigDeserializer extends StdDeserializer<DataSourceConfig> {
-    private final @NotNull Logger logger;
+    private static final long serialVersionUID = -1724048481514521412L;
+
+    private final transient @NotNull Logger logger;
 
     /**
      * Instantiates a new Data source config deserializer.
@@ -29,8 +33,10 @@ final class DataSourceConfigDeserializer extends StdDeserializer<DataSourceConfi
     }
 
     @Override
-    public DataSourceConfig deserialize(final @NotNull JsonParser jsonParser,
-                                        final @NotNull DeserializationContext deserializationContext) throws IOException {
+    public DataSourceConfig deserialize(
+            final @NotNull JsonParser jsonParser,
+            final @NotNull DeserializationContext deserializationContext
+    ) throws IOException {
         final JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
         String rawType = node.get("type").asText();

@@ -7,11 +7,11 @@ import it.fulminazzo.blocksmith.data.config.DataSourceConfig
 import spock.lang.Specification
 
 @Slf4j
-class DataSourceConfigDeserializerTest extends Specification {
+class DataSourceConfigDeserializerIntegrationTest extends Specification {
 
     def 'test load DataSourceConfig from file'() {
         given:
-        def configFile = new File('build/resources/test/database.yml')
+        def configFile = new File('build/resources/integrationTest/database.yml')
 
         and:
         def adapter = ConfigurationAdapter.newAdapter(log, ConfigurationFormat.YAML)
