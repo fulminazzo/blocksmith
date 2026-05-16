@@ -72,7 +72,7 @@ class AbstractRepositoryTest extends Specification {
         actual == null
     }
 
-    def 'test that findAllById ignores null ids'() {
+    def 'test that findAll page works'() {
         given:
         def expected = [
                 new Cat('Sissi', 18, true),
@@ -84,25 +84,71 @@ class AbstractRepositoryTest extends Specification {
         repository.saveAll(expected).get()
 
         when:
-        def actual = repository.findAllById([null, *expected*.name, null]).get()
+        def actual = repository.findAll(new Page(0, size)).get()
 
         then:
-        actual == expected
+        actual == expected.subList(0, size)
+
+        where:
+        size << (1..3)
+    }
+
+    def 'test that findAll page ignores invalid page numbers or size'() {
+        when:
+        def actual = repository.findAll(new Page(number, size)).get()
+
+        then:
+        actual == []
+
+        where:
+        number | size
+        -1     | 10
+        1      | 0
+        -1     | 0
+    }
+
+    def 'test that findAllById ignores null ids'() {
+        given:
+        repository.saveAll(expected).get()
+
+        when:
+        def actual = repository.findAllById(expected*.name).get()
+
+        then:
+        actual == expected.findAll { it != null }
+
+        where:
+        expected << [
+                [],
+                [
+                        null,
+                        new Cat('Sissi', 18, true),
+                        null,
+                        new Cat('Calimero', 4, false),
+                        null,
+                        new Cat('Junior', 7, true),
+                        null
+                ]
+        ]
     }
 
     def 'test that saveAll does not throw on valid entities'() {
         given:
         def expected = [
+                null,
                 new Cat('Sissi', 18, true),
+                null,
                 new Cat('Calimero', 4, false),
-                new Cat('Junior', 7, true)
+                null,
+                new Cat('Junior', 7, true),
+                null
         ]
 
         when:
         def saved = repository.saveAll(expected).get()
 
         then:
-        saved == expected
+        saved == expected.findAll { it != null }
     }
 
     def 'test that saveAll throws exception on invalid entities'() {
@@ -127,17 +173,10 @@ class AbstractRepositoryTest extends Specification {
 
     def 'test that deleteAll ignores null ids'() {
         given:
-        def expected = [
-                new Cat('Sissi', 18, true),
-                new Cat('Calimero', 4, false),
-                new Cat('Junior', 7, true)
-        ]
-
-        and:
         repository.saveAll(expected).get()
 
         when:
-        def actual = repository.deleteAll([null, *expected*.name, null]).get()
+        def actual = repository.deleteAll(expected*.name).get()
 
         then:
         actual == null
@@ -147,6 +186,20 @@ class AbstractRepositoryTest extends Specification {
 
         then:
         data.empty
+
+        where:
+        expected << [
+                [],
+                [
+                        null,
+                        new Cat('Sissi', 18, true),
+                        null,
+                        new Cat('Calimero', 4, false),
+                        null,
+                        new Cat('Junior', 7, true),
+                        null
+                ]
+        ]
     }
 
 }

@@ -10,7 +10,6 @@ import it.fulminazzo.blocksmith.data.memory.MemoryDataSource
 import it.fulminazzo.blocksmith.data.memory.MemoryRepository
 import it.fulminazzo.blocksmith.data.memory.MemoryRepositorySettings
 import it.fulminazzo.blocksmith.data.redis.RedisRepository
-import it.fulminazzo.blocksmith.data.sql.SqlRepository
 import org.jetbrains.annotations.NotNull
 import spock.lang.Shared
 
@@ -48,12 +47,28 @@ class CachedRepositoryIntegrationTest extends RepositoryIntegrationTest<CachedRe
         cache.delete(Users.SAVED2.id).join()
     }
 
+    def 'test that findAllById returns cached entities even if they are not present in the original database anymore'() {
+        given:
+        final expected = [Users.SAVED1]
+        final ids = [Users.SAVED1, Users.SAVED2]*.id
+
+        and:
+        repository.repository.deleteAll(ids).join()
+        repository.cacheRepository.saveAll(expected).join()
+
+        when:
+        def actual = repository.findAllById(ids).get()
+
+        then:
+        actual.sort() == expected.sort()
+    }
+
     def 'test that wrap allows creation of a cached repository wrapping the original'() {
         given:
         def memoryDataSource = MemoryDataSource.create(TEST_HELPER.executor)
 
         when:
-        def repository = CachedRepository.wrap(base)
+        def repository = CachedRepository.wrap(original)
                 ."$entityMapperMethod"(*entityMapperArguments)
                 .cacheRepository(TEST_HELPER.cacheDataSource, TEST_HELPER.cacheSettings)
                 .hybrid(
@@ -72,12 +87,14 @@ class CachedRepositoryIntegrationTest extends RepositoryIntegrationTest<CachedRe
         def baseRepository = repository.repository
         CachedRepository.isInstance(baseRepository)
         RedisRepository.isInstance(baseRepository.cacheRepository)
-        SqlRepository.isInstance(baseRepository.repository)
+        original.class.isInstance(baseRepository.repository)
 
         where:
-        entityMapperMethod | entityMapperArguments
-        'entityType'       | [User]
-        'entityMapper'     | [EntityMapper.create(User)]
+        original         | entityMapperMethod | entityMapperArguments
+        base             | 'entityType'       | [User]
+        base             | 'entityMapper'     | [EntityMapper.create(User)]
+        Mock(Repository) | 'entityType'       | [User]
+        Mock(Repository) | 'entityMapper'     | [EntityMapper.create(User)]
     }
 
     @Override
