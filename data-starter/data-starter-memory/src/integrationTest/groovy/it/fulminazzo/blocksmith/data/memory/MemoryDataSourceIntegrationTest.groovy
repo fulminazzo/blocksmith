@@ -16,7 +16,6 @@ class MemoryDataSourceIntegrationTest extends Specification {
         def repository = dataSource.newRepository(
                 User,
                 new MemoryRepositorySettings()
-                        .withTtl(Duration.ofSeconds(1))
                         .withExpirationStrategy(MemoryRepositorySettings.ExpiryStrategy.LAZY)
         )
 
@@ -44,7 +43,6 @@ class MemoryDataSourceIntegrationTest extends Specification {
         def repository = dataSource.newRepository(
                 User,
                 new MemoryRepositorySettings()
-                        .withTtl(Duration.ofSeconds(1))
                         .withExpirationStrategy(MemoryRepositorySettings.ExpiryStrategy.SCHEDULED)
         )
 

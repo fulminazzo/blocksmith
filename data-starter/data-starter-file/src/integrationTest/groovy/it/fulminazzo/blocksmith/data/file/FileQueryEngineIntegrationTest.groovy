@@ -66,6 +66,14 @@ class FileQueryEngineIntegrationTest extends Specification {
         actual.sort() == expected.sort()
     }
 
+    def 'test that getFiles does not throw if directory not existing'() {
+        given:
+        WORKING_DIR.deleteDir()
+
+        expect:
+        engine.files == []
+    }
+
     def 'test that getDataFile creates directory if not existing'() {
         given:
         WORKING_DIR.deleteDir()

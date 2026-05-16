@@ -6,12 +6,12 @@ import spock.lang.Specification
 
 class RedisDataSourceFactoryIntegrationTest extends Specification implements RedisIntegrationTest {
 
-    def 'test build with #database'() {
+    def 'test build with clientName=#clientName and database#database'() {
         given:
         def config = new RedisDataSourceConfig()
                 .setHost(serverHost)
                 .setPort(serverPort)
-                .setClientName(ProjectInfo.PROJECT_NAME)
+                .setClientName(clientName)
                 .setSsl(false)
                 .setDatabase(database)
 
@@ -25,7 +25,26 @@ class RedisDataSourceFactoryIntegrationTest extends Specification implements Red
         dataSource?.close()
 
         where:
-        database << [null, 0]
+        database | clientName
+        null     | null
+        0        | null
+        null     | ProjectInfo.PROJECT_NAME
+        0        | ProjectInfo.PROJECT_NAME
+    }
+
+    /**
+     * These tests are purely for coverage purposes.
+     * Although, they ensure that if the port has not been specified, the default one is used.
+     */
+    def 'test build with unspecified port'() {
+        given:
+        def config = new RedisDataSourceConfig().setHost(serverHost).setPort(null)
+
+        when:
+        new RedisDataSourceFactory().build(config)
+
+        then:
+        thrown(io.lettuce.core.RedisConnectionException)
     }
 
 }

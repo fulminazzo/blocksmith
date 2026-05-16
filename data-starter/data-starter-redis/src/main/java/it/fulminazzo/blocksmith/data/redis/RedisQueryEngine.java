@@ -10,7 +10,6 @@ import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -131,9 +130,9 @@ public final class RedisQueryEngine<T, I> implements QueryEngine<T, I> {
     private @NotNull CompletableFuture<Collection<String>> scanAllKeys(
             final @NotNull RedisAsyncCommands<String, String> async,
             final @NotNull List<String> keys,
-            final @Nullable ScanCursor cursor
+            final @NotNull ScanCursor cursor
     ) {
-        return (cursor == null ? async.scan() : async.scan(cursor))
+        return async.scan(cursor)
                 .toCompletableFuture()
                 .thenCompose(c -> {
                     keys.addAll(c.getKeys());

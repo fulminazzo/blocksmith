@@ -11,6 +11,8 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 class RedisQueryEngineIntegrationTest extends Specification implements RedisIntegrationTest {
+    private static final int ENTITY_COUNT = 50
+
     private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
     @Shared
@@ -42,6 +44,7 @@ class RedisQueryEngineIntegrationTest extends Specification implements RedisInte
     }
 
     void cleanupSpec() {
+        connection?.sync()?.del((1..ENTITY_COUNT).collect { "database:users:$it".toString() }.toArray())
         connection?.close()
         client?.shutdown()
     }
@@ -67,6 +70,25 @@ class RedisQueryEngineIntegrationTest extends Specification implements RedisInte
     def 'test that getAllKeys returns all keys'() {
         given:
         def expected = [Users.SAVED1, Users.SAVED2].collect { "database:users:$it.id" }
+
+        when:
+        def actual = engine.allKeys.get()
+
+        then:
+        actual.sort() == expected.sort()
+    }
+
+    def 'test getAllKeys of a big amount of keys'() {
+        given:
+        def entities = (1..ENTITY_COUNT).collect { new User(it, "User#$it", 18 + it) }
+        connection.async().mset(
+                entities.collectEntries {
+                    [("database:users:$it.id".toString()) : MAPPER.serialize(it)]
+                }
+        ).get()
+
+        and:
+        def expected = entities.collect { "database:users:$it.id" }
 
         when:
         def actual = engine.allKeys.get()

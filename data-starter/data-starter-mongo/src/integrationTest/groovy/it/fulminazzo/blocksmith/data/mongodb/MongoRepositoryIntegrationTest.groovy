@@ -7,6 +7,7 @@ import com.mongodb.reactivestreams.client.MongoClients
 import com.mongodb.reactivestreams.client.MongoCollection
 import it.fulminazzo.blocksmith.data.RepositoryIntegrationTest
 import it.fulminazzo.blocksmith.data.User
+import it.fulminazzo.blocksmith.data.Users
 import it.fulminazzo.blocksmith.data.entity.EntityMapper
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.pojo.PojoCodecProvider
@@ -43,6 +44,30 @@ class MongoRepositoryIntegrationTest extends RepositoryIntegrationTest<MongoRepo
 
     void cleanupSpec() {
         client?.close()
+    }
+
+    def 'test save-find cycle of entity with id field name different from "id"'() {
+        given:
+        def repository = new MongoRepository<User, String>(
+                new MongoQueryEngine<>(collection),
+                EntityMapper.create(User, 'username')
+        )
+
+        and:
+        final entity = Users.NEW1
+
+        when:
+        def saved = repository.save(entity).get()
+
+        then:
+        saved == entity
+
+        when:
+        def actual = repository.findById(entity.username).get()
+
+        then:
+        actual.present
+        actual.get() == entity
     }
 
     @Override

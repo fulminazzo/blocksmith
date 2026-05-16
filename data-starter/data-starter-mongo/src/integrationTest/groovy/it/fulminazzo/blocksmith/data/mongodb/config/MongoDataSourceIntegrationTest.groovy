@@ -19,6 +19,9 @@ class MongoDataSourceIntegrationTest extends Specification implements MongoInteg
         config << [
                 new MongoDataSourceConfig()
                         .setHost(serverHost)
+                        .setPort(null),
+                new MongoDataSourceConfig()
+                        .setHost(serverHost)
                         .setPort(serverPort),
                 new MongoDataSourceConfig()
                         .setHost(serverHost)
@@ -40,6 +43,17 @@ class MongoDataSourceIntegrationTest extends Specification implements MongoInteg
                                 new MongoDataSourceConfig.MongoCredentialConfig()
                                         .setUsername('root')
                                         .setPassword('test')
+                                        .setAuthSource(null)
+                                        .setMechanism(null)
+                        ),
+                new MongoDataSourceConfig()
+                        .setHost(serverHost)
+                        .setPort(serverPort)
+                        .setCredentials(
+                                new MongoDataSourceConfig.MongoCredentialConfig()
+                                        .setUsername('root')
+                                        .setPassword('test')
+                                        .setAuthSource('admin')
                                         .setMechanism('SCRAM_SHA_256')
                         )
         ]

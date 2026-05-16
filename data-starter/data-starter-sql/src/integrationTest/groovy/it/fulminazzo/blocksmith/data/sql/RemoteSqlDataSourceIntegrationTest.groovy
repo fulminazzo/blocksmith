@@ -8,6 +8,7 @@ abstract class RemoteSqlDataSourceIntegrationTest extends SqlDataSourceIntegrati
     protected <B extends ASqlDataSourceBuilder<B>> B newDataSourceBuilderImpl() {
         return SqlDataSource.builder()
                 .databaseType(databaseType)
+                .port(null)
                 .host(testHelper.serverHost)
                 .port(testHelper.serverPort)
     }
