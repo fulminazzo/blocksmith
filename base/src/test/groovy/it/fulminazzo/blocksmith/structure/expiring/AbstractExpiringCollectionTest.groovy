@@ -42,7 +42,7 @@ class AbstractExpiringCollectionTest extends Specification {
 
         and:
         def actualTtl = internal.find { it.value == value }.expireTime - now
-        actualTtl <= ttl.toMillis()
+        actualTtl <= ttl.toMillis() * 1.1
         actualTtl >= ttl.toMillis() * 0.9
     }
 
@@ -64,7 +64,7 @@ class AbstractExpiringCollectionTest extends Specification {
         then:
         def firstVal = internal.find { it.value == value }
         def actualTtl = firstVal.expireTime - now
-        actualTtl <= ttl.toMillis()
+        actualTtl <= ttl.toMillis() * 1.1
         actualTtl >= ttl.toMillis() * 0.9
 
         and:

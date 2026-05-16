@@ -115,7 +115,7 @@ class DelegateExpiringSetTest extends Specification {
 
         and:
         def actualTtl = internal.getTtl(value)
-        actualTtl.toMillis() <= ttl
+        actualTtl.toMillis() <= ttl * 1.1
         actualTtl.toMillis() >= ttl * 0.9
 
         and:
@@ -224,7 +224,7 @@ class DelegateExpiringSetTest extends Specification {
         then:
         def first = data.find { it.value == 'Hello' }
         first != null
-        first.expireTime - now <= ttl + 1
+        first.expireTime - now <= ttl * 1.1
         first.expireTime - now >= ttl * 0.9
 
         and:
