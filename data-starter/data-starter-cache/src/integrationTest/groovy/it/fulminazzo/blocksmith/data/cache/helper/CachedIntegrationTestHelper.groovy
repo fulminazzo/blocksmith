@@ -1,20 +1,12 @@
 package it.fulminazzo.blocksmith.data.cache.helper
 
-import it.fulminazzo.blocksmith.data.CacheRepository
-import it.fulminazzo.blocksmith.data.Repository
-import it.fulminazzo.blocksmith.data.RepositoryDataSource
-import it.fulminazzo.blocksmith.data.RepositorySettings
-import it.fulminazzo.blocksmith.data.User
+import it.fulminazzo.blocksmith.data.*
 import it.fulminazzo.blocksmith.data.redis.RedisDataSource
 import it.fulminazzo.blocksmith.data.redis.RedisRepositorySettings
 import it.fulminazzo.blocksmith.data.sql.DatabaseType
 import it.fulminazzo.blocksmith.data.sql.SqlDataSource
 import it.fulminazzo.blocksmith.data.sql.SqlRepositorySettings
-import org.jooq.DSLContext
-import org.jooq.Record
-import org.jooq.SQLDialect
-import org.jooq.Table
-import org.jooq.TableField
+import org.jooq.*
 import org.jooq.impl.SQLDataType
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.JdbcDatabaseContainer
@@ -73,22 +65,24 @@ final class CachedIntegrationTestHelper implements Closeable {
     }
 
     CacheRepository<User, Long> getCacheRepository() {
-        return cacheDataSource.newRepository(
-                User,
-                new RedisRepositorySettings()
-                        .withDatabaseName('test')
-                        .withCollectionName('users')
-                        .withTtl(Duration.ofMinutes(1L))
-        )
+        return cacheDataSource.newRepository(User, cacheSettings)
+    }
+
+    CacheRepositorySettings getCacheSettings() {
+        return new RedisRepositorySettings()
+                .withDatabaseName('test')
+                .withCollectionName('users')
+                .withTtl(Duration.ofMinutes(1L))
     }
 
     Repository<User, Long> getBaseRepository() {
-        return baseDataSource.newRepository(
-                User,
-                new SqlRepositorySettings()
-                        .withTable(table)
-                        .withIdColumn(column)
-        )
+        return baseDataSource.newRepository(User, baseSettings)
+    }
+
+    RepositorySettings getBaseSettings() {
+        return new SqlRepositorySettings()
+                .withTable(table)
+                .withIdColumn(column)
     }
 
     @SuppressWarnings('PublicMethodsBeforeNonPublicMethods')
