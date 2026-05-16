@@ -8,7 +8,6 @@ import it.fulminazzo.blocksmith.validation.annotation.*;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
@@ -24,8 +23,8 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@With
 public final class SqlDataSourceConfig implements DataSourceConfig {
 
     static {
@@ -36,12 +35,10 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     }
 
     @NonNull(exceptionMessage = "'database type' must be declared")
-    @NotNull
     DatabaseType databaseType;
 
     @NonNull(exceptionMessage = "'database name' must not be empty")
     @NotEmpty(exceptionMessage = "'database name' must not be empty")
-    @NotNull
     String database;
 
     @Nullable
@@ -75,8 +72,6 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     Long maxLifeTime;
 
-    @NotNull
-    @Builder.Default
     Map<String, Object> properties = new HashMap<>();
 
     /*
@@ -96,17 +91,13 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     String schemaName;
 
-    @Builder.Default
-    @NotNull
     Map<String, Object> parameters = new HashMap<>();
 
     /*
      * SqliteDataSource
      */
 
-    @NotNull
-    @Builder.Default
-    ConnectionMode connectionMode = ConnectionMode.builder().build();
+    ConnectionMode connectionMode = new ConnectionMode();
 
     /**
      * Defines the connection mode type.
@@ -121,12 +112,10 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
     @FieldDefaults(level = AccessLevel.PRIVATE)
+    @With
     public static class ConnectionMode {
 
-        @NotNull
-        @Builder.Default
         ConnectionModeType type = ConnectionModeType.MEMORY;
 
         @Nullable

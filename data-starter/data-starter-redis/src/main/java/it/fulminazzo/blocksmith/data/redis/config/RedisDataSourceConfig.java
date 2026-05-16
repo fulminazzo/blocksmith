@@ -9,7 +9,6 @@ import it.fulminazzo.blocksmith.validation.annotation.Port;
 import it.fulminazzo.blocksmith.validation.annotation.PositiveOrZero;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
@@ -22,8 +21,8 @@ import org.jetbrains.annotations.Range;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@With
 public final class RedisDataSourceConfig implements DataSourceConfig {
 
     static {
@@ -34,25 +33,21 @@ public final class RedisDataSourceConfig implements DataSourceConfig {
     }
 
     @NonNull(exceptionMessage = "'host' must be declared")
-    @NotNull
     String host;
 
     @Port
     @Range(from = 1, to = 65535)
     @Nullable
-    @Builder.Default
     Integer port = RedisURI.DEFAULT_REDIS_PORT;
 
     @PositiveOrZero(exceptionMessage = "'database number' must be at least 0")
     @Nullable
-    @Builder.Default
     Integer database = 0;
 
     @Nullable
     String clientName;
 
     @Nullable
-    @Builder.Default
     Boolean ssl = false;
 
 }

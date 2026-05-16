@@ -9,7 +9,6 @@ import it.fulminazzo.blocksmith.data.memory.MemoryDataSource;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -21,8 +20,8 @@ import org.jetbrains.annotations.Nullable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@With
 public final class CachedDataSourceConfig implements DataSourceConfig {
 
     static {
@@ -43,11 +42,9 @@ public final class CachedDataSourceConfig implements DataSourceConfig {
         );
     }
 
-    @NotNull
     @NonNull
     DataSourceConfig cache;
 
-    @NotNull
     @NonNull
     DataSourceConfig repository;
 

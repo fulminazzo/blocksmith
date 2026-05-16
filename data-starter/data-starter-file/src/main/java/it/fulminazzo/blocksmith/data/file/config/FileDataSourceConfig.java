@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import it.fulminazzo.blocksmith.data.file.FileDataSource;
 import lombok.Value;
+import lombok.With;
 
 import java.util.concurrent.Executors;
 
@@ -14,6 +15,7 @@ import java.util.concurrent.Executors;
  * @see FileDataSource
  */
 @Value
+@With
 public class FileDataSourceConfig implements DataSourceConfig {
 
     static {
