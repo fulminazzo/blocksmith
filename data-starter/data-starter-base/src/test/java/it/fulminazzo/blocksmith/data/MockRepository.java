@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.Cat;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -14,13 +15,19 @@ import java.util.stream.Collectors;
 /**
  * Mock {@link Repository} for testing purposes.
  */
-public final class MockRepository extends AbstractRepository<Cat, String, MockQueryEngine> {
+public final class MockRepository extends AbstractRepository<Cat, String, MockQueryEngine>
+        implements CacheRepository<Cat, String> {
 
     /**
      * Instantiates a new Mock repository.
      */
     public MockRepository() {
         super(new MockQueryEngine(), EntityMapper.create(Cat.class, "name"));
+    }
+
+    @Override
+    public @NotNull MockRepository ttl(final @NotNull Duration expiry) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

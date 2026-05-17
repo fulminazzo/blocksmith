@@ -9,15 +9,15 @@ import org.jspecify.annotations.NonNull;
  *
  * @see MockRepository
  */
-public final class MockDataSource implements RepositoryDataSource<MockRepositorySettings> {
+public final class MockDataSource implements CacheRepositoryDataSource<MockRepositorySettings> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public @NotNull <T, I> Repository<T, I> newRepository(
+    public @NotNull <T, I> CacheRepository<T, I> newRepository(
             final @NotNull EntityMapper<T, I> entityMapper,
             final @NonNull MockRepositorySettings settings
     ) {
-        return (Repository<T, I>) new MockRepository();
+        return (CacheRepository<T, I>) new MockRepository();
     }
 
     @Override

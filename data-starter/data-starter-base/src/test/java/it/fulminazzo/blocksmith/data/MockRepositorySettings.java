@@ -5,5 +5,6 @@ package it.fulminazzo.blocksmith.data;
  *
  * @see MockDataSource
  */
-public class MockRepositorySettings extends RepositorySettings {
+public class MockRepositorySettings extends CacheRepositorySettings<MockRepositorySettings> {
+
 }
