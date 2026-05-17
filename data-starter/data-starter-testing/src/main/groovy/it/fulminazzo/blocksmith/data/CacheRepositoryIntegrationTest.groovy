@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.data
 
 import java.time.Duration
 
+@SuppressWarnings('AbstractClassWithoutAbstractMethod')
 abstract class CacheRepositoryIntegrationTest<R extends CacheRepository<User, Long>> extends RepositoryIntegrationTest<R> {
     private static final long TTL = 2_000
 
