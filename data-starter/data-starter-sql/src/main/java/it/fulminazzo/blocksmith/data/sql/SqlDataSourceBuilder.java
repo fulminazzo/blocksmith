@@ -66,9 +66,9 @@ import org.jooq.SQLDialect;
 public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSourceBuilder> {
     private static final int MAXIMUM_POOL_SIZE = 20;
     private static final int MINIMUM_IDLE = 5;
-    private static final long CONNECTION_TIMEOUT = 30 * 1000;
-    private static final long IDLE_TIMEOUT = 10 * 60 * 1000;
-    private static final long MAX_LIFE_TIME = 30 * 60 * 1000;
+    private static final long CONNECTION_TIMEOUT = 30 * 1000L;
+    private static final long IDLE_TIMEOUT = 10 * 60 * 1000L;
+    private static final long MAX_LIFE_TIME = 30 * 60 * 1000L;
 
     /**
      * Instantiates a new SQL data source builder.

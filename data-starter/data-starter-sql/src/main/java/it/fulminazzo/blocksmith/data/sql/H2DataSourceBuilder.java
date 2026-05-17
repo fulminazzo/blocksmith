@@ -226,10 +226,10 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
 
     @Override
     protected @NotNull String getJdbcUrl() {
-        String schemaName = this.schemaName;
-        if (schemaName == null) schemaName = getDatabase();
-        setParameters(INITIAL_SETUP_KEY, "CREATE SCHEMA IF NOT EXISTS " + schemaName);
-        setParameters(INITIAL_SETUP_KEY, "SET SCHEMA " + schemaName);
+        String actualSchemaName = this.schemaName;
+        if (actualSchemaName == null) actualSchemaName = getDatabase();
+        setParameters(INITIAL_SETUP_KEY, "CREATE SCHEMA IF NOT EXISTS " + actualSchemaName);
+        setParameters(INITIAL_SETUP_KEY, "SET SCHEMA " + actualSchemaName);
         return String.format("jdbc:h2:%s",
                 Objects.requireNonNull(connectionMode, "The connection mode has not been specified yet. "
                         + "Please choose between memory, disk or server before building")

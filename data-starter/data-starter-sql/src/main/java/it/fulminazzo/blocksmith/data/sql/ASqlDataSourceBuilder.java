@@ -231,11 +231,11 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>>
     public @NotNull SqlDataSource build() {
         config.setJdbcUrl(getJdbcUrl());
         SQLDialect sqlDialect = getSQLDialect();
-        ExecutorService executor = Objects.requireNonNull(
+        ExecutorService actualExecutor = Objects.requireNonNull(
                 this.executor,
                 "executor has not been specified yet"
         );
-        return new SqlDataSource(new HikariDataSource(config), sqlDialect, executor);
+        return new SqlDataSource(new HikariDataSource(config), sqlDialect, actualExecutor);
     }
 
 }
