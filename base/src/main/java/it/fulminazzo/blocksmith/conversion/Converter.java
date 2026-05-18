@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <T> the type to convert from
  * @param <R> the type to convert to
+ * @see Convertible
  */
 @FunctionalInterface
 public interface Converter<T, R> {

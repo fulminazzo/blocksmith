@@ -9,8 +9,12 @@ import java.util.Collection;
 /**
  * An expiring collection is a special {@link Collection} whose elements are subject to expiration.
  * Each can be defined with a time-to-live (TTL) period after which they will not be present anymore.
+ * <br>
+ * If an element is saved with a TTL of {@link Long#MAX_VALUE}, it will never expire.
  *
  * @param <E> the type of the elements
+ * @see ExpiringList
+ * @see ExpiringSet
  */
 public interface ExpiringCollection<E> extends Collection<E> {
 

@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Collection of utilities to work with maps.
+ * A collection of utilities to work with maps.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MapUtils {
