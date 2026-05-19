@@ -18,7 +18,66 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * The registry of validators used to validate objects.
+ * A registry for collecting all {@link Constraint} annotations and their validation logic.
+ * <br>
+ * Consider the following class:
+ * <pre>{@code
+ * class User {
+ *     @NonNull @Alphabetical String name;
+ *     @NonNull @Positive Integer age
+ *
+ *     void setName(@NonNull @Alphabetical String name) {
+ *         this.name = name;
+ *     }
+ *
+ * }
+ * }</pre>
+ * It is possible to validate several elements:
+ * <ul>
+ *     <li>general <b>objects</b> (validating their <b>internal fields</b>):
+ *     <pre>{@code
+ *     String name = ...;
+ *     Integer age = ...;
+ *     User user = new User(name, age);
+ *     try {
+ *         Validator.validate(user);
+ *     } catch (ViolationException e) {
+ *         // if any violation occurred
+ *     }
+ *     }</pre>
+ *     </li>
+ *     <li><b>fields</b>:
+ *     <pre>{@code
+ *     Field field = User.class.getDeclaredField("name");
+ *     Object value = ...; // the value of the field
+ *     try {
+ *         Validator.validateField(field, value);
+ *     } catch (ViolationException e) {
+ *         // if any violation occurred
+ *     }
+ *     }</pre>
+ *     This is what {@link Validator#validate(Object)} does internally.
+ *     <li><b>parameters of methods</b>:
+ *     <pre>{@code
+ *     Method method = User.class.getDeclaredMethod("setName", String.class);
+ *     Object value = ...; // the value to pass to the method
+ *     try {
+ *         // A value for each parameter MUST be specified
+ *         Validator.validateMethod(method, value);
+ *     } catch (ViolationException e) {
+ *         // if any violation occurred
+ *     }
+ *     }</pre>
+ *     This can even be done automatically by modifying the method declaration:
+ *     <pre>{@code
+ *     void setName(@NonNull @Alphabetical String name) {
+ *         Validator.validateMethod(name); // ALL parameters required
+ *         // rest of logic
+ *     }
+ *     }</pre>
+ *     </li>
+ *     </li>
+ * </ul>
  *
  * @see Constraint
  */

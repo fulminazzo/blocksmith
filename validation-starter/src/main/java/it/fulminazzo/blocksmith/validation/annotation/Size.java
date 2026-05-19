@@ -13,6 +13,13 @@ import java.lang.annotation.*;
  * or {@code size()} method.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@Size(min = 1, max = 10) List<String> items) {
+ *     // items must have between 1 and 10 elements (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

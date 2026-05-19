@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a {@link CharSequence} parameter or type only made of alphabet characters or digits.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@AlphabeticalOrDigit String code) {
+ *     // code must only contain letters or digits (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a {@link CharSequence} parameter or type that must not be empty.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@NotEmpty String value) {
+ *     // value must not be empty (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

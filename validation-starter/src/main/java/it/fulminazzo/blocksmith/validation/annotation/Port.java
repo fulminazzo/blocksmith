@@ -12,6 +12,13 @@ import java.lang.annotation.*;
  * Accepts {@code null} values.
  * <br>
  * <b>WARNING</b>: does not support {@code 0} as port.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@Port int port) {
+ *     // port must be a valid networking port (between 1 and 65535, or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

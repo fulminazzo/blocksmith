@@ -19,6 +19,13 @@ import java.lang.annotation.*;
  * </ul>
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@AfterOrNow LocalDate date) {
+ *     // date must be now or in the future (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

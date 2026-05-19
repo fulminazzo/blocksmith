@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a {@link CharSequence} parameter or type that must match the given regular expression.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@Matches("[0-9]{4}") String pin) {
+ *     // pin must match the given regex (or null)
+ * }
+ * }</pre>
  */
 @Constraint
 @Documented

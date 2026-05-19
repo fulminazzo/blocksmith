@@ -12,6 +12,18 @@ import java.lang.annotation.*;
  * Also supports {@link java.time.Duration}, where the milliseconds are compared.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@Max(100) int percentage) {
+ *     // percentage must be at most 100 (or null)
+ * }
+ * }</pre>
+ * <pre>{@code
+ * void function(@Max(5000) Duration timeout) {
+ *     // timeout must be at most 5000 milliseconds (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull
