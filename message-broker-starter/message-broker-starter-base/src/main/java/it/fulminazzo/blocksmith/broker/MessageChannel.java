@@ -11,23 +11,12 @@ import java.util.function.Function;
 
 /**
  * A general channel for handling messaging across servers.
+ *
+ * @see AbstractMessageChannel
+ * @see MessageChannelSettings
+ * @see MessageBroker
  */
 public interface MessageChannel extends Closeable {
-
-    /**
-     * Sends a message to the channel.
-     * Then, awaits for the response and returns it.
-     *
-     * @param <T>          the type of the payload
-     * @param <R>          the type of the response
-     * @param payload      the payload to send
-     * @param responseType the type of the response
-     * @param timeout      the timeout after which the task will fail
-     * @return the response
-     */
-    <T, R> @NotNull CompletableFuture<R> sendAndReceive(final @NotNull T payload,
-                                                        final @NotNull Class<R> responseType,
-                                                        final @NotNull Duration timeout);
 
     /**
      * Sends a message to the channel.
@@ -40,19 +29,28 @@ public interface MessageChannel extends Closeable {
      * @param timeout      the timeout after which the task will fail (in milliseconds)
      * @return the response
      */
-    <T, R> @NotNull CompletableFuture<R> sendAndReceive(final @NotNull T payload,
-                                                        final @NotNull Class<R> responseType,
-                                                        final long timeout);
+    <T, R> @NotNull CompletableFuture<R> sendAndReceive(
+            final @NotNull T payload,
+            final @NotNull Class<R> responseType,
+            final long timeout
+    );
 
     /**
      * Sends a message to the channel.
      * Then, awaits for the response and returns it.
      *
-     * @param payload the payload to send
-     * @param timeout the timeout after which the task will fail
+     * @param <T>          the type of the payload
+     * @param <R>          the type of the response
+     * @param payload      the payload to send
+     * @param responseType the type of the response
+     * @param timeout      the timeout after which the task will fail
      * @return the response
      */
-    @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final @NotNull Duration timeout);
+    <T, R> @NotNull CompletableFuture<R> sendAndReceive(
+            final @NotNull T payload,
+            final @NotNull Class<R> responseType,
+            final @NotNull Duration timeout
+    );
 
     /**
      * Sends a message to the channel.
@@ -63,6 +61,19 @@ public interface MessageChannel extends Closeable {
      * @return the response
      */
     @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final long timeout);
+
+    /**
+     * Sends a message to the channel.
+     * Then, awaits for the response and returns it.
+     *
+     * @param payload the payload to send
+     * @param timeout the timeout after which the task will fail
+     * @return the response
+     */
+    @NotNull CompletableFuture<String> sendAndReceiveRaw(
+            final @NotNull String payload,
+            final @NotNull Duration timeout
+    );
 
     /**
      * Sends a message to the channel.

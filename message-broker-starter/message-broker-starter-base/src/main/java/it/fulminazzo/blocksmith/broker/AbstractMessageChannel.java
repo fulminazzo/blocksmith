@@ -22,9 +22,16 @@ import java.util.function.Function;
  * and support methods.
  *
  * @param <E> the type of the {@link MessageQueryEngine} responsible for executing internal interactions
+ * @see MessageChannel
+ * @see MessageQueryEngine
  */
 public abstract class AbstractMessageChannel<E extends MessageQueryEngine> implements MessageChannel {
     private static final long SELF_ECHO_TIMEOUT = 10_000;
+
+    /**
+     * The Query engine.
+     */
+    protected final @NotNull E queryEngine;
 
     private final @NotNull Map<UUID, Function<String, String>> messageHandlers = new ConcurrentHashMap<>();
     /**
@@ -35,11 +42,6 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
      * Identifies the messages sent by us. To prevent self-echoing.
      */
     private final @NotNull ExpiringSet<UUID> sentMessages = ExpiringSet.lazy();
-
-    /**
-     * The Query engine.
-     */
-    protected final @NotNull E queryEngine;
     private final @NotNull Mapper mapper;
 
     @Getter
@@ -51,31 +53,66 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
      * @param queryEngine the query engine
      * @param mapper      the mapper
      */
-    protected AbstractMessageChannel(final @NotNull E queryEngine,
-                                     final @NotNull Mapper mapper) {
+    protected AbstractMessageChannel(
+            final @NotNull E queryEngine,
+            final @NotNull Mapper mapper
+    ) {
         this.queryEngine = queryEngine;
         this.mapper = mapper;
         queryEngine.listen(this::handleMessage);
     }
 
-    @Override
-    public @NotNull <T, R> CompletableFuture<R> sendAndReceive(final @NotNull T payload,
-                                                               final @NotNull Class<R> responseType,
-                                                               final @NotNull Duration timeout) {
-        return sendAndReceive(payload, responseType, timeout.toMillis());
+    /**
+     * Handles an incoming message with all the listening message handlers.
+     *
+     * @param message the message
+     */
+    protected void handleMessage(final @NotNull String message) {
+        try {
+            NetworkMessage networkMessage = mapper.deserialize(message, NetworkMessage.class);
+            if (sentMessages.remove(networkMessage.getId())) return;
+            UUID conversationId = networkMessage.getConversationId();
+            if (pendingResponses.containsKey(conversationId)) {
+                CompletableFuture<String> future = pendingResponses.get(conversationId);
+                future.complete(networkMessage.getMessage());
+                return;
+            }
+            for (Function<String, String> handler : messageHandlers.values()) {
+                String response = handler.apply(networkMessage.getMessage());
+                if (response != null)
+                    sendRaw(new NetworkMessage(UUID.randomUUID(), conversationId, response));
+            }
+        } catch (MapperException e) {
+            // provide support for messages not sent through blocksmith
+            for (Function<String, String> handler : messageHandlers.values()) {
+                String response = handler.apply(message);
+                if (response != null) sendRaw(response);
+            }
+        }
+    }
+
+    private @NotNull CompletableFuture<Void> sendRaw(final @NotNull NetworkMessage message) {
+        sentMessages.add(message.getId(), SELF_ECHO_TIMEOUT);
+        return queryEngine.publish(mapper.serialize(message));
     }
 
     @Override
-    public @NotNull <T, R> CompletableFuture<R> sendAndReceive(final @NotNull T payload,
-                                                               final @NotNull Class<R> responseType,
-                                                               final long timeout) {
+    public @NotNull <T, R> CompletableFuture<R> sendAndReceive(
+            final @NotNull T payload,
+            final @NotNull Class<R> responseType,
+            final long timeout
+    ) {
         return sendAndReceiveRaw(mapper.serialize(payload), timeout)
                 .thenApply(r -> mapper.deserialize(r, responseType));
     }
 
     @Override
-    public @NotNull CompletableFuture<String> sendAndReceiveRaw(final @NotNull String payload, final @NotNull Duration timeout) {
-        return sendAndReceiveRaw(payload, timeout.toMillis());
+    public @NotNull <T, R> CompletableFuture<R> sendAndReceive(
+            final @NotNull T payload,
+            final @NotNull Class<R> responseType,
+            final @NotNull Duration timeout
+    ) {
+        return sendAndReceive(payload, responseType, timeout.toMillis());
     }
 
     @Override
@@ -86,6 +123,14 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
         return sendRaw(message)
                 .thenCompose(v -> future.orTimeout(timeout, TimeUnit.MILLISECONDS))
                 .whenComplete((r, t) -> pendingResponses.remove(message.getConversationId()));
+    }
+
+    @Override
+    public @NotNull CompletableFuture<String> sendAndReceiveRaw(
+            final @NotNull String payload,
+            final @NotNull Duration timeout
+    ) {
+        return sendAndReceiveRaw(payload, timeout.toMillis());
     }
 
     @Override
@@ -144,44 +189,13 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
     }
 
     /**
-     * Handles an incoming message with all the listening message handlers.
-     *
-     * @param message the message
+     * DTO for a message over the network.
      */
-    protected void handleMessage(final @NotNull String message) {
-        try {
-            NetworkMessage networkMessage = mapper.deserialize(message, NetworkMessage.class);
-            if (sentMessages.remove(networkMessage.getId())) return;
-            UUID conversationId = networkMessage.getConversationId();
-            if (pendingResponses.containsKey(conversationId)) {
-                CompletableFuture<String> future = pendingResponses.get(conversationId);
-                future.complete(networkMessage.getMessage());
-                return;
-            }
-            for (Function<String, String> handler : messageHandlers.values()) {
-                String response = handler.apply(networkMessage.getMessage());
-                if (response != null)
-                    sendRaw(new NetworkMessage(UUID.randomUUID(), conversationId, response));
-            }
-        } catch (MapperException e) {
-            // provide support for messages not sent through blocksmith
-            for (Function<String, String> handler : messageHandlers.values()) {
-                String response = handler.apply(message);
-                if (response != null) sendRaw(response);
-            }
-        }
-    }
-
-    private @NotNull CompletableFuture<Void> sendRaw(final @NotNull NetworkMessage message) {
-        sentMessages.add(message.getId(), SELF_ECHO_TIMEOUT);
-        return queryEngine.publish(mapper.serialize(message));
-    }
-
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @FieldDefaults(level = AccessLevel.PRIVATE)
-    private final static class NetworkMessage {
+    protected static final class NetworkMessage {
         @NotNull UUID id;
         /**
          * The id used to track back the flow of messages between clients.

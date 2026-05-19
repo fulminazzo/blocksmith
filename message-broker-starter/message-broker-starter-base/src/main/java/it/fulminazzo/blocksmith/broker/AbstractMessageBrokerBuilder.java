@@ -10,9 +10,13 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <B> the type of the message broker
  * @param <A> the type of this builder (for method chaining)
+ * @see MessageBrokerBuilder
+ * @see MessageBroker
+ * @see Mapper
  */
 @SuppressWarnings("unchecked")
-public abstract class AbstractMessageBrokerBuilder<B extends MessageBroker<?>, A extends AbstractMessageBrokerBuilder<B, A>>
+public abstract class AbstractMessageBrokerBuilder<B extends MessageBroker<?>, A
+        extends AbstractMessageBrokerBuilder<B, A>>
         implements MessageBrokerBuilder<B> {
     protected @NotNull Mapper mapper = MapperFormat.JSON.newMapper();
 

@@ -12,6 +12,10 @@ import java.io.Closeable;
  * because each backend has different requirements.
  *
  * @param <S> the type of the message channel settings (to build new message channels)
+ * @see MessageBrokerBuilder
+ * @see MessageChannel
+ * @see MessageChannelSettings
+ * @see MessageQueryEngine
  */
 public interface MessageBroker<S extends MessageChannelSettings<S>> extends Closeable {
 

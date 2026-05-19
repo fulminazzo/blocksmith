@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
  * Represents a general builder for a {@link MessageBroker}.
  *
  * @param <B> the type of the message broker
+ * @see MessageBroker
  */
 public interface MessageBrokerBuilder<B extends MessageBroker<?>> {
 

@@ -18,10 +18,10 @@ class AbstractMessageChannelTest extends Specification {
 
     private final data = new Cat('Felix', 7, false)
 
-    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor()
+    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor()
 
-    private AbstractMessageChannel sender = new MockMessageChannel(MAPPER, "abstract-message-test-1", executorService)
-    private AbstractMessageChannel receiver = new MockMessageChannel(MAPPER, "abstract-message-test-2", executorService)
+    private final AbstractMessageChannel sender = new MockMessageChannel(MAPPER, 'abstract-message-test-1', executorService)
+    private final AbstractMessageChannel receiver = new MockMessageChannel(MAPPER, 'abstract-message-test-2', executorService)
 
     void cleanup() {
         executorService.shutdown()
@@ -69,7 +69,7 @@ class AbstractMessageChannelTest extends Specification {
 
         then:
         def queue = MockMessageQueryEngine.getQueue(receiver.name)
-        !queue.isEmpty()
+        !queue.empty
 
         and:
         def raw = queue.poll()
@@ -135,7 +135,7 @@ class AbstractMessageChannelTest extends Specification {
         queue = MockMessageQueryEngine.getQueue(sender.name)
 
         then:
-        !queue.isEmpty()
+        !queue.empty
         def raw = queue.poll()
         def networkMessage = MAPPER.deserialize(raw, AbstractMessageChannel.NetworkMessage)
         networkMessage.conversationId != null
@@ -161,7 +161,7 @@ class AbstractMessageChannelTest extends Specification {
 
         then:
         actual.get() == null
-        !MockMessageQueryEngine.getQueue(receiver.name).isEmpty()
+        !MockMessageQueryEngine.getQueue(receiver.name).empty
     }
 
 }

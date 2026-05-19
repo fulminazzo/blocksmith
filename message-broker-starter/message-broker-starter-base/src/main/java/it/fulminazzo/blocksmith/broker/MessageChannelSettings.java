@@ -9,9 +9,11 @@ import java.util.Objects;
 
 /**
  * Represents a general data holder for message channel settings.
- * Implementation may vary according to message channel type.
+ * Implementation may vary according to the message channel type.
  *
  * @param <S> the type of the settings
+ * @see MessageChannel
+ * @see MessageBroker
  */
 @SuppressWarnings("unchecked")
 @EqualsAndHashCode
@@ -22,14 +24,53 @@ public abstract class MessageChannelSettings<S extends MessageChannelSettings<S>
     private @Nullable MessageChannelType channelType;
     private @Nullable String subchannelName;
 
+    /**
+     * Sets the channel name.
+     *
+     * @param channelName the channel name
+     * @return this object (for method chaining)
+     */
+    public @NotNull S withChannelName(final @NotNull String channelName) {
+        this.channelName = channelName;
+        return (S) this;
+    }
+
+    /**
+     * Sets the channel type to {@link MessageChannelType#BROADCAST}.
+     *
+     * @return this object (for method chaining)
+     */
+    public @NotNull S broadcast() {
+        this.channelType = MessageChannelType.BROADCAST;
+        return (S) this;
+    }
+
+    /**
+     * Sets the channel type to {@link MessageChannelType#DIRECT}.
+     *
+     * @param subchannelName the name of the subchannel
+     * @return this object (for method chaining)
+     */
+    public @NotNull S direct(final @NotNull String subchannelName) {
+        this.channelType = MessageChannelType.DIRECT;
+        this.subchannelName = subchannelName;
+        return (S) this;
+    }
+
+    /**
+     * Gets the channel name.
+     *
+     * @return the channel name
+     */
     public @NotNull String getChannelName() {
         return Objects.requireNonNull(channelName, "channel name has not been specified yet");
     }
 
-    public @NotNull MessageChannelType getChannelType() {
-        return Objects.requireNonNull(channelType, "channel type has not been specified yet");
-    }
-
+    /**
+     * Gets the subchannel name.
+     *
+     * @return the subchannel name
+     */
     public @NotNull String getSubchannelName() {
         return Objects.requireNonNull(
                 subchannelName,
@@ -37,20 +78,13 @@ public abstract class MessageChannelSettings<S extends MessageChannelSettings<S>
         );
     }
 
-    public @NotNull S withChannelName(final @NotNull String channelName) {
-        this.channelName = channelName;
-        return (S) this;
-    }
-
-    public @NotNull S broadcast() {
-        this.channelType = MessageChannelType.BROADCAST;
-        return (S) this;
-    }
-
-    public @NotNull S direct(final @NotNull String subchannelName) {
-        this.channelType = MessageChannelType.DIRECT;
-        this.subchannelName = subchannelName;
-        return (S) this;
+    /**
+     * Gets the channel type.
+     *
+     * @return the channel type
+     */
+    public @NotNull MessageChannelType getChannelType() {
+        return Objects.requireNonNull(channelType, "channel type has not been specified yet");
     }
 
 }

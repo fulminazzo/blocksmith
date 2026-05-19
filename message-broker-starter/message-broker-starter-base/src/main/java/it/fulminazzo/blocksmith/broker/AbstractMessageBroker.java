@@ -11,6 +11,9 @@ import java.util.List;
  * Provides support for registering and automatically closing channels from this broker.
  *
  * @param <S> the type of the channel settings
+ * @see MessageBroker
+ * @see MessageChannel
+ * @see MessageChannelSettings
  */
 public abstract class AbstractMessageBroker<S extends MessageChannelSettings<S>> implements MessageBroker<S> {
     private final @NotNull List<MessageChannel> registeredChannels = new ArrayList<>();

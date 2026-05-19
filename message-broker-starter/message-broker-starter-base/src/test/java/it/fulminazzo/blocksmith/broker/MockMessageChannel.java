@@ -7,7 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * Test message channel with handling of messages through internal static map.
+ * Test message channel with handling of messages through an internal static map.
+ *
+ * @see MockMessageQueryEngine
  */
 public final class MockMessageChannel extends AbstractMessageChannel<MockMessageQueryEngine> {
     @Getter
@@ -21,9 +23,11 @@ public final class MockMessageChannel extends AbstractMessageChannel<MockMessage
      * @param name            the name
      * @param executorService the executor service
      */
-    public MockMessageChannel(final @NotNull Mapper mapper,
-                              final @NotNull String name,
-                              final @NotNull ScheduledExecutorService executorService) {
+    public MockMessageChannel(
+            final @NotNull Mapper mapper,
+            final @NotNull String name,
+            final @NotNull ScheduledExecutorService executorService
+    ) {
         super(new MockMessageQueryEngine(name, executorService), mapper);
         this.name = name;
     }

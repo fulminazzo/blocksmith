@@ -24,7 +24,7 @@ class AbstractMessageBrokerTest extends Specification {
         def second = new MockMessageChannel(MAPPER, 'second', SERVICE)
 
         and:
-        List<MessageChannel> channels = getRegisteredChannels()
+        List<MessageChannel> channels = registeredChannels
 
         when:
         broker.registerChannel(first)
@@ -49,7 +49,7 @@ class AbstractMessageBrokerTest extends Specification {
         def second = new MockMessageChannel(MAPPER, 'second', SERVICE)
 
         and:
-        List<MessageChannel> channels = getRegisteredChannels()
+        List<MessageChannel> channels = registeredChannels
 
         and:
         channels.add(first)
@@ -65,7 +65,7 @@ class AbstractMessageBrokerTest extends Specification {
     }
 
     private List<MessageChannel> getRegisteredChannels() {
-        Reflect.on(broker)['registeredChannels'].get()
+        return Reflect.on(broker)['registeredChannels'].get()
     }
 
 }

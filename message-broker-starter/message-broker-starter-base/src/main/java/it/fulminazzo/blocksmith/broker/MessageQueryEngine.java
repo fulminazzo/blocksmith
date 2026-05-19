@@ -14,6 +14,10 @@ import java.util.function.Consumer;
  * A MessageQueryEngine encapsulates all backend-specific resources and operations needed
  * to interact with a particular message broker system.
  * Each backend implements this interface with its own specific methods and resources.
+ *
+ * @see MessageChannel
+ * @see AbstractMessageChannel
+ * @see MessageBroker
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class MessageQueryEngine implements Closeable {

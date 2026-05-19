@@ -7,13 +7,29 @@ import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
+/**
+ * Mock implementation of {@link MessageQueryEngine} for {@link MockMessageChannel}.
+ *
+ * @see MockMessageChannel
+ */
 public final class MockMessageQueryEngine extends MessageQueryEngine {
+    /**
+     * The Messages.
+     */
     static final @NotNull Map<String, Queue<String>> MESSAGES = new ConcurrentHashMap<>();
 
     private final @NotNull ScheduledExecutorService executorService;
 
-    public MockMessageQueryEngine(final @NotNull String channelName,
-                                  final @NotNull ScheduledExecutorService executorService) {
+    /**
+     * Instantiates a new Mock message query engine.
+     *
+     * @param channelName     the channel name
+     * @param executorService the executor service
+     */
+    public MockMessageQueryEngine(
+            final @NotNull String channelName,
+            final @NotNull ScheduledExecutorService executorService
+    ) {
         super(channelName);
         this.executorService = executorService;
     }
@@ -46,6 +62,12 @@ public final class MockMessageQueryEngine extends MessageQueryEngine {
         MockMessageQueryEngine.MESSAGES.remove(channelName);
     }
 
+    /**
+     * Gets the queue with the given name.
+     *
+     * @param name the name
+     * @return the queue
+     */
     public static @NotNull Queue<String> getQueue(final @NotNull String name) {
         return MESSAGES.computeIfAbsent(name, _ -> new ConcurrentLinkedQueue<>());
     }
