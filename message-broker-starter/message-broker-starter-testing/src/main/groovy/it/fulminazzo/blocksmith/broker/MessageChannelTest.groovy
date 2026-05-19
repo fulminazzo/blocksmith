@@ -13,14 +13,17 @@ abstract class MessageChannelTest extends Specification {
 
     protected static final int SLEEP_TIME = 125
 
+    protected MessageChannelIntegrationTestHelper helper
     protected MessageChannel channel
 
     void setupChannel() {
+        helper = newTestHelper().start()
         channel = initializeChannel()
     }
 
     void clearData() {
-        channel.close()
+        channel?.close()
+        helper?.close()
     }
 
     def 'test that sending of MESSAGE1 returns MESSAGE2'() {
@@ -100,19 +103,25 @@ abstract class MessageChannelTest extends Specification {
 
     abstract MessageChannel initializeChannel()
 
+    abstract MessageChannelIntegrationTestHelper newTestHelper()
+
     /**
      * Checks if a message with the given id has been received.
      *
      * @param id the message it
      * @return {@code true} if it has been since the test started
      */
-    abstract boolean received(final @NotNull Long id)
+    protected boolean received(final @NotNull Long id) {
+        return helper.received(id)
+    }
 
     /**
      * Sends a new message.
      *
      * @param message the message
      */
-    abstract void send(final @NotNull Message message, final @NotNull UUID conversationId)
+    protected void send(final @NotNull Message message, final @NotNull UUID conversationId) {
+        helper.send(message, conversationId)
+    }
 
 }
