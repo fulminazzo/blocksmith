@@ -8,8 +8,8 @@ import spock.lang.Specification
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 
-abstract class MessageChannelTest extends Specification {
-    protected static final Logger logger = LoggerFactory.getLogger(MessageChannelTest)
+abstract class MessageChannelIntegrationTest extends Specification {
+    protected static final Logger logger = LoggerFactory.getLogger(MessageChannelIntegrationTest)
 
     protected static final int SLEEP_TIME = 125
 

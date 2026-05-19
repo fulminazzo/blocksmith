@@ -2,10 +2,10 @@ package it.fulminazzo.blocksmith.broker.redis
 
 import it.fulminazzo.blocksmith.broker.MessageChannel
 import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTestHelper
-import it.fulminazzo.blocksmith.broker.MessageChannelTest
+import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTest
 import it.fulminazzo.blocksmith.broker.Messages
 
-class RedisMessageChannelTest extends MessageChannelTest {
+class RedisMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
     private static final String CHANNEL_NAME = 'redis-message-channel'
 
     void setup() {

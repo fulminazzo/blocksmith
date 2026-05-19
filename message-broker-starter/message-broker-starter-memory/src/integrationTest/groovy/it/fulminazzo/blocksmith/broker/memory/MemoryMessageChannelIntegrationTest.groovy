@@ -2,9 +2,9 @@ package it.fulminazzo.blocksmith.broker.memory
 
 import it.fulminazzo.blocksmith.broker.MessageChannel
 import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTestHelper
-import it.fulminazzo.blocksmith.broker.MessageChannelTest
+import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTest
 
-class MemoryMessageChannelTest extends MessageChannelTest {
+class MemoryMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
     private static final String CHANNEL_NAME = 'memory-message-channel'
 
     void setup() {
