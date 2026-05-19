@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.broker.memory
 
 import groovy.util.logging.Slf4j
 import it.fulminazzo.blocksmith.broker.Message
+import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTestHelper
 import it.fulminazzo.blocksmith.broker.Messages
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import spock.lang.Shared
@@ -12,20 +13,18 @@ class MemoryMessageBrokerIntegrationTest extends Specification {
     private static final String CHANNEL_NAME = 'main:sub'
 
     @Shared
-    private MemoryChannelIntegrationTestHelper helper
+    private MessageChannelIntegrationTestHelper helper
 
     void setupSpec() {
         helper = new MemoryChannelIntegrationTestHelper(
                 Mock(MemoryMessageQueryEngine),
                 CHANNEL_NAME,
                 log
-        ).registerConsumer { m, i ->
-            if (m == Messages.MESSAGE1) helper.send(Messages.MESSAGE2, i)
-        }
+        ).start()
     }
 
     void cleanup() {
-        helper.clear()
+        helper.close()
     }
 
     def 'test broker life cycle'() {
