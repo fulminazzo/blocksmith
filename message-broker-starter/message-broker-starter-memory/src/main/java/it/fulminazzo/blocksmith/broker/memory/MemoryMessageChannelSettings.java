@@ -4,6 +4,12 @@ import it.fulminazzo.blocksmith.broker.MessageChannelSettings;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+/**
+ * Message channel settings for in-memory databases.
+ *
+ * @see MemoryMessageChannel
+ * @see MemoryMessageBroker
+ */
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
 public final class MemoryMessageChannelSettings extends MessageChannelSettings<MemoryMessageChannelSettings> {

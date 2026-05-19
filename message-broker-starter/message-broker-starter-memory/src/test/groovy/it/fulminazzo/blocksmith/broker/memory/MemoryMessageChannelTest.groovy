@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull
 class MemoryMessageChannelTest extends MessageChannelTest {
     private static final String channelName = 'memory-message-channel'
 
-    private static final Queue<Message> receivedMessages = new LinkedList<>()
+    private static final Queue<Message> receivedMessages = [] as Queue
 
     private static final MemoryMessageQueryEngine.MemoryChannel memoryChannel = MemoryMessageQueryEngine.MemoryChannel.getChannel(channelName)
 

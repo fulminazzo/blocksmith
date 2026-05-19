@@ -1,12 +1,16 @@
 package it.fulminazzo.blocksmith.broker.memory;
 
 import it.fulminazzo.blocksmith.broker.AbstractMessageChannel;
+import it.fulminazzo.blocksmith.broker.MessageChannel;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Implementation of {@link it.fulminazzo.blocksmith.broker.MessageChannel} for in-memory databases.
+ * Implementation of {@link MessageChannel} for in-memory databases.
+ *
+ * @see MemoryMessageChannelSettings
+ * @see MemoryMessageQueryEngine
  */
 public class MemoryMessageChannel extends AbstractMessageChannel<MemoryMessageQueryEngine> {
 
@@ -16,8 +20,10 @@ public class MemoryMessageChannel extends AbstractMessageChannel<MemoryMessageQu
      * @param queryEngine the query engine
      * @param mapper      the mapper
      */
-    protected MemoryMessageChannel(final @NotNull MemoryMessageQueryEngine queryEngine,
-                                   final @NotNull Mapper mapper) {
+    protected MemoryMessageChannel(
+            final @NotNull MemoryMessageQueryEngine queryEngine,
+            final @NotNull Mapper mapper
+    ) {
         super(queryEngine, mapper);
     }
 

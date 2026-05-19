@@ -9,7 +9,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.function.BiFunction;
 
 /**
@@ -47,15 +46,15 @@ import java.util.function.BiFunction;
  *         where CustomMemoryMessageChannel extends MemoryMessageChannel and adds custom behavior.
  *     </li>
  * </ul>
+ *
+ * @see MemoryMessageBroker
+ * @see MemoryMessageChannel
+ * @see MemoryMessageChannelSettings
+ * @see MemoryMessageQueryEngine
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MemoryMessageBroker extends AbstractMessageBroker<MemoryMessageChannelSettings> {
     private final @NotNull Mapper mapper;
-
-    @Override
-    public @NotNull MessageChannel newChannel(final @NotNull MemoryMessageChannelSettings settings) {
-        return newChannel(MemoryMessageChannel::new, settings);
-    }
 
     /**
      * Creates a new custom channel.
@@ -74,6 +73,11 @@ public final class MemoryMessageBroker extends AbstractMessageBroker<MemoryMessa
             channelName += ":" + settings.getSubchannelName();
         MemoryMessageQueryEngine queryEngine = new MemoryMessageQueryEngine(channelName);
         return registerChannel(channelBuilder.apply(queryEngine, mapper));
+    }
+
+    @Override
+    public @NotNull MessageChannel newChannel(final @NotNull MemoryMessageChannelSettings settings) {
+        return newChannel(MemoryMessageChannel::new, settings);
     }
 
     /**

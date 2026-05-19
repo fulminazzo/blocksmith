@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.broker.memory;
 
 import it.fulminazzo.blocksmith.broker.MessageQueryEngine;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,6 +12,9 @@ import java.util.function.Consumer;
 
 /**
  * Pseudo-implementation of a Message query engine for in-memory messages.
+ *
+ * @see MemoryMessageChannel
+ * @see MemoryMessageBroker
  */
 public final class MemoryMessageQueryEngine extends MessageQueryEngine {
 
@@ -21,6 +25,10 @@ public final class MemoryMessageQueryEngine extends MessageQueryEngine {
      */
     public MemoryMessageQueryEngine(final @NotNull String channelName) {
         super(channelName);
+    }
+
+    private @NotNull MemoryChannel getChannel() {
+        return MemoryChannel.getChannel(channelName);
     }
 
     @Override
@@ -39,10 +47,6 @@ public final class MemoryMessageQueryEngine extends MessageQueryEngine {
         getChannel().unregister(this);
     }
 
-    private @NotNull MemoryChannel getChannel() {
-        return MemoryChannel.getChannel(channelName);
-    }
-
     /**
      * Artificial channel implementation.
      */
@@ -50,6 +54,7 @@ public final class MemoryMessageQueryEngine extends MessageQueryEngine {
     static final class MemoryChannel {
         private static final @NotNull Map<String, MemoryChannel> CHANNELS = new ConcurrentHashMap<>();
 
+        @Getter
         private final @NotNull String name;
         private final @NotNull Map<MemoryMessageQueryEngine, Consumer<String>> listeners = new ConcurrentHashMap<>();
 
