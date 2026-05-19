@@ -18,6 +18,8 @@ import java.util.function.Consumer;
  * Uses the <a href="https://lettuce.io">lettuce</a> library under the hood
  * to leverage the speed and optimizations provided by Netty asynchronous operations.
  *
+ * @see RedisMessageChannel
+ * @see RedisMessageBroker
  */
 public final class RedisMessageQueryEngine extends MessageQueryEngine {
     private final @NotNull Set<RedisPubSubListener<String, String>> listeners = ConcurrentHashMap.newKeySet();
@@ -32,9 +34,11 @@ public final class RedisMessageQueryEngine extends MessageQueryEngine {
      * @param connection       the connection used for sending
      * @param pubSubConnection the connection used for receiving
      */
-    RedisMessageQueryEngine(final @NotNull String channelName,
-                            final @NotNull StatefulRedisConnection<String, String> connection,
-                            final @NotNull StatefulRedisPubSubConnection<String, String> pubSubConnection) {
+    RedisMessageQueryEngine(
+            final @NotNull String channelName,
+            final @NotNull StatefulRedisConnection<String, String> connection,
+            final @NotNull StatefulRedisPubSubConnection<String, String> pubSubConnection
+    ) {
         super(channelName);
         this.connection = connection;
         this.pubSubConnection = pubSubConnection;
@@ -54,8 +58,7 @@ public final class RedisMessageQueryEngine extends MessageQueryEngine {
         RedisPubSubAdapter<String, String> listener = new RedisPubSubAdapter<>() {
 
             @Override
-            public void message(final @NotNull String channel,
-                                final @NotNull String message) {
+            public void message(final @NotNull String channel, final @NotNull String message) {
                 if (channel.equals(channelName)) consumer.accept(message);
             }
 

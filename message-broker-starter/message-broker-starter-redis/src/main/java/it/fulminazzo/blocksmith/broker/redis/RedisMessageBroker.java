@@ -61,6 +61,11 @@ import java.util.function.BiFunction;
  *         where CustomRedisMessageChannel extends RedisMessageChannel and adds custom behavior.
  *     </li>
  * </ul>
+ *
+ * @see RedisMessageBroker
+ * @see RedisMessageChannel
+ * @see RedisMessageChannelSettings
+ * @see RedisMessageQueryEngine
  */
 public final class RedisMessageBroker extends AbstractMessageBroker<RedisMessageChannelSettings> {
     private final @NotNull RedisClient redisClient;
@@ -74,16 +79,10 @@ public final class RedisMessageBroker extends AbstractMessageBroker<RedisMessage
      * @param redisClient the redis client
      * @param mapper      the mapper
      */
-    RedisMessageBroker(final @NotNull RedisClient redisClient,
-                       final @NotNull Mapper mapper) {
+    RedisMessageBroker(final @NotNull RedisClient redisClient, final @NotNull Mapper mapper) {
         this.redisClient = redisClient;
         this.connection = redisClient.connect();
         this.mapper = mapper;
-    }
-
-    @Override
-    public @NotNull MessageChannel newChannel(final @NotNull RedisMessageChannelSettings settings) {
-        return newChannel(RedisMessageChannel::new, settings);
     }
 
     /**
@@ -106,6 +105,11 @@ public final class RedisMessageBroker extends AbstractMessageBroker<RedisMessage
                 redisClient.connectPubSub()
         );
         return registerChannel(channelBuilder.apply(queryEngine, mapper));
+    }
+
+    @Override
+    public @NotNull MessageChannel newChannel(final @NotNull RedisMessageChannelSettings settings) {
+        return newChannel(RedisMessageChannel::new, settings);
     }
 
     @Override

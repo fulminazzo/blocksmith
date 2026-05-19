@@ -38,38 +38,31 @@ import java.util.function.Consumer;
  *         .mapper(MapperFormat.SERIALIZABLE.newMapper()) // defaults to JSON
  *         .build();
  * }</pre>
+ *
+ * @see RedisMessageBroker
  */
-public final class RedisMessageBrokerBuilder extends AbstractMessageBrokerBuilder<RedisMessageBroker, RedisMessageBrokerBuilder> {
+public final class RedisMessageBrokerBuilder
+        extends AbstractMessageBrokerBuilder<RedisMessageBroker, RedisMessageBrokerBuilder> {
     private final @NotNull ClientOptions.Builder clientOptions = ClientOptions.builder();
     private final @NotNull SocketOptions.Builder socketOptions = SocketOptions.builder();
 
-    private final @NotNull RedisURI.Builder redisURIbuilder;
+    private final @NotNull RedisURI.Builder redisUribuilder;
 
     /**
      * Instantiates a new Redis message broker builder.
      */
     RedisMessageBrokerBuilder() {
-        this.redisURIbuilder = RedisURI.builder(RedisURI.create("redis://127.0.0.1:6379/0"));
-    }
-
-    @Override
-    public @NotNull RedisMessageBroker build() {
-        final RedisClient client = RedisClient.create(redisURIbuilder.build());
-        client.setOptions(clientOptions
-                .socketOptions(socketOptions.build())
-                .build()
-        );
-        return new RedisMessageBroker(client, mapper);
+        this.redisUribuilder = RedisURI.builder(RedisURI.create("redis://127.0.0.1:6379/0"));
     }
 
     /**
-     * Allows editing the internal redis URI using the lettuce provided builder.
+     * Allows editing the internal redis URI using the builder provided by Lettuce.
      *
      * @param editFunction the function to edit the URI
      * @return this object (for method chaining)
      */
     public @NotNull RedisMessageBrokerBuilder uri(final @NotNull Consumer<RedisURI.Builder> editFunction) {
-        editFunction.accept(redisURIbuilder);
+        editFunction.accept(redisUribuilder);
         return this;
     }
 
@@ -93,6 +86,16 @@ public final class RedisMessageBrokerBuilder extends AbstractMessageBrokerBuilde
     public @NotNull RedisMessageBrokerBuilder socketOptions(final @NotNull Consumer<SocketOptions.Builder> function) {
         function.accept(socketOptions);
         return this;
+    }
+
+    @Override
+    public @NotNull RedisMessageBroker build() {
+        final RedisClient client = RedisClient.create(redisUribuilder.build());
+        client.setOptions(clientOptions
+                .socketOptions(socketOptions.build())
+                .build()
+        );
+        return new RedisMessageBroker(client, mapper);
     }
 
 }

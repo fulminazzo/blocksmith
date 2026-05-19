@@ -6,6 +6,9 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Implementation of {@link it.fulminazzo.blocksmith.broker.MessageChannel} for Redis databases.
+ *
+ * @see RedisMessageChannelSettings
+ * @see RedisMessageQueryEngine
  */
 public class RedisMessageChannel extends AbstractMessageChannel<RedisMessageQueryEngine> {
 
@@ -15,8 +18,10 @@ public class RedisMessageChannel extends AbstractMessageChannel<RedisMessageQuer
      * @param queryEngine the query engine
      * @param mapper      the mapper
      */
-    protected RedisMessageChannel(final @NotNull RedisMessageQueryEngine queryEngine,
-                                  final @NotNull Mapper mapper) {
+    protected RedisMessageChannel(
+            final @NotNull RedisMessageQueryEngine queryEngine,
+            final @NotNull Mapper mapper
+    ) {
         super(queryEngine, mapper);
     }
 
