@@ -30,10 +30,10 @@ abstract class MessageBrokerIntegrationTest<S extends MessageChannelSettings<S>>
         messageChannel != null
 
         when:
-        def message = messageChannel.sendAndReceiveRaw('hello', 10_000).get()
+        def message = messageChannel.sendAndReceive(Messages.MESSAGE1, Message, 10_000).get()
 
         then:
-        message == 'world'
+        message == Messages.MESSAGE2
 
         when:
         broker.close()
