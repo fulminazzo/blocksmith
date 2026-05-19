@@ -7,12 +7,12 @@ class MigrationTest extends Specification {
     def 'test that migration methods work'() {
         given:
         def data = [
-                'to_rename'           : true,
-                'to_change'           : '',
-                'to_update'           : 1.0,
-                'to_remove'           : 'invalid value',
-                'to_direct_update'    : [],
-                'to_direct_update_map': ['Hello': 'world']
+                'to_rename'            : true,
+                'to_change'            : '',
+                'to_update'            : 1.0,
+                'to_remove'            : 'invalid value',
+                'to_direct_update'     : [],
+                'to_direct_update_map' : ['Hello' : 'world']
         ]
 
         when:
@@ -30,12 +30,12 @@ class MigrationTest extends Specification {
 
         then:
         actual == [
-                'valid'           : true,
-                'to_change'       : 'Hello, world!',
-                'version'         : 2.0,
-                'name'            : 'blocksmith',
-                'to_direct_update': [1, 2, 3],
-                'map'             : ['Hello': 'world', 'Goodbye': 'mars']
+                'valid'            : true,
+                'to_change'        : 'Hello, world!',
+                'version'          : 2.0,
+                'name'             : 'blocksmith',
+                'to_direct_update' : [1, 2, 3],
+                'map'              : ['Hello' : 'world', 'Goodbye' : 'mars']
         ]
     }
 
@@ -50,14 +50,14 @@ class MigrationTest extends Specification {
         thrown(IllegalArgumentException)
 
         where:
-        data            | method   | arguments
-        ['valid': true] | 'add'    | ['valid', false]
-        [:]             | 'remove' | ['valid']
-        [:]             | 'update' | ['valid', false]
-        [:]             | 'update' | ['valid', 'not-valid', false]
-        [:]             | 'update' | ['valid', (o) -> { }]
-        [:]             | 'update' | ['valid', 'not-valid', (o) -> { }]
-        [:]             | 'rename' | ['valid', 'not-valid']
+        data             | method   | arguments
+        ['valid' : true] | 'add'    | ['valid', false]
+        [:]              | 'remove' | ['valid']
+        [:]              | 'update' | ['valid', false]
+        [:]              | 'update' | ['valid', 'not-valid', false]
+        [:]              | 'update' | ['valid', (o) -> { }]
+        [:]              | 'update' | ['valid', 'not-valid', (o) -> { }]
+        [:]              | 'rename' | ['valid', 'not-valid']
     }
 
 }

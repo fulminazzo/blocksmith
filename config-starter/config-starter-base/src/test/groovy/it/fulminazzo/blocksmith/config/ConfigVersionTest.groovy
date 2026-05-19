@@ -7,11 +7,11 @@ class ConfigVersionTest extends Specification {
     def 'test that migrate of #version and #data returns updated data'() {
         given:
         def expected = [
-                'valid'        : true,
-                'database.host': '127.0.0.1',
-                'database.port': 3306,
-                'database.type': 'SQL',
-                'last-update'  : '01-04-2026'
+                'valid'         : true,
+                'database.host' : '127.0.0.1',
+                'database.port' : 3306,
+                'database.type' : 'SQL',
+                'last-update'   : '01-04-2026'
         ]
 
         and:
@@ -39,18 +39,18 @@ class ConfigVersionTest extends Specification {
         where:
         version | data
         0.0     | [:]
-        1.0     | ['host': '127.0.0.1', 'port': 3306, 'version': 1.0]
+        1.0     | ['host' : '127.0.0.1', 'port' : 3306, 'version' : 1.0]
         2.0     | [
-                'database.host': '127.0.0.1',
-                'database.port': 3306,
-                'last-update'  : '31-03-2026'
+                'database.host' : '127.0.0.1',
+                'database.port' : 3306,
+                'last-update'   : '31-03-2026'
         ]
         3.0     | [
-                'valid'        : true,
-                'database.host': '127.0.0.1',
-                'database.port': 3306,
-                'database.type': 'SQL',
-                'last-update'  : '01-04-2026'
+                'valid'         : true,
+                'database.host' : '127.0.0.1',
+                'database.port' : 3306,
+                'database.type' : 'SQL',
+                'last-update'   : '01-04-2026'
         ]
     }
 
@@ -63,6 +63,19 @@ class ConfigVersionTest extends Specification {
 
         then:
         thrown(IllegalArgumentException)
+    }
+
+    def 'test that getVersion of #type returns #expected'() {
+        when:
+        def actual = ConfigVersion.getVersion(type).orElse(null)
+
+        then:
+        actual == expected
+
+        where:
+        type                 || expected
+        ConfigVersionAbsent  || null
+        ConfigVersionPresent || ConfigVersion.of(1.0)
     }
 
 }

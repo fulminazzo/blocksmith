@@ -5,6 +5,9 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * Mock DTO for testing purposes.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,6 +21,9 @@ public class Car implements Serializable {
 
     private Fuel fuel;
 
+    /**
+     * Mock DTO for testing purposes.
+     */
     public enum Fuel {
         DIESEL,
         HYBRID,

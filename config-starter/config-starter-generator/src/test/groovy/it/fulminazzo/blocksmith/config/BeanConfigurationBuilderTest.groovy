@@ -2,60 +2,23 @@ package it.fulminazzo.blocksmith.config
 
 import com.github.javaparser.StaticJavaParser
 import com.github.javaparser.ast.NodeList
+import com.github.javaparser.ast.body.BodyDeclaration
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.FieldDeclaration
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.body.VariableDeclarator
 import com.github.javaparser.ast.expr.DoubleLiteralExpr
+import com.github.javaparser.ast.expr.Expression
 import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.ast.expr.NameExpr
+import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 class BeanConfigurationBuilderTest extends Specification {
-
     private BeanConfigurationBuilder builder
 
     void setup() {
         builder = new BeanConfigurationBuilder([:], new ClassOrInterfaceDeclaration(), [:])
-    }
-
-    def 'test generate of existing class with version'() {
-        given:
-        def configurationFile = new File('build/resources/test/config-version.yml')
-        def sourceDirectory = new File('build/resources/test')
-        def packageName = 'it.fulminazzo.blocksmith'
-        def className = 'BlocksmithEnhancedConfigVersion'
-        def expected = new File('src/test/resources/it/fulminazzo/blocksmith/BlocksmithEnhancedConfigVersion.java')
-
-        when:
-        def file = BeanConfigurationBuilder.generate(configurationFile, sourceDirectory, packageName, className)
-
-        then:
-        file.exists()
-
-        and:
-        file.readLines() == expected.readLines()
-    }
-
-    def 'test generate of not-existing class with version'() {
-        given:
-        def configurationFile = new File('build/resources/test/config-version.yml')
-        def sourceDirectory = new File('build/resources/src')
-        def packageName = 'it.fulminazzo.blocksmith'
-        def className = 'BlocksmithConfigVersion'
-        def expected = new File('build/resources/test/BlocksmithConfigVersion.java')
-
-        and:
-        if (sourceDirectory.exists()) sourceDirectory.deleteDir()
-
-        when:
-        def file = BeanConfigurationBuilder.generate(configurationFile, sourceDirectory, packageName, className)
-
-        then:
-        file.exists()
-
-        and:
-        file.readLines() == expected.readLines()
     }
 
     def 'test that parseVersion of version class field updates initializer'() {
@@ -102,45 +65,6 @@ class BeanConfigurationBuilderTest extends Specification {
                 'public static ConfigVersion version = ConfigVersion.of(2.0);'
     }
 
-    def 'test generate of existing class'() {
-        given:
-        def configurationFile = new File('build/resources/test/config.yml')
-        def sourceDirectory = new File('build/resources/test')
-        def packageName = 'it.fulminazzo.blocksmith'
-        def className = 'BlocksmithEnhancedConfig'
-        def expected = new File('src/test/resources/it/fulminazzo/blocksmith/BlocksmithEnhancedConfig.java')
-
-        when:
-        def file = BeanConfigurationBuilder.generate(configurationFile, sourceDirectory, packageName, className)
-
-        then:
-        file.exists()
-
-        and:
-        file.readLines() == expected.readLines()
-    }
-
-    def 'test generate of not-existing class'() {
-        given:
-        def configurationFile = new File('build/resources/test/config.yml')
-        def sourceDirectory = new File('build/resources/src')
-        def packageName = 'it.fulminazzo.blocksmith'
-        def className = 'BlocksmithConfig'
-        def expected = new File('build/resources/test/BlocksmithConfig.java')
-
-        and:
-        if (sourceDirectory.exists()) sourceDirectory.deleteDir()
-
-        when:
-        def file = BeanConfigurationBuilder.generate(configurationFile, sourceDirectory, packageName, className)
-
-        then:
-        file.exists()
-
-        and:
-        file.readLines() == expected.readLines()
-    }
-
     def 'test that initialization correctly adds nested classes (not interfaces), methods and fields'() {
         given:
         def classDeclaration = new ClassOrInterfaceDeclaration()
@@ -163,7 +87,7 @@ class BeanConfigurationBuilderTest extends Specification {
     def 'test that parseNestedConfig of existing field and getter correctly updates nodes and nested class'() {
         given:
         def key = new CommentKey('nested', ['Updated comment'])
-        def data = [(new CommentKey('value', [])): 1]
+        def data = [(new CommentKey('value', [])) : 1]
 
         and:
         def f = new FieldDeclaration()
@@ -208,23 +132,23 @@ class BeanConfigurationBuilderTest extends Specification {
         then:
         def field = builder.fields['nested']
         field != null
-        field.toString() == "@Annotation(true)\n" +
-                "@Comment(\"Updated comment\")\n" +
-                "public Nested nested = new Nested();"
+        field.toString() == '@Annotation(true)\n' +
+                '@Comment("Updated comment")\n' +
+                'public Nested nested = new Nested();'
 
         and:
         def getter = builder.methods['getNested']
         getter != null
-        getter.toString() == "protected final Nested getNested() {\n" +
-                "    throw new UnsupportedOperationException();\n" +
-                "}"
+        getter.toString() == 'protected final Nested getNested() {\n' +
+                '    throw new UnsupportedOperationException();\n' +
+                '}'
 
         and:
         def setter = builder.methods['setNested']
         setter != null
-        setter.toString() == "private void setNested(final Nested nested) {\n" +
-                "    throw new UnsupportedOperationException();\n" +
-                "}"
+        setter.toString() == 'private void setNested(final Nested nested) {\n' +
+                '    throw new UnsupportedOperationException();\n' +
+                '}'
 
         and:
         builder.nestedClasses['Nested'].is(existingNestedClass)
@@ -236,7 +160,7 @@ class BeanConfigurationBuilderTest extends Specification {
     def 'test that parseNestedConfig of non-existing field and getter correctly creates nodes and nested class'() {
         given:
         def key = new CommentKey('nested', ['Nested config'])
-        def data = [(new CommentKey('value', [])): 1]
+        def data = [(new CommentKey('value', [])) : 1]
 
         when:
         builder.parseNestedConfig(key, data)
@@ -244,29 +168,29 @@ class BeanConfigurationBuilderTest extends Specification {
         then:
         def field = builder.fields['nested']
         field != null
-        field.toString() == "@Comment(\"Nested config\")\n" +
-                "private Nested nested = new Nested();"
+        field.toString() == '@Comment("Nested config")\n' +
+                'private Nested nested = new Nested();'
 
         and:
         def getter = builder.methods['getNested']
         getter != null
-        getter.toString() == "public Nested getNested() {" +
-                "\n    return nested;\n" +
-                "}"
+        getter.toString() == 'public Nested getNested() {' +
+                '\n    return nested;\n' +
+                '}'
 
         and:
         def setter = builder.methods['setNested']
         setter != null
-        setter.toString() == "public void setNested(final Nested nested) {" +
-                "\n    this.nested = nested;\n" +
-                "}"
+        setter.toString() == 'public void setNested(final Nested nested) {' +
+                '\n    this.nested = nested;\n' +
+                '}'
 
         and:
         def nestedClass = builder.nestedClasses['Nested']
         nestedClass != null
         nestedClass.nameAsString == 'Nested'
-        nestedClass.isPublic()
-        nestedClass.isStatic()
+        nestedClass.public
+        nestedClass.static
         builder.root.members.contains(nestedClass)
 
         and:
@@ -309,23 +233,23 @@ class BeanConfigurationBuilderTest extends Specification {
         then:
         def field = builder.fields['object']
         field != null
-        field.toString() == "@Annotation(true)\n" +
-                "@Comment(\"Hello, world!\")\n" +
+        field.toString() == '@Annotation(true)\n' +
+                '@Comment("Hello, world!")\n' +
                 "public $type object = ${builder.getInitializer(value)};"
 
         and:
         def getter = builder.methods['getObject']
         getter != null
         getter.toString() == "protected final $type getObject() {\n" +
-                "    throw new UnsupportedOperationException();\n" +
-                "}"
+                '    throw new UnsupportedOperationException();\n' +
+                '}'
 
         and:
         def setter = builder.methods['setObject']
         setter != null
         setter.toString() == "private void setObject(final $type object) {\n" +
-                "    throw new UnsupportedOperationException();\n" +
-                "}"
+                '    throw new UnsupportedOperationException();\n' +
+                '}'
 
         where:
         value                                                 | type
@@ -350,22 +274,22 @@ class BeanConfigurationBuilderTest extends Specification {
         then:
         def field = builder.fields['object']
         field != null
-        field.toString() == "@Comment(\"Hello, world!\")\n" +
+        field.toString() == '@Comment("Hello, world!")\n' +
                 "private $type object = ${builder.getInitializer(value)};"
 
         and:
         def getter = builder.methods['getObject']
         getter != null
         getter.toString() == "public $type getObject() {\n" +
-                "    return object;\n" +
-                "}"
+                '    return object;\n' +
+                '}'
 
         and:
         def setter = builder.methods['setObject']
         setter != null
         setter.toString() == "public void setObject(final $type object) {\n" +
-                "    this.object = object;\n" +
-                "}"
+                '    this.object = object;\n' +
+                '}'
 
         where:
         value                                                 | type
@@ -390,9 +314,9 @@ class BeanConfigurationBuilderTest extends Specification {
 
         then:
         if (expected instanceof String) {
-            assert annotation.isPresent()
+            assert annotation.present
             assert annotation.get().toString() == expected
-        } else assert !annotation.isPresent()
+        } else assert annotation.empty
 
         where:
         key                                        | field                  || expected
@@ -445,7 +369,7 @@ class BeanConfigurationBuilderTest extends Specification {
         actual == expected
 
         and:
-        builder.imports.isEmpty()
+        Reflect.on(builder.imports).invoke('isEmpty')
 
         where:
         object                                       || expected
@@ -454,24 +378,108 @@ class BeanConfigurationBuilderTest extends Specification {
         1 as Byte                                    || '1'
         1 as short                                   || '1'
         1 as Short                                   || '1'
-        1 as int                                     || '1'
+        1                                            || '1'
         1 as Integer                                 || '1'
-        1 as long                                    || '1'
+        1L                                           || '1'
         1 as Long                                    || '1'
-        1 as float                                   || '1.0'
+        1.0f                                         || '1.0'
         1 as Float                                   || '1.0'
-        1 as double                                  || '1.0'
+        1.0                                          || '1.0'
         1 as Double                                  || '1.0'
         'a' as char                                  || '\'a\''
         'a' as Character                             || '\'a\''
         'Hello, world!'                              || '"Hello, world!"'
         'Hello, "world"!'                            || '"Hello, \\"world\\"!"'
         'Hello, \"world\"!'                          || '"Hello, \\"world\\"!"'
-        "Hello, \"world\"!"                          || '"Hello, \\"world\\"!"'
+        'Hello, \"world\"!'                          || '"Hello, \\"world\\"!"'
         ['Hello', 'world'].toArray(new String[2])    || 'new String[]{"Hello", "world"}'
         new String[0]                                || 'new String[0]'
         new String[0][0]                             || 'new String[0][0]'
         new String[][]{new String[0], new String[0]} || 'new String[][]{new String[0], new String[0]}'
+    }
+
+    def 'test that getMemberPriority of #type returns #expected'() {
+        given:
+        def member = Mock(type)
+
+        expect:
+        BeanConfigurationBuilder.getMemberPriority(member) == expected
+
+        where:
+        type                        || expected
+        FieldDeclaration            || 1
+        MethodDeclaration           || 2
+        ClassOrInterfaceDeclaration || 3
+        BodyDeclaration             || 4
+    }
+
+    def 'test that isValidVersionInitializer does not throw if method call name matches but arguments are #arguments'() {
+        given:
+        def expression = Mock(MethodCallExpr)
+        expression.scope >> {
+            def scope = Mock(NameExpr)
+            scope.nameExpr >> true
+            scope.asNameExpr() >> scope
+            scope.nameAsString >> Object.simpleName
+            return Optional.of(scope)
+        }
+
+        and:
+        expression.nameAsString >> 'of'
+
+        and:
+        expression.arguments >> new NodeList<>([Mock(Expression)] * arguments)
+
+        expect:
+        !BeanConfigurationBuilder.isValidVersionInitializer(Object, expression)
+
+        where:
+        arguments << [0, 2, 4]
+    }
+
+    def 'test that isValidVersionInitializer does not throw if method call name is not of'() {
+        given:
+        def expression = Mock(MethodCallExpr)
+        expression.scope >> {
+            def scope = Mock(NameExpr)
+            scope.nameExpr >> true
+            scope.asNameExpr() >> scope
+            scope.nameAsString >> Object.simpleName
+            return Optional.of(scope)
+        }
+
+        and:
+        expression.nameAsString >> 'somethingElse'
+
+        expect:
+        !BeanConfigurationBuilder.isValidVersionInitializer(Object, expression)
+    }
+
+    def 'test that isValidVersionInitializer does not throw if scope name is #name'() {
+        given:
+        def expression = Mock(MethodCallExpr)
+        expression.scope >> {
+            def scope = Mock(NameExpr)
+            scope.nameExpr >> (name != null)
+            scope.asNameExpr() >> scope
+            scope.nameAsString >> name
+            return Optional.of(scope)
+        }
+
+        expect:
+        !BeanConfigurationBuilder.isValidVersionInitializer(Object, expression)
+
+        where:
+        name << [null, 'Mock']
+    }
+
+    def 'test that isValidVersionInitializer does not throw if scope is missing'() {
+        given:
+        def expression = Mock(MethodCallExpr)
+        expression.scope >> Optional.empty()
+
+        expect:
+        !BeanConfigurationBuilder.isValidVersionInitializer(Object, expression)
     }
 
 }

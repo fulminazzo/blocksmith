@@ -6,6 +6,9 @@ import org.jetbrains.annotations.Nullable;
 import org.jooq.SQLDialect;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
@@ -33,6 +36,12 @@ import java.util.concurrent.ExecutorService;
  *         }</pre>
  *     </li>
  * </ul>
+ *
+ * @see SqlDataSource
+ * @see SqlDataSourceBuilder
+ * @see H2DataSourceBuilder
+ * @see SqliteDataSourceBuilder
+ * @see RemoteDataSourceBuilder
  */
 public final class SqliteDataSourceBuilder extends ASqlDataSourceBuilder<SqliteDataSourceBuilder> {
     private @Nullable String connectionMode;
@@ -44,23 +53,12 @@ public final class SqliteDataSourceBuilder extends ASqlDataSourceBuilder<SqliteD
      * @param database the database
      * @param executor the executor
      */
-    SqliteDataSourceBuilder(final @NotNull HikariConfig config,
-                            final @Nullable String database,
-                            final @Nullable ExecutorService executor) {
+    SqliteDataSourceBuilder(
+            final @NotNull HikariConfig config,
+            final @Nullable String database,
+            final @Nullable ExecutorService executor
+    ) {
         super(config, database, executor);
-    }
-
-    @Override
-    protected @NotNull String getJdbcUrl() {
-        return String.format("jdbc:sqlite:%s",
-                Objects.requireNonNull(connectionMode, "The connection mode has not been specified yet. " +
-                        "Please choose between memory, disk or server before building")
-        );
-    }
-
-    @Override
-    protected @NotNull SQLDialect getSQLDialect() {
-        return SQLDialect.SQLITE;
     }
 
     /**
@@ -81,9 +79,26 @@ public final class SqliteDataSourceBuilder extends ASqlDataSourceBuilder<SqliteD
      */
     public @NotNull SqliteDataSourceBuilder disk(final @NotNull String directoryPath) {
         File directory = new File(directoryPath);
-        if (!directory.exists()) directory.mkdirs();
+        try {
+            Files.createDirectories(directory.toPath());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         connectionMode = new File(directory, getDatabase() + ".db").getAbsolutePath();
         return this;
+    }
+
+    @Override
+    protected @NotNull String getJdbcUrl() {
+        return String.format("jdbc:sqlite:%s",
+                Objects.requireNonNull(connectionMode, "The connection mode has not been specified yet. "
+                        + "Please choose between memory, disk or server before building")
+        );
+    }
+
+    @Override
+    protected @NotNull SQLDialect getSQLDialect() {
+        return SQLDialect.SQLITE;
     }
 
 }

@@ -17,47 +17,57 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Modifier;
 
-@JsonAppend(prepend = true, props = @JsonAppend.Prop(
-        name = ConfigVersion.PROPERTY_NAME,
-        value = VersionMixin.VersionPropertyWriter.class,
-        include = JsonInclude.Include.NON_NULL
-))
+@JsonAppend(
+        prepend = true,
+        props = @JsonAppend.Prop(
+                name = ConfigVersion.PROPERTY_NAME,
+                value = VersionMixin.VersionPropertyWriter.class,
+                include = JsonInclude.Include.NON_NULL
+        )
+)
 interface VersionMixin {
 
     @SuppressWarnings("unused")
     final class VersionPropertyWriter extends VirtualBeanPropertyWriter {
+        private static final long serialVersionUID = -3399916575150071300L;
 
         public VersionPropertyWriter() {
         }
 
-        public VersionPropertyWriter(final @NotNull BeanPropertyDefinition propDef,
-                                     final @NotNull Annotations annotations,
-                                     final @NotNull JavaType declaredType) {
+        public VersionPropertyWriter(
+                final @NotNull BeanPropertyDefinition propDef,
+                final @NotNull Annotations annotations,
+                final @NotNull JavaType declaredType
+        ) {
             super(propDef, annotations, declaredType);
         }
 
         @Override
-        protected Object value(final @NotNull Object bean,
-                               final @NotNull JsonGenerator generator,
-                               final @NotNull SerializerProvider provider) throws Exception {
+        public VirtualBeanPropertyWriter withConfig(
+                final @NotNull MapperConfig<?> config,
+                final @NotNull AnnotatedClass declaringClass,
+                final @NotNull BeanPropertyDefinition propDef,
+                final @NotNull JavaType type
+        ) {
+            PropertyNamingStrategy strategy = config.getPropertyNamingStrategy();
+            String name = ConfigVersion.PROPERTY_NAME;
+            if (strategy != null) name = strategy.nameForField(config, null, name);
+            BeanPropertyDefinition renamedPropDef = propDef.withSimpleName(name);
+            return new VersionPropertyWriter(renamedPropDef, declaringClass.getAnnotations(), type);
+        }
+
+        @Override
+        protected Object value(
+                final @NotNull Object bean,
+                final @NotNull JsonGenerator generator,
+                final @NotNull SerializerProvider provider
+        ) throws Exception {
             Reflect reflect = Reflect.on(bean.getClass());
             return reflect
                     .getFields(f -> Modifier.isStatic(f.getModifiers()) && f.getType().equals(ConfigVersion.class))
                     .stream().findFirst()
                     .map(f -> reflect.get(f).<ConfigVersion>get().getVersion())
                     .orElse(null);
-        }
-
-        @Override
-        public VirtualBeanPropertyWriter withConfig(final @NotNull MapperConfig<?> config,
-                                                    final @NotNull AnnotatedClass declaringClass,
-                                                    final @NotNull BeanPropertyDefinition propDef,
-                                                    final @NotNull JavaType type) {
-            PropertyNamingStrategy strategy = config.getPropertyNamingStrategy();
-            String name = ConfigVersion.PROPERTY_NAME;
-            if (strategy != null) name = strategy.nameForField(config, null, name);
-            BeanPropertyDefinition renamedPropDef = propDef.withSimpleName(name);
-            return new VersionPropertyWriter(renamedPropDef, declaringClass.getAnnotations(), type);
         }
 
     }

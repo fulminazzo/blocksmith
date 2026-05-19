@@ -25,8 +25,7 @@ final class SerializableMapper implements Mapper {
     }
 
     @Override
-    public <T> @NotNull T deserialize(final @NotNull String serialized,
-                                      final @NotNull Class<T> dataType) {
+    public <T> @NotNull T deserialize(final @NotNull String serialized, final @NotNull Class<T> dataType) {
         byte[] raw = Base64.getDecoder().decode(serialized);
         try (
                 ByteArrayInputStream input = new ByteArrayInputStream(raw);

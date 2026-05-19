@@ -10,6 +10,10 @@ import java.lang.annotation.*;
  * Identifies a {@link CharSequence} parameter or type only made of alphabet characters or digits.
  * <br>
  * Accepts {@code null} values.
+ *
+ * @see Constraint
+ * @see NonNull
+ * @see Matches
  */
 @Matches("[A-Za-z0-9]+")
 @Constraint
@@ -24,11 +28,13 @@ public @interface AlphabeticalOrDigit {
      * By default, the message is a code that will later be translated by an appropriate translator.
      *
      * @return the message
+     * @see ValidationMessages
      */
     @NotNull String message() default ValidationMessages.REQUIRED_ALPHABETICAL_OR_DIGIT;
 
     /**
-     * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
+     * Gets the error message that will be shown in the
+     * {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
      *
      * @return the message
      */

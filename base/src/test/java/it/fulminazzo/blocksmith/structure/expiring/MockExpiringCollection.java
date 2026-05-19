@@ -16,24 +16,13 @@ import java.util.stream.Collectors;
 public class MockExpiringCollection<E> extends AbstractExpiringCollection<E> {
     private final @NotNull Collection<ExpiringEntry<E>> delegate = new ArrayList<>();
 
-    @Override
-    @NotNull Collection<ExpiringEntry<E>> expiringEntries() {
-        return new HashSet<>(delegate);
-    }
-
-    @Override
-    public boolean add(final @Nullable E element, final long ttl) {
-        return delegate.add(new ExpiringEntry<>(element, ttl));
+    private @NotNull Collection<E> actualCollection() {
+        return delegate.stream().map(ExpiringEntry::getValue).collect(Collectors.toList());
     }
 
     @Override
     public int size() {
         return delegate.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return delegate.isEmpty();
     }
 
     @Override
@@ -57,8 +46,23 @@ public class MockExpiringCollection<E> extends AbstractExpiringCollection<E> {
     }
 
     @Override
+    public boolean containsAll(final @NotNull Collection<?> collection) {
+        return actualCollection().containsAll(collection);
+    }
+
+    @Override
+    public void clear() {
+        delegate.clear();
+    }
+
+    @Override
     public boolean add(final @Nullable E element) {
         return delegate.add(new ExpiringEntry<>(element, ExpiringEntry.NEVER_EXPIRE));
+    }
+
+    @Override
+    public boolean add(final @Nullable E element, final long ttl) {
+        return delegate.add(new ExpiringEntry<>(element, ttl));
     }
 
     @Override
@@ -67,13 +71,8 @@ public class MockExpiringCollection<E> extends AbstractExpiringCollection<E> {
     }
 
     @Override
-    public boolean containsAll(final @NotNull Collection<?> collection) {
-        return actualCollection().containsAll(collection);
-    }
-
-    @Override
-    public void clear() {
-        delegate.clear();
+    public boolean isEmpty() {
+        return delegate.isEmpty();
     }
 
     @Override
@@ -86,8 +85,9 @@ public class MockExpiringCollection<E> extends AbstractExpiringCollection<E> {
                 .findAny().orElse(null);
     }
 
-    private @NotNull Collection<E> actualCollection() {
-        return delegate.stream().map(ExpiringEntry::getValue).collect(Collectors.toList());
+    @Override
+    @NotNull Collection<ExpiringEntry<E>> expiringEntries() {
+        return new HashSet<>(delegate);
     }
 
 }

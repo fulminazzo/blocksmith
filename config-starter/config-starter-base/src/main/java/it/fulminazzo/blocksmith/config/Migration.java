@@ -39,25 +39,11 @@ public final class Migration {
     }
 
     /**
-     * Renames and updates the value of a property.
-     *
-     * @param from  the name of the property
-     * @param to    the new name of the property
-     * @param value the new value
-     * @return this object (for method chaining)
-     */
-    public @NotNull Migration update(final @NotNull String from,
-                                     final @NotNull String to,
-                                     final @NotNull Object value) {
-        return remove(from).add(to, value);
-    }
-
-    /**
      * Updates the value of a property.
      *
-     * @param path  the path of the property
+     * @param path          the path of the property
      * @param valueModifier uses the given function to update the existing value without replacing it
-     *              (useful for arrays and collections modifications)
+     *                      (useful for arrays and collections modifications)
      * @return this object (for method chaining)
      */
     public @NotNull Migration update(final @NotNull String path, final @NotNull Consumer<Object> valueModifier) {
@@ -69,13 +55,31 @@ public final class Migration {
      *
      * @param from  the name of the property
      * @param to    the new name of the property
-     * @param valueModifier uses the given function to update the existing value without replacing it
-     *              (useful for arrays and collections modifications)
+     * @param value the new value
      * @return this object (for method chaining)
      */
-    public @NotNull Migration update(final @NotNull String from,
-                                     final @NotNull String to,
-                                     final @NotNull Consumer<Object> valueModifier) {
+    public @NotNull Migration update(
+            final @NotNull String from,
+            final @NotNull String to,
+            final @NotNull Object value
+    ) {
+        return remove(from).add(to, value);
+    }
+
+    /**
+     * Renames and updates the value of a property.
+     *
+     * @param from          the name of the property
+     * @param to            the new name of the property
+     * @param valueModifier uses the given function to update the existing value without replacing it
+     *                      (useful for arrays and collections modifications)
+     * @return this object (for method chaining)
+     */
+    public @NotNull Migration update(
+            final @NotNull String from,
+            final @NotNull String to,
+            final @NotNull Consumer<Object> valueModifier
+    ) {
         Object value = data.remove(from);
         if (value == null) throw new IllegalArgumentException(String.format("Path '%s' does not exist", from));
         valueModifier.accept(value);

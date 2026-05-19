@@ -41,28 +41,28 @@ import static com.github.javaparser.utils.Utils.isNullOrEmpty;
 /**
  * A builder to generate a Java bean from a configuration file.
  */
-@Slf4j
 @SuppressWarnings("unchecked")
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BeanConfigurationBuilder {
-    private static final @NotNull PrinterConfiguration printConfiguration = new DefaultPrinterConfiguration()
+    private static final @NotNull PrinterConfiguration PRINTER_CONFIGURATION = new DefaultPrinterConfiguration()
             .addOption(new DefaultConfigurationOption(
                     DefaultPrinterConfiguration.ConfigOption.SORT_IMPORTS_STRATEGY,
                     new IntelliJImportOrderingStrategy()
             ));
 
-    private static final @NotNull List<Class<? extends Expression>> numberExpressions = Arrays.asList(
+    private static final @NotNull List<Class<? extends Expression>> NUMBER_EXPRESSIONS = Arrays.asList(
             IntegerLiteralExpr.class, LongLiteralExpr.class, DoubleLiteralExpr.class
     );
 
     private static final @NotNull String DEFAULT_JAVA_PACKAGE = "java.lang";
     private static final @NotNull String GENERICS_FORMAT = "<%s>";
-    private static final @NotNull Class<?> nullClass = Object.class;
+    private static final @NotNull Class<?> NULL_CLASS = Object.class;
 
-    private static final @NotNull String[] lombokGetterAnnotations = Stream.of(
+    private static final @NotNull String[] LOMBOK_GETTER_ANNOTATIONS = Stream.of(
             Getter.class, Data.class, Value.class
     ).map(Class::getSimpleName).toArray(String[]::new);
-    private static final @NotNull String[] lombokSetterAnnotations = Stream.of(
+    private static final @NotNull String[] LOMBOK_SETTER_ANNOTATIONS = Stream.of(
             Setter.class, Data.class, Value.class
     ).map(Class::getSimpleName).toArray(String[]::new);
 
@@ -81,9 +81,11 @@ public class BeanConfigurationBuilder {
      * @param root    the root
      * @param imports the imports
      */
-    BeanConfigurationBuilder(final @NotNull Map<CommentKey, Object> data,
-                             final @NotNull ClassOrInterfaceDeclaration root,
-                             final @NotNull Map<String, ImportDeclaration> imports) {
+    BeanConfigurationBuilder(
+            final @NotNull Map<CommentKey, Object> data,
+            final @NotNull ClassOrInterfaceDeclaration root,
+            final @NotNull Map<String, ImportDeclaration> imports
+    ) {
         this.data = data;
         this.root = root;
         this.imports = imports;
@@ -138,7 +140,7 @@ public class BeanConfigurationBuilder {
         if (isValidVersionInitializer(versionClass, initializer)) {
             MethodCallExpr methodCall = getFirstCall(initializer.asMethodCallExpr());
             double current = Double.parseDouble(methodCall.getArgument(0).toString());
-            if (current != actualVersion) {
+            if (!Objects.equals(current, actualVersion)) {
                 methodCall.setArgument(0, new DoubleLiteralExpr(actualVersion));
                 field.setLineComment("TODO: auto-updated, handle migrations manually");
             }
@@ -199,53 +201,6 @@ public class BeanConfigurationBuilder {
         }
     }
 
-    private @NotNull VariableDeclarator generateField(final @NotNull CommentKey key,
-                                                      final @NotNull String fieldClassName) {
-        final String propertyName = key.getKey();
-        final Type type = StaticJavaParser.parseType(fieldClassName);
-
-        // field
-        final FieldDeclaration field = fields.computeIfAbsent(
-                propertyName,
-                k -> root.addPrivateField(type, k)
-        );
-        if (field.getVariables().isEmpty()) field.addVariable(new VariableDeclarator().setName(propertyName));
-
-        // comment annotation
-        convertComments(key, field);
-
-        // getter
-        if (!isAnnotationPresent(field, lombokGetterAnnotations))
-            methods.computeIfAbsent(
-                    "get" + capitalize(propertyName),
-                    k -> {
-                        MethodDeclaration method = root.addMethod(k).setPublic(true);
-                        method.createBody().addStatement(new ReturnStmt(new NameExpr(propertyName)));
-                        return method;
-                    }
-            ).setType(fieldClassName).setAbstract(false);
-
-        // setter
-        if (!isAnnotationPresent(field, lombokSetterAnnotations)) {
-            MethodDeclaration setter = methods.computeIfAbsent(
-                    "set" + capitalize(propertyName),
-                    k -> {
-                        MethodDeclaration method = root.addMethod(k).setPublic(true);
-                        method.createBody().addStatement(new AssignExpr(
-                                new FieldAccessExpr(new ThisExpr(), propertyName),
-                                new NameExpr(propertyName),
-                                AssignExpr.Operator.ASSIGN
-                        ));
-                        return method;
-                    }
-            ).setType("void").setAbstract(false);
-            if (setter.getParameters().isEmpty()) setter.addParameter(type, propertyName);
-            setter.getParameter(0).setType(type).setName(propertyName).setFinal(true);
-        }
-
-        return field.getVariable(0).setType(type);
-    }
-
     /**
      * Converts the comments of the key to a {@link Comment} annotation for the field.
      *
@@ -270,6 +225,62 @@ public class BeanConfigurationBuilder {
                 a -> a.setMemberValue(initializer),
                 () -> field.addSingleMemberAnnotation(Comment.class, initializer)
         );
+    }
+
+    /**
+     * Adds an import to the imports list.
+     * If the import belongs to defaultJavaPackage,
+     * then nothing is done (as already imported by default).
+     *
+     * @param value the value to get the type from (if {@code null}, nothing is done)
+     */
+    void addImport(final @Nullable Object value) {
+        addImport(getTypeFromObject(value));
+    }
+
+    /**
+     * Adds an import to the imports list.
+     * If the import belongs to defaultJavaPackage,
+     * then nothing is done (as already imported by default).
+     *
+     * @param type the type to add
+     */
+    void addImport(final @NotNull Class<?> type) {
+        addImport(type.getCanonicalName());
+    }
+
+    /**
+     * Adds an import to the imports list.
+     * If the import belongs to {@link #DEFAULT_JAVA_PACKAGE},
+     * then nothing is done (as already imported by default).
+     *
+     * @param classCanonicalName the canonical name of the class to add
+     */
+    void addImport(final @NotNull String classCanonicalName) {
+        if (!classCanonicalName.startsWith(DEFAULT_JAVA_PACKAGE))
+            imports.computeIfAbsent(
+                    classCanonicalName,
+                    c -> new ImportDeclaration(c, false, false)
+            );
+    }
+
+    /**
+     * Checks if an annotation with any of the given names is present
+     * in the root class or field.
+     *
+     * @param field       the field declaration
+     * @param annotations the annotation names
+     * @return {@code true} if at least one is
+     */
+    boolean isAnnotationPresent(
+            final @NotNull FieldDeclaration field,
+            final @NotNull String @NotNull ... annotations
+    ) {
+        for (String name : annotations) {
+            if (root.isAnnotationPresent(name) || field.isAnnotationPresent(name))
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -311,60 +322,6 @@ public class BeanConfigurationBuilder {
     }
 
     /**
-     * Checks if an annotation with any of the given names is present
-     * in the root class or field.
-     *
-     * @param field       the field declaration
-     * @param annotations the annotation names
-     * @return {@code true} if at least one is
-     */
-    boolean isAnnotationPresent(final @NotNull FieldDeclaration field,
-                                final @NotNull String @NotNull ... annotations) {
-        for (String name : annotations) {
-            if (root.isAnnotationPresent(name) || field.isAnnotationPresent(name))
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Adds an import to the imports list.
-     * If the import belongs to defaultJavaPackage,
-     * then nothing is done (as already imported by default).
-     *
-     * @param value the value to get the type from (if {@code null}, nothing is done)
-     */
-    void addImport(final @Nullable Object value) {
-        addImport(getTypeFromObject(value));
-    }
-
-    /**
-     * Adds an import to the imports list.
-     * If the import belongs to defaultJavaPackage,
-     * then nothing is done (as already imported by default).
-     *
-     * @param type the type to add
-     */
-    void addImport(final @NotNull Class<?> type) {
-        addImport(type.getCanonicalName());
-    }
-
-    /**
-     * Adds an import to the imports list.
-     * If the import belongs to {@link #DEFAULT_JAVA_PACKAGE},
-     * then nothing is done (as already imported by default).
-     *
-     * @param classCanonicalName the canonical name of the class to add
-     */
-    void addImport(final @NotNull String classCanonicalName) {
-        if (!classCanonicalName.startsWith(DEFAULT_JAVA_PACKAGE))
-            imports.computeIfAbsent(
-                    classCanonicalName,
-                    c -> new ImportDeclaration(c, false, false)
-            );
-    }
-
-    /**
      * Gets the type name of the given object.
      * If the object is a collection, the generic type is returned.
      *
@@ -382,6 +339,55 @@ public class BeanConfigurationBuilder {
             typeName = parseGenericTypesImports(typeName);
             return typeName.substring(typeName.lastIndexOf('.') + 1);
         } else return getTypeFromObject(object).getSimpleName();
+    }
+
+    private @NotNull VariableDeclarator generateField(
+            final @NotNull CommentKey key,
+            final @NotNull String fieldClassName
+    ) {
+        final String propertyName = key.getKey();
+        final Type type = StaticJavaParser.parseType(fieldClassName);
+
+        // field
+        final FieldDeclaration field = fields.computeIfAbsent(
+                propertyName,
+                k -> root.addPrivateField(type, k)
+        );
+        if (field.getVariables().isEmpty()) field.addVariable(new VariableDeclarator().setName(propertyName));
+
+        // comment annotation
+        convertComments(key, field);
+
+        // getter
+        if (!isAnnotationPresent(field, LOMBOK_GETTER_ANNOTATIONS))
+            methods.computeIfAbsent(
+                    "get" + capitalize(propertyName),
+                    k -> {
+                        MethodDeclaration method = root.addMethod(k).setPublic(true);
+                        method.createBody().addStatement(new ReturnStmt(new NameExpr(propertyName)));
+                        return method;
+                    }
+            ).setType(fieldClassName).setAbstract(false);
+
+        // setter
+        if (!isAnnotationPresent(field, LOMBOK_SETTER_ANNOTATIONS)) {
+            MethodDeclaration setter = methods.computeIfAbsent(
+                    "set" + capitalize(propertyName),
+                    k -> {
+                        MethodDeclaration method = root.addMethod(k).setPublic(true);
+                        method.createBody().addStatement(new AssignExpr(
+                                new FieldAccessExpr(new ThisExpr(), propertyName),
+                                new NameExpr(propertyName),
+                                AssignExpr.Operator.ASSIGN
+                        ));
+                        return method;
+                    }
+            ).setType("void").setAbstract(false);
+            if (setter.getParameters().isEmpty()) setter.addParameter(type, propertyName);
+            setter.getParameter(0).setType(type).setName(propertyName).setFinal(true);
+        }
+
+        return field.getVariable(0).setType(type);
     }
 
     private @NotNull String parseGenericTypesImports(final @NotNull String genericType) {
@@ -415,19 +421,21 @@ public class BeanConfigurationBuilder {
      * @return the newly created bean
      * @throws IOException in case of any errors
      */
-    public static @NotNull File generate(final @NotNull File configurationFile,
-                                         final @NotNull File sourceDirectory,
-                                         final @NotNull String packageName,
-                                         final @NotNull String className) throws IOException {
+    public static @NotNull File generate(
+            final @NotNull File configurationFile,
+            final @NotNull File sourceDirectory,
+            final @NotNull String packageName,
+            final @NotNull String className
+    ) throws IOException {
         ConfigurationAdapter configurationAdapter = ConfigurationAdapter.newAdapter(
                 log,
                 ConfigurationFormat.fromExtension(configurationFile.getName())
         );
         final Map<CommentKey, Object> data = configurationAdapter.loadWithComments(configurationFile);
 
-        final File beanFile = new File(sourceDirectory,
-                packageName.replace(".", File.separator) +
-                        File.separator + className + ".java"
+        final File beanFile = new File(
+                sourceDirectory,
+                packageName.replace(".", File.separator) + File.separator + className + ".java"
         );
         Files.createDirectories(beanFile.getParentFile().toPath());
 
@@ -453,7 +461,8 @@ public class BeanConfigurationBuilder {
         builder.imports.values().forEach(compilationUnit::addImport);
         sortClass(root);
 
-        final String code = new DefaultPrettyPrinter(BlocksmithVisitor::new, printConfiguration).print(compilationUnit);
+        final String code = new DefaultPrettyPrinter(BlocksmithVisitor::new, PRINTER_CONFIGURATION)
+                .print(compilationUnit);
 
         try (FileOutputStream output = new FileOutputStream(beanFile)) {
             output.write(code.getBytes(StandardCharsets.UTF_8));
@@ -471,11 +480,11 @@ public class BeanConfigurationBuilder {
      */
     static @NotNull Class<?> getTypeFromObject(final @Nullable Object value) {
         if (value instanceof Float) return Double.class; // Floats suck
-        return value == null ? nullClass : value.getClass();
+        return value == null ? NULL_CLASS : value.getClass();
     }
 
     private static @NotNull String capitalize(final @NotNull String string) {
-        return string.substring(0, 1).toUpperCase() + string.substring(1);
+        return string.substring(0, 1).toUpperCase(Locale.ROOT) + string.substring(1);
     }
 
     /**
@@ -501,7 +510,7 @@ public class BeanConfigurationBuilder {
                 .filter(e -> e.getValue() == collection.size())
                 .map(Map.Entry::getKey)
                 .findFirst()
-                .orElse(nullClass.getCanonicalName());
+                .orElse(NULL_CLASS.getCanonicalName());
     }
 
     /**
@@ -513,8 +522,10 @@ public class BeanConfigurationBuilder {
      * @param base the type to get the types of
      * @return the name of the types
      */
-    private static @NotNull Set<String> getBasicTypeNames(final @Nullable Class<?> type,
-                                                          final @NotNull Class<?> base) {
+    private static @NotNull Set<String> getBasicTypeNames(
+            final @Nullable Class<?> type,
+            final @NotNull Class<?> base
+    ) {
         final Set<String> typeNames = new LinkedHashSet<>();
         if (type == null) return typeNames;
         String typeName = type.getCanonicalName();
@@ -535,8 +546,10 @@ public class BeanConfigurationBuilder {
      * @param genericType the generic type
      * @return the name of the types
      */
-    private static @NotNull Set<String> getCollectionTypeNames(final @Nullable Class<?> type,
-                                                               final @NotNull String genericType) {
+    private static @NotNull Set<String> getCollectionTypeNames(
+            final @Nullable Class<?> type,
+            final @NotNull String genericType
+    ) {
         final Set<String> typeNames = new LinkedHashSet<>();
         if (type == null || type.equals(Object.class)) return typeNames;
         String typeName = type.getCanonicalName();
@@ -557,13 +570,15 @@ public class BeanConfigurationBuilder {
 
     private static int getMemberPriority(final @NotNull BodyDeclaration<?> member) {
         if (member instanceof FieldDeclaration) return 1;
-        if (member instanceof MethodDeclaration) return 2;
-        if (member instanceof ClassOrInterfaceDeclaration) return 3;
-        return 4;
+        else if (member instanceof MethodDeclaration) return 2;
+        else if (member instanceof ClassOrInterfaceDeclaration) return 3;
+        else return 4;
     }
 
-    private static boolean isValidVersionInitializer(final @NotNull Class<?> classVersion,
-                                                     final @Nullable Expression expression) {
+    private static boolean isValidVersionInitializer(
+            final @NotNull Class<?> classVersion,
+            final @Nullable Expression expression
+    ) {
         if (!(expression instanceof MethodCallExpr)) return false;
         MethodCallExpr methodCall = (MethodCallExpr) expression;
         methodCall = getFirstCall(methodCall);
@@ -581,7 +596,9 @@ public class BeanConfigurationBuilder {
         NodeList<Expression> arguments = methodCall.getArguments();
         if (arguments.size() != 1) return false;
         Expression argument = arguments.get(0);
-        return numberExpressions.stream().anyMatch(t -> t.isAssignableFrom(argument.getClass()));
+        return NUMBER_EXPRESSIONS.stream().anyMatch(t ->
+                t.isAssignableFrom(argument.getClass())
+        );
     }
 
     private static @NotNull MethodCallExpr getFirstCall(@NotNull MethodCallExpr expression) {
@@ -609,8 +626,7 @@ public class BeanConfigurationBuilder {
         }
 
         @Override
-        public void visit(final @NotNull ArrayInitializerExpr expression,
-                          final @NotNull Void argument) {
+        public void visit(final @NotNull ArrayInitializerExpr expression, final @NotNull Void argument) {
             printOrphanCommentsBeforeThisChildNode(expression);
             printComment(expression.getComment(), argument);
             printer.print("{");
@@ -644,8 +660,7 @@ public class BeanConfigurationBuilder {
         }
 
         @Override
-        public void visit(final @NotNull MethodCallExpr expression,
-                          final @NotNull Void argument) {
+        public void visit(final @NotNull MethodCallExpr expression, final @NotNull Void argument) {
             printOrphanCommentsBeforeThisChildNode(expression);
             printComment(expression.getComment(), argument);
             // we are at the last method call of a call chain
@@ -682,17 +697,19 @@ public class BeanConfigurationBuilder {
             expression.getScope().ifPresent(scope -> {
                 scope.accept(this, argument);
                 if (methodCallWithScopeInScope.get()) {
-                    /* We're a method call on the result of something (method call, property access, ...) that is not stand alone,
-                    and not the first one with scope, like:
+                    /* We're a method call on the result of something (method call, property access, ...)
+                    that is not stand alone, and not the first one with scope, like:
                     we're x() in a.b().x(), or in a=b().c[15].d.e().x().
-                    That means that the "else" has been executed by one of the methods in the scope chain, so that the alignment
-                    is set to the "." of that method.
+                    That means that the "else" has been executed by one of the methods in the scope chain,
+                    so that the alignment is set to the "." of that method.
                     That means we will align to that "." when we start a new line: */
                     printer.println();
                 } else if (!lastMethodInCallChain.get()) {
-                    /* We're the first method call on the result of something in the chain (method call, property access, ...),
-                    but we are not at the same time the last method call in that chain, like:
-                    we're x() in a().x().y(), or in Long.x().y.z(). That means we get to dictate the indent of following method
+                    /* We're the first method call on the result of something in
+                    the chain (method call, property access, ...), but we are not at the same time
+                    the last method call in that chain, like:
+                    we're x() in a().x().y(), or in Long.x().y.z().
+                    That means we get to dictate the indent of following method
                     calls in this chain by setting the cursor to where we are now: just before the "."
                     that start this method call. */
                     printer.indent();

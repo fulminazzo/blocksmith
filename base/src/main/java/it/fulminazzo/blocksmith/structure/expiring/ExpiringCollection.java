@@ -15,15 +15,32 @@ import java.util.Collection;
 public interface ExpiringCollection<E> extends Collection<E> {
 
     /**
-     * Adds a new element in the collection.
-     * <br>
-     * If the element is already present, its TTL will be renewed.
+     * Adds all the elements of the given collection to the current one.
      *
-     * @param element the element to add
-     * @param ttl     the time-to-live (after which it will expire)
-     * @return {@code true} if the element was added, {@code false} if it was already present
+     * @param collection the collection to take elements from
+     * @return {@code true} if the collection was modified, {@code false} if it was not modified
      */
-    boolean add(final @Nullable E element, final @NotNull Duration ttl);
+    boolean addAll(final @NotNull ExpiringCollection<? extends E> collection);
+
+    /**
+     * Adds all the elements of the given collection to the current one.
+     * Each element will have the same expiration time.
+     *
+     * @param collection the collection to take elements from
+     * @param ttl        the time-to-live (after which the elements will expire) in milliseconds
+     * @return {@code true} if the collection was modified, {@code false} if it was not modified
+     */
+    boolean addAll(final @NotNull Collection<? extends E> collection, final long ttl);
+
+    /**
+     * Adds all the elements of the given collection to the current one.
+     * Each element will have the same expiration time.
+     *
+     * @param collection the collection to take elements from
+     * @param ttl        the time-to-live (after which the elements will expire)
+     * @return {@code true} if the collection was modified, {@code false} if it was not modified
+     */
+    boolean addAll(final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl);
 
     /**
      * Adds a new element in the collection.
@@ -38,41 +55,22 @@ public interface ExpiringCollection<E> extends Collection<E> {
 
     /**
      * Adds a new element in the collection.
-     * The element will have no expiration time.
+     * <br>
+     * If the element is already present, its TTL will be renewed.
      *
      * @param element the element to add
+     * @param ttl     the time-to-live (after which it will expire)
      * @return {@code true} if the element was added, {@code false} if it was already present
      */
-    @Override
-    boolean add(final @Nullable E element);
+    boolean add(final @Nullable E element, final @NotNull Duration ttl);
 
     /**
-     * Adds all the elements of the given collection to the current one.
+     * Gets the remaining time-to-live of the element.
      *
-     * @param collection the collection to take elements from
-     * @return {@code true} if the collection was modified, {@code false} if it was not modified
+     * @param element the element
+     * @return the TTL ({@code null} if not present)
      */
-    boolean addAll(final @NotNull ExpiringCollection<? extends E> collection);
-
-    /**
-     * Adds all the elements of the given collection to the current one.
-     * Each element will have the same expiration time.
-     *
-     * @param collection the collection to take elements from
-     * @param ttl        the time-to-live (after which the elements will expire)
-     * @return {@code true} if the collection was modified, {@code false} if it was not modified
-     */
-    boolean addAll(final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl);
-
-    /**
-     * Adds all the elements of the given collection to the current one.
-     * Each element will have the same expiration time.
-     *
-     * @param collection the collection to take elements from
-     * @param ttl        the time-to-live (after which the elements will expire) in milliseconds
-     * @return {@code true} if the collection was modified, {@code false} if it was not modified
-     */
-    boolean addAll(final @NotNull Collection<? extends E> collection, final long ttl);
+    @Nullable Duration getTtl(final @Nullable E element);
 
     /**
      * Adds all the elements of the given collection to the current one.
@@ -85,12 +83,14 @@ public interface ExpiringCollection<E> extends Collection<E> {
     boolean addAll(final @NotNull Collection<? extends E> collection);
 
     /**
-     * Gets the remaining time-to-live of the element.
+     * Adds a new element in the collection.
+     * The element will have no expiration time.
      *
-     * @param element the element
-     * @return the TTL ({@code null} if not present)
+     * @param element the element to add
+     * @return {@code true} if the element was added, {@code false} if it was already present
      */
-    @Nullable Duration getTtl(final @Nullable E element);
+    @Override
+    boolean add(final @Nullable E element);
 
     /**
      * Prints out the contents of this collection.

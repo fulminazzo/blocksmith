@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Mock DTO for testing purposes.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

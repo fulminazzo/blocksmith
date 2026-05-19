@@ -1,6 +1,32 @@
-rootProject.name = "blocksmith"
+@file:Suppress("UnstableApiUsage")
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        maven {
+            name = "spigotmc-repo"
+            url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+        }
+        maven {
+            name = "papermc"
+            url = uri("https://repo.papermc.io/repository/maven-public/")
+        }
+    }
+
+}
+
+pluginManagement {
+    includeBuild("build-logic")
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+rootProject.name = "blocksmith"
 
 // base
 include(
@@ -37,15 +63,14 @@ include(
     "data-starter:data-starter-base",
 
     "data-starter:data-starter-mapper",
-
     "data-starter:data-starter-mapper:data-starter-mapper-base",
     "data-starter:data-starter-mapper:data-starter-mapper-json",
 
-    "data-starter:data-starter-file",
     "data-starter:data-starter-memory",
-    "data-starter:data-starter-mongo",
-    "data-starter:data-starter-redis",
+    "data-starter:data-starter-file",
     "data-starter:data-starter-sql",
+    "data-starter:data-starter-redis",
+    "data-starter:data-starter-mongo",
 
     "data-starter:data-starter-cache",
 
@@ -63,9 +88,6 @@ include(
 
     "message-broker-starter:message-broker-starter-testing"
 )
-
-// example
-include("example")
 
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {

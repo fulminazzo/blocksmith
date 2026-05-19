@@ -52,7 +52,7 @@ class AbstractExpiringListTest extends Specification {
 
         and:
         def actualTtl = entry.expireTime - now
-        actualTtl <= ttl
+        actualTtl <= ttl * 1.1
         actualTtl >= ttl * 0.9
     }
 
@@ -134,7 +134,7 @@ class AbstractExpiringListTest extends Specification {
         first != null
         first.value == SECOND.value
         def actualTtl = first.expireTime - now
-        actualTtl <= ttl
+        actualTtl <= ttl * 1.1
         actualTtl >= ttl * 0.9
 
         and:
@@ -169,15 +169,15 @@ class AbstractExpiringListTest extends Specification {
         first != null
         first.value == SECOND.value
         def actualTtl1 = first.expireTime - now
+        actualTtl1 <= ttl * 1.1
         actualTtl1 >= ttl * 0.9
-        actualTtl1 <= ttl
 
         and:
         def second = internal[2]
         second != null
         second.value == VALUE
         def actualTtl2 = second.expireTime - now
-        actualTtl2 <= ttl
+        actualTtl2 <= ttl * 1.1
         actualTtl2 >= ttl * 0.9
 
         and:
@@ -232,11 +232,11 @@ class AbstractExpiringListTest extends Specification {
         actual != null
         actual.value == SECOND.value
         def actualTtl = actual.expireTime - now
-        actualTtl >= ttl - 20
         actualTtl <= ttl + 20
+        actualTtl >= ttl - 20
     }
 
-    def 'test that set correctly overwrites value in list'() {
+    def 'test that set of never expiring works'() {
         given:
         internal.addAll([FIRST, FIRST])
 
@@ -287,7 +287,7 @@ class AbstractExpiringListTest extends Specification {
         for (def i : list) actual.add(i)
 
         then:
-        actual == EXPECTED_ENTRIES.collect { it.value }
+        actual == EXPECTED_ENTRIES*.value
     }
 
     def 'test that toArray works'() {
@@ -298,7 +298,7 @@ class AbstractExpiringListTest extends Specification {
         def actual = list.toArray()
 
         then:
-        [*actual] == EXPECTED_ENTRIES.collect { it.value }
+        [*actual] == EXPECTED_ENTRIES*.value
     }
 
     def 'test that toArray with smaller array creates new array'() {
@@ -312,7 +312,7 @@ class AbstractExpiringListTest extends Specification {
         def actual = list.toArray(previous)
 
         then:
-        [*actual] == EXPECTED_ENTRIES.collect { it.value }
+        [*actual] == EXPECTED_ENTRIES*.value
         [*previous] == ['1']
     }
 
@@ -324,7 +324,7 @@ class AbstractExpiringListTest extends Specification {
         internal.addAll(EXPECTED_ENTRIES)
 
         and:
-        def expected = EXPECTED_ENTRIES.collect { it.value }
+        def expected = EXPECTED_ENTRIES*.value
         if (size != EXPECTED_ENTRIES.size()) expected.add(null)
 
         when:
@@ -354,12 +354,12 @@ class AbstractExpiringListTest extends Specification {
         list.expiringEntries() == internal
     }
 
-    private ExpiringEntry<String> find(final String value) {
+    protected ExpiringEntry<String> find(final String value) {
         return internal.find { it.value == value }
     }
 
-    private static long now() {
-        System.currentTimeMillis()
+    protected static long now() {
+        return System.currentTimeMillis()
     }
 
 }

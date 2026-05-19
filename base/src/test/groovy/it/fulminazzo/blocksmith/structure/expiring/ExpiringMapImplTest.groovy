@@ -4,7 +4,7 @@ import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 abstract class ExpiringMapImplTest extends Specification {
-    private static final long ttl = 400L
+    private static final long ttl = 2_000L
     private static final long expiringTtl = ttl / 4 as long
 
     private ExpiringMap<String, String> map
@@ -14,8 +14,6 @@ abstract class ExpiringMapImplTest extends Specification {
         map = createMap()
         internal = Reflect.on(map).get('delegate').get()
     }
-
-    protected abstract ExpiringMap<String, String> createMap()
 
     def 'test that size does not count expired entries'() {
         given:
@@ -48,7 +46,7 @@ abstract class ExpiringMapImplTest extends Specification {
         sleepTtl()
 
         expect:
-        map.isEmpty()
+        Reflect.on(map).invoke('isEmpty')
     }
 
     def 'test that isEmpty returns false when non-expired entries are present'() {
@@ -56,7 +54,7 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] = new ExpiringEntry<>('world', ttl)
 
         expect:
-        !map.isEmpty()
+        !map.empty
     }
 
     def 'test that containsKey returns false for expired key'() {
@@ -132,7 +130,7 @@ abstract class ExpiringMapImplTest extends Specification {
         sleepTtl()
 
         expect:
-        map.keySet().isEmpty()
+        map.keySet().empty
     }
 
     def 'test that keySet includes only non-expired keys'() {
@@ -159,7 +157,7 @@ abstract class ExpiringMapImplTest extends Specification {
         sleepTtl()
 
         expect:
-        map.values().isEmpty()
+        map.values().empty
     }
 
     def 'test that values includes only non-expired values'() {
@@ -186,7 +184,7 @@ abstract class ExpiringMapImplTest extends Specification {
         sleepTtl()
 
         expect:
-        map.entrySet().isEmpty()
+        map.entrySet().empty
     }
 
     def 'test that entrySet includes only non-expired entries'() {
@@ -220,15 +218,15 @@ abstract class ExpiringMapImplTest extends Specification {
         !arguments.empty || internal['Hello'] == null
 
         where:
-        method         | arguments
-        'size'         | []
-        'isEmpty'      | []
-        'containsKey'  | ['Goodbye']
-        'get'          | ['Goodbye']
-        'remove'       | ['Goodbye']
-        'keySet'       | []
-        'values'       | []
-        'entrySet'     | []
+        method        | arguments
+        'size'        | []
+        'isEmpty'     | []
+        'containsKey' | ['Goodbye']
+        'get'         | ['Goodbye']
+        'remove'      | ['Goodbye']
+        'keySet'      | []
+        'values'      | []
+        'entrySet'    | []
     }
 
     def 'test that put treats expired key as absent'() {
@@ -308,8 +306,10 @@ abstract class ExpiringMapImplTest extends Specification {
         internal['Hello'] == null
     }
 
-    private static void sleepTtl() {
-        sleep(ttl / 2 as long)
+    protected abstract ExpiringMap<String, String> createMap()
+
+    protected static void sleepTtl() {
+        sleep((long) (ttl / 2))
     }
 
 }

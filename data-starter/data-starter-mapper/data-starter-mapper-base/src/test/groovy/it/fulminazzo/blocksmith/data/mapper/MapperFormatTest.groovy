@@ -23,7 +23,7 @@ class MapperFormatTest extends Specification {
         def e = thrown(IllegalStateException)
         e.message == "Could not find suitable ${Mapper.simpleName} for ${mapperFormat.name().toLowerCase().capitalize()}. " +
                 "Please check that the module it.fulminazzo.blocksmith:data-starter-mapper-${mapperFormat.name().toLowerCase()} " +
-                "is correctly installed."
+                'is correctly installed.'
     }
 
 }

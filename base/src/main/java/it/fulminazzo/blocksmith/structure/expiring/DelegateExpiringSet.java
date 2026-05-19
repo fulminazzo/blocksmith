@@ -23,23 +23,8 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
     private final AbstractExpiringMap<E, Object> delegate;
 
     @Override
-    public boolean add(final @Nullable E element, final long ttl) {
-        return delegate.put(element, PRESENT, ttl) == null;
-    }
-
-    @Override
-    public boolean remove(final @Nullable Object object) {
-        return delegate.remove(object) != null;
-    }
-
-    @Override
     public boolean containsAll(final @NotNull Collection<?> collection) {
         return delegate.keySet().containsAll(collection);
-    }
-
-    @Override
-    public @Nullable Duration getTtl(final @Nullable E element) {
-        return delegate.getTtl(element);
     }
 
     @Override
@@ -50,11 +35,6 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
     @Override
     public int size() {
         return delegate.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return delegate.isEmpty();
     }
 
     @Override
@@ -78,6 +58,26 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
     }
 
     @Override
+    public boolean add(final @Nullable E element, final long ttl) {
+        return element != null && delegate.put(element, PRESENT, ttl) == null;
+    }
+
+    @Override
+    public boolean remove(final @Nullable Object object) {
+        return delegate.remove(object) != null;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return delegate.isEmpty();
+    }
+
+    @Override
+    public @Nullable Duration getTtl(final @Nullable E element) {
+        return element == null ? null : delegate.getTtl(element);
+    }
+
+    @Override
     public boolean equals(final @Nullable Object obj) {
         if (obj == this) return true;
         else if (!(obj instanceof Set)) return false;
@@ -93,7 +93,7 @@ final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> impleme
 
     @SuppressWarnings("unchecked")
     @Override
-    @NotNull Collection<ExpiringEntry<E>> expiringEntries() {
+    synchronized @NotNull Collection<ExpiringEntry<E>> expiringEntries() {
         return delegate.delegate.entrySet().stream()
                 .map(e ->
                         (ExpiringEntry<E>) Reflect.on(new ExpiringEntry<>(e.getKey(), 1))

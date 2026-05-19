@@ -20,11 +20,13 @@ import java.util.function.Function;
  * <a href="https://www.mongodb.com/docs/languages/java/reactive-streams-driver/current/getting-started/">MongoDB Reactive Streams</a>
  * library under the hood to leverage the speed and optimizations provided by Netty asynchronous operations.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities
+ * @see MongoRepository
+ * @see MongoDataSource
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class MongoQueryEngine<T, ID> implements QueryEngine<T, ID> {
+public final class MongoQueryEngine<T, I> implements QueryEngine<T, I> {
     private final @NotNull MongoCollection<T> collection;
 
     /**

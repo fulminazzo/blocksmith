@@ -4,7 +4,7 @@ import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 abstract class ExpiringListImplTest extends Specification {
-    private static final long ttl = 400L
+    private static final long ttl = 2_000L
     private static final long expiringTtl = ttl / 4 as long
 
     private final ExpiringEntry<String> first = new ExpiringEntry<>('Hello', ttl)
@@ -18,8 +18,6 @@ abstract class ExpiringListImplTest extends Specification {
         list = createList()
         internal = Reflect.on(list).get('delegate').get()
     }
-
-    protected abstract ExpiringList<String> createList()
 
     def 'test that indexed add does not consider expired entries'() {
         given:
@@ -159,17 +157,19 @@ abstract class ExpiringListImplTest extends Specification {
         sleepTtl()
 
         then:
-        list.containsAll([first].collect { it.value })
-        !list.containsAll([second].collect { it.value })
-        list.containsAll([third].collect { it.value })
-        !list.containsAll([first, second].collect { it.value })
-        !list.containsAll([second, third].collect { it.value })
-        list.containsAll([first, third].collect { it.value })
-        !list.containsAll([first, second, third].collect { it.value })
+        list.containsAll([first]*.value)
+        !list.containsAll([second]*.value)
+        list.containsAll([third]*.value)
+        !list.containsAll([first, second]*.value)
+        !list.containsAll([second, third]*.value)
+        list.containsAll([first, third]*.value)
+        !list.containsAll([first, second, third]*.value)
     }
 
-    private static void sleepTtl() {
-        sleep(ttl / 2 as long)
+    protected abstract ExpiringList<String> createList()
+
+    protected static void sleepTtl() {
+        sleep((long) (ttl / 2))
     }
 
 }

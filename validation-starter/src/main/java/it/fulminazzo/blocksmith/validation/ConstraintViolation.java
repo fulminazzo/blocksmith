@@ -14,6 +14,7 @@ import java.util.Map;
 /**
  * Defines the violation of a constraint.
  */
+@SuppressWarnings("checkstyle:SummaryJavadoc")
 @Value
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class ConstraintViolation {
@@ -22,9 +23,9 @@ public class ConstraintViolation {
     /**
      * The reason why there are two messages is the following:
      * <ul>
-     *     <li>the first message is user-defined, but it falls back to a message code
+     *     <li>The first message is user-defined, but it falls back to a message code
      *     later translated by an appropriate translator;</li>
-     *     <li>the second message is used in throwing of exceptions in Java code.</li>
+     *     <li>The second message is used in throwing of exceptions in Java code.</li>
      * </ul>
      */
     @Nullable String message;
@@ -39,8 +40,10 @@ public class ConstraintViolation {
      * @param expectedTypeNames the expected types names
      * @return the constraint violation
      */
-    static @NotNull ConstraintViolation invalidType(final Object value,
-                                                    final @NotNull String expectedTypeNames) {
+    static @NotNull ConstraintViolation invalidType(
+            final Object value,
+            final @NotNull String expectedTypeNames
+    ) {
         return new ConstraintViolation(
                 value,
                 ValidationMessages.INVALID_TYPE,
@@ -56,8 +59,10 @@ public class ConstraintViolation {
      * @param constraintInfo the constraint information to generate the messages from
      * @return the constraint violation
      */
-    static @NotNull ConstraintViolation of(final Object value,
-                                           final @NotNull ConstraintInfo constraintInfo) {
+    static @NotNull ConstraintViolation of(
+            final Object value,
+            final @NotNull ConstraintInfo constraintInfo
+    ) {
         final @NotNull Object[] arguments = constraintInfo.formatArguments(value);
         final @NotNull Map<String, Object> argumentsMap = new HashMap<>();
         String message = constraintInfo.getMessage();

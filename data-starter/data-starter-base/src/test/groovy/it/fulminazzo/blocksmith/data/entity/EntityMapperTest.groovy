@@ -41,7 +41,7 @@ class EntityMapperTest extends Specification {
         InvalidIdEntity || "Invalid entity '${InvalidIdEntity.canonicalName}'." +
                 " Detected 2 annotated fields with ${Id.simpleName}. Please choose only one field"
         SimpleEntity    || "Invalid entity '${SimpleEntity.canonicalName}'. " +
-                "Could not find field '${EntityMapper.defaultIdFieldName}' and no field annotated with ${Id.simpleName} was present"
+                "Could not find field '${EntityMapper.DEFAULT_ID_FIELD_NAME}' and no field annotated with ${Id.simpleName} was present"
     }
 
     def 'test that create(Class, String) throws IllegalArgumentException if could not find argument'() {

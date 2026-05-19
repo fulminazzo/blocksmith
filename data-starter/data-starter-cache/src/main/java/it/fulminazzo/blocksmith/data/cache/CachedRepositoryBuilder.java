@@ -68,25 +68,50 @@ import java.util.Objects;
  *     </li>
  * </ul>
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities
+ * @see CachedRepository
+ * @see CachedRepositorySettings
+ * @see CacheRepository
+ * @see EntityMapper
+ * @see MemoryRepositorySettings
  */
-public final class CachedRepositoryBuilder<T, ID> {
-    private final @NotNull Repository<T, ID> internalRepository;
+public final class CachedRepositoryBuilder<T, I> {
+    private final @NotNull Repository<T, I> internalRepository;
 
-    private @Nullable EntityMapper<T, ID> entityMapper;
+    private @Nullable EntityMapper<T, I> entityMapper;
 
-    private @Nullable CacheRepository<T, ID> cacheRepository;
+    private @Nullable CacheRepository<T, I> cacheRepository;
 
     /**
      * Instantiates a new Cached repository builder.
      *
      * @param internalRepository the internal repository
      */
-    CachedRepositoryBuilder(final @NotNull Repository<T, ID> internalRepository) {
+    CachedRepositoryBuilder(final @NotNull Repository<T, I> internalRepository) {
         this.internalRepository = internalRepository;
         if (internalRepository instanceof AbstractRepository<?, ?, ?>)
-            entityMapper(((AbstractRepository<T, ID, ?>) internalRepository).getEntityMapper());
+            entityMapper(((AbstractRepository<T, I, ?>) internalRepository).getEntityMapper());
+    }
+
+    /**
+     * Builds a Cached repository with two caches.
+     * The lookup logic is the following:
+     * <ol>
+     *     <li>the first {@link CacheRepository} is queried for the resource;</li>
+     *     <li>if not found, the second {@link CacheRepository} is queried for the resource;</li>
+     *     <li>if not found, the actual {@link Repository} is queried.</li>
+     * </ol>
+     *
+     * @param firstCacheRepository the first cache repository
+     * @return the repository
+     */
+    public @NotNull Repository<T, I> hybrid(final @NotNull CacheRepository<T, I> firstCacheRepository) {
+        return new CachedRepository<>(
+                firstCacheRepository,
+                build(),
+                getEntityMapper()
+        );
     }
 
     /**
@@ -103,35 +128,11 @@ public final class CachedRepositoryBuilder<T, ID> {
      * @param memoryRepositorySettings the memory repository settings
      * @return the repository
      */
-    public @NotNull Repository<T, ID> hybrid(
+    public @NotNull Repository<T, I> hybrid(
             final @NotNull CacheRepositoryDataSource<MemoryRepositorySettings> memoryDataSource,
             final @NotNull MemoryRepositorySettings memoryRepositorySettings
     ) {
-        return new CachedRepository<>(
-                memoryDataSource.newRepository(getEntityMapper(), memoryRepositorySettings),
-                build(),
-                getEntityMapper()
-        );
-    }
-
-    /**
-     * Builds a Cached repository with two caches.
-     * The lookup logic is the following:
-     * <ol>
-     *     <li>the first {@link CacheRepository} is queried for the resource;</li>
-     *     <li>if not found, the second {@link CacheRepository} is queried for the resource;</li>
-     *     <li>if not found, the actual {@link Repository} is queried.</li>
-     * </ol>
-     *
-     * @param firstCacheRepository the first cache repository
-     * @return the repository
-     */
-    public @NotNull Repository<T, ID> hybrid(final @NotNull CacheRepository<T, ID> firstCacheRepository) {
-        return new CachedRepository<>(
-                firstCacheRepository,
-                build(),
-                getEntityMapper()
-        );
+        return hybrid(memoryDataSource.newRepository(getEntityMapper(), memoryRepositorySettings));
     }
 
     /**
@@ -139,12 +140,25 @@ public final class CachedRepositoryBuilder<T, ID> {
      *
      * @return the repository
      */
-    public @NotNull Repository<T, ID> build() {
+    public @NotNull Repository<T, I> build() {
         return new CachedRepository<>(
                 Objects.requireNonNull(cacheRepository, "cacheRepository has not been specified yet"),
                 internalRepository,
                 getEntityMapper()
         );
+    }
+
+    /**
+     * Sets the repository to use as cache.
+     *
+     * @param cacheRepository the repository
+     * @return this object (for method chaining)
+     */
+    public @NotNull CachedRepositoryBuilder<T, I> cacheRepository(
+            final @NotNull CacheRepository<T, I> cacheRepository
+    ) {
+        this.cacheRepository = cacheRepository;
+        return this;
     }
 
     /**
@@ -157,7 +171,7 @@ public final class CachedRepositoryBuilder<T, ID> {
      * @param repositorySettings the cache repository settings
      * @return this object (for method chaining)
      */
-    public <S extends CacheRepositorySettings<S>> @NotNull CachedRepositoryBuilder<T, ID> cacheRepository(
+    public <S extends CacheRepositorySettings<S>> @NotNull CachedRepositoryBuilder<T, I> cacheRepository(
             final @NotNull CacheRepositoryDataSource<S> dataSource,
             final @NotNull S repositorySettings
     ) {
@@ -167,25 +181,14 @@ public final class CachedRepositoryBuilder<T, ID> {
     }
 
     /**
-     * Sets the repository to use as cache.
-     *
-     * @param cacheRepository the repository
-     * @return this object (for method chaining)
-     */
-    public @NotNull CachedRepositoryBuilder<T, ID> cacheRepository(final @NotNull CacheRepository<T, ID> cacheRepository) {
-        this.cacheRepository = cacheRepository;
-        return this;
-    }
-
-    /**
      * Sets the type of the entities for the internal mapper.
      * <br>
-     * This is NOT necessary if the provided internal repository is one of the modules implementations.
+     * This is NOT necessary if the provided internal repository is one of the implementations of the modules.
      *
      * @param type the entity Java class
      * @return this object (for method chaining)
      */
-    public @NotNull CachedRepositoryBuilder<T, ID> entityType(final @NotNull Class<T> type) {
+    public @NotNull CachedRepositoryBuilder<T, I> entityType(final @NotNull Class<T> type) {
         this.entityMapper = EntityMapper.create(type);
         return this;
     }
@@ -193,17 +196,17 @@ public final class CachedRepositoryBuilder<T, ID> {
     /**
      * Sets the entity mapper.
      * <br>
-     * This is NOT necessary if the provided internal repository is one of the modules implementations.
+     * This is NOT necessary if the provided internal repository is one of the implementations of the modules.
      *
      * @param entityMapper the entity mapper
      * @return this object (for method chaining)
      */
-    public @NotNull CachedRepositoryBuilder<T, ID> entityMapper(final @NotNull EntityMapper<T, ID> entityMapper) {
+    public @NotNull CachedRepositoryBuilder<T, I> entityMapper(final @NotNull EntityMapper<T, I> entityMapper) {
         this.entityMapper = entityMapper;
         return this;
     }
 
-    private @NotNull EntityMapper<T, ID> getEntityMapper() {
+    private @NotNull EntityMapper<T, I> getEntityMapper() {
         return Objects.requireNonNull(entityMapper, "entityMapper has not been specified yet");
     }
 

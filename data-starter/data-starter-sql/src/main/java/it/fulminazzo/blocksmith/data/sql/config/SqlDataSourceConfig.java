@@ -3,22 +3,29 @@ package it.fulminazzo.blocksmith.data.sql.config;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import it.fulminazzo.blocksmith.data.sql.DatabaseType;
+import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
 import it.fulminazzo.blocksmith.validation.annotation.*;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
 import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * {@link SqlDataSourceConfig} for {@link SqlDataSource}.
+ *
+ * @see DataSourceConfig
+ * @see SqlDataSource
+ */
 @Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Accessors(chain = true)
 public final class SqlDataSourceConfig implements DataSourceConfig {
 
     static {
@@ -29,12 +36,10 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     }
 
     @NonNull(exceptionMessage = "'database type' must be declared")
-    @NotNull
     DatabaseType databaseType;
 
     @NonNull(exceptionMessage = "'database name' must not be empty")
     @NotEmpty(exceptionMessage = "'database name' must not be empty")
-    @NotNull
     String database;
 
     @Nullable
@@ -68,8 +73,6 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     Long maxLifeTime;
 
-    @NotNull
-    @Builder.Default
     Map<String, Object> properties = new HashMap<>();
 
     /*
@@ -89,44 +92,40 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     @Nullable
     String schemaName;
 
-    @Builder.Default
-    @NotNull
     Map<String, Object> parameters = new HashMap<>();
 
     /*
-     * SqliteDataSource
+     * H2DataSource and SqliteDataSource
      */
 
-    @NotNull
-    @Builder.Default
-    ConnectionMode connectionMode = ConnectionMode.builder().build();
+    ConnectionMode connectionMode = new ConnectionMode();
 
+    /**
+     * Defines the connection mode type.
+     */
+    public enum ConnectionModeType {
+        MEMORY, DISK, SERVER
+    }
+
+    /**
+     * Defines the connection mode.
+     */
     @Data
-    @FieldDefaults(level = AccessLevel.PRIVATE)
     @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @Accessors(chain = true)
     public static class ConnectionMode {
 
-        @NotNull
-        @Builder.Default
         ConnectionModeType type = ConnectionModeType.MEMORY;
 
+        /**
+         * The path of the directory where the database should be saved.
+         * The database will be saved in the form {@code <directory_path>/<database_name>.mv.db}
+         */
         @Nullable
         String directoryPath;
 
-        @Nullable
-        String host;
-
-        @Port
-        @Range(from = 1, to = 65535)
-        @Nullable
-        Integer port;
-
-    }
-
-    public enum ConnectionModeType {
-        MEMORY, DISK, SERVER
     }
 
 }

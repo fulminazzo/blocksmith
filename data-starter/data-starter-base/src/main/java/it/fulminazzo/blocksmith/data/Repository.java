@@ -10,10 +10,14 @@ import java.util.function.Function;
 /**
  * A general repository for handling entities in a data source.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities (should be unique)
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities (should be unique)
+ * @see AbstractRepository
+ * @see CacheRepository
+ * @see RepositorySettings
+ * @see RepositoryDataSource
  */
-public interface Repository<T, ID> {
+public interface Repository<T, I> {
 
     /**
      * Gets the entity with the associated id.
@@ -21,27 +25,27 @@ public interface Repository<T, ID> {
      * @param id the id
      * @return the entity
      */
-    @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id);
+    @NotNull CompletableFuture<Optional<T>> findById(final @NotNull I id);
 
     /**
      * Attempts to find the entity with the associated it.
      * If it was not found, it will be created.
      *
-     * @param id the id
+     * @param id     the id
      * @param entity the entity (will be stored in the database if existing not found)
      * @return the entity
      */
-    @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull ID id, final @NotNull T entity);
+    @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull I id, final @NotNull T entity);
 
     /**
      * Attempts to find the entity with the associated it.
      * If it was not found, it will be created.
      *
-     * @param id the id
+     * @param id       the id
      * @param supplier the supplier to create and store a new entity from the given id
      * @return the entity
      */
-    @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull ID id, final @NotNull Function<ID, T> supplier);
+    @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull I id, final @NotNull Function<I, T> supplier);
 
     /**
      * Checks if an entity with the associated id exists.
@@ -49,7 +53,7 @@ public interface Repository<T, ID> {
      * @param id the id
      * @return {@code true} if it does
      */
-    @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id);
+    @NotNull CompletableFuture<Boolean> existsById(final @NotNull I id);
 
     /**
      * Saves the given entity.
@@ -58,14 +62,6 @@ public interface Repository<T, ID> {
      * @return the saved entity (in case values are changed)
      */
     @NotNull CompletableFuture<T> save(final @NotNull T entity);
-
-    /**
-     * Deletes the entities.
-     *
-     * @param id the id
-     * @return nothing
-     */
-    @NotNull CompletableFuture<Void> delete(final @NotNull ID id);
 
     /**
      * Gets all the entities currently stored.
@@ -88,7 +84,7 @@ public interface Repository<T, ID> {
      * @param ids the ids
      * @return the filtered entities
      */
-    @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids);
+    @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<I> ids);
 
     /**
      * Saves all the given entities.
@@ -99,18 +95,26 @@ public interface Repository<T, ID> {
     @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entities);
 
     /**
-     * Deletes all the entities with the associated id.
-     *
-     * @param ids the ids
-     * @return nothing
-     */
-    @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<ID> ids);
-
-    /**
      * Counts all the entities currently stored.
      *
      * @return the amount
      */
     @NotNull CompletableFuture<Long> count();
+
+    /**
+     * Deletes all the entities with the associated id.
+     *
+     * @param ids the ids
+     * @return nothing
+     */
+    @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<I> ids);
+
+    /**
+     * Deletes the entities.
+     *
+     * @param id the id
+     * @return nothing
+     */
+    @NotNull CompletableFuture<Void> delete(final @NotNull I id);
 
 }

@@ -40,15 +40,17 @@ class NightConfigUtilsTest extends Specification {
 
         and:
         def expected = CommentedConfig.inMemory()
-        expected.set('simple', 'Hello, world!')
-        expected.setComment('version', ' This is the first comment')
-        expected.set('version', 1.0d)
-        expected.setComment('players', ' This comment is multiline\n Hope it will work!')
-        expected.set('players', 2)
-        expected.setComment('data', ' This should not be searched')
-        expected.set('data', null)
-        expected.set('allowed', null)
-        expected.set('current', null)
+        expected.with {
+            set('simple', 'Hello, world!')
+            setComment('version', ' This is the first comment')
+            set('version', 1.0d)
+            setComment('players', ' This comment is multiline\n Hope it will work!')
+            set('players', 2)
+            setComment('data', ' This should not be searched')
+            set('data', null)
+            set('allowed', null)
+            set('current', null)
+        }
 
         def authors = expected.createSubConfig()
         authors.set('Alex', 'Fulminazzo')

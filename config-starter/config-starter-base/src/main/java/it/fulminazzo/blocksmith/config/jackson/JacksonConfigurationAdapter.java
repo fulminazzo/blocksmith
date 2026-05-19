@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.config.BaseConfigurationAdapter;
 import it.fulminazzo.blocksmith.config.ConfigUtils;
 import it.fulminazzo.blocksmith.config.ConfigVersion;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -27,7 +29,7 @@ import java.util.*;
  */
 @SuppressWarnings("unchecked")
 public final class JacksonConfigurationAdapter implements BaseConfigurationAdapter {
-    private static final @NotNull SimpleDateFormat backupTimeFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS");
+    private final @NotNull SimpleDateFormat backupTimeFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS");
 
     private final @NotNull ObjectMapper mapper;
     private final @NotNull Logger logger;
@@ -39,24 +41,29 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
      * @param logger                    the logger
      * @param commentPropertyWriterType the type of {@link CommentPropertyWriter} responsible for writing comments
      */
-    public JacksonConfigurationAdapter(final @NotNull ObjectMapper mapper,
-                                       final @NotNull Logger logger,
-                                       final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType) {
+    public JacksonConfigurationAdapter(
+            final @NotNull ObjectMapper mapper,
+            final @NotNull Logger logger,
+            final @Nullable Class<? extends CommentPropertyWriter> commentPropertyWriterType
+    ) {
         this.mapper = JacksonUtils.setupMapper(mapper, logger, commentPropertyWriterType);
         this.logger = logger;
     }
 
     @Override
-    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(final @NotNull InputStream stream) {
+    public @NotNull Map<@NotNull String, @NotNull List<@NotNull String>> loadComments(
+            final @NotNull InputStream stream
+    ) {
         // JSON does not support comments
         return Collections.emptyMap();
     }
 
     @Override
     public <T> @NotNull T load(final @NotNull String data, final @NotNull Class<T> type) throws IOException {
-        return load(new ByteArrayInputStream(data.getBytes()), type);
+        return load(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)), type);
     }
 
+    @SuppressFBWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
     @Override
     public <T> @NotNull T load(final @NotNull File file, final @NotNull Class<T> type) throws IOException {
         JsonNode tree = mapper.readTree(file);
@@ -70,12 +77,13 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                 data = MapUtils.flatten(data);
 
                 Object rawVersion = data.get(ConfigVersion.PROPERTY_NAME);
-                double latest = version.getVersion();
+                Double latest = version.getVersion();
                 Double currentVersion = null;
                 if (rawVersion != null)
                     try {
                         currentVersion = Double.parseDouble(rawVersion.toString());
                     } catch (NumberFormatException ignored) {
+                        // could not parse version
                     }
                 if (currentVersion == null) {
                     logger.warn("Invalid version '{}'. Expected a decimal number.", rawVersion);
@@ -83,8 +91,10 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                     currentVersion = latest;
                 }
 
-                if (currentVersion != latest) {
-                    logger.info("Migrating configuration '{}' from version {} to version {}", file.getName(), currentVersion, latest);
+                if (!currentVersion.equals(latest)) {
+                    logger.info("Migrating configuration '{}' from version {} to version {}",
+                            file.getName(), currentVersion, latest
+                    );
 
                     String tmp = file.getName();
                     String name = tmp.substring(0, tmp.lastIndexOf('.'));
@@ -106,9 +116,12 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
                 }
             }
         }
-        return load(new FileInputStream(file), type);
+        try (InputStream input = new FileInputStream(file)) {
+            return load(input, type);
+        }
     }
 
+    @Override
     public <T> @NotNull T load(final @NotNull InputStream stream, final @NotNull Class<T> type) throws IOException {
         return mapper.readValue(stream, type);
     }
@@ -132,8 +145,10 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
         mapper.writeValue(stream, configuration);
     }
 
-    private void applyNamingStrategy(final @NotNull Map<String, Object> data,
-                                     final @Nullable PropertyNamingStrategy strategy) {
+    private static void applyNamingStrategy(
+            final @NotNull Map<String, Object> data,
+            final @Nullable PropertyNamingStrategy strategy
+    ) {
         if (strategy == null) return;
         for (String key : new ArrayList<>(data.keySet())) {
             Object value = data.remove(key);
@@ -142,17 +157,19 @@ public final class JacksonConfigurationAdapter implements BaseConfigurationAdapt
         }
     }
 
-    private void unapplyNamingStrategy(final @NotNull Map<String, Object> data,
-                                       final @Nullable PropertyNamingStrategy strategy) {
+    private static void unapplyNamingStrategy(
+            final @NotNull Map<String, Object> data,
+            final @Nullable PropertyNamingStrategy strategy
+    ) {
         if (strategy == null) return;
         for (String key : new ArrayList<>(data.keySet())) {
             Object value = data.remove(key);
             if (value instanceof Map) unapplyNamingStrategy((Map<String, Object>) value, strategy);
             if (strategy.equals(PropertyNamingStrategies.KEBAB_CASE))
-                key = CaseConverter.convert(key, Convention.KEBAB_CASE, ConfigUtils.javaNamingConvention);
+                key = CaseConverter.convert(key, Convention.KEBAB_CASE, ConfigUtils.JAVA_NAMING_CONVENTION);
             else if (strategy.equals(PropertyNamingStrategies.SNAKE_CASE))
-                key = CaseConverter.convert(key, Convention.SNAKE_CASE, ConfigUtils.javaNamingConvention);
-            else key = key.substring(0, 1).toLowerCase() + key.substring(1);
+                key = CaseConverter.convert(key, Convention.SNAKE_CASE, ConfigUtils.JAVA_NAMING_CONVENTION);
+            else key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
             data.put(key, value);
         }
     }

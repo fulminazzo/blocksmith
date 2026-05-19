@@ -56,36 +56,30 @@ import org.jooq.SQLDialect;
  *          }</pre>
  *     Check {@link RemoteDataSourceBuilder} for more.</li>
  * </ul>
+ *
+ * @see SqlDataSource
+ * @see SqlDataSourceBuilder
+ * @see H2DataSourceBuilder
+ * @see SqliteDataSourceBuilder
+ * @see RemoteDataSourceBuilder
  */
 public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSourceBuilder> {
-    private static final int maximumPoolSize = 20;
-    private static final int minimumIdle = 5;
-    private static final long connectionTimeout = 30 * 1000;
-    private static final long idleTimeout = 10 * 60 * 1000;
-    private static final long maxLifeTime = 30 * 60 * 1000;
+    private static final int MAXIMUM_POOL_SIZE = 20;
+    private static final int MINIMUM_IDLE = 5;
+    private static final long CONNECTION_TIMEOUT = 30 * 1000L;
+    private static final long IDLE_TIMEOUT = 10 * 60 * 1000L;
+    private static final long MAX_LIFE_TIME = 30 * 60 * 1000L;
 
     /**
      * Instantiates a new SQL data source builder.
      */
     SqlDataSourceBuilder() {
         super(new HikariConfig(), null, null);
-        maximumPoolSize(maximumPoolSize)
-                .minimumIdle(minimumIdle)
-                .connectionTimeout(connectionTimeout)
-                .idleTimeout(idleTimeout)
-                .maxLifeTime(maxLifeTime);
-    }
-
-    @Override
-    protected @NotNull String getJdbcUrl() {
-        throw new IllegalStateException("A database type has not been set yet! " +
-                "Please use setDatabaseType or h2 before calling this method");
-    }
-
-    @Override
-    protected @NotNull SQLDialect getSQLDialect() {
-        throw new IllegalStateException("A database type has not been set yet! " +
-                "Please use setDatabaseType or h2 before calling this method");
+        maximumPoolSize(MAXIMUM_POOL_SIZE)
+                .minimumIdle(MINIMUM_IDLE)
+                .connectionTimeout(CONNECTION_TIMEOUT)
+                .idleTimeout(IDLE_TIMEOUT)
+                .maxLifeTime(MAX_LIFE_TIME);
     }
 
     /**
@@ -114,6 +108,18 @@ public final class SqlDataSourceBuilder extends ASqlDataSourceBuilder<SqlDataSou
      */
     public @NotNull SqliteDataSourceBuilder sqlite() {
         return new SqliteDataSourceBuilder(config, database, executor);
+    }
+
+    @Override
+    protected @NotNull String getJdbcUrl() {
+        throw new IllegalStateException("A database type has not been set yet! "
+                + "Please use setDatabaseType or h2 before calling this method");
+    }
+
+    @Override
+    protected @NotNull SQLDialect getSQLDialect() {
+        throw new IllegalStateException("A database type has not been set yet! "
+                + "Please use setDatabaseType or h2 before calling this method");
     }
 
 }

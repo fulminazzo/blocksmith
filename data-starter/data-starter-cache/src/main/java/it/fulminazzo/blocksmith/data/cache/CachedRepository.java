@@ -8,7 +8,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -17,18 +19,23 @@ import java.util.stream.Stream;
 /**
  * A special implementation of {@link Repository} that supports internal caching.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class CachedRepository<T, ID> implements Repository<T, ID> {
-    protected final @NotNull CacheRepository<T, ID> cacheRepository;
-    protected final @NotNull Repository<T, ID> repository;
+public class CachedRepository<T, I> implements Repository<T, I> {
+    protected final @NotNull CacheRepository<T, I> cacheRepository;
+    protected final @NotNull Repository<T, I> repository;
 
-    protected final @NotNull EntityMapper<T, ID> entityMapper;
+    protected final @NotNull EntityMapper<T, I> entityMapper;
 
     @Override
-    public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
+    public @NotNull CompletableFuture<Long> count() {
+        return repository.count();
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull I id) {
         return cacheRepository.findById(id).thenCompose(r -> {
             if (r.isPresent()) return CompletableFuture.completedFuture(r);
             else return repository.findById(id)
@@ -40,12 +47,12 @@ public class CachedRepository<T, ID> implements Repository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull ID id, final @NotNull T entity) {
+    public @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull I id, final @NotNull T entity) {
         return findByIdOrCreate(id, i -> entity);
     }
 
     @Override
-    public @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull ID id, final @NotNull Function<ID, T> supplier) {
+    public @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull I id, final @NotNull Function<I, T> supplier) {
         return findById(id).thenCompose(o -> o
                 .map(CompletableFuture::completedFuture)
                 .orElseGet(() -> save(supplier.apply(id)))
@@ -53,7 +60,7 @@ public class CachedRepository<T, ID> implements Repository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id) {
+    public @NotNull CompletableFuture<Boolean> existsById(final @NotNull I id) {
         return findById(id).thenApply(Optional::isPresent);
     }
 
@@ -61,14 +68,6 @@ public class CachedRepository<T, ID> implements Repository<T, ID> {
     public @NotNull CompletableFuture<T> save(final @NotNull T entity) {
         return repository.save(entity).thenCompose(e ->
                 cacheRepository.save(e).thenApply(c -> e)
-        );
-    }
-
-    @Override
-    public @NotNull CompletableFuture<Void> delete(final @NotNull ID id) {
-        return CompletableFuture.allOf(
-                cacheRepository.delete(id),
-                repository.delete(id)
         );
     }
 
@@ -83,10 +82,10 @@ public class CachedRepository<T, ID> implements Repository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
+    public @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<I> ids) {
         return cacheRepository.findAllById(ids).thenCompose(c -> {
-            Set<ID> found = c.stream().map(entityMapper::getId).collect(Collectors.toSet());
-            Collection<ID> missing = ids.stream()
+            Set<I> found = c.stream().map(entityMapper::getId).collect(Collectors.toSet());
+            Collection<I> missing = ids.stream()
                     .filter(i -> !found.contains(i))
                     .collect(Collectors.toList());
             if (missing.isEmpty()) return CompletableFuture.completedFuture(c);
@@ -107,7 +106,7 @@ public class CachedRepository<T, ID> implements Repository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<ID> ids) {
+    public @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<I> ids) {
         return CompletableFuture.allOf(
                 cacheRepository.deleteAll(ids),
                 repository.deleteAll(ids)
@@ -115,20 +114,23 @@ public class CachedRepository<T, ID> implements Repository<T, ID> {
     }
 
     @Override
-    public @NotNull CompletableFuture<Long> count() {
-        return repository.count();
+    public @NotNull CompletableFuture<Void> delete(final @NotNull I id) {
+        return CompletableFuture.allOf(
+                cacheRepository.delete(id),
+                repository.delete(id)
+        );
     }
 
     /**
      * Gets a new builder for this class.
      *
      * @param <T>        the type of the entities
-     * @param <ID>       the type of the id of the entities
+     * @param <I>        the type of the id of the entities
      * @param repository the base repository that will be responsible for handling the main data
      * @return the repository builder
      */
-    public static <T, ID> @NotNull CachedRepositoryBuilder<T, ID> wrap(
-            final @NotNull Repository<T, ID> repository
+    public static <T, I> @NotNull CachedRepositoryBuilder<T, I> wrap(
+            final @NotNull Repository<T, I> repository
     ) {
         return new CachedRepositoryBuilder<>(repository);
     }

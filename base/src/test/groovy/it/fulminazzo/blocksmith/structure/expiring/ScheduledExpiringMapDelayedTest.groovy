@@ -8,27 +8,23 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 
 class ScheduledExpiringMapDelayedTest extends Specification {
-    private static ScheduledExecutorService scheduler
+    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor()
 
     private ScheduledExpiringMap<String, String> map
     private Map<String, ExpiringEntry<String>> internal
 
-    void setupSpec() {
-        scheduler = Executors.newSingleThreadScheduledExecutor()
-    }
-
     void cleanupSpec() {
-        scheduler.close()
+        SCHEDULER.close()
     }
 
     void setup() {
-        map = new ScheduledExpiringMap<>(scheduler, Duration.ofDays(1L))
+        map = new ScheduledExpiringMap<>(SCHEDULER, Duration.ofDays(1L))
         internal = Reflect.on(map).get('delegate').get()
     }
 
     def 'test that initialization of invalid duration throws'() {
         when:
-        new ScheduledExpiringMap<>(scheduler, Duration.ofSeconds(0))
+        new ScheduledExpiringMap<>(SCHEDULER, Duration.ofSeconds(0))
 
         then:
         thrown(IllegalArgumentException)

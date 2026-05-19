@@ -12,6 +12,10 @@ import java.lang.annotation.*;
  * Accepts {@code null} values.
  * <br>
  * <b>WARNING</b>: does not support {@code 0} as port.
+ *
+ * @see Constraint
+ * @see NonNull
+ * @see Range
  */
 @Range(min = 1, max = 65535)
 @Constraint
@@ -26,11 +30,13 @@ public @interface Port {
      * By default, the message is a code that will later be translated by an appropriate translator.
      *
      * @return the message
+     * @see ValidationMessages
      */
     @NotNull String message() default ValidationMessages.REQUIRED_PORT;
 
     /**
-     * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
+     * Gets the error message that will be shown in the
+     * {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
      *
      * @return the message
      */

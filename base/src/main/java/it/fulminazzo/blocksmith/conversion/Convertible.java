@@ -22,8 +22,9 @@ public interface Convertible {
      */
     @SuppressWarnings("unchecked")
     default <T> T as(final @NotNull Class<T> type, final @Nullable Object @NotNull ... args) {
-        Converter<Convertible, T> converter = (Converter<Convertible, T>) ConversionRegistry.getConverter(getClass(), type)
-                .orElse((t, a) -> Reflect.cast(type, t));
+        Converter<Convertible, T> converter = (Converter<Convertible, T>)
+                ConversionRegistry.getConverter(getClass(), type)
+                        .orElse((t, a) -> Reflect.cast(type, t));
         return converter.convert(this, args);
     }
 
@@ -38,9 +39,11 @@ public interface Convertible {
      * @param to        the type to convert to
      * @param converter the conversion function
      */
-    static <T, R> void register(final @NotNull Class<T> from,
-                                final @NotNull Class<R> to,
-                                final @NotNull Converter<T, R> converter) {
+    static <T, R> void register(
+            final @NotNull Class<T> from,
+            final @NotNull Class<R> to,
+            final @NotNull Converter<T, R> converter
+    ) {
         ConversionRegistry.register(from, to, converter);
     }
 

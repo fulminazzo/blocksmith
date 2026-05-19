@@ -2,23 +2,31 @@
 # PLUGINS
 buildconfig = "6.0.9"
 shadow = "9.4.1"
-jooq_gen = "10.1.1"
+checkstyle = "13.4.2"
+codenarc = "3.7.0"
+sonarqube = "7.3.0.8198"
+spotbugs-version = "4.9.8"
+spotbugs-plugin = "6.5.4"
+jooq-gen = "10.1.1"
 
 # ANNOTATIONS
 lombok = "1.18.44"
-jetbrains_annotations = "26.1.0"
+jetbrains-annotations = "26.1.0"
 
 # LOGGING
 slf4j = "2.0.17"
 log4j = "2.25.4"
 
 # TESTING
-spock_core = "2.4-groovy-5.0"
+spock-core = "2.4-groovy-5.0"
 mockito = "5.23.0"
+
+test-containers = "2.0.5"
+test-containers-module = "1.21.4"
 
 # DATA FORMATS
 jackson = "2.21.2"
-night_config = "3.8.4"
+night-config = "3.8.4"
 
 # DATABASES
 jooq = "3.16.23"
@@ -29,16 +37,12 @@ sqlite = "3.51.3.0"
 mysql = "9.6.0"
 mariadb = "3.5.7"
 postgresql = "42.7.10"
+yugabytedb = "42.7.3-yb-4"
 
 lettuce = "7.5.0.RELEASE"
 
 mongodb = "5.6.4"
 reactor = "3.8.4"
-
-
-embedded_mariadb = "3.3.1"
-embedded_redis = "0.7.3"
-embedded_mongodb = "4.24.0"
 
 # MINECRAFT
 bukkit = "1.16.5-R0.1-SNAPSHOT"
@@ -47,33 +51,41 @@ bungeecord = "1.16-R0.2"
 velocity = "3.0.0-SNAPSHOT"
 
 # PROJECT
-java_parser = "3.28.0"
+java-parser = "3.28.0"
 
 [libraries]
+checkstyle = { module = "com.puppycrawl.tools:checkstyle", version.ref = "checkstyle" }
+
 # ANNOTATIONS
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
-jetbrains_annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains_annotations" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
 
 # LOGGING
 slf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
-log4j_api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
-log4j_core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
-log4j_slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
+log4j-api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
+log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
+log4j-slf4j = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
 
 # TESTING
-junit_platform = { module = "org.junit.platform:junit-platform-launcher" }
-
-spock_core = { module = "org.spockframework:spock-core", version.ref = "spock_core" }
+spock-core = { module = "org.spockframework:spock-core", version.ref = "spock-core" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-version" }
+
+test-containers = { module = "org.testcontainers:testcontainers", version.ref = "test-containers" }
+test-containers-mysql = { module = "org.testcontainers:mysql", version.ref = "test-containers-module" }
+test-containers-mariadb = { module = "org.testcontainers:mariadb", version.ref = "test-containers-module" }
+test-containers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "test-containers-module" }
+test-containers-yugabytedb = { module = "org.testcontainers:yugabytedb", version.ref = "test-containers-module" }
+test-containers-mongodb = { module = "org.testcontainers:mongodb", version.ref = "test-containers-module" }
 
 # DATA FORMATS
-jackson_json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-jackson_yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
-jackson_toml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-toml", version.ref = "jackson" }
-jackson_xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
-jackson_properties = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-properties", version.ref = "jackson" }
+jackson-json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
+jackson-toml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-toml", version.ref = "jackson" }
+jackson-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
+jackson-properties = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-properties", version.ref = "jackson" }
 
-night_config_toml = { module = "com.electronwill.night-config:toml", version.ref = "night_config" }
+night-config-toml = { module = "com.electronwill.night-config:toml", version.ref = "night-config" }
 
 # DATABASES
 jooq = { module = "org.jooq:jooq", version.ref = "jooq" }
@@ -84,17 +96,13 @@ sqlite = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite" }
 mysql = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
 mariadb = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "mariadb" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+yugabytedb = { module = "com.yugabyte:jdbc-yugabytedb", version.ref = "yugabytedb" }
 
 lettuce = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
 
 mongodb-driver-platform = { module = "org.mongodb:mongodb-driver-bom", version.ref = "mongodb" }
 mongodb-driver-async = { module = "org.mongodb:mongodb-driver-reactivestreams", version.ref = "mongodb" }
 reactor = { module = "io.projectreactor:reactor-core", version.ref = "reactor" }
-
-
-embedded_mariadb = { module = "ch.vorburger.mariaDB4j:mariaDB4j", version.ref = "embedded_mariadb" }
-embedded_redis = { module = "it.ozimov:embedded-redis", version.ref = "embedded_redis" }
-embedded_mongodb = { module = "de.flapdoodle.embed:de.flapdoodle.embed.mongo", version.ref = "embedded_mongodb" }
 
 # MINECRAFT
 bukkit = { module = "org.spigotmc:spigot-api", version.ref = "bukkit" }
@@ -103,22 +111,24 @@ bungeecord = { module = "net.md-5:bungeecord-api", version.ref = "bungeecord" }
 velocity = { module = "com.velocitypowered:velocity-api", version.ref = "velocity" }
 
 # PROJECT
-java_parser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "java_parser" }
+java-parser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "java-parser" }
 
 [bundles]
 # ANNOTATIONS
-annotations = ["lombok", "jetbrains_annotations"]
+annotations = ["lombok", "jetbrains-annotations"]
 
 # LOGGING
-log4j = ["log4j_api", "log4j_core", "log4j_slf4j"]
+log4j = ["log4j-api", "log4j-core", "log4j-slf4j"]
 
 # TESTING
-test_framework = ["spock_core", "mockito"]
+test-framework = ["spock-core", "mockito"]
 
 # DATA FORMATS
-toml = ["jackson_toml", "night_config_toml"]
+toml = ["jackson-toml", "night-config-toml"]
 
 [plugins]
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
-jooq = { id = "nu.studer.jooq", version.ref = "jooq_gen" }
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
+spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugs-plugin" }
+jooq = { id = "nu.studer.jooq", version.ref = "jooq-gen" }

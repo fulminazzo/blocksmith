@@ -1,0 +1,330 @@
+package it.fulminazzo.blocksmith.data
+
+import org.jetbrains.annotations.NotNull
+import spock.lang.Specification
+import spock.lang.Stepwise
+
+@Stepwise
+abstract class RepositoryIntegrationTest<R extends Repository<User, Long>> extends Specification {
+    protected R repository
+
+    void setupRepository() {
+        repository = initializeRepository()
+        clearData()
+        insert(Users.SAVED1)
+        insert(Users.SAVED2)
+    }
+
+    void clearData() {
+        remove(Users.SAVED1.id)
+        remove(Users.SAVED2.id)
+        remove(Users.NEW1.id)
+        remove(Users.NEW2.id)
+    }
+
+    def 'test that findById returns #expected'() {
+        when:
+        def actual = repository.findById(expected.id).get()
+
+        then:
+        actual.present
+        actual.get() == expected
+
+        where:
+        expected << [Users.SAVED1, Users.SAVED2]
+    }
+
+    def 'test that findById does not throw if not existing'() {
+        when:
+        def actual = repository.findById(3L).get()
+
+        then:
+        actual.empty
+    }
+
+    def 'test that findByIdOrCreate of #entity saves if not existing'() {
+        when:
+        def first = repository.findByIdOrCreate(
+                entity.id,
+                entity
+        ).get()
+
+        then:
+        first == entity
+
+        and:
+        exists(entity.id)
+
+        where:
+        entity << [Users.SAVED1, Users.SAVED2, Users.NEW1, Users.NEW2]
+    }
+
+    def 'test that existsById of #entity returns #expected'() {
+        when:
+        def actual = repository.existsById(entity.id).get()
+
+        then:
+        actual == expected
+
+        where:
+        entity       || expected
+        Users.SAVED1 || true
+        Users.SAVED2 || true
+        Users.NEW1   || false
+        Users.NEW2   || false
+    }
+
+    def 'test that save correctly updates #entity'() {
+        when:
+        def saved = repository.save(entity).get()
+
+        then:
+        saved == entity
+
+        when:
+        def actual = repository.findById(entity.id).get()
+
+        then:
+        actual.present
+        actual.get() == entity
+
+        where:
+        entity << [
+                new User(Users.SAVED1.id, Users.SAVED1.username + '_', Users.SAVED1.age + 1),
+                new User(Users.SAVED2.id, Users.SAVED2.username + '_', Users.SAVED2.age + 1)
+        ]
+    }
+
+    def 'test that save correctly saves #entity'() {
+        expect:
+        !exists(entity.id)
+
+        when:
+        def saved = repository.save(entity).get()
+
+        then:
+        saved == entity
+
+        and:
+        exists(entity.id)
+
+        where:
+        entity << [Users.NEW1, Users.NEW2]
+    }
+
+    def 'test that delete correctly deletes #entity'() {
+        expect:
+        exists(entity.id)
+
+        when:
+        repository.delete(entity.id).get()
+
+        then:
+        !exists(entity.id)
+
+        where:
+        entity << [Users.SAVED1, Users.SAVED2]
+    }
+
+    def 'test that delete does not throw on not existing entity'() {
+        when:
+        repository.delete(3L).get()
+
+        then:
+        noExceptionThrown()
+    }
+
+    def 'test that findAll returns all loaded entities'() {
+        when:
+        def result = repository.findAll().get()
+
+        then:
+        result.sort() == [Users.SAVED1, Users.SAVED2].sort()
+    }
+
+    def 'test that findAll with page #page returns #expected'() {
+        when:
+        def result = repository.findAll(page).get()
+
+        then:
+        result == expected
+
+        where:
+        page           || expected
+        Page.of(0, 0)  || []
+        Page.of(0, 1)  || [Users.SAVED1]
+        Page.of(1, 1)  || [Users.SAVED2]
+        Page.of(-1, 1) || []
+        Page.of(-1, 0) || []
+        Page.of(2, 1)  || []
+        Page.of(2, 0)  || []
+        Page.of(0, 3)  || [Users.SAVED1, Users.SAVED2]
+    }
+
+    def 'test that findAllById correctly returns all entities'() {
+        given:
+        def expected = [Users.SAVED1, Users.SAVED2]
+
+        when:
+        def actual = repository.findAllById([Users.SAVED1.id, Users.SAVED2.id, 3L]).get()
+
+        then:
+        actual.sort() == expected.sort()
+    }
+
+    def 'test that findAllById does not throw on null entities'() {
+        given:
+        def expected = [Users.SAVED1, Users.SAVED2]
+
+        when:
+        def actual = repository.findAllById([null, Users.SAVED1.id, null, Users.SAVED2.id, null]).get()
+
+        then:
+        actual.sort() == expected.sort()
+    }
+
+    def 'test that findAllById of empty returns empty'() {
+        given:
+        def expected = []
+
+        when:
+        def actual = repository.findAllById([]).get()
+
+        then:
+        actual == expected
+    }
+
+    def 'test that saveAll correctly updates all entities'() {
+        given:
+        def entities = [
+                new User(Users.SAVED1.id, Users.SAVED1.username + '_', Users.SAVED1.age + 1),
+                new User(Users.SAVED2.id, Users.SAVED2.username + '_', Users.SAVED2.age + 1)
+        ]
+
+        when:
+        def saved = repository.saveAll(entities).get()
+
+        then:
+        saved == entities
+
+        when:
+        def actual = repository.findAllById(entities*.id).get()
+
+        then:
+        actual == entities
+    }
+
+    def 'test that saveAll correctly saves all entities'() {
+        given:
+        def entities = [Users.NEW1, Users.NEW2]
+
+        expect:
+        entities.every { !exists(it.id) }
+
+        when:
+        def saved = repository.saveAll(entities).get()
+
+        then:
+        saved.sort() == entities.sort()
+
+        and:
+        entities.every { exists(it.id) }
+    }
+
+    def 'test that saveAll does not throw on null entities'() {
+        given:
+        def entities = [Users.NEW1, Users.NEW2]
+
+        expect:
+        entities.every { !exists(it.id) }
+
+        when:
+        def saved = repository.saveAll([null, Users.NEW1, null, Users.NEW2, null]).get()
+
+        then:
+        saved.sort() == entities.sort()
+
+        and:
+        entities.every { exists(it.id) }
+    }
+
+    def 'test that saveAll of empty returns empty'() {
+        given:
+        def entities = []
+
+        when:
+        def saved = repository.saveAll(entities).get()
+
+        then:
+        saved == entities
+    }
+
+    def 'test that deleteAll correctly deletes all entities'() {
+        given:
+        def entities = [Users.SAVED1, Users.SAVED2]
+
+        expect:
+        entities.every { exists(it.id) }
+
+        when:
+        repository.deleteAll([Users.SAVED1.id, Users.SAVED2.id, 3L]).join()
+
+        then:
+        entities.every { !exists(it.id) }
+    }
+
+    def 'test that deleteAll does not throw on null entities'() {
+        given:
+        def entities = [Users.SAVED1, Users.SAVED2]
+
+        expect:
+        entities.every { exists(it.id) }
+
+        when:
+        repository.deleteAll([null, Users.SAVED1.id, null, Users.SAVED2.id, null]).join()
+
+        then:
+        entities.every { !exists(it.id) }
+    }
+
+    def 'test that deleteAll of empty does not throw'() {
+        when:
+        repository.deleteAll([]).join()
+
+        then:
+        noExceptionThrown()
+    }
+
+    def 'test that count correctly returns number of entities'() {
+        when:
+        def actual = repository.count().get()
+
+        then:
+        actual == 2L
+    }
+
+    abstract R initializeRepository()
+
+    /**
+     * Checks if a entity with the given id exists in the repository.
+     *
+     * @param id the entity id
+     * @return {@code true} if it does
+     */
+    abstract boolean exists(final @NotNull Long id)
+
+    /**
+     * Adds the given entity to the repository.
+     *
+     * @param entity the entity
+     */
+    abstract void insert(final @NotNull User entity);
+
+    /**
+     * Removes the entity with the given id from the repository.
+     *
+     * @param entity the entity id
+     */
+    abstract void remove(final @NotNull Long id);
+
+}

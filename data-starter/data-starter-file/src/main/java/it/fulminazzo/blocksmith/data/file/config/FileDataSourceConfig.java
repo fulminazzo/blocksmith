@@ -4,10 +4,18 @@ import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import it.fulminazzo.blocksmith.data.file.FileDataSource;
 import lombok.Value;
+import lombok.experimental.Accessors;
 
 import java.util.concurrent.Executors;
 
+/**
+ * {@link DataSourceConfig} for {@link FileDataSource}.
+ *
+ * @see DataSourceConfig
+ * @see FileDataSource
+ */
 @Value
+@Accessors(chain = true)
 public class FileDataSourceConfig implements DataSourceConfig {
 
     static {

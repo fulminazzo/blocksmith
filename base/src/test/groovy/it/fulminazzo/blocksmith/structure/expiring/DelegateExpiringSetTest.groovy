@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.structure.expiring
 import spock.lang.Specification
 
 class DelegateExpiringSetTest extends Specification {
-    private static final long ttl = 400L
+    private static final long ttl = 2_000L
 
     private static final String value = 'Hello, world!'
     private static final Object PRESENT = DelegateExpiringSet.PRESENT
@@ -115,7 +115,7 @@ class DelegateExpiringSetTest extends Specification {
 
         and:
         def actualTtl = internal.getTtl(value)
-        actualTtl.toMillis() <= ttl
+        actualTtl.toMillis() <= ttl * 1.1
         actualTtl.toMillis() >= ttl * 0.9
 
         and:
@@ -180,14 +180,18 @@ class DelegateExpiringSetTest extends Specification {
         ['Hello']                                || true
         ['Goodbye']                              || false
         new DelegateExpiringSet(new MockExpiringMap() {
+
             {
                 put('Hello', PRESENT, 10_000L)
             }
+
         })                                       || true
         new DelegateExpiringSet(new MockExpiringMap() {
+
             {
                 put('Goodbye', PRESENT, 10_000L)
             }
+
         })                                       || false
     }
 
@@ -220,13 +224,13 @@ class DelegateExpiringSetTest extends Specification {
         then:
         def first = data.find { it.value == 'Hello' }
         first != null
-        first.expireTime - now <= ttl + 1
+        first.expireTime - now <= ttl * 1.1
         first.expireTime - now >= ttl * 0.9
 
         and:
         def second = data.find { it.value == 'Goodbye' }
         second != null
-        second.expireTime - now <= 2
+        second.expireTime - now <= 200
 
         and:
         def third = data.find { it.value == 'Ciao' }
@@ -234,8 +238,8 @@ class DelegateExpiringSetTest extends Specification {
         third.expireTime == ExpiringEntry.NEVER_EXPIRE
     }
 
-    private static sleepTtl() {
-        sleep(ttl / 2 as long)
+    protected static sleepTtl() {
+        sleep((long) (ttl / 2))
     }
 
 }

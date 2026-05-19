@@ -3,5 +3,5 @@ dependencies {
 
     api(projects.configStarter.configStarterBase)
 
-    testImplementation(projects.configStarter.configStarterJson)
+    integrationTestImplementation(projects.configStarter.configStarterJson)
 }

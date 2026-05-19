@@ -21,17 +21,19 @@ import java.util.function.BiFunction;
  * Uses the <a href="https://www.jooq.org/">jOOQ</a> library under the hood
  * with custom methods to speed up development.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities
- * @param <TB> the type of the table containing the entities
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities
+ * @param <E> the type of the table containing the entities
+ * @see SqlRepository
+ * @see SqlDataSource
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class SqlQueryEngine<T, ID, TB> implements QueryEngine<T, ID> {
+public final class SqlQueryEngine<T, I, E> implements QueryEngine<T, I> {
     private final @NotNull DSLContext context;
     @Getter
-    private final @NotNull TB table;
+    private final @NotNull E table;
     @Getter
-    private final @NotNull Field<ID> idColumn;
+    private final @NotNull Field<I> idColumn;
     private final @NotNull Executor executor;
 
     /**
@@ -40,7 +42,7 @@ public final class SqlQueryEngine<T, ID, TB> implements QueryEngine<T, ID> {
      * @param id the id
      * @return the condition
      */
-    public @NotNull Condition idEquals(final @NotNull ID id) {
+    public @NotNull Condition idEquals(final @NotNull I id) {
         return idColumn.eq(id);
     }
 
@@ -50,18 +52,8 @@ public final class SqlQueryEngine<T, ID, TB> implements QueryEngine<T, ID> {
      * @param ids the collection of ids
      * @return the condition
      */
-    public @NotNull Condition idIn(final @NotNull Collection<ID> ids) {
+    public @NotNull Condition idIn(final @NotNull Collection<I> ids) {
         return idColumn.in(ids);
-    }
-
-    /**
-     * Gets the underlying table for operations that need direct access.
-     * Useful for operations where the type needs to be preserved.
-     *
-     * @return the table where the entities are stored
-     */
-    public @NotNull Table<?> getWildcardTable() {
-        return (Table<?>) table;
     }
 
     /**
@@ -92,6 +84,16 @@ public final class SqlQueryEngine<T, ID, TB> implements QueryEngine<T, ID> {
             final @NotNull BiFunction<DSLContext, Table<?>, R> queryFunction
     ) {
         return CompletableFuture.supplyAsync(() -> queryFunction.apply(context, getWildcardTable()), executor);
+    }
+
+    /**
+     * Gets the underlying table for operations that need direct access.
+     * Useful for operations where the type needs to be preserved.
+     *
+     * @return the table where the entities are stored
+     */
+    public @NotNull Table<?> getWildcardTable() {
+        return (Table<?>) table;
     }
 
 }

@@ -17,14 +17,35 @@ import java.util.concurrent.ScheduledExecutorService;
 public interface ExpiringList<E> extends List<E>, ExpiringCollection<E> {
 
     /**
-     * Adds an element in the list at the given index.
-     * All the elements after the index will be shifted to the right.
+     * Adds all the elements of the given list to the current one at the given index.
      *
-     * @param index   the index at which to insert the element
-     * @param element the element to add
-     * @param ttl     the time-to-live (after which it will expire)
+     * @param index      the index at which to insert the elements
+     * @param collection the collection to take elements from
+     * @return {@code true} if the list was modified, {@code false} if it was not modified
      */
-    void add(final int index, final @Nullable E element, final @NotNull Duration ttl);
+    boolean addAll(final int index, final @NotNull ExpiringCollection<? extends E> collection);
+
+    /**
+     * Adds all the elements of the given collection to the current one at the given index.
+     * Each element will have the same expiration time.
+     *
+     * @param index      the index at which to insert the elements
+     * @param collection the collection to take elements from
+     * @param ttl        the time-to-live (after which the elements will expire) in milliseconds
+     * @return {@code true} if the collection was modified, {@code false} if it was not modified
+     */
+    boolean addAll(final int index, final @NotNull Collection<? extends E> collection, final long ttl);
+
+    /**
+     * Adds all the elements of the given collection to the current one at the given index.
+     * Each element will have the same expiration time.
+     *
+     * @param index      the index at which to insert the elements
+     * @param collection the collection to take elements from
+     * @param ttl        the time-to-live (after which the elements will expire)
+     * @return {@code true} if the collection was modified, {@code false} if it was not modified
+     */
+    boolean addAll(final int index, final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl);
 
     /**
      * Adds an element in the list at the given index.
@@ -42,61 +63,9 @@ public interface ExpiringList<E> extends List<E>, ExpiringCollection<E> {
      *
      * @param index   the index at which to insert the element
      * @param element the element to add
-     */
-    @Override
-    void add(final int index, final @Nullable E element);
-
-    /**
-     * Adds all the elements of the given list to the current one at the given index.
-     *
-     * @param index      the index at which to insert the elements
-     * @param collection the collection to take elements from
-     * @return {@code true} if the list was modified, {@code false} if it was not modified
-     */
-    boolean addAll(final int index, final @NotNull ExpiringCollection<? extends E> collection);
-
-    /**
-     * Adds all the elements of the given collection to the current one at the given index.
-     * Each element will have the same expiration time.
-     *
-     * @param index      the index at which to insert the elements
-     * @param collection the collection to take elements from
-     * @param ttl        the time-to-live (after which the elements will expire)
-     * @return {@code true} if the collection was modified, {@code false} if it was not modified
-     */
-    boolean addAll(final int index, final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl);
-
-    /**
-     * Adds all the elements of the given collection to the current one at the given index.
-     * Each element will have the same expiration time.
-     *
-     * @param index      the index at which to insert the elements
-     * @param collection the collection to take elements from
-     * @param ttl        the time-to-live (after which the elements will expire) in milliseconds
-     * @return {@code true} if the collection was modified, {@code false} if it was not modified
-     */
-    boolean addAll(final int index, final @NotNull Collection<? extends E> collection, final long ttl);
-
-    /**
-     * Adds all the elements of the given collection to the current one at the given index.
-     * If the collection is not a {@link ExpiringList}, every element will have no expiration time.
-     *
-     * @param index      the index at which to insert the elements
-     * @param collection the collection to take elements from
-     * @return {@code true} if the collection was modified, {@code false} if it was not modified
-     */
-    @Override
-    boolean addAll(final int index, final @NotNull Collection<? extends E> collection);
-
-    /**
-     * Sets the element at the given index.
-     *
-     * @param index   the index of the element to set
-     * @param element the new element
      * @param ttl     the time-to-live (after which it will expire)
-     * @return the previous element at the given index
      */
-    E set(final int index, final @Nullable E element, final @NotNull Duration ttl);
+    void add(final int index, final @Nullable E element, final @NotNull Duration ttl);
 
     /**
      * Sets the element at the given index.
@@ -113,10 +82,10 @@ public interface ExpiringList<E> extends List<E>, ExpiringCollection<E> {
      *
      * @param index   the index of the element to set
      * @param element the new element
+     * @param ttl     the time-to-live (after which it will expire)
      * @return the previous element at the given index
      */
-    @Override
-    E set(final int index, final @Nullable E element);
+    E set(final int index, final @Nullable E element, final @NotNull Duration ttl);
 
     /**
      * Returns a sublist of the elements in this list between
@@ -128,6 +97,37 @@ public interface ExpiringList<E> extends List<E>, ExpiringCollection<E> {
      */
     @Override
     @NotNull ExpiringList<E> subList(int fromIndex, int toIndex);
+
+    /**
+     * Adds all the elements of the given collection to the current one at the given index.
+     * If the collection is not a {@link ExpiringList}, every element will have no expiration time.
+     *
+     * @param index      the index at which to insert the elements
+     * @param collection the collection to take elements from
+     * @return {@code true} if the collection was modified, {@code false} if it was not modified
+     */
+    @Override
+    boolean addAll(final int index, final @NotNull Collection<? extends E> collection);
+
+    /**
+     * Adds an element in the list at the given index.
+     * All the elements after the index will be shifted to the right.
+     *
+     * @param index   the index at which to insert the element
+     * @param element the element to add
+     */
+    @Override
+    void add(final int index, final @Nullable E element);
+
+    /**
+     * Sets the element at the given index.
+     *
+     * @param index   the index of the element to set
+     * @param element the new element
+     * @return the previous element at the given index
+     */
+    @Override
+    E set(final int index, final @Nullable E element);
 
     /**
      * Initializes a new passive ExpirationList.
@@ -165,8 +165,10 @@ public interface ExpiringList<E> extends List<E>, ExpiringCollection<E> {
      * @param taskInterval the interval upon which to check expirations
      * @return the list
      */
-    static <E> @NotNull ExpiringList<E> scheduled(final @NotNull ScheduledExecutorService scheduler,
-                                                  final @NotNull Duration taskInterval) {
+    static <E> @NotNull ExpiringList<E> scheduled(
+            final @NotNull ScheduledExecutorService scheduler,
+            final @NotNull Duration taskInterval
+    ) {
         return new ScheduledExpiringList<>(scheduler, taskInterval);
     }
 

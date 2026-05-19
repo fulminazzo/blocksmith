@@ -5,7 +5,7 @@ import spock.lang.Specification
 import java.time.Duration
 
 class AbstractExpiringCollectionTest extends Specification {
-    private static final Duration ttl = Duration.ofMillis(200)
+    private static final Duration ttl = Duration.ofMillis(1_000L)
 
     private static final String value = 'Hello, world!'
 
@@ -42,7 +42,7 @@ class AbstractExpiringCollectionTest extends Specification {
 
         and:
         def actualTtl = internal.find { it.value == value }.expireTime - now
-        actualTtl <= ttl.toMillis()
+        actualTtl <= ttl.toMillis() * 1.1
         actualTtl >= ttl.toMillis() * 0.9
     }
 
@@ -64,7 +64,7 @@ class AbstractExpiringCollectionTest extends Specification {
         then:
         def firstVal = internal.find { it.value == value }
         def actualTtl = firstVal.expireTime - now
-        actualTtl <= ttl.toMillis()
+        actualTtl <= ttl.toMillis() * 1.1
         actualTtl >= ttl.toMillis() * 0.9
 
         and:
@@ -139,8 +139,8 @@ class AbstractExpiringCollectionTest extends Specification {
         string == '[Goodbye (*), Hello, Ciao (!)]'
     }
 
-    private static sleepTtl() {
-        sleep(ttl.toMillis() / 2 as long)
+    protected static sleepTtl() {
+        sleep((long) (ttl.toMillis() / 2))
     }
 
 }

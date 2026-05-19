@@ -122,6 +122,103 @@ public final class ReflectUtils {
         return scoreTypeMatching(source, target).isPresent();
     }
 
+    /**
+     * Regroups the given values to create an array that matches the expected parameter types.
+     *
+     * @param parameters      the parameters
+     * @param parameterValues the parameter values
+     * @return the array
+     */
+    static @Nullable Object @NotNull [] regroup(
+            final @NotNull Parameter @NotNull [] parameters,
+            final @Nullable Object @NotNull [] parameterValues
+    ) {
+        List<Object> flattened = new ArrayList<>();
+        for (int i = 0; i < parameters.length; i++) {
+            Parameter parameter = parameters[i];
+            if (parameter.isVarArgs()) {
+                List<Object> remaining = new ArrayList<>(Arrays.asList(parameterValues)
+                        .subList(i, parameterValues.length));
+                Class<?> type = parameter.getType();
+                if (remaining.size() == 1) {
+                    Object last = remaining.get(0);
+                    if (last != null && extendsType(last.getClass(), type)) {
+                        flattened.add(last);
+                        continue;
+                    }
+                }
+                flattened.add(remaining.toArray(
+                        (Object[]) Array.newInstance(type.getComponentType(), remaining.size())
+                ));
+                continue;
+            }
+            flattened.add(parameterValues[i]);
+        }
+        return flattened.toArray();
+    }
+
+    /**
+     * Finds the executable that best matches with the given parameter types.
+     *
+     * @param <E>            the type of the executable
+     * @param executables    the collection to find the executable from
+     * @param parameterTypes the parameter types
+     * @return the executable (if found)
+     */
+    static <E extends Executable> @NotNull Optional<E> findExecutable(
+            final @NotNull Collection<E> executables,
+            final @Nullable Class<?> @NotNull [] parameterTypes
+    ) {
+        return executables.stream()
+                .map(e -> {
+                    OptionalInt score = parameterMatches(e.getParameters(), parameterTypes);
+                    return score.isPresent() ? Map.entry(e, score.getAsInt()) : null;
+                })
+                .filter(Objects::nonNull)
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey);
+    }
+
+    /**
+     * Verifies that the given parameter types match the parameters.
+     *
+     * @param parameters the parameters
+     * @param given      the parameter types
+     * @return the parameter compatibility, computed as the difference between the given and the requested
+     */
+    static OptionalInt parameterMatches(
+            final @NotNull Parameter @NotNull [] parameters,
+            final Class<?> @NotNull [] given
+    ) {
+        int total = 0;
+        for (int i = 0; i < parameters.length; i++) {
+            Parameter parameter = parameters[i];
+            Type type = parameter.getParameterizedType();
+            if (parameter.isVarArgs()) {
+                Type componentType = type instanceof Class<?>
+                        ? ((Class<?>) type).getComponentType()
+                        : ((GenericArrayType) type).getGenericComponentType();
+                total -= 1;
+                for (int j = i; j < given.length; j++) {
+                    Class<?> current = given[j];
+                    if (current == null) continue;
+                    OptionalInt score = scoreTypeMatching(current, componentType);
+                    if (score.isEmpty()) return score;
+                    total += score.getAsInt();
+                }
+                return OptionalInt.of(total);
+            }
+            if (i >= given.length) return OptionalInt.empty();
+            Class<?> current = given[i];
+            if (current == null) continue;
+            OptionalInt score = scoreTypeMatching(current, type);
+            if (score.isEmpty()) return score;
+            total += score.getAsInt();
+        }
+        if (given.length != parameters.length) return OptionalInt.empty();
+        else return OptionalInt.of(total);
+    }
+
     private static @NotNull OptionalInt scoreTypeMatching(final @NotNull Type source, final @NotNull Type target) {
         final Class<?> sourceClass = toWrapper(toClass(source));
         if (target instanceof Class<?>) {
@@ -134,7 +231,10 @@ public final class ReflectUtils {
             if (!(source instanceof ParameterizedType))
                 return scoreTypeMatching(source, targetParameterizedType.getRawType());
             ParameterizedType sourceParameterizedType = (ParameterizedType) source;
-            OptionalInt score = scoreTypeMatching(sourceParameterizedType.getRawType(), targetParameterizedType.getRawType());
+            OptionalInt score = scoreTypeMatching(
+                    sourceParameterizedType.getRawType(),
+                    targetParameterizedType.getRawType()
+            );
             if (score.isEmpty()) return score;
             int s = score.getAsInt();
             Type[] sourceActualTypeArguments = sourceParameterizedType.getActualTypeArguments();
@@ -168,7 +268,10 @@ public final class ReflectUtils {
         } else return OptionalInt.empty();
     }
 
-    private static @NotNull OptionalInt aggregateScore(final @NotNull Type source, final @NotNull Type @NotNull [] bounds) {
+    private static @NotNull OptionalInt aggregateScore(
+            final @NotNull Type source,
+            final @NotNull Type @NotNull [] bounds
+    ) {
         int score = 0;
         for (Type b : bounds) {
             OptionalInt opt = scoreTypeMatching(source, b);
@@ -201,94 +304,6 @@ public final class ReflectUtils {
                 }
         }
         return Integer.MAX_VALUE; // fallback value in case of target = Object and source = Interface
-    }
-
-    /**
-     * Regroups the given values to create an array that matches the expected parameter types.
-     *
-     * @param parameters      the parameters
-     * @param parameterValues the parameter values
-     * @return the array
-     */
-    static @Nullable Object @NotNull [] regroup(final @NotNull Parameter @NotNull [] parameters,
-                                                final @Nullable Object @NotNull [] parameterValues) {
-        List<Object> flattened = new ArrayList<>();
-        for (int i = 0; i < parameters.length; i++) {
-            Parameter parameter = parameters[i];
-            if (parameter.isVarArgs()) {
-                List<Object> remaining = new ArrayList<>(Arrays.asList(parameterValues).subList(i, parameterValues.length));
-                Class<?> type = parameter.getType();
-                if (remaining.size() == 1) {
-                    Object last = remaining.get(0);
-                    if (last != null && extendsType(last.getClass(), type)) {
-                        flattened.add(last);
-                        continue;
-                    }
-                }
-                flattened.add(remaining.toArray((Object[]) Array.newInstance(type.getComponentType(), remaining.size())));
-                continue;
-            }
-            flattened.add(parameterValues[i]);
-        }
-        return flattened.toArray();
-    }
-
-    /**
-     * Finds the executable that best matches with the given parameter types.
-     *
-     * @param <E>            the type of the executable
-     * @param executables    the collection to find the executable from
-     * @param parameterTypes the parameter types
-     * @return the executable (if found)
-     */
-    static <E extends Executable> @NotNull Optional<E> findExecutable(final @NotNull Collection<E> executables,
-                                                                      final @Nullable Class<?> @NotNull [] parameterTypes) {
-        return executables.stream()
-                .map(e -> {
-                    OptionalInt score = parameterMatches(e.getParameters(), parameterTypes);
-                    return score.isPresent() ? Map.entry(e, score.getAsInt()) : null;
-                })
-                .filter(Objects::nonNull)
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey);
-    }
-
-    /**
-     * Verifies that the given parameter types match the parameters.
-     *
-     * @param parameters the parameters
-     * @param given      the parameter types
-     * @return the parameters compatibility, computed as the difference between the given and the requested
-     */
-    static OptionalInt parameterMatches(final @NotNull Parameter @NotNull [] parameters,
-                                        final @Nullable Class<?> @NotNull [] given) {
-        int total = 0;
-        for (int i = 0; i < parameters.length; i++) {
-            Parameter parameter = parameters[i];
-            Type type = parameter.getParameterizedType();
-            if (parameter.isVarArgs()) {
-                Type componentType = type instanceof Class<?>
-                        ? ((Class<?>) type).getComponentType()
-                        : ((GenericArrayType) type).getGenericComponentType();
-                total -= 1;
-                for (int j = i; j < given.length; j++) {
-                    Class<?> current = given[j];
-                    if (current == null) continue;
-                    OptionalInt score = scoreTypeMatching(current, componentType);
-                    if (score.isEmpty()) return score;
-                    total += score.getAsInt();
-                }
-                return OptionalInt.of(total);
-            }
-            if (i >= given.length) return OptionalInt.empty();
-            Class<?> current = given[i];
-            if (current == null) continue;
-            OptionalInt score = scoreTypeMatching(current, type);
-            if (score.isEmpty()) return score;
-            total += score.getAsInt();
-        }
-        if (given.length != parameters.length) return OptionalInt.empty();
-        else return OptionalInt.of(total);
     }
 
 }

@@ -23,10 +23,12 @@ import static com.mongodb.client.model.Filters.in;
 /**
  * Implementation of {@link Repository} for MongoDB databases.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities (should be unique)
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities (should be unique)
+ * @see MongoRepositorySettings
+ * @see MongoQueryEngine
  */
-public class MongoRepository<T, ID> extends AbstractRepository<T, ID, MongoQueryEngine<T, ID>> {
+public class MongoRepository<T, I> extends AbstractRepository<T, I, MongoQueryEngine<T, I>> {
 
     /**
      * Instantiates a new MongoDB repository.
@@ -34,27 +36,51 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID, MongoQuery
      * @param queryEngine  the query engine
      * @param entityMapper the entity mapper
      */
-    protected MongoRepository(final @NotNull MongoQueryEngine<T, ID> queryEngine,
-                              final @NotNull EntityMapper<T, ID> entityMapper) {
+    protected MongoRepository(
+            final @NotNull MongoQueryEngine<T, I> queryEngine,
+            final @NotNull EntityMapper<T, I> entityMapper
+    ) {
         super(queryEngine, entityMapper);
     }
 
+    /**
+     * Because of Reactive streams internal conversion from "id" to "_id",
+     * we have to check if the field name is "id" and update it.
+     *
+     * @return the id field name
+     */
+    private @NotNull String getIdFieldName() {
+        String idFieldName = entityMapper.getIdFieldName();
+        if (idFieldName.equals("id")) idFieldName = "_" + idFieldName;
+        return idFieldName;
+    }
+
     @Override
-    public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
+    public @NotNull CompletableFuture<Long> count() {
+        return queryEngine.query(MongoCollection::countDocuments);
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull I id) {
         return queryEngine.query(collection ->
                 collection.find(eq(getIdFieldName(), id))
         ).thenApply(Optional::ofNullable);
     }
 
     @Override
-    public @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id) {
+    public @NotNull CompletableFuture<Boolean> existsById(final @NotNull I id) {
         return queryEngine.query(collection ->
                 collection.countDocuments(eq(getIdFieldName(), id), new CountOptions().limit(1))
         ).thenApply(c -> c > 0);
     }
 
     @Override
-    public @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
+    public @NotNull CompletableFuture<Collection<T>> findAll() {
+        return queryEngine.queryMany(MongoCollection::find);
+    }
+
+    @Override
+    protected @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
         return queryEngine.query(collection ->
                 collection.replaceOne(
                         eq(getIdFieldName(), entityMapper.getId(entity)),
@@ -62,18 +88,6 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID, MongoQuery
                         new ReplaceOptions().upsert(true)
                 )
         ).thenApply(r -> entity);
-    }
-
-    @Override
-    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id) {
-        return queryEngine.query(collection ->
-                collection.deleteOne(eq(getIdFieldName(), id))
-        );
-    }
-
-    @Override
-    public @NotNull CompletableFuture<Collection<T>> findAll() {
-        return queryEngine.queryMany(MongoCollection::find);
     }
 
     @Override
@@ -85,7 +99,7 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID, MongoQuery
     }
 
     @Override
-    protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
+    protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<I> ids) {
         return queryEngine.queryMany(query -> query.find(in(getIdFieldName(), ids)));
     }
 
@@ -103,27 +117,17 @@ public class MongoRepository<T, ID> extends AbstractRepository<T, ID, MongoQuery
     }
 
     @Override
-    protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids) {
+    protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<I> ids) {
         return queryEngine.query(collection ->
                 collection.deleteMany(in(getIdFieldName(), ids))
         );
     }
 
     @Override
-    public @NotNull CompletableFuture<Long> count() {
-        return queryEngine.query(MongoCollection::countDocuments);
-    }
-
-    /**
-     * Because of Reactive streams internal conversion from "id" to "_id",
-     * we have to check if the field name is "id" and update it.
-     *
-     * @return the id field name
-     */
-    private @NotNull String getIdFieldName() {
-        String idFieldName = entityMapper.getIdFieldName();
-        if (idFieldName.equals("id")) idFieldName = "_" + idFieldName;
-        return idFieldName;
+    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull I id) {
+        return queryEngine.query(collection ->
+                collection.deleteOne(eq(getIdFieldName(), id))
+        );
     }
 
 }

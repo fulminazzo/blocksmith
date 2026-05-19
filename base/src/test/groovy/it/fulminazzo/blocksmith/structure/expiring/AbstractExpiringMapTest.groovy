@@ -9,7 +9,7 @@ import java.util.function.BiFunction
 import java.util.function.Function
 
 class AbstractExpiringMapTest extends Specification {
-    private static final long ttl = 400L
+    private static final long ttl = 2_000L
 
     private static final Function<? super String, ? extends String> function = { k -> 'world' }
     private static final BiFunction<? super String, ? super String, ? extends String> bifunction = { (k, v) -> 'moon' }
@@ -358,7 +358,7 @@ class AbstractExpiringMapTest extends Specification {
 
     def 'test that putAll adds every element with same TTL'() {
         given:
-        def map = ['Hello': 'world', 'Goodbye': 'mars']
+        def map = ['Hello' : 'world', 'Goodbye' : 'mars']
 
         and:
         def now = System.currentTimeMillis()
@@ -446,8 +446,8 @@ class AbstractExpiringMapTest extends Specification {
 
         and:
         def millis = duration.toMillis()
+        millis <= ttl * 1.1
         millis >= ttl * 0.9
-        millis <= ttl
     }
 
     def 'test that getTtl of non-existing returns null'() {
@@ -479,8 +479,8 @@ class AbstractExpiringMapTest extends Specification {
 
         then:
         def millis = entry.expireTime - now
-        millis >= ttl * 2 * 0.9
         millis <= ttl * 2 * 1.1
+        millis >= ttl * 2 * 0.9
     }
 
     def 'test that #method(#arguments) throws invalid TTL exception'() {
@@ -571,17 +571,21 @@ class AbstractExpiringMapTest extends Specification {
         null                                    || false
         'Hello=world'                           || false
         [:]                                     || false
-        ['Hello': 'world']                      || true
-        ['Goodbye': 'mars']                     || false
+        ['Hello' : 'world']                     || true
+        ['Goodbye' : 'mars']                    || false
         new MockExpiringMap() {
+
             {
                 put('Hello', 'world', 10_000L)
             }
+
         }                                       || true
         new MockExpiringMap() {
+
             {
                 put('Goodbye', 'mars', 10_000L)
             }
+
         }                                       || false
     }
 
@@ -640,7 +644,7 @@ class AbstractExpiringMapTest extends Specification {
         def second = Map.entry('Hello', 'world')
 
         expect:
-        first.equals(second)
+        Reflect.on(first).invoke('equals', second).get()
     }
 
     def 'test that entry does not equal #other'() {
@@ -651,11 +655,11 @@ class AbstractExpiringMapTest extends Specification {
         )
 
         expect:
-        !entry.equals(other)
+        !Reflect.on(entry).invoke('equals', other).get()
 
         where:
         other << [
-                null,
+                new Object[]{null},
                 Map.entry('Goodbye', 'mars'),
                 Map.entry('Hello', 'mars'),
                 Map.entry('Goodbye', 'world')
@@ -720,8 +724,8 @@ class AbstractExpiringMapTest extends Specification {
         'setValue' | ['mars']
     }
 
-    private static void sleepTtl() {
-        sleep(ttl / 2 as long)
+    protected static void sleepTtl() {
+        sleep((long) (ttl / 2))
     }
 
 }

@@ -19,30 +19,21 @@ import java.util.concurrent.ExecutorService;
  * A general SQL data source builder.
  *
  * @param <B> the type of the builder
+ *
+ * @see SqlDataSource
+ * @see SqlDataSourceBuilder
+ * @see H2DataSourceBuilder
+ * @see SqliteDataSourceBuilder
+ * @see RemoteDataSourceBuilder
  */
 @SuppressWarnings("unchecked")
 @AllArgsConstructor
-abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> implements RepositoryDataSourceBuilder<SqlDataSource> {
+abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>>
+        implements RepositoryDataSourceBuilder<SqlDataSource> {
     protected final @NotNull HikariConfig config;
 
     protected @Nullable String database;
     protected @Nullable ExecutorService executor;
-
-    @Override
-    public @NotNull SqlDataSource build() {
-        config.setJdbcUrl(getJdbcUrl());
-        ExecutorService executor = Objects.requireNonNull(this.executor, "executor has not been specified yet");
-        return new SqlDataSource(new HikariDataSource(config), getSQLDialect(), executor);
-    }
-
-    /**
-     * Gets the database name.
-     *
-     * @return the database
-     */
-    protected @NotNull String getDatabase() {
-        return Objects.requireNonNull(database, "database name has not been specified yet");
-    }
 
     /**
      * Gets the jdbc URL.
@@ -56,6 +47,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      *
      * @return the SQL dialect
      */
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     protected abstract @NotNull SQLDialect getSQLDialect();
 
     /**
@@ -99,11 +91,13 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param maximumPoolSize the maximum pool size
      * @return this object (for method chaining)
      */
-    public @NotNull B maximumPoolSize(final
-                                      @Nullable
-                                      @Range(from = 1, to = Integer.MAX_VALUE)
-                                      @Positive(exceptionMessage = "maximum pool size must be positive")
-                                      Integer maximumPoolSize) {
+    public @NotNull B maximumPoolSize(
+            final
+            @Nullable
+            @Range(from = 1, to = Integer.MAX_VALUE)
+            @Positive(exceptionMessage = "maximum pool size must be positive")
+            Integer maximumPoolSize
+    ) {
         if (maximumPoolSize != null) {
             Validator.validateMethod(maximumPoolSize);
             config.setMaximumPoolSize(maximumPoolSize);
@@ -119,11 +113,13 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param minimumIdle the minimum idle
      * @return this object (for method chaining)
      */
-    public @NotNull B minimumIdle(final
-                                  @Nullable
-                                  @Range(from = 0, to = Integer.MAX_VALUE)
-                                  @PositiveOrZero(exceptionMessage = "minimum idle must be at least 0")
-                                  Integer minimumIdle) {
+    public @NotNull B minimumIdle(
+            final
+            @Nullable
+            @Range(from = 0, to = Integer.MAX_VALUE)
+            @PositiveOrZero(exceptionMessage = "minimum idle must be at least 0")
+            Integer minimumIdle
+    ) {
         if (minimumIdle != null) {
             Validator.validateMethod(minimumIdle);
             config.setMinimumIdle(minimumIdle);
@@ -139,11 +135,13 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param connectionTimeout the connection timeout
      * @return this object (for method chaining)
      */
-    public @NotNull B connectionTimeout(final
-                                        @Nullable
-                                        @Range(from = 1, to = Long.MAX_VALUE)
-                                        @Positive(exceptionMessage = "connection timeout must be positive")
-                                        Long connectionTimeout) {
+    public @NotNull B connectionTimeout(
+            final
+            @Nullable
+            @Range(from = 1, to = Long.MAX_VALUE)
+            @Positive(exceptionMessage = "connection timeout must be positive")
+            Long connectionTimeout
+    ) {
         if (connectionTimeout != null) {
             Validator.validateMethod(connectionTimeout);
             config.setConnectionTimeout(connectionTimeout);
@@ -159,11 +157,13 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param idleTimeout the idle timeout
      * @return this object (for method chaining)
      */
-    public @NotNull B idleTimeout(final
-                                  @Nullable
-                                  @Range(from = 0, to = Long.MAX_VALUE)
-                                  @PositiveOrZero(exceptionMessage = "idle timeout must be at least 0")
-                                  Long idleTimeout) {
+    public @NotNull B idleTimeout(
+            final
+            @Nullable
+            @Range(from = 0, to = Long.MAX_VALUE)
+            @PositiveOrZero(exceptionMessage = "idle timeout must be at least 0")
+            Long idleTimeout
+    ) {
         if (idleTimeout != null) {
             Validator.validateMethod(idleTimeout);
             config.setIdleTimeout(idleTimeout);
@@ -179,24 +179,16 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
      * @param maxLifetime the max lifetime
      * @return this object (for method chaining)
      */
-    public @NotNull B maxLifeTime(final @Nullable @PositiveOrZero(exceptionMessage = "maximum lifetime must be at least 0") Long maxLifetime) {
+    public @NotNull B maxLifeTime(
+            final
+            @Nullable
+            @PositiveOrZero(exceptionMessage = "maximum lifetime must be at least 0")
+            Long maxLifetime
+    ) {
         if (maxLifetime != null) {
             Validator.validateMethod(maxLifetime);
             config.setMaxLifetime(maxLifetime);
         }
-        return (B) this;
-    }
-
-    /**
-     * Sets a property for the final data source.
-     *
-     * @param propertyName the property name
-     * @param value        the value
-     * @return this object (for method chaining)
-     */
-    public @NotNull B addDataSourceProperty(final @NotNull String propertyName,
-                                            final Object value) {
-        config.addDataSourceProperty(propertyName, value);
         return (B) this;
     }
 
@@ -209,6 +201,41 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>> impleme
     public @NotNull B executor(final @NotNull ExecutorService executor) {
         this.executor = executor;
         return (B) this;
+    }
+
+    /**
+     * Sets a property for the final data source.
+     *
+     * @param propertyName the property name
+     * @param value        the value
+     * @return this object (for method chaining)
+     */
+    public @NotNull B addDataSourceProperty(
+            final @NotNull String propertyName,
+            final Object value
+    ) {
+        config.addDataSourceProperty(propertyName, value);
+        return (B) this;
+    }
+
+    /**
+     * Gets the database name.
+     *
+     * @return the database
+     */
+    protected @NotNull String getDatabase() {
+        return Objects.requireNonNull(database, "database name has not been specified yet");
+    }
+
+    @Override
+    public @NotNull SqlDataSource build() {
+        config.setJdbcUrl(getJdbcUrl());
+        SQLDialect sqlDialect = getSQLDialect();
+        ExecutorService actualExecutor = Objects.requireNonNull(
+                this.executor,
+                "executor has not been specified yet"
+        );
+        return new SqlDataSource(new HikariDataSource(config), sqlDialect, actualExecutor);
     }
 
 }

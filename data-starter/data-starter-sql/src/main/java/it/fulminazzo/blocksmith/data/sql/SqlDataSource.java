@@ -85,9 +85,13 @@ import java.util.function.Function;
  *         );
  *         }</pre>
  *         where CustomSqlRepository extends SqlRepository and adds custom behavior
- *         such as audit logging, transaction handling, or query optimization.
+ *         such as audit logging, transaction handling or query optimization.
  *     </li>
  * </ul>
+ *
+ * @see SqlRepositorySettings
+ * @see SqlRepository
+ * @see SqlQueryEngine
  */
 public final class SqlDataSource implements RepositoryDataSource<SqlRepositorySettings> {
     private final @NotNull HikariDataSource dataSource;
@@ -101,50 +105,15 @@ public final class SqlDataSource implements RepositoryDataSource<SqlRepositorySe
      * @param dialect    the dialect
      * @param executor   the executor
      */
-    SqlDataSource(final @NotNull HikariDataSource dataSource,
-                  final @NotNull SQLDialect dialect,
-                  final @NotNull ExecutorService executor) {
+    SqlDataSource(
+            final @NotNull HikariDataSource dataSource,
+            final @NotNull SQLDialect dialect,
+            final @NotNull ExecutorService executor
+    ) {
         this.dataSource = dataSource;
         this.executor = executor;
         this.context = DSL.using(dataSource, dialect);
     }
-
-    @Override
-    public <T, ID> @NotNull Repository<T, ID> newRepository(
-            final @NotNull EntityMapper<T, ID> entityMapper,
-            final @NotNull SqlRepositorySettings settings
-    ) {
-        return newRepository(
-                e -> new SqlRepository<>(e, entityMapper),
-                settings
-        );
-    }
-
-    /**
-     * Creates a new custom repository.
-     *
-     * @param <R>               the type of the repository
-     * @param <T>               the type of the entities
-     * @param <ID>              the type of the id of the entities
-     * @param <TR>              the type of the entities in the table
-     * @param repositoryBuilder the repository creation function
-     * @param settings          the settings to build the repository with
-     * @return the repository
-     */
-    @SuppressWarnings("unchecked")
-    public <R extends SqlRepository<T, ID, Table<TR>>, T, ID, TR extends Record> @NotNull R newRepository(
-            final @NotNull Function<SqlQueryEngine<T, ID, Table<TR>>, R> repositoryBuilder,
-            final @NotNull SqlRepositorySettings settings
-    ) {
-        SqlQueryEngine<T, ID, Table<TR>> engine = new SqlQueryEngine<>(
-                context,
-                (Table<TR>) settings.getTable(),
-                (Field<ID>) settings.getIdColumn(),
-                executor
-        );
-        return repositoryBuilder.apply(engine);
-    }
-
 
     /**
      * Executes the given script.
@@ -195,6 +164,42 @@ public final class SqlDataSource implements RepositoryDataSource<SqlRepositorySe
         String raw = new String(data, StandardCharsets.UTF_8);
         context.parser().parse(raw).executeBatch();
         return this;
+    }
+
+    /**
+     * Creates a new custom repository.
+     *
+     * @param <R>               the type of the repository
+     * @param <T>               the type of the entities
+     * @param <I>               the type of the id of the entities
+     * @param <C>               the type of the entities in the table
+     * @param repositoryBuilder the repository creation function
+     * @param settings          the settings to build the repository with
+     * @return the repository
+     */
+    @SuppressWarnings("unchecked")
+    public <R extends SqlRepository<T, I, Table<C>>, T, I, C extends Record> @NotNull R newRepository(
+            final @NotNull Function<SqlQueryEngine<T, I, Table<C>>, R> repositoryBuilder,
+            final @NotNull SqlRepositorySettings settings
+    ) {
+        SqlQueryEngine<T, I, Table<C>> engine = new SqlQueryEngine<>(
+                context,
+                (Table<C>) settings.getTable(),
+                (Field<I>) settings.getIdColumn(),
+                executor
+        );
+        return repositoryBuilder.apply(engine);
+    }
+
+    @Override
+    public <T, I> @NotNull Repository<T, I> newRepository(
+            final @NotNull EntityMapper<T, I> entityMapper,
+            final @NotNull SqlRepositorySettings settings
+    ) {
+        return newRepository(
+                e -> new SqlRepository<>(e, entityMapper),
+                settings
+        );
     }
 
     @Override

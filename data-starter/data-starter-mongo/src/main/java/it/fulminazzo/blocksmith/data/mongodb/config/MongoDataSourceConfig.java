@@ -3,19 +3,28 @@ package it.fulminazzo.blocksmith.data.mongodb.config;
 import com.mongodb.ServerAddress;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
-import it.fulminazzo.blocksmith.validation.annotation.*;
+import it.fulminazzo.blocksmith.data.mongodb.MongoDataSource;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
+import it.fulminazzo.blocksmith.validation.annotation.NotEmpty;
+import it.fulminazzo.blocksmith.validation.annotation.Port;
+import it.fulminazzo.blocksmith.validation.annotation.Positive;
 import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
+/**
+ * {@link MongoDataSourceConfig} for {@link MongoDataSource}.
+ *
+ * @see DataSourceConfig
+ * @see MongoDataSource
+ */
 @Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Accessors(chain = true)
 public final class MongoDataSourceConfig implements DataSourceConfig {
 
     static {
@@ -26,13 +35,11 @@ public final class MongoDataSourceConfig implements DataSourceConfig {
     }
 
     @NonNull(exceptionMessage = "'host' must be declared")
-    @NotNull
     String host;
 
     @Port
     @Range(from = 1, to = 65535)
     @Nullable
-    @Builder.Default
     Integer port = ServerAddress.defaultPort();
 
     @Nullable
@@ -55,21 +62,23 @@ public final class MongoDataSourceConfig implements DataSourceConfig {
     @Nullable
     MongoCredentialConfig credentials;
 
+    /**
+     * MongoDB credentials configuration.
+     */
     @Data
-    @FieldDefaults(level = AccessLevel.PRIVATE)
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @Accessors(chain = true)
     public static class MongoCredentialConfig {
 
         @NotEmpty(exceptionMessage = "'username' must not be empty")
         @NonNull
-        @NotNull
         String username;
 
         @NotEmpty(exceptionMessage = "'password' must not be empty")
         @NonNull
-        @NotNull
         String password;
 
         @Nullable

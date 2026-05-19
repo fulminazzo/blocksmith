@@ -3,15 +3,39 @@ package it.fulminazzo.blocksmith.data.config;
 import it.fulminazzo.blocksmith.ProjectInfo;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+
 /**
- * Identifies the supported types of data source configurations.
+ * The supported types of data source configurations.
+ *
+ * @see DataSourceConfig
+ * @see DataSourceFactory
+ * @see it.fulminazzo.blocksmith.data.RepositoryDataSource
  */
 public enum DataSourceType {
+    /**
+     * Identifies a configuration with support for caching.
+     */
     CACHED,
+    /**
+     * Identifies the in-memory data source.
+     */
     MEMORY,
+    /**
+     * Identifies the filesystem data source.
+     */
     FILE,
+    /**
+     * Identifies the SQL data source.
+     */
     SQL,
+    /**
+     * Identifies the Redis data source.
+     */
     REDIS,
+    /**
+     * Identifies the MongoDB data source.
+     */
     MONGO;
 
     /**
@@ -21,10 +45,10 @@ public enum DataSourceType {
      */
     @SuppressWarnings("unchecked")
     public @NotNull Class<DataSourceConfig> getConfigClass() {
-        String type = name().toLowerCase();
+        String type = name().toLowerCase(Locale.ROOT);
         type = Character.toUpperCase(type.charAt(0)) + type.substring(1);
 
-        String lowercaseType = type.toLowerCase();
+        String lowercaseType = type.toLowerCase(Locale.ROOT);
         if (this == CACHED) lowercaseType = "cache";
 
         String packageName = lowercaseType;
@@ -42,8 +66,8 @@ public enum DataSourceType {
                     lowercaseType
             );
             throw new IllegalStateException(
-                    String.format("Could not find suitable %s for %s. ", DataSourceConfig.class.getSimpleName(), type) +
-                            String.format("Please check that the module %s is correctly installed.", moduleName)
+                    String.format("Could not find suitable %s for %s. ", DataSourceConfig.class.getSimpleName(), type)
+                            + String.format("Please check that the module %s is correctly installed.", moduleName)
             );
         }
     }

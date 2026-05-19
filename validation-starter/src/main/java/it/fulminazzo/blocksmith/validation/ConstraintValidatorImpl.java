@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 /**
  * Base implementation of {@link ConstraintValidator}.
+ *
+ * @see ConstraintValidator
  */
 class ConstraintValidatorImpl implements ConstraintValidator {
     private final @NotNull Type[] types;
@@ -22,8 +24,10 @@ class ConstraintValidatorImpl implements ConstraintValidator {
      * @param validPredicate the valid predicate
      * @param types          the types
      */
-    public ConstraintValidatorImpl(final @NotNull Predicate<Object> validPredicate,
-                                   final @NotNull Type @NotNull ... types) {
+    public ConstraintValidatorImpl(
+            final @NotNull Predicate<Object> validPredicate,
+            final @NotNull Type @NotNull ... types
+    ) {
         this.validPredicate = validPredicate;
         this.types = types;
     }
@@ -46,6 +50,5 @@ class ConstraintValidatorImpl implements ConstraintValidator {
     public boolean isValid(final Object value) {
         return validPredicate.test(value);
     }
-
 
 }

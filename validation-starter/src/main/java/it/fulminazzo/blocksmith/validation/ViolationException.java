@@ -24,7 +24,7 @@ public final class ViolationException extends RuntimeException {
     /**
      * Instantiates a new Violation exception.
      *
-     * @param violations the violations
+     * @param violations the violations (a map containing the paths of the fields and their violations)
      */
     ViolationException(final @NotNull Map<String, Set<ConstraintViolation>> violations) {
         super(violations.entrySet().stream()

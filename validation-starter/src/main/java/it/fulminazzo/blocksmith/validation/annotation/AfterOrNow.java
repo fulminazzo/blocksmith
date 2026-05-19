@@ -19,6 +19,12 @@ import java.lang.annotation.*;
  * </ul>
  * <br>
  * Accepts {@code null} values.
+ *
+ * @see Constraint
+ * @see NonNull
+ * @see Before
+ * @see BeforeOrNow
+ * @see After
  */
 @Constraint
 @Documented
@@ -32,11 +38,13 @@ public @interface AfterOrNow {
      * By default, the message is a code that will later be translated by an appropriate translator.
      *
      * @return the message
+     * @see ValidationMessages
      */
     @NotNull String message() default ValidationMessages.REQUIRED_AFTER_OR_NOW;
 
     /**
-     * Gets the error message that will be shown in the {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
+     * Gets the error message that will be shown in the
+     * {@link it.fulminazzo.blocksmith.validation.ValidationException} message.
      *
      * @return the message
      */

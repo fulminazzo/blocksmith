@@ -11,9 +11,15 @@ package it.fulminazzo.blocksmith.data;
  * There are no shared methods because each backend has fundamentally different async models
  * and APIs.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities
+ * @see Repository
+ * @see AbstractRepository
+ * @see RepositoryDataSource
  */
-public interface QueryEngine<T, ID> {
-
+public interface QueryEngine<T, I> {
+    /*
+     * This is a marker interface.
+     * Submodules should use it to provide their own implementation.
+     */
 }

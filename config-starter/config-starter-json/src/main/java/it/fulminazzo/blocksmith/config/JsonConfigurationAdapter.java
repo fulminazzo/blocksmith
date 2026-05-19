@@ -35,6 +35,7 @@ final class JsonConfigurationAdapter implements BaseConfigurationAdapter {
      * A special {@link DefaultPrettyPrinter} that overrides {@link #_objectFieldValueSeparatorWithSpaces}.
      */
     static final class JsonPrettyPrinter extends DefaultPrettyPrinter {
+        private static final long serialVersionUID = -9182864051372620624L;
 
         /**
          * Instantiates a new JSON pretty printer.

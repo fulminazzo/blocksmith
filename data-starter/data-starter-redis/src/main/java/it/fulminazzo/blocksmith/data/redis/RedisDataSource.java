@@ -60,9 +60,13 @@ import java.util.function.Function;
  *         );
  *         }</pre>
  *         where CustomRedisRepository extends RedisRepository and adds custom behavior
- *         such as per-value TTL-based expiration, pub/sub messaging, or cache warming strategies.
+ *         such as per-value TTL-based expiration, pub/sub messaging or cache warming strategies.
  *     </li>
  * </ul>
+ *
+ * @see RedisRepositorySettings
+ * @see RedisRepository
+ * @see RedisQueryEngine
  */
 public final class RedisDataSource implements CacheRepositoryDataSource<RedisRepositorySettings> {
     private final @NotNull RedisClient redisClient;
@@ -76,22 +80,10 @@ public final class RedisDataSource implements CacheRepositoryDataSource<RedisRep
      * @param redisClient the redis client
      * @param mapper      the mapper
      */
-    RedisDataSource(final @NotNull RedisClient redisClient,
-                    final @NotNull Mapper mapper) {
+    RedisDataSource(final @NotNull RedisClient redisClient, final @NotNull Mapper mapper) {
         this.redisClient = redisClient;
         this.connection = redisClient.connect();
         this.mapper = mapper;
-    }
-
-    @Override
-    public <T, ID> @NotNull CacheRepository<T, ID> newRepository(
-            final @NotNull EntityMapper<T, ID> entityMapper,
-            final @NotNull RedisRepositorySettings settings
-    ) {
-        return newRepository(
-                e -> new RedisRepository<>(e, entityMapper),
-                settings.withEntityMapperIfNotSet(entityMapper)
-        );
     }
 
     /**
@@ -99,19 +91,19 @@ public final class RedisDataSource implements CacheRepositoryDataSource<RedisRep
      *
      * @param <R>               the type of the repository
      * @param <T>               the type of the entities
-     * @param <ID>              the type of the id of the entities
+     * @param <I>               the type of the id of the entities
      * @param repositoryBuilder the repository creation function
      * @param settings          the settings to build the repository with
      * @return the repository
      */
     @SuppressWarnings("unchecked")
-    public <T, ID, R extends RedisRepository<T, ID>> @NotNull R newRepository(
-            final @NotNull Function<RedisQueryEngine<T, ID>, R> repositoryBuilder,
+    public <T, I, R extends RedisRepository<T, I>> @NotNull R newRepository(
+            final @NotNull Function<RedisQueryEngine<T, I>, R> repositoryBuilder,
             final @NotNull RedisRepositorySettings settings
     ) {
-        RedisQueryEngine<T, ID> engine = new RedisQueryEngine<>(
+        RedisQueryEngine<T, I> engine = new RedisQueryEngine<>(
                 connection,
-                (EntityMapper<T, ID>) settings.getEntityMapper(),
+                (EntityMapper<T, I>) settings.getEntityMapper(),
                 mapper,
                 settings.getDatabaseName(),
                 settings.getCollectionName()
@@ -120,6 +112,17 @@ public final class RedisDataSource implements CacheRepositoryDataSource<RedisRep
         Duration expiry = settings.getTtl();
         if (expiry != null) repository.ttl(expiry);
         return repository;
+    }
+
+    @Override
+    public <T, I> @NotNull CacheRepository<T, I> newRepository(
+            final @NotNull EntityMapper<T, I> entityMapper,
+            final @NotNull RedisRepositorySettings settings
+    ) {
+        return newRepository(
+                e -> new RedisRepository<>(e, entityMapper),
+                settings.withEntityMapperIfNotSet(entityMapper)
+        );
     }
 
     @Override

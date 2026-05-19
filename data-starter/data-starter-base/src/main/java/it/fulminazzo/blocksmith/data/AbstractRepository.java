@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.data;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.validation.Validator;
 import it.fulminazzo.blocksmith.validation.ViolationException;
@@ -16,24 +17,87 @@ import java.util.stream.Collectors;
  * Abstract implementation of {@link Repository} with common checks
  * and support methods.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities (should be unique)
- * @param <E>  the type of the {@link QueryEngine} responsible for executing internal queries
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities (should be unique)
+ * @param <E> the type of the {@link QueryEngine} responsible for executing internal queries
+ * @see Repository
+ * @see QueryEngine
  */
 @RequiredArgsConstructor
-@SuppressWarnings("DeprecatedIsStillUsed")
-public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> implements Repository<T, ID> {
+public abstract class AbstractRepository<T, I, E extends QueryEngine<T, I>> implements Repository<T, I> {
+    @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
     protected final @NotNull E queryEngine;
     @Getter
-    protected final @NotNull EntityMapper<T, ID> entityMapper;
+    protected final @NotNull EntityMapper<T, I> entityMapper;
+
+    /**
+     * Actual implementation of {@link #save(Object)}.
+     * <br>
+     * <b>For internal use only</b>: the entity will be already validated.
+     *
+     * @param entity the entity (already validated)
+     * @return the saved entity (in case values are changed)
+     */
+    protected abstract @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity);
+
+    /**
+     * Actual implementation of {@link #findAll(Page)}.
+     * <br>
+     * <b>For internal use only</b>: the page number <b>must</b> be <b>greater than</b> or <b>equal to</b> {@code 0}
+     * and pages must be <b>not empty</b>.
+     *
+     * @param page the page
+     * @return the data
+     */
+    protected abstract @NotNull CompletableFuture<Collection<T>> findAllImpl(final @NotNull Page page);
+
+    /**
+     * Actual implementation of {@link #findAllById(Collection)}.
+     * <br>
+     * <b>For internal use only</b>: parameters must be <b>not empty</b> and elements must be <b>not</b> {@code null}.
+     *
+     * @param ids the ids
+     * @return the data
+     */
+    protected abstract @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<I> ids);
+
+    /**
+     * Actual implementation of {@link #saveAll(Collection)}.
+     * <br>
+     * <b>For internal use only</b>: parameters must be <b>not empty</b> and elements must be <b>not</b> {@code null}.
+     *
+     * @param entities the entities
+     * @return the saved entities (in case values are changed)
+     */
+    protected abstract @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities);
+
+    /**
+     * Actual implementation of {@link #deleteAll(Collection)}.
+     * <br>
+     * <b>For internal use only</b>: parameters must be <b>not empty</b> and elements must be <b>not</b> {@code null}.
+     *
+     * @param ids the ids
+     * @return nothing
+     */
+    protected abstract @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<I> ids);
+
+    /**
+     * Actual implementation of {@link #delete(Object)}.
+     * <br>
+     * <b>For internal use only</b>.
+     *
+     * @param id the id
+     * @return anything (results will be ignored)
+     */
+    protected abstract @NotNull CompletableFuture<?> deleteImpl(final @NotNull I id);
 
     @Override
-    public @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull ID id, final @NotNull T entity) {
+    public @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull I id, final @NotNull T entity) {
         return findByIdOrCreate(id, i -> entity);
     }
 
     @Override
-    public @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull ID id, final @NotNull Function<ID, T> supplier) {
+    public @NotNull CompletableFuture<T> findByIdOrCreate(final @NotNull I id, final @NotNull Function<I, T> supplier) {
         return findById(id).thenCompose(o -> o
                 .map(CompletableFuture::completedFuture)
                 .orElseGet(() -> save(supplier.apply(id)))
@@ -52,63 +116,18 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
         return saveImpl(entity);
     }
 
-    /**
-     * Internal implementation of {@link #save(Object)}.
-     *
-     * @param entity the entity (already validated)
-     * @return the saved entity (in case values are changed)
-     * @deprecated FOR INTERNAL USE ONLY
-     */
-    @Deprecated
-    protected abstract @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity);
-
-    @Override
-    public final @NotNull CompletableFuture<Void> delete(final @NotNull ID id) {
-        return deleteImpl(id).thenApply(r -> null);
-    }
-
-    /**
-     * Internal implementation of {@link #delete(Object)}.
-     *
-     * @param id the id
-     * @return anything (result will be ignored)
-     * @deprecated FOR INTERNAL USE ONLY
-     */
-    @Deprecated
-    protected abstract @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id);
-
     @Override
     public @NotNull CompletableFuture<Collection<T>> findAll(final @NotNull Page page) {
         if (page.getNumber() < 0 || page.getSize() < 1)
             return CompletableFuture.completedFuture(Collections.emptyList());
-        return findAllImpl(page);
+        else return findAllImpl(page);
     }
-
-    /**
-     * Internal implementation of {@link #findAll(Page)}.
-     *
-     * @param page the page
-     * @return the data
-     * @deprecated FOR INTERNAL USE ONLY, PAGE NUMBER MUST BE GREATER THAN OR EQUAL TO 0 AND PAGES SIZE MUST BE GREATER THAN 0
-     */
-    @Deprecated
-    protected abstract @NotNull CompletableFuture<Collection<T>> findAllImpl(@NotNull Page page);
 
     @Override
-    public final @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<ID> ids) {
+    public final @NotNull CompletableFuture<Collection<T>> findAllById(final @NotNull Collection<I> ids) {
         if (ids.isEmpty()) return CompletableFuture.completedFuture(Collections.emptyList());
-        return findAllByIdImpl(ids.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+        else return findAllByIdImpl(ids.stream().filter(Objects::nonNull).collect(Collectors.toList()));
     }
-
-    /**
-     * Internal implementation of {@link #findAllById(Collection)}.
-     *
-     * @param ids the ids
-     * @return the data
-     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY AND ELEMENTS NOT {@code null}
-     */
-    @Deprecated
-    protected abstract @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids);
 
     @Override
     public final @NotNull CompletableFuture<Collection<T>> saveAll(final @NotNull Collection<T> entities) {
@@ -128,31 +147,16 @@ public abstract class AbstractRepository<T, ID, E extends QueryEngine<T, ID>> im
         return saveAllImpl(actualEntities);
     }
 
-    /**
-     * Internal implementation of {@link #saveAll(Collection)}.
-     *
-     * @param entities the entities
-     * @return the saved entities (in case values are changed)
-     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY AND ELEMENTS NOT {@code null}
-     */
-    @Deprecated
-    protected abstract @NotNull CompletableFuture<Collection<T>> saveAllImpl(final @NotNull Collection<T> entities);
-
     @Override
-    public final @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<ID> ids) {
+    public final @NotNull CompletableFuture<Void> deleteAll(final @NotNull Collection<I> ids) {
         if (ids.isEmpty()) return CompletableFuture.completedFuture(null);
-        return deleteAllImpl(ids.stream().filter(Objects::nonNull).collect(Collectors.toList()))
+        else return deleteAllImpl(ids.stream().filter(Objects::nonNull).collect(Collectors.toList()))
                 .thenApply(r -> null);
     }
 
-    /**
-     * Internal implementation of {@link #deleteAll(Collection)}.
-     *
-     * @param ids the ids
-     * @return nothing
-     * @deprecated FOR INTERNAL USE ONLY, PARAMETER MUST BE NOT EMPTY AND ELEMENTS NOT {@code null}
-     */
-    @Deprecated
-    protected abstract @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids);
+    @Override
+    public final @NotNull CompletableFuture<Void> delete(final @NotNull I id) {
+        return deleteImpl(id).thenApply(r -> null);
+    }
 
 }

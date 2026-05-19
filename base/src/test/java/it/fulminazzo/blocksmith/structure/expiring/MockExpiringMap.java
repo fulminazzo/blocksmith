@@ -17,36 +17,14 @@ import java.util.stream.Collectors;
 public class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
 
     @Override
-    @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
-        return delegate.get(key);
-    }
-
-    @Override
     public int size() {
         clearExpired();
         return delegate.size();
     }
 
     @Override
-    public boolean isEmpty() {
-        return delegate.isEmpty();
-    }
-
-    @Override
     public boolean containsKey(final @Nullable Object key) {
-        return delegate.containsKey(key);
-    }
-
-    @Override
-    public @Nullable V get(final @Nullable Object key) {
-        ExpiringEntry<V> entry = getExpiring(key);
-        return entry == null ? null : entry.getValue();
-    }
-
-    @Override
-    public @Nullable V remove(final @Nullable Object key) {
-        ExpiringEntry<V> removed = delegate.remove(key);
-        return removed == null ? null : removed.getValue();
+        return key != null && delegate.containsKey(key);
     }
 
     @Override
@@ -59,6 +37,28 @@ public class MockExpiringMap<K, V> extends AbstractExpiringMap<K, V> {
         return delegate.values().stream()
                 .map(ExpiringEntry::getValue)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public @Nullable V remove(final @Nullable Object key) {
+        ExpiringEntry<V> removed = key == null ? null : delegate.remove(key);
+        return removed == null ? null : removed.getValue();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return delegate.isEmpty();
+    }
+
+    @Override
+    public @Nullable V get(final @Nullable Object key) {
+        ExpiringEntry<V> entry = getExpiring(key);
+        return entry == null ? null : entry.getValue();
+    }
+
+    @Override
+    @Nullable ExpiringEntry<V> getExpiring(final @Nullable Object key) {
+        return key == null ? null : delegate.get(key);
     }
 
 }

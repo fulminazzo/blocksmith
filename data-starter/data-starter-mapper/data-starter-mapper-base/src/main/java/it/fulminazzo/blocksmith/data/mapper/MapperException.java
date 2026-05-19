@@ -4,6 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * An exception thrown by {@link Mapper} implementations.
+ *
+ * @see Mapper
+ * @see MapperFormat
  */
 public final class MapperException extends RuntimeException {
     private static final long serialVersionUID = -6706326718229573159L;

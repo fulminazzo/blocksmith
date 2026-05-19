@@ -24,21 +24,6 @@ abstract class AbstractExpiringCollection<E> implements ExpiringCollection<E> {
      */
     abstract @NotNull Collection<ExpiringEntry<E>> expiringEntries();
 
-    @Override
-    public boolean add(final @Nullable E element, final @NotNull Duration ttl) {
-        return add(element, ttl.toMillis());
-    }
-
-    @Override
-    public boolean add(final @Nullable E element) {
-        return add(element, ExpiringEntry.NEVER_EXPIRE);
-    }
-
-    @Override
-    public boolean addAll(final @NotNull ExpiringCollection<? extends E> collection) {
-        return addAllHelper(collection);
-    }
-
     private <E1 extends E> boolean addAllHelper(final @NotNull ExpiringCollection<E1> collection) {
         boolean added = false;
         for (E1 e : collection) {
@@ -46,28 +31,6 @@ abstract class AbstractExpiringCollection<E> implements ExpiringCollection<E> {
             if (ttl != null) added |= add(e, ttl);
         }
         return added;
-    }
-
-    @Override
-    public boolean addAll(final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl) {
-        return addAll(collection, ttl.toMillis());
-    }
-
-    @Override
-    public boolean addAll(final @NotNull Collection<? extends E> collection, final long ttl) {
-        boolean added = false;
-        for (E e : collection) added |= add(e, ttl);
-        return added;
-    }
-
-    @Override
-    public boolean addAll(final @NotNull Collection<? extends E> collection) {
-        if (collection instanceof ExpiringCollection<?>) return addAll((ExpiringCollection<? extends E>) collection);
-        else {
-            boolean added = false;
-            for (E e : collection) added |= add(e);
-            return added;
-        }
     }
 
     @Override
@@ -82,10 +45,47 @@ abstract class AbstractExpiringCollection<E> implements ExpiringCollection<E> {
     }
 
     @Override
+    public boolean addAll(final @NotNull ExpiringCollection<? extends E> collection) {
+        return addAllHelper(collection);
+    }
+
+    @Override
+    public boolean addAll(final @NotNull Collection<? extends E> collection) {
+        if (collection instanceof ExpiringCollection<?>) return addAll((ExpiringCollection<? extends E>) collection);
+        else {
+            boolean added = false;
+            for (E e : collection) added |= add(e);
+            return added;
+        }
+    }
+
+    @Override
+    public boolean addAll(final @NotNull Collection<? extends E> collection, final long ttl) {
+        boolean added = false;
+        for (E e : collection) added |= add(e, ttl);
+        return added;
+    }
+
+    @Override
+    public boolean addAll(final @NotNull Collection<? extends E> collection, final @NotNull Duration ttl) {
+        return addAll(collection, ttl.toMillis());
+    }
+
+    @Override
     public boolean removeAll(final @NotNull Collection<?> collection) {
         boolean removed = false;
         for (Object o : collection) removed |= remove(o);
         return removed;
+    }
+
+    @Override
+    public boolean add(final @Nullable E element) {
+        return add(element, ExpiringEntry.NEVER_EXPIRE);
+    }
+
+    @Override
+    public boolean add(final @Nullable E element, final @NotNull Duration ttl) {
+        return add(element, ttl.toMillis());
     }
 
     @Override

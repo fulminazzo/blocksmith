@@ -9,6 +9,9 @@ import org.jetbrains.annotations.NotNull;
  * to see if an implementation is already available.
  * Also, do not USE it for <b>H2</b>, as a predefined method
  * is present for that type.
+ *
+ * @see DatabaseType
+ * @see RemoteDataSourceBuilder
  */
 public interface IDatabaseType {
 

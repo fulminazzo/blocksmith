@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,7 +37,8 @@ import java.util.function.Function;
  *                 EntityMapper.create(User.class),
  *                 new MemoryRepositorySettings()
  *                         .withExpiryInMillis(300000) // optional
- *                         .withExpirationStrategy(ExpiryStrategy.SCHEDULED) // optional, defines how the expired entities will be cleared
+ *                         // optional, defines how the expired entities will be cleared
+ *                         .withExpirationStrategy(ExpiryStrategy.SCHEDULED)
  *         );
  *         }</pre>
  *     </li>
@@ -47,65 +49,82 @@ import java.util.function.Function;
  *                 engine -> new CustomMemoryRepository<>(engine),
  *                 new MemoryRepositorySettings()
  *                         .withExpiryInMillis(300000) // optional
- *                         .withExpirationStrategy(ExpiryStrategy.SCHEDULED) // optional, defines how the expired entities will be cleared
+ *                         // optional, defines how the expired entities will be cleared
+ *                         .withExpirationStrategy(ExpiryStrategy.SCHEDULED)
  *         );
  *         }</pre>
  *         where CustomMemoryRepository extends MemoryRepository and adds custom behavior.
  *     </li>
  * </ul>
+ *
+ * @see MemoryRepositorySettings
+ * @see MemoryRepository
+ * @see MemoryQueryEngine
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryRepositorySettings> {
     private static int threadsCount = 1;
 
-    private final @NotNull ExecutorService executor;
-    private final @NotNull ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(runnable -> {
-        Thread thread = new Thread(runnable);
-        thread.setDaemon(true);
-        thread.setName(String.format("%s-Cleaner-%s", ExpiringMap.class.getSimpleName(), threadsCount++));
-        return thread;
-    });
-
-    @Override
-    public <T, ID> @NotNull CacheRepository<T, ID> newRepository(
-            final @NotNull EntityMapper<T, ID> entityMapper,
-            final @NotNull MemoryRepositorySettings settings
-    ) {
-        return newRepository(e -> new MemoryRepository<>(e, entityMapper), settings);
-    }
+    private final @NotNull Executor executor;
+    private final @NotNull ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
+            r -> {
+                Thread thread = new Thread(r);
+                thread.setDaemon(true);
+                thread.setName(String.format("%s-Cleaner-%s", MemoryRepository.class.getSimpleName(), threadsCount++));
+                return thread;
+            }
+    );
 
     /**
      * Creates a new custom repository.
      *
      * @param <R>               the type of the repository
      * @param <T>               the type of the entities
-     * @param <ID>              the type of the id of the entities
+     * @param <I>               the type of the id of the entities
      * @param repositoryBuilder the repository creation function
      * @param settings          the settings to build the repository with
      * @return the repository
      */
-    public <T, ID, R extends MemoryRepository<T, ID>> @NotNull R newRepository(
-            final @NotNull Function<MemoryQueryEngine<T, ID>, R> repositoryBuilder,
+    public <T, I, R extends MemoryRepository<T, I>> @NotNull R newRepository(
+            final @NotNull Function<MemoryQueryEngine<T, I>, R> repositoryBuilder,
             final @NotNull MemoryRepositorySettings settings
     ) {
         final Duration ttl = settings.getTtl();
 
-        MemoryRepositorySettings.ExpiryStrategy strategy = settings.getStrategy();
-        final ExpiringMap<ID, T> map;
+        MemoryRepositorySettings.ExpiryStrategy strategy = settings.getExpirationStrategy();
+        final ExpiringMap<I, T> map;
         if (strategy == MemoryRepositorySettings.ExpiryStrategy.SCHEDULED && ttl != null)
             map = ExpiringMap.scheduled(scheduler, ttl.dividedBy(2));
         else map = ExpiringMap.lazy();
 
-        MemoryQueryEngine<T, ID> engine = new MemoryQueryEngine<>(map, executor);
+        MemoryQueryEngine<T, I> engine = new MemoryQueryEngine<>(map, executor);
         R repository = repositoryBuilder.apply(engine);
         if (ttl != null) repository.ttl(ttl);
         return repository;
     }
 
     @Override
+    public <T, I> @NotNull CacheRepository<T, I> newRepository(
+            final @NotNull EntityMapper<T, I> entityMapper,
+            final @NotNull MemoryRepositorySettings settings
+    ) {
+        return newRepository(e -> new MemoryRepository<>(e, entityMapper), settings);
+    }
+
+    @Override
     public void close() {
         scheduler.shutdown();
-        executor.shutdown();
+        if (executor instanceof ExecutorService) ((ExecutorService) executor).shutdown();
+    }
+
+    /**
+     * Creates a new Memory data source.
+     * The queries will be run synchronously.
+     *
+     * @return the memory data source
+     */
+    public static @NotNull MemoryDataSource create() {
+        return create(Runnable::run);
     }
 
     /**
@@ -114,8 +133,22 @@ public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryR
      * @param executor the executor
      * @return the memory data source
      */
-    public static @NotNull MemoryDataSource create(final @NotNull ExecutorService executor) {
+    public static @NotNull MemoryDataSource create(final @NotNull Executor executor) {
         return new MemoryDataSource(executor);
+    }
+
+    /**
+     * Creates a new Memory data source.
+     * The queries will be run asynchronously.
+     *
+     * @return the memory data source
+     */
+    public static @NotNull MemoryDataSource createAsync() {
+        return create(Executors.newCachedThreadPool(r -> {
+            Thread thread = new Thread(r);
+            thread.setName(String.format("%s-%s", MemoryQueryEngine.class.getSimpleName(), threadsCount++));
+            return thread;
+        }));
     }
 
 }

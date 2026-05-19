@@ -12,12 +12,14 @@ import java.time.Duration;
  * A Jackson serializer for {@link Duration} objects.
  */
 final class DurationSerializer extends StdSerializer<Duration> {
-    private static final int daysInYear = 365;
-    private static final int daysInMonth = 30;
-    private static final int secondsInDay = 86400;
-    private static final int secondsInHour = 3600;
-    private static final int secondsInMinute = 60;
-    private static final long nanosInMillis = 1_000_000;
+    private static final long serialVersionUID = 1977004924180711288L;
+
+    private static final int DAYS_IN_YEAR = 365;
+    private static final int DAYS_IN_MONTH = 30;
+    private static final int SECONDS_IN_DAY = 86400;
+    private static final int SECONDS_IN_HOUR = 3600;
+    private static final int SECONDS_IN_MINUTE = 60;
+    private static final long NANOS_IN_MILLIS = 1_000_000;
 
     /**
      * Instantiates a new Duration serializer.
@@ -27,32 +29,35 @@ final class DurationSerializer extends StdSerializer<Duration> {
     }
 
     @Override
-    public void serialize(final @NotNull Duration value,
-                          final @NotNull JsonGenerator gen,
-                          final @NotNull SerializerProvider provider) throws IOException {
+    public void serialize(
+            final @NotNull Duration value,
+            final @NotNull JsonGenerator gen,
+            final @NotNull SerializerProvider provider
+    ) throws IOException {
         Duration abs = value.abs();
         final long totalSeconds = abs.getSeconds();
         final int nanosOfSecond = abs.getNano();
 
-        long totalDays = totalSeconds / secondsInDay;
+        long totalDays = totalSeconds / SECONDS_IN_DAY;
 
-        long years = totalDays / daysInYear;
-        long daysRemainder = totalDays % daysInYear;
+        long years = totalDays / DAYS_IN_YEAR;
+        long daysRemainder = totalDays % DAYS_IN_YEAR;
 
-        long months = daysRemainder / daysInMonth;
-        long days = daysRemainder % daysInMonth;
+        long months = daysRemainder / DAYS_IN_MONTH;
+        long days = daysRemainder % DAYS_IN_MONTH;
 
-        long secondsRemainder = totalSeconds % secondsInDay;
-        long hours = secondsRemainder / secondsInHour;
-        secondsRemainder %= secondsInHour;
+        long secondsRemainder = totalSeconds % SECONDS_IN_DAY;
+        long hours = secondsRemainder / SECONDS_IN_HOUR;
+        secondsRemainder %= SECONDS_IN_HOUR;
 
-        long minutes = secondsRemainder / secondsInMinute;
-        long seconds = secondsRemainder % secondsInMinute;
+        long minutes = secondsRemainder / SECONDS_IN_MINUTE;
+        long seconds = secondsRemainder % SECONDS_IN_MINUTE;
 
-        long millis = nanosOfSecond / nanosInMillis;
-        long nanos = nanosOfSecond % nanosInMillis;
+        long millis = nanosOfSecond / NANOS_IN_MILLIS;
+        long nanos = nanosOfSecond % NANOS_IN_MILLIS;
 
-        if (years == 0 && months == 0 && days == 0 && hours == 0 && minutes == 0 && nanos == 0 && (seconds != 0 || millis != 0)) {
+        if (years == 0 && months == 0 && days == 0 && hours == 0 && minutes == 0 && nanos == 0
+                && (seconds != 0 || millis != 0)) {
             gen.writeNumber((value.isNegative() ? "-" : "") + formatSeconds(seconds, millis));
             return;
         }
@@ -61,19 +66,33 @@ final class DurationSerializer extends StdSerializer<Duration> {
 
         if (years != 0) builder.append(value.isNegative() ? "-" : "").append(years).append("y");
         if (months != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(months).append("M");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(months).append("M");
         if (days != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(days).append("d");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(days).append("d");
         if (hours != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(hours).append("h");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(hours).append("h");
         if (minutes != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(minutes).append("m");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(minutes).append("m");
         if (seconds != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(seconds).append("s");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(seconds).append("s");
         if (millis != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(millis).append("ms");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(millis).append("ms");
         if (nanos != 0)
-            builder.append(builder.length() > 0 ? " " : "").append(value.isNegative() ? "-" : "").append(nanos).append("ns");
+            builder.append(builder.length() > 0 ? " " : "")
+                    .append(value.isNegative() ? "-" : "")
+                    .append(nanos).append("ns");
 
         if (builder.length() == 0) gen.writeNumber(0);
         else gen.writeString(builder.toString());
@@ -82,8 +101,9 @@ final class DurationSerializer extends StdSerializer<Duration> {
     private static @NotNull String formatSeconds(final long integerPart, long decimalPart) {
         if (decimalPart == 0) return String.valueOf(integerPart);
         String decStr = String.format("%03d", decimalPart);
-        decStr = decStr.replaceAll("0+$", "");
-        return integerPart + "." + decStr;
+        int lastIndex = decStr.length() - 1;
+        while (lastIndex >= 0 && decStr.charAt(lastIndex) == '0') lastIndex--;
+        return integerPart + "." + decStr.substring(0, lastIndex + 1);
     }
 
 }

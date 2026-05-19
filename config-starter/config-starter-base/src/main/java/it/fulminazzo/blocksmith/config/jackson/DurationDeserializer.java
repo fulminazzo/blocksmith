@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -12,33 +13,37 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
  * A Jackson deserializer for {@link Duration} objects.
  */
 final class DurationDeserializer extends StdDeserializer<Duration> {
-    private static final long daysInMonth = 30;
-    private static final long daysInYear = 365;
-    private static final long millisInSecond = 1000;
+    private static final long serialVersionUID = 5211295652933578090L;
 
-    private static final @NotNull Map<String, Function<String, Duration>> parsers = new LinkedHashMap<>();
+    private static final long DAYS_IN_MONTH = 30;
+    private static final long DAYS_IN_YEAR = 365;
+    private static final long MILLIS_IN_SECOND = 1000;
 
-    private final @NotNull Logger logger;
+    private static final @NotNull Map<String, Function<String, Duration>> PARSERS = new LinkedHashMap<>();
+
+    @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+    private final transient @NotNull Logger logger;
 
     static {
-        parsers.put("ns", s -> Duration.ofNanos(Long.parseLong(s)));
-        parsers.put("ms", s -> Duration.ofMillis(Long.parseLong(s)));
-        parsers.put("s", s -> {
-            long secondsAndMillis = (long) (Double.parseDouble(s) * millisInSecond);
+        PARSERS.put("ns", s -> Duration.ofNanos(Long.parseLong(s)));
+        PARSERS.put("ms", s -> Duration.ofMillis(Long.parseLong(s)));
+        PARSERS.put("s", s -> {
+            long secondsAndMillis = (long) (Double.parseDouble(s) * MILLIS_IN_SECOND);
             return Duration.ofSeconds(secondsAndMillis / 1000).plusMillis(secondsAndMillis % 1000);
         });
-        parsers.put("m", s -> Duration.ofMinutes(Long.parseLong(s)));
-        parsers.put("h", s -> Duration.ofHours(Long.parseLong(s)));
-        parsers.put("d", s -> Duration.ofDays(Long.parseLong(s)));
-        parsers.put("M", s -> Duration.ofDays(Long.parseLong(s) * daysInMonth));
-        parsers.put("y", s -> Duration.ofDays(Long.parseLong(s) * daysInYear));
-        parsers.put("Y", s -> Duration.ofDays(Long.parseLong(s) * daysInYear));
+        PARSERS.put("m", s -> Duration.ofMinutes(Long.parseLong(s)));
+        PARSERS.put("h", s -> Duration.ofHours(Long.parseLong(s)));
+        PARSERS.put("d", s -> Duration.ofDays(Long.parseLong(s)));
+        PARSERS.put("M", s -> Duration.ofDays(Long.parseLong(s) * DAYS_IN_MONTH));
+        PARSERS.put("y", s -> Duration.ofDays(Long.parseLong(s) * DAYS_IN_YEAR));
+        PARSERS.put("Y", s -> Duration.ofDays(Long.parseLong(s) * DAYS_IN_YEAR));
     }
 
     /**
@@ -52,13 +57,20 @@ final class DurationDeserializer extends StdDeserializer<Duration> {
     }
 
     @Override
-    public Duration deserialize(final @NotNull JsonParser parser,
-                                final @NotNull DeserializationContext context) throws IOException {
+    public Duration deserialize(
+            final @NotNull JsonParser parser,
+            final @NotNull DeserializationContext context
+    ) throws IOException {
         JsonNode node = parser.getCodec().readTree(parser);
         String raw = node.asText();
         try {
-            return getParser("s").getValue().apply(raw);
-        } catch (NumberFormatException ignored) {}
+            return Objects.requireNonNull(
+                    getParser("s"),
+                    "Could not find seconds parser" // should be impossible
+            ).getValue().apply(raw);
+        } catch (NumberFormatException ignored) {
+            // some time unit was used, we require complete parsing
+        }
         Duration duration = null;
 
         for (String r : raw.split("[ \r\n\t]+")) {
@@ -70,10 +82,14 @@ final class DurationDeserializer extends StdDeserializer<Duration> {
                     Duration d = durationParser.getValue().apply(rawValue);
                     duration = duration == null ? d : duration.plus(d);
                 } catch (NumberFormatException e) {
-                    logger.warn("Invalid time value '{}' for unit {} (path: {})", rawValue, unit, JacksonUtils.getCurrentPath(parser));
+                    logger.warn("Invalid time value '{}' for unit {} (path: {})",
+                            rawValue, unit, JacksonUtils.getCurrentPath(parser)
+                    );
                 }
             } else
-                logger.warn("Unrecognized time notation '{}'. Supported units: {} (path: {})", r, getSupportedUnits(), JacksonUtils.getCurrentPath(parser));
+                logger.warn("Unrecognized time notation '{}'. Supported units: {} (path: {})",
+                        r, getSupportedUnits(), JacksonUtils.getCurrentPath(parser)
+                );
         }
 
         if (duration == null) {
@@ -87,14 +103,14 @@ final class DurationDeserializer extends StdDeserializer<Duration> {
     }
 
     private static @Nullable Map.Entry<String, Function<String, Duration>> getParser(final @NotNull String raw) {
-        for (Map.Entry<String, Function<String, Duration>> entry : parsers.entrySet())
+        for (Map.Entry<String, Function<String, Duration>> entry : PARSERS.entrySet())
             if (raw.endsWith(entry.getKey()))
                 return entry;
         return null;
     }
 
     private static @NotNull String getSupportedUnits() {
-        return String.join(", ", parsers.keySet());
+        return String.join(", ", PARSERS.keySet());
     }
 
 }

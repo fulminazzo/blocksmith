@@ -5,18 +5,25 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.data.config.DataSourceConfig;
 import it.fulminazzo.blocksmith.data.config.DataSourceType;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * Jackson deserializer for {@link DataSourceConfig} objects.
+ *
+ * @see DataSourceConfig
  */
 final class DataSourceConfigDeserializer extends StdDeserializer<DataSourceConfig> {
-    private final @NotNull Logger logger;
+    private static final long serialVersionUID = -1724048481514521412L;
+
+    @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+    private final transient @NotNull Logger logger;
 
     /**
      * Instantiates a new Data source config deserializer.
@@ -29,19 +36,21 @@ final class DataSourceConfigDeserializer extends StdDeserializer<DataSourceConfi
     }
 
     @Override
-    public DataSourceConfig deserialize(final @NotNull JsonParser jsonParser,
-                                        final @NotNull DeserializationContext deserializationContext) throws IOException {
+    public DataSourceConfig deserialize(
+            final @NotNull JsonParser jsonParser,
+            final @NotNull DeserializationContext deserializationContext
+    ) throws IOException {
         final JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
-        String rawType = node.get("type").asText();
+        JsonNode typeNode = node.get("type");
+        final String rawType = typeNode == null ? "null" : typeNode.asText();
         try {
-            if (rawType == null) throw new IllegalArgumentException();
-            DataSourceType type = DataSourceType.valueOf(rawType.toUpperCase());
+            DataSourceType type = DataSourceType.valueOf(rawType.toUpperCase(Locale.ROOT));
             ((ObjectNode) node).remove("type");
             return deserializationContext.readTreeAsValue(node, type.getConfigClass());
         } catch (IllegalArgumentException e) {
-            logger.warn("Invalid database configuration: unidentified type '{}'", rawType);
-            return null;
+            logger.warn("Invalid database configuration: unrecognized type '{}'", rawType);
+            throw new IOException(String.format("Invalid database configuration: unrecognized type '%s'", rawType));
         }
     }
 

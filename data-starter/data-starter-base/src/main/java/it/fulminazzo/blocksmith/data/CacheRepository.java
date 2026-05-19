@@ -5,13 +5,15 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 
 /**
- * Special implementation of {@link Repository} to support saving of entities
- * with limited lifetime.
+ * Special implementation of {@link Repository} to support saving of entities with limited lifetime.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities (should be unique)
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities (should be unique)
+ * @see Repository
+ * @see CacheRepositorySettings
+ * @see CacheRepositoryDataSource
  */
-public interface CacheRepository<T, ID> extends Repository<T, ID> {
+public interface CacheRepository<T, I> extends Repository<T, I> {
 
     /**
      * Sets the expiration time when saving an entity.
@@ -19,6 +21,6 @@ public interface CacheRepository<T, ID> extends Repository<T, ID> {
      * @param expiry the expiration time
      * @return this object (for method chaining)
      */
-    @NotNull CacheRepository<T, ID> ttl(final @NotNull Duration expiry);
+    @NotNull CacheRepository<T, I> ttl(final @NotNull Duration expiry);
 
 }

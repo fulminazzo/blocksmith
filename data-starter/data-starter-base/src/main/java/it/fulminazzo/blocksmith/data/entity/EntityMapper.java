@@ -16,18 +16,18 @@ import java.util.stream.Collectors;
 /**
  * Responsible for accessing information of an entity.
  *
- * @param <T>  the type of the entity
- * @param <ID> the type of the id of the entity (should be unique)
+ * @param <T> the type of the entity
+ * @param <I> the type of the id of the entity (should be unique)
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class EntityMapper<T, ID> {
-    private static final @NotNull String defaultIdFieldName = "id";
+public final class EntityMapper<T, I> {
+    private static final @NotNull String DEFAULT_ID_FIELD_NAME = "id";
 
     @Getter
     private final @NotNull Class<T> type;
     @Getter
     private final @NotNull String idFieldName;
-    private final @NotNull Function<T, ID> idMapper;
+    private final @NotNull Function<T, I> idMapper;
 
     /**
      * Gets the ID of the entity.
@@ -35,7 +35,7 @@ public final class EntityMapper<T, ID> {
      * @param entity the entity
      * @return the id
      */
-    public @NotNull ID getId(final @NotNull T entity) {
+    public @NotNull I getId(final @NotNull T entity) {
         return Objects.requireNonNull(idMapper.apply(entity), "ID should not be null");
     }
 
@@ -45,16 +45,16 @@ public final class EntityMapper<T, ID> {
      * The ID lookup will follow the logic:
      * <ol>
      *     <li>attempts to find a field annotated with {@link Id} (only ONE field must be annotated);</li>
-     *     <li>if it fails, attempts to find a field named {@link #defaultIdFieldName};</li>
+     *     <li>if it fails, attempts to find a field named {@link #DEFAULT_ID_FIELD_NAME};</li>
      *     <li>if it fails, an exception is thrown notifying the user.</li>
      * </ol>
      *
      * @param <T>  the type of the entity
-     * @param <ID> the type of the id of the entity (should be unique)
+     * @param <I>  the type of the id of the entity (should be unique)
      * @param type the entity Java class
      * @return the entity mapper
      */
-    public static <T, ID> @NotNull EntityMapper<T, ID> create(final @NotNull Class<T> type) {
+    public static <T, I> @NotNull EntityMapper<T, I> create(final @NotNull Class<T> type) {
         final Reflect reflect = Reflect.on(type);
         @NotNull List<Field> fields = reflect.getNonStaticFields().stream()
                 .filter(f -> f.isAnnotationPresent(Id.class))
@@ -68,12 +68,12 @@ public final class EntityMapper<T, ID> {
             return create(type, fields.get(0).getName());
         }
         try {
-            reflect.getNonStaticField(defaultIdFieldName);
-            return create(type, defaultIdFieldName);
+            reflect.getNonStaticField(DEFAULT_ID_FIELD_NAME);
+            return create(type, DEFAULT_ID_FIELD_NAME);
         } catch (ReflectException e) {
             throw new IllegalArgumentException(String.format(
                     "Invalid entity '%s'. Could not find field '%s' and no field annotated with %s was present",
-                    type.getCanonicalName(), defaultIdFieldName, Id.class.getSimpleName()
+                    type.getCanonicalName(), DEFAULT_ID_FIELD_NAME, Id.class.getSimpleName()
             ));
         }
     }
@@ -82,12 +82,12 @@ public final class EntityMapper<T, ID> {
      * Creates a new Entity mapper.
      *
      * @param <T>         the type of the entity
-     * @param <ID>        the type of the id of the entity (should be unique)
+     * @param <I>         the type of the id of the entity (should be unique)
      * @param type        the entity Java class
      * @param idFieldName the name of the field that identifies the entity
      * @return the entity mapper
      */
-    public static <T, ID> @NotNull EntityMapper<T, ID> create(
+    public static <T, I> @NotNull EntityMapper<T, I> create(
             final @NotNull Class<T> type,
             final @NotNull String idFieldName
     ) {
@@ -109,16 +109,16 @@ public final class EntityMapper<T, ID> {
      * Creates a new Entity mapper.
      *
      * @param <T>         the type of the entity
-     * @param <ID>        the type of the id of the entity (should be unique)
+     * @param <I>         the type of the id of the entity (should be unique)
      * @param type        the entity Java class
      * @param idFieldName the name of the field that represents the ID of the entity
      * @param idMapper    the function to get the ID of the entity
      * @return the entity mapper
      */
-    public static <T, ID> @NotNull EntityMapper<T, ID> create(
+    public static <T, I> @NotNull EntityMapper<T, I> create(
             final @NotNull Class<T> type,
             final @NotNull String idFieldName,
-            final @NotNull Function<T, ID> idMapper
+            final @NotNull Function<T, I> idMapper
     ) {
         return new EntityMapper<>(type, idFieldName, idMapper);
     }

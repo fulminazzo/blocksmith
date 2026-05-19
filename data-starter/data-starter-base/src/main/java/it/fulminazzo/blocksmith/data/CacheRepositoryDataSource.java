@@ -7,21 +7,27 @@ import org.jetbrains.annotations.NotNull;
  * Special implementation of {@link RepositoryDataSource} for creating cache repositories.
  *
  * @param <S> the type of the repository settings (to build new repositories)
+ * @see RepositoryDataSource
+ * @see RepositoryDataSourceBuilder
+ * @see CacheRepository
+ * @see CacheRepositorySettings
+ * @see QueryEngine
+ * @see EntityMapper
  */
 public interface CacheRepositoryDataSource<S extends CacheRepositorySettings<S>> extends RepositoryDataSource<S> {
 
     @SuppressWarnings("unchecked")
     @Override
-    default <T, ID> @NotNull CacheRepository<T, ID> newRepository(
+    default <T, I> @NotNull CacheRepository<T, I> newRepository(
             final @NotNull Class<T> entityType,
             final @NotNull S settings
     ) {
-        return (CacheRepository<T, ID>) RepositoryDataSource.super.newRepository(entityType, settings);
+        return (CacheRepository<T, I>) RepositoryDataSource.super.newRepository(entityType, settings);
     }
 
     @Override
-    <T, ID> @NotNull CacheRepository<T, ID> newRepository(
-            final @NotNull EntityMapper<T, ID> entityMapper,
+    <T, I> @NotNull CacheRepository<T, I> newRepository(
+            final @NotNull EntityMapper<T, I> entityMapper,
             final @NotNull S settings
     );
 

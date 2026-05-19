@@ -4,8 +4,12 @@ import it.fulminazzo.blocksmith.ProjectInfo;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+
 /**
  * Contains all the default {@link Mapper}s.
+ *
+ * @see Mapper
  */
 public enum MapperFormat {
     /**
@@ -24,7 +28,7 @@ public enum MapperFormat {
      */
     @SuppressWarnings("unchecked")
     public @NotNull Mapper newMapper() {
-        String type = name().toLowerCase();
+        String type = name().toLowerCase(Locale.ROOT);
         type = Character.toUpperCase(type.charAt(0)) + type.substring(1);
         Class<Mapper> mapperClass = Mapper.class;
         String simpleName = mapperClass.getSimpleName();
@@ -37,11 +41,11 @@ public enum MapperFormat {
                     ProjectInfo.GROUP,
                     ProjectInfo.PROJECT_NAME,
                     ProjectInfo.MODULE_NAME,
-                    type.toLowerCase()
+                    type.toLowerCase(Locale.ROOT)
             );
             throw new IllegalStateException(
-                    String.format("Could not find suitable %s for %s. ", Mapper.class.getSimpleName(), type) +
-                            String.format("Please check that the module %s is correctly installed.", moduleName)
+                    String.format("Could not find suitable %s for %s. ", Mapper.class.getSimpleName(), type)
+                            + String.format("Please check that the module %s is correctly installed.", moduleName)
             );
         }
     }

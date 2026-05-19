@@ -50,8 +50,10 @@ public interface ExpiringSet<E> extends Set<E>, ExpiringCollection<E> {
      * @param <E>          the type of the elements
      * @return the set
      */
-    static <E> @NotNull ExpiringSet<E> scheduled(final @NotNull ScheduledExecutorService scheduler,
-                                                 final @NotNull Duration taskInterval) {
+    static <E> @NotNull ExpiringSet<E> scheduled(
+            final @NotNull ScheduledExecutorService scheduler,
+            final @NotNull Duration taskInterval
+    ) {
         return new DelegateExpiringSet<>((AbstractExpiringMap<E, Object>) ExpiringMap.<E, Object>scheduled(
                 scheduler,
                 taskInterval

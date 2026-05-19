@@ -4,7 +4,7 @@ import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 class PassiveExpiringListTest extends Specification {
-    private static final long ttl = 400L
+    private static final long ttl = 1_000L
     private static final long expiringTtl = ttl / 4 as long
 
     private final ExpiringEntry<String> first = new ExpiringEntry<>('Hello', ttl)
@@ -109,7 +109,7 @@ class PassiveExpiringListTest extends Specification {
         sublist.size() == 2
     }
 
-    def 'test that #method considers expired entries'() {
+    def 'test that #method returns #expected with expired entries'() {
         given:
         internal.add(second)
 
@@ -153,13 +153,15 @@ class PassiveExpiringListTest extends Specification {
         sleepTtl()
 
         then:
-        list.containsAll([first].collect { it.value })
-        list.containsAll([second].collect { it.value })
-        list.containsAll([third].collect { it.value })
-        list.containsAll([first, second].collect { it.value })
-        list.containsAll([second, third].collect { it.value })
-        list.containsAll([first, third].collect { it.value })
-        list.containsAll([first, second, third].collect { it.value })
+        list.with {
+            containsAll([this.first]*.value)
+            containsAll([this.second]*.value)
+            containsAll([this.third]*.value)
+            containsAll([this.first, this.second]*.value)
+            containsAll([this.second, this.third]*.value)
+            containsAll([this.first, this.third]*.value)
+            containsAll([this.first, this.second, this.third]*.value)
+        }
     }
 
     def 'test that iterator returns expired entries'() {
@@ -175,11 +177,11 @@ class PassiveExpiringListTest extends Specification {
         for (def i : list) actual.add(i)
 
         then:
-        actual == entries.collect { it.value }
+        actual == entries*.value
     }
 
-    private static void sleepTtl() {
-        sleep(ttl / 2 as long)
+    protected static void sleepTtl() {
+        sleep((long) (ttl / 2))
     }
 
 }

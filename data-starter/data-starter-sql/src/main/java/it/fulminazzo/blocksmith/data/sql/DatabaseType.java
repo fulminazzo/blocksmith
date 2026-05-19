@@ -4,10 +4,14 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+
 /**
  * Most commonly used SQL databases.
- * For each one of them, an optimization method is present
- * in {@link RemoteDataSourceBuilder}.
+ * For each one of them, an optimization method is present in {@link RemoteDataSourceBuilder}.
+ *
+ * @see IDatabaseType
+ * @see RemoteDataSourceBuilder
  */
 @RequiredArgsConstructor
 public enum DatabaseType implements IDatabaseType {
@@ -15,7 +19,7 @@ public enum DatabaseType implements IDatabaseType {
     MARIADB(3306),
     POSTGRESQL(5432),
     H2(8082),
-    SQLITE(8191)
+    SQLITE(-1)
     ;
 
     @Getter
@@ -23,7 +27,7 @@ public enum DatabaseType implements IDatabaseType {
 
     @Override
     public @NotNull String getJdbcName() {
-        return name().toLowerCase();
+        return name().toLowerCase(Locale.ROOT);
     }
 
 }

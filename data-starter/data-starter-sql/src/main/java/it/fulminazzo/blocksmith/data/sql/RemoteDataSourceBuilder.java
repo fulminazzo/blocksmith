@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 import org.jooq.SQLDialect;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
@@ -27,6 +28,12 @@ import java.util.concurrent.ExecutorService;
  *        .postgres() // optimizations for PostgreSQL
  *        .build();
  * }</pre>
+ *
+ * @see SqlDataSource
+ * @see SqlDataSourceBuilder
+ * @see H2DataSourceBuilder
+ * @see SqliteDataSourceBuilder
+ * @see RemoteDataSourceBuilder
  */
 public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteDataSourceBuilder> {
     private final @NotNull IDatabaseType databaseType;
@@ -41,35 +48,15 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
      * @param executor     the executor
      * @param databaseType the database type
      */
-    RemoteDataSourceBuilder(final @NotNull HikariConfig config,
-                            final @Nullable String database,
-                            final @Nullable ExecutorService executor,
-                            final @NotNull IDatabaseType databaseType) {
+    RemoteDataSourceBuilder(
+            final @NotNull HikariConfig config,
+            final @Nullable String database,
+            final @Nullable ExecutorService executor,
+            final @NotNull IDatabaseType databaseType
+    ) {
         super(config, database, executor);
         this.databaseType = databaseType;
         host("127.0.0.1").port(databaseType.getPort());
-    }
-
-    @Override
-    protected @NotNull String getJdbcUrl() {
-        return String.format("jdbc:%s://%s:%s/%s",
-                databaseType.getJdbcName(),
-                Objects.requireNonNull(host, "host has not been specified yet"),
-                Objects.requireNonNull(port, "port has not been specified yet"),
-                getDatabase()
-        );
-    }
-
-    @Override
-    protected @NotNull SQLDialect getSQLDialect() {
-        String databaseName = databaseType.getJdbcName().toUpperCase();
-        try {
-            return SQLDialect.valueOf(databaseName);
-        } catch (IllegalArgumentException e) {
-            if (databaseName.equals(DatabaseType.POSTGRESQL.name()))
-                return SQLDialect.POSTGRES;
-            else return SQLDialect.DEFAULT;
-        }
     }
 
     /**
@@ -127,6 +114,28 @@ public final class RemoteDataSourceBuilder extends ASqlDataSourceBuilder<RemoteD
     public @NotNull RemoteDataSourceBuilder postgres() {
         return addDataSourceProperty("tcpKeepAlive", true)
                 .addDataSourceProperty("prepareThreshold", 5);
+    }
+
+    @Override
+    protected @NotNull String getJdbcUrl() {
+        return String.format("jdbc:%s://%s:%s/%s",
+                databaseType.getJdbcName(),
+                Objects.requireNonNull(host, "host has not been specified yet"),
+                Objects.requireNonNull(port, "port has not been specified yet"),
+                getDatabase()
+        );
+    }
+
+    @Override
+    protected @NotNull SQLDialect getSQLDialect() {
+        String databaseName = databaseType.getJdbcName().toUpperCase(Locale.ROOT);
+        try {
+            return SQLDialect.valueOf(databaseName);
+        } catch (IllegalArgumentException e) {
+            if (databaseName.equals(DatabaseType.POSTGRESQL.name()))
+                return SQLDialect.POSTGRES;
+            else throw new IllegalArgumentException("Unsupported database type: " + databaseType.getJdbcName());
+        }
     }
 
 }

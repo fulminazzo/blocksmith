@@ -26,11 +26,13 @@ final class LoggerDeserializationProblemHandler extends DeserializationProblemHa
     @NotNull Logger logger;
 
     @Override
-    public boolean handleUnknownProperty(final @Nullable DeserializationContext context,
-                                         final @NotNull JsonParser parser,
-                                         final @Nullable JsonDeserializer<?> deserializer,
-                                         final @Nullable Object beanOrClass,
-                                         final @NotNull String propertyName) throws IOException {
+    public boolean handleUnknownProperty(
+            final @Nullable DeserializationContext context,
+            final @NotNull JsonParser parser,
+            final @Nullable JsonDeserializer<?> deserializer,
+            final @Nullable Object beanOrClass,
+            final @NotNull String propertyName
+    ) throws IOException {
         // when the JSON contains a property not present in the bean
         String path = JacksonUtils.getCurrentPath(parser);
         if (!propertyName.equalsIgnoreCase(ConfigVersion.PROPERTY_NAME))
@@ -40,10 +42,12 @@ final class LoggerDeserializationProblemHandler extends DeserializationProblemHa
     }
 
     @Override
-    public @Nullable Object handleWeirdKey(final @NotNull DeserializationContext context,
-                                           final @NotNull Class<?> rawKeyType,
-                                           final @NotNull String keyValue,
-                                           final @Nullable String failureMsg) {
+    public @Nullable Object handleWeirdKey(
+            final @NotNull DeserializationContext context,
+            final @NotNull Class<?> rawKeyType,
+            final @NotNull String keyValue,
+            final @Nullable String failureMsg
+    ) {
         // when the key of a Map cannot be converted to the expected type (e.g. Integer)
         String path = JacksonUtils.getCurrentPath(context.getParser());
         logger.warn("Invalid key '{}' for map: expected {} (path: '{}')",
@@ -55,10 +59,12 @@ final class LoggerDeserializationProblemHandler extends DeserializationProblemHa
     }
 
     @Override
-    public Object handleWeirdStringValue(final DeserializationContext context,
-                                         final Class<?> targetType,
-                                         final String valueToConvert,
-                                         final String failureMsg) {
+    public Object handleWeirdStringValue(
+            final DeserializationContext context,
+            final Class<?> targetType,
+            final String valueToConvert,
+            final String failureMsg
+    ) {
         // when a string cannot be converted to the requested type (e.g. LocalDate)
         throw new LoggerSettableBeanProperty.DeserializationException(
                 "Invalid value for property '<name>': expected <type> but got '%s' (path: '%s')",
@@ -67,10 +73,12 @@ final class LoggerDeserializationProblemHandler extends DeserializationProblemHa
     }
 
     @Override
-    public Object handleWeirdNumberValue(final DeserializationContext context,
-                                         final Class<?> targetType,
-                                         final Number valueToConvert,
-                                         final String failureMsg) {
+    public Object handleWeirdNumberValue(
+            final DeserializationContext context,
+            final Class<?> targetType,
+            final Number valueToConvert,
+            final String failureMsg
+    ) {
         // when a number cannot be converted to the requested type (e.g. too big)
         throw new LoggerSettableBeanProperty.DeserializationException(
                 "Invalid value for property '<name>': expected <type> but got '%s' (path: '%s')",
@@ -79,11 +87,13 @@ final class LoggerDeserializationProblemHandler extends DeserializationProblemHa
     }
 
     @Override
-    public Object handleUnexpectedToken(final DeserializationContext context,
-                                        final JavaType targetType,
-                                        final JsonToken token,
-                                        final JsonParser parser,
-                                        final String failureMsg) {
+    public Object handleUnexpectedToken(
+            final DeserializationContext context,
+            final JavaType targetType,
+            final JsonToken token,
+            final JsonParser parser,
+            final String failureMsg
+    ) {
         // when the value is different from the expected type
         throw new LoggerSettableBeanProperty.DeserializationException(
                 "Invalid value for property '<name>': expected <type> but got token '%s' (path: '%s')",

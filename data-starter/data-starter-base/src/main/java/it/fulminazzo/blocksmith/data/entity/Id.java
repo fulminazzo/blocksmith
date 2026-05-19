@@ -3,7 +3,7 @@ package it.fulminazzo.blocksmith.data.entity;
 import java.lang.annotation.*;
 
 /**
- * Indicates that a field identifies the entity where it is contained.
+ * Marks the field of a class as the identifier of the entity represented by the class itself.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

@@ -225,7 +225,8 @@ public final class ValidationMessages {
      *     <li><b>value</b>: the given invalid value.</li>
      * </ul>
      */
-    public static final @NotNull String REQUIRED_ALPHABETICAL_OR_DIGIT = "error.validation.invalid-alphabetical-or-digit";
+    public static final @NotNull String REQUIRED_ALPHABETICAL_OR_DIGIT =
+            "error.validation.invalid-alphabetical-or-digit";
 
     /**
      * The annotation expected the value to be a <b>string</b> (or characters sequence)

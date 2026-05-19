@@ -20,11 +20,13 @@ import java.util.stream.Collectors;
 /**
  * Implementation of {@link Repository} for Redis databases.
  *
- * @param <T>  the type of the entities
- * @param <ID> the type of the id of the entities (should be unique)
+ * @param <T> the type of the entities
+ * @param <I> the type of the id of the entities (should be unique)
+ * @see RedisRepositorySettings
+ * @see RedisQueryEngine
  */
-public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQueryEngine<T, ID>>
-        implements CacheRepository<T, ID> {
+public class RedisRepository<T, I> extends AbstractRepository<T, I, RedisQueryEngine<T, I>>
+        implements CacheRepository<T, I> {
     private long expiry;
 
     /**
@@ -33,42 +35,53 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
      * @param queryEngine  the query engine
      * @param entityMapper the entity mapper
      */
-    protected RedisRepository(final @NotNull RedisQueryEngine<T, ID> queryEngine,
-                              final @NotNull EntityMapper<T, ID> entityMapper) {
+    protected RedisRepository(
+            final @NotNull RedisQueryEngine<T, I> queryEngine,
+            final @NotNull EntityMapper<T, I> entityMapper
+    ) {
         super(queryEngine, entityMapper);
     }
 
     @Override
-    public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull ID id) {
+    public @NotNull CompletableFuture<Long> count() {
+        return queryEngine.query(RedisServerAsyncCommands::dbsize);
+    }
+
+    @Override
+    public @NotNull RedisRepository<T, I> ttl(
+            final @PositiveOrZero(exceptionMessage = "expire time must be at least 0") @NotNull Duration expiry
+    ) {
+        Validator.validateMethod(expiry);
+        this.expiry = expiry.toMillis();
+        return this;
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Optional<T>> findById(final @NotNull I id) {
         return queryEngine.query(async -> async.get(queryEngine.getId(id)))
                 .thenApply(Optional::ofNullable)
                 .thenApply(o -> o.map(queryEngine::deserialize));
     }
 
     @Override
-    public @NotNull CompletableFuture<Boolean> existsById(final @NotNull ID id) {
+    public @NotNull CompletableFuture<Boolean> existsById(final @NotNull I id) {
         return queryEngine.query(async -> async.exists(queryEngine.getId(id)))
                 .thenApply(l -> l > 0);
     }
 
     @Override
-    public @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
+    public @NotNull CompletableFuture<Collection<T>> findAll() {
+        return queryEngine.getAllKeys().thenCompose(queryEngine::getValues);
+    }
+
+    @Override
+    protected @NotNull CompletableFuture<T> saveImpl(final @NotNull T entity) {
         return queryEngine.query(async -> {
             String id = queryEngine.getEntityId(entity);
             String serEntity = queryEngine.serialize(entity);
             if (expiry > 0) return async.psetex(id, expiry, serEntity);
             else return async.set(id, serEntity);
         }).thenApply(s -> entity);
-    }
-
-    @Override
-    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull ID id) {
-        return queryEngine.query(async -> async.del(queryEngine.getId(id)));
-    }
-
-    @Override
-    public @NotNull CompletableFuture<Collection<T>> findAll() {
-        return queryEngine.getAllKeys().thenCompose(queryEngine::getValues);
     }
 
     @Override
@@ -82,7 +95,7 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
     }
 
     @Override
-    protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<ID> ids) {
+    protected @NotNull CompletableFuture<Collection<T>> findAllByIdImpl(final @NotNull Collection<I> ids) {
         return queryEngine.getValues(ids.stream().map(queryEngine::getId).collect(Collectors.toList()));
     }
 
@@ -109,22 +122,15 @@ public class RedisRepository<T, ID> extends AbstractRepository<T, ID, RedisQuery
     }
 
     @Override
-    protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<ID> ids) {
+    protected @NotNull CompletableFuture<?> deleteAllImpl(final @NotNull Collection<I> ids) {
         return queryEngine.query(async ->
                 async.del(ids.stream().map(queryEngine::getId).toArray(String[]::new))
         );
     }
 
     @Override
-    public @NotNull CompletableFuture<Long> count() {
-        return queryEngine.query(RedisServerAsyncCommands::dbsize);
-    }
-
-    @Override
-    public @NotNull RedisRepository<T, ID> ttl(final @PositiveOrZero(exceptionMessage = "expire time must be at least 0") @NotNull Duration expiry) {
-        Validator.validateMethod(expiry);
-        this.expiry = expiry.toMillis();
-        return this;
+    protected @NotNull CompletableFuture<?> deleteImpl(final @NotNull I id) {
+        return queryEngine.query(async -> async.del(queryEngine.getId(id)));
     }
 
 }

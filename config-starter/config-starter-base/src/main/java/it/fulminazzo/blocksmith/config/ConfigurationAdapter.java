@@ -27,9 +27,11 @@ public interface ConfigurationAdapter extends BaseConfigurationAdapter {
      * @return the loaded configuration
      * @throws IOException in case of any errors
      */
-    <T> @NotNull T load(final @NotNull File parentDirectory,
-                        final @NotNull String fileName,
-                        final @NotNull Class<T> type) throws IOException;
+    <T> @NotNull T load(
+            final @NotNull File parentDirectory,
+            final @NotNull String fileName,
+            final @NotNull Class<T> type
+    ) throws IOException;
 
     /**
      * Stores the given configuration to file.
@@ -41,9 +43,11 @@ public interface ConfigurationAdapter extends BaseConfigurationAdapter {
      * @param configuration   the configuration
      * @throws IOException in case of any errors
      */
-    <T> void store(final @NotNull File parentDirectory,
-                   final @NotNull String fileName,
-                   final @NotNull T configuration) throws IOException;
+    <T> void store(
+            final @NotNull File parentDirectory,
+            final @NotNull String fileName,
+            final @NotNull T configuration
+    ) throws IOException;
 
     /**
      * Updates the format for this configuration adapter.
@@ -60,8 +64,10 @@ public interface ConfigurationAdapter extends BaseConfigurationAdapter {
      * @param format the format
      * @return the configuration adapter
      */
-    static @NotNull ConfigurationAdapter newAdapter(final @NotNull Logger logger,
-                                                    final @NotNull ConfigurationFormat format) {
+    static @NotNull ConfigurationAdapter newAdapter(
+            final @NotNull Logger logger,
+            final @NotNull ConfigurationFormat format
+    ) {
         return new DelegateConfigurationAdapter(logger).setFormat(format);
     }
 

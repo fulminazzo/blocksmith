@@ -9,7 +9,7 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Identifies a configuration version along with migrations to update previous versions.
@@ -52,7 +52,7 @@ public class ConfigVersion {
 
     @Getter
     double version;
-    @NotNull Map<Double, Function<Migration, Migration>> migrations = new TreeMap<>();
+    @NotNull Map<Double, UnaryOperator<Migration>> migrations = new TreeMap<>();
 
     /**
      * Applies the migrations for the specified version to the data.
@@ -61,10 +61,14 @@ public class ConfigVersion {
      * @param data           the data
      * @return the updated data
      */
-    public @NotNull Map<String, Object> applyMigrations(final double currentVersion, @NotNull Map<String, Object> data) {
-        for (double v : migrations.keySet()) {
+    public @NotNull Map<String, Object> applyMigrations(
+            final double currentVersion,
+            @NotNull Map<String, Object> data
+    ) {
+        for (Map.Entry<Double, UnaryOperator<Migration>> entry : migrations.entrySet()) {
+            final double v = entry.getKey();
+            final UnaryOperator<Migration> migration = entry.getValue();
             if (v <= currentVersion) continue;
-            Function<Migration, Migration> migration = migrations.get(v);
             data = migration.apply(new Migration(data)).getData();
         }
         return data;
@@ -77,7 +81,10 @@ public class ConfigVersion {
      * @param migration the migration logic
      * @return this object (for method chaining)
      */
-    public @NotNull ConfigVersion migrate(final double version, final @NotNull Function<Migration, Migration> migration) {
+    public @NotNull ConfigVersion migrate(
+            final double version,
+            final @NotNull UnaryOperator<Migration> migration
+    ) {
         if (migrations.containsKey(version))
             throw new IllegalArgumentException("Migration already present for version " + version);
         migrations.put(version, migration);
@@ -93,7 +100,8 @@ public class ConfigVersion {
      */
     public static @NotNull Optional<ConfigVersion> getVersion(final @NotNull Class<?> type) {
         Reflect reflect = Reflect.on(type);
-        return reflect.getFields(f -> Modifier.isStatic(f.getModifiers()) && f.getType().equals(ConfigVersion.class))
+        return reflect.getFields(f -> Modifier.isStatic(f.getModifiers())
+                        && f.getType().equals(ConfigVersion.class))
                 .stream()
                 .findFirst()
                 .map(f -> reflect.get(f).get());
