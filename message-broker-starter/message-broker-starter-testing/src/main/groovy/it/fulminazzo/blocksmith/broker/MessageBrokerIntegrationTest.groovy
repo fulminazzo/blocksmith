@@ -3,6 +3,15 @@ package it.fulminazzo.blocksmith.broker
 import spock.lang.Specification
 
 abstract class MessageBrokerIntegrationTest<S extends MessageChannelSettings<S>> extends Specification {
+    private MessageChannelIntegrationTestHelper helper
+
+    void setupSingle() {
+        helper = newTestHelper().start()
+    }
+
+    void cleanupSingle() {
+        helper?.close()
+    }
 
     def 'test broker life cycle'() {
         given:
@@ -34,6 +43,8 @@ abstract class MessageBrokerIntegrationTest<S extends MessageChannelSettings<S>>
     }
 
     protected abstract MessageBrokerBuilder<MessageBroker<S>> newMessageBrokerBuilder()
+
+    protected abstract MessageChannelIntegrationTestHelper newTestHelper()
 
     protected abstract S getSettings()
 
