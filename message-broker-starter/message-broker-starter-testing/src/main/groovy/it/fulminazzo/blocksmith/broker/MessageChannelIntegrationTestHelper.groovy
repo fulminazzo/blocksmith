@@ -1,0 +1,80 @@
+package it.fulminazzo.blocksmith.broker
+
+import it.fulminazzo.blocksmith.data.mapper.Mapper
+import it.fulminazzo.blocksmith.data.mapper.MapperFormat
+import it.fulminazzo.blocksmith.structure.Pair
+import org.jetbrains.annotations.NotNull
+import org.slf4j.Logger
+
+import java.util.function.Consumer
+
+abstract class MessageChannelIntegrationTestHelper implements Closeable {
+    static final Mapper MAPPER = MapperFormat.JSON.newMapper()
+
+    private final Queue<Message> receivedMessages = [] as Queue
+
+    protected final String channelName
+    protected final Logger logger
+
+    MessageChannelIntegrationTestHelper(
+            final String channelName,
+            final Logger logger
+    ) {
+        this.channelName = channelName
+        this.logger  = logger
+    }
+
+    abstract void send(final Message message, final UUID conversationId)
+
+    protected abstract MessageChannelIntegrationTestHelper start(
+            final String channelName,
+            final Logger logger,
+            final Consumer<String> consumer
+    )
+
+    MessageChannelIntegrationTestHelper start() {
+        start(
+                channelName,
+                logger,
+                p -> {
+                    logger.debug("Received raw: $p")
+                    def pair = deserializeMessage(p)
+
+                    def message = pair.first
+                    logger.info("Received message with id=$message.id")
+                    receivedMessages.add(message)
+
+                    if (message == Messages.MESSAGE1) send(Messages.MESSAGE2, pair.second)
+                }
+        )
+    }
+
+    boolean received(final Long id) {
+        return receivedMessages.any { it.id == id }
+    }
+
+    @Override
+    void close() throws IOException {
+        receivedMessages.clear()
+    }
+
+    static String serializeMessage(final @NotNull Message message, final @NotNull UUID conversationId) {
+        return MAPPER.serialize(new AbstractMessageChannel.NetworkMessage(
+                UUID.randomUUID(),
+                conversationId,
+                MAPPER.serialize(message)
+        ))
+    }
+
+    static Pair<Message, UUID> deserializeMessage(final @NotNull String payload) {
+        def actualMessage = MAPPER.deserialize(
+                payload,
+                AbstractMessageChannel.NetworkMessage
+        )
+        return Pair.of(
+                MAPPER.deserialize(actualMessage.message, Message),
+                actualMessage.conversationId
+        )
+    }
+
+}
