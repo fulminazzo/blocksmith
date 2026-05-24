@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.broker;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.MapperException;
 import it.fulminazzo.blocksmith.structure.expiring.ExpiringMap;
@@ -67,6 +68,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
      *
      * @param message the message
      */
+    @SuppressFBWarnings({"DE_MIGHT_IGNORE", "REC_CATCH_EXCEPTION"})
     protected void handleMessage(final @NotNull String message) {
         try {
             NetworkMessage networkMessage = mapper.deserialize(message, NetworkMessage.class);
@@ -77,17 +79,23 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
                 future.complete(networkMessage.getMessage());
                 return;
             }
-            for (Function<String, String> handler : messageHandlers.values()) {
-                String response = handler.apply(networkMessage.getMessage());
-                if (response != null)
-                    sendRaw(new NetworkMessage(UUID.randomUUID(), conversationId, response));
-            }
+            for (Function<String, String> handler : messageHandlers.values())
+                try {
+                    String response = handler.apply(networkMessage.getMessage());
+                    if (response != null)
+                        sendRaw(new NetworkMessage(UUID.randomUUID(), conversationId, response));
+                } catch (Exception ignored) {
+                    // Failed handling, maybe due to parsing. Ignoring to allow other handlers to proceed.
+                }
         } catch (MapperException e) {
             // provide support for messages not sent through blocksmith
-            for (Function<String, String> handler : messageHandlers.values()) {
-                String response = handler.apply(message);
-                if (response != null) sendRaw(response);
-            }
+            for (Function<String, String> handler : messageHandlers.values())
+                try {
+                    String response = handler.apply(message);
+                    if (response != null) sendRaw(response);
+                } catch (Exception ignored) {
+                    // Failed handling, maybe due to parsing. Ignoring to allow other handlers to proceed.
+                }
         }
     }
 
