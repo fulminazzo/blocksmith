@@ -6,7 +6,6 @@ import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTest
 import it.fulminazzo.blocksmith.broker.Messages
 
 class RedisMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
-    private static final String CHANNEL_NAME = 'redis-message-channel'
 
     void setup() {
         setupChannel()
@@ -44,8 +43,8 @@ class RedisMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
     }
 
     @Override
-    MessageChannelIntegrationTestHelper newTestHelper() {
-        return new RedisChannelIntegrationTestHelper(CHANNEL_NAME, logger)
+    MessageChannelIntegrationTestHelper newTestHelper(final String channelName) {
+        return new RedisChannelIntegrationTestHelper(channelName, logger)
     }
 
 }

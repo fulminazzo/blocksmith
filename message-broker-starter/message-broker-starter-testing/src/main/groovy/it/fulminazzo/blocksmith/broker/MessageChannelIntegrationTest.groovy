@@ -11,13 +11,15 @@ import java.util.function.Consumer
 abstract class MessageChannelIntegrationTest extends Specification {
     protected static final Logger logger = LoggerFactory.getLogger(MessageChannelIntegrationTest)
 
+    protected static final String CHANNEL_NAME = 'message-channel-integration-test'
+
     protected static final int SLEEP_TIME = 125
 
     protected MessageChannelIntegrationTestHelper helper
     protected MessageChannel channel
 
     void setupChannel() {
-        helper = newTestHelper().start()
+        helper = newTestHelper(CHANNEL_NAME).start()
         channel = initializeChannel()
     }
 
@@ -103,7 +105,7 @@ abstract class MessageChannelIntegrationTest extends Specification {
 
     abstract MessageChannel initializeChannel()
 
-    abstract MessageChannelIntegrationTestHelper newTestHelper()
+    abstract MessageChannelIntegrationTestHelper newTestHelper(final String channelName)
 
     /**
      * Checks if a message with the given id has been received.
