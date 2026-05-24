@@ -35,6 +35,7 @@ class AbstractMessageChannelTest extends Specification {
 
         and:
         receiver.subscribe(expected.class, (Function<?, ?>) (d -> d == data ? expected : null))
+        receiver.subscribe(String, (Function<?, ?>) (d -> null))
 
         when:
         def actual = sender.sendAndReceive(data, Cat, Duration.ofSeconds(1)).get()
@@ -162,6 +163,20 @@ class AbstractMessageChannelTest extends Specification {
         then:
         actual.get() == null
         !MockMessageQueryEngine.getQueue(receiver.name).empty
+    }
+
+    def 'test that dual close call does not throw'() {
+        when:
+        sender.close()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        sender.close()
+
+        then:
+        noExceptionThrown()
     }
 
 }
