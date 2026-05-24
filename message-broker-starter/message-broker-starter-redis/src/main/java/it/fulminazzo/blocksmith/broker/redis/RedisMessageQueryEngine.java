@@ -48,7 +48,7 @@ public final class RedisMessageQueryEngine extends MessageQueryEngine {
 
     @Override
     public @NotNull CompletableFuture<Void> publish(final @NotNull String payload) {
-        return connection.async().publish(channelName, payload)
+        return connection.async().publish(getChannelName(), payload)
                 .toCompletableFuture()
                 .thenApply(r -> null);
     }
@@ -59,7 +59,7 @@ public final class RedisMessageQueryEngine extends MessageQueryEngine {
 
             @Override
             public void message(final @NotNull String channel, final @NotNull String message) {
-                if (channel.equals(channelName)) consumer.accept(message);
+                if (channel.equals(getChannelName())) consumer.accept(message);
             }
 
         };
@@ -70,7 +70,7 @@ public final class RedisMessageQueryEngine extends MessageQueryEngine {
     @Override
     public void close() {
         listeners.forEach(pubSubConnection::removeListener);
-        pubSubConnection.sync().unsubscribe(channelName);
+        pubSubConnection.sync().unsubscribe(getChannelName());
         pubSubConnection.close();
     }
 

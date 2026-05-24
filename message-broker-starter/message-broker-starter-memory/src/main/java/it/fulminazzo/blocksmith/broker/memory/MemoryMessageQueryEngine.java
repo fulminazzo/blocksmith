@@ -28,7 +28,7 @@ public final class MemoryMessageQueryEngine extends MessageQueryEngine {
     }
 
     private @NotNull MemoryChannel getChannel() {
-        return MemoryChannel.getChannel(channelName);
+        return MemoryChannel.getChannel(getChannelName());
     }
 
     @Override

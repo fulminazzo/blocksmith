@@ -12,7 +12,7 @@ public final class MockMessageBrokerBuilder
 
     @Override
     public @NotNull MockMessageBroker build() {
-        return new MockMessageBroker(mapper);
+        return new MockMessageBroker(getMapper());
     }
 
 }

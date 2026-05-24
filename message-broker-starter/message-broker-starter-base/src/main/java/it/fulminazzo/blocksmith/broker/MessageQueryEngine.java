@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.broker;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +22,8 @@ import java.util.function.Consumer;
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class MessageQueryEngine implements Closeable {
-    protected final @NotNull String channelName;
+    @Getter(AccessLevel.PROTECTED)
+    private final @NotNull String channelName;
 
     /**
      * Publishes a raw serialized payload to the underlying message broker.

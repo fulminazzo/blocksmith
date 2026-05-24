@@ -38,7 +38,7 @@ public final class MockMessageQueryEngine extends MessageQueryEngine {
     public @NotNull CompletableFuture<Void> publish(final @NotNull String payload) {
         return CompletableFuture.runAsync(() ->
                 MESSAGES.keySet().stream()
-                        .filter(n -> !n.equals(channelName))
+                        .filter(n -> !n.equals(getChannelName()))
                         .map(MESSAGES::get)
                         .forEach(q -> q.add(payload))
         );
@@ -48,7 +48,7 @@ public final class MockMessageQueryEngine extends MessageQueryEngine {
     public void listen(final @NotNull Consumer<String> consumer) {
         executorService.scheduleAtFixedRate(
                 () -> {
-                    Queue<String> queue = MockMessageQueryEngine.getQueue(channelName);
+                    Queue<String> queue = MockMessageQueryEngine.getQueue(getChannelName());
                     if (!queue.isEmpty()) consumer.accept(queue.poll());
                 },
                 0,
@@ -59,7 +59,7 @@ public final class MockMessageQueryEngine extends MessageQueryEngine {
 
     @Override
     public void close() {
-        MockMessageQueryEngine.MESSAGES.remove(channelName);
+        MockMessageQueryEngine.MESSAGES.remove(getChannelName());
     }
 
     /**

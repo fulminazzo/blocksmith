@@ -95,7 +95,7 @@ public final class RedisMessageBrokerBuilder
                 .socketOptions(socketOptions.build())
                 .build()
         );
-        return new RedisMessageBroker(client, mapper);
+        return new RedisMessageBroker(client, getMapper());
     }
 
 }

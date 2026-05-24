@@ -2,6 +2,8 @@ package it.fulminazzo.blocksmith.broker;
 
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,7 +21,8 @@ public abstract class AbstractMessageBrokerBuilder<
         B extends MessageBroker<?>,
         A extends AbstractMessageBrokerBuilder<B, A>
         > implements MessageBrokerBuilder<B> {
-    protected @NotNull Mapper mapper = MapperFormat.JSON.newMapper();
+    @Getter(AccessLevel.PROTECTED)
+    private @NotNull Mapper mapper = MapperFormat.JSON.newMapper();
 
     /**
      * Sets the data mapper.
