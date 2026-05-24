@@ -5,7 +5,6 @@ import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTestHelper
 import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTest
 
 class MemoryMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
-    private static final String CHANNEL_NAME = 'memory-message-channel'
 
     void setup() {
         setupChannel()
@@ -29,10 +28,10 @@ class MemoryMessageChannelIntegrationTest extends MessageChannelIntegrationTest 
     }
 
     @Override
-    MessageChannelIntegrationTestHelper newTestHelper() {
+    MessageChannelIntegrationTestHelper newTestHelper(final String channelName) {
         return new MemoryChannelIntegrationTestHelper(
                 Mock(MemoryMessageQueryEngine),
-                CHANNEL_NAME,
+                channelName,
                 logger
         )
     }
