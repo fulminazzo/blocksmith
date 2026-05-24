@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * A general channel for handling messaging across servers.
@@ -129,7 +130,7 @@ public interface MessageChannel extends Closeable {
      *                 If the return is not {@code null}, the message is sent back into the channel.
      * @return the id of the handler
      */
-    @NotNull UUID subscribeRaw(final @NotNull Function<String, String> consumer);
+    @NotNull UUID subscribeRaw(final @NotNull UnaryOperator<String> consumer);
 
     /**
      * Unsubscribes a handler from the channel.

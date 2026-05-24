@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import java.util.function.Function
+import java.util.function.UnaryOperator
 
 class AbstractMessageChannelTest extends Specification {
     private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
@@ -50,7 +51,7 @@ class AbstractMessageChannelTest extends Specification {
 
     def 'test that sendAndReceiveRaw works'() {
         given:
-        receiver.subscribeRaw((Function<String, String>) (r -> r == 'ping' ? 'pong' : null))
+        receiver.subscribeRaw((UnaryOperator<String>) (r -> r == 'ping' ? 'pong' : null))
 
         when:
         def actual = sender.sendAndReceiveRaw('ping', Duration.ofSeconds(10)).get()
@@ -190,7 +191,7 @@ class AbstractMessageChannelTest extends Specification {
 
         and:
         def handled = new AtomicBoolean()
-        channel.get('messageHandlers').get()[UUID.randomUUID()] = (Function<String, String>) (s -> {
+        channel.get('messageHandlers').get()[UUID.randomUUID()] = (UnaryOperator<String>) (s -> {
             handled.set(true)
             return null
         })

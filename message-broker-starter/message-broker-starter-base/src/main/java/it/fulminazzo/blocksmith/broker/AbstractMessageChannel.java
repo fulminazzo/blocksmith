@@ -11,12 +11,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Abstract implementation of {@link MessageChannel} with common checks
@@ -34,7 +36,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
      */
     protected final @NotNull E queryEngine;
 
-    private final @NotNull Map<UUID, Function<String, String>> messageHandlers = new ConcurrentHashMap<>();
+    private final @NotNull Map<UUID, UnaryOperator<String>> messageHandlers = new ConcurrentHashMap<>();
     /**
      * Identifies the sendAndReceive requests that are still pending an answer.
      */
@@ -79,7 +81,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
                 future.complete(networkMessage.getMessage());
                 return;
             }
-            for (Function<String, String> handler : messageHandlers.values())
+            for (UnaryOperator<String> handler : messageHandlers.values())
                 try {
                     String response = handler.apply(networkMessage.getMessage());
                     if (response != null)
@@ -89,7 +91,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
                 }
         } catch (MapperException e) {
             // provide support for messages not sent through blocksmith
-            for (Function<String, String> handler : messageHandlers.values())
+            for (UnaryOperator<String> handler : messageHandlers.values())
                 try {
                     String response = handler.apply(message);
                     if (response != null) sendRaw(response);
@@ -176,7 +178,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
     }
 
     @Override
-    public @NotNull UUID subscribeRaw(final @NotNull Function<String, String> consumer) {
+    public @NotNull UUID subscribeRaw(final @NotNull UnaryOperator<String> consumer) {
         UUID id = UUID.randomUUID();
         messageHandlers.put(id, consumer);
         return id;
