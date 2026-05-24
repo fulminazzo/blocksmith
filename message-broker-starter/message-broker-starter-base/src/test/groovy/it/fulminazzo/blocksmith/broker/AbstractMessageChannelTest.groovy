@@ -69,17 +69,19 @@ class AbstractMessageChannelTest extends Specification {
     }
 
     def 'test that send correctly sends serialized payload'() {
+        given:
+        final queue = MockMessageQueryEngine.getQueue(receiver.name)
+
         when:
         sender.send(data).join()
 
         then:
-        def queue = MockMessageQueryEngine.getQueue(receiver.name)
         !queue.empty
 
         and:
         def raw = queue.poll()
-        def networkMessage = MAPPER.deserialize(raw, AbstractMessageChannel.NetworkMessage)
-        networkMessage.conversationId != null
+        def networkMessage = raw?.empty ? null : MAPPER.deserialize(raw, AbstractMessageChannel.NetworkMessage)
+        networkMessage?.conversationId != null
 
         and:
         def rawPayload = networkMessage.message
