@@ -15,9 +15,10 @@ import org.jetbrains.annotations.NotNull;
  * @see Mapper
  */
 @SuppressWarnings("unchecked")
-public abstract class AbstractMessageBrokerBuilder<B extends MessageBroker<?>, A
-        extends AbstractMessageBrokerBuilder<B, A>>
-        implements MessageBrokerBuilder<B> {
+public abstract class AbstractMessageBrokerBuilder<
+        B extends MessageBroker<?>,
+        A extends AbstractMessageBrokerBuilder<B, A>
+        > implements MessageBrokerBuilder<B> {
     protected @NotNull Mapper mapper = MapperFormat.JSON.newMapper();
 
     /**
