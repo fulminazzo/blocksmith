@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.broker
 
 import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
+import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 import java.time.Duration
@@ -9,6 +10,7 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeoutException
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import java.util.function.Function
@@ -163,6 +165,43 @@ class AbstractMessageChannelTest extends Specification {
         then:
         actual.get() == null
         !MockMessageQueryEngine.getQueue(receiver.name).empty
+    }
+
+    @SuppressWarnings('GroovyAccessibility')
+    def 'test that handleMessage does not handle sent message once'() {
+        given:
+        final channel = Reflect.on(sender)
+        final mapper = channel.get('mapper')
+
+        and:
+        def message = new AbstractMessageChannel.NetworkMessage(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                'Hello, world'
+        )
+        final serialized = mapper.invoke('serialize', message).get()
+
+        and:
+        channel.get('sentMessages').get().add(message.id)
+
+        and:
+        def handled = new AtomicBoolean()
+        channel.get('messageHandlers').get()[UUID.randomUUID()] = (Function<String, String>) (s -> {
+            handled.set(true)
+            return null
+        })
+
+        when:
+        sender.handleMessage(serialized)
+
+        then:
+        !handled.get()
+
+        when:
+        sender.handleMessage(serialized)
+
+        then:
+        handled.get()
     }
 
     def 'test that dual close call does not throw'() {
