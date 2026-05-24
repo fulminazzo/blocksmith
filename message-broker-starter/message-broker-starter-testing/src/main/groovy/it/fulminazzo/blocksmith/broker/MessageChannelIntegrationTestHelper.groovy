@@ -16,12 +16,12 @@ abstract class MessageChannelIntegrationTestHelper implements Closeable {
     protected final String channelName
     protected final Logger logger
 
-    MessageChannelIntegrationTestHelper(
+    protected MessageChannelIntegrationTestHelper(
             final String channelName,
             final Logger logger
     ) {
         this.channelName = channelName
-        this.logger  = logger
+        this.logger = logger
     }
 
     abstract void send(final Message message, final UUID conversationId)
@@ -32,8 +32,9 @@ abstract class MessageChannelIntegrationTestHelper implements Closeable {
             final Consumer<String> consumer
     )
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     MessageChannelIntegrationTestHelper start() {
-        start(
+        return start(
                 channelName,
                 logger,
                 p -> {
@@ -49,15 +50,18 @@ abstract class MessageChannelIntegrationTestHelper implements Closeable {
         )
     }
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     boolean received(final Long id) {
         return receivedMessages.any { it.id == id }
     }
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     @Override
     void close() throws IOException {
         receivedMessages.clear()
     }
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static String serializeMessage(final @NotNull Message message, final @NotNull UUID conversationId) {
         return MAPPER.serialize(new AbstractMessageChannel.NetworkMessage(
                 UUID.randomUUID(),
@@ -66,6 +70,7 @@ abstract class MessageChannelIntegrationTestHelper implements Closeable {
         ))
     }
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static Pair<Message, UUID> deserializeMessage(final @NotNull String payload) {
         def actualMessage = MAPPER.deserialize(
                 payload,

@@ -8,7 +8,7 @@ import org.slf4j.Logger
 import java.util.function.Consumer
 
 class MemoryChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelper {
-    private MemoryMessageQueryEngine queryEngine
+    private final MemoryMessageQueryEngine queryEngine
     private MemoryChannel memoryChannel
 
     MemoryChannelIntegrationTestHelper(

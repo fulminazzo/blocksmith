@@ -11,6 +11,7 @@ import org.testcontainers.containers.GenericContainer
 
 import java.util.function.Consumer
 
+@SuppressWarnings('CloseWithoutCloseable')
 class RedisChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelper {
     private static final int REDIS_PORT = 6379
 
@@ -36,6 +37,15 @@ class RedisChannelIntegrationTestHelper extends MessageChannelIntegrationTestHel
     }
 
     @Override
+    void close() throws IOException {
+        pubSubConnection?.sync()?.unsubscribe(channelName)
+        pubSubConnection?.close()
+        connection?.close()
+        client?.close()
+        super.close()
+    }
+
+    @Override
     protected MessageChannelIntegrationTestHelper start(
             final String channelName,
             final Logger logger,
@@ -53,19 +63,12 @@ class RedisChannelIntegrationTestHelper extends MessageChannelIntegrationTestHel
         return this
     }
 
-    @Override
-    void close() throws IOException {
-        pubSubConnection?.sync()?.unsubscribe(channelName)
-        pubSubConnection?.close()
-        connection?.close()
-        client?.close()
-        super.close()
-    }
-
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static String getServerHost() {
         return container.host
     }
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static int getServerPort() {
         return container.getMappedPort(REDIS_PORT)
     }
