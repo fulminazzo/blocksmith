@@ -3,14 +3,20 @@ package it.fulminazzo.blocksmith.broker
 import spock.lang.Specification
 
 abstract class MessageBrokerIntegrationTest<S extends MessageChannelSettings<S>> extends Specification {
-    private MessageChannelIntegrationTestHelper helper
+    protected static final String CHANNEL_NAME = 'message-broker-integration-test'
+    protected static final String SUBCHANNEL_NAME = 'direct'
+
+    private MessageChannelIntegrationTestHelper directHelper
+    private MessageChannelIntegrationTestHelper broadcastHelper
 
     void setupSingle() {
-        helper = newTestHelper().start()
+        directHelper = newTestHelper(CHANNEL_NAME).start()
+        broadcastHelper = newTestHelper("$CHANNEL_NAME:$SUBCHANNEL_NAME").start()
     }
 
     void cleanupSingle() {
-        helper?.close()
+        broadcastHelper?.close()
+        directHelper?.close()
     }
 
     def 'test broker life cycle'() {
@@ -24,16 +30,28 @@ abstract class MessageBrokerIntegrationTest<S extends MessageChannelSettings<S>>
         noExceptionThrown()
 
         when:
-        def messageChannel = broker.newChannel(settings)
+        def direct = broker.newChannel(settings.direct(SUBCHANNEL_NAME))
 
         then:
-        messageChannel != null
+        direct != null
 
         when:
-        def message = messageChannel.sendAndReceive(Messages.MESSAGE1, Message, 10_000).get()
+        def firstMessage = direct.sendAndReceive(Messages.MESSAGE1, Message, 10_000).get()
 
         then:
-        message == Messages.MESSAGE2
+        firstMessage == Messages.MESSAGE2
+
+        when:
+        def broadcast = broker.newChannel(settings.broadcast())
+
+        then:
+        broadcast != null
+
+        when:
+        def secondMessage = broadcast.sendAndReceive(Messages.MESSAGE1, Message, 10_000).get()
+
+        then:
+        secondMessage == Messages.MESSAGE2
 
         when:
         broker.close()
@@ -44,7 +62,7 @@ abstract class MessageBrokerIntegrationTest<S extends MessageChannelSettings<S>>
 
     protected abstract MessageBrokerBuilder<MessageBroker<S>> newMessageBrokerBuilder()
 
-    protected abstract MessageChannelIntegrationTestHelper newTestHelper()
+    protected abstract MessageChannelIntegrationTestHelper newTestHelper(final String channelName)
 
     protected abstract S getSettings()
 

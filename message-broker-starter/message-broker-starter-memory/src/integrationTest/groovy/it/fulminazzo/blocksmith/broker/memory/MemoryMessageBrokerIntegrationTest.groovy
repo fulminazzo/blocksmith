@@ -10,13 +10,22 @@ import spock.lang.Specification
 
 @Slf4j
 class MemoryMessageBrokerIntegrationTest extends Specification {
-    private static final String CHANNEL_NAME = 'main:sub'
+    private static final String CHANNEL_NAME = 'main'
+    private static final String SUBCHANNEL_NAME = 'main:sub'
 
     @Shared
-    private MessageChannelIntegrationTestHelper helper
+    private MessageChannelIntegrationTestHelper directHelper
+
+    @Shared
+    private MessageChannelIntegrationTestHelper broadcastHelper
 
     void setupSpec() {
-        helper = new MemoryChannelIntegrationTestHelper(
+        directHelper = new MemoryChannelIntegrationTestHelper(
+                Mock(MemoryMessageQueryEngine),
+                "$CHANNEL_NAME:$SUBCHANNEL_NAME",
+                log
+        ).start()
+        broadcastHelper = new MemoryChannelIntegrationTestHelper(
                 Mock(MemoryMessageQueryEngine),
                 CHANNEL_NAME,
                 log
@@ -24,7 +33,8 @@ class MemoryMessageBrokerIntegrationTest extends Specification {
     }
 
     void cleanup() {
-        helper.close()
+        broadcastHelper?.close()
+        directHelper?.close()
     }
 
     def 'test broker life cycle'() {
@@ -35,20 +45,36 @@ class MemoryMessageBrokerIntegrationTest extends Specification {
         noExceptionThrown()
 
         when:
-        def messageChannel = broker.newChannel(
+        def directChannel = broker.newChannel(
                 new MemoryMessageChannelSettings()
-                        .withChannelName('main')
-                        .direct('sub')
+                        .withChannelName(CHANNEL_NAME)
+                        .direct(SUBCHANNEL_NAME)
         )
 
         then:
-        messageChannel != null
+        directChannel != null
 
         when:
-        def message = messageChannel.sendAndReceive(Messages.MESSAGE1, Message, 10_000).get()
+        def firstMessage = directChannel.sendAndReceive(Messages.MESSAGE1, Message, 10_000).get()
 
         then:
-        message == Messages.MESSAGE2
+        firstMessage == Messages.MESSAGE2
+
+        when:
+        def broadcastChannel = broker.newChannel(
+                new MemoryMessageChannelSettings()
+                        .withChannelName(CHANNEL_NAME)
+                        .broadcast()
+        )
+
+        then:
+        broadcastChannel != null
+
+        when:
+        def secondMessage = broadcastChannel.sendAndReceive(Messages.MESSAGE1, Message, 10_000).get()
+
+        then:
+        secondMessage == Messages.MESSAGE2
 
         when:
         broker.close()

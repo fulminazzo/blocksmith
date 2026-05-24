@@ -9,7 +9,6 @@ import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 
 @Slf4j
 class RedisMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<RedisMessageChannelSettings> {
-    private static final String CHANNEL_NAME = 'redis-message-broker'
 
     void setup() {
         setupSingle()
@@ -32,15 +31,13 @@ class RedisMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<Red
     }
 
     @Override
-    protected MessageChannelIntegrationTestHelper newTestHelper() {
-        return new RedisChannelIntegrationTestHelper(CHANNEL_NAME, log)
+    protected MessageChannelIntegrationTestHelper newTestHelper(final String channelName) {
+        return new RedisChannelIntegrationTestHelper(channelName, log)
     }
 
     @Override
     protected RedisMessageChannelSettings getSettings() {
-        return new RedisMessageChannelSettings()
-                .withChannelName(CHANNEL_NAME)
-                .broadcast()
+        return new RedisMessageChannelSettings().withChannelName(CHANNEL_NAME)
     }
 
 }
