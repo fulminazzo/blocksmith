@@ -20,13 +20,15 @@ class AbstractMessageChannelTest extends Specification {
 
     private final data = new Cat('Felix', 7, false)
 
-    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor()
+    private final ScheduledExecutorService senderService = Executors.newSingleThreadScheduledExecutor()
+    private final ScheduledExecutorService receiverService = Executors.newSingleThreadScheduledExecutor()
 
-    private final AbstractMessageChannel sender = new MockMessageChannel(MAPPER, 'abstract-message-test-1', executorService)
-    private final AbstractMessageChannel receiver = new MockMessageChannel(MAPPER, 'abstract-message-test-2', executorService)
+    private final AbstractMessageChannel sender = new MockMessageChannel(MAPPER, 'abstract-message-test-1', senderService)
+    private final AbstractMessageChannel receiver = new MockMessageChannel(MAPPER, 'abstract-message-test-2', receiverService)
 
     void cleanup() {
-        executorService.shutdown()
+        senderService.shutdown()
+        receiverService.shutdown()
         sender.close()
         receiver.close()
     }
@@ -119,7 +121,7 @@ class AbstractMessageChannelTest extends Specification {
         and:
         receiver.subscribe(data.class, (Function<?, ?>) (d -> {
             actual.set(d)
-            executorService.shutdown()
+            senderService.shutdown()
             return expected
         }))
 
