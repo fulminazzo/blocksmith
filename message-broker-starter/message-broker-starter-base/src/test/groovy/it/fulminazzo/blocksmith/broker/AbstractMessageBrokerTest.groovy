@@ -12,7 +12,7 @@ class AbstractMessageBrokerTest extends Specification {
     private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor()
     private static final Mapper MAPPER = MapperFormat.SERIALIZABLE.newMapper()
 
-    private final AbstractMessageBroker<? extends MessageChannelSettings> broker = new MockMessageBroker()
+    private final AbstractMessageBroker<? extends MessageChannelSettings> broker = new MockMessageBroker(MapperFormat.SERIALIZABLE.newMapper())
 
     void cleanupSpec() {
         SERVICE.close()

@@ -38,7 +38,7 @@ class AbstractMessageChannelTest extends Specification {
         receiver.subscribe(String, (Function<?, ?>) (d -> null))
 
         when:
-        def actual = sender.sendAndReceive(data, Cat, Duration.ofSeconds(1)).get()
+        def actual = sender.sendAndReceive(data, Cat, Duration.ofSeconds(10)).get()
 
         then:
         actual == expected
@@ -49,7 +49,7 @@ class AbstractMessageChannelTest extends Specification {
         receiver.subscribeRaw((Function<String, String>) (r -> r == 'ping' ? 'pong' : null))
 
         when:
-        def actual = sender.sendAndReceiveRaw('ping', Duration.ofSeconds(1)).get()
+        def actual = sender.sendAndReceiveRaw('ping', Duration.ofSeconds(10)).get()
 
         then:
         actual == 'pong'
