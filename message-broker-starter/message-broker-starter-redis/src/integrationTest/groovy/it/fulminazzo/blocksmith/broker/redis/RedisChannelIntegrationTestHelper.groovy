@@ -73,7 +73,7 @@ class RedisChannelIntegrationTestHelper extends MessageChannelIntegrationTestHel
         return container.getMappedPort(REDIS_PORT)
     }
 
-    private static GenericContainer getContainer() {
+    protected static GenericContainer getContainer() {
         if (!REDIS_SERVER.created) REDIS_SERVER.start()
         return REDIS_SERVER
     }

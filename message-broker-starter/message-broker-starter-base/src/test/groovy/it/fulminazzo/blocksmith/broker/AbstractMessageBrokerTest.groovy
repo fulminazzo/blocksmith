@@ -64,7 +64,7 @@ class AbstractMessageBrokerTest extends Specification {
         second.closed
     }
 
-    private List<MessageChannel> getRegisteredChannels() {
+    protected List<MessageChannel> getRegisteredChannels() {
         return Reflect.on(broker)['registeredChannels'].get()
     }
 
