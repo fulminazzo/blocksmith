@@ -29,6 +29,26 @@ class RedisMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
         message << [Messages.MESSAGE1, Messages.MESSAGE2]
     }
 
+    def 'test that send from other channel does not return to current'() {
+        given:
+        channel.queryEngine.pubSubConnection.sync().subscribe('other-channel')
+
+        when:
+        helper.connection.sync().publish(
+                'other-channel',
+                RedisChannelIntegrationTestHelper.serializeMessage(message, UUID.randomUUID())
+        )
+
+        then:
+        !received(message.id)
+
+        cleanup:
+        channel?.queryEngine?.pubSubConnection?.sync()?.unsubscribe('other-channel')
+
+        where:
+        message << [Messages.MESSAGE1, Messages.MESSAGE2]
+    }
+
     @Override
     MessageChannel initializeChannel() {
         RedisChannelIntegrationTestHelper helper = new RedisChannelIntegrationTestHelper(CHANNEL_NAME, logger)
