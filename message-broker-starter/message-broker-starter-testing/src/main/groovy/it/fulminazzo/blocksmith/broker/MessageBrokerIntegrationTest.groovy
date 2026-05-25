@@ -3,15 +3,17 @@ package it.fulminazzo.blocksmith.broker
 import spock.lang.Specification
 
 abstract class MessageBrokerIntegrationTest<S extends MessageChannelSettings<S>> extends Specification {
-    protected static final String CHANNEL_NAME = 'message-broker-integration-test'
-    protected static final String SUBCHANNEL_NAME = 'direct'
+    private static final String CHANNEL_NAME = 'message-broker-integration-test'
+    private static final String SUBCHANNEL_NAME = 'direct'
+    private static final String DIRECT_CHANNEL_NAME = "$CHANNEL_NAME-direct"
+    private static final String BROADCAST_CHANNEL_NAME = "$CHANNEL_NAME-broadcast"
 
     private MessageChannelIntegrationTestHelper directHelper
     private MessageChannelIntegrationTestHelper broadcastHelper
 
     void setupSingle() {
-        directHelper = newTestHelper("$CHANNEL_NAME:$SUBCHANNEL_NAME").start()
-        broadcastHelper = newTestHelper(CHANNEL_NAME).start()
+        directHelper = newTestHelper("$DIRECT_CHANNEL_NAME:$SUBCHANNEL_NAME").start()
+        broadcastHelper = newTestHelper(BROADCAST_CHANNEL_NAME).start()
     }
 
     void cleanupSingle() {
@@ -30,7 +32,7 @@ abstract class MessageBrokerIntegrationTest<S extends MessageChannelSettings<S>>
         noExceptionThrown()
 
         when:
-        def direct = broker.newChannel(settings.direct(SUBCHANNEL_NAME))
+        def direct = broker.newChannel(settings.withChannelName(DIRECT_CHANNEL_NAME).direct(SUBCHANNEL_NAME))
 
         then:
         direct != null
@@ -42,7 +44,7 @@ abstract class MessageBrokerIntegrationTest<S extends MessageChannelSettings<S>>
         firstMessage == Messages.MESSAGE2
 
         when:
-        def broadcast = broker.newChannel(settings.broadcast())
+        def broadcast = broker.newChannel(settings.withChannelName(BROADCAST_CHANNEL_NAME).broadcast())
 
         then:
         broadcast != null

@@ -37,7 +37,7 @@ class RedisMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<Red
 
     @Override
     protected RedisMessageChannelSettings getSettings() {
-        return new RedisMessageChannelSettings().withChannelName(CHANNEL_NAME)
+        return new RedisMessageChannelSettings()
     }
 
 }
