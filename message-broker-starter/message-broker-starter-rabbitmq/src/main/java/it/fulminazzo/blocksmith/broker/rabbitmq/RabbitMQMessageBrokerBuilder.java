@@ -133,7 +133,11 @@ public final class RabbitMQMessageBrokerBuilder
                     getMapper()
             );
         } catch (IOException | TimeoutException e) {
-            throw new RuntimeException(e);
+            throw RabbitMQMessageBrokerException.createConnectionException(
+                    connectionFactory.getHost(),
+                    connectionFactory.getPort(),
+                    e
+            );
         }
     }
 

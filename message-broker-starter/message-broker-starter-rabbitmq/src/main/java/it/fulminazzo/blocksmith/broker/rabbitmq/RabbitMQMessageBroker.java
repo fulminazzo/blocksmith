@@ -9,7 +9,6 @@ import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiFunction;
 
@@ -110,8 +109,8 @@ public final class RabbitMQMessageBroker extends AbstractMessageBroker<RabbitMQM
             final @NotNull BiFunction<RabbitMQMessageQueryEngine, Mapper, C> channelBuilder,
             final @NotNull RabbitMQMessageChannelSettings settings
     ) {
+        String exchangeName = settings.getChannelName();
         try {
-            String exchangeName = settings.getChannelName();
             String subchannelName = settings.getSubchannelNameOrNull();
             if (subchannelName != null) exchangeName += "." + subchannelName;
             Channel channel = connection.createChannel();
@@ -129,7 +128,7 @@ public final class RabbitMQMessageBroker extends AbstractMessageBroker<RabbitMQM
             );
             return registerChannel(channelBuilder.apply(queryEngine, mapper));
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw RabbitMQMessageBrokerException.createChannelException(exchangeName, e);
         }
     }
 

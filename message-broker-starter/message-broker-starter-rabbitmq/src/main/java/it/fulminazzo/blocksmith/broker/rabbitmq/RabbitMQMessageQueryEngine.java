@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -96,7 +95,7 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
                                 payload.getBytes(StandardCharsets.UTF_8)
                         );
                     } catch (IOException e) {
-                        throw new UncheckedIOException(e);
+                        throw RabbitMQMessageBrokerException.publishException(payload, e);
                     }
                 },
                 executor
@@ -105,8 +104,8 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
 
     @Override
     public void listen(final @NotNull Consumer<String> consumer) {
+        final String queueName = queueSettings.getQueueName();
         try {
-            final String queueName = queueSettings.getQueueName();
             channel.queueDeclare(
                     queueName,
                     queueSettings.isDurable(),
@@ -115,6 +114,15 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
                     queueSettings.getArguments()
             );
             channel.queueBind(queueName, getChannelName(), routingKey);
+        } catch (IOException e) {
+            throw RabbitMQMessageBrokerException.queueDeclareException(
+                    queueName,
+                    getChannelName(),
+                    routingKey,
+                    e
+            );
+        }
+        try {
             channel.basicConsume(
                     queueName,
                     false,
@@ -136,7 +144,7 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
                     }
             );
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw RabbitMQMessageBrokerException.registerConsumerException(queueName, e);
         }
     }
 
