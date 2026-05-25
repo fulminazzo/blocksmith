@@ -13,7 +13,7 @@ import java.util.function.Consumer
 class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelper {
     static final String QUEUE_NAME = 'test-queue'
 
-    private static final RabbitMQContainer RABBIT_MQ_SERVER = new RabbitMQContainer('rabbitmq:4.3.0-alpine')
+    private static final RabbitMQContainer RABBIT_MQ_SERVER = new RabbitMQContainer('rabbitmq:4.3.0-management-alpine')
             .withReuse(true)
 
     private static int consumerCount = 0
@@ -32,18 +32,36 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
         channel = connection.createChannel()
     }
 
+    /**
+     * Sets up the internal exchange and queue.
+     *
+     * @return the exchange, routing key and queue
+     */
+    protected Tuple<String> setupExchangeAndQueue() {
+        final queueName = QUEUE_NAME
+        def (baseChannelName, subchannelName) = getChannelNames(channelName)
+
+        channel.exchangeDeclare(baseChannelName, subchannelName.empty ? 'fanout' : 'direct', true)
+
+        channel.queueDeclare(queueName, true, false, false, null)
+        channel.queueBind(queueName, baseChannelName, subchannelName)
+
+        return [baseChannelName, subchannelName, queueName]
+    }
+
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     @Override
     void send(final Message message, final UUID conversationId) {
-        def (String baseChannelName, String subchannelName) = getChannelNames(channelName)
-        channel.exchangeDeclare(baseChannelName, subchannelName.empty ? 'fanout' : 'direct', true)
+        def (exchange, routingKey) = setupExchangeAndQueue()
         channel.basicPublish(
-                baseChannelName,
-                subchannelName,
+                exchange,
+                routingKey,
                 null,
                 serializeMessage(message, conversationId).bytes
         )
     }
 
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     @Override
     void close() throws IOException {
         if (channel.open) channel?.close()
@@ -57,11 +75,9 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
             final Logger logger,
             final Consumer<String> consumer
     ) {
-        channel.queueDeclare(QUEUE_NAME, true, false, false, null)
-        def (String baseChannelName, String subchannelName) = getChannelNames(channelName)
-        channel.queueBind(QUEUE_NAME, baseChannelName, subchannelName)
+        def (_, _, queueName) = setupExchangeAndQueue()
         channel.basicConsume(
-                QUEUE_NAME,
+                queueName,
                 true,
                 "test-consumer-${consumerCount++}",
                 new DefaultConsumer(channel) {
