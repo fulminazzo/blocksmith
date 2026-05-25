@@ -128,7 +128,8 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
                                 final AMQP.BasicProperties properties,
                                 final byte[] body
                         ) throws IOException {
-                            consumer.accept(new String(body, StandardCharsets.UTF_8));
+                            String payload = new String(body, StandardCharsets.UTF_8);
+                            consumer.accept(payload);
                             channel.basicAck(envelope.getDeliveryTag(), false);
                         }
 

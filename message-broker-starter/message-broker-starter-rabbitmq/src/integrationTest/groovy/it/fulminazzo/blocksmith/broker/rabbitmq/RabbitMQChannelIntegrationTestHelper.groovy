@@ -94,7 +94,8 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
                             final AMQP.BasicProperties properties,
                             final byte[] body
                     ) throws IOException {
-                        consumer.accept(new String(body, StandardCharsets.UTF_8))
+                        def payload = new String(body, StandardCharsets.UTF_8)
+                        consumer.accept(payload)
                     }
 
                 }
