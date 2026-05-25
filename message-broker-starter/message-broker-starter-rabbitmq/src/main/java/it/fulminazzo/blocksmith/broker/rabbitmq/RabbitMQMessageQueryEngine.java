@@ -4,6 +4,7 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
+import it.fulminazzo.blocksmith.ProjectInfo;
 import it.fulminazzo.blocksmith.broker.MessageChannelType;
 import it.fulminazzo.blocksmith.broker.MessageQueryEngine;
 import org.jetbrains.annotations.NotNull;
@@ -79,7 +80,7 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
     }
 
     private @NotNull String getConsumerTag(final int consumerCount) {
-        return String.format("rabbitmq-engine-%d-consumer-%d", engineId, consumerCount);
+        return String.format("%s-rabbitmq-%d-consumer-%d", ProjectInfo.PROJECT_NAME, engineId, consumerCount);
     }
 
     @Override
