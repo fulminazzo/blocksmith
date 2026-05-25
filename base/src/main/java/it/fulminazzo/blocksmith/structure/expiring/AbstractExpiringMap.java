@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
  *
  * @param <K> the type of the keys
  * @param <V> the type of the values
+ * @see ExpiringMap
  */
 abstract class AbstractExpiringMap<K, V> implements ExpiringMap<K, V> {
     protected final @NotNull Map<K, ExpiringEntry<V>> delegate = new ConcurrentHashMap<>();

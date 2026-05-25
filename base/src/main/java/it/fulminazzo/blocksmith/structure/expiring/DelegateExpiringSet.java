@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
  * Implementation of {@link ExpiringSet} that delegates to a {@link ExpiringMap} the caching logic.
  *
  * @param <E> the type of the elements
+ * @see ExpiringSet
+ * @see ExpiringMap
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 final class DelegateExpiringSet<E> extends AbstractExpiringCollection<E> implements ExpiringSet<E> {

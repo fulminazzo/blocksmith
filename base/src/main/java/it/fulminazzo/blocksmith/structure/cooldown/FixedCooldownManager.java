@@ -8,9 +8,13 @@ import org.jetbrains.annotations.Range;
 import java.time.Duration;
 
 /**
- * Keeps track of the same cooldown for general entities.
+ * A manager to store entities on cooldown.
+ * It is possible to verify if the entity is on cooldown and to retrieve the remaining time for general purposes.
+ * <br>
+ * Each entity is put with the same cooldown specified upon creation of the manager.
  *
  * @param <E> the type of the entity
+ * @see CooldownManager
  */
 @EqualsAndHashCode
 @ToString(includeFieldNames = false)

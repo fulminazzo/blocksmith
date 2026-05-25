@@ -5,17 +5,12 @@ import it.fulminazzo.blocksmith.config.ConfigurationFormat
 import it.fulminazzo.blocksmith.data.User
 import spock.lang.Specification
 
-import java.util.concurrent.Executors
-
 @Slf4j
 class FileDataSourceIntegrationTest extends Specification {
 
     def 'test datasource life cycle'() {
         given:
-        def executor = Executors.newSingleThreadExecutor()
-
-        and:
-        def dataSource = FileDataSource.create(executor)
+        def dataSource = FileDataSource.create()
 
         when:
         def repository = dataSource.newRepository(
@@ -39,7 +34,7 @@ class FileDataSourceIntegrationTest extends Specification {
         dataSource.close()
 
         then:
-        executor.shutdown
+        dataSource?.executor?.shutdown
     }
 
 }

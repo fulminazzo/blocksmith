@@ -13,6 +13,8 @@ import static it.fulminazzo.blocksmith.reflect.Reflect.toWrapper;
 
 /**
  * A collection of utilities for working with reflections.
+ *
+ * @see Reflect
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReflectUtils {

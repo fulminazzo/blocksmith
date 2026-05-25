@@ -4,11 +4,13 @@ import it.fulminazzo.blocksmith.config.ConfigurationAdapter;
 import it.fulminazzo.blocksmith.data.Repository;
 import it.fulminazzo.blocksmith.data.RepositoryDataSource;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
+import it.fulminazzo.blocksmith.util.ThreadUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 
 /**
@@ -51,7 +53,7 @@ import java.util.function.Function;
  *                         .withFormat(format)
  *         );
  *         }</pre>
- *         where CustomFileRepository extends FileRepository and adds custom behavior
+ *         where CustomFileRepository extends {@link FileRepository} and adds custom behavior
  *         such as backup on save, or encryption of sensitive fields.
  *     </li>
  * </ul>
@@ -101,6 +103,15 @@ public final class FileDataSource implements RepositoryDataSource<FileRepository
     @Override
     public void close() {
         executor.shutdown();
+    }
+
+    /**
+     * Creates a new File data source.
+     *
+     * @return the file data source
+     */
+    public static @NotNull FileDataSource create() {
+        return create(Executors.newCachedThreadPool(ThreadUtils.ownedThreadFactory(FileQueryEngine.class)));
     }
 
     /**

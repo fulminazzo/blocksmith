@@ -14,7 +14,140 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * A wrapper for Java objects to work with reflections.
+ * A wrapper for handling Java reflections with ease.
+ * Methods will throw an unchecked {@link ReflectException} to allow try-catch free methods chaining.
+ * <br>
+ * The wrapper can be used for:
+ * <ul>
+ *     <li>reflective {@code instanceof} and casting:
+ *     <pre>{@code
+ *     Reflect reflect = Reflect.on(new Integer(10)); // bad practice, just for demonstration purposes
+ *     System.out.println(reflect.extendsType(Integer.class)); // true
+ *     System.out.println(reflect.extendsType(int.class)); // still true, even if wrapped type
+ *
+ *     reflect = reflect.cast(int.class); // now '10' is an int
+ *     }</pre>
+ *     </li>
+ *     <li><b>primitives</b> and <b>wrappers</b> operations:
+ *     <pre>{@code
+ *     Reflect reflect = Reflect.on(10)
+ *         .toWrapper() // now '10' is a Integer
+ *         .toPrimitive(); // '10' is back to int
+ *
+ *     System.out.println(reflect.isPrimitive()); // true
+ *     System.out.println(reflect.isWrapper()); // false
+ *     }</pre>
+ *     </li>
+ *     <li><b>constructors</b> operations:
+ *     <pre>{@code
+ *     Reflect reflect = Reflect.on(String.class);
+ *
+ *     // Invoke constructor
+ *     Constructor<?> constructor = reflect.getConstructor(String.class);
+ *     System.out.println(constructor); // java.lang.String(java.lang.String)
+ *     reflect = reflect.init(constructor, "Hello");
+ *     // or, shorthand
+ *     reflect = reflect.init("Hello");
+ *     // now reflect contains the string 'Hello'
+ *
+ *     // Get all constructors
+ *     List<Constructor<?>> constructors = reflect.getConstructors();
+ *     }</pre>
+ *     </li>
+ *     <li><b>fields</b> operations:
+ *     <pre>{@code
+ *     Reflect reflect = Reflect.on(new User());
+ *
+ *     // Get field value
+ *     Field field = reflect.getField("name");
+ *     reflect = reflect.get(field);
+ *     // or, shorthand
+ *     reflect = reflect.get("name");
+ *     // now reflect contains the string 'name'
+ *
+ *     // Set field value
+ *     reflect = reflect.set("name", "NewName");
+ *
+ *     // Get all fields and values
+ *     List<Field> fields = reflect.getFields();
+ *     List<Reflect> values = reflect.getFieldValues();
+ *     }</pre>
+ *     All of the above can be automatically filtered with:
+ *     <ul>
+ *         <li>{@code Instance} to get only the fields declared in the <b>same class</b>,
+ *         ignoring any inherited field:
+ *         <pre>{@code
+ *         reflect = reflect.getInstanceFieldValues();
+ *         }</pre>
+ *         </li>
+ *         <li>{@code NonStatic} to get only the <b>non-static</b> fields:
+ *         <pre>{@code
+ *         reflect = reflect.getNonStatic("name");
+ *         }</pre>
+ *         </li>
+ *         <li>{@code Static} to get only <b>static</b> fields:
+ *         <pre>{@code
+ *         Field field = reflect.getStaticField("name");
+ *         }</pre>
+ *         </li>
+ *     </ul>
+ *     </li>
+ *     <li><b>methods</b> operations:
+ *     <pre>{@code
+ *     Reflect reflect = Reflect.on(new User());
+ *
+ *     // Invoke method
+ *     Method method = reflect.getMethod("getName");
+ *     reflect = reflect.invoke(method);
+ *     // or, shorthand
+ *     reflect = reflect.invoke("getName");
+ *     // now reflect contains the result of 'getName'
+ *
+ *     // Invoke method with parameters
+ *     reflect = reflect.invoke("setName", "NewName");
+ *
+ *     // Get all methods
+ *     List<Method> methods = reflect.getMethods();
+ *     }</pre>
+ *     All of the above can be automatically filtered with:
+ *     <ul>
+ *         <li>{@code Instance} to get only the methods declared in the <b>same class</b>,
+ *         ignoring any inherited method:
+ *         <pre>{@code
+ *         reflect = reflect.getInstanceMethods();
+ *         }</pre>
+ *         </li>
+ *         <li>{@code NonStatic} to get only the <b>non-static</b> methods:
+ *         <pre>{@code
+ *         reflect = reflect.getNonStatic("getName");
+ *         }</pre>
+ *         </li>
+ *         <li>{@code Static} to get only <b>static</b> methods:
+ *         <pre>{@code
+ *         Method method = reflect.getStaticMethod("getName");
+ *         }</pre>
+ *         </li>
+ *     </ul>
+ *     </li>
+ *     <li><b>enum</b> operations (only if the wrapped object is an {@link Enum}:
+ *     <pre>{@code
+ *     // On enum value
+ *     Reflect reflect = Reflect.on(Color.RED);
+ *
+ *     reflect.name(); // equivalent to Color.RED.name()
+ *     reflect.ordinal(); // equivalent to Color.RED.ordinal()
+ *
+ *     // On enum class
+ *     Reflect reflect = Reflect.on(Color.class);
+ *
+ *     reflect.valueOf("RED"); // equivalent to Color.valueOf("RED")
+ *     reflect.values(); // equivalent to Color.values()
+ *     }</pre>
+ *     </li>
+ * </ul>
+ *
+ * @see ReflectException
+ * @see ReflectUtils
  */
 @SuppressWarnings({
         "unchecked", "unused",

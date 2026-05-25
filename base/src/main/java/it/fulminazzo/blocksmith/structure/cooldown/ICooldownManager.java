@@ -6,8 +6,10 @@ import org.jetbrains.annotations.NotNull;
  * Represents a general interface to handle cooldowns for general entities.
  *
  * @param <E> the type of the entity
+ * @see CooldownManager
+ * @see FixedCooldownManager
  */
-public interface ICooldownManager<E> {
+interface ICooldownManager<E> {
 
     /**
      * Removes the entity from the cooldown.

@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.data.sql;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import it.fulminazzo.blocksmith.data.RepositoryDataSourceBuilder;
+import it.fulminazzo.blocksmith.util.ThreadUtils;
 import it.fulminazzo.blocksmith.validation.Validator;
 import it.fulminazzo.blocksmith.validation.annotation.Positive;
 import it.fulminazzo.blocksmith.validation.annotation.PositiveOrZero;
@@ -14,6 +15,7 @@ import org.jooq.SQLDialect;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * A general SQL data source builder.
@@ -231,10 +233,9 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>>
     public @NotNull SqlDataSource build() {
         config.setJdbcUrl(getJdbcUrl());
         SQLDialect sqlDialect = getSQLDialect();
-        ExecutorService actualExecutor = Objects.requireNonNull(
-                this.executor,
-                "executor has not been specified yet"
-        );
+        ExecutorService actualExecutor = executor != null
+                ? executor
+                : Executors.newCachedThreadPool(ThreadUtils.ownedThreadFactory(SqlDataSource.class));
         return new SqlDataSource(new HikariDataSource(config), sqlDialect, actualExecutor);
     }
 

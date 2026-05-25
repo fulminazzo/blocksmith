@@ -17,7 +17,6 @@ class SQLiteDataSourceIntegrationTest extends SqlDataSourceIntegrationTest {
     def 'test memory datasource life cycle'() {
         given:
         def builder = SqlDataSource.builder()
-                .executor(executor)
                 .database('sqlite')
                 .username('sa')
                 .password('')

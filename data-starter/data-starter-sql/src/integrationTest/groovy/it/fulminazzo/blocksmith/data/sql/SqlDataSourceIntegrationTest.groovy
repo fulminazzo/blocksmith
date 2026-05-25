@@ -79,7 +79,6 @@ abstract class SqlDataSourceIntegrationTest extends DataSourceIntegrationTest<Sq
         return builder
                 .username('root')
                 .password('test')
-                .executor(executor)
     }
 
     @Override

@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
  * Basic implementation of {@link ExpiringCollection} with common logic.
  *
  * @param <E> the type of the elements
+ * @see ExpiringCollection
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 abstract class AbstractExpiringCollection<E> implements ExpiringCollection<E> {

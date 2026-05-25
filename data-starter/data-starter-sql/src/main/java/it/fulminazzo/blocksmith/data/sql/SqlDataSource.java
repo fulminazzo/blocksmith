@@ -84,7 +84,7 @@ import java.util.function.Function;
  *                         .withIdColumn(idColumn)
  *         );
  *         }</pre>
- *         where CustomSqlRepository extends SqlRepository and adds custom behavior
+ *         where CustomSqlRepository extends {@link SqlRepository} and adds custom behavior
  *         such as audit logging, transaction handling or query optimization.
  *     </li>
  * </ul>

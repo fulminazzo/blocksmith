@@ -61,7 +61,7 @@ import java.util.function.Function;
  *                         .withCollectionName("users")
  *         );
  *         }</pre>
- *         where CustomMongoRepository extends MongoRepository and adds custom behavior
+ *         where CustomMongoRepository extends {@link MongoRepository} and adds custom behavior
  *         such as batch operations, aggregation pipelines or change stream monitoring.
  *     </li>
  * </ul>

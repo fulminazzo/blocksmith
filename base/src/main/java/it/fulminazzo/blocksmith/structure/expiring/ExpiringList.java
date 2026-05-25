@@ -11,8 +11,12 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * An expiring list is a special {@link List} whose elements are subject to expiration.
  * Each can be defined with a time-to-live (TTL) period after which they will not be present anymore.
+ * <br>
+ * If an element is saved with a TTL of {@link Long#MAX_VALUE}, it will never expire.
  *
  * @param <E> the type of the elements
+ * @see ExpiringSet
+ * @see ExpiringCollection
  */
 public interface ExpiringList<E> extends List<E>, ExpiringCollection<E> {
 
