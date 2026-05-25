@@ -42,6 +42,7 @@ public abstract class MessageChannelSettings<S extends MessageChannelSettings<S>
      */
     public @NotNull S broadcast() {
         this.channelType = MessageChannelType.BROADCAST;
+        this.subchannelName = null;
         return (S) this;
     }
 
@@ -73,9 +74,18 @@ public abstract class MessageChannelSettings<S extends MessageChannelSettings<S>
      */
     public @NotNull String getSubchannelName() {
         return Objects.requireNonNull(
-                subchannelName,
+                getSubchannelNameOrNull(),
                 "required subchannel name to be specified when using " + MessageChannelType.DIRECT
         );
+    }
+
+    /**
+     * Gets the subchannel name.
+     *
+     * @return the subchannel name or {@code null} if the channel type is not {@link MessageChannelType#DIRECT}
+     */
+    public @Nullable String getSubchannelNameOrNull() {
+        return subchannelName;
     }
 
     /**
