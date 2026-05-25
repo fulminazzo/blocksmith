@@ -25,7 +25,6 @@ class H2DataSourceIntegrationTest extends SqlDataSourceIntegrationTest {
     def 'test initialize h2 disk connection throws on non-existing'() {
         when:
         SqlDataSource.builder()
-                .executor(executor)
                 .database('h2')
                 .username('sa')
                 .password('')
@@ -42,7 +41,6 @@ class H2DataSourceIntegrationTest extends SqlDataSourceIntegrationTest {
     def 'test memory datasource life cycle'() {
         given:
         def builder = SqlDataSource.builder()
-                .executor(executor)
                 .database('h2')
                 .username('sa')
                 .password('')
