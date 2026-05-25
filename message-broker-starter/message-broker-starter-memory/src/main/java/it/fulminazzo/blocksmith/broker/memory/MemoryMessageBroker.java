@@ -43,7 +43,7 @@ import java.util.function.BiFunction;
  *                         .direct("private_channel")
  *         );
  *         }</pre>
- *         where CustomMemoryMessageChannel extends MemoryMessageChannel and adds custom behavior.
+ *         where CustomMemoryMessageChannel extends {@link MemoryMessageChannel} and adds custom behavior.
  *     </li>
  * </ul>
  *

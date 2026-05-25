@@ -23,8 +23,8 @@ import java.util.function.Consumer;
  *         .username("root") // defaults to "guest"
  *         .password("super-secure-password-should-use-an-env-variable") // defaults to "guest"
  *         .configure(f -> f
- *                 .setConnectionTimeout(30_000L)
- *                 .setHandshakeTimeout(10_000L)
+ *                 .setConnectionTimeout(30_000)
+ *                 .setHandshakeTimeout(10_000)
  *         )
  *         .mapper(MapperFormat.SERIALIZABLE.newMapper()) // defaults to JSON
  *         .build();

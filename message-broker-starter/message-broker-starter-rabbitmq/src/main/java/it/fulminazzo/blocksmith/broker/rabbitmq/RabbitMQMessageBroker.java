@@ -65,7 +65,7 @@ import java.util.function.BiFunction;
  *                         .withQueueName("rabbitmq_queue")
  *         );
  *         }</pre>
- *         where CustomRabbitMQMessageChannel extends RabbitMQMessageChannel and adds custom behavior.
+ *         where CustomRabbitMQMessageChannel extends {@link RabbitMQMessageChannel} and adds custom behavior.
  *     </li>
  * </ul>
  *

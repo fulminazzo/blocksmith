@@ -58,7 +58,7 @@ import java.util.function.BiFunction;
  *                         .direct("private_channel")
  *         );
  *         }</pre>
- *         where CustomRedisMessageChannel extends RedisMessageChannel and adds custom behavior.
+ *         where CustomRedisMessageChannel extends {@link RedisMessageChannel} and adds custom behavior.
  *     </li>
  * </ul>
  *
