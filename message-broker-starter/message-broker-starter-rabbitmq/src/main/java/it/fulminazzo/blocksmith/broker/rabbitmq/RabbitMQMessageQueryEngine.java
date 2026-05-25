@@ -104,6 +104,8 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
     @Override
     public void listen(final @NotNull Consumer<String> consumer) {
         try {
+            //TODO: export settings
+            channel.queueDeclare(queueName, true, false, false, null);
             channel.basicConsume(
                     queueName,
                     false,

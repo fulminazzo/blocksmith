@@ -14,6 +14,7 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
     static final String QUEUE_NAME = 'test-queue'
 
     private static final RabbitMQContainer RABBIT_MQ_SERVER = new RabbitMQContainer('rabbitmq:4.3.0-alpine')
+            .withReuse(true)
 
     private static int consumerCount = 0
 
@@ -64,6 +65,7 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
             final Logger logger,
             final Consumer<String> consumer
     ) {
+        channel.queueDeclare(QUEUE_NAME, true, false, false, null)
         channel.basicConsume(
                 QUEUE_NAME,
                 false,
