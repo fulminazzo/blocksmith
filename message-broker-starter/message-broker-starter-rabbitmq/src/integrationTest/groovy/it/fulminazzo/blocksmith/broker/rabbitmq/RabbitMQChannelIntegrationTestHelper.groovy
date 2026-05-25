@@ -109,7 +109,7 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
         final String subchannelName
         if (channelName.contains(':')) {
             def split = channelName.split(':')
-            baseChannelName = channelName.replace(':', '.')
+            baseChannelName = split[0]
             subchannelName = split[1]
         } else {
             baseChannelName = channelName

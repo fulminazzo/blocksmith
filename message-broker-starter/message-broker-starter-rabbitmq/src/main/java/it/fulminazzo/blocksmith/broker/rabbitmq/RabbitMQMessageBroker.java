@@ -109,10 +109,8 @@ public final class RabbitMQMessageBroker extends AbstractMessageBroker<RabbitMQM
             final @NotNull BiFunction<RabbitMQMessageQueryEngine, Mapper, C> channelBuilder,
             final @NotNull RabbitMQMessageChannelSettings settings
     ) {
-        String exchangeName = settings.getChannelName();
+        final String exchangeName = settings.getChannelName();
         try {
-            String subchannelName = settings.getSubchannelNameOrNull();
-            if (subchannelName != null) exchangeName += "." + subchannelName;
             Channel channel = connection.createChannel();
             channel.exchangeDeclare(
                     exchangeName,
@@ -123,7 +121,7 @@ public final class RabbitMQMessageBroker extends AbstractMessageBroker<RabbitMQM
                     executor,
                     exchangeName,
                     channel,
-                    subchannelName,
+                    settings.getSubchannelNameOrNull(),
                     settings.getQueueSettings()
             );
             return registerChannel(channelBuilder.apply(queryEngine, mapper));
