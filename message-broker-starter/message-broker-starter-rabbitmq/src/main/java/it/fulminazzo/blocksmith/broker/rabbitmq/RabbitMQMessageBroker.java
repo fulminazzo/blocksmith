@@ -143,4 +143,13 @@ public final class RabbitMQMessageBroker extends AbstractMessageBroker<RabbitMQM
         executor.shutdown();
     }
 
+    /**
+     * Gets a new builder for this class.
+     *
+     * @return the builder
+     */
+    public static @NotNull RabbitMQMessageBrokerBuilder builder() {
+        return new RabbitMQMessageBrokerBuilder();
+    }
+
 }
