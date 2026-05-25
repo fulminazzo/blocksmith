@@ -34,19 +34,10 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
 
     @Override
     void send(final Message message, final UUID conversationId) {
-        final String channelName
-        final String subchannelName
-        if (super.channelName.contains(':')) {
-            def split = super.channelName.split(':')
-            channelName = split[0]
-            subchannelName = split[1]
-        } else {
-            channelName = super.channelName
-            subchannelName = ''
-        }
-        channel.exchangeDeclare(channelName, subchannelName.empty ? 'fanout' : 'direct', true)
+        def (String baseChannelName, String subchannelName) = getChannelNames(channelName)
+        channel.exchangeDeclare(baseChannelName, subchannelName.empty ? 'fanout' : 'direct', true)
         channel.basicPublish(
-                channelName,
+                baseChannelName,
                 subchannelName,
                 null,
                 serializeMessage(message, conversationId).bytes
@@ -67,6 +58,8 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
             final Consumer<String> consumer
     ) {
         channel.queueDeclare(QUEUE_NAME, true, false, false, null)
+        def (String baseChannelName, String subchannelName) = getChannelNames(channelName)
+        channel.queueBind(QUEUE_NAME, baseChannelName, subchannelName)
         channel.basicConsume(
                 QUEUE_NAME,
                 false,
@@ -88,14 +81,27 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
         return this
     }
 
-    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods')
-    // enforce our ordering
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
+    static Tuple<String> getChannelNames(final String channelName) {
+        final String baseChannelName
+        final String subchannelName
+        if (channelName.contains(':')) {
+            def split = channelName.split(':')
+            baseChannelName = split[0]
+            subchannelName = split[1]
+        } else {
+            baseChannelName = channelName
+            subchannelName = ''
+        }
+        [baseChannelName, subchannelName]
+    }
+
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static String getServerHost() {
         return container.host
     }
 
-    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods')
-    // enforce our ordering
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static int getServerPort() {
         return container.amqpPort
     }

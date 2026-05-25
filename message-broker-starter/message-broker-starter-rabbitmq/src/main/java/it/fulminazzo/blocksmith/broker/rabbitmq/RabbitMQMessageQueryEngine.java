@@ -106,6 +106,7 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
         try {
             //TODO: export settings
             channel.queueDeclare(queueName, true, false, false, null);
+            channel.queueBind(queueName, getChannelName(), routingKey);
             channel.basicConsume(
                     queueName,
                     false,
