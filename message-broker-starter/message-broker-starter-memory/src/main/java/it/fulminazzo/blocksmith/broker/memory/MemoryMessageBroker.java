@@ -47,7 +47,6 @@ import java.util.function.BiFunction;
  *     </li>
  * </ul>
  *
- * @see MemoryMessageBroker
  * @see MemoryMessageChannel
  * @see MemoryMessageChannelSettings
  * @see MemoryMessageQueryEngine

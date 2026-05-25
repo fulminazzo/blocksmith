@@ -62,7 +62,6 @@ import java.util.function.BiFunction;
  *     </li>
  * </ul>
  *
- * @see RedisMessageBroker
  * @see RedisMessageChannel
  * @see RedisMessageChannelSettings
  * @see RedisMessageQueryEngine
