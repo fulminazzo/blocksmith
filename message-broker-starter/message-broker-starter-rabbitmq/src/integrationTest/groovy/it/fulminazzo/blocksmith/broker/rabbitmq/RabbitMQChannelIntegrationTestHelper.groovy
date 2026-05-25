@@ -62,7 +62,7 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
         channel.queueBind(QUEUE_NAME, baseChannelName, subchannelName)
         channel.basicConsume(
                 QUEUE_NAME,
-                false,
+                true,
                 "test-consumer-${consumerCount++}",
                 new DefaultConsumer(channel) {
 
