@@ -13,7 +13,7 @@ import java.util.function.Consumer
 class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelper {
     static final String QUEUE_NAME = 'test-queue'
 
-    private static final RabbitMQContainer RABBIT_MQ_SERVER = new RabbitMQContainer('rabbitmq:4.3.0-alphine')
+    private static final RabbitMQContainer RABBIT_MQ_SERVER = new RabbitMQContainer('rabbitmq:4.3.0-alpine')
 
     private static int consumerCount = 0
 
