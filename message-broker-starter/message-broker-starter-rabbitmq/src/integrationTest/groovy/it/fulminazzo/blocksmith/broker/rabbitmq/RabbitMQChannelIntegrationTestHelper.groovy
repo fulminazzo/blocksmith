@@ -46,7 +46,7 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
 
     @Override
     void close() throws IOException {
-        channel?.close()
+        if (channel.open) channel?.close()
         connection?.close()
         super.close()
     }
