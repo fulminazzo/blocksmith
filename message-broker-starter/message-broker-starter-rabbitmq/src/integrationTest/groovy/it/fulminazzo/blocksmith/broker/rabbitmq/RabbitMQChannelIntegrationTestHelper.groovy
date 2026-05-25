@@ -44,6 +44,7 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
             channelName = super.channelName
             subchannelName = ''
         }
+        channel.exchangeDeclare(channelName, subchannelName.empty ? 'fanout' : 'direct', true)
         channel.basicPublish(
                 channelName,
                 subchannelName,
