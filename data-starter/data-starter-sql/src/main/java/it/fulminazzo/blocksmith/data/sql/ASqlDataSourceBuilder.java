@@ -235,7 +235,7 @@ abstract class ASqlDataSourceBuilder<B extends ASqlDataSourceBuilder<B>>
         SQLDialect sqlDialect = getSQLDialect();
         ExecutorService actualExecutor = executor != null
                 ? executor
-                : Executors.newCachedThreadPool(ThreadUtils.ownedThreadFactory(SqlDataSource.class));
+                : Executors.newCachedThreadPool(ThreadUtils.ownedThreadFactory(SqlQueryEngine.class));
         return new SqlDataSource(new HikariDataSource(config), sqlDialect, actualExecutor);
     }
 
