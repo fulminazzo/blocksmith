@@ -24,9 +24,25 @@ import java.util.function.BiFunction;
  *     <li><b>consumer tags</b> are programmatically generated;</li>
  *     <li>the <b>queue name</b> is configured from the user.</li>
  * </ul>
- * //TODO: creation examples
  * Examples:
  * <ul>
+ *     <li>creation (local RabbitMQ):
+ *         <pre>{@code
+ *         RabbitMQMessageBroker messageBroker = RabbitMQMessageBroker.builder()
+ *                 // defaults to "amqp://guest:guest@127.0.0.1:5672"
+ *                 .build()
+ *         }</pre>
+ *     </li>
+ *     <li>creation (remote RabbitMQ with authentication):
+ *         <pre>{@code
+ *         RabbitMQMessageBroker messageBroker = RabbitMQMessageBroker.builder()
+ *                 .host("0.0.0.0")
+ *                 .port(5671)
+ *                 .username("root")
+ *                 .password("super-secure-password-should-use-an-env-variable")
+ *                 .build();
+ *         }</pre>
+ *     </li>
  *     <li>creating a standard channel:
  *         <pre>{@code
  *         RabbitMQMessageBroker messageBroker = ...;
