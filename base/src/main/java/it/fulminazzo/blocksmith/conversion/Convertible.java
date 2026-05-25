@@ -8,6 +8,31 @@ import org.jetbrains.annotations.Nullable;
  * Identifies an object that can be automatically converted into another type.
  * By default, this acts as a facade for casting types.
  * However, it is possible to register custom converters through {@link #register(Class, Class, Converter)}.
+ * <br>
+ * For example, consider the class:
+ * <pre>{@code
+ * class User implements Convertible {
+ *     String name;
+ *     int age;
+ *
+ * }
+ * }</pre>
+ * And the following code:
+ * <pre>{@code
+ * User user = ...;
+ * Convertible.register(User.class, String.class, (u, a) -> a[0] + ", " + u.name);
+ * Convertible.register(User.class, Integer.class, (u, a) -> u.age);
+ *
+ * System.out.println(user.as(String.class, "Hello")); // passing "Hello" as the first argument
+ * System.out.println(user.as(Integer.class));
+ * }</pre>
+ * The above will print:
+ * <ul>
+ *     <li>{@code Hello, <name>}</li>
+ *     <li>{@code <age>}</li>
+ * </ul>
+ *
+ * @see Converter
  */
 public interface Convertible {
 

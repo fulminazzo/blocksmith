@@ -15,19 +15,19 @@ import org.jetbrains.annotations.NotNull;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public enum Convention {
     /**
-     * The camelCase (Java naming) convention.
+     * The <i>camelCase</i> (Java naming) convention.
      */
     CAMEL_CASE(new CamelCaseConvention()),
     /**
-     * The kebab-case convention.
+     * The <i>kebab-case</i> convention.
      */
     KEBAB_CASE(new SeparatedCaseConvention("-")),
     /**
-     * The snake_case convention.
+     * The <i>snake_case</i> convention.
      */
     SNAKE_CASE(new SeparatedCaseConvention("_")),
     /**
-     * The PascalCase convention.
+     * The <i>PascalCase</i> convention.
      */
     PASCAL_CASE(new PascalCaseConvention())
     ;
