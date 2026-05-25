@@ -5,6 +5,7 @@ import it.fulminazzo.blocksmith.data.CacheRepositoryDataSource;
 import it.fulminazzo.blocksmith.data.RepositoryDataSource;
 import it.fulminazzo.blocksmith.data.entity.EntityMapper;
 import it.fulminazzo.blocksmith.structure.expiring.ExpiringMap;
+import it.fulminazzo.blocksmith.util.ThreadUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -63,17 +64,10 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryRepositorySettings> {
-    private static int threadsCount = 1;
-
-    private final @NotNull Executor executor;
     private final @NotNull ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
-            r -> {
-                Thread thread = new Thread(r);
-                thread.setDaemon(true);
-                thread.setName(String.format("%s-Cleaner-%s", MemoryRepository.class.getSimpleName(), threadsCount++));
-                return thread;
-            }
+            ThreadUtils.ownedThreadFactory(MemoryRepository.class, true, "cleaner")
     );
+    private final @NotNull Executor executor;
 
     /**
      * Creates a new custom repository.
@@ -144,11 +138,7 @@ public final class MemoryDataSource implements CacheRepositoryDataSource<MemoryR
      * @return the memory data source
      */
     public static @NotNull MemoryDataSource createAsync() {
-        return create(Executors.newCachedThreadPool(r -> {
-            Thread thread = new Thread(r);
-            thread.setName(String.format("%s-%s", MemoryQueryEngine.class.getSimpleName(), threadsCount++));
-            return thread;
-        }));
+        return create(Executors.newCachedThreadPool(ThreadUtils.ownedThreadFactory(MemoryQueryEngine.class)));
     }
 
 }
