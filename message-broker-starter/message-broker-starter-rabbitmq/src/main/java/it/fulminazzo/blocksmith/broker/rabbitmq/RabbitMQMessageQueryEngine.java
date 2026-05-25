@@ -151,7 +151,6 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
                 // Ignored
             }
         }
-        executor.shutdown();
     }
 
 }
