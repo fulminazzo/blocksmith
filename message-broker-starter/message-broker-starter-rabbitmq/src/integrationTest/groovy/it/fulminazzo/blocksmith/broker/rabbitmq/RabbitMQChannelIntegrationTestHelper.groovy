@@ -65,7 +65,11 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
     @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     @Override
     void close() throws IOException {
-        if (channel.open) channel?.close()
+        if (channel?.open) {
+            channel.queuePurge(QUEUE_NAME)
+            channel.queuePurge(HELPER_QUEUE_NAME)
+            channel.close()
+        }
         connection?.close()
         super.close()
     }
