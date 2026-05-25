@@ -39,13 +39,17 @@ abstract class MessageChannelIntegrationTestHelper implements Closeable {
                 logger,
                 p -> {
                     logger.debug("Received raw: $p")
-                    def pair = deserializeMessage(p)
+                    try {
+                        def pair = deserializeMessage(p)
 
-                    def message = pair.first
-                    logger.info("Received message with id=$message.id")
-                    receivedMessages.add(message)
+                        def message = pair.first
+                        logger.info("Received message with id=$message.id")
+                        receivedMessages.add(message)
 
-                    if (message == Messages.MESSAGE1) send(Messages.MESSAGE2, pair.second)
+                        if (message == Messages.MESSAGE1) send(Messages.MESSAGE2, pair.second)
+                    } catch (Exception e) {
+                        logger.error("Error while parsing message '$p'", e)
+                    }
                 }
         )
     }
