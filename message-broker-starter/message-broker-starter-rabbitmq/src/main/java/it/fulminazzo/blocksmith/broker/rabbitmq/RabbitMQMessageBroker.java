@@ -107,7 +107,7 @@ public final class RabbitMQMessageBroker extends AbstractMessageBroker<RabbitMQM
                     exchangeName,
                     channel,
                     settings.getSubchannelNameOrNull(),
-                    settings.getQueueName()
+                    settings.getQueueSettings()
             );
             return registerChannel(channelBuilder.apply(queryEngine, mapper));
         } catch (IOException e) {

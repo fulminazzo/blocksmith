@@ -45,7 +45,8 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
     private final @NotNull Channel channel;
 
     private final @NotNull String routingKey;
-    private final @NotNull String queueName;
+
+    private final @NotNull RabbitMQMessageChannelSettings.QueueSettings queueSettings;
 
     private final int engineId;
     private volatile int consumerCount = 0;
@@ -53,25 +54,25 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
     /**
      * Instantiates a new RabbitMQ message query engine.
      *
-     * @param channelName the channel name
-     * @param executor    the executor
-     * @param channel     the channel
-     * @param routingKey  the routing key ({@code null} if irrelevant)
-     * @param queueName   the queue name
+     * @param channelName   the channel name
+     * @param executor      the executor
+     * @param channel       the channel
+     * @param routingKey    the routing key ({@code null} if irrelevant)
+     * @param queueSettings the queue settings
      */
     RabbitMQMessageQueryEngine(
             final @NotNull ExecutorService executor,
             final @NotNull String channelName,
             final @NotNull Channel channel,
             final @Nullable String routingKey,
-            final @NotNull String queueName
+            final @NotNull RabbitMQMessageChannelSettings.QueueSettings queueSettings
     ) {
         super(channelName);
         this.engineId = ENGINE_COUNT.getAndIncrement();
         this.executor = executor;
         this.channel = channel;
         this.routingKey = routingKey == null ? "" : routingKey;
-        this.queueName = queueName;
+        this.queueSettings = queueSettings;
     }
 
     private synchronized @NotNull String getConsumerTag() {
@@ -105,8 +106,14 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
     @Override
     public void listen(final @NotNull Consumer<String> consumer) {
         try {
-            //TODO: export settings
-            channel.queueDeclare(queueName, true, false, false, null);
+            final String queueName = queueSettings.getQueueName();
+            channel.queueDeclare(
+                    queueName,
+                    queueSettings.isDurable(),
+                    queueSettings.isExclusive(),
+                    queueSettings.isAutoDelete(),
+                    queueSettings.getArguments()
+            );
             channel.queueBind(queueName, getChannelName(), routingKey);
             channel.basicConsume(
                     queueName,

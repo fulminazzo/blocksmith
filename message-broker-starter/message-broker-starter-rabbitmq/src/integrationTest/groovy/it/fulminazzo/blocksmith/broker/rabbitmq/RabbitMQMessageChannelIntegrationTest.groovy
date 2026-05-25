@@ -40,7 +40,9 @@ class RabbitMQMessageChannelIntegrationTest extends MessageChannelIntegrationTes
                         CHANNEL_NAME,
                         helper.channel,
                         '',
-                        RabbitMQChannelIntegrationTestHelper.QUEUE_NAME
+                        new RabbitMQMessageChannelSettings.QueueSettings()
+                                .withQueueName(RabbitMQChannelIntegrationTestHelper.QUEUE_NAME)
+                                .durable()
                 ),
                 MessageChannelIntegrationTestHelper.MAPPER
         )
