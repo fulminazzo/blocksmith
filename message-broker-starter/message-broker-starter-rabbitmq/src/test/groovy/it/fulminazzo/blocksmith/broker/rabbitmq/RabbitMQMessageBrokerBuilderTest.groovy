@@ -16,7 +16,7 @@ class RabbitMQMessageBrokerBuilderTest extends Specification {
         connectionFactory.port >> 1234
 
         and:
-        def builder = new RabbitMQMessageBrokerBuilder().executor(Mock(ExecutorService))
+        def builder = new RabbitMQMessageBrokerBuilder().executor(executor)
         Reflect.on(builder).set('connectionFactory', connectionFactory)
 
         when:
@@ -25,6 +25,9 @@ class RabbitMQMessageBrokerBuilderTest extends Specification {
         then:
         def e = thrown(RabbitMQMessageBrokerException)
         e.message =~ /.*0\.0\.0\.0:1234.+Test exception.*/
+
+        where:
+        executor << [Mock(ExecutorService), null]
     }
 
 }

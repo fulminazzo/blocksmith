@@ -123,9 +123,17 @@ public final class RabbitMQMessageBrokerBuilder
 
     @Override
     public @NotNull RabbitMQMessageBroker build() {
-        ExecutorService actualExecutor = executor != null
-                ? executor
-                : Executors.newCachedThreadPool(ThreadUtils.ownedThreadFactory(RabbitMQMessageQueryEngine.class));
+        final boolean generatedExecutor;
+        final ExecutorService actualExecutor;
+        if (executor != null) {
+            generatedExecutor = false;
+            actualExecutor = executor;
+        } else {
+            generatedExecutor = true;
+            actualExecutor = Executors.newCachedThreadPool(
+                    ThreadUtils.ownedThreadFactory(RabbitMQMessageQueryEngine.class)
+            );
+        }
         try {
             return new RabbitMQMessageBroker(
                     actualExecutor,
@@ -133,6 +141,7 @@ public final class RabbitMQMessageBrokerBuilder
                     getMapper()
             );
         } catch (IOException | TimeoutException e) {
+            if (generatedExecutor) actualExecutor.shutdown();
             throw RabbitMQMessageBrokerException.createConnectionException(
                     connectionFactory.getHost(),
                     connectionFactory.getPort(),
