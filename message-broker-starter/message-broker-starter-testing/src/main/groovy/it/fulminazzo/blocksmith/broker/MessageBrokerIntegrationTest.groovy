@@ -10,8 +10,8 @@ abstract class MessageBrokerIntegrationTest<S extends MessageChannelSettings<S>>
     private MessageChannelIntegrationTestHelper broadcastHelper
 
     void setupSingle() {
-        directHelper = newTestHelper(CHANNEL_NAME).start()
-        broadcastHelper = newTestHelper("$CHANNEL_NAME:$SUBCHANNEL_NAME").start()
+        directHelper = newTestHelper("$CHANNEL_NAME:$SUBCHANNEL_NAME").start()
+        broadcastHelper = newTestHelper(CHANNEL_NAME).start()
     }
 
     void cleanupSingle() {
