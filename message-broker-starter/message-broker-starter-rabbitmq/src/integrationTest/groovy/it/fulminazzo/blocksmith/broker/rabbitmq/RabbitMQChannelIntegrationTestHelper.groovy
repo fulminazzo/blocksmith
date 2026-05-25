@@ -11,7 +11,8 @@ import java.util.function.Consumer
 
 @SuppressWarnings('CloseWithoutCloseable')
 class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelper {
-    static final String QUEUE_NAME = 'test-queue'
+    static final String QUEUE_NAME = 'integration-tests-queue'
+    private static final String HELPER_QUEUE_NAME = 'tests-helper-queue'
 
     private static final RabbitMQContainer RABBIT_MQ_SERVER = new RabbitMQContainer('rabbitmq:4.3.0-management-alpine')
             .withReuse(true)
@@ -38,7 +39,7 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
      * @return the exchange, routing key and queue
      */
     protected Tuple<String> setupExchangeAndQueue() {
-        final queueName = QUEUE_NAME
+        final queueName = HELPER_QUEUE_NAME
         def (baseChannelName, subchannelName) = getChannelNames(channelName)
 
         channel.exchangeDeclare(baseChannelName, subchannelName.empty ? 'fanout' : 'direct', true)
