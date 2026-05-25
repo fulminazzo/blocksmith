@@ -2,12 +2,13 @@ package it.fulminazzo.blocksmith.broker.rabbitmq;
 
 import com.rabbitmq.client.ConnectionFactory;
 import it.fulminazzo.blocksmith.broker.AbstractMessageBrokerBuilder;
+import it.fulminazzo.blocksmith.util.ThreadUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
@@ -122,10 +123,9 @@ public final class RabbitMQMessageBrokerBuilder
 
     @Override
     public @NotNull RabbitMQMessageBroker build() {
-        ExecutorService actualExecutor = Objects.requireNonNull(
-                this.executor,
-                "executor has not been specified yet"
-        );
+        ExecutorService actualExecutor = executor != null
+                ? executor
+                : Executors.newCachedThreadPool(ThreadUtils.ownedThreadFactory(RabbitMQMessageQueryEngine.class));
         try {
             return new RabbitMQMessageBroker(
                     actualExecutor,
