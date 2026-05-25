@@ -51,7 +51,7 @@ import java.util.function.Function;
  *                         .withFormat(format)
  *         );
  *         }</pre>
- *         where CustomFileRepository extends FileRepository and adds custom behavior
+ *         where CustomFileRepository extends {@link FileRepository} and adds custom behavior
  *         such as backup on save, or encryption of sensitive fields.
  *     </li>
  * </ul>

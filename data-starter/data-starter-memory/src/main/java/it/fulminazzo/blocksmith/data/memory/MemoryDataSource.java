@@ -53,7 +53,7 @@ import java.util.function.Function;
  *                         .withExpirationStrategy(ExpiryStrategy.SCHEDULED)
  *         );
  *         }</pre>
- *         where CustomMemoryRepository extends MemoryRepository and adds custom behavior.
+ *         where CustomMemoryRepository extends {@link MemoryRepository} and adds custom behavior.
  *     </li>
  * </ul>
  *

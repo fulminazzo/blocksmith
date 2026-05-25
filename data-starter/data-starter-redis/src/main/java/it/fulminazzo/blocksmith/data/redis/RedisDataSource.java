@@ -59,7 +59,7 @@ import java.util.function.Function;
  *                         .withCollectionName("users")
  *         );
  *         }</pre>
- *         where CustomRedisRepository extends RedisRepository and adds custom behavior
+ *         where CustomRedisRepository extends {@link RedisRepository} and adds custom behavior
  *         such as per-value TTL-based expiration, pub/sub messaging or cache warming strategies.
  *     </li>
  * </ul>
