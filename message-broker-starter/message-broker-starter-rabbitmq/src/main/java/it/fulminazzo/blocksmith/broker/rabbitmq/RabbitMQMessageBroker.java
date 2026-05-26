@@ -115,7 +115,7 @@ public final class RabbitMQMessageBroker extends AbstractMessageBroker<RabbitMQM
             channel.exchangeDeclare(
                     exchangeName,
                     settings.getChannelType() == MessageChannelType.DIRECT ? "direct" : "fanout",
-                    true
+                    settings.isDurable()
             );
             RabbitMQMessageQueryEngine queryEngine = new RabbitMQMessageQueryEngine(
                     executor,

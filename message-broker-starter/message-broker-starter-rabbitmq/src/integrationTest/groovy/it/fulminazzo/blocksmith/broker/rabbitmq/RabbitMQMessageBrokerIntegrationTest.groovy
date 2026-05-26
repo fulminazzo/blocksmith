@@ -43,10 +43,12 @@ class RabbitMQMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<
     @Override
     protected RabbitMQMessageChannelSettings getSettings() {
         return new RabbitMQMessageChannelSettings()
+                .withQueueName(RabbitMQChannelIntegrationTestHelper.QUEUE_NAME)
+                .durable()
                 .withQueueSettings { RabbitMQMessageChannelSettings.QueueSettings queueSettings ->
                     queueSettings
-                            .withQueueName(RabbitMQChannelIntegrationTestHelper.QUEUE_NAME)
                             .durable()
+                            .addArgument('testing', true)
                 }
     }
 

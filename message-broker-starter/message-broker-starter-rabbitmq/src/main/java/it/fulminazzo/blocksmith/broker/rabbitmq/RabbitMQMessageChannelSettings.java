@@ -17,11 +17,13 @@ import java.util.function.Consumer;
  * @see RabbitMQMessageBroker
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
+@Getter(AccessLevel.PACKAGE)
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
 public final class RabbitMQMessageChannelSettings extends MessageChannelSettings<RabbitMQMessageChannelSettings> {
     @Getter(AccessLevel.PACKAGE)
     private final @NotNull QueueSettings queueSettings = new QueueSettings();
+    private boolean durable;
 
     /**
      * Sets the queue name.
@@ -44,6 +46,17 @@ public final class RabbitMQMessageChannelSettings extends MessageChannelSettings
             final @NotNull Consumer<QueueSettings> queueSettings
     ) {
         queueSettings.accept(this.queueSettings);
+        return this;
+    }
+
+    /**
+     * Flags the exchange as <b>durable</b>.
+     * A durable exchange will survive a broker restart.
+     *
+     * @return this object (for method chaining)
+     */
+    public @NotNull RabbitMQMessageChannelSettings durable() {
+        durable = true;
         return this;
     }
 
