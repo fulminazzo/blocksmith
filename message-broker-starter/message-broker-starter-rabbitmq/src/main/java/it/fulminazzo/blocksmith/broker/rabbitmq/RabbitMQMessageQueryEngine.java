@@ -47,8 +47,8 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
 
     private final @NotNull RabbitMQMessageChannelSettings.QueueSettings queueSettings;
 
+    private final @NotNull AtomicInteger consumerCount = new AtomicInteger();
     private final int engineId;
-    private volatile int consumerCount = 0;
 
     /**
      * Instantiates a new RabbitMQ message query engine.
@@ -74,9 +74,8 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
         this.queueSettings = queueSettings;
     }
 
-    private synchronized @NotNull String getConsumerTag() {
-        int consumerCount = this.consumerCount++;
-        return getConsumerTag(consumerCount);
+    private @NotNull String getConsumerTag() {
+        return getConsumerTag(consumerCount.getAndIncrement());
     }
 
     private @NotNull String getConsumerTag(final int consumerCount) {
@@ -151,7 +150,7 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
     @Override
     public void close() throws IOException {
         if (channel.isOpen()) {
-            final int count = consumerCount;
+            final int count = consumerCount.get();
             for (int i = 0; i < count; i++) channel.basicCancel(getConsumerTag(i));
             try {
                 channel.close();

@@ -17,11 +17,10 @@ import java.util.function.Consumer;
  * @see RabbitMQMessageBroker
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-@Getter(AccessLevel.PACKAGE)
+@Getter
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
 public final class RabbitMQMessageChannelSettings extends MessageChannelSettings<RabbitMQMessageChannelSettings> {
-    @Getter(AccessLevel.PACKAGE)
     private final @NotNull QueueSettings queueSettings = new QueueSettings();
     private boolean durable;
 
@@ -63,7 +62,7 @@ public final class RabbitMQMessageChannelSettings extends MessageChannelSettings
     /**
      * Settings for a RabbitMQ queue.
      */
-    @Getter(AccessLevel.PACKAGE)
+    @Getter
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class QueueSettings {
         private final @NotNull Map<String, Object> arguments = new HashMap<>();
