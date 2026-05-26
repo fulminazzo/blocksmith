@@ -86,6 +86,7 @@ include(
     "message-broker-starter:message-broker-starter-memory",
     "message-broker-starter:message-broker-starter-rabbitmq",
     "message-broker-starter:message-broker-starter-redis",
+    "message-broker-starter:message-broker-starter-kafka",
 
     "message-broker-starter:message-broker-starter-testing"
 )

@@ -46,6 +46,7 @@ reactor = "3.8.4"
 
 # MESSAGE BROKERS
 rabbitmq = "5.30.0"
+kafka = "4.3.0"
 
 # MINECRAFT
 bukkit = "1.16.5-R0.1-SNAPSHOT"
@@ -81,6 +82,7 @@ test-containers-postgresql = { module = "org.testcontainers:postgresql", version
 test-containers-yugabytedb = { module = "org.testcontainers:yugabytedb", version.ref = "test-containers-module" }
 test-containers-mongodb = { module = "org.testcontainers:mongodb", version.ref = "test-containers-module" }
 test-containers-rabbitmq = { module = "org.testcontainers:rabbitmq", version.ref = "test-containers-module" }
+test-containers-kafka = { module = "org.testcontainers:kafka", version.ref = "test-containers-module" }
 
 # DATA FORMATS
 jackson-json = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
@@ -110,6 +112,7 @@ reactor = { module = "io.projectreactor:reactor-core", version.ref = "reactor" }
 
 # MESSAGE BROKERS
 rabbitmq = { module = "com.rabbitmq:amqp-client", version.ref = "rabbitmq" }
+kafka = { module = "org.apache.kafka:kafka-clients", version.ref = "kafka" }
 
 # MINECRAFT
 bukkit = { module = "org.spigotmc:spigot-api", version.ref = "bukkit" }
