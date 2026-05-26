@@ -53,8 +53,8 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
     /**
      * Instantiates a new RabbitMQ message query engine.
      *
-     * @param channelName   the channel name
      * @param executor      the executor
+     * @param channelName   the channel name
      * @param channel       the channel
      * @param routingKey    the routing key ({@code null} if irrelevant)
      * @param queueSettings the queue settings
