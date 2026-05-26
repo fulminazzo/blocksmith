@@ -103,6 +103,12 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
         return this
     }
 
+    @SuppressWarnings('UnnecessaryOverridingMethod') // required from Spotbugs
+    @Override
+    protected final void finalize() throws Throwable {
+        super.finalize()
+    }
+
     @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static Tuple<String> getChannelNames(final String channelName) {
         final String baseChannelName
