@@ -17,10 +17,10 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
     private static final RabbitMQContainer RABBIT_MQ_SERVER = new RabbitMQContainer('rabbitmq:4.3.0-management-alpine')
             .withReuse(true)
 
-    private static int consumerCount = 0
-
     private final Connection connection
-    protected final Channel channel
+    private final Channel channel
+
+    private int consumerCount = 0
 
     RabbitMQChannelIntegrationTestHelper(final String channelName, final Logger logger) {
         super(channelName, logger)
@@ -115,7 +115,7 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
             baseChannelName = channelName
             subchannelName = ''
         }
-        [baseChannelName, subchannelName]
+        return [baseChannelName, subchannelName]
     }
 
     @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
