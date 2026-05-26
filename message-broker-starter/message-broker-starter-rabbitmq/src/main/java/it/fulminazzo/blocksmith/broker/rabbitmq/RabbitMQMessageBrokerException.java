@@ -6,6 +6,8 @@ import java.util.Arrays;
 
 /**
  * Unchecked exception used throughout this package to capture any RabbitMQ related exceptions.
+ * <br>
+ * For internal use only.
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public final class RabbitMQMessageBrokerException extends RuntimeException {
