@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.broker.rabbitmq;
 
+import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import it.fulminazzo.blocksmith.broker.AbstractMessageBrokerBuilder;
 import it.fulminazzo.blocksmith.util.ThreadUtils;
@@ -134,12 +135,10 @@ public final class RabbitMQMessageBrokerBuilder
                     ThreadUtils.ownedThreadFactory(RabbitMQMessageQueryEngine.class)
             );
         }
+
+        final Connection connection;
         try {
-            return new RabbitMQMessageBroker(
-                    actualExecutor,
-                    connectionFactory.newConnection(actualExecutor),
-                    getMapper()
-            );
+            connection = connectionFactory.newConnection(actualExecutor);
         } catch (IOException | TimeoutException e) {
             if (generatedExecutor) actualExecutor.shutdown();
             throw RabbitMQMessageBrokerException.createConnectionException(
@@ -148,6 +147,8 @@ public final class RabbitMQMessageBrokerBuilder
                     e
             );
         }
+
+        return new RabbitMQMessageBroker(actualExecutor, connection, getMapper());
     }
 
 }
