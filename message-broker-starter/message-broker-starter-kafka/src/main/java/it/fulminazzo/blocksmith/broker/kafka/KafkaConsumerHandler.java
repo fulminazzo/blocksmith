@@ -74,6 +74,11 @@ abstract class KafkaConsumerHandler<K, V> implements ConsumerRebalanceListener, 
         handle(record.key(), record.value());
     }
 
+    @SuppressWarnings({"checkstyle:NoFinalizer", "removal"})
+    protected final void finalize() {
+        // to prevent finalizer attacks
+    }
+
     @Override
     public void onPartitionsAssigned(final @NotNull Collection<TopicPartition> partitions) {
         consumer.seekToEnd(partitions);

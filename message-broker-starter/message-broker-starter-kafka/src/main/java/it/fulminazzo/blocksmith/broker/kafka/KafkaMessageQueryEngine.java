@@ -10,7 +10,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 /**
@@ -59,14 +62,14 @@ public final class KafkaMessageQueryEngine extends MessageQueryEngine {
         super(channelName);
         this.executor = executor;
 
-        this.properties = properties;
+        this.properties = new Properties(properties);
         this.assignmentWaitTime = assignmentWaitTime;
         this.pollInterval = pollInterval;
 
-        properties.put("key.serializer", SERIALIZER);
-        properties.put("value.serializer", SERIALIZER);
-        properties.put("key.deserializer", DESERIALIZER);
-        properties.put("value.deserializer", DESERIALIZER);
+        this.properties.put("key.serializer", SERIALIZER);
+        this.properties.put("value.serializer", SERIALIZER);
+        this.properties.put("key.deserializer", DESERIALIZER);
+        this.properties.put("value.deserializer", DESERIALIZER);
 
         this.producer = new KafkaProducer<>(properties);
 
@@ -90,17 +93,13 @@ public final class KafkaMessageQueryEngine extends MessageQueryEngine {
 
     @Override
     public void listen(final @NotNull Consumer<String> consumer) {
-        consumers.add(new KafkaConsumerHandler<>(
+        consumers.add(new KafkaConsumerHandlerImpl<>(
                 properties,
                 List.of(getChannelName()),
                 assignmentWaitTime,
-                pollInterval
-        ) {
-            @Override
-            protected void handle(final @NotNull String key, final @NotNull String value) {
-                consumer.accept(value);
-            }
-        });
+                pollInterval,
+                consumer
+        ));
     }
 
     @Override
@@ -108,6 +107,37 @@ public final class KafkaMessageQueryEngine extends MessageQueryEngine {
         consumers.forEach(KafkaConsumerHandler::close);
         producer.close();
         executor.shutdown();
+    }
+
+    private static final class KafkaConsumerHandlerImpl<K, V> extends KafkaConsumerHandler<K, V> {
+        private final @NotNull Consumer<V> messageConsumer;
+
+        /**
+         * Instantiates a new Kafka consumer handler.
+         *
+         * @param consumerProperties the properties for the internal consumer
+         * @param topics             the topics to subscribe the consumer to
+         * @param assignmentWaitTime the time to wait for the first assignment
+         * @param pollInterval       the time between polls
+         * @param messageConsumer    the function to parse the message
+         * @throws KafkaMessageBrokerException if the assignment is not received within the specified time
+         */
+        KafkaConsumerHandlerImpl(
+                final @NotNull Properties consumerProperties,
+                final @NotNull List<String> topics,
+                final long assignmentWaitTime,
+                final long pollInterval,
+                final @NotNull Consumer<V> messageConsumer
+        ) {
+            super(consumerProperties, topics, assignmentWaitTime, pollInterval);
+            this.messageConsumer = messageConsumer;
+        }
+
+        @Override
+        protected void handle(final @NotNull K key, final @NotNull V value) {
+            messageConsumer.accept(value);
+        }
+
     }
 
 }
