@@ -79,14 +79,15 @@ public final class KafkaMessageQueryEngine extends MessageQueryEngine {
     @Override
     public @NotNull CompletableFuture<Void> publish(final @NotNull String payload) {
         return CompletableFuture.runAsync(() -> {
+            String topic = getChannelName();
             try {
-                ProducerRecord<String, String> producerRecord = new ProducerRecord<>(getChannelName(), key, payload);
+                ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topic, key, payload);
                 producer.send(producerRecord).get();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                throw new RuntimeException(e);
+                throw KafkaMessageBrokerException.publishException(topic, payload, e);
             } catch (ExecutionException e) {
-                throw new CompletionException(e.getCause());
+                throw KafkaMessageBrokerException.publishException(topic, payload, e);
             }
         }, executor);
     }
