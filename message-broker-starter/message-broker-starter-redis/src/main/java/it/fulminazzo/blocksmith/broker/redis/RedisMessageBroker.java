@@ -70,8 +70,6 @@ public final class RedisMessageBroker extends AbstractMessageBroker<RedisMessage
     private final @NotNull RedisClient redisClient;
     private final @NotNull StatefulRedisConnection<String, String> connection;
 
-    private final @NotNull Mapper mapper;
-
     /**
      * Instantiates a new Redis message broker.
      *
@@ -79,9 +77,9 @@ public final class RedisMessageBroker extends AbstractMessageBroker<RedisMessage
      * @param mapper      the mapper
      */
     RedisMessageBroker(final @NotNull RedisClient redisClient, final @NotNull Mapper mapper) {
+        super(mapper);
         this.redisClient = redisClient;
         this.connection = redisClient.connect();
-        this.mapper = mapper;
     }
 
     /**

@@ -78,8 +78,6 @@ public final class RabbitMQMessageBroker extends AbstractMessageBroker<RabbitMQM
 
     private final @NotNull Connection connection;
 
-    private final @NotNull Mapper mapper;
-
     /**
      * Instantiates a new RabbitMQ message broker.
      *
@@ -92,9 +90,9 @@ public final class RabbitMQMessageBroker extends AbstractMessageBroker<RabbitMQM
             final @NotNull Connection connection,
             final @NotNull Mapper mapper
     ) {
+        super(mapper);
         this.executor = executor;
         this.connection = connection;
-        this.mapper = mapper;
     }
 
     /**

@@ -5,8 +5,6 @@ import it.fulminazzo.blocksmith.broker.MessageBroker;
 import it.fulminazzo.blocksmith.broker.MessageChannel;
 import it.fulminazzo.blocksmith.broker.MessageChannelType;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiFunction;
@@ -51,9 +49,16 @@ import java.util.function.BiFunction;
  * @see MemoryMessageChannelSettings
  * @see MemoryMessageQueryEngine
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class MemoryMessageBroker extends AbstractMessageBroker<MemoryMessageChannelSettings> {
-    private final @NotNull Mapper mapper;
+
+    /**
+     * Instantiates a new Memory message broker.
+     *
+     * @param mapper the mapper
+     */
+    MemoryMessageBroker(final @NotNull Mapper mapper) {
+        super(mapper);
+    }
 
     /**
      * Creates a new custom channel.

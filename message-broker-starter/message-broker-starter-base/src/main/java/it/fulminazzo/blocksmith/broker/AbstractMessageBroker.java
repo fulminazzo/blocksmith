@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.broker;
 
+import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -16,7 +17,21 @@ import java.util.List;
  * @see MessageChannelSettings
  */
 public abstract class AbstractMessageBroker<S extends MessageChannelSettings<S>> implements MessageBroker<S> {
+    /**
+     * The mapper for converting messages into payloads.
+     */
+    protected final @NotNull Mapper mapper;
+
     private final @NotNull List<MessageChannel> registeredChannels = new ArrayList<>();
+
+    /**
+     * Instantiates a new Abstract message broker.
+     *
+     * @param mapper the mapper
+     */
+    protected AbstractMessageBroker(final @NotNull Mapper mapper) {
+        this.mapper = mapper;
+    }
 
     /**
      * Registers a new channel (so that it can be closed by calling {@link #close()} on this object).
