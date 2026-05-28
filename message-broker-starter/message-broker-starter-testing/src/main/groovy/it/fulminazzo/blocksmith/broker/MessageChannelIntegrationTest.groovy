@@ -13,7 +13,7 @@ abstract class MessageChannelIntegrationTest extends Specification {
 
     protected static final String CHANNEL_NAME = 'message-channel-integration-test'
 
-    protected static final int SLEEP_TIME = 125
+    protected static final int SLEEP_TIME = 500
 
     protected MessageChannelIntegrationTestHelper helper
     protected MessageChannel channel
