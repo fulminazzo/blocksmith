@@ -179,6 +179,7 @@ public class KafkaMessageBrokerBuilder
 
     @Override
     public @NotNull KafkaMessageBroker build() {
+        final String bootstrapServers = getBootstrapServers();
         final ExecutorService actualExecutor = Objects.requireNonNullElseGet(
                 executor,
                 () -> Executors.newCachedThreadPool(
@@ -188,7 +189,7 @@ public class KafkaMessageBrokerBuilder
 
         Properties properties = new Properties();
         properties.putAll(this.properties);
-        properties.put(BOOTSTRAP_SERVERS, getBootstrapServers());
+        properties.put(BOOTSTRAP_SERVERS, bootstrapServers);
         properties.put(SECURITY_PROTOCOL, this.securityProtocol.name());
         properties.put(CLIENT_DNS_LOOKUP, this.clientDnsLookup.name().toLowerCase(Locale.ROOT));
         properties.put(RECONNECT_BACKOFF, this.reconnectBackoff);
