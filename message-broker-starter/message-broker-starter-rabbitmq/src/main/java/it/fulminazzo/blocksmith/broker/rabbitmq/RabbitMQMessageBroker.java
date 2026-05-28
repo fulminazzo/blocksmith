@@ -105,7 +105,7 @@ public final class RabbitMQMessageBroker extends AbstractMessageBroker<RabbitMQM
      * @param settings       the settings to build the channel with
      * @return the channel
      */
-    public <C extends RabbitMQMessageChannel> C newChannel(
+    public <C extends RabbitMQMessageChannel> @NotNull C newChannel(
             final @NotNull BiFunction<RabbitMQMessageQueryEngine, Mapper, C> channelBuilder,
             final @NotNull RabbitMQMessageChannelSettings settings
     ) {
