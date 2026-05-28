@@ -47,7 +47,7 @@ public final class KafkaMessageQueryEngine extends MessageQueryEngine {
      * @param executor           the executor
      * @param properties         the properties to apply to both the producer and the consumer
      * @param channelName        the channel name
-     * @param key                the key to include in the message
+     * @param key                the key to include in the messages
      * @param assignmentWaitTime the time to wait for the first assignment
      * @param pollInterval       the time between polls
      */
