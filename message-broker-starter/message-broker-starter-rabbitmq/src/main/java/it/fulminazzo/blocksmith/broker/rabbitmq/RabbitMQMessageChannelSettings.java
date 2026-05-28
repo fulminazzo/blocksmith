@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * Message channel settings for RabbitMQ databases.
+ * Message channel settings for RabbitMQ channels.
  *
  * @see RabbitMQMessageChannel
  * @see RabbitMQMessageBroker

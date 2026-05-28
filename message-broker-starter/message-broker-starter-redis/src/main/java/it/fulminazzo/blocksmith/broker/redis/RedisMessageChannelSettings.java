@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * Message channel settings for Redis databases.
+ * Message channel settings for Redis channels.
  *
  * @see RedisMessageChannel
  * @see RedisMessageBroker

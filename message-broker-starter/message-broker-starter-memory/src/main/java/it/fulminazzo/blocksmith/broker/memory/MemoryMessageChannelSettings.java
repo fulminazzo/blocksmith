@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * Message channel settings for in-memory databases.
+ * Message channel settings for in-memory channels.
  *
  * @see MemoryMessageChannel
  * @see MemoryMessageBroker
