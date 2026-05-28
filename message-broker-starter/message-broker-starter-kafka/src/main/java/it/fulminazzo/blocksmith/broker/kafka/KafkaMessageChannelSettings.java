@@ -47,14 +47,14 @@ public final class KafkaMessageChannelSettings extends MessageChannelSettings<Ka
                 .withSendRetries(0)
                 .withCompressionType(CompressionType.NONE)
                 .addProperty(ENABLE_IDEMPOTENCE, false)
-                .withDeliveryTimeout(2 * 60_000L)
+                .withDeliveryTimeout(2 * 60_000)
                 .withOffsetResetStrategy(OffsetResetStrategy.LATEST)
                 .addProperty(ENABLE_AUTO_COMMIT, false)
                 .withMaxPollRecords(500)
-                .withAutoCommitInterval(5_000L)
-                .withMaxPollInterval(300_000L)
-                .withSessionTimeout(45_000L)
-                .withHeartbeatInterval(3_000L);
+                .withAutoCommitInterval(5_000)
+                .withMaxPollInterval(300_000)
+                .withSessionTimeout(45_000)
+                .withHeartbeatInterval(3_000);
     }
 
     /**
@@ -163,7 +163,7 @@ public final class KafkaMessageChannelSettings extends MessageChannelSettings<Ka
      * @param deliveryTimeout the timeout (in milliseconds)
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageChannelSettings withDeliveryTimeout(final long deliveryTimeout) {
+    public @NotNull KafkaMessageChannelSettings withDeliveryTimeout(final int deliveryTimeout) {
         return addProperty(DELIVERY_TIMEOUT, deliveryTimeout);
     }
 
@@ -216,7 +216,7 @@ public final class KafkaMessageChannelSettings extends MessageChannelSettings<Ka
      * @param autoCommitInterval the interval (in milliseconds)
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageChannelSettings withAutoCommit(final long autoCommitInterval) {
+    public @NotNull KafkaMessageChannelSettings withAutoCommit(final int autoCommitInterval) {
         return enableAutoCommit().withAutoCommitInterval(autoCommitInterval);
     }
 
@@ -246,7 +246,7 @@ public final class KafkaMessageChannelSettings extends MessageChannelSettings<Ka
      * @param autoCommitInterval the interval (in milliseconds)
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageChannelSettings withAutoCommitInterval(final long autoCommitInterval) {
+    public @NotNull KafkaMessageChannelSettings withAutoCommitInterval(final int autoCommitInterval) {
         return addProperty(AUTO_COMMIT_INTERVAL, autoCommitInterval);
     }
 
@@ -257,7 +257,7 @@ public final class KafkaMessageChannelSettings extends MessageChannelSettings<Ka
      * @param maxPollInterval the maximum time (in milliseconds)
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageChannelSettings withMaxPollInterval(final long maxPollInterval) {
+    public @NotNull KafkaMessageChannelSettings withMaxPollInterval(final int maxPollInterval) {
         return addProperty(MAX_POLL_INTERVAL, maxPollInterval);
     }
 
@@ -273,7 +273,7 @@ public final class KafkaMessageChannelSettings extends MessageChannelSettings<Ka
      * @param sessionTimeout the session timeout
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageChannelSettings withSessionAndHeartbeat(final long sessionTimeout) {
+    public @NotNull KafkaMessageChannelSettings withSessionAndHeartbeat(final int sessionTimeout) {
         return withSessionTimeout(sessionTimeout)
                 .withHeartbeatInterval(sessionTimeout / 3);
     }
@@ -284,18 +284,18 @@ public final class KafkaMessageChannelSettings extends MessageChannelSettings<Ka
      * @param sessionTimeout the timeout (in milliseconds)
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageChannelSettings withSessionTimeout(final long sessionTimeout) {
+    public @NotNull KafkaMessageChannelSettings withSessionTimeout(final int sessionTimeout) {
         return addProperty(SESSION_TIMEOUT, sessionTimeout);
     }
 
     /**
      * Sets the interval between heartbeats sent by the consumer.
-     * Should be a third of {@link #withSessionTimeout(long)}.
+     * Should be a third of {@link #withSessionTimeout(int)}.
      *
      * @param heartbeatInterval the interval (in milliseconds)
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageChannelSettings withHeartbeatInterval(final long heartbeatInterval) {
+    public @NotNull KafkaMessageChannelSettings withHeartbeatInterval(final int heartbeatInterval) {
         return addProperty(HEARTBEAT_INTERVAL, heartbeatInterval);
     }
 

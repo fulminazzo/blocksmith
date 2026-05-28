@@ -45,10 +45,10 @@ public class KafkaMessageBrokerBuilder
     private @NotNull SecurityProtocol securityProtocol = SecurityProtocol.PLAINTEXT;
     private @NotNull ClientDnsLookup clientDnsLookup = ClientDnsLookup.USE_ALL_DNS_IPS;
 
-    private long reconnectBackoff = 50L;
-    private long reconnectBackoffMax = 1_000L;
+    private int reconnectBackoff = 50;
+    private int reconnectBackoffMax = 1_000;
 
-    private long requestTimeout = 30_000L;
+    private int requestTimeout = 30_000;
 
     private @Nullable ExecutorService executor;
 
@@ -93,14 +93,14 @@ public class KafkaMessageBrokerBuilder
     /**
      * Sets the retry delay when a connection to the broker is lost.
      * The actual delay increases exponentially based on this value until
-     * {@link #reconnectBackoffMax(long)} is reached.
+     * {@link #reconnectBackoffMax(int)} is reached.
      * <br>
      * Default: {@code 50}
      *
      * @param reconnectBackoff the retry backoff (in milliseconds)
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageBrokerBuilder reconnectBackoff(final long reconnectBackoff) {
+    public @NotNull KafkaMessageBrokerBuilder reconnectBackoff(final int reconnectBackoff) {
         this.reconnectBackoff = reconnectBackoff;
         return this;
     }
@@ -113,7 +113,7 @@ public class KafkaMessageBrokerBuilder
      * @param reconnectBackoffMax the maximum retry backoff (in milliseconds)
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageBrokerBuilder reconnectBackoffMax(final long reconnectBackoffMax) {
+    public @NotNull KafkaMessageBrokerBuilder reconnectBackoffMax(final int reconnectBackoffMax) {
         this.reconnectBackoffMax = reconnectBackoffMax;
         return this;
     }
@@ -126,7 +126,7 @@ public class KafkaMessageBrokerBuilder
      * @param requestTimeout the request timeout (in milliseconds)
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageBrokerBuilder requestTimeout(final long requestTimeout) {
+    public @NotNull KafkaMessageBrokerBuilder requestTimeout(final int requestTimeout) {
         this.requestTimeout = requestTimeout;
         return this;
     }

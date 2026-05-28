@@ -30,9 +30,9 @@ class KafkaMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<Kaf
                 )
                 .securityProtocol(SecurityProtocol.PLAINTEXT)
                 .clientDnsLookup(ClientDnsLookup.USE_ALL_DNS_IPS)
-                .reconnectBackoff(100L)
-                .reconnectBackoffMax(50_000L)
-                .requestTimeout(60_000L)
+                .reconnectBackoff(100)
+                .reconnectBackoffMax(50_000)
+                .requestTimeout(60_000)
                 .executor(Executors.newCachedThreadPool())
                 .addProperty('test', 'property')
     }
@@ -45,13 +45,13 @@ class KafkaMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<Kaf
     @Override
     protected KafkaMessageChannelSettings getSettings() {
         return new KafkaMessageChannelSettings()
-                .withAssignmentWaitTime(120_000L)
-                .withPollInterval(75L)
+                .withAssignmentWaitTime(120_000)
+                .withPollInterval(75)
                 .idempotenceWithDefaults()
                 .withMessagesKey('broker-test-message')
                 .withGroupId('integration-tests-group')
-                .withAutoCommit(1_000L)
-                .withSessionAndHeartbeat(5_000L)
+                .withAutoCommit(1_000)
+                .withSessionAndHeartbeat(10_000)
     }
 
 }
