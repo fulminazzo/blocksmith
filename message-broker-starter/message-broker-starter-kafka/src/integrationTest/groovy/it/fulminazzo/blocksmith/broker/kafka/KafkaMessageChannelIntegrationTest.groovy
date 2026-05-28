@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class KafkaMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
-    private ExecutorService executor = Executors.newCachedThreadPool()
+    private final ExecutorService executor = Executors.newCachedThreadPool()
 
     void setup() {
         setupChannel()

@@ -74,7 +74,8 @@ public final class KafkaMessageBroker extends AbstractMessageBroker<KafkaMessage
     ) {
         super(mapper);
         this.executor = executor;
-        this.baseProperties = baseProperties;
+        this.baseProperties = new Properties();
+        this.baseProperties.putAll(baseProperties);
     }
 
     /**
