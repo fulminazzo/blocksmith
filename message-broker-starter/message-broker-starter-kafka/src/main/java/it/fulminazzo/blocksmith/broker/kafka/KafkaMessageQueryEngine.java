@@ -62,7 +62,8 @@ public final class KafkaMessageQueryEngine extends MessageQueryEngine {
         super(channelName);
         this.executor = executor;
 
-        this.properties = new Properties(properties);
+        this.properties = new Properties();
+        this.properties.putAll(properties);
         this.assignmentWaitTime = assignmentWaitTime;
         this.pollInterval = pollInterval;
 
@@ -71,7 +72,7 @@ public final class KafkaMessageQueryEngine extends MessageQueryEngine {
         this.properties.put("key.deserializer", DESERIALIZER);
         this.properties.put("value.deserializer", DESERIALIZER);
 
-        this.producer = new KafkaProducer<>(properties);
+        this.producer = new KafkaProducer<>(this.properties);
 
         this.key = key;
     }
