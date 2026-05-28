@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.broker;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,6 +21,7 @@ public abstract class AbstractMessageBroker<S extends MessageChannelSettings<S>>
     /**
      * The mapper for converting messages into payloads.
      */
+    @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
     protected final @NotNull Mapper mapper;
 
     private final @NotNull List<MessageChannel> registeredChannels = new ArrayList<>();
