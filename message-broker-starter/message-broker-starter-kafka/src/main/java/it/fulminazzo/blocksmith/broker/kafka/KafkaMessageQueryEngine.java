@@ -107,7 +107,6 @@ public final class KafkaMessageQueryEngine extends MessageQueryEngine {
     public void close() {
         consumers.forEach(KafkaConsumerHandler::close);
         producer.close();
-        executor.shutdown();
     }
 
     private static final class KafkaConsumerHandlerImpl<K, V> extends KafkaConsumerHandler<K, V> {

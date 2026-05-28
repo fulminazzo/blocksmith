@@ -5,9 +5,11 @@ import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTest
 import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTestHelper
 import it.fulminazzo.blocksmith.broker.Messages
 
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class KafkaMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
+    private ExecutorService executor = Executors.newCachedThreadPool()
 
     void setup() {
         setupChannel()
@@ -15,6 +17,7 @@ class KafkaMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
 
     void cleanup() {
         clearData()
+        executor?.close()
     }
 
     def 'test that sending on server works'() {
@@ -35,7 +38,7 @@ class KafkaMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
     MessageChannel initializeChannel() {
         return new KafkaMessageChannel(
                 new KafkaMessageQueryEngine(
-                        Executors.newCachedThreadPool(),
+                        executor,
                         KafkaChannelIntegrationTestHelper.properties,
                         CHANNEL_NAME,
                         null,
