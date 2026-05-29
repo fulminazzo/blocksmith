@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.broker.tcp.client;
 
 import it.fulminazzo.blocksmith.broker.tcp.peer.PeerConnection;
+import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +16,7 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractTcpMessageClient implements PeerConnection, Runnable, Closeable {
     protected final @NotNull Logger logger;
+    protected final @NotNull Mapper mapper;
 
     private final @NotNull Socket socket;
     private final @NotNull BufferedReader input;
@@ -30,14 +32,16 @@ public abstract class AbstractTcpMessageClient implements PeerConnection, Runnab
      * Instantiates a new TCP Message client.
      *
      * @param logger the logger to display messages
+     * @param mapper the mapper to serialize the messages
      * @param socket the actual socket connection to the client
      * @throws IOException in case it is not possible to retrieve the data streams
      */
     public AbstractTcpMessageClient(
-            final @NotNull Logger logger,
+            final @NotNull Logger logger, @NotNull Mapper mapper,
             final @NotNull Socket socket
     ) throws IOException {
         this.logger = logger;
+        this.mapper = mapper;
         this.socket = socket;
         this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));

@@ -25,7 +25,6 @@ final class TcpMessageServerClient extends AbstractTcpMessageClient {
     private final @NotNull ExecutorService executor = Executors.newSingleThreadExecutor(
             ThreadUtils.ownedThreadFactory(TcpMessageServerClient.class, true, "")
     );
-    private final @NotNull Mapper mapper;
 
     private @Nullable String channelName;
 
@@ -42,8 +41,7 @@ final class TcpMessageServerClient extends AbstractTcpMessageClient {
             final @NotNull Mapper mapper,
             final @NotNull Socket socket
     ) throws IOException {
-        super(logger, socket);
-        this.mapper = mapper;
+        super(logger, mapper, socket);
     }
 
     /**

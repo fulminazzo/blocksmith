@@ -21,7 +21,6 @@ import java.util.function.Consumer;
 public final class TcpMessageClient extends AbstractTcpMessageClient {
     @Getter
     private final @NotNull String channelName;
-    private final @NotNull Mapper mapper;
 
     /**
      * Instantiates a new TCP Message client.
@@ -38,8 +37,7 @@ public final class TcpMessageClient extends AbstractTcpMessageClient {
             final int port,
             final @NotNull String channelName
     ) throws IOException {
-        super(logger, new Socket("localhost", port));
-        this.mapper = mapper;
+        super(logger, mapper, new Socket("localhost", port));
         this.channelName = channelName;
     }
 
