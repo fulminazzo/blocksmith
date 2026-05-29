@@ -133,7 +133,7 @@ public abstract class AbstractTcpMessageClient implements Runnable, Closeable {
             logger.debug(formatLog("Received message: {}"), line);
             onRead.accept(line);
         }
-        closed = true;
+        close();
     }
 
     @Override
@@ -153,7 +153,10 @@ public abstract class AbstractTcpMessageClient implements Runnable, Closeable {
         } catch (IOException e) {
             // do nothing
         }
-        logger.info(formatLog("Connection closed"));
+        if (!isClosed()) {
+            logger.info(formatLog("Connection closed"));
+            closed = true;
+        }
     }
 
 }
