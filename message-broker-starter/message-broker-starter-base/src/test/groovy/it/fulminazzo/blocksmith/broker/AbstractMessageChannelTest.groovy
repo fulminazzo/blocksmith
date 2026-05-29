@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
+import spock.lang.Stepwise
 
 import java.time.Duration
 import java.util.concurrent.ExecutionException
@@ -16,6 +17,7 @@ import java.util.function.Consumer
 import java.util.function.Function
 import java.util.function.UnaryOperator
 
+@Stepwise
 class AbstractMessageChannelTest extends Specification {
     private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
