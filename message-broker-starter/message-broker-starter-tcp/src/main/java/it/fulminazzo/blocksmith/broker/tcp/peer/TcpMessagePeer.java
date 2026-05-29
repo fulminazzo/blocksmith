@@ -1,0 +1,193 @@
+package it.fulminazzo.blocksmith.broker.tcp.peer;
+
+import it.fulminazzo.blocksmith.broker.tcp.peer.client.TcpMessageClient;
+import it.fulminazzo.blocksmith.broker.tcp.peer.server.TcpMessageServer;
+import it.fulminazzo.blocksmith.data.mapper.Mapper;
+import it.fulminazzo.blocksmith.util.ThreadUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.*;
+
+/**
+ * Local peer for handling TCP connections across the same machine.
+ * <br>
+ * The peer will handle simultaneously <b>server</b> and <b>client</b>.
+ * <ul>
+ *     <li>First, it will attempt to run a new server.
+ *     If this fails, it is probably because another peer is already running the server on the machine;</li>
+ *     <li>Then, it starts the actual client.
+ *     The client does not know if the server was started by its peer or not, and it does not have to,
+ *     as it adds no extra functionality: all functionality must run through the connection stream.</li>
+ * </ul>
+ * The peer will also handle <b>server shutdowns</b> by re-trying to run it.
+ *
+ * @see TcpMessageServer
+ * @see TcpMessageClient
+ */
+public final class TcpMessagePeer extends Loggable implements ChannelSubscriber<TcpMessagePeer>, Runnable, Closeable {
+    private final @NotNull ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
+            2, // one for the server, one for the peer (which includes the client)
+            ThreadUtils.ownedThreadFactory(TcpMessagePeer.class)
+    );
+
+    private final @NotNull Map<String, List<MessageHandler>> messageHandlers = new ConcurrentHashMap<>();
+    private final @NotNull Set<String> channels = new CopyOnWriteArraySet<>();
+
+    private final @NotNull Mapper mapper;
+    private final int port;
+
+    private final long retryInterval;
+
+    private final @NotNull ExecutorService executor;
+
+    private @Nullable TcpMessageServer server;
+    private @Nullable TcpMessageClient client;
+
+    /**
+     * Instantiates a new TCP Message peer.
+     *
+     * @param logger        the logger used to display messages
+     * @param mapper        the mapper used to serialize the messages
+     * @param port          the port to connect on
+     * @param retryInterval the time to wait before trying to reconnect to the server (in milliseconds)
+     * @param executor      the executor to handle internal tasks with
+     */
+    public TcpMessagePeer(
+            final @NotNull Logger logger,
+            final @NotNull Mapper mapper,
+            final int port,
+            final long retryInterval,
+            @NotNull ExecutorService executor
+    ) {
+        super(logger);
+        this.mapper = mapper;
+        this.port = port;
+        this.retryInterval = retryInterval;
+        this.executor = executor;
+    }
+
+    /**
+     * Starts the peer.
+     *
+     * @return this object (for method chaining)
+     */
+    public @NotNull TcpMessagePeer start() {
+        scheduler.scheduleAtFixedRate(this, 0, retryInterval, TimeUnit.MILLISECONDS);
+        return this;
+    }
+
+    /**
+     * Registers a new handler for the specified channel.
+     *
+     * @param channel        the channel name
+     * @param messageHandler the handler to register
+     */
+    public void registerHandler(final @NotNull String channel, final @NotNull MessageHandler messageHandler) {
+        messageHandlers.computeIfAbsent(channel, c -> new ArrayList<>()).add(messageHandler);
+    }
+
+    /**
+     * Unregisters the handler from all the channels.
+     *
+     * @param messageHandler the handler to unregister
+     */
+    public void unregisterHandler(final @NotNull MessageHandler messageHandler) {
+        messageHandlers.values().forEach(h -> h.remove(messageHandler));
+    }
+
+    /**
+     * Gets the internal server, if present.
+     *
+     * @return the server
+     */
+    @NotNull Optional<TcpMessageServer> server() {
+        return Optional.ofNullable(server);
+    }
+
+    /**
+     * Gets the internal client, if present.
+     *
+     * @return the client
+     */
+    @NotNull Optional<TcpMessageClient> client() {
+        return Optional.ofNullable(client);
+    }
+
+    private void closeConnections() {
+        server().ifPresent(TcpMessageServer::close);
+        server = null;
+
+        client().ifPresent(TcpMessageClient::close);
+        client = null;
+    }
+
+    @Override
+    public void run() {
+        try {
+            logger.debug(formatLog("Attempting to start TCP server"));
+            server = new TcpMessageServer(logger, mapper, port, executor);
+            scheduler.submit(server);
+        } catch (IOException e) {
+            // server already running or port already in use, ignore the error
+            logger.debug(formatLog("TCP server already running or port already in use"));
+        }
+        try {
+            logger.debug(formatLog("Starting client"));
+            client = new TcpMessageClient(
+                    logger,
+                    mapper,
+                    port
+            ) {
+
+                @Override
+                public void handleMessage(final @NotNull String channel, final @NotNull String message) {
+                    messageHandlers.getOrDefault(channel, Collections.emptyList())
+                            .forEach(h -> h.handle(message));
+                }
+
+            };
+            channels.forEach(client::subscribe);
+            client.run();
+        } catch (IOException e) {
+            logger.warn(formatLog("Failed to start client: {}"), e.getMessage(), e);
+        }
+        closeConnections();
+        logger.info(formatLog("Attempting to restart TCP peer in {} seconds"), retryInterval / 1000);
+    }
+
+    @Override
+    public void close() {
+        closeConnections();
+        scheduler.shutdown();
+    }
+
+    @Override
+    public @NotNull TcpMessagePeer subscribe(final @NotNull String channel) {
+        channels.add(channel);
+        client().ifPresent(c -> c.subscribe(channel));
+        return this;
+    }
+
+    @Override
+    public @NotNull TcpMessagePeer unsubscribe(final @NotNull String channel) {
+        channels.remove(channel);
+        client().ifPresent(c -> c.unsubscribe(channel));
+        return this;
+    }
+
+    @Override
+    public boolean isSubscribed(final @NotNull String channel) {
+        return channels.contains(channel);
+    }
+
+    @Override
+    protected @NotNull String formatLog(@NotNull String message) {
+        return String.format("|%s (%s)| %s", getClass().getSimpleName(), port, message);
+    }
+
+}
