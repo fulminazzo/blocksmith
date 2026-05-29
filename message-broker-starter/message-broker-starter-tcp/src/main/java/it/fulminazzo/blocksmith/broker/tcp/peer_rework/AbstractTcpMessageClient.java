@@ -90,6 +90,7 @@ public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClien
         } catch (IOException e) {
             // connection dropped or client closed, ignore the error
         }
+        close();
     }
 
     @Override
