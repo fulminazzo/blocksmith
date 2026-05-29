@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.broker.tcp.peer_rework;
 
 import it.fulminazzo.blocksmith.broker.tcp.peer_rework.server.ServerCommand;
+import it.fulminazzo.blocksmith.broker.tcp.peer_rework.server.ServerResponse;
 import it.fulminazzo.blocksmith.broker.tcp.peer_rework.server.TcpMessageServer;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.MapperException;
@@ -57,11 +58,12 @@ public abstract class TcpMessageClient extends AbstractTcpMessageClient<TcpMessa
 
     @Override
     protected void handleMessage(final @NotNull String message) {
+        if (message.equals(ServerResponse.SUCCESS)) return;
         final MessageDto messageDto;
         try {
             messageDto = getMapper().deserialize(message, MessageDto.class);
         } catch (MapperException e) {
-            logger.warn("Error while deserializing message: {}", e.getMessage());
+            logger.warn(formatLog("Received error response: {}"), message);
             return;
         }
         handleMessage(messageDto.getChannel(), messageDto.getMessage());
