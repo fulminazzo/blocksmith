@@ -32,6 +32,15 @@ public final class TcpMessageServer implements Runnable, Closeable {
     private @Nullable ServerSocket socket;
 
     /**
+     * Checks if the server is closed.
+     *
+     * @return {@code true} if it is
+     */
+    public boolean isClosed() {
+        return socket == null || socket.isClosed();
+    }
+
+    /**
      * Broadcasts a message to all the clients subscribed to the specified channel.
      *
      * @param channel the channel to which the message should be sent
@@ -65,7 +74,7 @@ public final class TcpMessageServer implements Runnable, Closeable {
              * Both cases are handled by the clients.
              */
         }
-        while (socket != null && !socket.isClosed())
+        while (!isClosed())
             try {
                 Socket socket = this.socket.accept();
                 logger.debug(
