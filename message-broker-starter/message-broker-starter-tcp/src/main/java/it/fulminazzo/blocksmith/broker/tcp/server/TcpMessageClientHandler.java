@@ -1,43 +1,34 @@
 package it.fulminazzo.blocksmith.broker.tcp.server;
 
+import it.fulminazzo.blocksmith.broker.tcp.AbstractTcpMessageClient;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.MapperException;
 import it.fulminazzo.blocksmith.util.ThreadUtils;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.Socket;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Handles a single client connection.
  *
  * @see TcpMessageServer
  */
-final class TcpMessageClientHandler implements Runnable, Closeable {
+final class TcpMessageClientHandler extends AbstractTcpMessageClient {
     private final @NotNull ExecutorService executor = Executors.newSingleThreadExecutor(
             ThreadUtils.ownedThreadFactory(TcpMessageClientHandler.class, true, "")
     );
-    private final @NotNull Logger logger;
     private final @NotNull Mapper mapper;
 
-    private final @NotNull Socket socket;
-    private final @NotNull BufferedReader input;
-    private final @NotNull BufferedWriter output;
-
-    private @NotNull BiConsumer<@NotNull String, @NotNull String> onRead = (c, m) -> {
-    };
-
     private @Nullable String channelName;
-    @Getter
-    private boolean closed;
 
     /**
      * Instantiates a new TCP Message client handler.
@@ -52,11 +43,8 @@ final class TcpMessageClientHandler implements Runnable, Closeable {
             final @NotNull Mapper mapper,
             final @NotNull Socket socket
     ) throws IOException {
-        this.logger = logger;
+        super(logger, socket);
         this.mapper = mapper;
-        this.socket = socket;
-        this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        this.output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
     }
 
     /**
@@ -91,34 +79,6 @@ final class TcpMessageClientHandler implements Runnable, Closeable {
     }
 
     /**
-     * Reads a single line from the input stream.
-     *
-     * @return the line (or {@code null} if the connection is closed)
-     */
-    public @Nullable String read() {
-        try {
-            return input.readLine();
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Attempts to send a message to the output stream.
-     * It will <b>not throw</b> if the message could not be delivered.
-     *
-     * @param message the message
-     */
-    public void write(final @NotNull String message) {
-        try {
-            output.write(message);
-            output.flush();
-        } catch (IOException e) {
-            // do nothing
-        }
-    }
-
-    /**
      * Sets the callback to be executed when a message is received.
      *
      * @param onRead the callback
@@ -127,18 +87,7 @@ final class TcpMessageClientHandler implements Runnable, Closeable {
     public @NotNull TcpMessageClientHandler onRead(
             final @NotNull BiConsumer<@NotNull String, @NotNull String> onRead
     ) {
-        this.onRead = onRead;
-        return this;
-    }
-
-    private @NotNull String formatLog(final @NotNull String message) {
-        return String.format(
-                "|TCP Client (%s:%s) [%s]|: %s",
-                getHost(),
-                getPort(),
-                channelName,
-                message
-        );
+        return onRead(m -> onRead.accept(getChannelName(), m));
     }
 
     private @NotNull String getChannelName() {
@@ -148,43 +97,28 @@ final class TcpMessageClientHandler implements Runnable, Closeable {
         );
     }
 
-    private @NotNull String getHost() {
-        return socket.getInetAddress().getHostAddress();
-    }
-
-    private int getPort() {
-        return socket.getPort();
-    }
-
     @Override
-    public void run() {
-        String line;
-        while ((line = read()) != null) {
-            logger.debug(formatLog("Received message: {}"), line);
-            onRead.accept(getChannelName(), line);
-        }
-        closed = true;
+    public @NotNull TcpMessageClientHandler onRead(
+            final @NotNull Consumer<@NotNull String> onRead
+    ) {
+        return (TcpMessageClientHandler) super.onRead(onRead);
     }
 
     @Override
     public void close() {
         executor.shutdownNow();
-        try {
-            output.close();
-        } catch (IOException e) {
-            // do nothing
-        }
-        try {
-            input.close();
-        } catch (IOException e) {
-            // do nothing
-        }
-        try {
-            socket.close();
-        } catch (IOException e) {
-            // do nothing
-        }
-        logger.info(formatLog("Connection closed"));
+        super.close();
+    }
+
+    @Override
+    protected @NotNull String formatLog(final @NotNull String message) {
+        return String.format(
+                "|TCP Client (%s:%s) [%s]|: %s",
+                getHost(),
+                getPort(),
+                channelName,
+                message
+        );
     }
 
 }

@@ -1,0 +1,142 @@
+package it.fulminazzo.blocksmith.broker.tcp;
+
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+
+import java.io.*;
+import java.net.Socket;
+import java.util.function.Consumer;
+
+/**
+ * Abstraction of a TCP message client with common logic.
+ */
+public abstract class AbstractTcpMessageClient implements Runnable, Closeable {
+    protected final @NotNull Logger logger;
+
+    private final @NotNull Socket socket;
+    private final @NotNull BufferedReader input;
+    private final @NotNull BufferedWriter output;
+
+    private @NotNull Consumer<@NotNull String> onRead = (m) -> {
+    };
+
+    @Getter
+    private boolean closed;
+
+    /**
+     * Instantiates a new TCP Message client.
+     *
+     * @param logger the logger to display messages
+     * @param socket the actual socket connection to the client
+     * @throws IOException in case it is not possible to retrieve the data streams
+     */
+    public AbstractTcpMessageClient(
+            final @NotNull Logger logger,
+            final @NotNull Socket socket
+    ) throws IOException {
+        this.logger = logger;
+        this.socket = socket;
+        this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        this.output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+    }
+
+    /**
+     * Formats the message to the log format.
+     *
+     * @param message the message
+     * @return the formatted message
+     */
+    protected abstract @NotNull String formatLog(final @NotNull String message);
+
+    /**
+     * Reads a single line from the input stream.
+     *
+     * @return the line (or {@code null} if the connection is closed)
+     */
+    public @Nullable String read() {
+        try {
+            return input.readLine();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Attempts to send a message to the output stream.
+     * It will <b>not throw</b> if the message could not be delivered.
+     *
+     * @param message the message
+     */
+    public void write(final @NotNull String message) {
+        try {
+            output.write(message);
+            output.flush();
+        } catch (IOException e) {
+            // do nothing
+        }
+    }
+
+    /**
+     * Sets the callback to be executed when a message is received.
+     *
+     * @param onRead the callback
+     * @return this object (for method chaining)
+     */
+    public @NotNull AbstractTcpMessageClient onRead(
+            final @NotNull Consumer<@NotNull String> onRead
+    ) {
+        this.onRead = onRead;
+        return this;
+    }
+
+    /**
+     * Gets the host to which the client is connected.
+     *
+     * @return the host
+     */
+    public @NotNull String getHost() {
+        return socket.getInetAddress().getHostAddress();
+    }
+
+    /**
+     * Gets the port on which the client is connected.
+     *
+     * @return the port
+     */
+    public int getPort() {
+        return socket.getPort();
+    }
+
+    @Override
+    public void run() {
+        String line;
+        while ((line = read()) != null) {
+            logger.debug(formatLog("Received message: {}"), line);
+            onRead.accept(line);
+        }
+        closed = true;
+    }
+
+    @Override
+    public void close() {
+        try {
+            output.close();
+        } catch (IOException e) {
+            // do nothing
+        }
+        try {
+            input.close();
+        } catch (IOException e) {
+            // do nothing
+        }
+        try {
+            socket.close();
+        } catch (IOException e) {
+            // do nothing
+        }
+        logger.info(formatLog("Connection closed"));
+    }
+
+}
