@@ -133,9 +133,10 @@ final class TcpMessageClientHandler implements Runnable, Closeable {
 
     private @NotNull String formatLog(final @NotNull String message) {
         return String.format(
-                "|TCP Client (%s:%s)|: %s",
+                "|TCP Client (%s:%s) [%s]|: %s",
                 getHost(),
                 getPort(),
+                channelName,
                 message
         );
     }
