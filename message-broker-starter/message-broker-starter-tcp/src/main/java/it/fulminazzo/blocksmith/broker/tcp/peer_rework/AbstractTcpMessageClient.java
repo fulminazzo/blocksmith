@@ -20,7 +20,7 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClient<C>>
         extends Loggable
-        implements TcpConnection, Runnable {
+        implements TcpConnection, Runnable, ChannelSubscriber<C> {
     private final @NotNull Set<String> channels = new HashSet<>();
 
     @Getter
@@ -61,30 +61,6 @@ public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClien
     protected abstract void handleMessage(final @NotNull String message);
 
     /**
-     * Subscribes this client to a new channel.
-     *
-     * @param channel the channel name
-     * @return this object (for method chaining)
-     */
-    public @NotNull C subscribe(final @NotNull String channel) {
-        channels.add(channel);
-        logger.info(formatLog("Subscribed to channel: {}"), channel);
-        return (C) this;
-    }
-
-    /**
-     * Unsubscribes this client from a channel.
-     *
-     * @param channel the channel name
-     * @return this object (for method chaining)
-     */
-    public @NotNull C unsubscribe(final @NotNull String channel) {
-        channels.remove(channel);
-        logger.info(formatLog("Unsubscribed from channel: {}"), channel);
-        return (C) this;
-    }
-
-    /**
      * Sends a message to the peer.
      * <br>
      * The message is <b>not</b> guaranteed to be delivered
@@ -100,16 +76,6 @@ public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClien
         } catch (IOException e) {
             // do nothing
         }
-    }
-
-    /**
-     * Checks if this client is subscribed to a channel.
-     *
-     * @param channel the channel name
-     * @return {@code true} if the client is subscribed, {@code false} otherwise
-     */
-    public boolean isSubscribed(final @NotNull String channel) {
-        return channels.contains(channel);
     }
 
     @Override
@@ -147,6 +113,25 @@ public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClien
             logger.info(formatLog("Connection closed"));
             closed = true;
         }
+    }
+
+    @Override
+    public @NotNull C subscribe(final @NotNull String channel) {
+        channels.add(channel);
+        logger.info(formatLog("Subscribed to channel: {}"), channel);
+        return (C) this;
+    }
+
+    @Override
+    public @NotNull C unsubscribe(final @NotNull String channel) {
+        channels.remove(channel);
+        logger.info(formatLog("Unsubscribed from channel: {}"), channel);
+        return (C) this;
+    }
+
+    @Override
+    public boolean isSubscribed(final @NotNull String channel) {
+        return channels.contains(channel);
     }
 
     @Override
