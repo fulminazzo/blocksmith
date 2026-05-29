@@ -19,11 +19,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * The message protocol is very basic as the main concern for this module is testing purposes.
  * In production environments a more sophisticated module should be used.
  *
- * @see TcpMessageClientHandler
+ * @see TcpMessageServerClient
  */
 @RequiredArgsConstructor
 public final class TcpMessageServer implements Runnable, Closeable {
-    private final @NotNull Map<String, List<TcpMessageClientHandler>> handlers = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, List<TcpMessageServerClient>> clients = new ConcurrentHashMap<>();
 
     private final @NotNull Logger logger;
     private final @NotNull Mapper mapper;
@@ -38,19 +38,19 @@ public final class TcpMessageServer implements Runnable, Closeable {
      * @param message the message to send (without the leading {@code \n})
      */
     void broadcast(final @NotNull String channel, final @NotNull String message) {
-        handlers.computeIfPresent(channel, (c, l) -> {
-            l.removeIf(TcpMessageClientHandler::isClosed);
-            l.forEach(h -> h.write(message + "\n"));
+        clients.computeIfPresent(channel, (c, l) -> {
+            l.removeIf(TcpMessageServerClient::isClosed);
+            l.forEach(t -> t.write(message + "\n"));
             return l;
         });
     }
 
     private @NotNull String formatLog(final @NotNull String message) {
-        return String.format("|TCP Server (%s)|: %s", port, message);
+        return String.format("|%s (%s)|: %s", getClass().getSimpleName(), port, message);
     }
 
-    private void registerHandler(final @NotNull String channel, final @NotNull TcpMessageClientHandler handler) {
-        handlers.computeIfAbsent(channel, c -> new ArrayList<>()).add(handler);
+    private void registerHandler(final @NotNull String channel, final @NotNull TcpMessageServerClient handler) {
+        clients.computeIfAbsent(channel, c -> new ArrayList<>()).add(handler);
         handler.write("OK\n");
     }
 
@@ -73,7 +73,7 @@ public final class TcpMessageServer implements Runnable, Closeable {
                         socket.getInetAddress().getHostAddress(),
                         socket.getPort()
                 );
-                new TcpMessageClientHandler(logger, mapper, socket)
+                new TcpMessageServerClient(logger, mapper, socket)
                         .onRead(this::broadcast)
                         .start(this::registerHandler);
             } catch (IOException e) {

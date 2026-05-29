@@ -61,7 +61,7 @@ class TcpMessageServerIntegrationTest extends Specification {
         first.received(message)
 
         and:
-        def handlers = server.handlers[CHANNEL_NAME]
+        def handlers = server.clients[CHANNEL_NAME]
         handlers != null
         handlers.size() == 1
 

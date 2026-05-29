@@ -18,27 +18,27 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * Handles a single client connection.
+ * Handles a single TCP client connection to the server.
  *
  * @see TcpMessageServer
  */
-final class TcpMessageClientHandler extends AbstractTcpMessageClient {
+final class TcpMessageServerClient extends AbstractTcpMessageClient {
     private final @NotNull ExecutorService executor = Executors.newSingleThreadExecutor(
-            ThreadUtils.ownedThreadFactory(TcpMessageClientHandler.class, true, "")
+            ThreadUtils.ownedThreadFactory(TcpMessageServerClient.class, true, "")
     );
     private final @NotNull Mapper mapper;
 
     private @Nullable String channelName;
 
     /**
-     * Instantiates a new TCP Message client handler.
+     * Instantiates a new TCP Message server client.
      *
      * @param logger the logger to display messages
      * @param mapper the mapper to deserialize the messages
      * @param socket the actual socket connection to the client
      * @throws IOException in case it is not possible to retrieve the data streams
      */
-    public TcpMessageClientHandler(
+    public TcpMessageServerClient(
             final @NotNull Logger logger,
             final @NotNull Mapper mapper,
             final @NotNull Socket socket
@@ -55,7 +55,7 @@ final class TcpMessageClientHandler extends AbstractTcpMessageClient {
      * @param channelNameConsumer the consumer to be notified when the channel name is received
      */
     public void start(
-            final @NotNull BiConsumer<@NotNull String, @NotNull TcpMessageClientHandler> channelNameConsumer
+            final @NotNull BiConsumer<@NotNull String, @NotNull TcpMessageServerClient> channelNameConsumer
     ) {
         CompletableFuture.runAsync(() -> {
             String raw = read();
@@ -84,24 +84,17 @@ final class TcpMessageClientHandler extends AbstractTcpMessageClient {
      * @param onRead the callback
      * @return this object (for method chaining)
      */
-    public @NotNull TcpMessageClientHandler onRead(
+    public @NotNull TcpMessageServerClient onRead(
             final @NotNull BiConsumer<@NotNull String, @NotNull String> onRead
     ) {
         return onRead(m -> onRead.accept(getChannelName(), m));
     }
 
-    private @NotNull String getChannelName() {
-        return Objects.requireNonNull(
-                channelName,
-                "channel name has not been determined yet or was not provided"
-        );
-    }
-
     @Override
-    public @NotNull TcpMessageClientHandler onRead(
+    public @NotNull TcpMessageServerClient onRead(
             final @NotNull Consumer<@NotNull String> onRead
     ) {
-        return (TcpMessageClientHandler) super.onRead(onRead);
+        return (TcpMessageServerClient) super.onRead(onRead);
     }
 
     @Override
@@ -111,13 +104,10 @@ final class TcpMessageClientHandler extends AbstractTcpMessageClient {
     }
 
     @Override
-    protected @NotNull String formatLog(final @NotNull String message) {
-        return String.format(
-                "|TCP Client (%s:%s) [%s]|: %s",
-                getHost(),
-                getPort(),
+    public @NotNull String getChannelName() {
+        return Objects.requireNonNull(
                 channelName,
-                message
+                "channel name has not been determined yet or was not provided"
         );
     }
 

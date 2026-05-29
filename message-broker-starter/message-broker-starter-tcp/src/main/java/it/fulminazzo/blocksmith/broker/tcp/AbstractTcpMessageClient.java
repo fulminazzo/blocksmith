@@ -43,12 +43,11 @@ public abstract class AbstractTcpMessageClient implements Runnable, Closeable {
     }
 
     /**
-     * Formats the message to the log format.
+     * Gets the channel name.
      *
-     * @param message the message
-     * @return the formatted message
+     * @return the channel name
      */
-    protected abstract @NotNull String formatLog(final @NotNull String message);
+    public abstract @NotNull String getChannelName();
 
     /**
      * Reads a single line from the input stream.
@@ -107,6 +106,23 @@ public abstract class AbstractTcpMessageClient implements Runnable, Closeable {
      */
     public int getPort() {
         return socket.getPort();
+    }
+
+    /**
+     * Formats the message to the log format.
+     *
+     * @param message the message
+     * @return the formatted message
+     */
+    protected @NotNull String formatLog(final @NotNull String message) {
+        return String.format(
+                "|%s (%s:%s) [%s]|: %s",
+                getClass().getSimpleName(),
+                getHost(),
+                getPort(),
+                getChannelName(),
+                message
+        );
     }
 
     @Override
