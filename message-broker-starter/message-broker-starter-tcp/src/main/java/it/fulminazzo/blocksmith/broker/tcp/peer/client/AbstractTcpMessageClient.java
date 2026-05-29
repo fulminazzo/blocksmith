@@ -97,7 +97,7 @@ public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClien
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         try {
             output.close();
         } catch (IOException e) {
