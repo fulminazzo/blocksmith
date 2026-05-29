@@ -71,6 +71,7 @@ public abstract class AbstractTcpMessageClient implements Runnable, Closeable {
     public void write(final @NotNull String message) {
         try {
             output.write(message);
+            output.newLine();
             output.flush();
         } catch (IOException e) {
             // do nothing

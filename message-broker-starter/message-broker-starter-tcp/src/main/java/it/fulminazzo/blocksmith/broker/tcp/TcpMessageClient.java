@@ -49,7 +49,7 @@ final class TcpMessageClient extends AbstractTcpMessageClient {
      * If the response is valid, the client will start reading messages.
      */
     public void start() {
-        write(mapper.serialize(new ChannelDto(channelName)) + "\n");
+        write(mapper.serialize(new ChannelDto(channelName)));
         String response = read();
         logger.debug(formatLog("Received server response to connection request: {}"), response);
         if (response != null && response.equals("OK")) {

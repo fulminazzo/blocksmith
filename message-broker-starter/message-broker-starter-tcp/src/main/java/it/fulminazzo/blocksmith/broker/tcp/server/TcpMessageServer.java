@@ -40,7 +40,7 @@ public final class TcpMessageServer implements Runnable, Closeable {
     void broadcast(final @NotNull String channel, final @NotNull String message) {
         clients.computeIfPresent(channel, (c, l) -> {
             l.removeIf(TcpMessageServerClient::isClosed);
-            l.forEach(t -> t.write(message + "\n"));
+            l.forEach(t -> t.write(message));
             return l;
         });
     }
@@ -51,7 +51,7 @@ public final class TcpMessageServer implements Runnable, Closeable {
 
     private void registerHandler(final @NotNull String channel, final @NotNull TcpMessageServerClient handler) {
         clients.computeIfAbsent(channel, c -> new ArrayList<>()).add(handler);
-        handler.write("OK\n");
+        handler.write("OK");
     }
 
     @Override
