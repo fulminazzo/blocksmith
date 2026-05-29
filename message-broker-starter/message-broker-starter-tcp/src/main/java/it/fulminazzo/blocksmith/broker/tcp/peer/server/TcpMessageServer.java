@@ -94,7 +94,7 @@ public final class TcpMessageServer extends Loggable implements TcpConnection, R
     @Override
     public void close() {
         try {
-            getClients().forEach(TcpMessageServerClient::close);
+            clients.forEach(TcpMessageServerClient::close);
             if (!isClosed()) {
                 serverSocket.close();
                 logger.info(formatLog("TCP server stopped"));
