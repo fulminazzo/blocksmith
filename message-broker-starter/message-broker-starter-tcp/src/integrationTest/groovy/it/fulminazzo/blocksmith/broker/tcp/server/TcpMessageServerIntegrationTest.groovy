@@ -15,11 +15,11 @@ class TcpMessageServerIntegrationTest extends Specification {
     private static final int PORT = 29005
     private static final String CHANNEL_NAME = 'main'
 
-    @Shared
-    private final Mapper mapper = MapperFormat.JSON.newMapper()
+    private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
+    private static final String SERIALIZED_CHANNEL = MAPPER.serialize(new ChannelDto(CHANNEL_NAME))
 
     @Shared
-    private final TcpMessageServer server = new TcpMessageServer(log, mapper, PORT)
+    private final TcpMessageServer server = new TcpMessageServer(log, MAPPER, PORT)
 
     void setupSpec() {
         Thread.startDaemon { server.run() }
@@ -39,14 +39,14 @@ class TcpMessageServerIntegrationTest extends Specification {
 
         when:
         first.start()
-        first.write(mapper.serialize(new ChannelDto(CHANNEL_NAME)))
+        first.write(SERIALIZED_CHANNEL)
 
         then:
         first.received('OK')
 
         when:
         second.start()
-        second.write(mapper.serialize(new ChannelDto(CHANNEL_NAME)))
+        second.write(SERIALIZED_CHANNEL)
 
         then:
         second.received('OK')
@@ -82,7 +82,7 @@ class TcpMessageServerIntegrationTest extends Specification {
         first.start()
 
         and: 'sends channel name'
-        first.write(mapper.serialize(new ChannelDto(CHANNEL_NAME)))
+        first.write(SERIALIZED_CHANNEL)
 
         then: 'it should have received feedback from server'
         first.received('OK')
@@ -91,7 +91,7 @@ class TcpMessageServerIntegrationTest extends Specification {
         second.start()
 
         and: 'sends channel name'
-        second.write(mapper.serialize(new ChannelDto(CHANNEL_NAME)))
+        second.write(SERIALIZED_CHANNEL)
 
         then: 'it should have received feedback from server'
         second.received('OK')
@@ -126,7 +126,7 @@ class TcpMessageServerIntegrationTest extends Specification {
         client.start()
 
         and: 'sends channel name'
-        client.write(mapper.serialize(new ChannelDto(CHANNEL_NAME)))
+        client.write(SERIALIZED_CHANNEL)
 
         then: 'it should have received feedback from server'
         client.received('OK')
