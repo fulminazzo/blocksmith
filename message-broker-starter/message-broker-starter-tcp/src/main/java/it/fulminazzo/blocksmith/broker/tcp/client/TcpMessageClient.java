@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.function.Consumer;
 
 /**
  * TCP client to connect to {@link TcpMessageServer}.
@@ -55,6 +56,11 @@ public final class TcpMessageClient extends AbstractTcpMessageClient {
             run();
         } else logger.warn(formatLog("Server did not respond to connection request"));
         close();
+    }
+
+    @Override
+    public @NotNull TcpMessageClient onRead(final @NotNull Consumer<@NotNull String> onRead) {
+        return (TcpMessageClient) super.onRead(onRead);
     }
 
 }
