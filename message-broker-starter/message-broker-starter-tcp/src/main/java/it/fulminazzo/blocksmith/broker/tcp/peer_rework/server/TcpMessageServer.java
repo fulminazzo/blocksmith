@@ -52,6 +52,17 @@ public class TcpMessageServer extends Loggable implements TcpConnection, Runnabl
     }
 
     /**
+     * Sends the given payload to all connected clients.
+     *
+     * @param payload the payload to send
+     */
+    public void broadcast(final @NotNull String payload) {
+        List<TcpMessageServerClient> clients = getClients();
+        logger.debug(formatLog("Broadcasting to {} clients, message: {}"), clients.size(), payload);
+        clients.forEach(c -> ServerCommand.MESSAGE.execute(c, payload));
+    }
+
+    /**
      * Returns the current list of connected clients.
      *
      * @return the connected clients
@@ -72,7 +83,7 @@ public class TcpMessageServer extends Loggable implements TcpConnection, Runnabl
                         socket.getInetAddress().getHostAddress(),
                         socket.getPort()
                 );
-                TcpMessageServerClient client = new TcpMessageServerClient(logger, mapper, socket);
+                TcpMessageServerClient client = new TcpMessageServerClient(this, logger, mapper, socket);
                 clients.add(client);
                 executor.submit(client);
             } catch (IOException e) {

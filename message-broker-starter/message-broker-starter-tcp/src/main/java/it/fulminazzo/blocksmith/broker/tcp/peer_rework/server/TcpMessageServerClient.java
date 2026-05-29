@@ -16,21 +16,25 @@ import java.util.Locale;
  * @see TcpMessageServer
  */
 final class TcpMessageServerClient extends AbstractTcpMessageClient<TcpMessageServerClient> {
+    private final @NotNull TcpMessageServer server;
 
     /**
      * Instantiates a new TCP Message server client.
      *
+     * @param server the server that manages this client
      * @param logger the logger used to display messages
      * @param mapper the mapper used to serialize the messages. Must be the same on the client
      * @param socket the socket connection
      * @throws IOException in case it is not possible to retrieve the data streams
      */
     public TcpMessageServerClient(
+            final @NotNull TcpMessageServer server,
             final @NotNull Logger logger,
             final @NotNull Mapper mapper,
             final @NotNull Socket socket
     ) throws IOException {
         super(logger, mapper, socket);
+        this.server = server;
     }
 
     @Override
@@ -45,7 +49,9 @@ final class TcpMessageServerClient extends AbstractTcpMessageClient<TcpMessageSe
             } catch (IllegalArgumentException e) {
                 send(ServerResponse.UNKNOWN_COMMAND);
             }
-            if (serverCommand != null) serverCommand.execute(this, payload);
+            if (serverCommand != null)
+                if (serverCommand == ServerCommand.MESSAGE) server.broadcast(payload);
+                else serverCommand.execute(this, payload);
         } else send(ServerResponse.INVALID_REQUEST);
     }
 
