@@ -25,7 +25,7 @@ class TcpMessageClientTest extends Specification {
         def serverThread = Thread.start { server.run() }
 
         when:
-        def client = new TcpMessageClient(log, MAPPER, '0.0.0.0', PORT, CHANNEL_NAME)
+        def client = new TcpMessageClient(log, MAPPER, PORT, CHANNEL_NAME)
         def clientThread = Thread.startDaemon { client.start() }
 
         then:
@@ -50,7 +50,7 @@ class TcpMessageClientTest extends Specification {
         def serverThread = Thread.startDaemon { server.run() }
 
         when:
-        def client = new TcpMessageClient(log, MAPPER, '0.0.0.0', PORT, CHANNEL_NAME)
+        def client = new TcpMessageClient(log, MAPPER, PORT, CHANNEL_NAME)
         def clientThread = Thread.startDaemon { client.start() }
 
         and:

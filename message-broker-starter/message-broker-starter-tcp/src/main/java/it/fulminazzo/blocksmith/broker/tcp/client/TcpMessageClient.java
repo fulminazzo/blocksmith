@@ -17,7 +17,7 @@ import java.net.Socket;
  *
  * @see TcpMessageServer
  */
-final class TcpMessageClient extends AbstractTcpMessageClient {
+public final class TcpMessageClient extends AbstractTcpMessageClient {
     @Getter
     private final @NotNull String channelName;
     private final @NotNull Mapper mapper;
@@ -27,7 +27,6 @@ final class TcpMessageClient extends AbstractTcpMessageClient {
      *
      * @param logger      the logger to display messages
      * @param mapper      the mapper to deserialize the messages
-     * @param host        the host to connect to
      * @param port        the port to connect on
      * @param channelName the channel name
      * @throws IOException in case it is not possible to retrieve the data streams
@@ -35,11 +34,10 @@ final class TcpMessageClient extends AbstractTcpMessageClient {
     public TcpMessageClient(
             final @NotNull Logger logger,
             final @NotNull Mapper mapper,
-            final @NotNull String host,
             final int port,
             final @NotNull String channelName
     ) throws IOException {
-        super(logger, new Socket(host, port));
+        super(logger, new Socket("localhost", port));
         this.mapper = mapper;
         this.channelName = channelName;
     }
