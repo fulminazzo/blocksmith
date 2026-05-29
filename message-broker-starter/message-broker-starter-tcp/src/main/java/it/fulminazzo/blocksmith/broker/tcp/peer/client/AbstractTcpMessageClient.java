@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.broker.tcp.client;
+package it.fulminazzo.blocksmith.broker.tcp.peer.client;
 
 import it.fulminazzo.blocksmith.broker.tcp.peer.PeerConnection;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;

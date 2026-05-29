@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.broker.tcp.server;
+package it.fulminazzo.blocksmith.broker.tcp.peer.server;
 
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import lombok.RequiredArgsConstructor;

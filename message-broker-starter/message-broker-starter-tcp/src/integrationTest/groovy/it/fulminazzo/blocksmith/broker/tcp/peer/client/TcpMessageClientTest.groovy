@@ -1,7 +1,8 @@
-package it.fulminazzo.blocksmith.broker.tcp.client
+package it.fulminazzo.blocksmith.broker.tcp.peer.client
 
 import groovy.util.logging.Slf4j
-import it.fulminazzo.blocksmith.broker.tcp.server.ChannelDto
+import it.fulminazzo.blocksmith.broker.tcp.peer.client.TcpMessageClient
+import it.fulminazzo.blocksmith.broker.tcp.peer.server.ChannelDto
 import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import spock.lang.Specification

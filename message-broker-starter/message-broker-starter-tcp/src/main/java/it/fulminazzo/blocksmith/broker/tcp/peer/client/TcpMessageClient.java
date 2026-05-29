@@ -1,7 +1,7 @@
-package it.fulminazzo.blocksmith.broker.tcp.client;
+package it.fulminazzo.blocksmith.broker.tcp.peer.client;
 
-import it.fulminazzo.blocksmith.broker.tcp.server.ChannelDto;
-import it.fulminazzo.blocksmith.broker.tcp.server.TcpMessageServer;
+import it.fulminazzo.blocksmith.broker.tcp.peer.server.ChannelDto;
+import it.fulminazzo.blocksmith.broker.tcp.peer.server.TcpMessageServer;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

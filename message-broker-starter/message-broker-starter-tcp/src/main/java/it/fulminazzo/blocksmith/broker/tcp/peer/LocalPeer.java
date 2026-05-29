@@ -1,7 +1,7 @@
 package it.fulminazzo.blocksmith.broker.tcp.peer;
 
-import it.fulminazzo.blocksmith.broker.tcp.client.TcpMessageClient;
-import it.fulminazzo.blocksmith.broker.tcp.server.TcpMessageServer;
+import it.fulminazzo.blocksmith.broker.tcp.peer.client.TcpMessageClient;
+import it.fulminazzo.blocksmith.broker.tcp.peer.server.TcpMessageServer;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.util.ThreadUtils;
 import lombok.Getter;
