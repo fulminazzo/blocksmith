@@ -98,6 +98,10 @@ abstract class MessageChannelIntegrationTest extends Specification {
         when:
         send(message, UUID.randomUUID())
 
+        and:
+        // adding sleep to ensure any MESSAGE2 response is handled and does not interfere with other tests
+        sleep(SLEEP_TIME)
+
         then:
         received.get() == null
 
