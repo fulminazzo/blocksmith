@@ -23,8 +23,7 @@ public enum ServerCommand {
      * Syntax: {@code SUBSCRIBE <channel>}
      */
     SUBSCRIBE((client, args) -> {
-        if (!args.isEmpty()) client.subscribe(args.get(0)).send(ServerResponse.SUCCESS);
-        else client.send(ServerResponse.NOT_ENOUGH_ARGUMENTS);
+        client.subscribe(args.get(0)).send(ServerResponse.SUCCESS);
     }) {
         @Override
         public @NotNull String formatCommand(final @NotNull Object... arguments) {
@@ -37,8 +36,7 @@ public enum ServerCommand {
      * Syntax: {@code UNSUBSCRIBE <channel>}
      */
     UNSUBSCRIBE((client, args) -> {
-        if (!args.isEmpty()) client.unsubscribe(args.get(0)).send(ServerResponse.SUCCESS);
-        else client.send(ServerResponse.NOT_ENOUGH_ARGUMENTS);
+        client.unsubscribe(args.get(0)).send(ServerResponse.SUCCESS);
     }) {
         @Override
         public @NotNull String formatCommand(final @NotNull Object... arguments) {
@@ -51,14 +49,12 @@ public enum ServerCommand {
      * Syntax: {@code MESSAGE <channel> <message...>}
      */
     MESSAGE((client, args) -> {
-        if (args.size() > 1) {
-            String channel = args.get(0);
-            if (client.isSubscribed(channel)) {
-                String message = String.join(" ", args.subList(1, args.size()));
-                Mapper mapper = client.getMapper();
-                client.send(mapper.serialize(new MessageDto(channel, message)));
-            }
-        } else client.send(ServerResponse.NOT_ENOUGH_ARGUMENTS);
+        String channel = args.get(0);
+        if (client.isSubscribed(channel)) {
+            String message = String.join(" ", args.subList(1, args.size()));
+            Mapper mapper = client.getMapper();
+            client.send(mapper.serialize(new MessageDto(channel, message)));
+        }
     }) {
         @Override
         public @NotNull String formatCommand(final Object @NotNull ... arguments) {

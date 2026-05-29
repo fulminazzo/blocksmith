@@ -20,9 +20,4 @@ public final class ServerResponse {
      */
     public static final @NotNull String UNKNOWN_COMMAND = "UNKNOWN_COMMAND";
 
-    /**
-     * Message sent when the client did not specify enough arguments.
-     */
-    public static final @NotNull String NOT_ENOUGH_ARGUMENTS = "MISSING_ARGUMENTS";
-
 }
