@@ -34,8 +34,8 @@ class TcpMessageServerIntegrationTest extends Specification {
         final def message = 'Hello, world'
 
         and:
-        def first = new TcpMessageClient(PORT)
-        def second = new TcpMessageClient(PORT)
+        def first = new MockTcpMessageClient(PORT)
+        def second = new MockTcpMessageClient(PORT)
 
         when:
         first.start()
@@ -75,8 +75,8 @@ class TcpMessageServerIntegrationTest extends Specification {
         final def message = 'Hello, world'
 
         and:
-        def first = new TcpMessageClient(PORT)
-        def second = new TcpMessageClient(PORT)
+        def first = new MockTcpMessageClient(PORT)
+        def second = new MockTcpMessageClient(PORT)
 
         when: 'first client connects'
         first.start()
@@ -120,7 +120,7 @@ class TcpMessageServerIntegrationTest extends Specification {
         final def message = 'Hello, world'
 
         and:
-        def client = new TcpMessageClient(PORT)
+        def client = new MockTcpMessageClient(PORT)
 
         when: 'client connects'
         client.start()
@@ -143,7 +143,7 @@ class TcpMessageServerIntegrationTest extends Specification {
 
     def 'test that server responds with error if channel name has not been specified correctly'() {
         given:
-        def client = new TcpMessageClient(PORT)
+        def client = new MockTcpMessageClient(PORT)
 
         when:
         client.start()
@@ -155,14 +155,14 @@ class TcpMessageServerIntegrationTest extends Specification {
         client.received('Invalid connection. Please provide a channel name before sending any message.')
     }
 
-    static final class TcpMessageClient implements Runnable, Closeable {
+    static final class MockTcpMessageClient implements Runnable, Closeable {
         private final List<String> received = new CopyOnWriteArrayList<>()
 
         private final Socket socket
         private final BufferedReader input
         private final Writer output
 
-        TcpMessageClient(final int port) {
+        MockTcpMessageClient(final int port) {
             socket = new Socket('0.0.0.0', port)
             input = socket.inputStream.newReader()
             output = socket.outputStream.newWriter()
