@@ -1,15 +1,16 @@
 package it.fulminazzo.blocksmith.broker.tcp.peer.client;
 
-import it.fulminazzo.blocksmith.broker.tcp.peer.server.ChannelDto;
+import it.fulminazzo.blocksmith.broker.tcp.peer.MessageDto;
+import it.fulminazzo.blocksmith.broker.tcp.peer.server.ServerCommand;
+import it.fulminazzo.blocksmith.broker.tcp.peer.server.ServerResponse;
 import it.fulminazzo.blocksmith.broker.tcp.peer.server.TcpMessageServer;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
-import lombok.Getter;
+import it.fulminazzo.blocksmith.data.mapper.MapperException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.function.Consumer;
 
 /**
  * TCP client to connect to {@link TcpMessageServer}.
@@ -18,47 +19,55 @@ import java.util.function.Consumer;
  *
  * @see TcpMessageServer
  */
-public final class TcpMessageClient extends AbstractTcpMessageClient {
-    @Getter
-    private final @NotNull String channelName;
+public abstract class TcpMessageClient extends AbstractTcpMessageClient<TcpMessageClient> {
 
     /**
      * Instantiates a new TCP Message client.
      *
-     * @param logger      the logger to display messages
-     * @param mapper      the mapper to deserialize the messages
-     * @param port        the port to connect on
-     * @param channelName the channel name
+     * @param logger the logger used to display messages
+     * @param mapper the mapper used to serialize the messages. Must be the same on the server
+     * @param port   the port to connect on
      * @throws IOException in case it is not possible to retrieve the data streams
      */
     public TcpMessageClient(
             final @NotNull Logger logger,
             final @NotNull Mapper mapper,
-            final int port,
-            final @NotNull String channelName
+            final int port
     ) throws IOException {
         super(logger, mapper, new Socket("localhost", port));
-        this.channelName = channelName;
     }
 
     /**
-     * Sends the channel name and awaits a server response.
-     * If the response is valid, the client will start reading messages.
+     * Handles the message received from the server.
+     *
+     * @param channel the channel the message was published to
+     * @param message the actual message
      */
-    public void start() {
-        write(mapper.serialize(new ChannelDto(channelName)));
-        String response = read();
-        logger.debug(formatLog("Received server response to connection request: {}"), response);
-        if (response != null && response.equals("OK")) {
-            logger.info(formatLog("Connected to channel '{}'"), channelName);
-            run();
-        } else logger.warn(formatLog("Server did not respond to connection request"));
-        close();
+    public abstract void handleMessage(final @NotNull String channel, final @NotNull String message);
+
+    @Override
+    public @NotNull TcpMessageClient subscribe(final @NotNull String channel) {
+        send(ServerCommand.SUBSCRIBE.formatCommand(channel));
+        return super.subscribe(channel);
     }
 
     @Override
-    public @NotNull TcpMessageClient onRead(final @NotNull Consumer<@NotNull String> onRead) {
-        return (TcpMessageClient) super.onRead(onRead);
+    public @NotNull TcpMessageClient unsubscribe(final @NotNull String channel) {
+        send(ServerCommand.UNSUBSCRIBE.formatCommand(channel));
+        return super.unsubscribe(channel);
+    }
+
+    @Override
+    protected void handleMessage(final @NotNull String message) {
+        if (message.equals(ServerResponse.SUCCESS)) return;
+        final MessageDto messageDto;
+        try {
+            messageDto = getMapper().deserialize(message, MessageDto.class);
+        } catch (MapperException e) {
+            logger.warn(formatLog("Received error response: {}"), message);
+            return;
+        }
+        handleMessage(messageDto.getChannel(), messageDto.getMessage());
     }
 
 }

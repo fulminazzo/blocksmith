@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.broker.tcp.peer_rework;
+package it.fulminazzo.blocksmith.broker.tcp.peer;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

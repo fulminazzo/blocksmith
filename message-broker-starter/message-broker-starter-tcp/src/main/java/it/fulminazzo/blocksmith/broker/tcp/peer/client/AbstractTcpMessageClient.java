@@ -1,46 +1,55 @@
 package it.fulminazzo.blocksmith.broker.tcp.peer.client;
 
-import it.fulminazzo.blocksmith.broker.tcp.peer.PeerConnection;
+import it.fulminazzo.blocksmith.broker.tcp.peer.ChannelSubscriber;
+import it.fulminazzo.blocksmith.broker.tcp.peer.Loggable;
+import it.fulminazzo.blocksmith.broker.tcp.peer.TcpConnection;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.function.Consumer;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Abstraction of a TCP message client with common logic.
+ *
+ * @param <C> the type of the client (for method chaining)
+ * @see TcpConnection
+ * @see Loggable
  */
-public abstract class AbstractTcpMessageClient implements PeerConnection, Runnable, Closeable {
-    protected final @NotNull Logger logger;
-    protected final @NotNull Mapper mapper;
+@SuppressWarnings("unchecked")
+public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClient<C>>
+        extends Loggable
+        implements TcpConnection, Runnable, ChannelSubscriber<C> {
+    private final @NotNull Set<String> channels = new HashSet<>();
+
+    @Getter
+    private final @NotNull Mapper mapper;
 
     private final @NotNull Socket socket;
     private final @NotNull BufferedReader input;
     private final @NotNull BufferedWriter output;
 
-    private @NotNull Consumer<@NotNull String> onRead = (m) -> {
-    };
-
     @Getter
     private boolean closed;
 
     /**
-     * Instantiates a new TCP Message client.
+     * Instantiates a new Abstract TCP Message client.
      *
-     * @param logger the logger to display messages
-     * @param mapper the mapper to serialize the messages
-     * @param socket the actual socket connection to the client
+     * @param logger the logger used to display messages
+     * @param mapper the mapper used to serialize the messages
+     * @param socket the socket connection
      * @throws IOException in case it is not possible to retrieve the data streams
      */
     public AbstractTcpMessageClient(
-            final @NotNull Logger logger, @NotNull Mapper mapper,
+            final @NotNull Logger logger,
+            final @NotNull Mapper mapper,
             final @NotNull Socket socket
     ) throws IOException {
-        this.logger = logger;
+        super(logger);
         this.mapper = mapper;
         this.socket = socket;
         this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -48,62 +57,21 @@ public abstract class AbstractTcpMessageClient implements PeerConnection, Runnab
     }
 
     /**
-     * Gets the channel name.
+     * Handles the message received from the peer.
      *
-     * @return the channel name
+     * @param message the message received
      */
-    public abstract @NotNull String getChannelName();
+    protected abstract void handleMessage(final @NotNull String message);
 
     /**
-     * Reads a single line from the input stream.
+     * Sends a message to the peer.
+     * <br>
+     * The message is <b>not</b> guaranteed to be delivered
+     * (if the peer is offline at the time of writing).
      *
-     * @return the line (or {@code null} if the connection is closed)
+     * @param message the message to send
      */
-    public @Nullable String read() {
-        try {
-            return input.readLine();
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Gets the host to which the client is connected.
-     *
-     * @return the host
-     */
-    public @NotNull String getHost() {
-        return socket.getInetAddress().getHostAddress();
-    }
-
-    /**
-     * Gets the port on which the client is connected.
-     *
-     * @return the port
-     */
-    public int getPort() {
-        return socket.getPort();
-    }
-
-    /**
-     * Formats the message to the log format.
-     *
-     * @param message the message
-     * @return the formatted message
-     */
-    protected @NotNull String formatLog(final @NotNull String message) {
-        return String.format(
-                "|%s (%s:%s) [%s]|: %s",
-                getClass().getSimpleName(),
-                getHost(),
-                getPort(),
-                getChannelName(),
-                message
-        );
-    }
-
-    @Override
-    public void write(final @NotNull String message) {
+    public void send(final @NotNull String message) {
         try {
             output.write(message);
             output.newLine();
@@ -114,19 +82,16 @@ public abstract class AbstractTcpMessageClient implements PeerConnection, Runnab
     }
 
     @Override
-    public @NotNull AbstractTcpMessageClient onRead(
-            final @NotNull Consumer<@NotNull String> onRead
-    ) {
-        this.onRead = onRead;
-        return this;
-    }
-
-    @Override
     public void run() {
+        logger.info(formatLog("New connection established"));
         String line;
-        while ((line = read()) != null) {
-            logger.debug(formatLog("Received message: {}"), line);
-            onRead.accept(line);
+        try {
+            while ((line = input.readLine()) != null) {
+                logger.debug(formatLog("Received message: {}"), line);
+                handleMessage(line);
+            }
+        } catch (IOException e) {
+            // connection dropped or client closed, ignore the error
         }
         close();
     }
@@ -152,6 +117,46 @@ public abstract class AbstractTcpMessageClient implements PeerConnection, Runnab
             logger.info(formatLog("Connection closed"));
             closed = true;
         }
+    }
+
+    @Override
+    public @NotNull C subscribe(final @NotNull String channel) {
+        channels.add(channel);
+        logger.info(formatLog("Subscribed to channel: {}"), channel);
+        return (C) this;
+    }
+
+    @Override
+    public @NotNull C unsubscribe(final @NotNull String channel) {
+        channels.remove(channel);
+        logger.info(formatLog("Unsubscribed from channel: {}"), channel);
+        return (C) this;
+    }
+
+    @Override
+    public boolean isSubscribed(final @NotNull String channel) {
+        return channels.contains(channel);
+    }
+
+    @Override
+    public @NotNull String getHost() {
+        return socket.getInetAddress().getHostAddress();
+    }
+
+    @Override
+    public int getPort() {
+        return socket.getPort();
+    }
+
+    @Override
+    protected @NotNull String formatLog(final @NotNull String message) {
+        return String.format(
+                "|%s (%s:%s)| %s",
+                getClass().getSimpleName(),
+                getHost(),
+                getPort(),
+                message
+        );
     }
 
 }

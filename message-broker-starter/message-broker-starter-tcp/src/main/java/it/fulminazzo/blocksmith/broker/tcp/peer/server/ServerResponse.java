@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.broker.tcp.peer_rework.server;
+package it.fulminazzo.blocksmith.broker.tcp.peer.server;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

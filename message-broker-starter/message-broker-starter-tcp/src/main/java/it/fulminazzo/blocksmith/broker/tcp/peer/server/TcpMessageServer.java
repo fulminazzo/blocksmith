@@ -1,106 +1,127 @@
 package it.fulminazzo.blocksmith.broker.tcp.peer.server;
 
+import it.fulminazzo.blocksmith.broker.tcp.peer.Loggable;
+import it.fulminazzo.blocksmith.broker.tcp.peer.TcpConnection;
+import it.fulminazzo.blocksmith.broker.tcp.peer.client.TcpMessageClient;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
 
 /**
  * TCP server to handle incoming messages.
  * The message protocol is very basic as the main concern for this module is testing purposes.
  * In production environments a more sophisticated module should be used.
  *
+ * @see TcpMessageClient
  * @see TcpMessageServerClient
  */
-@RequiredArgsConstructor
-public final class TcpMessageServer implements Runnable, Closeable {
-    private final @NotNull Map<String, List<TcpMessageServerClient>> clients = new ConcurrentHashMap<>();
+public class TcpMessageServer extends Loggable implements TcpConnection, Runnable {
+    private final @NotNull List<TcpMessageServerClient> clients = new CopyOnWriteArrayList<>();
 
-    private final @NotNull Logger logger;
+    private final @NotNull ServerSocket serverSocket;
+
     private final @NotNull Mapper mapper;
-    private final int port;
-
-    private @Nullable ServerSocket socket;
+    private final @NotNull ExecutorService executor;
 
     /**
-     * Checks if the server is closed.
+     * Instantiates a new Tcp message server.
      *
-     * @return {@code true} if it is
+     * @param logger   the logger used to display messages
+     * @param mapper   the mapper used to serialize the messages
+     * @param port     the port to listen to
+     * @param executor the executor to handle clients with
+     * @throws IOException in case the server cannot be started
      */
-    public boolean isClosed() {
-        return socket == null || socket.isClosed();
+    public TcpMessageServer(
+            final @NotNull Logger logger,
+            final @NotNull Mapper mapper,
+            final int port,
+            final @NotNull ExecutorService executor
+    ) throws IOException {
+        super(logger);
+        this.serverSocket = new ServerSocket(port);
+        this.mapper = mapper;
+        this.executor = executor;
     }
 
     /**
-     * Broadcasts a message to all the clients subscribed to the specified channel.
+     * Sends the given payload to all connected clients.
      *
-     * @param channel the channel to which the message should be sent
-     * @param message the message to send (without the leading {@code \n})
+     * @param payload the payload to send
      */
-    void broadcast(final @NotNull String channel, final @NotNull String message) {
-        clients.computeIfPresent(channel, (c, l) -> {
-            l.removeIf(TcpMessageServerClient::isClosed);
-            l.forEach(t -> t.write(message));
-            return l;
-        });
+    public void broadcast(final @NotNull String payload) {
+        List<TcpMessageServerClient> clients = getClients();
+        logger.debug(formatLog("Broadcasting to {} clients, message: {}"), clients.size(), payload);
+        clients.forEach(c -> ServerCommand.MESSAGE.execute(c, payload));
     }
 
-    private @NotNull String formatLog(final @NotNull String message) {
-        return String.format("|%s (%s)|: %s", getClass().getSimpleName(), port, message);
-    }
-
-    private void registerHandler(final @NotNull String channel, final @NotNull TcpMessageServerClient handler) {
-        clients.computeIfAbsent(channel, c -> new ArrayList<>()).add(handler);
-        handler.write("OK");
+    /**
+     * Returns the current list of connected clients.
+     *
+     * @return the connected clients
+     */
+    @NotNull List<TcpMessageServerClient> getClients() {
+        clients.removeIf(TcpMessageServerClient::isClosed);
+        return clients;
     }
 
     @Override
     public void run() {
-        try {
-            socket = new ServerSocket(port);
-            logger.info(formatLog("Server started on port {}"), port);
-        } catch (IOException e) {
-            /*
-             * Either the port is already in use or the system refused to bind it.
-             * Both cases are handled by the clients.
-             */
-        }
+        logger.info(formatLog("TCP server listening on port {}"), getPort());
         while (!isClosed())
             try {
-                Socket socket = this.socket.accept();
+                Socket socket = serverSocket.accept();
                 logger.debug(
                         formatLog("New client connected on {}:{}"),
                         socket.getInetAddress().getHostAddress(),
                         socket.getPort()
                 );
-                new TcpMessageServerClient(logger, mapper, socket)
-                        .onRead(this::broadcast)
-                        .start(this::registerHandler);
+                TcpMessageServerClient client = new TcpMessageServerClient(this, logger, mapper, socket);
+                clients.add(client);
+                executor.submit(client);
             } catch (IOException e) {
-                // client closed connection abruptly
+                // client connection closed abruptly
             }
     }
 
     @Override
     public void close() {
-        if (socket != null) {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                // do nothing
+        try {
+            getClients().forEach(TcpMessageServerClient::close);
+            if (!isClosed()) {
+                serverSocket.close();
+                logger.info(formatLog("TCP server stopped"));
             }
-            socket = null;
-            logger.info(formatLog("TCP server stopped"));
+        } catch (IOException e) {
+            // do nothing
         }
+    }
+
+    @Override
+    public @NotNull String getHost() {
+        return serverSocket.getInetAddress().getHostAddress();
+    }
+
+    @Override
+    public int getPort() {
+        return serverSocket.getLocalPort();
+    }
+
+    @Override
+    public boolean isClosed() {
+        return serverSocket.isClosed();
+    }
+
+    @Override
+    protected @NotNull String formatLog(@NotNull String message) {
+        return String.format("|%s (%s)| %s", getClass().getSimpleName(), getPort(), message);
     }
 
 }

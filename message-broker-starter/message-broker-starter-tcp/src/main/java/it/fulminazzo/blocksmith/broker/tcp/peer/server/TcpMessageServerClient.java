@@ -2,107 +2,57 @@ package it.fulminazzo.blocksmith.broker.tcp.peer.server;
 
 import it.fulminazzo.blocksmith.broker.tcp.peer.client.AbstractTcpMessageClient;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
-import it.fulminazzo.blocksmith.data.mapper.MapperException;
-import it.fulminazzo.blocksmith.util.ThreadUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.Locale;
 
 /**
  * Handles a single TCP client connection to the server.
  *
+ * @see AbstractTcpMessageClient
  * @see TcpMessageServer
  */
-final class TcpMessageServerClient extends AbstractTcpMessageClient {
-    private final @NotNull ExecutorService executor = Executors.newSingleThreadExecutor(
-            ThreadUtils.ownedThreadFactory(TcpMessageServerClient.class, true, "")
-    );
-
-    private @Nullable String channelName;
+final class TcpMessageServerClient extends AbstractTcpMessageClient<TcpMessageServerClient> {
+    private final @NotNull TcpMessageServer server;
 
     /**
      * Instantiates a new TCP Message server client.
      *
-     * @param logger the logger to display messages
-     * @param mapper the mapper to deserialize the messages
-     * @param socket the actual socket connection to the client
+     * @param server the server that manages this client
+     * @param logger the logger used to display messages
+     * @param mapper the mapper used to serialize the messages. Must be the same on the client
+     * @param socket the socket connection
      * @throws IOException in case it is not possible to retrieve the data streams
      */
     public TcpMessageServerClient(
+            final @NotNull TcpMessageServer server,
             final @NotNull Logger logger,
             final @NotNull Mapper mapper,
             final @NotNull Socket socket
     ) throws IOException {
         super(logger, mapper, socket);
-    }
-
-    /**
-     * Finalizes the connection and starts the message reading.
-     * <br>
-     * The connection requires the client to provide a {@link #channelName} before sending any messages.
-     *
-     * @param channelNameConsumer the consumer to be notified when the channel name is received
-     */
-    public void start(
-            final @NotNull BiConsumer<@NotNull String, @NotNull TcpMessageServerClient> channelNameConsumer
-    ) {
-        CompletableFuture.runAsync(() -> {
-            String raw = read();
-            logger.debug(formatLog("Received connection request: {}"), raw);
-            if (raw != null)
-                try {
-                    ChannelDto channelDto = mapper.deserialize(raw, ChannelDto.class);
-                    this.channelName = channelDto.getChannelName();
-                    channelNameConsumer.accept(channelName, this);
-                    logger.info(formatLog("Connected and listening on channel '{}'"), channelName);
-                    if (channelName != null) run();
-                    return;
-                } catch (MapperException e) {
-                    // handled immediately below
-                }
-            // invalid connection, notify client and quit
-            logger.warn(formatLog("Invalid connection request"));
-            write("Invalid connection. Please provide a channel name before sending any message.");
-            close();
-        }, executor);
-    }
-
-    /**
-     * Sets the callback to be executed when a message is received.
-     *
-     * @param onRead the callback
-     * @return this object (for method chaining)
-     */
-    public @NotNull TcpMessageServerClient onRead(
-            final @NotNull BiConsumer<@NotNull String, @NotNull String> onRead
-    ) {
-        return onRead(m -> onRead.accept(getChannelName(), m));
+        this.server = server;
     }
 
     @Override
-    public @NotNull TcpMessageServerClient onRead(
-            final @NotNull Consumer<@NotNull String> onRead
-    ) {
-        return (TcpMessageServerClient) super.onRead(onRead);
-    }
-
-    @Override
-    public void close() {
-        executor.shutdownNow();
-        super.close();
-    }
-
-    @Override
-    public @NotNull String getChannelName() {
-        return channelName == null ? "" : channelName;
+    protected void handleMessage(final @NotNull String message) {
+        int index = message.indexOf(' ');
+        if (index != -1) {
+            String command = message.substring(0, index);
+            String payload = message.substring(index + 1);
+            ServerCommand serverCommand = null;
+            try {
+                serverCommand = ServerCommand.valueOf(command.toUpperCase(Locale.ROOT));
+            } catch (IllegalArgumentException e) {
+                send(ServerResponse.UNKNOWN_COMMAND);
+            }
+            if (serverCommand != null)
+                if (serverCommand == ServerCommand.MESSAGE) server.broadcast(payload);
+                else serverCommand.execute(this, payload);
+        } else send(ServerResponse.INVALID_REQUEST);
     }
 
 }

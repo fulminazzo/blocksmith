@@ -1,6 +1,6 @@
-package it.fulminazzo.blocksmith.broker.tcp.peer_rework.server;
+package it.fulminazzo.blocksmith.broker.tcp.peer.server;
 
-import it.fulminazzo.blocksmith.broker.tcp.peer_rework.MessageDto;
+import it.fulminazzo.blocksmith.broker.tcp.peer.MessageDto;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.RequiredArgsConstructor;
