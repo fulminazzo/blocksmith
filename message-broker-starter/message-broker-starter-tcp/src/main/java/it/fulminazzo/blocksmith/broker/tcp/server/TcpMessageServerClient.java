@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -105,10 +104,7 @@ final class TcpMessageServerClient extends AbstractTcpMessageClient {
 
     @Override
     public @NotNull String getChannelName() {
-        return Objects.requireNonNull(
-                channelName,
-                "channel name has not been determined yet or was not provided"
-        );
+        return channelName == null ? "" : channelName;
     }
 
 }
