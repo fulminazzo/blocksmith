@@ -52,7 +52,7 @@ class TcpMessageClientTest extends Specification {
         received.size() == 0
         
         when:
-        server.send(ServerResponse.INVALID_REQUEST)
+        server.send(ServerResponse.UNKNOWN_COMMAND)
         sleep(TEST_WAIT_TIME)
 
         then:

@@ -16,15 +16,9 @@ public final class ServerResponse {
     public static final @NotNull String SUCCESS = "OK";
 
     /**
-     * Message sent when the client sends an invalid request.
-     * An invalid request is one with no command or an unknown command.
-     */
-    public static final @NotNull String INVALID_REQUEST = "INVALID_REQ";
-
-    /**
      * Message sent when the client sends a command that is not recognized.
      */
-    public static final @NotNull String UNKNOWN_COMMAND = "NO_COMMAND";
+    public static final @NotNull String UNKNOWN_COMMAND = "UNKNOWN_COMMAND";
 
     /**
      * Message sent when the client did not specify enough arguments.

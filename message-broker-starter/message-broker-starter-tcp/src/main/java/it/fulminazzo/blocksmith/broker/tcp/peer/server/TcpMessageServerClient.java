@@ -52,7 +52,7 @@ final class TcpMessageServerClient extends AbstractTcpMessageClient<TcpMessageSe
             if (serverCommand != null)
                 if (serverCommand == ServerCommand.MESSAGE) server.broadcast(payload);
                 else serverCommand.execute(this, payload);
-        } else send(ServerResponse.INVALID_REQUEST);
+        } else send(ServerResponse.UNKNOWN_COMMAND);
     }
 
 }
