@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.broker.tcp.client;
 
+import it.fulminazzo.blocksmith.broker.tcp.peer.PeerConnection;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +13,7 @@ import java.util.function.Consumer;
 /**
  * Abstraction of a TCP message client with common logic.
  */
-public abstract class AbstractTcpMessageClient implements Runnable, Closeable {
+public abstract class AbstractTcpMessageClient implements PeerConnection, Runnable, Closeable {
     protected final @NotNull Logger logger;
 
     private final @NotNull Socket socket;
@@ -63,35 +64,6 @@ public abstract class AbstractTcpMessageClient implements Runnable, Closeable {
     }
 
     /**
-     * Attempts to send a message to the output stream.
-     * It will <b>not throw</b> if the message could not be delivered.
-     *
-     * @param message the message
-     */
-    public void write(final @NotNull String message) {
-        try {
-            output.write(message);
-            output.newLine();
-            output.flush();
-        } catch (IOException e) {
-            // do nothing
-        }
-    }
-
-    /**
-     * Sets the callback to be executed when a message is received.
-     *
-     * @param onRead the callback
-     * @return this object (for method chaining)
-     */
-    public @NotNull AbstractTcpMessageClient onRead(
-            final @NotNull Consumer<@NotNull String> onRead
-    ) {
-        this.onRead = onRead;
-        return this;
-    }
-
-    /**
      * Gets the host to which the client is connected.
      *
      * @return the host
@@ -124,6 +96,25 @@ public abstract class AbstractTcpMessageClient implements Runnable, Closeable {
                 getChannelName(),
                 message
         );
+    }
+
+    @Override
+    public void write(final @NotNull String message) {
+        try {
+            output.write(message);
+            output.newLine();
+            output.flush();
+        } catch (IOException e) {
+            // do nothing
+        }
+    }
+
+    @Override
+    public @NotNull AbstractTcpMessageClient onRead(
+            final @NotNull Consumer<@NotNull String> onRead
+    ) {
+        this.onRead = onRead;
+        return this;
     }
 
     @Override
