@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutorService;
  * @see TcpMessageClient
  * @see TcpMessageServerClient
  */
-public class TcpMessageServer extends Loggable implements TcpConnection, Runnable {
+public final class TcpMessageServer extends Loggable implements TcpConnection, Runnable {
     private final @NotNull List<TcpMessageServerClient> clients = new CopyOnWriteArrayList<>();
 
     private final @NotNull ServerSocket serverSocket;
