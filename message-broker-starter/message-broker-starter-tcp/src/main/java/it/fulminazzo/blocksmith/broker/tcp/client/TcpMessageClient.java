@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.broker.tcp;
+package it.fulminazzo.blocksmith.broker.tcp.client;
 
 import it.fulminazzo.blocksmith.broker.tcp.server.ChannelDto;
 import it.fulminazzo.blocksmith.broker.tcp.server.TcpMessageServer;

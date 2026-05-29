@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.broker.tcp.server;
 
-import it.fulminazzo.blocksmith.broker.tcp.AbstractTcpMessageClient;
+import it.fulminazzo.blocksmith.broker.tcp.client.AbstractTcpMessageClient;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.MapperException;
 import it.fulminazzo.blocksmith.util.ThreadUtils;

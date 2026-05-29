@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.broker.tcp
+package it.fulminazzo.blocksmith.broker.tcp.client
 
 import groovy.util.logging.Slf4j
 import it.fulminazzo.blocksmith.broker.tcp.server.ChannelDto

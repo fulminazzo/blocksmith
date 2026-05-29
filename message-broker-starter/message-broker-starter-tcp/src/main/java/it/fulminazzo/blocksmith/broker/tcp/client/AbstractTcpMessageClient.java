@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.broker.tcp;
+package it.fulminazzo.blocksmith.broker.tcp.client;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
