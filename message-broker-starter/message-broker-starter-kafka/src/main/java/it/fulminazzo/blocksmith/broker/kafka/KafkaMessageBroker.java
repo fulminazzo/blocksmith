@@ -18,7 +18,24 @@ import java.util.function.BiFunction;
  * <br>
  * Examples:
  * <ul>
- *     // TODO: creation examples
+ *     <li>creation (local Kafka):</li>
+ *          <pre>{@code
+ *          KafkaMessageBroker messageBroker = KafkaMessageBroker.builder()
+ *                  .bootstrapServer("localhost", 9002)
+ *                  .build();
+ *          }</pre>
+ *     <li>creation (remote Kafka with authentication):</li>
+ *         <pre>{@code
+ *         KafkaMessageBroker messageBroker = KafkaMessageBroker.builder()
+ *                  .bootstrapServer("localhost", 9002)
+ *                  .bootstrapServer("localhost", 9003)
+ *                  .bootstrapServer("localhost", 9004)
+ *                  // defaults to PLAINTEXT
+ *                  .securityProtocol(SecurityProtocol.SSL)
+ *                  // defaults to USE_ALL_DNS_IPS
+ *                  .clientDnsLookup(ClientDnsLookup.RESOLVE_CANONICAL_BOOTSTRAP_SERVERS_ONLY)
+ *                  .build();
+ *         }</pre>
  *     <li>creating a standard channel:
  *         <pre>{@code
  *         KafkaMessageBroker messageBroker = ...;
