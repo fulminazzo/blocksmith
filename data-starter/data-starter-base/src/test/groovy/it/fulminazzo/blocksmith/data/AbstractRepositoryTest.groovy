@@ -2,9 +2,11 @@ package it.fulminazzo.blocksmith.data
 
 import it.fulminazzo.blocksmith.Cat
 import spock.lang.Specification
+import spock.lang.Stepwise
 
 import java.util.concurrent.ExecutionException
 
+@Stepwise
 class AbstractRepositoryTest extends Specification {
 
     private AbstractRepository<Cat, String, ? extends QueryEngine<Cat, String>> repository
