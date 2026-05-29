@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.broker.tcp.peer_rework;
 
+import it.fulminazzo.blocksmith.broker.tcp.peer_rework.server.ServerCommand;
 import it.fulminazzo.blocksmith.broker.tcp.peer_rework.server.TcpMessageServer;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.data.mapper.MapperException;
@@ -41,6 +42,18 @@ public abstract class TcpMessageClient extends AbstractTcpMessageClient<TcpMessa
      * @param message the actual message
      */
     public abstract void handleMessage(final @NotNull String channel, final @NotNull String message);
+
+    @Override
+    public @NotNull TcpMessageClient subscribe(final @NotNull String channel) {
+        send(ServerCommand.SUBSCRIBE.formatCommand(channel));
+        return super.subscribe(channel);
+    }
+
+    @Override
+    public @NotNull TcpMessageClient unsubscribe(final @NotNull String channel) {
+        send(ServerCommand.UNSUBSCRIBE.formatCommand(channel));
+        return super.unsubscribe(channel);
+    }
 
     @Override
     protected void handleMessage(final @NotNull String message) {

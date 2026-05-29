@@ -16,7 +16,7 @@ import java.util.function.BiConsumer;
  * @see TcpMessageServerClient
  */
 @RequiredArgsConstructor
-enum ServerCommand {
+public enum ServerCommand {
     /**
      * Subscribes to a channel.
      * <br>
@@ -25,7 +25,12 @@ enum ServerCommand {
     SUBSCRIBE((client, args) -> {
         if (!args.isEmpty()) client.subscribe(args.get(0)).send(ServerResponse.SUCCESS);
         else client.send(ServerResponse.NOT_ENOUGH_ARGUMENTS);
-    }),
+    }) {
+        @Override
+        public @NotNull String formatCommand(final @NotNull Object... arguments) {
+            return String.format("%s %s", name(), arguments[0]);
+        }
+    },
     /**
      * Unsubscribes from a channel.
      * <br>
@@ -34,7 +39,12 @@ enum ServerCommand {
     UNSUBSCRIBE((client, args) -> {
         if (!args.isEmpty()) client.unsubscribe(args.get(0)).send(ServerResponse.SUCCESS);
         else client.send(ServerResponse.NOT_ENOUGH_ARGUMENTS);
-    }),
+    }) {
+        @Override
+        public @NotNull String formatCommand(final @NotNull Object... arguments) {
+            return String.format("%s %s", name(), arguments[0]);
+        }
+    },
     /**
      * Sends a message to all the clients listening on the channel.
      * <br>
@@ -49,9 +59,27 @@ enum ServerCommand {
                 client.send(mapper.serialize(new MessageDto(channel, message)));
             }
         } else client.send(ServerResponse.NOT_ENOUGH_ARGUMENTS);
-    });
+    }) {
+        @Override
+        public @NotNull String formatCommand(final Object @NotNull ... arguments) {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 1; i < arguments.length; i++) {
+                Object arg = arguments[i];
+                builder.append(arg == null ? "null" : arg.toString()).append(" ");
+            }
+            return String.format("%s %s %s", name(), arguments[0], builder.toString().trim());
+        }
+    };
 
     private final @NotNull BiConsumer<TcpMessageServerClient, List<String>> executor;
+
+    /**
+     * Formats the command with the given arguments.
+     *
+     * @param arguments the arguments
+     * @return the formatted command
+     */
+    public abstract @NotNull String formatCommand(final @NotNull Object... arguments);
 
     /**
      * Executes the command.
@@ -59,7 +87,7 @@ enum ServerCommand {
      * @param client    the client
      * @param arguments the arguments for the command
      */
-    public void execute(final @NotNull TcpMessageServerClient client, final @NotNull String arguments) {
+    void execute(final @NotNull TcpMessageServerClient client, final @NotNull String arguments) {
         executor.accept(
                 client,
                 StringUtils.split(arguments, " ", "'", "\"")
