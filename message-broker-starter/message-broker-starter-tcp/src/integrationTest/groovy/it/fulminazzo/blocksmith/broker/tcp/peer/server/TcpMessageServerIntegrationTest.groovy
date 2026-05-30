@@ -114,17 +114,24 @@ class TcpMessageServerIntegrationTest extends Specification {
         when:
         client1.close()
 
+        and:
+        sleep(TEST_WAIT_TIME)
+
         then:
         server.clients.size() == 2
 
         when:
         client2.close()
 
+        and:
+        sleep(TEST_WAIT_TIME)
+
         then:
         server.clients.size() == 1
 
         when:
         client3.close()
+        sleep(TEST_WAIT_TIME)
 
         then:
         server.clients.empty
