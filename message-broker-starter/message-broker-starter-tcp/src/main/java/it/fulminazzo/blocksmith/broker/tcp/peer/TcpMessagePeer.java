@@ -10,7 +10,10 @@ import org.slf4j.Logger;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.*;
 
 /**
@@ -35,7 +38,7 @@ public final class TcpMessagePeer extends Loggable implements ChannelSubscriber<
             ThreadUtils.ownedThreadFactory(TcpMessagePeer.class)
     );
 
-    private final @NotNull Map<String, List<MessageHandler>> messageHandlers = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, Set<MessageHandler>> messageHandlers = new ConcurrentHashMap<>();
     private final @NotNull Set<String> channels = new CopyOnWriteArraySet<>();
 
     private final @NotNull Mapper mapper;
@@ -88,7 +91,7 @@ public final class TcpMessagePeer extends Loggable implements ChannelSubscriber<
      * @param messageHandler the handler to register
      */
     public void registerHandler(final @NotNull String channel, final @NotNull MessageHandler messageHandler) {
-        messageHandlers.computeIfAbsent(channel, c -> new ArrayList<>()).add(messageHandler);
+        messageHandlers.computeIfAbsent(channel, c -> new CopyOnWriteArraySet<>()).add(messageHandler);
     }
 
     /**
@@ -98,8 +101,8 @@ public final class TcpMessagePeer extends Loggable implements ChannelSubscriber<
      */
     @SuppressWarnings("resource")
     public void unregisterHandler(final @NotNull MessageHandler messageHandler) {
-        for (Map.Entry<String, List<MessageHandler>> entry : messageHandlers.entrySet()) {
-            List<MessageHandler> handlers = entry.getValue();
+        for (Map.Entry<String, Set<MessageHandler>> entry : messageHandlers.entrySet()) {
+            Set<MessageHandler> handlers = entry.getValue();
             handlers.remove(messageHandler);
             if (handlers.isEmpty()) {
                 String channelName = entry.getKey();
@@ -155,7 +158,7 @@ public final class TcpMessagePeer extends Loggable implements ChannelSubscriber<
 
                 @Override
                 public void handleMessage(final @NotNull String channel, final @NotNull String message) {
-                    messageHandlers.getOrDefault(channel, Collections.emptyList())
+                    messageHandlers.getOrDefault(channel, Collections.emptySet())
                             .forEach(h -> h.handle(message));
                 }
 
