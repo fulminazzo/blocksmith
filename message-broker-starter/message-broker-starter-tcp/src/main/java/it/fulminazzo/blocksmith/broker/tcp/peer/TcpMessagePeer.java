@@ -96,8 +96,17 @@ public final class TcpMessagePeer extends Loggable implements ChannelSubscriber<
      *
      * @param messageHandler the handler to unregister
      */
+    @SuppressWarnings("resource")
     public void unregisterHandler(final @NotNull MessageHandler messageHandler) {
-        messageHandlers.values().forEach(h -> h.remove(messageHandler));
+        for (Map.Entry<String, List<MessageHandler>> entry : messageHandlers.entrySet()) {
+            List<MessageHandler> handlers = entry.getValue();
+            handlers.remove(messageHandler);
+            if (handlers.isEmpty()) {
+                String channelName = entry.getKey();
+                messageHandlers.remove(channelName);
+                unsubscribe(channelName);
+            }
+        }
     }
 
     /**

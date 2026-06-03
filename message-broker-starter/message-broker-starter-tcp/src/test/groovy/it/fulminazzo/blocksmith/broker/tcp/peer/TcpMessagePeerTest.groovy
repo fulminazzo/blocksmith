@@ -17,6 +17,45 @@ class TcpMessagePeerTest extends Specification {
             Mock(ExecutorService)
     ])
 
+    def 'test that unregisterHandler removes dead channels and unsubscribes'() {
+        given:
+        peer.registerHandler(_, _) >> { callRealMethod() }
+        peer.unregisterHandler(_) >> { callRealMethod() }
+
+        and:
+        def channel1 = Mock(MessageHandler)
+        def channel12 = Mock(MessageHandler)
+        def channel2 = Mock(MessageHandler)
+
+        when:
+        peer.registerHandler('channel1', channel1)
+        peer.registerHandler('channel1', channel12)
+        peer.registerHandler('channel2', channel12)
+        peer.registerHandler('channel2', channel2)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        peer.unregisterHandler(channel1)
+
+        then:
+        0 * peer.unsubscribe('channel1')
+
+        when:
+        peer.unregisterHandler(channel12)
+
+        then:
+        1 * peer.unsubscribe('channel1')
+        0 * peer.unsubscribe('channel2')
+
+        when:
+        peer.unregisterHandler(channel2)
+
+        then:
+        1 * peer.unsubscribe('channel2')
+    }
+
     def 'test subscribe unsubscribe cycle with client present'() {
         given:
         final channel = 'main'
