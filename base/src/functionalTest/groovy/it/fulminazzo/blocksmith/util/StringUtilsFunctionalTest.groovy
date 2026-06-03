@@ -108,6 +108,31 @@ class StringUtilsFunctionalTest extends Specification {
         'a,b,'                          | ','    | []                                     || ['a', 'b', '']
     }
 
+    def 'test that quote and unquote of #string returns #expected'() {
+        given:
+        def quoted = StringUtils.quote(string)
+
+        expect:
+        quoted == expectedQuoted
+        StringUtils.unquote(quoted) == expected
+
+        where:
+        string             | expectedQuoted             | expected
+        'Hello, "friend"!' | 'Hello, \\"friend\\"!'     | 'Hello, "friend"!'
+        "Hello, 'friend'!" | "Hello, \\'friend\\'!"     | "Hello, 'friend'!"
+        'price is $10'     | 'price is \\$10'           | 'price is $10'
+        '^start'           | '\\^start'                 | '^start'
+        'end$'             | 'end\\$'                   | 'end$'
+        'file\\path'       | 'file\\\\path'             | 'file\\path'
+        '(grouped)'        | '\\(grouped\\)'            | '(grouped)'
+        '[bracketed]'      | '\\[bracketed\\]'          | '[bracketed]'
+        'a.b.c'            | 'a\\.b\\.c'                | 'a.b.c'
+        'a*b+c?'           | 'a\\*b\\+c\\?'             | 'a*b+c?'
+        'mix "\'$^all\\'   | 'mix \\"\\\'\\$\\^all\\\\' | 'mix "\'$^all\\'
+        ''                 | ''                         | ''
+        'no special chars' | 'no special chars'         | 'no special chars'
+    }
+
     def 'test that tag works'() {
         expect:
         StringUtils.tag('red', 'Hello, world!') == '<red>Hello, world!</red>'

@@ -192,6 +192,26 @@ public final class StringUtils {
     }
 
     /**
+     * Escapes all special regex and quote characters in the given string by prefixing them with a backslash.
+     *
+     * @param string the string to quote
+     * @return the escaped string
+     */
+    public static @NotNull String quote(final @NotNull String string) {
+        return string.replaceAll("([\\\\\"'`$^*+?.{}\\[\\]|()])", "\\\\$1");
+    }
+
+    /**
+     * Unescapes all backslash-prefixed characters in the given string.
+     *
+     * @param string the string to unquote
+     * @return the unescaped string
+     */
+    public static @NotNull String unquote(final @NotNull String string) {
+        return string.replaceAll("\\\\(.)", "$1");
+    }
+
+    /**
      * Wraps the given content in tags.
      *
      * @param tag     the name of the tags
