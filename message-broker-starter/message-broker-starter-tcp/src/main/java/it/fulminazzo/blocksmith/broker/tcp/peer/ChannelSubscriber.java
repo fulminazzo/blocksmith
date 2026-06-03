@@ -10,6 +10,16 @@ import org.jetbrains.annotations.NotNull;
 public interface ChannelSubscriber<C extends ChannelSubscriber<C>> {
 
     /**
+     * Sends a message to the channel.
+     * <br>
+     * The message is <b>not</b> guaranteed to be delivered
+     * (if the channel is offline at the time of writing).
+     *
+     * @param message the message to send
+     */
+    void send(final @NotNull String message);
+
+    /**
      * Subscribes this object to a new channel.
      *
      * @param channel the channel name

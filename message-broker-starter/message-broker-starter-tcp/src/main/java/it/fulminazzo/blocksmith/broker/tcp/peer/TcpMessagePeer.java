@@ -139,6 +139,11 @@ public final class TcpMessagePeer extends Loggable implements ChannelSubscriber<
     }
 
     @Override
+    public void send(final @NotNull String message) {
+        client().ifPresent(c -> c.send(message));
+    }
+
+    @Override
     public void run() {
         try {
             logger.debug(formatLog("Attempting to start TCP server"));

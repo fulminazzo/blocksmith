@@ -63,14 +63,7 @@ public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClien
      */
     protected abstract void handleMessage(final @NotNull String message);
 
-    /**
-     * Sends a message to the peer.
-     * <br>
-     * The message is <b>not</b> guaranteed to be delivered
-     * (if the peer is offline at the time of writing).
-     *
-     * @param message the message to send
-     */
+    @Override
     public void send(final @NotNull String message) {
         try {
             output.write(message);
