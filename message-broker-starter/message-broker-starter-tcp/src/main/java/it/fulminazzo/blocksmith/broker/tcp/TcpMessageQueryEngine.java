@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.broker.tcp;
 import it.fulminazzo.blocksmith.broker.MessageQueryEngine;
 import it.fulminazzo.blocksmith.broker.tcp.peer.MessageHandler;
 import it.fulminazzo.blocksmith.broker.tcp.peer.TcpMessagePeer;
+import it.fulminazzo.blocksmith.broker.tcp.peer.server.ServerCommand;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -50,7 +51,10 @@ public final class TcpMessageQueryEngine extends MessageQueryEngine implements M
 
     @Override
     public @NotNull CompletableFuture<Void> publish(final @NotNull String payload) {
-        return CompletableFuture.runAsync(() -> connection.send(payload), executor);
+        return CompletableFuture.runAsync(
+                () -> connection.send(ServerCommand.MESSAGE.formatCommand(getChannelName(), payload)),
+                executor
+        );
     }
 
     @Override
