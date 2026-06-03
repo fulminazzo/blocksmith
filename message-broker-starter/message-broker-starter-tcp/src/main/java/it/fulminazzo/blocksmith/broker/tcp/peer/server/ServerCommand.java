@@ -2,10 +2,10 @@ package it.fulminazzo.blocksmith.broker.tcp.peer.server;
 
 import it.fulminazzo.blocksmith.broker.tcp.peer.MessageDto;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
-import it.fulminazzo.blocksmith.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -84,10 +84,7 @@ public enum ServerCommand {
      * @param arguments the arguments for the command
      */
     void execute(final @NotNull TcpMessageServerClient client, final @NotNull String arguments) {
-        executor.accept(
-                client,
-                StringUtils.split(arguments, " ", "'", "\"")
-        );
+        executor.accept(client, Arrays.asList(arguments.split(" ")));
     }
 
 }
