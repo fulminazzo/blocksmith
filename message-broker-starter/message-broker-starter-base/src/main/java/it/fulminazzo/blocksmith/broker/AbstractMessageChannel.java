@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
@@ -205,7 +206,9 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
     @NoArgsConstructor
     @AllArgsConstructor
     @FieldDefaults(level = AccessLevel.PRIVATE)
-    protected static final class NetworkMessage {
+    protected static final class NetworkMessage implements Serializable {
+        private static final long serialVersionUID = 5257190224662114674L;
+
         @NotNull UUID id;
         /**
          * The id used to track back the flow of messages between clients.
