@@ -6,9 +6,9 @@ import spock.lang.Specification
 
 @SuppressWarnings('GroovyAccessibility')
 class OverloadValidatorTest extends Specification {
-    private static final Executable noParameters = new Executable('method', [])
-    private static final Executable primitiveParameter = new Executable('method', [new Executable.Parameter('int', 'a', true)])
-    private static final Executable wrapperParameter = new Executable('method', [new Executable.Parameter('Integer', 'b', false)])
+    private static final Executable NO_PARAMETERS = new Executable('method', [])
+    private static final Executable PRIMITIVE_PARAMETER = new Executable('method', [new Executable.Parameter('int', 'a', true)])
+    private static final Executable WRAPPER_PARAMETER = new Executable('method', [new Executable.Parameter('Integer', 'b', false)])
 
     private final DetailAST noParametersNode = Mock(DetailAST)
     private final DetailAST primitiveParameterNode = Mock(DetailAST)
@@ -19,9 +19,9 @@ class OverloadValidatorTest extends Specification {
     private final executableMock = Mockito.mockStatic(Executable)
 
     void setup() {
-        executableMock.when { Executable.of(noParametersNode) }.thenReturn(noParameters)
-        executableMock.when { Executable.of(primitiveParameterNode) }.thenReturn(primitiveParameter)
-        executableMock.when { Executable.of(wrapperParameterNode) }.thenReturn(wrapperParameter)
+        executableMock.when { Executable.of(noParametersNode) }.thenReturn(NO_PARAMETERS)
+        executableMock.when { Executable.of(primitiveParameterNode) }.thenReturn(PRIMITIVE_PARAMETER)
+        executableMock.when { Executable.of(wrapperParameterNode) }.thenReturn(WRAPPER_PARAMETER)
     }
 
     void cleanup() {
@@ -36,7 +36,7 @@ class OverloadValidatorTest extends Specification {
         noExceptionThrown()
 
         and:
-        validator.lastScope.lastExecutable == noParameters
+        validator.lastScope.lastExecutable == NO_PARAMETERS
 
         when:
         validator.validateNode(primitiveParameterNode)
@@ -45,7 +45,7 @@ class OverloadValidatorTest extends Specification {
         noExceptionThrown()
 
         and:
-        validator.lastScope.lastExecutable == primitiveParameter
+        validator.lastScope.lastExecutable == PRIMITIVE_PARAMETER
 
         when:
         validator.validateNode(wrapperParameterNode)
@@ -54,7 +54,7 @@ class OverloadValidatorTest extends Specification {
         noExceptionThrown()
 
         and:
-        validator.lastScope.lastExecutable == wrapperParameter
+        validator.lastScope.lastExecutable == WRAPPER_PARAMETER
     }
 
     def 'test that validateNode when lastExecutable is #lastExecutable throws for node #node'() {

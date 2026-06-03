@@ -18,7 +18,7 @@ import java.util.Objects;
 @Value
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Executable implements Comparable<Executable> {
-    private static final @NotNull String constructorName = "<init>";
+    private static final @NotNull String CONSTRUCTOR_NAME = "<init>";
 
     @NotNull String name;
     @NotNull List<Parameter> parameters;
@@ -44,7 +44,7 @@ public class Executable implements Comparable<Executable> {
      */
     public static @NotNull Executable of(final @NotNull DetailAST executableNode) {
         final String name = executableNode.getType() == TokenTypes.CTOR_DEF
-                ? constructorName
+                ? CONSTRUCTOR_NAME
                 : Objects.requireNonNull(
                 executableNode.findFirstToken(TokenTypes.IDENT),
                 "Could not find name node from executable node: " + executableNode
@@ -70,7 +70,7 @@ public class Executable implements Comparable<Executable> {
     @Value
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Parameter implements Comparable<Parameter> {
-        private static final @NotNull List<Integer> primitiveTypes = List.of(
+        private static final @NotNull List<Integer> PRIMITIVE_TYPES = List.of(
                 TokenTypes.LITERAL_BYTE, TokenTypes.LITERAL_SHORT, TokenTypes.LITERAL_CHAR,
                 TokenTypes.LITERAL_INT, TokenTypes.LITERAL_LONG,
                 TokenTypes.LITERAL_FLOAT, TokenTypes.LITERAL_DOUBLE,
@@ -114,7 +114,7 @@ public class Executable implements Comparable<Executable> {
                     "Could not find actual type node from parameter node: " + parameterNode
             );
 
-            boolean primitive = primitiveTypes.contains(actualType.getType());
+            boolean primitive = PRIMITIVE_TYPES.contains(actualType.getType());
             return new Parameter(actualType.getText(), name.getText(), primitive);
         }
     }
