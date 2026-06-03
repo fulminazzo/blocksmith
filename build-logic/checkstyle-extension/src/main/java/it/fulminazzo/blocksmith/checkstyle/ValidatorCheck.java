@@ -22,7 +22,9 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 abstract class ValidatorCheck extends AbstractCheck {
     private static final @NotNull List<Integer> SCOPE_CHANGE_TOKENS = List.of(
-            TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF, TokenTypes.ENUM_DEF, TokenTypes.RECORD_DEF,
+            TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF,
+            TokenTypes.ENUM_DEF, TokenTypes.ENUM_CONSTANT_DEF,
+            TokenTypes.RECORD_DEF,
             TokenTypes.SLIST
     );
 
