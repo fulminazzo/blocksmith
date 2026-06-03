@@ -144,7 +144,7 @@ public final class StringUtils {
                     StringBuilder startBuilder = new StringBuilder(current);
                     for (; i < chars.length; i++) {
                         startBuilder.append(chars[i]);
-                        if (!Pattern.matches(current + r + "$", startBuilder)) {
+                        if (!Pattern.matches(Pattern.quote(current.toString()) + r + "$", startBuilder)) {
                             startBuilder.setLength(startBuilder.length() - 1);
                             break;
                         }
@@ -175,7 +175,7 @@ public final class StringUtils {
                 StringBuilder tmpBuilder = new StringBuilder(current);
                 for (; i < chars.length; i++) {
                     tmpBuilder.append(chars[i]);
-                    if (!Pattern.matches(current + regex + "$", tmpBuilder)) {
+                    if (!Pattern.matches(Pattern.quote(current.toString()) + regex + "$", tmpBuilder)) {
                         i--;
                         break;
                     }
