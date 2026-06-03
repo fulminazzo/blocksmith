@@ -21,7 +21,7 @@ class TcpMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
                 TcpChannelIntegrationTestHelper.PORT,
                 TcpChannelIntegrationTestHelper.RETRY_INTERVAL,
                 executor
-        )
+        ).subscribe(CHANNEL_NAME)
         connection.start()
         setupChannel()
     }
