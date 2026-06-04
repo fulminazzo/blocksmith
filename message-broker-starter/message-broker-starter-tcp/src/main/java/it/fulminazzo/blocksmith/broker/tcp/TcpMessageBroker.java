@@ -25,7 +25,20 @@ import java.util.function.BiFunction;
  * <br>
  * Examples:
  * <ul>
- *     //TODO: creation examples
+ *     <li>creation:
+ *     <pre>{@code
+ *     Mapper mapper = ...;
+ *     Logger logger = ...;
+ *     ExecutorService executor = ...;
+ *     TcpMessageBroker messageBroker = TcpMessageBroker.builder()
+ *             .port(30926)
+ *             .retryInterval(1_000L)
+ *             .mapper(mapper)
+ *             .logger(logger)
+ *             .executor(executor)
+ *             .build();
+ *     }</pre>
+ *     </li>
  *     <li>creating a standard channel:
  *     <pre>{@code
  *     TcpMessageBroker messageBroker = ...;
@@ -124,14 +137,13 @@ public final class TcpMessageBroker extends AbstractMessageBroker<TcpMessageChan
         executor.shutdown();
     }
 
-    //TODO: re-enable
-//    /**
-//     * Gets a new builder for this class.
-//     *
-//     * @return the builder
-//     */
-//    public static @NotNull TcpMessageBrokerBuilder builder() {
-//        return new TcpMessageBrokerBuilder();
-//    }
+    /**
+     * Gets a new builder for this class.
+     *
+     * @return the builder
+     */
+    public static @NotNull TcpMessageBrokerBuilder builder() {
+        return new TcpMessageBrokerBuilder();
+    }
 
 }
