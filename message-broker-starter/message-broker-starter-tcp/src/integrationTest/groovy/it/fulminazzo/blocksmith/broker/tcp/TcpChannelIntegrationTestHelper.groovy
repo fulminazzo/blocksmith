@@ -12,19 +12,19 @@ import java.util.function.Consumer
 
 @SuppressWarnings('CloseWithoutCloseable')
 class TcpChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelper {
-    static final int PORT = 40626
-    static final long RETRY_INTERVAL = 1L
+    static final int DEFAULT_PORT = 40626
+    static final long RETRY_INTERVAL = 1_000L
 
     private final ExecutorService executor
     private final TcpMessagePeer connection
 
-    TcpChannelIntegrationTestHelper(final String channelName, final Logger logger) {
+    TcpChannelIntegrationTestHelper(final String channelName, final Logger logger, final int port) {
         super(channelName, logger)
         executor = Executors.newCachedThreadPool()
         connection = new TcpMessagePeer(
                 logger,
                 MAPPER,
-                PORT,
+                port,
                 RETRY_INTERVAL,
                 executor
         )

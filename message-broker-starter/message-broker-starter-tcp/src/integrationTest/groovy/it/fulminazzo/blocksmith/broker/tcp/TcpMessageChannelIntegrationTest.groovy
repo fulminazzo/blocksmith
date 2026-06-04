@@ -18,7 +18,7 @@ class TcpMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
         connection = new TcpMessagePeer(
                 logger,
                 TcpChannelIntegrationTestHelper.MAPPER,
-                TcpChannelIntegrationTestHelper.PORT,
+                TcpChannelIntegrationTestHelper.DEFAULT_PORT,
                 TcpChannelIntegrationTestHelper.RETRY_INTERVAL,
                 executor
         ).subscribe(CHANNEL_NAME)
@@ -60,7 +60,7 @@ class TcpMessageChannelIntegrationTest extends MessageChannelIntegrationTest {
 
     @Override
     MessageChannelIntegrationTestHelper newTestHelper(final String channelName) {
-        return new TcpChannelIntegrationTestHelper(channelName, logger)
+        return new TcpChannelIntegrationTestHelper(channelName, logger, TcpChannelIntegrationTestHelper.DEFAULT_PORT)
     }
 
 }
