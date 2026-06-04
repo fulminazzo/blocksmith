@@ -4,10 +4,12 @@ import org.jetbrains.annotations.NotNull
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
+import spock.lang.Stepwise
 
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 
+@Stepwise
 abstract class MessageChannelIntegrationTest extends Specification {
     protected static final Logger logger = LoggerFactory.getLogger(MessageChannelIntegrationTest)
 
