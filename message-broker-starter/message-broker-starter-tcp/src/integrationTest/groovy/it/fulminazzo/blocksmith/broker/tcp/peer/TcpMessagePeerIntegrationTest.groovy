@@ -4,12 +4,14 @@ import groovy.util.logging.Slf4j
 import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import spock.lang.Specification
+import spock.lang.Stepwise
 
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicReference
 
 @Slf4j
+@Stepwise
 class TcpMessagePeerIntegrationTest extends Specification {
     private static final long AWAIT_TIME = 1_000L
     private static final long RETRY_INTERVAL = 1_000L
