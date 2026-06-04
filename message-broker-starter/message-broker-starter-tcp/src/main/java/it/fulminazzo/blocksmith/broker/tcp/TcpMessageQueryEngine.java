@@ -40,7 +40,7 @@ public final class TcpMessageQueryEngine extends MessageQueryEngine implements M
             final @NotNull ExecutorService executor
     ) {
         super(channelName);
-        this.connection = connection;
+        this.connection = connection.subscribe(channelName);
         this.executor = executor;
     }
 
