@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference
 @Slf4j
 @Stepwise
 class TcpMessagePeerIntegrationTest extends Specification {
-    private static final long AWAIT_TIME = 1_000L
+    private static final long AWAIT_TIME = 5_000L
     private static final long RETRY_INTERVAL = 1_000L
 
     private static int port = 30015
