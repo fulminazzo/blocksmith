@@ -98,6 +98,7 @@ public final class TcpMessageBroker extends AbstractMessageBroker<TcpMessageChan
                 retryInterval,
                 executor
         );
+        this.connection.start();
         this.mapper = mapper;
         this.executor = executor;
     }
