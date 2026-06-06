@@ -142,7 +142,7 @@ class TcpMessageServerIntegrationTest extends Specification {
         client3?.close()
     }
 
-    private String formatMessage(final String channel, final String message) {
+    protected String formatMessage(final String channel, final String message) {
         return mapper.serialize(new MessageDto(channel, message))
     }
 

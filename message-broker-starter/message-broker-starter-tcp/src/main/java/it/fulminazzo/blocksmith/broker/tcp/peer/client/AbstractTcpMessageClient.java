@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.broker.tcp.peer.client;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.broker.tcp.peer.ChannelSubscriber;
 import it.fulminazzo.blocksmith.broker.tcp.peer.Loggable;
 import it.fulminazzo.blocksmith.broker.tcp.peer.TcpConnection;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,7 +36,7 @@ public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClien
     private final @NotNull BufferedWriter output;
 
     @Getter
-    private boolean closed;
+    private volatile boolean closed;
 
     /**
      * Instantiates a new Abstract TCP Message client.
@@ -44,6 +46,11 @@ public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClien
      * @param socket the socket connection
      * @throws IOException in case it is not possible to retrieve the data streams
      */
+    @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP2",
+            justification = "The socket comes directly from the SocketServer#accept() return method "
+                    + "in the case of server clients"
+    )
     public AbstractTcpMessageClient(
             final @NotNull Logger logger,
             final @NotNull Mapper mapper,
@@ -52,8 +59,8 @@ public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClien
         super(logger);
         this.mapper = mapper;
         this.socket = socket;
-        this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        this.output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        this.input = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+        this.output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
     }
 
     /**
@@ -150,6 +157,12 @@ public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClien
                 getPort(),
                 message
         );
+    }
+
+    @SuppressWarnings("checkstyle:NoFinalizer")
+    @Override
+    protected final void finalize() {
+        // Requested from SpotBugs to avoid finalizer attacks.
     }
 
 }

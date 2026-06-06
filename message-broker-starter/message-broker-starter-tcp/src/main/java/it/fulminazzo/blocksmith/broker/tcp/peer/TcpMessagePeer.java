@@ -59,7 +59,7 @@ public final class TcpMessagePeer extends Loggable implements ChannelSubscriber<
     private @Nullable TcpMessageClient client;
 
     @Getter
-    private boolean closed = false;
+    private volatile boolean closed = false;
 
     /**
      * Instantiates a new TCP Message peer.
