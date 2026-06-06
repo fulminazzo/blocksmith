@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.broker.tcp.peer.client.TcpMessageClient;
 import it.fulminazzo.blocksmith.broker.tcp.peer.server.TcpMessageServer;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import it.fulminazzo.blocksmith.util.ThreadUtils;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -33,10 +34,16 @@ import java.util.concurrent.*;
  * @see TcpMessageClient
  */
 public final class TcpMessagePeer extends Loggable implements ChannelSubscriber<TcpMessagePeer>, Runnable, Closeable {
-    private final @NotNull ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
-            2, // one for the server, one for the peer (which includes the client)
-            ThreadUtils.ownedThreadFactory(TcpMessagePeer.class)
-    );
+    private static final @NotNull ThreadFactory THREAD_FACTORY = ThreadUtils.ownedThreadFactory(TcpMessagePeer.class);
+    /**
+     * How many milliseconds the client should wait for the server to either start or fail to start
+     * (and therefore connect to another running instance).
+     */
+    private static final int AWAIT_SERVER_BOOT_TIME = 125;
+    /**
+     * How many milliseconds the {@link #start()} method should wait for the client to connect to the server.
+     */
+    private static final int AWAIT_CLIENT_BOOT_TIME = 125;
 
     private final @NotNull Map<String, Set<MessageHandler>> messageHandlers = new ConcurrentHashMap<>();
     private final @NotNull Set<String> channels = new CopyOnWriteArraySet<>();
@@ -50,6 +57,9 @@ public final class TcpMessagePeer extends Loggable implements ChannelSubscriber<
 
     private @Nullable TcpMessageServer server;
     private @Nullable TcpMessageClient client;
+
+    @Getter
+    private boolean closed = false;
 
     /**
      * Instantiates a new TCP Message peer.
@@ -80,7 +90,13 @@ public final class TcpMessagePeer extends Loggable implements ChannelSubscriber<
      * @return this object (for method chaining)
      */
     public @NotNull TcpMessagePeer start() {
-        scheduler.scheduleAtFixedRate(this, 0, retryInterval, TimeUnit.MILLISECONDS);
+        Thread clientThread = THREAD_FACTORY.newThread(this);
+        clientThread.start();
+        try {
+            clientThread.join(AWAIT_CLIENT_BOOT_TIME);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         return this;
     }
 
@@ -145,42 +161,53 @@ public final class TcpMessagePeer extends Loggable implements ChannelSubscriber<
 
     @Override
     public void run() {
-        try {
-            logger.debug(formatLog("Attempting to start TCP server"));
-            server = new TcpMessageServer(logger, mapper, port, executor);
-            scheduler.submit(server);
-        } catch (IOException e) {
-            // server already running or port already in use, ignore the error
-            logger.debug(formatLog("TCP server already running or port already in use"));
-        }
-        try {
-            logger.debug(formatLog("Starting client"));
-            client = new TcpMessageClient(
-                    logger,
-                    mapper,
-                    port
-            ) {
-
-                @Override
-                public void handleMessage(final @NotNull String channel, final @NotNull String message) {
-                    messageHandlers.getOrDefault(channel, Collections.emptySet())
-                            .forEach(h -> h.handle(message));
+        while (!isClosed()) {
+            Thread serverThread = THREAD_FACTORY.newThread(() -> {
+                try {
+                    logger.debug(formatLog("Attempting to start TCP server"));
+                    server = new TcpMessageServer(logger, mapper, port, executor);
+                    server.run();
+                } catch (IOException e) {
+                    // server already running or port already in use, ignore the error
+                    logger.debug(formatLog("TCP server already running or port already in use"));
                 }
+            });
+            serverThread.start();
+            try {
+                serverThread.join(AWAIT_SERVER_BOOT_TIME);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+            try {
+                logger.debug(formatLog("Starting client"));
+                client = new TcpMessageClient(
+                        logger,
+                        mapper,
+                        port
+                ) {
 
-            };
-            channels.forEach(client::subscribe);
-            client.run();
-        } catch (IOException e) {
-            logger.warn(formatLog("Failed to start client: {}"), e.getMessage(), e);
+                    @Override
+                    public void handleMessage(final @NotNull String channel, final @NotNull String message) {
+                        messageHandlers.getOrDefault(channel, Collections.emptySet())
+                                .forEach(h -> h.handle(message));
+                    }
+
+                };
+                channels.forEach(client::subscribe);
+                client.run();
+            } catch (IOException e) {
+                logger.warn(formatLog("Failed to start client: {}"), e.getMessage(), e);
+            }
+            closeConnections();
+            logger.info(formatLog("Attempting to restart TCP peer in {} seconds"), retryInterval / 1000);
         }
-        closeConnections();
-        logger.info(formatLog("Attempting to restart TCP peer in {} seconds"), retryInterval / 1000);
     }
 
     @Override
     public void close() {
+        closed = true;
         closeConnections();
-        scheduler.shutdown();
     }
 
     @Override
