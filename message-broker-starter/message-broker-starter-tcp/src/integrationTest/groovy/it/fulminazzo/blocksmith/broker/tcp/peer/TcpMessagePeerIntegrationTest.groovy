@@ -16,7 +16,7 @@ class TcpMessagePeerIntegrationTest extends Specification {
     private static final long AWAIT_TIME = 5_000L
     private static final long RETRY_INTERVAL = 1_000L
 
-    private static int port = 30015
+    private static final int PORT = 30015
 
     private final Executor executor = Executors.newCachedThreadPool()
 
@@ -29,14 +29,14 @@ class TcpMessagePeerIntegrationTest extends Specification {
         peer1 = new TcpMessagePeer(
                 log,
                 mapper,
-                port,
+                PORT,
                 RETRY_INTERVAL,
                 executor
         )
         peer2 = new TcpMessagePeer(
                 log,
                 mapper,
-                port,
+                PORT,
                 RETRY_INTERVAL,
                 executor
         )

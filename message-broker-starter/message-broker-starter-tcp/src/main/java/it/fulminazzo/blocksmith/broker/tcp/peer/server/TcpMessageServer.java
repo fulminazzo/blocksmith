@@ -85,7 +85,7 @@ public final class TcpMessageServer extends Loggable implements TcpConnection, R
                 );
                 TcpMessageServerClient client = new TcpMessageServerClient(this, logger, mapper, socket);
                 clients.add(client);
-                executor.submit(client);
+                executor.execute(client);
             } catch (IOException e) {
                 // client connection closed abruptly
             }

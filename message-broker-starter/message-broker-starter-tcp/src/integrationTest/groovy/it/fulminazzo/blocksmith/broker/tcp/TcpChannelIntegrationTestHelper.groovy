@@ -51,10 +51,7 @@ class TcpChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelpe
             final Logger logger,
             final Consumer<String> consumer
     ) {
-        connection.subscribe(channelName).registerHandler(
-                channelName,
-                { consumer.accept(it) }
-        )
+        connection.subscribe(channelName).registerHandler(channelName) { consumer.accept(it) }
         connection.start()
         return this
     }

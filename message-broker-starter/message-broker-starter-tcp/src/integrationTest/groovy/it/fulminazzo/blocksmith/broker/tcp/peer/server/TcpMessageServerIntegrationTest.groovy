@@ -149,9 +149,9 @@ class TcpMessageServerIntegrationTest extends Specification {
     private static class MockTcpMessageClient implements Runnable, Closeable {
         private final List<String> received = []
 
-        private Socket clientSocket
-        private Reader clientInput
-        private Writer clientOutput
+        private final Socket clientSocket
+        private final Reader clientInput
+        private final Writer clientOutput
 
         MockTcpMessageClient(final int port) {
             clientSocket = new Socket('localhost', port)

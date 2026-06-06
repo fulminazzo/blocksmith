@@ -18,7 +18,7 @@ class TcpMessageClientTest extends Specification {
 
     private final Mapper mapper = MapperFormat.JSON.newMapper()
 
-    private MockTcpMessageServer server = new MockTcpMessageServer(port++)
+    private final MockTcpMessageServer server = new MockTcpMessageServer(port++)
 
     void setup() {
         Thread.startDaemon { server.run() }
@@ -30,10 +30,12 @@ class TcpMessageClientTest extends Specification {
 
         when:
         def client = new TcpMessageClient(log, mapper, server.port) {
+
             @Override
             void handleMessage(final @NotNull String channel, final @NotNull String message) {
                 received[channel] = message
             }
+
         }
         Thread.startDaemon { client.run() }
         sleep(TEST_WAIT_TIME)
@@ -44,13 +46,13 @@ class TcpMessageClientTest extends Specification {
         when:
         server.send(ServerResponse.SUCCESS)
         sleep(TEST_WAIT_TIME)
-        
+
         then:
         noExceptionThrown()
-        
+
         and:
         received.size() == 0
-        
+
         when:
         server.send(ServerResponse.UNKNOWN_COMMAND)
         sleep(TEST_WAIT_TIME)
@@ -60,11 +62,11 @@ class TcpMessageClientTest extends Specification {
 
         and:
         received.size() == 0
-        
+
         when:
         server.send(mapper.serialize(new MessageDto('Hello', 'world')))
         sleep(TEST_WAIT_TIME)
-        
+
         then:
         received['Hello'] == 'world'
     }
@@ -72,10 +74,12 @@ class TcpMessageClientTest extends Specification {
     def 'test that subscribe and unsubscribe send correct commands'() {
         when:
         def client = new TcpMessageClient(log, mapper, server.port) {
+
             @Override
             void handleMessage(final @NotNull String channel, final @NotNull String message) {
-
+                // do nothing
             }
+
         }
         Thread.startDaemon { client.run() }
         sleep(TEST_WAIT_TIME)
@@ -126,7 +130,7 @@ class TcpMessageClientTest extends Specification {
             }
             return false
         }
-        
+
         void send(final String message) {
             clientOutput.write("$message\n")
             clientOutput.flush()
