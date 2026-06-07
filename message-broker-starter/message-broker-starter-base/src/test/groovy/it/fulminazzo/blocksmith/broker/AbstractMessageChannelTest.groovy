@@ -4,7 +4,6 @@ import it.fulminazzo.blocksmith.data.mapper.Mapper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
-import spock.lang.Stepwise
 
 import java.time.Duration
 import java.util.concurrent.ExecutionException
@@ -17,7 +16,6 @@ import java.util.function.Consumer
 import java.util.function.Function
 import java.util.function.UnaryOperator
 
-@Stepwise
 class AbstractMessageChannelTest extends Specification {
     private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
@@ -36,10 +34,11 @@ class AbstractMessageChannelTest extends Specification {
     }
 
     void cleanup() {
-        senderService.shutdown()
-        receiverService.shutdown()
         sender.close()
         receiver.close()
+        senderService.shutdownNow()
+        receiverService.shutdownNow()
+        MockMessageQueryEngine.clear()
     }
 
     def 'test that sendAndReceive works'() {
@@ -69,7 +68,7 @@ class AbstractMessageChannelTest extends Specification {
         def actual = sender.sendAndReceiveRaw(
                 'ping',
                 Duration.ofMillis(SLEEP_TIME * 10)
-        ).get()
+        ).join()
 
         then:
         actual == 'pong'
