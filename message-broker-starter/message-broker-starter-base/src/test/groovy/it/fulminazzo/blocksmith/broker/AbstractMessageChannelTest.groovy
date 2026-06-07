@@ -31,6 +31,10 @@ class AbstractMessageChannelTest extends Specification {
     private final AbstractMessageChannel sender = new MockMessageChannel(MAPPER, 'abstract-message-test-1', senderService)
     private final AbstractMessageChannel receiver = new MockMessageChannel(MAPPER, 'abstract-message-test-2', receiverService)
 
+    void setup() {
+        MockMessageQueryEngine.clear()
+    }
+
     void cleanup() {
         senderService.shutdown()
         receiverService.shutdown()

@@ -18,6 +18,10 @@ class AbstractMessageBrokerTest extends Specification {
         SERVICE.close()
     }
 
+    void setup() {
+        MockMessageQueryEngine.clear()
+    }
+
     def 'test that registerChannel registers new channel and removes closed ones'() {
         given:
         def first = new MockMessageChannel(MAPPER, 'first', SERVICE)

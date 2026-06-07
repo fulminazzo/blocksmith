@@ -69,6 +69,13 @@ public final class MockMessageQueryEngine extends MessageQueryEngine {
     }
 
     /**
+     * Clears all the messages.
+     */
+    static void clear() {
+        MESSAGES.clear();
+    }
+
+    /**
      * Gets the queue with the given name.
      *
      * @param name the name
