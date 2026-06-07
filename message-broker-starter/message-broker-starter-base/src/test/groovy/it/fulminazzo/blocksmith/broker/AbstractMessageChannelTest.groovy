@@ -21,7 +21,7 @@ import java.util.function.UnaryOperator
 class AbstractMessageChannelTest extends Specification {
     private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
-    private static final int SLEEP_TIME = 250
+    private static final int SLEEP_TIME = 500
 
     private final data = new Cat('Felix', 7, false)
 
