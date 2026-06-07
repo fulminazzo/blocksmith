@@ -21,7 +21,7 @@ import java.util.function.UnaryOperator
 class AbstractMessageChannelTest extends Specification {
     private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
-    private static final int SLEEP_TIME = 500
+    private static final int SLEEP_TIME = 250
 
     private final data = new Cat('Felix', 7, false)
 
@@ -97,7 +97,7 @@ class AbstractMessageChannelTest extends Specification {
         !queue.empty
 
         and:
-        def raw = queue.poll()
+        def raw = queue.poll()?.message()
         def networkMessage = raw?.empty ? null : MAPPER.deserialize(raw, AbstractMessageChannel.NetworkMessage)
         networkMessage?.conversationId != null
 
@@ -117,7 +117,8 @@ class AbstractMessageChannelTest extends Specification {
         receiver.subscribeRaw((Consumer<String>) (r -> raw.set(r)))
 
         when:
-        MockMessageQueryEngine.getQueue(receiver.name).add(MAPPER.serialize(data))
+        MockMessageQueryEngine.getQueue(receiver.name)
+                .add(new MockMessageQueryEngine.MockMessage(MAPPER.serialize(data), System.currentTimeMillis()))
 
         and:
         sleep(SLEEP_TIME)
@@ -147,7 +148,7 @@ class AbstractMessageChannelTest extends Specification {
 
         when:
         def queue = MockMessageQueryEngine.getQueue(receiver.name)
-        queue.add(MAPPER.serialize(data))
+        queue.add(new MockMessageQueryEngine.MockMessage(MAPPER.serialize(data), System.currentTimeMillis()))
 
         and:
         sleep(SLEEP_TIME)
@@ -164,7 +165,7 @@ class AbstractMessageChannelTest extends Specification {
 
         then:
         !queue.empty
-        def raw = queue.poll()
+        def raw = queue.poll()?.message()
         def networkMessage = MAPPER.deserialize(raw, AbstractMessageChannel.NetworkMessage)
         networkMessage.conversationId != null
 
