@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a parameter or type that must be {@code false}.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@AssertFalse Boolean flag) {
+ *     // flag must be false (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

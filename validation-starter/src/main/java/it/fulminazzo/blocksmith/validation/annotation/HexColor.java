@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a {@link CharSequence} parameter or type that is a valid HEX color.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@HexColor String color) {
+ *     // color must be a valid HEX color (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

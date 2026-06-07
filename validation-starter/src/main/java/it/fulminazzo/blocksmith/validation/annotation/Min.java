@@ -12,6 +12,18 @@ import java.lang.annotation.*;
  * Also supports {@link java.time.Duration}, where the milliseconds are compared.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@Min(0) int count) {
+ *     // count must be at least 0 (or null)
+ * }
+ * }</pre>
+ * <pre>{@code
+ * void function(@Min(1000) Duration timeout) {
+ *     // timeout must be at least 1000 milliseconds (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a {@link CharSequence} parameter or type that represents an IPv4.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@IPv4 String address) {
+ *     // address must be a valid IPv4 (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

@@ -12,6 +12,18 @@ import java.lang.annotation.*;
  * Also supports {@link java.time.Duration}, where the milliseconds are compared.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@NegativeOrZero int offset) {
+ *     // offset must be negative or zero (or null)
+ * }
+ * }</pre>
+ * <pre>{@code
+ * void function(@NegativeOrZero Duration duration) {
+ *     // duration must be negative or zero in milliseconds (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

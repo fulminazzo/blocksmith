@@ -9,7 +9,21 @@ import java.lang.annotation.*;
 /**
  * Identifies a numeric parameter or type that must positive (zero not allowed).
  * <br>
+ * Also supports {@link java.time.Duration}, where the milliseconds are compared.
+ * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@Positive int count) {
+ *     // count must be positive (or null)
+ * }
+ * }</pre>
+ * <pre>{@code
+ * void function(@Positive Duration duration) {
+ *     // duration must be positive in milliseconds (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull
