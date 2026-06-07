@@ -9,7 +9,21 @@ import java.lang.annotation.*;
 /**
  * Identifies a numeric parameter or type that must positive or at most zero.
  * <br>
+ * Also supports {@link java.time.Duration}, where the milliseconds are compared.
+ * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@PositiveOrZero int count) {
+ *     // count must be positive or zero (or null)
+ * }
+ * }</pre>
+ * <pre>{@code
+ * void function(@PositiveOrZero Duration duration) {
+ *     // duration must be positive or zero in milliseconds (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

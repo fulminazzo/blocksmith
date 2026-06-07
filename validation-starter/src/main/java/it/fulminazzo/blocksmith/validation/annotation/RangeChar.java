@@ -12,6 +12,13 @@ import java.lang.annotation.*;
  * Also supports {@link java.time.Duration}, where the milliseconds are compared.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@RangeChar(min = 'a', max = 'z') char letter) {
+ *     // letter must be between 'a' and 'z' (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

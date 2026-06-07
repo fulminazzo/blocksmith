@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.*;
 
 /**
- * Identifies a {@link java.time.temporal.Temporal} parameter or type that 
+ * Identifies a {@link java.time.temporal.Temporal} parameter or type that
  * must be before the current time of execution (milliseconds are ignored).
  * <br>
  * Supported types are:
@@ -19,6 +19,13 @@ import java.lang.annotation.*;
  * </ul>
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@Before LocalDate date) {
+ *     // date must be before now (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

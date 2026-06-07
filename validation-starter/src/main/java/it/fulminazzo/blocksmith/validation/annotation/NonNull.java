@@ -8,6 +8,13 @@ import java.lang.annotation.*;
 
 /**
  * Identifies a parameter or type that cannot be null.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@NonNull String value) {
+ *     // value cannot be null
+ * }
+ * }</pre>
  *
  * @see Constraint
  */

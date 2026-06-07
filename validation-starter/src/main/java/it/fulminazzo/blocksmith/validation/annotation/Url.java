@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a {@link CharSequence} parameter or type that represents a URL.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@Url String url) {
+ *     // url must be a valid URL (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

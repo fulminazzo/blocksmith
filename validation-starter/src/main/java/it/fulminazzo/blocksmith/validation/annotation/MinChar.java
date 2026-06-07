@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a character parameter or type that must be greater than or equal to the given value.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@MinChar('a') char letter) {
+ *     // letter must be at least 'a' (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

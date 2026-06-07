@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a {@link CharSequence} parameter or type that is usable as an identifier.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@Identifier String id) {
+ *     // id must be a valid identifier (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

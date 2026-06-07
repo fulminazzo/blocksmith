@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a character parameter or type that must be less than or equal to the given value.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@MaxChar('z') char letter) {
+ *     // letter must be at most 'z' (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

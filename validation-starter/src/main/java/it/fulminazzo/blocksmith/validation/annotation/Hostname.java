@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a {@link CharSequence} parameter or type that represents a hostname.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@Hostname String host) {
+ *     // host must be a valid hostname (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull

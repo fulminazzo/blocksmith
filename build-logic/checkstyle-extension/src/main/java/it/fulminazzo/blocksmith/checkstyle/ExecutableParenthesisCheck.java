@@ -21,7 +21,7 @@ import java.util.Objects;
  * }</pre>
  */
 public class ExecutableParenthesisCheck extends AbstractCheck {
-    private static final @NotNull String baseMessagePath = ExecutableParenthesisCheck.class.getPackageName() + ".";
+    private static final @NotNull String BASE_MESSAGE_PATH = ExecutableParenthesisCheck.class.getPackageName() + ".";
 
     @Override
     public int[] getDefaultTokens() {
@@ -48,13 +48,13 @@ public class ExecutableParenthesisCheck extends AbstractCheck {
                 parameters,
                 "Could not find parameters from executable: " + ast
         ).getFirstChild();
-        if (parameter == null) log(parameters, baseMessagePath + "executable.parenthesis.noParameters");
+        if (parameter == null) log(parameters, BASE_MESSAGE_PATH + "executable.parenthesis.noParameters");
         else {
             if (parameter.getLineNo() == leftPar.getLineNo())
-                log(parameter, baseMessagePath + "executable.parenthesis.parameters");
+                log(parameter, BASE_MESSAGE_PATH + "executable.parenthesis.parameters");
             while (parameter.getNextSibling() != null) parameter = parameter.getNextSibling();
             if (parameter.getLineNo() == rightPar.getLineNo())
-                log(parameter, baseMessagePath + "executable.parenthesis.parameters");
+                log(parameter, BASE_MESSAGE_PATH + "executable.parenthesis.parameters");
         }
     }
 

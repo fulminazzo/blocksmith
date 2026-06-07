@@ -35,7 +35,7 @@ abstract class MessageChannelIntegrationTest extends Specification {
         def actual = channel.sendAndReceive(
                 Messages.MESSAGE1,
                 Message,
-                1_000
+                SLEEP_TIME * 10
         ).join()
 
         then:

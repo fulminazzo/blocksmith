@@ -10,6 +10,13 @@ import java.lang.annotation.*;
  * Identifies a {@link CharSequence} parameter or type that represents an email.
  * <br>
  * Accepts {@code null} values.
+ * <br>
+ * Example usage:
+ * <pre>{@code
+ * void function(@Email String address) {
+ *     // address must be a valid email (or null)
+ * }
+ * }</pre>
  *
  * @see Constraint
  * @see NonNull
