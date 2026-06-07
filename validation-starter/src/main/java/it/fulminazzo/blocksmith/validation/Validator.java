@@ -413,7 +413,7 @@ public final class Validator {
     }
 
     private static long now() {
-        return System.currentTimeMillis() / 1000;
+        return System.currentTimeMillis();
     }
 
 }

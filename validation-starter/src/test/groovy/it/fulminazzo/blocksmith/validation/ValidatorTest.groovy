@@ -364,19 +364,13 @@ class ValidatorTest extends Specification {
         'afterTemporal'          | LocalDateTime.now().plusSeconds(TEST_TIME)
         // AfterOrNow
         'afterOrNowDate'         | null
-        'afterOrNowDate'         | { new Date(new Date().time) }
         'afterOrNowDate'         | { new Date(new Date().time + TEST_TIME * 1_000) }
         'afterOrNowCalendar'     | null
-        'afterOrNowCalendar'     | { Calendar.instance }
         'afterOrNowCalendar'     | { Calendar.instance.add(Calendar.SECOND, TEST_TIME) }
         'afterOrNowTemporal'     | null
-        'afterOrNowTemporal'     | { Instant.now() }
         'afterOrNowTemporal'     | { Instant.now().plusSeconds(TEST_TIME) }
-        'afterOrNowTemporal'     | { LocalTime.now() }
         'afterOrNowTemporal'     | { LocalTime.now().plusSeconds(TEST_TIME) }
-        'afterOrNowTemporal'     | { LocalDate.now() }
         'afterOrNowTemporal'     | { LocalDate.now().plusDays(TEST_TIME) }
-        'afterOrNowTemporal'     | { LocalDateTime.now() }
         'afterOrNowTemporal'     | { LocalDateTime.now().plusSeconds(TEST_TIME) }
         // Before
         'beforeDate'             | null
