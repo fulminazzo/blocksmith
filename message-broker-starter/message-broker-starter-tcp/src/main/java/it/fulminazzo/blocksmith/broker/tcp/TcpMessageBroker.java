@@ -73,8 +73,6 @@ public final class TcpMessageBroker extends AbstractMessageBroker<TcpMessageChan
     private final @NotNull TcpMessagePeer connection;
     private final @NotNull ExecutorService executor;
 
-    private final @NotNull Mapper mapper;
-
     /**
      * Instantiates a new Tcp message broker.
      *
@@ -91,6 +89,7 @@ public final class TcpMessageBroker extends AbstractMessageBroker<TcpMessageChan
             final @NotNull Logger logger,
             final @NotNull ExecutorService executor
     ) {
+        super(mapper);
         this.connection = new TcpMessagePeer(
                 logger,
                 mapper,
@@ -99,7 +98,6 @@ public final class TcpMessageBroker extends AbstractMessageBroker<TcpMessageChan
                 executor
         );
         this.connection.start();
-        this.mapper = mapper;
         this.executor = executor;
     }
 
