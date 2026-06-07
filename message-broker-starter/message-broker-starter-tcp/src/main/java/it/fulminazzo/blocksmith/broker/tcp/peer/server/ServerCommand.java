@@ -22,9 +22,9 @@ public enum ServerCommand {
      * <br>
      * Syntax: {@code SUBSCRIBE <channel>}
      */
-    SUBSCRIBE((client, args) -> {
-        client.subscribe(args.get(0)).send(ServerResponse.SUCCESS);
-    }) {
+    SUBSCRIBE((client, args) ->
+            client.subscribe(args.get(0)).send(ServerResponse.SUCCESS)
+    ) {
         @Override
         public @NotNull String formatCommand(final @NotNull Object... arguments) {
             return String.format("%s %s", name(), arguments[0]);
@@ -35,9 +35,9 @@ public enum ServerCommand {
      * <br>
      * Syntax: {@code UNSUBSCRIBE <channel>}
      */
-    UNSUBSCRIBE((client, args) -> {
-        client.unsubscribe(args.get(0)).send(ServerResponse.SUCCESS);
-    }) {
+    UNSUBSCRIBE((client, args) ->
+            client.unsubscribe(args.get(0)).send(ServerResponse.SUCCESS)
+    ) {
         @Override
         public @NotNull String formatCommand(final @NotNull Object... arguments) {
             return String.format("%s %s", name(), arguments[0]);

@@ -102,14 +102,14 @@ class TcpMessageServerIntegrationTest extends Specification {
         client3?.close()
     }
 
-    def 'test that getClients does not return dead clients'() {
+    def 'test that getActiveClients does not return dead clients'() {
         given:
         def client1 = new MockTcpMessageClient(server.port).start()
         def client2 = new MockTcpMessageClient(server.port).start()
         def client3 = new MockTcpMessageClient(server.port).start()
 
         expect:
-        server.clients.size() == 3
+        server.activeClients.size() == 3
 
         when:
         client1.close()
@@ -118,7 +118,7 @@ class TcpMessageServerIntegrationTest extends Specification {
         sleep(TEST_WAIT_TIME)
 
         then:
-        server.clients.size() == 2
+        server.activeClients.size() == 2
 
         when:
         client2.close()
@@ -127,14 +127,14 @@ class TcpMessageServerIntegrationTest extends Specification {
         sleep(TEST_WAIT_TIME)
 
         then:
-        server.clients.size() == 1
+        server.activeClients.size() == 1
 
         when:
         client3.close()
         sleep(TEST_WAIT_TIME)
 
         then:
-        server.clients.empty
+        server.activeClients.empty
 
         cleanup:
         client1?.close()

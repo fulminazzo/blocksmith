@@ -57,9 +57,9 @@ public final class TcpMessageServer extends Loggable implements TcpConnection, R
      * @param payload the payload to send
      */
     public void broadcast(final @NotNull String payload) {
-        List<TcpMessageServerClient> clients = getClients();
-        logger.debug(formatLog("Broadcasting to {} clients, message: {}"), clients.size(), payload);
-        clients.forEach(c -> ServerCommand.MESSAGE.execute(c, payload));
+        List<TcpMessageServerClient> receivers = getActiveClients();
+        logger.debug(formatLog("Broadcasting to {} clients, message: {}"), receivers.size(), payload);
+        receivers.forEach(c -> ServerCommand.MESSAGE.execute(c, payload));
     }
 
     /**
@@ -67,7 +67,7 @@ public final class TcpMessageServer extends Loggable implements TcpConnection, R
      *
      * @return the connected clients
      */
-    @NotNull List<TcpMessageServerClient> getClients() {
+    @NotNull List<TcpMessageServerClient> getActiveClients() {
         clients.removeIf(TcpMessageServerClient::isClosed);
         return clients;
     }

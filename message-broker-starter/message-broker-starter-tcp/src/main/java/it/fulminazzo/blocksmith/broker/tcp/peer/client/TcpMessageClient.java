@@ -29,7 +29,7 @@ public abstract class TcpMessageClient extends AbstractTcpMessageClient<TcpMessa
      * @param port   the port to connect on
      * @throws IOException in case it is not possible to retrieve the data streams
      */
-    public TcpMessageClient(
+    protected TcpMessageClient(
             final @NotNull Logger logger,
             final @NotNull Mapper mapper,
             final int port

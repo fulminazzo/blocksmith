@@ -51,7 +51,7 @@ public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClien
             justification = "The socket comes directly from the SocketServer#accept() return method "
                     + "in the case of server clients"
     )
-    public AbstractTcpMessageClient(
+    protected AbstractTcpMessageClient(
             final @NotNull Logger logger,
             final @NotNull Mapper mapper,
             final @NotNull Socket socket
