@@ -21,6 +21,8 @@ import java.util.function.UnaryOperator
 class AbstractMessageChannelTest extends Specification {
     private static final Mapper MAPPER = MapperFormat.JSON.newMapper()
 
+    private static final int SLEEP_TIME = 500
+
     private final data = new Cat('Felix', 7, false)
 
     private final ScheduledExecutorService senderService = Executors.newSingleThreadScheduledExecutor()
@@ -45,7 +47,11 @@ class AbstractMessageChannelTest extends Specification {
         receiver.subscribe(String, (Function<?, ?>) (d -> null))
 
         when:
-        def actual = sender.sendAndReceive(data, Cat, Duration.ofSeconds(10)).get()
+        def actual = sender.sendAndReceive(
+                data,
+                Cat,
+                Duration.ofMillis(SLEEP_TIME * 10)
+        ).get()
 
         then:
         actual == expected
@@ -56,7 +62,10 @@ class AbstractMessageChannelTest extends Specification {
         receiver.subscribeRaw((UnaryOperator<String>) (r -> r == 'ping' ? 'pong' : null))
 
         when:
-        def actual = sender.sendAndReceiveRaw('ping', Duration.ofSeconds(10)).get()
+        def actual = sender.sendAndReceiveRaw(
+                'ping',
+                Duration.ofMillis(SLEEP_TIME * 10)
+        ).get()
 
         then:
         actual == 'pong'
@@ -64,7 +73,10 @@ class AbstractMessageChannelTest extends Specification {
 
     def 'test that sendAndReceiveRaw throws Timeout if nobody is subscribed'() {
         when:
-        sender.sendAndReceiveRaw('ping', Duration.ofMillis(125)).get()
+        sender.sendAndReceiveRaw(
+                'ping',
+                Duration.ofMillis(SLEEP_TIME * 10)
+        ).get()
 
         then:
         def e = thrown(ExecutionException)
@@ -77,6 +89,9 @@ class AbstractMessageChannelTest extends Specification {
 
         when:
         sender.send(data).join()
+
+        and:
+        sleep(SLEEP_TIME)
 
         then:
         !queue.empty
@@ -105,7 +120,7 @@ class AbstractMessageChannelTest extends Specification {
         MockMessageQueryEngine.getQueue(receiver.name).add(MAPPER.serialize(data))
 
         and:
-        sleep(250)
+        sleep(SLEEP_TIME)
 
         then:
         def actualData = actual.get()
@@ -135,7 +150,7 @@ class AbstractMessageChannelTest extends Specification {
         queue.add(MAPPER.serialize(data))
 
         and:
-        sleep(250)
+        sleep(SLEEP_TIME)
 
         then:
         def actualData = actual.get()
@@ -143,6 +158,9 @@ class AbstractMessageChannelTest extends Specification {
 
         when:
         queue = MockMessageQueryEngine.getQueue(sender.name)
+
+        and:
+        sleep(SLEEP_TIME)
 
         then:
         !queue.empty
@@ -167,14 +185,19 @@ class AbstractMessageChannelTest extends Specification {
         receiver.unsubscribe(id)
 
         and:
+        sleep(SLEEP_TIME)
+
+        and:
         sender.sendRaw('Hello, world!')
+
+        and:
+        sleep(SLEEP_TIME)
 
         then:
         actual.get() == null
         !MockMessageQueryEngine.getQueue(receiver.name).empty
     }
 
-    @SuppressWarnings('GroovyAccessibility')
     def 'test that handleMessage does not handle sent message once'() {
         given:
         final channel = Reflect.on(sender)
@@ -201,11 +224,17 @@ class AbstractMessageChannelTest extends Specification {
         when:
         sender.handleMessage(serialized)
 
+        and:
+        sleep(SLEEP_TIME)
+
         then:
         !handled.get()
 
         when:
         sender.handleMessage(serialized)
+
+        and:
+        sleep(SLEEP_TIME)
 
         then:
         handled.get()
