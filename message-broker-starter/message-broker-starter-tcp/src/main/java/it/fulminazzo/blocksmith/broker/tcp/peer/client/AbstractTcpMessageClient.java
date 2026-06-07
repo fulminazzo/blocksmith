@@ -1,6 +1,5 @@
 package it.fulminazzo.blocksmith.broker.tcp.peer.client;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.broker.tcp.peer.ChannelSubscriber;
 import it.fulminazzo.blocksmith.broker.tcp.peer.Loggable;
 import it.fulminazzo.blocksmith.broker.tcp.peer.TcpConnection;
@@ -46,11 +45,6 @@ public abstract class AbstractTcpMessageClient<C extends AbstractTcpMessageClien
      * @param socket the socket connection
      * @throws IOException in case it is not possible to retrieve the data streams
      */
-    @SuppressFBWarnings(
-            value = "EI_EXPOSE_REP2",
-            justification = "The socket comes directly from the SocketServer#accept() return method "
-                    + "in the case of server clients"
-    )
     protected AbstractTcpMessageClient(
             final @NotNull Logger logger,
             final @NotNull Mapper mapper,
