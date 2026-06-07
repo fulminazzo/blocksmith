@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.broker;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.*;
@@ -13,12 +14,12 @@ import java.util.function.Consumer;
  * @see MockMessageChannel
  */
 public final class MockMessageQueryEngine extends MessageQueryEngine {
-    /**
-     * The Messages.
-     */
-    static final @NotNull Map<String, Queue<String>> MESSAGES = new ConcurrentHashMap<>();
+    private static final @NotNull Map<String, Queue<MockMessage>> MESSAGES = new ConcurrentHashMap<>();
+
+    private final @NotNull List<Consumer<String>> consumers = new CopyOnWriteArrayList<>();
 
     private final @NotNull ScheduledExecutorService executorService;
+    private long lastRead;
 
     /**
      * Instantiates a new Mock message query engine.
@@ -32,24 +33,13 @@ public final class MockMessageQueryEngine extends MessageQueryEngine {
     ) {
         super(channelName);
         this.executorService = executorService;
-    }
-
-    @Override
-    public @NotNull CompletableFuture<Void> publish(final @NotNull String payload) {
-        return CompletableFuture.runAsync(() ->
-                MESSAGES.keySet().stream()
-                        .filter(n -> !n.equals(getChannelName()))
-                        .map(MESSAGES::get)
-                        .forEach(q -> q.add(payload))
-        );
-    }
-
-    @Override
-    public void listen(final @NotNull Consumer<String> consumer) {
-        executorService.scheduleAtFixedRate(
+        this.executorService.scheduleAtFixedRate(
                 () -> {
-                    Queue<String> queue = MockMessageQueryEngine.getQueue(getChannelName());
-                    if (!queue.isEmpty()) consumer.accept(queue.poll());
+                    MockMessageQueryEngine.getQueue(getChannelName()).stream()
+                            .filter(m -> m.timestamp() > lastRead)
+                            .map(MockMessage::message)
+                            .forEach(m -> consumers.forEach(c -> c.accept(m)));
+                    lastRead = System.currentTimeMillis();
                 },
                 0,
                 125,
@@ -58,8 +48,24 @@ public final class MockMessageQueryEngine extends MessageQueryEngine {
     }
 
     @Override
+    public @NotNull CompletableFuture<Void> publish(final @NotNull String payload) {
+        return CompletableFuture.runAsync(() ->
+                MESSAGES.keySet().stream()
+                        .filter(n -> !n.equals(getChannelName()))
+                        .map(MESSAGES::get)
+                        .forEach(q -> q.add(new MockMessage(payload, System.currentTimeMillis())))
+        );
+    }
+
+    @Override
+    public void listen(final @NotNull Consumer<String> consumer) {
+        consumers.add(consumer);
+    }
+
+    @Override
     public void close() {
         MockMessageQueryEngine.MESSAGES.remove(getChannelName());
+        executorService.shutdown();
     }
 
     /**
@@ -68,8 +74,17 @@ public final class MockMessageQueryEngine extends MessageQueryEngine {
      * @param name the name
      * @return the queue
      */
-    public static @NotNull Queue<String> getQueue(final @NotNull String name) {
+    static @NotNull Queue<MockMessage> getQueue(final @NotNull String name) {
         return MESSAGES.computeIfAbsent(name, _ -> new ConcurrentLinkedQueue<>());
+    }
+
+    /**
+     * A record representing a message.
+     *
+     * @param message   the message
+     * @param timestamp the time when the message was received
+     */
+    record MockMessage(@NotNull String message, long timestamp) {
     }
 
 }
