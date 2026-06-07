@@ -9,23 +9,23 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 
 class AbstractMessageBrokerTest extends Specification {
-    private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor()
     private static final Mapper MAPPER = MapperFormat.SERIALIZABLE.newMapper()
 
+    private final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor()
     private final AbstractMessageBroker<? extends MessageChannelSettings> broker = new MockMessageBroker(MapperFormat.SERIALIZABLE.newMapper())
-
-    void cleanupSpec() {
-        SERVICE.close()
-    }
 
     void setup() {
         MockMessageQueryEngine.clear()
     }
 
+    void cleanup() {
+        service.close()
+    }
+
     def 'test that registerChannel registers new channel and removes closed ones'() {
         given:
-        def first = new MockMessageChannel(MAPPER, 'first', SERVICE)
-        def second = new MockMessageChannel(MAPPER, 'second', SERVICE)
+        def first = new MockMessageChannel(MAPPER, 'first', service)
+        def second = new MockMessageChannel(MAPPER, 'second', service)
 
         and:
         List<MessageChannel> channels = registeredChannels
@@ -49,8 +49,8 @@ class AbstractMessageBrokerTest extends Specification {
 
     def 'test that close closes all registered channels'() {
         given:
-        def first = new MockMessageChannel(MAPPER, 'first', SERVICE)
-        def second = new MockMessageChannel(MAPPER, 'second', SERVICE)
+        def first = new MockMessageChannel(MAPPER, 'first', service)
+        def second = new MockMessageChannel(MAPPER, 'second', service)
 
         and:
         List<MessageChannel> channels = registeredChannels
