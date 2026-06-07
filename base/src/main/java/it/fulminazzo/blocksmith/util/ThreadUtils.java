@@ -3,6 +3,8 @@ package it.fulminazzo.blocksmith.util;
 import it.fulminazzo.blocksmith.ProjectInfo;
 import it.fulminazzo.blocksmith.naming.CaseConverter;
 import it.fulminazzo.blocksmith.naming.Convention;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +15,7 @@ import java.util.concurrent.ThreadFactory;
 /**
  * A collection of utilities for working with threads.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ThreadUtils {
     private static final @NotNull Map<Class<?>, Integer> THREADS_COUNT = new ConcurrentHashMap<>();
 
