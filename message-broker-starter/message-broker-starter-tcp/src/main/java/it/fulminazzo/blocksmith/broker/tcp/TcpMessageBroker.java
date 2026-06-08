@@ -9,7 +9,6 @@ import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiFunction;
 
@@ -130,7 +129,7 @@ public final class TcpMessageBroker extends AbstractMessageBroker<TcpMessageChan
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         super.close();
         connection.close();
         executor.shutdown();

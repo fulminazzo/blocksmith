@@ -9,7 +9,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Map;
@@ -192,7 +191,7 @@ public abstract class AbstractMessageChannel<E extends MessageQueryEngine> imple
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (!isClosed()) {
             queryEngine.close();
             closed = true;

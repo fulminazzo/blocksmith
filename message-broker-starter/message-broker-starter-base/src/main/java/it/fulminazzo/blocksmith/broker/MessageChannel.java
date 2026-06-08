@@ -145,4 +145,7 @@ public interface MessageChannel extends Closeable {
      */
     boolean isClosed();
 
+    @Override
+    void close();
+
 }

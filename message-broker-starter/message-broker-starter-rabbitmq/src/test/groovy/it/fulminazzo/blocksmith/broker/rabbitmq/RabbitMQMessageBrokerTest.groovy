@@ -31,4 +31,24 @@ class RabbitMQMessageBrokerTest extends Specification {
         e.message =~ /.*$exchangeName.+Test exception.*/
     }
 
+    def 'test that IOException on close is re-thrown as RabbitMQMessageBrokerException'() {
+        given:
+        def connection = Mock(Connection)
+        def broker = Spy(RabbitMQMessageBroker, constructorArgs : [
+                Mock(ExecutorService),
+                connection,
+                Mock(Mapper)
+        ])
+
+        and:
+        connection.close() >> { throw new IOException('Test exception') }
+
+        when:
+        broker.close()
+
+        then:
+        def e = thrown(RabbitMQMessageBrokerException)
+        e.message =~ /.*Test exception.*/
+    }
+
 }

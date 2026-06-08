@@ -4,7 +4,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +52,7 @@ public abstract class AbstractMessageBroker<S extends MessageChannelSettings<S>>
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         for (MessageChannel channel : getRegisteredChannels()) channel.close();
         registeredChannels.clear();
     }

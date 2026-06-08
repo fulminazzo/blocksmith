@@ -41,4 +41,7 @@ public abstract class MessageQueryEngine implements Closeable {
      */
     public abstract void listen(final @NotNull Consumer<String> consumer);
 
+    @Override
+    public abstract void close();
+
 }

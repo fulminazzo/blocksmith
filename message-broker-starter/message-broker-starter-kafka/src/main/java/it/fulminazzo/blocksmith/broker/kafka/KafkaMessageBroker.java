@@ -6,7 +6,6 @@ import it.fulminazzo.blocksmith.broker.MessageChannelType;
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiFunction;
@@ -130,7 +129,7 @@ public final class KafkaMessageBroker extends AbstractMessageBroker<KafkaMessage
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         super.close();
         executor.shutdown();
     }

@@ -27,4 +27,7 @@ public interface MessageBroker<S extends MessageChannelSettings<S>> extends Clos
      */
     @NotNull MessageChannel newChannel(final @NotNull S settings);
 
+    @Override
+    void close();
+
 }

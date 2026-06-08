@@ -34,6 +34,13 @@ public final class RabbitMQMessageBrokerException extends RuntimeException {
         );
     }
 
+    static @NotNull RabbitMQMessageBrokerException closeConnectionException(final @NotNull Throwable cause) {
+        return newException(
+                "An exception occurred while closing a connection",
+                cause
+        );
+    }
+
     static @NotNull RabbitMQMessageBrokerException createChannelException(
             final @NotNull String exchangeName,
             @NotNull Throwable cause

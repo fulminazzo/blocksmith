@@ -134,9 +134,13 @@ public final class RabbitMQMessageBroker extends AbstractMessageBroker<RabbitMQM
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         super.close();
-        connection.close();
+        try {
+            connection.close();
+        } catch (IOException e) {
+            throw RabbitMQMessageBrokerException.closeConnectionException(e);
+        }
         executor.shutdown();
     }
 

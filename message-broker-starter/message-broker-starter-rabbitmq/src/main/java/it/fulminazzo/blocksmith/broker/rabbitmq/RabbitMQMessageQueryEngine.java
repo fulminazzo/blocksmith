@@ -148,13 +148,18 @@ public final class RabbitMQMessageQueryEngine extends MessageQueryEngine {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (channel.isOpen()) {
             final int count = consumerCount.get();
-            for (int i = 0; i < count; i++) channel.basicCancel(getConsumerTag(i));
+            for (int i = 0; i < count; i++)
+                try {
+                    channel.basicCancel(getConsumerTag(i));
+                } catch (IOException e) {
+                    // Ignored to allow other consumers to close
+                }
             try {
                 channel.close();
-            } catch (TimeoutException ignored) {
+            } catch (TimeoutException | IOException ignored) {
                 // Ignored
             }
         }
