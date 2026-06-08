@@ -30,15 +30,14 @@ extensions.configure<CompositeModuleExtension> {
 
 afterEvaluate {
 
-    val libraries = mutableListOf(
-        libs.bukkit,
-        libs.bungeecord,
-        libs.velocity
+    val libraries = mutableMapOf(
+        "bukkit" to libs.bukkit,
+        "bungeecord" to libs.bungeecord,
+        "velocity" to libs.velocity
     )
-    if (extension.enableFolia.getOrElse(false)) libraries.add(libs.folia)
+    if (extension.enableFolia.getOrElse(false)) libraries["folia"] = libs.folia
 
-    libraries.map { it.get() }.forEach { library ->
-        val name = library.name
+    libraries.forEach { (name, library) ->
         project("${project.path}:${project.name}-$name") {
 
             dependencies {
