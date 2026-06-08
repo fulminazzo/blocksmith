@@ -4,3 +4,15 @@ description: '$description'
 main: $group.${name_lower}.bukkit.$name
 authors: [ '$author' ]
 api-version: 1.13
+
+commands:
+  '$name_lower':
+    description: '$name base command'
+    usage: '/$name_lower'
+    aliases: [ '$alias' ]
+    permission: '${name_lower}.command'
+
+permissions:
+  '${name_lower}.command':
+    description: 'Permission to execute the /$name_lower command'
+    default: true

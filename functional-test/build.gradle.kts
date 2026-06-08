@@ -34,7 +34,8 @@ allprojects {
             "name_lower" to rootProject.name,
             "description" to "${rootProject.name} plugin for functional testing purposes",
             "version" to "${rootProject.version}",
-            "author" to author
+            "author" to author,
+            "alias" to "bs"
         )
         filesMatching("*.yml") { expand(properties) }
         filesMatching("*.json") { expand(properties) }
