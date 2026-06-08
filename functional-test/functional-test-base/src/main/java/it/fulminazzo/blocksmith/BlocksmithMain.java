@@ -21,7 +21,12 @@ public final class BlocksmithMain {
     public void enable() {
         if (isEnabled()) return;
         enabled = true;
+
         logger.info("Enabling...");
+        logger.info("┏┓ ╻  ┏━┓┏━╸╻┏ ┏━┓┏┳┓╻╺┳╸╻ ╻");
+        logger.info("┣┻┓┃  ┃ ┃┃  ┣┻┓┗━┓┃┃┃┃ ┃ ┣━┫");
+        logger.info("┗━┛┗━╸┗━┛┗━╸╹ ╹┗━┛╹ ╹╹ ╹ ╹ ╹");
+
         logger.info("Successfully enabled. Welcome!");
     }
 
