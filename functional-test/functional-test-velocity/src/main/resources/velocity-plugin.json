@@ -1,0 +1,11 @@
+{
+  "id": "$name_lower",
+  "name": "$name",
+  "version": "$version",
+  "description": "$description",
+  "authors": [
+    "$author"
+  ],
+  "dependencies": [],
+  "main": "$group.${name_lower}.velocity.$name"
+}
