@@ -6,8 +6,8 @@ plugins {
 
 val baseModuleName: String by extra
 
-subprojects {
-    if (name.endsWith("-$baseModuleName")) return@subprojects
+allprojects {
+    if (name.endsWith("-$baseModuleName")) return@allprojects
 
     apply { plugin(rootProject.libs.plugins.shadow.get().pluginId) }
 
@@ -40,4 +40,8 @@ subprojects {
         filesMatching("*.json") { expand(properties) }
     }
 
+}
+
+dependencies {
+    subprojects.forEach { implementation(it) }
 }
