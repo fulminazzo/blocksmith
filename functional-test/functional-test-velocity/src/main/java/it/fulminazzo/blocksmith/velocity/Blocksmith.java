@@ -1,11 +1,22 @@
 package it.fulminazzo.blocksmith.velocity;
 
 import com.google.inject.Inject;
+import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
 import it.fulminazzo.blocksmith.BlocksmithMain;
+import it.fulminazzo.blocksmith.ExecutorWrapper;
+import it.fulminazzo.blocksmith.ProjectInfo;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+
+import java.util.Arrays;
 
 /**
  * Main entry access point for the plugin.
@@ -14,20 +25,59 @@ import org.slf4j.Logger;
  */
 @SuppressWarnings("checkstyle:MissingJavadocMethod") // for events
 public final class Blocksmith {
+    private final @NotNull ProxyServer server;
     private final @NotNull BlocksmithMain main;
 
     /**
      * Instantiates this class.
      *
+     * @param server the server
      * @param logger the logger
      */
     @Inject
-    public Blocksmith(final @NotNull Logger logger) {
+    public Blocksmith(final @NotNull ProxyServer server, final @NotNull Logger logger) {
+        this.server = server;
         this.main = new BlocksmithMain(logger);
     }
 
     @Subscribe
     public void onEnable(final @NotNull ProxyInitializeEvent event) {
+        server.getCommandManager().register(
+                ProjectInfo.PROJECT_NAME,
+                new SimpleCommand() {
+
+                    @Override
+                    public void execute(final @NotNull Invocation invocation) {
+                        CommandSource sender = invocation.source();
+                        String @NonNull [] arguments = invocation.arguments();
+                        if (arguments.length == 0)
+                            sender.sendMessage(Component
+                                    .text("No subcommand specified")
+                                    .color(NamedTextColor.RED)
+                            );
+                        else main.executeCommand(
+                                new ExecutorWrapper() {
+
+                                    @Override
+                                    public void sendMessage(final @NotNull String message) {
+                                        sender.sendMessage(Component.text(message));
+                                    }
+
+                                    @Override
+                                    public @NotNull String getName() {
+                                        return sender instanceof Player ? ((Player) sender).getUsername() : "CONSOLE";
+                                    }
+
+                                },
+                                arguments[0],
+                                Arrays.copyOfRange(arguments, 1, arguments.length)
+                        );
+                    }
+
+                },
+                "bs"
+        );
+
         main.enable();
     }
 
