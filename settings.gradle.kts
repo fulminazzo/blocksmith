@@ -34,3 +34,13 @@ include(
 
     "base:testing"
 )
+
+// functional testing
+include(
+    "functional-test",
+
+    "functional-test:functional-test-base",
+    "functional-test:functional-test-bukkit",
+    "functional-test:functional-test-bungeecord",
+    "functional-test:functional-test-velocity"
+)
