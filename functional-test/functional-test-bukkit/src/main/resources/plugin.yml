@@ -1,0 +1,6 @@
+name: '$name'
+version: $version
+description: '$description'
+main: $group.${name_lower}.bukkit.$name
+authors: [ '$author' ]
+api-version: 1.13
