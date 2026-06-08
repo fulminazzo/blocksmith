@@ -11,12 +11,15 @@ import it.fulminazzo.blocksmith.BlocksmithMain;
 import it.fulminazzo.blocksmith.ExecutorWrapper;
 import it.fulminazzo.blocksmith.ProjectInfo;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * Main entry access point for the plugin.
@@ -51,10 +54,7 @@ public final class Blocksmith {
                         CommandSource sender = invocation.source();
                         String @NonNull [] arguments = invocation.arguments();
                         if (arguments.length == 0)
-                            sender.sendMessage(Component
-                                    .text("No subcommand specified")
-                                    .color(NamedTextColor.RED)
-                            );
+                            sender.sendMessage(Component.text("No subcommand specified"));
                         else main.executeCommand(
                                 new ExecutorWrapper() {
 
@@ -72,6 +72,17 @@ public final class Blocksmith {
                                 arguments[0],
                                 Arrays.copyOfRange(arguments, 1, arguments.length)
                         );
+                    }
+
+                    @Override
+                    public List<String> suggest(final @NotNull Invocation invocation) {
+                        String @NonNull [] arguments = invocation.arguments();
+                        if (arguments.length == 1)
+                            return main.getCommands().stream()
+                                    .filter(c -> c.toLowerCase(Locale.ROOT)
+                                            .startsWith(arguments[0].toLowerCase(Locale.ROOT)))
+                                    .collect(Collectors.toList());
+                        else return Collections.emptyList();
                     }
 
                 },
