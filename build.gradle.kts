@@ -29,8 +29,11 @@ allprojects {
     apply { plugin("blocksmith.buildconfig-configuration") }
     apply { plugin("blocksmith.checkstyle-configuration") }
     apply { plugin("blocksmith.codenarc-configuration") }
-    apply { plugin("blocksmith.jacoco-configuration") }
     apply { plugin("blocksmith.spotbugs-configuration") }
+
+    // Coverage is not needed for testing modules
+    if (!name.startsWith(rootProject.projects.functionalTest.name))
+        apply { plugin("blocksmith.jacoco-configuration") }
 
     dependencies {
         compileOnly(rootProject.libs.bundles.annotations)
