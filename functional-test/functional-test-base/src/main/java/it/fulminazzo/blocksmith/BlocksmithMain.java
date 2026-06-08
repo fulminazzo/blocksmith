@@ -40,4 +40,19 @@ public final class BlocksmithMain {
         logger.info("Successfully disabled. Goodbye");
     }
 
+    /**
+     * Executes the command.
+     *
+     * @param executor  the executor
+     * @param command   the command name
+     * @param arguments the arguments of the command
+     */
+    public void executeCommand(
+            final @NotNull ExecutorWrapper executor,
+            final @NotNull String command,
+            final @NotNull String @NotNull [] arguments
+    ) {
+        // logic
+    }
+
 }
