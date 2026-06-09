@@ -49,19 +49,7 @@ public final class Blocksmith extends JavaPlugin {
     ) {
         if (args.length == 0) sender.sendMessage("No subcommand specified");
         else main.executeCommand(
-                new ExecutorWrapper() {
-
-                    @Override
-                    public void sendMessage(final @NotNull String message) {
-                        sender.sendMessage(message);
-                    }
-
-                    @Override
-                    public @NotNull String getName() {
-                        return sender.getName();
-                    }
-
-                },
+                new BukkitExecutorWrapper(sender),
                 args[0],
                 Arrays.copyOfRange(args, 1, args.length)
         );
@@ -80,6 +68,25 @@ public final class Blocksmith extends JavaPlugin {
                     .filter(c -> c.toLowerCase(Locale.ROOT).startsWith(args[0].toLowerCase(Locale.ROOT)))
                     .collect(Collectors.toList());
         else return Collections.emptyList();
+    }
+
+    private static final class BukkitExecutorWrapper implements ExecutorWrapper {
+        private final @NotNull CommandSender sender;
+
+        public BukkitExecutorWrapper(@NotNull CommandSender sender) {
+            this.sender = sender;
+        }
+
+        @Override
+        public void sendMessage(final @NotNull String message) {
+            sender.sendMessage(message);
+        }
+
+        @Override
+        public @NotNull String getName() {
+            return sender.getName();
+        }
+
     }
 
 }

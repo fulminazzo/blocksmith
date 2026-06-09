@@ -41,7 +41,26 @@ public final class Blocksmith extends Plugin {
         main.disable();
     }
 
-    private class BlocksmithCommand extends Command implements TabExecutor {
+    private static final class BungeecordExecutorWrapper implements ExecutorWrapper {
+        private final @NotNull CommandSender sender;
+
+        public BungeecordExecutorWrapper(@NotNull CommandSender sender) {
+            this.sender = sender;
+        }
+
+        @Override
+        public void sendMessage(final @NotNull String message) {
+            sender.sendMessage(TextComponent.fromLegacyText(message));
+        }
+
+        @Override
+        public @NotNull String getName() {
+            return sender.getName();
+        }
+
+    }
+
+    private final class BlocksmithCommand extends Command implements TabExecutor {
 
         public BlocksmithCommand() {
             super(ProjectInfo.PROJECT_NAME, null, "bs");
@@ -52,19 +71,7 @@ public final class Blocksmith extends Plugin {
             if (args.length == 0)
                 sender.sendMessage(TextComponent.fromLegacyText("No subcommand specified"));
             else main.executeCommand(
-                    new ExecutorWrapper() {
-
-                        @Override
-                        public void sendMessage(final @NotNull String message) {
-                            sender.sendMessage(TextComponent.fromLegacyText(message));
-                        }
-
-                        @Override
-                        public @NotNull String getName() {
-                            return sender.getName();
-                        }
-
-                    },
+                    new BungeecordExecutorWrapper(sender),
                     args[0],
                     Arrays.copyOfRange(args, 1, args.length)
             );
