@@ -24,7 +24,7 @@ abstract class ValidatorCheck extends AbstractCheck {
     private static final @NotNull List<Integer> SCOPE_CHANGE_TOKENS = List.of(
             TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF,
             TokenTypes.ENUM_DEF, TokenTypes.ENUM_CONSTANT_DEF,
-            TokenTypes.RECORD_DEF,
+            TokenTypes.RECORD_DEF, TokenTypes.OBJBLOCK,
             TokenTypes.SLIST
     );
 
@@ -121,6 +121,18 @@ abstract class ValidatorCheck extends AbstractCheck {
 
     private void handle(final CompositeValidationException exception) {
         exception.getExceptions().forEach(e -> log(e.getNode(), e.getMessage(), e.getArguments()));
+    }
+
+    /**
+     * Checks if the given node is a special scope change token.
+     *
+     * @param node the node to check
+     * @return {@code true} if it is, {@code false} otherwise
+     */
+    protected static boolean isSpecialScopeChangeToken(final @NotNull DetailAST node) {
+        return node.getType() == TokenTypes.SLIST
+                || node.getType() == TokenTypes.OBJBLOCK
+                || node.getType() == TokenTypes.ENUM_CONSTANT_DEF;
     }
 
     /**
