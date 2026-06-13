@@ -7,7 +7,7 @@ class AbstractPluginMessagePublisherTest extends Specification {
 
     def 'test that republishFailedMessages adds failed messages a second time if publication fails'() {
         given:
-        def validator = a -> a[0] == 'valid'
+        def validator = a -> new String(a[0]) == 'valid'
 
         and:
         def publisher = Spy(AbstractPluginMessagePublisher)
@@ -17,17 +17,17 @@ class AbstractPluginMessagePublisherTest extends Specification {
         final failedMessages = Reflect.on(publisher).get('failedMessages').get()
 
         when:
-        publisher.publish('valid', 'Hello')
-        publisher.publish('valid', 'world')
-        publisher.publish('invalid', 'valid:Hello')
-        publisher.publish('invalid', 'invalid:world')
+        publisher.publish('valid', 'Hello'.bytes)
+        publisher.publish('valid', 'world'.bytes)
+        publisher.publish('invalid', 'valid:Hello'.bytes)
+        publisher.publish('invalid', 'invalid:world'.bytes)
 
         then:
         failedMessages.size() == 1
         failedMessages['invalid'].size() == 2
 
         when:
-        validator = a -> a[1].startsWith('valid:')
+        validator = a -> new String(a[1]).startsWith('valid:')
 
         and:
         publisher.republishFailedMessages()

@@ -48,7 +48,7 @@ public abstract class ProxyPluginMessageChannelCoordinator<N> extends PluginMess
     }
 
     @Override
-    public boolean publish(final @NotNull String channelName, final @NotNull String message) {
+    public boolean publish(final @NotNull String channelName, final byte @NotNull [] message) {
         refreshNodes();
         return nodes.values().stream().anyMatch(n -> n.publish(channelName, message));
     }

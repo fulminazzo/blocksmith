@@ -22,10 +22,10 @@ public interface PluginMessagePublisher {
      *         {@code false} if the message could not be sent at this time
      *         (probably due to missing bridge between connections)
      */
-    boolean publish(final @NotNull String channelName, final @NotNull String message);
+    boolean publish(final @NotNull String channelName, final byte @NotNull [] message);
 
     /**
-     * Attempts to publish once again (in order) the messages whose {@link #publish(String, String)}
+     * Attempts to publish once again (in order) the messages whose {@link #publish(String, byte[])}
      * returned {@code false}.
      * <br>
      * <b>WARNING</b>: it is <b>not guaranteed</b> that the publication will be successful.
