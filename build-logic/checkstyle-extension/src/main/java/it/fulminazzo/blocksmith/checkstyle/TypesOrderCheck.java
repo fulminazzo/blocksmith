@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.checkstyle;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import it.fulminazzo.blocksmith.checkstyle.validator.OrderValidator;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.StaticCriterion;
 import it.fulminazzo.blocksmith.checkstyle.validator.criterion.TypeCriterion;
@@ -44,8 +43,7 @@ public final class TypesOrderCheck extends ValidatorCheck {
     @Override
     public void visitToken(final @NotNull DetailAST ast) {
         if (isTopLevel(ast)) return;
-        if (ast.getType() != TokenTypes.SLIST && ast.getType() != TokenTypes.ENUM_CONSTANT_DEF)
-            visitTokenImpl(ast);
+        if (!isSpecialScopeChangeToken(ast)) visitTokenImpl(ast);
         if (isScopeChanged(ast)) getValidator().enterScope();
     }
 
