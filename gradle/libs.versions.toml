@@ -56,6 +56,7 @@ velocity = "3.0.0-SNAPSHOT"
 
 # PROJECT
 java-parser = "3.28.0"
+guava = "33.6.0-jre"
 
 [libraries]
 checkstyle = { module = "com.puppycrawl.tools:checkstyle", version.ref = "checkstyle" }
@@ -122,6 +123,7 @@ velocity = { module = "com.velocitypowered:velocity-api", version.ref = "velocit
 
 # PROJECT
 java-parser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "java-parser" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
 [bundles]
 # ANNOTATIONS
