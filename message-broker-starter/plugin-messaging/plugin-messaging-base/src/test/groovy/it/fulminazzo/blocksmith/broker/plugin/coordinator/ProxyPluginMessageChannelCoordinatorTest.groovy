@@ -9,6 +9,34 @@ class ProxyPluginMessageChannelCoordinatorTest extends Specification {
             constructorArgs : [Mock(PluginMessageRegistrar)]
     )
 
+    def 'test that getNodePublisher creates a new node if missing'() {
+        given:
+        def nodes = Reflect.on(coordinator).get('nodes').get() as Map
+        final nodeId = 'node'
+
+        and:
+        coordinator.getNodePublisher(_) >> { callRealMethod() }
+        coordinator.newNodePublisher(_) >> { Mock(PluginMessagePublisher) }
+
+        when:
+        def first = coordinator.getNodePublisher(nodeId)
+
+        then:
+        first != null
+
+        and:
+        nodes[nodeId] == first
+
+        when:
+        def second = coordinator.getNodePublisher(nodeId)
+
+        then:
+        second != null
+
+        and:
+        first == second
+    }
+
     def 'test that refreshNodes removes disconnected nodes and updates with new ones'() {
         given:
         def nodes = Reflect.on(coordinator).get('nodes').get() as Map

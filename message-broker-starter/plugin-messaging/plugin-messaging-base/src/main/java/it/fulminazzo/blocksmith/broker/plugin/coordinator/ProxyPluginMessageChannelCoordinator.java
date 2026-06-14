@@ -41,6 +41,16 @@ public abstract class ProxyPluginMessageChannelCoordinator<N> extends PluginMess
      */
     protected abstract @NotNull Collection<N> getAllNodes();
 
+    /**
+     * Gets the publisher for the given node.
+     *
+     * @param node the node
+     * @return the publisher
+     */
+    protected @NotNull PluginMessagePublisher getNodePublisher(final @NotNull N node) {
+        return nodes.computeIfAbsent(node, this::newNodePublisher);
+    }
+
     private void refreshNodes() {
         @NotNull Collection<N> currNodes = getAllNodes();
         nodes.keySet().removeIf(n -> !currNodes.contains(n));
