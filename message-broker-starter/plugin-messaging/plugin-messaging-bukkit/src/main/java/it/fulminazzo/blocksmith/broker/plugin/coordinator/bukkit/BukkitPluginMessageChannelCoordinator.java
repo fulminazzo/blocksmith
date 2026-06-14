@@ -43,7 +43,7 @@ public final class BukkitPluginMessageChannelCoordinator
 
     /**
      * Attempts to resend the failed messages whenever a player joins
-     * (will only have effect if no other player was online at the time of publishing).
+     * (will only have an effect if no other player was online at the time of publishing).
      *
      * @param event the event
      */

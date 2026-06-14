@@ -1,7 +1,6 @@
 package it.fulminazzo.blocksmith.broker.plugin.coordinator.bukkit
 
 import it.fulminazzo.blocksmith.broker.plugin.coordinator.AbstractPluginMessagePublisher
-import it.fulminazzo.blocksmith.broker.plugin.coordinator.PluginMessagePublisher
 import it.fulminazzo.blocksmith.broker.plugin.coordinator.PluginMessageRegistrar
 import it.fulminazzo.blocksmith.reflect.Reflect
 import org.bukkit.Server
