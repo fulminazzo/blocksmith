@@ -129,6 +129,20 @@ class VelocityPluginMessageChannelCoordinatorTest extends Specification {
         1 * registrar.server().eventManager.unregisterListener(registrar.plugin(), coordinator)
     }
 
+    def 'test that getNode throws if it could not find the node'() {
+        given:
+        def publisher = new VelocityPluginMessageChannelCoordinator.VelocityPluginMessagePublisher(
+                coordinator,
+                'unknown'
+        )
+
+        when:
+        publisher.node
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
     protected RegisteredServer newServer(final String name) {
         return Mock(RegisteredServer) { RegisteredServer server ->
             def serverInfo = Mock(ServerInfo) { it.name >> name }
