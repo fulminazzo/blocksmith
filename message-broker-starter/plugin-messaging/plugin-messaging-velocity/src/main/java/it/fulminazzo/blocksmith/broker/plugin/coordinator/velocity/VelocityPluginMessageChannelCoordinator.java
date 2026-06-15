@@ -33,6 +33,7 @@ public final class VelocityPluginMessageChannelCoordinator
     VelocityPluginMessageChannelCoordinator(final @NotNull PluginMessageRegistrar registrar) {
         super(registrar);
         this.server = this.registrar.server();
+        server.getEventManager().register(registrar.plugin(), this);
     }
 
     /**
@@ -60,6 +61,12 @@ public final class VelocityPluginMessageChannelCoordinator
     }
 
     @Override
+    public void close() {
+        super.close();
+        server.getEventManager().unregisterListener(registrar.plugin(), this);
+    }
+
+    @Override
     protected @NotNull PluginMessagePublisher newNodePublisher(final @NotNull String node) {
         return new VelocityPluginMessagePublisher(node);
     }
@@ -67,13 +74,11 @@ public final class VelocityPluginMessageChannelCoordinator
     @Override
     protected void registerChannel(final @NotNull String channelName) {
         server.getChannelRegistrar().register(VelocityChannelUtils.toIdentifier(channelName));
-        server.getEventManager().register(registrar.plugin(), this);
     }
 
     @Override
     protected void unregisterChannel(final @NotNull String channelName) {
         server.getChannelRegistrar().unregister(VelocityChannelUtils.toIdentifier(channelName));
-        server.getEventManager().unregisterListener(registrar.plugin(), this);
     }
 
     @Override

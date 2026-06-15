@@ -39,6 +39,7 @@ public final class BukkitPluginMessageChannelCoordinator
         super(registrar);
         this.server = this.registrar.server();
         this.publisher = new BukkitPluginMessageChannelPublisher();
+        server.getPluginManager().registerEvents(this, this.registrar.plugin());
     }
 
     /**
@@ -62,6 +63,12 @@ public final class BukkitPluginMessageChannelCoordinator
     }
 
     @Override
+    public void close() {
+        super.close();
+        HandlerList.unregisterAll(this);
+    }
+
+    @Override
     protected void registerChannel(final @NotNull String channelName) {
         Plugin plugin = registrar.plugin();
         server.getMessenger().registerIncomingPluginChannel(
@@ -70,7 +77,6 @@ public final class BukkitPluginMessageChannelCoordinator
                 this
         );
         server.getMessenger().registerOutgoingPluginChannel(plugin, channelName);
-        server.getPluginManager().registerEvents(this, plugin);
     }
 
     @Override
@@ -78,7 +84,6 @@ public final class BukkitPluginMessageChannelCoordinator
         Plugin plugin = registrar.plugin();
         server.getMessenger().unregisterIncomingPluginChannel(plugin, channelName);
         server.getMessenger().unregisterOutgoingPluginChannel(plugin, channelName);
-        HandlerList.unregisterAll(this);
     }
 
     /**

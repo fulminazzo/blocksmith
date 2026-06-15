@@ -29,6 +29,14 @@ class BungeecordPluginMessageChannelCoordinatorTest extends Specification {
 
     private final BungeecordPluginMessageChannelCoordinator coordinator = new BungeecordPluginMessageChannelCoordinator(registrar)
 
+    def 'test that constructor registers listener'() {
+        when:
+        new BungeecordPluginMessageChannelCoordinator(registrar)
+
+        then:
+        1 * registrar.server().pluginManager.registerListener(registrar.plugin(), _ as BungeecordPluginMessageChannelCoordinator)
+    }
+
     def 'test that coordinator attempts to publish failed messages on player connect to server'() {
         given:
         final message = 'message'.bytes
@@ -97,7 +105,6 @@ class BungeecordPluginMessageChannelCoordinatorTest extends Specification {
 
         then:
         1 * registrar.server().registerChannel(CHANNEL_NAME)
-        1 * registrar.server().pluginManager.registerListener(registrar.plugin(), coordinator)
     }
 
     def 'test that unregisterChannel correctly unregisters all previously registered channels'() {
@@ -106,6 +113,13 @@ class BungeecordPluginMessageChannelCoordinatorTest extends Specification {
 
         then:
         1 * registrar.server().unregisterChannel(CHANNEL_NAME)
+    }
+
+    def 'test that close correctly unregisters listener'() {
+        when:
+        coordinator.close()
+
+        then:
         1 * registrar.server().pluginManager.unregisterListener(coordinator)
     }
 

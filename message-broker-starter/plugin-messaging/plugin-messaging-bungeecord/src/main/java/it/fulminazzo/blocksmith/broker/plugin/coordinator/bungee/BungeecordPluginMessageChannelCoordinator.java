@@ -33,6 +33,7 @@ public final class BungeecordPluginMessageChannelCoordinator
     BungeecordPluginMessageChannelCoordinator(final @NotNull PluginMessageRegistrar registrar) {
         super(registrar);
         this.server = this.registrar.server();
+        server.getPluginManager().registerListener(this.registrar.plugin(), this);
     }
 
     /**
@@ -57,6 +58,12 @@ public final class BungeecordPluginMessageChannelCoordinator
     }
 
     @Override
+    public void close() {
+        super.close();
+        server.getPluginManager().unregisterListener(this);
+    }
+
+    @Override
     protected @NotNull PluginMessagePublisher newNodePublisher(final @NotNull String node) {
         return new BungeePluginMessagePublisher(node);
     }
@@ -64,13 +71,11 @@ public final class BungeecordPluginMessageChannelCoordinator
     @Override
     protected void registerChannel(final @NotNull String channelName) {
         server.registerChannel(channelName);
-        server.getPluginManager().registerListener(registrar.plugin(), this);
     }
 
     @Override
     protected void unregisterChannel(final @NotNull String channelName) {
         server.unregisterChannel(channelName);
-        server.getPluginManager().unregisterListener(this);
     }
 
     @Override

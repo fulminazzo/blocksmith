@@ -36,6 +36,14 @@ class VelocityPluginMessageChannelCoordinatorTest extends Specification {
 
     private final VelocityPluginMessageChannelCoordinator coordinator = new VelocityPluginMessageChannelCoordinator(registrar)
 
+    def 'test that constructor registers listener'() {
+        when:
+        new VelocityPluginMessageChannelCoordinator(registrar)
+
+        then:
+        1 * registrar.server().eventManager.register(registrar.plugin(), _ as VelocityPluginMessageChannelCoordinator)
+    }
+
     def 'test that coordinator attempts to publish failed messages on player connect to server'() {
         given:
         final message = 'message'.bytes
@@ -103,7 +111,6 @@ class VelocityPluginMessageChannelCoordinatorTest extends Specification {
 
         then:
         1 * registrar.server().channelRegistrar.register(CHANNEL_IDENTIFIER)
-        1 * registrar.server().eventManager.register(registrar.plugin(), coordinator)
     }
 
     def 'test that unregisterChannel correctly unregisters all previously registered channels'() {
@@ -112,6 +119,13 @@ class VelocityPluginMessageChannelCoordinatorTest extends Specification {
 
         then:
         1 * registrar.server().channelRegistrar.unregister(CHANNEL_IDENTIFIER)
+    }
+
+    def 'test that close unregisters listener'() {
+        when:
+        coordinator.close()
+
+        then:
         1 * registrar.server().eventManager.unregisterListener(registrar.plugin(), coordinator)
     }
 

@@ -33,6 +33,14 @@ class BukkitPluginMessageChannelCoordinatorTest extends Specification {
 
     private final BukkitPluginMessageChannelCoordinator coordinator = new BukkitPluginMessageChannelCoordinator(registrar)
 
+    def 'test that constructor registers listener'() {
+        when:
+        new BukkitPluginMessageChannelCoordinator(registrar)
+
+        then:
+        1 * registrar.server().pluginManager.registerEvents(_ as BukkitPluginMessageChannelCoordinator, registrar.plugin())
+    }
+
     def 'test that coordinator attempts to publish failed messages on player join'() {
         given:
         final message = 'message'.bytes
@@ -91,21 +99,25 @@ class BukkitPluginMessageChannelCoordinatorTest extends Specification {
                 coordinator
         )
         1 * registrar.server().messenger.registerOutgoingPluginChannel(registrar.plugin(), CHANNEL_NAME)
-        1 * registrar.server().pluginManager.registerEvents(coordinator, registrar.plugin())
     }
 
     def 'test that unregisterChannel correctly unregisters all previously registered channels'() {
-        given:
-        def handlerList = Mockito.mockStatic(HandlerList)
-
         when:
         coordinator.unregisterChannel(CHANNEL_NAME)
 
         then:
         1 * registrar.server().messenger.unregisterIncomingPluginChannel(registrar.plugin(), CHANNEL_NAME)
         1 * registrar.server().messenger.unregisterOutgoingPluginChannel(registrar.plugin(), CHANNEL_NAME)
+    }
 
-        and:
+    def 'test that close unregisters listener'() {
+        given:
+        def handlerList = Mockito.mockStatic(HandlerList)
+
+        when:
+        coordinator.close()
+
+        then:
         handlerList.verify(
                 { HandlerList.unregisterAll(coordinator) },
                 Mockito.only()
