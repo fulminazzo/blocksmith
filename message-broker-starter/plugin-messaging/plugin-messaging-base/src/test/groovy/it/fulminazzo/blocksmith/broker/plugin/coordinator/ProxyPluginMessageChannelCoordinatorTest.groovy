@@ -44,7 +44,7 @@ class ProxyPluginMessageChannelCoordinatorTest extends Specification {
             nodes.put("$i".toString(), Mock(PluginMessagePublisher))
 
         and:
-        final newNodes = (1..3).collect { "${it * 2}" }
+        final newNodes = (1..3).collect { "${it * 2}".toString() }
 
         and:
         coordinator.allNodes >> newNodes
