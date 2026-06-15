@@ -23,15 +23,16 @@ public final class PluginMessageChannelCoordinatorFactories {
     /**
      * Instantiates a new {@link PluginMessageChannelCoordinator} instance.
      *
-     * @param registrar the registrar to use for the coordinator
+     * @param owner the owner of the coordinator
      * @return the coordinator
      */
-    public static @NotNull PluginMessageChannelCoordinator create(final @NotNull PluginMessageRegistrar registrar) {
+    public static @NotNull PluginMessageChannelCoordinator create(final @NotNull Object owner) {
+        Class<?> ownerType = owner.getClass();
         return FACTORIES.stream()
-                .filter(f -> f.supportsRegistrar(registrar))
+                .filter(f -> f.supportsOwner(ownerType))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No factory found for registrar: " + registrar))
-                .create(registrar);
+                .orElseThrow(() -> new IllegalArgumentException("No factory found for owner type: " + ownerType))
+                .create(owner);
     }
 
 }

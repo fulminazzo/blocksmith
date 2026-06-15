@@ -19,8 +19,13 @@ public final class VelocityPluginMessageChannelCoordinatorFactory implements Plu
     }
 
     @Override
-    public boolean supportsRegistrar(final @NotNull PluginMessageRegistrar registrar) {
-        return ProxyServer.class.isAssignableFrom(registrar.server().getClass());
+    public @NotNull PluginMessageRegistrar createRegistrar(final @NotNull Object owner) {
+        return new VelocityPluginMessageRegistrar(owner);
+    }
+
+    @Override
+    public boolean supportsOwner(final @NotNull Class<?> ownerType) {
+        return ProxyServer.class.isAssignableFrom(ownerType);
     }
 
 }

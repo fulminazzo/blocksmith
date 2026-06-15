@@ -19,8 +19,13 @@ public final class BukkitPluginMessageChannelCoordinatorFactory implements Plugi
     }
 
     @Override
-    public boolean supportsRegistrar(final @NotNull PluginMessageRegistrar registrar) {
-        return Plugin.class.isAssignableFrom(registrar.plugin().getClass());
+    public @NotNull PluginMessageRegistrar createRegistrar(final @NotNull Object owner) {
+        return new BukkitPluginMessageRegistrar((Plugin) owner);
+    }
+
+    @Override
+    public boolean supportsOwner(final @NotNull Class<?> ownerType) {
+        return Plugin.class.isAssignableFrom(ownerType);
     }
 
 }

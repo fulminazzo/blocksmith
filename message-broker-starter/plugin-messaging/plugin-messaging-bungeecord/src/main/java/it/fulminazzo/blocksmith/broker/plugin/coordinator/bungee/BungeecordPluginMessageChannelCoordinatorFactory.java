@@ -19,8 +19,13 @@ public final class BungeecordPluginMessageChannelCoordinatorFactory implements P
     }
 
     @Override
-    public boolean supportsRegistrar(final @NotNull PluginMessageRegistrar registrar) {
-        return Plugin.class.isAssignableFrom(registrar.plugin().getClass());
+    public @NotNull PluginMessageRegistrar createRegistrar(final @NotNull Object owner) {
+        return new BungeecordPluginMessageRegistrar((Plugin) owner);
+    }
+
+    @Override
+    public boolean supportsOwner(final @NotNull Class<?> ownerType) {
+        return Plugin.class.isAssignableFrom(ownerType);
     }
 
 }
