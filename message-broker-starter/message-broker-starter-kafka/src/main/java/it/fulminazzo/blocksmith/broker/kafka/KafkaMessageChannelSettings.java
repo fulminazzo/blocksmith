@@ -63,10 +63,10 @@ public final class KafkaMessageChannelSettings extends MessageChannelSettings<Ka
      * @return the properties
      */
     public @NotNull Properties buildProperties() {
-        Properties properties = new Properties();
-        properties.putAll(this.properties);
-        properties.put(GROUP_ID, getGroupId());
-        return properties;
+        Properties finalProperties = new Properties();
+        finalProperties.putAll(this.properties);
+        finalProperties.put(GROUP_ID, getGroupId());
+        return finalProperties;
     }
 
     /**

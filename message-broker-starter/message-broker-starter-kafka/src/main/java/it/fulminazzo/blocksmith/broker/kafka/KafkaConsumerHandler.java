@@ -44,7 +44,7 @@ abstract class KafkaConsumerHandler<K, V> implements ConsumerRebalanceListener, 
      * @param pollInterval       the time between polls
      * @throws KafkaMessageBrokerException if the assignment is not received within the specified time
      */
-    public KafkaConsumerHandler(
+    protected KafkaConsumerHandler(
             final @NotNull Properties consumerProperties,
             final @NotNull Collection<String> topics,
             final long assignmentWaitTime,

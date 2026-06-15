@@ -41,7 +41,7 @@ class ProxyPluginMessageChannelCoordinatorTest extends Specification {
         given:
         def nodes = Reflect.on(coordinator).get('nodes').get() as Map
         for (def i in 1..5)
-            nodes.put("$i", Mock(PluginMessagePublisher))
+            nodes.put("$i".toString(), Mock(PluginMessagePublisher))
 
         and:
         final newNodes = (1..3).collect { "${it * 2}" }

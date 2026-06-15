@@ -179,7 +179,7 @@ public class KafkaMessageBrokerBuilder
 
     @Override
     public @NotNull KafkaMessageBroker build() {
-        final String bootstrapServers = getBootstrapServers();
+        final String actualBootstrapServers = getBootstrapServers();
         final ExecutorService actualExecutor = Objects.requireNonNullElseGet(
                 executor,
                 () -> Executors.newCachedThreadPool(
@@ -187,16 +187,16 @@ public class KafkaMessageBrokerBuilder
                 )
         );
 
-        Properties properties = new Properties();
-        properties.putAll(this.properties);
-        properties.put(BOOTSTRAP_SERVERS, bootstrapServers);
-        properties.put(SECURITY_PROTOCOL, this.securityProtocol.name());
-        properties.put(CLIENT_DNS_LOOKUP, this.clientDnsLookup.name().toLowerCase(Locale.ROOT));
-        properties.put(RECONNECT_BACKOFF, this.reconnectBackoff);
-        properties.put(RECONNECT_BACKOFF_MAX, this.reconnectBackoffMax);
-        properties.put(REQUEST_TIMEOUT, this.requestTimeout);
+        Properties finalProperties = new Properties();
+        finalProperties.putAll(this.properties);
+        finalProperties.put(BOOTSTRAP_SERVERS, actualBootstrapServers);
+        finalProperties.put(SECURITY_PROTOCOL, this.securityProtocol.name());
+        finalProperties.put(CLIENT_DNS_LOOKUP, this.clientDnsLookup.name().toLowerCase(Locale.ROOT));
+        finalProperties.put(RECONNECT_BACKOFF, this.reconnectBackoff);
+        finalProperties.put(RECONNECT_BACKOFF_MAX, this.reconnectBackoffMax);
+        finalProperties.put(REQUEST_TIMEOUT, this.requestTimeout);
 
-        return new KafkaMessageBroker(actualExecutor, properties, getMapper());
+        return new KafkaMessageBroker(actualExecutor, finalProperties, getMapper());
     }
 
 }
