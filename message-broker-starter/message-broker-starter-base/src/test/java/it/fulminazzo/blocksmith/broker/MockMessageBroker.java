@@ -2,7 +2,6 @@ package it.fulminazzo.blocksmith.broker;
 
 import it.fulminazzo.blocksmith.data.mapper.Mapper;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Mock {@link MessageBroker} for testing purposes.
@@ -21,7 +20,7 @@ public final class MockMessageBroker extends AbstractMessageBroker<MockMessageCh
     }
 
     @Override
-    public @NotNull MessageChannel newChannel(final @NonNull MockMessageChannelSettings settings) {
+    public @NotNull MessageChannel newChannel(final @NotNull MockMessageChannelSettings settings) {
         throw new UnsupportedOperationException();
     }
 
