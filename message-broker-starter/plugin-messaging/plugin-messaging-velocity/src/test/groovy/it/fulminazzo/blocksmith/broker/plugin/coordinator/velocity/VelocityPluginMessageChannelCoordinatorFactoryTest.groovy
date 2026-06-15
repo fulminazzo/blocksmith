@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.broker.plugin.coordinator.velocity
 
+import com.velocitypowered.api.event.EventManager
 import com.velocitypowered.api.proxy.ProxyServer
 import it.fulminazzo.blocksmith.broker.plugin.coordinator.PluginMessageChannelCoordinatorFactory
 import spock.lang.Specification
@@ -9,7 +10,9 @@ class VelocityPluginMessageChannelCoordinatorFactoryTest extends Specification {
 
     def 'test that create returns VelocityPluginMessageChannelCoordinator'() {
         when:
-        def coordinator = factory.create(new MockPlugin(Mock(ProxyServer)))
+        def coordinator = factory.create(new MockPlugin(Mock(ProxyServer) {
+            it.eventManager >> Mock(EventManager)
+        }))
 
         then:
         VelocityPluginMessageChannelCoordinator.isInstance(coordinator)
