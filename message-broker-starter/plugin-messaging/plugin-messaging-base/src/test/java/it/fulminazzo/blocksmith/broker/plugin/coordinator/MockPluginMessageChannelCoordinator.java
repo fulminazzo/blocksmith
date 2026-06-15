@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class MockPluginMessageChannelCoordinator extends PluginMessageChannelCoordinator {
 
-    /***
+    /**
      * Instantiates a new Mock plugin message channel coordinator.
      *
      * @param registrar the registrar
@@ -20,22 +20,22 @@ public final class MockPluginMessageChannelCoordinator extends PluginMessageChan
     }
 
     @Override
-    protected void registerChannel(final @NotNull String channelName) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected void unregisterChannel(final @NotNull String channelName) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean publish(final @NotNull String channelName, final byte @NotNull [] message) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void republishFailedMessages() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected void registerChannel(final @NotNull String channelName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected void unregisterChannel(final @NotNull String channelName) {
         throw new UnsupportedOperationException();
     }
 

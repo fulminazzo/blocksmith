@@ -26,7 +26,6 @@ class PluginMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<Pl
                 .owner(new Object())
                 .executor(Executors.newCachedThreadPool())
                 .mapper(MapperFormat.JSON.newMapper())
-
     }
 
     @Override

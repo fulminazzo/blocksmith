@@ -34,13 +34,13 @@ class PluginMessageChannelCoordinatorTest extends Specification {
         coordinator.registerHandler(channel, h -> { })
 
         then:
-        1 * coordinator.registerChannel(channel) >> {}
+        1 * coordinator.registerChannel(channel) >> { }
 
         when:
         coordinator.registerHandler(channel, h -> { })
 
         then:
-        0 * coordinator.registerChannel(channel) >> {}
+        0 * coordinator.registerChannel(channel) >> { }
     }
 
     def 'test that unregisterHandler unregisters channel only if no other handler is registered'() {
@@ -58,13 +58,13 @@ class PluginMessageChannelCoordinatorTest extends Specification {
         coordinator.unregisterHandler(handler1)
 
         then:
-        0 * coordinator.unregisterChannel(channel) >> {}
+        0 * coordinator.unregisterChannel(channel) >> { }
 
         when:
         coordinator.unregisterHandler(handler2)
 
         then:
-        1 * coordinator.unregisterChannel(channel) >> {}
+        1 * coordinator.unregisterChannel(channel) >> { }
     }
 
     def 'test that close unregisters all channels'() {
@@ -81,7 +81,7 @@ class PluginMessageChannelCoordinatorTest extends Specification {
 
         then:
         channels.forEach {
-            1 * coordinator.unregisterChannel(it) >> {}
+            1 * coordinator.unregisterChannel(it) >> { }
         }
     }
 

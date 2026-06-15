@@ -37,5 +37,4 @@ class AbstractPluginMessagePublisherTest extends Specification {
         failedMessages['invalid'].size() == 1
     }
 
-
 }
