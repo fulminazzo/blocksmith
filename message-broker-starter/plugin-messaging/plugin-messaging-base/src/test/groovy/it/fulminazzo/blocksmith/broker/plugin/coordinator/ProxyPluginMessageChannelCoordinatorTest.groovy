@@ -75,7 +75,7 @@ class ProxyPluginMessageChannelCoordinatorTest extends Specification {
 
         where:
         method                    | arguments
-        'publish'                 | ['channel', 'message']
+        'publish'                 | ['channel', 'message'.bytes]
         'republishFailedMessages' | []
     }
 
