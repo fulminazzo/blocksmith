@@ -4,21 +4,21 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * Holds all the {@link PluginMessageChannelCoordinatorFactory} implementations.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PluginMessageChannelCoordinatorFactories {
-    private static final @NotNull Set<PluginMessageChannelCoordinatorFactory> FACTORIES = ServiceLoader.load(
-                    PluginMessageChannelCoordinatorFactory.class,
-                    PluginMessageChannelCoordinatorFactory.class.getClassLoader()
-            ).stream()
-            .map(ServiceLoader.Provider::get)
-            .collect(Collectors.toSet());
+    private static final @NotNull Set<PluginMessageChannelCoordinatorFactory> FACTORIES = new LinkedHashSet<>();
+
+    static {
+        registerNext(ServiceLoader.load(
+                PluginMessageChannelCoordinatorFactory.class,
+                PluginMessageChannelCoordinatorFactories.class.getClassLoader()
+        ).iterator());
+    }
 
     /**
      * Instantiates a new {@link PluginMessageChannelCoordinator} instance.
@@ -28,11 +28,20 @@ public final class PluginMessageChannelCoordinatorFactories {
      */
     public static @NotNull PluginMessageChannelCoordinator create(final @NotNull Object owner) {
         Class<?> ownerType = owner.getClass();
-        return FACTORIES.stream()
-                .filter(f -> f.supportsOwner(ownerType))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No factory found for owner type: " + ownerType))
-                .create(owner);
+        for (PluginMessageChannelCoordinatorFactory factory : FACTORIES)
+            if (factory.supportsOwner(ownerType)) return factory.create(owner);
+        throw new IllegalArgumentException("No factory found for owner type: " + ownerType);
+    }
+
+    private static void registerNext(final @NotNull Iterator<PluginMessageChannelCoordinatorFactory> factories) {
+        if (factories.hasNext()) {
+            try {
+                FACTORIES.add(factories.next());
+            } catch (ServiceConfigurationError e) {
+                // unsupported factory on the current platform
+            }
+            registerNext(factories);
+        }
     }
 
 }
