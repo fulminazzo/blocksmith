@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see PluginMessageRegistrar
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class PluginMessageChannelCoordinator implements PluginMessagePublisher {
+public abstract class PluginMessageChannelCoordinator implements PluginMessagePublisher, Closeable {
     protected final @NotNull PluginMessageRegistrar registrar;
 
     private final @NotNull Map<String, List<PluginMessageHandler>> handlers = new ConcurrentHashMap<>();
@@ -96,6 +97,12 @@ public abstract class PluginMessageChannelCoordinator implements PluginMessagePu
             handlers.get(channelName).forEach(h -> h.handle(message));
             return true;
         } else return false;
+    }
+
+    @Override
+    public void close() {
+        handlers.keySet().forEach(this::unregisterChannel);
+        handlers.clear();
     }
 
 }

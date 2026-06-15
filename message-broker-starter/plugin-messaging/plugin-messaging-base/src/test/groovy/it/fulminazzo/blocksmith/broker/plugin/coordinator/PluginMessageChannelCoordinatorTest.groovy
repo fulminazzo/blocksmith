@@ -67,4 +67,22 @@ class PluginMessageChannelCoordinatorTest extends Specification {
         1 * coordinator.unregisterChannel(channel) >> {}
     }
 
+    def 'test that close unregisters all channels'() {
+        given:
+        final channels = (0..9).collect { "channel$it".toString() }
+
+        and:
+        channels.forEach {
+            Reflect.on(coordinator).get('handlers').invoke('put', it, [])
+        }
+
+        when:
+        coordinator.close()
+
+        then:
+        channels.forEach {
+            1 * coordinator.unregisterChannel(it) >> {}
+        }
+    }
+
 }
