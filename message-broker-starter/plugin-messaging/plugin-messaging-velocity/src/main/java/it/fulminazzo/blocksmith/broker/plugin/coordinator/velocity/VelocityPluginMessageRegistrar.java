@@ -19,16 +19,6 @@ import java.lang.reflect.Modifier;
 final class VelocityPluginMessageRegistrar implements PluginMessageRegistrar {
     private final @NotNull Object owner;
 
-    @Override
-    public @NotNull <P> P plugin() {
-        return (P) owner;
-    }
-
-    @Override
-    public @NotNull <S> S server() {
-        return (S) getServer(owner);
-    }
-
     private @NotNull ProxyServer getServer(final @NotNull Object plugin) {
         try {
             return Reflect.on(plugin)
@@ -37,6 +27,16 @@ final class VelocityPluginMessageRegistrar implements PluginMessageRegistrar {
         } catch (ReflectException e) {
             throw new ReflectException("Could not find %s field in %s", ProxyServer.class, plugin.getClass());
         }
+    }
+
+    @Override
+    public @NotNull <P> P plugin() {
+        return (P) owner;
+    }
+
+    @Override
+    public @NotNull <S> S server() {
+        return (S) getServer(owner);
     }
 
 }
