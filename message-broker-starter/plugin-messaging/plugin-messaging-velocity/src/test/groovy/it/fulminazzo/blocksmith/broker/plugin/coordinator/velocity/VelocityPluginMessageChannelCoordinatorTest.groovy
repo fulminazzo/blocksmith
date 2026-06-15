@@ -129,7 +129,7 @@ class VelocityPluginMessageChannelCoordinatorTest extends Specification {
         1 * registrar.server().eventManager.unregisterListener(registrar.plugin(), coordinator)
     }
 
-    private RegisteredServer newServer(final String name) {
+    protected RegisteredServer newServer(final String name) {
         return Mock(RegisteredServer) { RegisteredServer server ->
             def serverInfo = Mock(ServerInfo) { it.name >> name }
             server.serverInfo >> serverInfo

@@ -123,7 +123,7 @@ class BungeecordPluginMessageChannelCoordinatorTest extends Specification {
         1 * registrar.server().pluginManager.unregisterListener(coordinator)
     }
 
-    private ServerInfo newServer(final String name) {
+    protected ServerInfo newServer(final String name) {
         return Mock(ServerInfo) {
             it.name >> name
         }
