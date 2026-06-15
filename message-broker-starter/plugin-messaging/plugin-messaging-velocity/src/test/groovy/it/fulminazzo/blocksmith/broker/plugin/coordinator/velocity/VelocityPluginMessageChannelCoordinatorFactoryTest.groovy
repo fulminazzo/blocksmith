@@ -15,12 +15,9 @@ class VelocityPluginMessageChannelCoordinatorFactoryTest extends Specification {
         VelocityPluginMessageChannelCoordinator.isInstance(coordinator)
     }
 
-    def 'test that factory supports ProxyServer'() {
+    def 'test that factory supports everything'() {
         expect:
-        factory.supportsOwner(ProxyServer)
-
-        and:
-        !factory.supportsOwner(Object)
+        factory.supportsOwner(Object)
     }
 
     private static final class MockPlugin {

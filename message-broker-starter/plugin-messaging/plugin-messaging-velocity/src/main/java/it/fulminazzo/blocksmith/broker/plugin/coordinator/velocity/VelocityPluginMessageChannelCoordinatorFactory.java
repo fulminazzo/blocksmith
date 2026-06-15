@@ -1,6 +1,5 @@
 package it.fulminazzo.blocksmith.broker.plugin.coordinator.velocity;
 
-import com.velocitypowered.api.proxy.ProxyServer;
 import it.fulminazzo.blocksmith.broker.plugin.coordinator.PluginMessageChannelCoordinator;
 import it.fulminazzo.blocksmith.broker.plugin.coordinator.PluginMessageChannelCoordinatorFactory;
 import it.fulminazzo.blocksmith.broker.plugin.coordinator.PluginMessageRegistrar;
@@ -25,7 +24,7 @@ public final class VelocityPluginMessageChannelCoordinatorFactory implements Plu
 
     @Override
     public boolean supportsOwner(final @NotNull Class<?> ownerType) {
-        return ProxyServer.class.isAssignableFrom(ownerType);
+        return true;
     }
 
 }
