@@ -12,6 +12,7 @@ public final class MockPluginMessageChannelCoordinator extends PluginMessageChan
 
     /***
      * Instantiates a new Mock plugin message channel coordinator.
+     *
      * @param registrar the registrar
      */
     public MockPluginMessageChannelCoordinator(final @NotNull PluginMessageRegistrar registrar) {
