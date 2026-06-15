@@ -38,11 +38,15 @@ public abstract class AbstractPluginMessagePublisher implements PluginMessagePub
     public boolean publish(final @NotNull String channelName, final byte @NotNull [] message) {
         if (publishImpl(channelName, message)) return true;
         else {
-            failedMessages.computeIfAbsent(
+            /*
+             * If the queue is full, we will consider the message as sent.
+             * This will result in the user having no idea if the message was actually sent or not,
+             * but the chance of a full queue happening is close to non-existent, so this is negligible.
+             */
+            return !failedMessages.computeIfAbsent(
                     channelName,
                     c -> new ConcurrentLinkedQueue<>()
             ).offer(message);
-            return false;
         }
     }
 

@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.broker.plugin.coordinator;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class PluginMessageChannelCoordinator implements PluginMessagePublisher, Closeable {
+    @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
     protected final @NotNull PluginMessageRegistrar registrar;
 
     private final @NotNull Map<String, List<PluginMessageHandler>> handlers = new ConcurrentHashMap<>();

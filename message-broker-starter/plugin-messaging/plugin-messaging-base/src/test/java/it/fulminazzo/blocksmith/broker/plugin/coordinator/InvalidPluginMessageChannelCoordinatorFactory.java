@@ -31,4 +31,10 @@ public class InvalidPluginMessageChannelCoordinatorFactory implements PluginMess
         throw new UnsupportedOperationException();
     }
 
+    @SuppressWarnings("checkstyle:NoFinalizer")
+    @Override
+    protected final void finalize() {
+        // Requested from SpotBugs to avoid finalizer attacks.
+    }
+
 }
