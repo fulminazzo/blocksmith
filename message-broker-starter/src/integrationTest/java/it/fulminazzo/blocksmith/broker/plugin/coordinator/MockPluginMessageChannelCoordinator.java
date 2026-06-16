@@ -1,0 +1,42 @@
+package it.fulminazzo.blocksmith.broker.plugin.coordinator;
+
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Mock implementation of {@link PluginMessageChannelCoordinator}.
+ *
+ * @see MockPluginMessageRegistrar
+ * @see MockPluginMessageChannelCoordinatorFactory
+ */
+public final class MockPluginMessageChannelCoordinator extends PluginMessageChannelCoordinator {
+
+    /**
+     * Instantiates a new Mock plugin message channel coordinator.
+     *
+     * @param registrar the registrar
+     */
+    MockPluginMessageChannelCoordinator(final @NotNull PluginMessageRegistrar registrar) {
+        super(registrar);
+    }
+
+    @Override
+    protected void registerChannel(final @NotNull String channelName) {
+        // do nothing
+    }
+
+    @Override
+    protected void unregisterChannel(final @NotNull String channelName) {
+        // do nothing
+    }
+
+    @Override
+    public boolean publish(final @NotNull String channelName, final byte @NotNull [] message) {
+        return true;
+    }
+
+    @Override
+    public void republishFailedMessages() {
+        // do nothing
+    }
+
+}
