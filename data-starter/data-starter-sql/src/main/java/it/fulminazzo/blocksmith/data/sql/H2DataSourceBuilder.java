@@ -5,7 +5,6 @@ import it.fulminazzo.blocksmith.validation.Validator;
 import it.fulminazzo.blocksmith.validation.annotation.Port;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
 import org.jooq.SQLDialect;
 
 import java.io.File;
@@ -124,7 +123,7 @@ public final class H2DataSourceBuilder extends ASqlDataSourceBuilder<H2DataSourc
      */
     public @NotNull H2DataSourceBuilder server(
             final @NotNull String host,
-            final @Range(from = 1, to = 65535) @Port int port,
+            final @Port int port,
             final @NotNull String path
     ) {
         Validator.validateMethod(host, port, path);

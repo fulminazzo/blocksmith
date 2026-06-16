@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
 
 /**
  * {@link DataSourceConfig} for {@link RedisDataSource}.
@@ -40,7 +39,6 @@ public final class RedisDataSourceConfig implements DataSourceConfig {
     String host;
 
     @Port
-    @Range(from = 1, to = 65535)
     @Nullable
     Integer port = RedisURI.DEFAULT_REDIS_PORT;
 

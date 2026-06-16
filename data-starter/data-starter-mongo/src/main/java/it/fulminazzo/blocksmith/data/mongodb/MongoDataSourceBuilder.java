@@ -138,7 +138,7 @@ public final class MongoDataSourceBuilder implements RepositoryDataSourceBuilder
      */
     public @NotNull MongoDataSourceBuilder host(
             final @NotNull String address,
-            final @Range(from = 1, to = 65535) @Port int port
+            final @Port int port
     ) {
         Validator.validateMethod(address, port);
         hosts.add(new ServerAddress(address, port));

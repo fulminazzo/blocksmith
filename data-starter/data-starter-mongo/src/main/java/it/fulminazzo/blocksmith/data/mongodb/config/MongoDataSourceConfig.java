@@ -38,7 +38,6 @@ public final class MongoDataSourceConfig implements DataSourceConfig {
     String host;
 
     @Port
-    @Range(from = 1, to = 65535)
     @Nullable
     Integer port = ServerAddress.defaultPort();
 

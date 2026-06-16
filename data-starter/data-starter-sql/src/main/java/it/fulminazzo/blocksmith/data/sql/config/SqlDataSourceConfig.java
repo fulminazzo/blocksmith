@@ -5,8 +5,10 @@ import it.fulminazzo.blocksmith.data.config.DataSourceFactories;
 import it.fulminazzo.blocksmith.data.sql.DatabaseType;
 import it.fulminazzo.blocksmith.data.sql.SqlDataSource;
 import it.fulminazzo.blocksmith.validation.annotation.*;
-import it.fulminazzo.blocksmith.validation.annotation.NonNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.Nullable;
@@ -82,7 +84,6 @@ public final class SqlDataSourceConfig implements DataSourceConfig {
     String host;
 
     @Port
-    @Range(from = 1, to = 65535)
     @Nullable
     Integer port;
 
