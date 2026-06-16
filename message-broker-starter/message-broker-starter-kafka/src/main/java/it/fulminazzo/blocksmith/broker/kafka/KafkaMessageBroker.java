@@ -109,7 +109,8 @@ public final class KafkaMessageBroker extends AbstractMessageBroker<KafkaMessage
         Properties properties = new Properties();
         properties.putAll(baseProperties);
         properties.putAll(settings.buildProperties());
-        String topicName = settings.getChannelName();
+        // Replace ":" with "." in the topic name, to avoid issues with Kafka
+        String topicName = settings.getChannelName().replace(":", ".");
         if (settings.getChannelType() == MessageChannelType.DIRECT)
             topicName += "." + settings.getSubchannelName();
         KafkaMessageQueryEngine queryEngine = new KafkaMessageQueryEngine(
