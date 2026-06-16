@@ -14,8 +14,8 @@ import java.util.Objects;
  * @see MessageChannel
  * @see MessageBroker
  */
-@EqualsAndHashCode
-@ToString
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
 public abstract class MessageChannelSettings {
     private @Nullable String channelName;
 
