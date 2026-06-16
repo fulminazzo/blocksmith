@@ -40,6 +40,7 @@ final class JacksonUtils {
     static {
         addCustomDeserializer(DurationDeserializer.class.getSimpleName());
         addCustomDeserializer("DataSourceConfigDeserializer"); // for data-starter module configurations serialization
+        addCustomDeserializer("MessageBrokerConfigDeserializer"); // for message-broker-starter module configurations serialization
     }
 
     /**
