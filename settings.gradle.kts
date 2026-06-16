@@ -51,6 +51,7 @@ include(
     "config-starter:config-starter-yaml",
 
     "config-starter:config-starter-data",
+    "config-starter:config-starter-message-broker",
 
     "config-starter:config-starter-testing",
     "config-starter:config-starter-generator"

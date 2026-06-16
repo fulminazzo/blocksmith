@@ -1,0 +1,1 @@
+Special module to provide compatibility with [message-broker-starter](../../message-broker-starter) configurations.
