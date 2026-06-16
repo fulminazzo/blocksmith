@@ -62,7 +62,7 @@ public class KafkaMessageBrokerBuilder
      * @return this object (for method chaining)
      */
     public @NotNull KafkaMessageBrokerBuilder bootstrapServer(
-            final @IPv4 @NonNull @NotNull String host,
+            final @NonNull @NotNull String host,
             final @Port int port
     ) {
         Validator.validateMethod(host, port);

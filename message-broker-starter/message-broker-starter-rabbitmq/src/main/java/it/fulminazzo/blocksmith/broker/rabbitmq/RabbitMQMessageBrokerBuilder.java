@@ -58,7 +58,7 @@ public final class RabbitMQMessageBrokerBuilder
      * @param host the host
      * @return this object (for method chaining)
      */
-    public @NotNull RabbitMQMessageBrokerBuilder host(final @IPv4 @NotNull String host) {
+    public @NotNull RabbitMQMessageBrokerBuilder host(final @NotNull String host) {
         Validator.validateMethod(host);
         this.connectionFactory.setHost(host);
         return this;
