@@ -38,7 +38,11 @@ public final class KafkaMessageBrokerConfig extends MessageBrokerConfig<KafkaMes
     }
 
     @NonNull(exceptionMessage = "'bootstrap servers' must be declared")
-    @Size(min = 1, max = Integer.MAX_VALUE, exceptionMessage = "'bootstrapServers' must at least have one server configured")
+    @Size(
+            min = 1,
+            max = Integer.MAX_VALUE,
+            exceptionMessage = "'bootstrapServers' must at least have one server configured"
+    )
     Set<BootstrapServerConfig> bootstrapServers = new HashSet<>();
 
     @NonNull(exceptionMessage = "'security protocol' must be declared")
@@ -59,6 +63,9 @@ public final class KafkaMessageBrokerConfig extends MessageBrokerConfig<KafkaMes
     @NonNull(exceptionMessage = "'request timeout' must be declared")
     Integer requestTimeout = 30_000;
 
+    /**
+     * Configuration for a single bootstrap server.
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
