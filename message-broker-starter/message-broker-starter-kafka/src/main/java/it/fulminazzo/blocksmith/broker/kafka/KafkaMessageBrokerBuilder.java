@@ -2,6 +2,8 @@ package it.fulminazzo.blocksmith.broker.kafka;
 
 import it.fulminazzo.blocksmith.broker.AbstractMessageBrokerBuilder;
 import it.fulminazzo.blocksmith.util.ThreadUtils;
+import it.fulminazzo.blocksmith.validation.Validator;
+import it.fulminazzo.blocksmith.validation.annotation.*;
 import org.apache.kafka.clients.ClientDnsLookup;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +61,11 @@ public class KafkaMessageBrokerBuilder
      * @param port the port
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageBrokerBuilder bootstrapServer(final @NotNull String host, final int port) {
+    public @NotNull KafkaMessageBrokerBuilder bootstrapServer(
+            final @IPv4 @NonNull @NotNull String host,
+            final @Port int port
+    ) {
+        Validator.validateMethod(host, port);
         bootstrapServers.add(host + ":" + port);
         return this;
     }
@@ -100,7 +106,8 @@ public class KafkaMessageBrokerBuilder
      * @param reconnectBackoff the retry backoff (in milliseconds)
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageBrokerBuilder reconnectBackoff(final int reconnectBackoff) {
+    public @NotNull KafkaMessageBrokerBuilder reconnectBackoff(final @PositiveOrZero int reconnectBackoff) {
+        Validator.validateMethod(reconnectBackoff);
         this.reconnectBackoff = reconnectBackoff;
         return this;
     }
@@ -113,7 +120,8 @@ public class KafkaMessageBrokerBuilder
      * @param reconnectBackoffMax the maximum retry backoff (in milliseconds)
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageBrokerBuilder reconnectBackoffMax(final int reconnectBackoffMax) {
+    public @NotNull KafkaMessageBrokerBuilder reconnectBackoffMax(final @PositiveOrZero int reconnectBackoffMax) {
+        Validator.validateMethod(reconnectBackoffMax);
         this.reconnectBackoffMax = reconnectBackoffMax;
         return this;
     }
@@ -126,7 +134,8 @@ public class KafkaMessageBrokerBuilder
      * @param requestTimeout the request timeout (in milliseconds)
      * @return this object (for method chaining)
      */
-    public @NotNull KafkaMessageBrokerBuilder requestTimeout(final int requestTimeout) {
+    public @NotNull KafkaMessageBrokerBuilder requestTimeout(final @PositiveOrZero int requestTimeout) {
+        Validator.validateMethod(requestTimeout);
         this.requestTimeout = requestTimeout;
         return this;
     }

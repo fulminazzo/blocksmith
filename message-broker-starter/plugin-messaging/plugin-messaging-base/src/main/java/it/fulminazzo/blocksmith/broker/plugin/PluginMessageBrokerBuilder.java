@@ -49,7 +49,7 @@ public final class PluginMessageBrokerBuilder
      * @return this object (for method chaining)
      * @see PluginMessageChannelCoordinator
      */
-    public @NotNull PluginMessageBrokerBuilder coordinator(@NotNull PluginMessageChannelCoordinator coordinator) {
+    public @NotNull PluginMessageBrokerBuilder coordinator(final @NotNull PluginMessageChannelCoordinator coordinator) {
         this.coordinator = coordinator;
         return this;
     }
@@ -60,7 +60,7 @@ public final class PluginMessageBrokerBuilder
      * @param executor the executor
      * @return this object (for method chaining)
      */
-    public @NotNull PluginMessageBrokerBuilder executor(@NotNull ExecutorService executor) {
+    public @NotNull PluginMessageBrokerBuilder executor(final @NotNull ExecutorService executor) {
         this.executor = executor;
         return this;
     }

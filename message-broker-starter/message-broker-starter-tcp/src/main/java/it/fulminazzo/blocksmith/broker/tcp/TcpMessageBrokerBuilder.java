@@ -2,6 +2,9 @@ package it.fulminazzo.blocksmith.broker.tcp;
 
 import it.fulminazzo.blocksmith.broker.AbstractMessageBrokerBuilder;
 import it.fulminazzo.blocksmith.util.ThreadUtils;
+import it.fulminazzo.blocksmith.validation.Validator;
+import it.fulminazzo.blocksmith.validation.annotation.Port;
+import it.fulminazzo.blocksmith.validation.annotation.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +48,8 @@ public final class TcpMessageBrokerBuilder
      * @param port the port
      * @return this object (for method chaining)
      */
-    public @NotNull TcpMessageBrokerBuilder port(final @NotNull Integer port) {
+    public @NotNull TcpMessageBrokerBuilder port(final @Port @NotNull Integer port) {
+        Validator.validateMethod(port);
         this.port = port;
         return this;
     }
@@ -58,7 +62,8 @@ public final class TcpMessageBrokerBuilder
      * @param retryInterval the interval
      * @return this object (for method chaining)
      */
-    public @NotNull TcpMessageBrokerBuilder retryInterval(final @NotNull Long retryInterval) {
+    public @NotNull TcpMessageBrokerBuilder retryInterval(final @PositiveOrZero @NotNull Long retryInterval) {
+        Validator.validateMethod(retryInterval);
         this.retryInterval = retryInterval;
         return this;
     }

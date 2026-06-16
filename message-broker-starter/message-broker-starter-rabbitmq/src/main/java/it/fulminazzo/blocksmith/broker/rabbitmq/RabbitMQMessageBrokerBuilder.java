@@ -4,6 +4,9 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import it.fulminazzo.blocksmith.broker.AbstractMessageBrokerBuilder;
 import it.fulminazzo.blocksmith.util.ThreadUtils;
+import it.fulminazzo.blocksmith.validation.Validator;
+import it.fulminazzo.blocksmith.validation.annotation.IPv4;
+import it.fulminazzo.blocksmith.validation.annotation.Port;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +58,8 @@ public final class RabbitMQMessageBrokerBuilder
      * @param host the host
      * @return this object (for method chaining)
      */
-    public @NotNull RabbitMQMessageBrokerBuilder host(final @NotNull String host) {
+    public @NotNull RabbitMQMessageBrokerBuilder host(final @IPv4 @NotNull String host) {
+        Validator.validateMethod(host);
         this.connectionFactory.setHost(host);
         return this;
     }
@@ -69,7 +73,8 @@ public final class RabbitMQMessageBrokerBuilder
      * @param port the port
      * @return this object (for method chaining)
      */
-    public @NotNull RabbitMQMessageBrokerBuilder port(final @NotNull Integer port) {
+    public @NotNull RabbitMQMessageBrokerBuilder port(final @Port @NotNull Integer port) {
+        Validator.validateMethod(port);
         this.connectionFactory.setPort(port);
         return this;
     }
