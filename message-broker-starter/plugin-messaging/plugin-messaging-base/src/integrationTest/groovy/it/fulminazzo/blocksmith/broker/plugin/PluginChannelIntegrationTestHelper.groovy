@@ -3,6 +3,7 @@ package it.fulminazzo.blocksmith.broker.plugin
 import com.google.common.io.ByteStreams
 import it.fulminazzo.blocksmith.broker.Message
 import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTestHelper
+import it.fulminazzo.blocksmith.broker.plugin.coordinator.MockPluginMessageChannelCoordinator
 import it.fulminazzo.blocksmith.broker.plugin.coordinator.PluginMessageChannelCoordinator
 import org.slf4j.Logger
 

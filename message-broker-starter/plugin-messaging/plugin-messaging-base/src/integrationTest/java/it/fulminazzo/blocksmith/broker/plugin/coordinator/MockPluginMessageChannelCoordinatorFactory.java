@@ -1,8 +1,5 @@
-package it.fulminazzo.blocksmith.broker.plugin;
+package it.fulminazzo.blocksmith.broker.plugin.coordinator;
 
-import it.fulminazzo.blocksmith.broker.plugin.coordinator.PluginMessageChannelCoordinator;
-import it.fulminazzo.blocksmith.broker.plugin.coordinator.PluginMessageChannelCoordinatorFactory;
-import it.fulminazzo.blocksmith.broker.plugin.coordinator.PluginMessageRegistrar;
 import org.jetbrains.annotations.NotNull;
 
 /**

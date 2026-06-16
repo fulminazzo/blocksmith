@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.broker.MessageChannel
 import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTest
 import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTestHelper
 import it.fulminazzo.blocksmith.broker.Messages
+import it.fulminazzo.blocksmith.broker.plugin.coordinator.MockPluginMessageChannelCoordinator
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
