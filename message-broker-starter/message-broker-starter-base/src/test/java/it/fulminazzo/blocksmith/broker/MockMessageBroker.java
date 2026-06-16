@@ -15,7 +15,7 @@ public final class MockMessageBroker extends AbstractMessageBroker<MockMessageCh
      *
      * @param mapper the mapper
      */
-    MockMessageBroker(final @NotNull Mapper mapper) {
+    public MockMessageBroker(final @NotNull Mapper mapper) {
         super(mapper);
     }
 
