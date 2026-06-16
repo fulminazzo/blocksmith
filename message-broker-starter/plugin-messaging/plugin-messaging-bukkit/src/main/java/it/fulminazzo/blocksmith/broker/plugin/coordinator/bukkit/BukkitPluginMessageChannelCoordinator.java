@@ -23,7 +23,7 @@ import java.util.Comparator;
  *
  * @see PluginMessageChannelCoordinator
  */
-public final class BukkitPluginMessageChannelCoordinator
+final class BukkitPluginMessageChannelCoordinator
         extends PluginMessageChannelCoordinator
         implements PluginMessageListener, Listener {
     private final @NotNull Server server;

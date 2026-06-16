@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * @see MockPluginMessageRegistrar
  * @see MockPluginMessageChannelCoordinatorFactory
  */
-public final class MockPluginMessageChannelCoordinator extends PluginMessageChannelCoordinator {
+final class MockPluginMessageChannelCoordinator extends PluginMessageChannelCoordinator {
 
     /**
      * Instantiates a new Mock plugin message channel coordinator.

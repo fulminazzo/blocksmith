@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 /**
  * Mock implementation of {@link PluginMessageChannelCoordinator}.
  */
-public final class MockPluginMessageChannelCoordinator extends PluginMessageChannelCoordinator {
+final class MockPluginMessageChannelCoordinator extends PluginMessageChannelCoordinator {
     private static final @NotNull Map<
             String,
             Set<MockPluginMessageChannelCoordinator>

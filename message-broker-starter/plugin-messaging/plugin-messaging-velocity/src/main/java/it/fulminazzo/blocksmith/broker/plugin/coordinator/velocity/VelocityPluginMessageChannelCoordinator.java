@@ -21,8 +21,7 @@ import java.util.stream.Collectors;
  * @see PluginMessageChannelCoordinator
  * @see ProxyPluginMessageChannelCoordinator
  */
-public final class VelocityPluginMessageChannelCoordinator
-        extends ProxyPluginMessageChannelCoordinator<String> {
+final class VelocityPluginMessageChannelCoordinator extends ProxyPluginMessageChannelCoordinator<String> {
     private final @NotNull ProxyServer server;
 
     /**

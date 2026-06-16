@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see MockPluginMessageChannelCoordinator
  */
-public final class MockPluginMessageRegistrar implements PluginMessageRegistrar {
+final class MockPluginMessageRegistrar implements PluginMessageRegistrar {
 
     @Override
     public @NotNull <P> P plugin() {

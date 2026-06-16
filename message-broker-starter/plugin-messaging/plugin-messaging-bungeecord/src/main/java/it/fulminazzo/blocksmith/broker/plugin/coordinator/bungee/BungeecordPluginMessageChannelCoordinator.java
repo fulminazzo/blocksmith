@@ -20,7 +20,7 @@ import java.util.Collection;
  * @see PluginMessageChannelCoordinator
  * @see ProxyPluginMessageChannelCoordinator
  */
-public final class BungeecordPluginMessageChannelCoordinator
+final class BungeecordPluginMessageChannelCoordinator
         extends ProxyPluginMessageChannelCoordinator<String>
         implements Listener {
     private final @NotNull ProxyServer server;
