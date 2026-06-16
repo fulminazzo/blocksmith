@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.broker.rabbitmq;
 
-import it.fulminazzo.blocksmith.broker.MessageChannelSettings;
+import it.fulminazzo.blocksmith.broker.AbstractMessageChannelSettings;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 @Getter
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
-public final class RabbitMQMessageChannelSettings extends MessageChannelSettings {
+public final class RabbitMQMessageChannelSettings extends AbstractMessageChannelSettings {
     private final @NotNull QueueSettings queueSettings = new QueueSettings();
     private boolean durable;
 

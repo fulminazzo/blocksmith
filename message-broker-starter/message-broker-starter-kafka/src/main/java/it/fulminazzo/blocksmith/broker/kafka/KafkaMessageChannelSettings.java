@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.broker.kafka;
 
-import it.fulminazzo.blocksmith.broker.MessageChannelSettings;
+import it.fulminazzo.blocksmith.broker.AbstractMessageChannelSettings;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +16,7 @@ import java.util.*;
 @Getter
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
-public final class KafkaMessageChannelSettings extends MessageChannelSettings {
+public final class KafkaMessageChannelSettings extends AbstractMessageChannelSettings {
     static final @NotNull String ACKS = "acks";
     static final @NotNull String RETRIES = "retries";
     static final @NotNull String COMPRESSION_TYPE = "compression.type";

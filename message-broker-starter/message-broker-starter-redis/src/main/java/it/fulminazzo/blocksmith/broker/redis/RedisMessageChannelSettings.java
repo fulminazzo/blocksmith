@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.broker.redis;
 
-import it.fulminazzo.blocksmith.broker.MessageChannelSettings;
+import it.fulminazzo.blocksmith.broker.AbstractMessageChannelSettings;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
-public final class RedisMessageChannelSettings extends MessageChannelSettings {
+public final class RedisMessageChannelSettings extends AbstractMessageChannelSettings {
 
     @Override
     public @NotNull RedisMessageChannelSettings withChannelName(final @NotNull String channelName) {

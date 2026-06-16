@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see MockMessageBroker
  */
-public final class MockMessageChannelSettings extends MessageChannelSettings {
+public final class MockMessageChannelSettings extends AbstractMessageChannelSettings {
 
     @Override
     public @NotNull MockMessageChannelSettings withChannelName(final @NotNull String channelName) {

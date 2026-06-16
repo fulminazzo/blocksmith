@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.broker.plugin;
 
-import it.fulminazzo.blocksmith.broker.MessageChannelSettings;
+import it.fulminazzo.blocksmith.broker.AbstractMessageChannelSettings;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ import org.jspecify.annotations.NonNull;
  */
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
-public final class PluginMessageChannelSettings extends MessageChannelSettings {
+public final class PluginMessageChannelSettings extends AbstractMessageChannelSettings {
 
     @Override
     public @NonNull PluginMessageChannelSettings withChannelName(final @NotNull String channelName) {

@@ -1,6 +1,6 @@
 package it.fulminazzo.blocksmith.broker.memory;
 
-import it.fulminazzo.blocksmith.broker.MessageChannelSettings;
+import it.fulminazzo.blocksmith.broker.AbstractMessageChannelSettings;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
-public final class MemoryMessageChannelSettings extends MessageChannelSettings {
+public final class MemoryMessageChannelSettings extends AbstractMessageChannelSettings {
 
     @Override
     public @NotNull MemoryMessageChannelSettings withChannelName(final @NotNull String channelName) {
