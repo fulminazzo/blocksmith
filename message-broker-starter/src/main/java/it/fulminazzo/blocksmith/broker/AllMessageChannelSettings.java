@@ -66,7 +66,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-public final class AllMessageChannelSettings {
+public final class AllMessageChannelSettings extends MessageChannelSettings {
 
     @NotNull MemoryMessageChannelSettings memory;
 
@@ -79,6 +79,39 @@ public final class AllMessageChannelSettings {
     @NotNull KafkaMessageChannelSettings kafka;
 
     @NotNull PluginMessageChannelSettings plugin;
+
+    @Override
+    public @NotNull AllMessageChannelSettings withChannelName(final @NotNull String channelName) {
+        memory.withChannelName(channelName);
+        tcp.withChannelName(channelName);
+        rabbitMQ.withChannelName(channelName);
+        redis.withChannelName(channelName);
+        kafka.withChannelName(channelName);
+        plugin.withChannelName(channelName);
+        return this;
+    }
+
+    @Override
+    public @NotNull AllMessageChannelSettings broadcast() {
+        memory.broadcast();
+        tcp.broadcast();
+        rabbitMQ.broadcast();
+        redis.broadcast();
+        kafka.broadcast();
+        plugin.broadcast();
+        return this;
+    }
+
+    @Override
+    public @NotNull AllMessageChannelSettings direct(final @NotNull String subchannelName) {
+        memory.direct(subchannelName);
+        tcp.direct(subchannelName);
+        rabbitMQ.direct(subchannelName);
+        redis.direct(subchannelName);
+        kafka.direct(subchannelName);
+        plugin.direct(subchannelName);
+        return this;
+    }
 
     /**
      * Converts the current settings to a {@link MessageChannelSettings}, according to the given Message broker.
