@@ -34,14 +34,13 @@ public final class PluginMessageChannelCoordinatorFactories {
     }
 
     private static void registerNext(final @NotNull Iterator<PluginMessageChannelCoordinatorFactory> factories) {
-        if (factories.hasNext()) {
-            try {
-                FACTORIES.add(factories.next());
-            } catch (ServiceConfigurationError e) {
-                // unsupported factory on the current platform
-            }
-            registerNext(factories);
+        try {
+            if (factories.hasNext()) FACTORIES.add(factories.next());
+            else return;
+        } catch (ServiceConfigurationError | NoClassDefFoundError e) {
+            // unsupported factory on the current platform
         }
+        registerNext(factories);
     }
 
 }
