@@ -1,6 +1,5 @@
-type: REDIS
+type: RABBITMQ
 host: '0.0.0.0'
-port: 6379
-database: 0
-client-name: 'blocksmith'
-ssl: false
+port: 5672
+username: 'user'
+password: 'password'

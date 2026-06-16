@@ -30,6 +30,8 @@ class AllMessageChannelSettingsTest extends Specification {
             .kafka(KAFKA)
             .plugin(PLUGIN)
             .build()
+            .withChannelName('channel')
+            .direct('subchannel')
 
     def 'test that getMessageChannelSettings returns #expected with #messageBroker'() {
         when:
