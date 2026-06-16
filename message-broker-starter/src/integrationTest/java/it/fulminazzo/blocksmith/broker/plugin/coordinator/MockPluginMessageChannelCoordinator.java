@@ -20,22 +20,22 @@ final class MockPluginMessageChannelCoordinator extends PluginMessageChannelCoor
     }
 
     @Override
-    protected void registerChannel(final @NotNull String channelName) {
-        // do nothing
-    }
-
-    @Override
-    protected void unregisterChannel(final @NotNull String channelName) {
-        // do nothing
-    }
-
-    @Override
     public boolean publish(final @NotNull String channelName, final byte @NotNull [] message) {
         return true;
     }
 
     @Override
     public void republishFailedMessages() {
+        // do nothing
+    }
+
+    @Override
+    protected void registerChannel(final @NotNull String channelName) {
+        // do nothing
+    }
+
+    @Override
+    protected void unregisterChannel(final @NotNull String channelName) {
         // do nothing
     }
 

@@ -23,26 +23,6 @@ public abstract class AbstractMessageChannelSettings extends MessageChannelSetti
     private @Nullable MessageChannelType channelType;
     private @Nullable String subchannelName;
 
-    @Override
-    public @NotNull MessageChannelSettings withChannelName(final @NotNull String channelName) {
-        this.channelName = channelName;
-        return this;
-    }
-
-    @Override
-    public @NotNull MessageChannelSettings broadcast() {
-        this.channelType = MessageChannelType.BROADCAST;
-        this.subchannelName = null;
-        return this;
-    }
-
-    @Override
-    public @NotNull MessageChannelSettings direct(final @NotNull String subchannelName) {
-        this.channelType = MessageChannelType.DIRECT;
-        this.subchannelName = subchannelName;
-        return this;
-    }
-
     /**
      * Gets the channel name.
      *
@@ -80,6 +60,26 @@ public abstract class AbstractMessageChannelSettings extends MessageChannelSetti
      */
     public @NotNull MessageChannelType getChannelType() {
         return Objects.requireNonNull(channelType, "channel type has not been specified yet");
+    }
+
+    @Override
+    public @NotNull MessageChannelSettings withChannelName(final @NotNull String channelName) {
+        this.channelName = channelName;
+        return this;
+    }
+
+    @Override
+    public @NotNull MessageChannelSettings broadcast() {
+        this.channelType = MessageChannelType.BROADCAST;
+        this.subchannelName = null;
+        return this;
+    }
+
+    @Override
+    public @NotNull MessageChannelSettings direct(final @NotNull String subchannelName) {
+        this.channelType = MessageChannelType.DIRECT;
+        this.subchannelName = subchannelName;
+        return this;
     }
 
 }

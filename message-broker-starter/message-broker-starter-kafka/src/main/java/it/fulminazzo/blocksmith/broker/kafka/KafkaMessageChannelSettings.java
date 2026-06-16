@@ -299,21 +299,6 @@ public final class KafkaMessageChannelSettings extends AbstractMessageChannelSet
         return addProperty(HEARTBEAT_INTERVAL, heartbeatInterval);
     }
 
-    @Override
-    public @NotNull KafkaMessageChannelSettings withChannelName(final @NotNull String channelName) {
-        return (KafkaMessageChannelSettings) super.withChannelName(channelName);
-    }
-
-    @Override
-    public @NotNull KafkaMessageChannelSettings broadcast() {
-        return (KafkaMessageChannelSettings) super.broadcast();
-    }
-
-    @Override
-    public @NotNull KafkaMessageChannelSettings direct(final @NotNull String subchannelName) {
-        return (KafkaMessageChannelSettings) super.direct(subchannelName);
-    }
-
     /**
      * Adds a new general property to the settings.
      * <br>
@@ -347,6 +332,21 @@ public final class KafkaMessageChannelSettings extends AbstractMessageChannelSet
                 properties.get(GROUP_ID),
                 "group id has not been specified yet"
         ).toString();
+    }
+
+    @Override
+    public @NotNull KafkaMessageChannelSettings withChannelName(final @NotNull String channelName) {
+        return (KafkaMessageChannelSettings) super.withChannelName(channelName);
+    }
+
+    @Override
+    public @NotNull KafkaMessageChannelSettings broadcast() {
+        return (KafkaMessageChannelSettings) super.broadcast();
+    }
+
+    @Override
+    public @NotNull KafkaMessageChannelSettings direct(final @NotNull String subchannelName) {
+        return (KafkaMessageChannelSettings) super.direct(subchannelName);
     }
 
     /**

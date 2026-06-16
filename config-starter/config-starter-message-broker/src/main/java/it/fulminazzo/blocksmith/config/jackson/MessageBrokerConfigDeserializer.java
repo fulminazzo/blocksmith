@@ -50,7 +50,9 @@ final class MessageBrokerConfigDeserializer extends StdDeserializer<MessageBroke
             return deserializationContext.readTreeAsValue(node, type.getConfigClass());
         } catch (IllegalArgumentException e) {
             logger.warn("Invalid message broker configuration: unrecognized type '{}'", rawType);
-            throw new IOException(String.format("Invalid message broker configuration: unrecognized type '%s'", rawType));
+            throw new IOException(
+                    String.format("Invalid message broker configuration: unrecognized type '%s'", rawType)
+            );
         }
     }
 

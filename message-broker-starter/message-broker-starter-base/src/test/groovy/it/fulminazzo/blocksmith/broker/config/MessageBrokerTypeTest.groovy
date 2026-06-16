@@ -20,5 +20,5 @@ class MessageBrokerTypeTest extends Specification {
         where:
         messageBrokerType << MessageBrokerType.values()
     }
-    
+
 }

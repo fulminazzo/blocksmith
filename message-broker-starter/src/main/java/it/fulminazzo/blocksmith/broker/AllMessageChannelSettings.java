@@ -80,6 +80,23 @@ public final class AllMessageChannelSettings extends MessageChannelSettings {
 
     @NotNull PluginMessageChannelSettings plugin;
 
+    /**
+     * Converts the current settings to a {@link MessageChannelSettings}, according to the given Message broker.
+     *
+     * @param messageBroker the message broker
+     * @return the message channel settings
+     */
+    public @NotNull MessageChannelSettings getMessageChannelSettings(final @NotNull MessageBroker<?> messageBroker) {
+        if (messageBroker instanceof MemoryMessageBroker) return memory;
+        else if (messageBroker instanceof TcpMessageBroker) return tcp;
+        else if (messageBroker instanceof RabbitMQMessageBroker) return rabbitMQ;
+        else if (messageBroker instanceof RedisMessageBroker) return redis;
+        else if (messageBroker instanceof KafkaMessageBroker) return kafka;
+        else if (messageBroker instanceof PluginMessageBroker) return plugin;
+        else throw new IllegalArgumentException("Unsupported message broker type: "
+                    + messageBroker.getClass().getCanonicalName());
+    }
+
     @Override
     public @NotNull AllMessageChannelSettings withChannelName(final @NotNull String channelName) {
         memory.withChannelName(channelName);
@@ -111,23 +128,6 @@ public final class AllMessageChannelSettings extends MessageChannelSettings {
         kafka.direct(subchannelName);
         plugin.direct(subchannelName);
         return this;
-    }
-
-    /**
-     * Converts the current settings to a {@link MessageChannelSettings}, according to the given Message broker.
-     *
-     * @param messageBroker the message broker
-     * @return the message channel settings
-     */
-    public @NotNull MessageChannelSettings getMessageChannelSettings(final @NotNull MessageBroker<?> messageBroker) {
-        if (messageBroker instanceof MemoryMessageBroker) return memory;
-        else if (messageBroker instanceof TcpMessageBroker) return tcp;
-        else if (messageBroker instanceof RabbitMQMessageBroker) return rabbitMQ;
-        else if (messageBroker instanceof RedisMessageBroker) return redis;
-        else if (messageBroker instanceof KafkaMessageBroker) return kafka;
-        else if (messageBroker instanceof PluginMessageBroker) return plugin;
-        else throw new IllegalArgumentException("Unsupported message broker type: " +
-                    messageBroker.getClass().getCanonicalName());
     }
 
 }

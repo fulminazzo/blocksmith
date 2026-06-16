@@ -63,10 +63,12 @@ public enum MessageBrokerType {
                     ProjectInfo.MODULE_NAME.replace("-base", ""),
                     lowercaseType
             );
-            throw new IllegalStateException(
-                    String.format("Could not find suitable %s for %s. ", MessageBrokerConfig.class.getSimpleName(), type)
-                            + String.format("Please check that the module %s is correctly installed.", moduleName)
-            );
+            throw new IllegalStateException(String.format(
+                    "Could not find suitable %s for %s. Please check that the module %s is correctly installed.",
+                    MessageBrokerConfig.class.getSimpleName(),
+                    type,
+                    moduleName
+            ));
         }
     }
 
