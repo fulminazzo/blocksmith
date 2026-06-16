@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MessageBrokerFactories {
     private static final @NotNull Map<
-            Class<? extends MessageBrokerConfig>,
+            Class<? extends MessageBrokerConfig<?>>,
             MessageBrokerFactory
             > FACTORIES = new ConcurrentHashMap<>();
 
@@ -32,7 +32,7 @@ public final class MessageBrokerFactories {
      */
     @SuppressWarnings("unchecked")
     public static <S extends MessageChannelSettings<S>> @NotNull MessageBroker<S> build(
-            final @NotNull MessageBrokerConfig messageBrokerConfig
+            final @NotNull MessageBrokerConfig<?> messageBrokerConfig
     ) {
         MessageBrokerFactory messageBrokerFactory = FACTORIES.get(messageBrokerConfig.getClass());
         if (messageBrokerFactory == null)
@@ -51,7 +51,7 @@ public final class MessageBrokerFactories {
      * @param factory     the factory
      */
     public static void registerFactory(
-            final @NotNull Class<? extends MessageBrokerConfig> configClass,
+            final @NotNull Class<? extends MessageBrokerConfig<?>> configClass,
             final @NotNull MessageBrokerFactory factory
     ) {
         FACTORIES.put(configClass, factory);
