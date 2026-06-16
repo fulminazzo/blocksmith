@@ -5,6 +5,6 @@ package it.fulminazzo.blocksmith.broker.config;
  *
  * @see MockMessageBrokerFactory
  */
-public final class MockMessageBrokerConfig implements MessageBrokerConfig {
+public final class MockMessageBrokerConfig extends MessageBrokerConfig<MockMessageBrokerConfig> {
 
 }
