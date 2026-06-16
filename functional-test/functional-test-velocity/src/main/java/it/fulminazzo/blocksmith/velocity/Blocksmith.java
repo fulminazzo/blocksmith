@@ -5,6 +5,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import it.fulminazzo.blocksmith.BlocksmithMain;
@@ -15,6 +16,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -38,9 +40,13 @@ public final class Blocksmith {
      * @param logger the logger
      */
     @Inject
-    public Blocksmith(final @NotNull ProxyServer server, final @NotNull Logger logger) {
+    public Blocksmith(
+            final @NotNull ProxyServer server,
+            final @NotNull @DataDirectory Path dataDirectory,
+            final @NotNull Logger logger
+    ) {
         this.server = server;
-        this.main = new BlocksmithMain(logger);
+        this.main = new BlocksmithMain(this, dataDirectory.toFile(), logger);
     }
 
     @Subscribe

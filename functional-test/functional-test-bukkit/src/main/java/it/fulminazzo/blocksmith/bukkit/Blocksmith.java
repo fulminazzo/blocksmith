@@ -22,7 +22,11 @@ public final class Blocksmith extends JavaPlugin {
     private final @NotNull Logger logger = Reflect.on(JDK14LoggerAdapter.class)
             .init(getLogger())
             .get();
-    private final @NotNull BlocksmithMain main = new BlocksmithMain(logger);
+    private final @NotNull BlocksmithMain main = new BlocksmithMain(
+            this,
+            getDataFolder(),
+            logger
+    );
 
     @Override
     public void onEnable() {

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,6 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class BlocksmithMain {
     private final @NotNull Map<String, Subcommand> commands = new ConcurrentHashMap<>();
 
+    private final @NotNull Object owner;
+    private final @NotNull File workDir;
     private final @NotNull Logger logger;
 
     @Getter
