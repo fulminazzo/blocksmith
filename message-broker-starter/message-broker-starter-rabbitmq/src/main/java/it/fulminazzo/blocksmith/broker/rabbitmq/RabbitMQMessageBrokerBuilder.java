@@ -5,7 +5,6 @@ import com.rabbitmq.client.ConnectionFactory;
 import it.fulminazzo.blocksmith.broker.AbstractMessageBrokerBuilder;
 import it.fulminazzo.blocksmith.util.ThreadUtils;
 import it.fulminazzo.blocksmith.validation.Validator;
-import it.fulminazzo.blocksmith.validation.annotation.IPv4;
 import it.fulminazzo.blocksmith.validation.annotation.Port;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
