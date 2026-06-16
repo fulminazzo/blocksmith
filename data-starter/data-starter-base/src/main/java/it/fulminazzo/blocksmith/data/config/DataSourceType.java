@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.data.config;
 
 import it.fulminazzo.blocksmith.ProjectInfo;
+import it.fulminazzo.blocksmith.data.RepositoryDataSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -10,7 +11,7 @@ import java.util.Locale;
  *
  * @see DataSourceConfig
  * @see DataSourceFactory
- * @see it.fulminazzo.blocksmith.data.RepositoryDataSource
+ * @see RepositoryDataSource
  */
 public enum DataSourceType {
     /**
@@ -39,7 +40,7 @@ public enum DataSourceType {
     MONGO;
 
     /**
-     * Creates a new Data source config for the corresponding type.
+     * Gets the {@link DataSourceConfig} configuration class for this type.
      *
      * @return the data source config
      */

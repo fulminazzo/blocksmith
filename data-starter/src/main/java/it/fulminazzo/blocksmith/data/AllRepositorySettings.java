@@ -42,13 +42,13 @@ import org.jetbrains.annotations.NotNull;
  * final RedisRepositorySettings redisRepositorySettings = ...;
  * final MongoRepositorySettings mongoRepositorySettings = ...;
  *
- * final AllRepositorySettings repositorySettings = new AllRepositorySettings(
- *         memoryRepositorySettings,
- *         fileRepositorySettings,
- *         sqlRepositorySettings,
- *         redisRepositorySettings,
- *         mongoRepositorySettings
- * );
+ * final AllRepositorySettings repositorySettings = AllRepositorySettings.builder()
+ *         .memory(memoryRepositorySettings)
+ *         .file(fileRepositorySettings)
+ *         .sql(sqlRepositorySettings)
+ *         .redis(redisRepositorySettings)
+ *         .mongo(mongoRepositorySettings)
+ *         .build();
  *
  * DataSourceConfig dataSourceConfig = ...; // loaded from a configuration provider
  * RepositoryDataSource<RepositorySettings> dataSource = DataSourceFactories.build(dataSourceConfig);
