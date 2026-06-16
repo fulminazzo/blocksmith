@@ -18,6 +18,6 @@ public interface MessageBrokerFactory {
      * @param config the config
      * @return the message broker
      */
-    @NotNull MessageBroker<?> build(final @NotNull MessageBrokerConfig config);
+    @NotNull MessageBroker<?> build(final @NotNull MessageBrokerConfig<?> config);
 
 }
