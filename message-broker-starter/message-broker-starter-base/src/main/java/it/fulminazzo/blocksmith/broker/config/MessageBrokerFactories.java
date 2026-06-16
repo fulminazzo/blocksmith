@@ -27,11 +27,10 @@ public final class MessageBrokerFactories {
      * Instantiates a new {@link MessageBroker} from the given configuration.
      *
      * @param messageBrokerConfig the message broker configuration
-     * @param <S>                 the type of the channel settings
      * @return the message broker
      */
     @SuppressWarnings("unchecked")
-    public static <S extends MessageChannelSettings<S>> @NotNull MessageBroker<S> build(
+    public static @NotNull MessageBroker<MessageChannelSettings> build(
             final @NotNull MessageBrokerConfig<?> messageBrokerConfig
     ) {
         MessageBrokerFactory messageBrokerFactory = FACTORIES.get(messageBrokerConfig.getClass());
@@ -41,7 +40,7 @@ public final class MessageBrokerFactories {
                     MessageBroker.class.getSimpleName(),
                     messageBrokerConfig.getClass().getCanonicalName()
             ));
-        else return (MessageBroker<S>) messageBrokerFactory.build(messageBrokerConfig);
+        else return (MessageBroker<MessageChannelSettings>) messageBrokerFactory.build(messageBrokerConfig);
     }
 
     /**

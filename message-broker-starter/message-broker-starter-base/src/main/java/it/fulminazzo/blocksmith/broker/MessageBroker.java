@@ -17,7 +17,7 @@ import java.io.Closeable;
  * @see MessageChannelSettings
  * @see MessageQueryEngine
  */
-public interface MessageBroker<S extends MessageChannelSettings<S>> extends Closeable {
+public interface MessageBroker<S extends MessageChannelSettings> extends Closeable {
 
     /**
      * Creates a new message channel.

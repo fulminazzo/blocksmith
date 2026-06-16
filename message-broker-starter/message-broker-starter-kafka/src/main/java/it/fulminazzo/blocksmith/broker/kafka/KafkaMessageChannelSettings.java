@@ -16,7 +16,7 @@ import java.util.*;
 @Getter
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
-public final class KafkaMessageChannelSettings extends MessageChannelSettings<KafkaMessageChannelSettings> {
+public final class KafkaMessageChannelSettings extends MessageChannelSettings {
     static final @NotNull String ACKS = "acks";
     static final @NotNull String RETRIES = "retries";
     static final @NotNull String COMPRESSION_TYPE = "compression.type";
@@ -297,6 +297,21 @@ public final class KafkaMessageChannelSettings extends MessageChannelSettings<Ka
      */
     public @NotNull KafkaMessageChannelSettings withHeartbeatInterval(final int heartbeatInterval) {
         return addProperty(HEARTBEAT_INTERVAL, heartbeatInterval);
+    }
+
+    @Override
+    public @NotNull KafkaMessageChannelSettings withChannelName(final @NotNull String channelName) {
+        return (KafkaMessageChannelSettings) super.withChannelName(channelName);
+    }
+
+    @Override
+    public @NotNull KafkaMessageChannelSettings broadcast() {
+        return (KafkaMessageChannelSettings) super.broadcast();
+    }
+
+    @Override
+    public @NotNull KafkaMessageChannelSettings direct(final @NotNull String subchannelName) {
+        return (KafkaMessageChannelSettings) super.direct(subchannelName);
     }
 
     /**

@@ -51,7 +51,7 @@ import org.jetbrains.annotations.NotNull;
  *         .build();
  *
  * MessageBrokerConfig<?> messageBrokerConfig = ...; // loaded from a configuration provider
- * MessageBroker<MessageChannelSettings<?>> messageBroker = MessageBrokerFactories.build(messageBrokerConfig);
+ * MessageBroker<MessageChannelSettings> messageBroker = MessageBrokerFactories.build(messageBrokerConfig);
  *
  * // We don't care what the message channel settings type are, they are fetched automatically
  * MessageChannel messageChannel = messageBroker.newChannel(
@@ -86,7 +86,7 @@ public final class AllMessageChannelSettings {
      * @param messageBroker the message broker
      * @return the message channel settings
      */
-    public @NotNull MessageChannelSettings<?> getChannelSettings(final @NotNull MessageBroker<?> messageBroker) {
+    public @NotNull MessageChannelSettings getMessageChannelSettings(final @NotNull MessageBroker<?> messageBroker) {
         if (messageBroker instanceof MemoryMessageBroker) return memory;
         else if (messageBroker instanceof TcpMessageBroker) return tcp;
         else if (messageBroker instanceof RabbitMQMessageBroker) return rabbitMQ;

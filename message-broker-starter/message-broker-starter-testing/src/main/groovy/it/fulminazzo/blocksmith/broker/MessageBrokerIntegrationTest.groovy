@@ -2,7 +2,7 @@ package it.fulminazzo.blocksmith.broker
 
 import spock.lang.Specification
 
-abstract class MessageBrokerIntegrationTest<S extends MessageChannelSettings<S>> extends Specification {
+abstract class MessageBrokerIntegrationTest<S extends MessageChannelSettings> extends Specification {
     private static final String CHANNEL_NAME = 'message-broker-integration-test'
     private static final String SUBCHANNEL_NAME = 'direct'
     private static final String DIRECT_CHANNEL_NAME = "$CHANNEL_NAME-direct"

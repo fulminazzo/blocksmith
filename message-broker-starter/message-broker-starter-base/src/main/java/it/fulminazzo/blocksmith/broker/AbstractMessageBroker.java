@@ -16,7 +16,7 @@ import java.util.List;
  * @see MessageChannel
  * @see MessageChannelSettings
  */
-public abstract class AbstractMessageBroker<S extends MessageChannelSettings<S>> implements MessageBroker<S> {
+public abstract class AbstractMessageBroker<S extends MessageChannelSettings> implements MessageBroker<S> {
     /**
      * The mapper for converting messages into payloads.
      */

@@ -11,14 +11,12 @@ import java.util.Objects;
  * Represents a general data holder for message channel settings.
  * Implementation may vary according to the message channel type.
  *
- * @param <S> the type of the settings
  * @see MessageChannel
  * @see MessageBroker
  */
-@SuppressWarnings("unchecked")
 @EqualsAndHashCode
 @ToString
-public abstract class MessageChannelSettings<S extends MessageChannelSettings<S>> {
+public abstract class MessageChannelSettings {
     private @Nullable String channelName;
 
     private @Nullable MessageChannelType channelType;
@@ -30,9 +28,9 @@ public abstract class MessageChannelSettings<S extends MessageChannelSettings<S>
      * @param channelName the channel name
      * @return this object (for method chaining)
      */
-    public @NotNull S withChannelName(final @NotNull String channelName) {
+    public @NotNull MessageChannelSettings withChannelName(final @NotNull String channelName) {
         this.channelName = channelName;
-        return (S) this;
+        return this;
     }
 
     /**
@@ -40,10 +38,10 @@ public abstract class MessageChannelSettings<S extends MessageChannelSettings<S>
      *
      * @return this object (for method chaining)
      */
-    public @NotNull S broadcast() {
+    public @NotNull MessageChannelSettings broadcast() {
         this.channelType = MessageChannelType.BROADCAST;
         this.subchannelName = null;
-        return (S) this;
+        return this;
     }
 
     /**
@@ -52,10 +50,10 @@ public abstract class MessageChannelSettings<S extends MessageChannelSettings<S>
      * @param subchannelName the name of the subchannel
      * @return this object (for method chaining)
      */
-    public @NotNull S direct(final @NotNull String subchannelName) {
+    public @NotNull MessageChannelSettings direct(final @NotNull String subchannelName) {
         this.channelType = MessageChannelType.DIRECT;
         this.subchannelName = subchannelName;
-        return (S) this;
+        return this;
     }
 
     /**

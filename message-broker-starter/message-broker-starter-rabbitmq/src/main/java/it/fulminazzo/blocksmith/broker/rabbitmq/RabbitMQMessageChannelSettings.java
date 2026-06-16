@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 @Getter
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
-public final class RabbitMQMessageChannelSettings extends MessageChannelSettings<RabbitMQMessageChannelSettings> {
+public final class RabbitMQMessageChannelSettings extends MessageChannelSettings {
     private final @NotNull QueueSettings queueSettings = new QueueSettings();
     private boolean durable;
 
@@ -57,6 +57,21 @@ public final class RabbitMQMessageChannelSettings extends MessageChannelSettings
     public @NotNull RabbitMQMessageChannelSettings durable() {
         durable = true;
         return this;
+    }
+
+    @Override
+    public @NotNull RabbitMQMessageChannelSettings withChannelName(final @NotNull String channelName) {
+        return (RabbitMQMessageChannelSettings) super.withChannelName(channelName);
+    }
+
+    @Override
+    public @NotNull RabbitMQMessageChannelSettings broadcast() {
+        return (RabbitMQMessageChannelSettings) super.broadcast();
+    }
+
+    @Override
+    public @NotNull RabbitMQMessageChannelSettings direct(final @NotNull String subchannelName) {
+        return (RabbitMQMessageChannelSettings) super.direct(subchannelName);
     }
 
     /**
