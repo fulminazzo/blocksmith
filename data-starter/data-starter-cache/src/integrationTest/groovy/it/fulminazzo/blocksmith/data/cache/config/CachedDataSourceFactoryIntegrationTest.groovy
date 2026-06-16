@@ -8,22 +8,22 @@ import it.fulminazzo.blocksmith.data.sql.config.SqlDataSourceConfig
 import spock.lang.Specification
 
 class CachedDataSourceFactoryIntegrationTest extends Specification {
-    private static final CachedIntegrationTestHelper testHelper = new CachedIntegrationTestHelper()
+    private static final CachedIntegrationTestHelper TEST_HELPER = new CachedIntegrationTestHelper()
 
     void cleanupSpec() {
-        testHelper?.close()
+        TEST_HELPER?.close()
     }
 
     def 'test build from config'() {
         given:
         def config = new CachedDataSourceConfig(
                 new RedisDataSourceConfig()
-                        .setHost(testHelper.cacheServerHost)
-                        .setPort(testHelper.cacheServerPort),
+                        .setHost(TEST_HELPER.cacheServerHost)
+                        .setPort(TEST_HELPER.cacheServerPort),
                 new SqlDataSourceConfig()
                         .setDatabaseType(DatabaseType.POSTGRESQL)
-                        .setHost(testHelper.baseServerHost)
-                        .setPort(testHelper.baseServerPort)
+                        .setHost(TEST_HELPER.baseServerHost)
+                        .setPort(TEST_HELPER.baseServerPort)
                         .setUsername('root')
                         .setPassword('test')
                         .setDatabase('test'),
@@ -31,7 +31,7 @@ class CachedDataSourceFactoryIntegrationTest extends Specification {
         )
 
         when:
-        def dataSource = DataSourceFactories.factories[config.class].build(config)
+        def dataSource = DataSourceFactories.FACTORIES[config.class].build(config)
 
         then:
         dataSource != null

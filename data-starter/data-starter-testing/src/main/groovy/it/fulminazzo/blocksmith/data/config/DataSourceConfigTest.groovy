@@ -9,7 +9,7 @@ abstract class DataSourceConfigTest extends Specification {
         def config = configType.getConstructor(new Class[0]).newInstance(new Object[0])
 
         when:
-        def factory = DataSourceFactories.factories[config.class]
+        def factory = DataSourceFactories.FACTORIES[config.class]
 
         then:
         factory != null

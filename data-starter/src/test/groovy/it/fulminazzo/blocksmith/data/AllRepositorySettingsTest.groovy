@@ -15,41 +15,40 @@ import it.fulminazzo.blocksmith.data.sql.SqlRepositorySettings
 import spock.lang.Specification
 
 class AllRepositorySettingsTest extends Specification {
+    private static final MemoryRepositorySettings MEMORY = new MemoryRepositorySettings()
+    private static final FileRepositorySettings FILE = new FileRepositorySettings()
+    private static final SqlRepositorySettings SQL = new SqlRepositorySettings()
+    private static final RedisRepositorySettings REDIS = new RedisRepositorySettings()
+    private static final MongoRepositorySettings MONGO = new MongoRepositorySettings()
 
-    private final static MemoryRepositorySettings memory = new MemoryRepositorySettings()
-    private final static FileRepositorySettings file = new FileRepositorySettings()
-    private final static SqlRepositorySettings sql = new SqlRepositorySettings()
-    private final static RedisRepositorySettings redis = new RedisRepositorySettings()
-    private final static MongoRepositorySettings mongo = new MongoRepositorySettings()
-
-    private final static AllRepositorySettings settings = AllRepositorySettings.builder()
-            .memory(memory)
-            .file(file)
-            .sql(sql)
-            .redis(redis)
-            .mongo(mongo)
+    private static final AllRepositorySettings SETTINGS = AllRepositorySettings.builder()
+            .memory(MEMORY)
+            .file(FILE)
+            .sql(SQL)
+            .redis(REDIS)
+            .mongo(MONGO)
             .build()
 
     def 'test that getRepositorySettings returns #expected with #dataSource'() {
         when:
-        def actual = settings.getRepositorySettings(dataSource)
+        def actual = SETTINGS.getRepositorySettings(dataSource)
 
         then:
         actual == expected
 
         where:
         dataSource                                                            || expected
-        Mock(MemoryDataSource)                                                || memory
-        Mock(FileDataSource)                                                  || file
-        Mock(SqlDataSource)                                                   || sql
-        Mock(RedisDataSource)                                                 || redis
-        Mock(MongoDataSource)                                                 || mongo
-        new CachedDataSource<>(Mock(MemoryDataSource), Mock(MongoDataSource)) || CachedRepositorySettings.combine(memory, mongo)
+        Mock(MemoryDataSource)                                                || MEMORY
+        Mock(FileDataSource)                                                  || FILE
+        Mock(SqlDataSource)                                                   || SQL
+        Mock(RedisDataSource)                                                 || REDIS
+        Mock(MongoDataSource)                                                 || MONGO
+        new CachedDataSource<>(Mock(MemoryDataSource), Mock(MongoDataSource)) || CachedRepositorySettings.combine(MEMORY, MONGO)
     }
 
     def 'test that getRepositorySettings throws for unrecognized data source'() {
         when:
-        settings.getRepositorySettings(Mock(RepositoryDataSource))
+        SETTINGS.getRepositorySettings(Mock(RepositoryDataSource))
 
         then:
         thrown(IllegalArgumentException)

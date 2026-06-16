@@ -21,7 +21,7 @@ public final class DataSourceFactories {
     private static final @NotNull Map<
             Class<? extends DataSourceConfig>,
             DataSourceFactory
-            > factories = new ConcurrentHashMap<>();
+            > FACTORIES = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new {@link RepositoryDataSource} from the given configuration.
@@ -33,7 +33,7 @@ public final class DataSourceFactories {
     public static @NotNull RepositoryDataSource<RepositorySettings> build(
             final @NotNull DataSourceConfig dataSourceConfig
     ) {
-        DataSourceFactory dataSourceFactory = factories.get(dataSourceConfig.getClass());
+        DataSourceFactory dataSourceFactory = FACTORIES.get(dataSourceConfig.getClass());
         if (dataSourceFactory == null)
             throw new IllegalArgumentException(
                     "No RepositoryDataSource factory currently registered for configuration type: "
@@ -52,7 +52,7 @@ public final class DataSourceFactories {
             final @NotNull Class<? extends DataSourceConfig> configClass,
             final @NotNull DataSourceFactory factory
     ) {
-        factories.put(configClass, factory);
+        FACTORIES.put(configClass, factory);
     }
 
 }
