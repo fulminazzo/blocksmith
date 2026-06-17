@@ -19,7 +19,7 @@ class RedisChannelIntegrationTestHelper extends MessageChannelIntegrationTestHel
     RedisChannelIntegrationTestHelper(final String channelName, final Logger logger) {
         super(channelName, logger)
 
-        client = RedisClient.create("redis://$serverHost:$serverPort")
+        client = RedisClient.create("redis://$RedisIntegrationTest.serverHost:$RedisIntegrationTest.serverPort")
         connection = client.connect()
         pubSubConnection = client.connectPubSub()
     }

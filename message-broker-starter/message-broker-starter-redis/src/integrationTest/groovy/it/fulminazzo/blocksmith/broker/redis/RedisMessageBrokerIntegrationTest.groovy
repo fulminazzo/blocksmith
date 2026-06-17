@@ -22,8 +22,8 @@ class RedisMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<Red
     protected MessageBrokerBuilder<MessageBroker<RedisMessageChannelSettings>> newMessageBrokerBuilder() {
         return RedisMessageBroker.builder()
                 .uri(b -> b
-                        .withHost(RedisChannelIntegrationTestHelper.serverHost)
-                        .withPort(RedisChannelIntegrationTestHelper.serverPort)
+                        .withHost(RedisIntegrationTest.serverHost)
+                        .withPort(RedisIntegrationTest.serverPort)
                 )
                 .clientOptions(c -> c.autoReconnect(false))
                 .socketOptions(s -> s.keepAlive(true))

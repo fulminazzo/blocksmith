@@ -22,8 +22,8 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
         super(channelName, logger)
 
         final factory = new ConnectionFactory()
-        factory.host = serverHost
-        factory.port = serverPort
+        factory.host = RabbitMQIntegrationTest.serverHost
+        factory.port = RabbitMQIntegrationTest.serverPort
 
         connection = factory.newConnection()
         channel = connection.createChannel()

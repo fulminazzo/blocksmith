@@ -25,8 +25,8 @@ class KafkaMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<Kaf
     protected MessageBrokerBuilder<MessageBroker<KafkaMessageChannelSettings>> newMessageBrokerBuilder() {
         return KafkaMessageBroker.builder()
                 .bootstrapServer(
-                        KafkaChannelIntegrationTestHelper.serverHost,
-                        KafkaChannelIntegrationTestHelper.serverPort
+                        KafkaIntegrationTest.serverHost,
+                        KafkaIntegrationTest.serverPort
                 )
                 .securityProtocol(SecurityProtocol.PLAINTEXT)
                 .clientDnsLookup(ClientDnsLookup.USE_ALL_DNS_IPS)

@@ -24,8 +24,8 @@ class RabbitMQMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<
     @Override
     protected MessageBrokerBuilder<MessageBroker<RabbitMQMessageChannelSettings>> newMessageBrokerBuilder() {
         return RabbitMQMessageBroker.builder()
-                .host(RabbitMQChannelIntegrationTestHelper.serverHost)
-                .port(RabbitMQChannelIntegrationTestHelper.serverPort)
+                .host(RabbitMQIntegrationTest.serverHost)
+                .port(RabbitMQIntegrationTest.serverPort)
                 .username(ConnectionFactory.DEFAULT_USER)
                 .password(ConnectionFactory.DEFAULT_PASS)
                 .configure {
