@@ -46,4 +46,10 @@ class PluginChannelIntegrationTestHelper extends MessageChannelIntegrationTestHe
         return this
     }
 
+    @SuppressWarnings('UnnecessaryOverridingMethod') // required from Spotbugs
+    @Override
+    protected final void finalize() throws Throwable {
+        super.finalize()
+    }
+
 }

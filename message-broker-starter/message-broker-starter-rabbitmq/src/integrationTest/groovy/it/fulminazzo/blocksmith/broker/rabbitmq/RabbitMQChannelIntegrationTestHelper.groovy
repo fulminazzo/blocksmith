@@ -99,8 +99,7 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
         return this
     }
 
-    @SuppressWarnings('UnnecessaryOverridingMethod')
-    // required from Spotbugs
+    @SuppressWarnings('UnnecessaryOverridingMethod') // required from Spotbugs
     @Override
     protected final void finalize() throws Throwable {
         super.finalize()
