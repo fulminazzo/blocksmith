@@ -4,18 +4,14 @@ import com.rabbitmq.client.*
 import it.fulminazzo.blocksmith.broker.Message
 import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTestHelper
 import org.slf4j.Logger
-import org.testcontainers.containers.RabbitMQContainer
 
 import java.nio.charset.StandardCharsets
 import java.util.function.Consumer
 
 @SuppressWarnings('CloseWithoutCloseable')
-class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelper {
+class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelper implements RabbitMQIntegrationTest {
     static final String QUEUE_NAME = 'integration-tests-queue'
     private static final String HELPER_QUEUE_NAME = 'tests-helper-queue'
-
-    private static final RabbitMQContainer RABBIT_MQ_SERVER = new RabbitMQContainer('rabbitmq:4.3.0-management-alpine')
-            .withReuse(true)
 
     private final Connection connection
     private final Channel channel
@@ -103,7 +99,8 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
         return this
     }
 
-    @SuppressWarnings('UnnecessaryOverridingMethod') // required from Spotbugs
+    @SuppressWarnings('UnnecessaryOverridingMethod')
+    // required from Spotbugs
     @Override
     protected final void finalize() throws Throwable {
         super.finalize()
@@ -122,21 +119,6 @@ class RabbitMQChannelIntegrationTestHelper extends MessageChannelIntegrationTest
             subchannelName = ''
         }
         return [baseChannelName, subchannelName]
-    }
-
-    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
-    static String getServerHost() {
-        return container.host
-    }
-
-    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
-    static int getServerPort() {
-        return container.amqpPort
-    }
-
-    protected static RabbitMQContainer getContainer() {
-        if (!RABBIT_MQ_SERVER.created) RABBIT_MQ_SERVER.start()
-        return RABBIT_MQ_SERVER
     }
 
 }
