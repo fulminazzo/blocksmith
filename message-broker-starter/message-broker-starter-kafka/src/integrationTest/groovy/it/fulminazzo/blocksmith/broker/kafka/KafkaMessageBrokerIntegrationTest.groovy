@@ -11,7 +11,7 @@ import org.apache.kafka.common.security.auth.SecurityProtocol
 import java.util.concurrent.Executors
 
 @Slf4j
-class KafkaMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<KafkaMessageChannelSettings> {
+class KafkaMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<KafkaMessageChannelSettings> implements KafkaIntegrationTest {
 
     void setup() {
         setupSingle()
@@ -24,10 +24,7 @@ class KafkaMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<Kaf
     @Override
     protected MessageBrokerBuilder<MessageBroker<KafkaMessageChannelSettings>> newMessageBrokerBuilder() {
         return KafkaMessageBroker.builder()
-                .bootstrapServer(
-                        KafkaIntegrationTest.serverHost,
-                        KafkaIntegrationTest.serverPort
-                )
+                .bootstrapServer(serverHost, serverPort)
                 .securityProtocol(SecurityProtocol.PLAINTEXT)
                 .clientDnsLookup(ClientDnsLookup.USE_ALL_DNS_IPS)
                 .reconnectBackoff(100)

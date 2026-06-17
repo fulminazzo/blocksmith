@@ -3,18 +3,18 @@ package it.fulminazzo.blocksmith.broker.rabbitmq
 import org.testcontainers.containers.RabbitMQContainer
 
 interface RabbitMQIntegrationTest {
-    static final RabbitMQContainer RABBIT_MQ_SERVER = new RabbitMQContainer('rabbitmq:4.3.0-management-alpine')
+    RabbitMQContainer RABBIT_MQ_SERVER = new RabbitMQContainer('rabbitmq:4.3.0-management-alpine')
             .withReuse(true)
 
-    static String getServerHost() {
+    default String getServerHost() {
         return container.host
     }
 
-    static int getServerPort() {
+    default int getServerPort() {
         return container.amqpPort
     }
 
-    static RabbitMQContainer getContainer() {
+    default RabbitMQContainer getContainer() {
         if (!RABBIT_MQ_SERVER.created) RABBIT_MQ_SERVER.start()
         return RABBIT_MQ_SERVER
     }

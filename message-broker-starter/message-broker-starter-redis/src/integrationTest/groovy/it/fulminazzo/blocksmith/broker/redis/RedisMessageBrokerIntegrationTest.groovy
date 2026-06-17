@@ -8,7 +8,7 @@ import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTestHelper
 import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 
 @Slf4j
-class RedisMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<RedisMessageChannelSettings> {
+class RedisMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<RedisMessageChannelSettings> implements RedisIntegrationTest {
 
     void setup() {
         setupSingle()
@@ -21,10 +21,7 @@ class RedisMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<Red
     @Override
     protected MessageBrokerBuilder<MessageBroker<RedisMessageChannelSettings>> newMessageBrokerBuilder() {
         return RedisMessageBroker.builder()
-                .uri(b -> b
-                        .withHost(RedisIntegrationTest.serverHost)
-                        .withPort(RedisIntegrationTest.serverPort)
-                )
+                .uri(b -> b.withHost(serverHost).withPort(serverPort))
                 .clientOptions(c -> c.autoReconnect(false))
                 .socketOptions(s -> s.keepAlive(true))
                 .mapper(MapperFormat.JSON.newMapper())

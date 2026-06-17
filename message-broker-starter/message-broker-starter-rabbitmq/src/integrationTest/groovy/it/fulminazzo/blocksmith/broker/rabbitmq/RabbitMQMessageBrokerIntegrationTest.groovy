@@ -11,7 +11,7 @@ import it.fulminazzo.blocksmith.data.mapper.MapperFormat
 import java.util.concurrent.Executors
 
 @Slf4j
-class RabbitMQMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<RabbitMQMessageChannelSettings> {
+class RabbitMQMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<RabbitMQMessageChannelSettings> implements RabbitMQIntegrationTest {
 
     void setup() {
         setupSingle()
@@ -24,8 +24,8 @@ class RabbitMQMessageBrokerIntegrationTest extends MessageBrokerIntegrationTest<
     @Override
     protected MessageBrokerBuilder<MessageBroker<RabbitMQMessageChannelSettings>> newMessageBrokerBuilder() {
         return RabbitMQMessageBroker.builder()
-                .host(RabbitMQIntegrationTest.serverHost)
-                .port(RabbitMQIntegrationTest.serverPort)
+                .host(serverHost)
+                .port(serverPort)
                 .username(ConnectionFactory.DEFAULT_USER)
                 .password(ConnectionFactory.DEFAULT_PASS)
                 .configure {

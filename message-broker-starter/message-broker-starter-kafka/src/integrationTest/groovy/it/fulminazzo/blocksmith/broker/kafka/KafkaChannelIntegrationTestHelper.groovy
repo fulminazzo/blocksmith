@@ -71,7 +71,7 @@ class KafkaChannelIntegrationTestHelper extends MessageChannelIntegrationTestHel
     @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static Properties getProperties() {
         final Properties properties = new Properties()
-        properties['bootstrap.servers'] = "$KafkaIntegrationTest.serverHost:$KafkaIntegrationTest.serverPort".toString()
+        properties['bootstrap.servers'] = "$KafkaIntegrationTest.host:$KafkaIntegrationTest.port".toString()
         properties['key.serializer'] = StringSerializer.canonicalName
         properties['value.serializer'] = StringSerializer.canonicalName
         properties['key.deserializer'] = StringDeserializer.canonicalName

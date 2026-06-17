@@ -11,8 +11,8 @@ class RedisMessageBrokerFactoryIntegrationTest extends MessageBrokerFactoryInteg
     def 'test build with clientName=#clientName and database#database'() {
         given:
         def config = new RedisMessageBrokerConfig()
-                .setHost(RedisIntegrationTest.serverHost)
-                .setPort(RedisIntegrationTest.serverPort)
+                .setHost(serverHost)
+                .setPort(serverPort)
                 .setClientName(clientName)
                 .setSsl(false)
                 .setDatabase(database)
@@ -41,7 +41,7 @@ class RedisMessageBrokerFactoryIntegrationTest extends MessageBrokerFactoryInteg
     def 'test build with unspecified port'() {
         given:
         def config = new RedisMessageBrokerConfig()
-                .setHost(RedisIntegrationTest.serverHost)
+                .setHost(serverHost)
                 .setPort(null)
 
         when:
@@ -59,8 +59,8 @@ class RedisMessageBrokerFactoryIntegrationTest extends MessageBrokerFactoryInteg
     @Override
     protected MessageBrokerConfig getConfig() {
         return new RedisMessageBrokerConfig()
-                .setHost(RedisIntegrationTest.serverHost)
-                .setPort(RedisIntegrationTest.serverPort)
+                .setHost(serverHost)
+                .setPort(serverPort)
     }
 
 }

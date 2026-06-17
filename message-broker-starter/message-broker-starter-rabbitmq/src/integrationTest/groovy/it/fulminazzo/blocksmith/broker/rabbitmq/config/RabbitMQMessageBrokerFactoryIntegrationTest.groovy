@@ -25,8 +25,8 @@ class RabbitMQMessageBrokerFactoryIntegrationTest extends MessageBrokerFactoryIn
     @Override
     protected MessageBrokerConfig getConfig() {
         return new RabbitMQMessageBrokerConfig()
-                .setHost(RabbitMQIntegrationTest.serverHost)
-                .setPort(RabbitMQIntegrationTest.serverPort)
+                .setHost(serverHost)
+                .setPort(serverPort)
     }
 
 }
