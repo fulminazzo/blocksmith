@@ -9,21 +9,16 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.jetbrains.annotations.NotNull
 import org.slf4j.Logger
-import org.testcontainers.kafka.ConfluentKafkaContainer
-import org.testcontainers.kafka.KafkaHelper
 
 import java.util.function.Consumer
 
 @SuppressWarnings('CloseWithoutCloseable')
-class KafkaChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelper {
+class KafkaChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelper implements KafkaIntegrationTest {
     static final String GROUP_ID = 'integration-tests-group'
     static final String HELPER_GROUP_ID = 'tests-helper-group'
 
     static final int ASSIGNMENT_WAIT_MILLIS = 60_000
     static final int CONSUMER_POLL_MILLIS_INTERVAL = 125
-
-    private static final ConfluentKafkaContainer KAFKA_SERVER = new ConfluentKafkaContainer('confluentinc/cp-kafka:7.4.0')
-            .withReuse(true)
 
     private final List<KafkaConsumerHandler<String, String>> consumers = []
 
@@ -76,7 +71,7 @@ class KafkaChannelIntegrationTestHelper extends MessageChannelIntegrationTestHel
     @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static Properties getProperties() {
         final Properties properties = new Properties()
-        properties['bootstrap.servers'] = "$serverHost:$serverPort".toString()
+        properties['bootstrap.servers'] = "$KafkaIntegrationTest.serverHost:$KafkaIntegrationTest.serverPort".toString()
         properties['key.serializer'] = StringSerializer.canonicalName
         properties['value.serializer'] = StringSerializer.canonicalName
         properties['key.deserializer'] = StringDeserializer.canonicalName
@@ -86,21 +81,6 @@ class KafkaChannelIntegrationTestHelper extends MessageChannelIntegrationTestHel
         properties['auto.offset.reset'] = 'latest'
 
         return properties
-    }
-
-    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
-    static String getServerHost() {
-        return container.host
-    }
-
-    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
-    static int getServerPort() {
-        return container.getMappedPort(KafkaHelper.KAFKA_PORT)
-    }
-
-    protected static ConfluentKafkaContainer getContainer() {
-        if (!KAFKA_SERVER.created) KAFKA_SERVER.start()
-        return KAFKA_SERVER
     }
 
 }
