@@ -334,8 +334,7 @@ class AllDataSourceIntegrationTest extends Specification {
         return MONGO_SERVER.getMappedPort(MONGO_PORT)
     }
 
-    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods')
-    // enforce our ordering
+    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
     static DSLContext initializeContextAndTable(final DataSource dataSource, final SQLDialect dialect) {
         def context = using(dataSource, dialect)
         context.createTableIfNotExists(TABLE_NAME)
