@@ -68,12 +68,7 @@ class AllMessageBrokerIntegrationTest extends Specification {
                 .setHost(REDIS_SERVER.host)
                 .setPort(REDIS_SERVER.getMappedPort(REDIS_PORT))
         kafkaMessageBrokerConfig = new KafkaMessageBrokerConfig()
-                .setBootstrapServers([
-                        new KafkaMessageBrokerConfig.BootstrapServerConfig(
-                                KAFKA_SERVER.host,
-                                KAFKA_SERVER.getMappedPort(KafkaHelper.KAFKA_PORT)
-                        )
-                ].toSet())
+                .addBootstrapServer(KAFKA_SERVER.host, KAFKA_SERVER.getMappedPort(KafkaHelper.KAFKA_PORT))
         pluginMessageBrokerConfig = new PluginMessageBrokerConfig()
                 .setOwner(this)
     }

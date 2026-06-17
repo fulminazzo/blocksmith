@@ -15,12 +15,7 @@ class KafkaMessageBrokerFactoryIntegrationTest extends MessageBrokerFactoryInteg
     @Override
     protected MessageBrokerConfig getConfig() {
         return new KafkaMessageBrokerConfig()
-                .setBootstrapServers([
-                        new KafkaMessageBrokerConfig.BootstrapServerConfig(
-                                KafkaIntegrationTest.serverHost,
-                                KafkaIntegrationTest.serverPort
-                        )
-                ].toSet())
+                .addBootstrapServer(KafkaIntegrationTest.serverHost, KafkaIntegrationTest.serverPort)
     }
 
 }

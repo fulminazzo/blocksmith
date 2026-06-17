@@ -4,6 +4,7 @@ import it.fulminazzo.blocksmith.broker.config.MessageBrokerConfig;
 import it.fulminazzo.blocksmith.broker.config.MessageBrokerFactories;
 import it.fulminazzo.blocksmith.broker.kafka.KafkaMessageBroker;
 import it.fulminazzo.blocksmith.validation.annotation.NonNull;
+import it.fulminazzo.blocksmith.validation.annotation.Port;
 import it.fulminazzo.blocksmith.validation.annotation.PositiveOrZero;
 import it.fulminazzo.blocksmith.validation.annotation.Size;
 import lombok.*;
@@ -64,6 +65,18 @@ public final class KafkaMessageBrokerConfig extends MessageBrokerConfig<KafkaMes
     Integer requestTimeout = 30_000;
 
     /**
+     * Adds a bootstrap server to the list of servers to connect to.
+     *
+     * @param host the host
+     * @param port the port
+     * @return this object (for method chaining)
+     */
+    public KafkaMessageBrokerConfig addBootstrapServer(final String host, final int port) {
+        this.bootstrapServers.add(new BootstrapServerConfig(host, port));
+        return this;
+    }
+
+    /**
      * Configuration for a single bootstrap server.
      */
     @Data
@@ -76,6 +89,7 @@ public final class KafkaMessageBrokerConfig extends MessageBrokerConfig<KafkaMes
         @NonNull(exceptionMessage = "'host' must be declared")
         String host;
 
+        @Port
         @NonNull(exceptionMessage = "'port' must be declared")
         Integer port;
 
