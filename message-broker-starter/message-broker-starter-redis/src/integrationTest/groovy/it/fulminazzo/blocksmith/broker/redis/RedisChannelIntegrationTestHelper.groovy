@@ -7,18 +7,11 @@ import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
 import it.fulminazzo.blocksmith.broker.Message
 import it.fulminazzo.blocksmith.broker.MessageChannelIntegrationTestHelper
 import org.slf4j.Logger
-import org.testcontainers.containers.GenericContainer
 
 import java.util.function.Consumer
 
 @SuppressWarnings('CloseWithoutCloseable')
-class RedisChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelper {
-    private static final int REDIS_PORT = 6379
-
-    private static final GenericContainer REDIS_SERVER = new GenericContainer('redis:7-alpine')
-            .withExposedPorts(REDIS_PORT)
-            .withReuse(true)
-
+class RedisChannelIntegrationTestHelper extends MessageChannelIntegrationTestHelper implements RedisIntegrationTest {
     private final RedisClient client
     protected final StatefulRedisConnection<String, String> connection
     protected final StatefulRedisPubSubConnection<String, String> pubSubConnection
@@ -61,21 +54,6 @@ class RedisChannelIntegrationTestHelper extends MessageChannelIntegrationTestHel
         })
         pubSubConnection.sync().subscribe(channelName)
         return this
-    }
-
-    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
-    static String getServerHost() {
-        return container.host
-    }
-
-    @SuppressWarnings('PublicMethodsBeforeNonPublicMethods') // enforce our ordering
-    static int getServerPort() {
-        return container.getMappedPort(REDIS_PORT)
-    }
-
-    protected static GenericContainer getContainer() {
-        if (!REDIS_SERVER.created) REDIS_SERVER.start()
-        return REDIS_SERVER
     }
 
 }
