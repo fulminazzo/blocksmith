@@ -35,6 +35,32 @@ public final class ApplicationLoader {
     }
 
     /**
+     * Validates the built dependency tree by checking if any circular dependency is present.
+     *
+     * @param node the root of the tree to validate
+     */
+    void validateTree(final @NotNull LoaderNode node) {
+        int occurrences = validateNode(node, node);
+        if (occurrences > 1) throw new IllegalStateException(String.format(
+                "Circular dependency detected in application %s",
+                application.getClass().getCanonicalName()
+        ));
+        for (LoaderNode child : node.getChildren())
+            validateTree(child);
+    }
+
+    private int validateNode(final @NotNull LoaderNode node, final @NotNull LoaderNode target) {
+        int occurrences = 0;
+        for (LoaderNode child : node.getChildren())
+            if (child.equals(target)) occurrences++;
+        for (LoaderNode child : node.getChildren()) {
+            occurrences += validateNode(child, target);
+            if (occurrences > 1) return occurrences;
+        }
+        return occurrences;
+    }
+
+    /**
      * Uses the given list of nodes to build a dependency tree.
      *
      * @param nodes the nodes to build the tree from
