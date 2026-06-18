@@ -35,6 +35,18 @@ public final class ApplicationLoader {
     }
 
     /**
+     * Executes all the necessary steps to load the application.
+     *
+     * @return the root of the dependency tree
+     */
+    @NotNull LoaderNode load() {
+        List<FieldAnnotationNode> nodes = loadFieldAnnotationNodes();
+        LoaderNode tree = buildDependencyTree(nodes);
+        validateTree(tree);
+        return tree;
+    }
+
+    /**
      * Validates the built dependency tree by checking if any circular dependency is present.
      *
      * @param node the root of the tree to validate
