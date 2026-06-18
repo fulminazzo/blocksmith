@@ -32,6 +32,7 @@ public final class BlocksmithMain {
         enabled = true;
 
         logger.info("Enabling...");
+        logger.debug("Starting with owner {} in working directory: {}", owner, workDir.getPath());
         logger.info("┏┓ ╻  ┏━┓┏━╸╻┏ ┏━┓┏┳┓╻╺┳╸╻ ╻");
         logger.info("┣┻┓┃  ┃ ┃┃  ┣┻┓┗━┓┃┃┃┃ ┃ ┣━┫");
         logger.info("┗━┛┗━╸┗━┛┗━╸╹ ╹┗━┛╹ ╹╹ ╹ ╹ ╹");
