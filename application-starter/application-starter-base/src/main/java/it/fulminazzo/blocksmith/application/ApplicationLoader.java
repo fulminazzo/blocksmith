@@ -53,10 +53,10 @@ public final class ApplicationLoader {
      */
     void validateTree(final @NotNull LoaderNode node) {
         int occurrences = validateNode(node, node);
-        if (occurrences > 1) throw new IllegalStateException(String.format(
+        if (occurrences > 1) throw new InvalidApplicationException(
                 "Circular dependency detected in application %s",
                 application.getClass().getCanonicalName()
-        ));
+        );
         for (LoaderNode child : node.getChildren())
             validateTree(child);
     }
@@ -88,18 +88,19 @@ public final class ApplicationLoader {
             else for (String dep : node.getDependencies()) {
                 FieldAnnotationNode depNode = namedNodes.get(dep);
                 if (depNode != null) depNode.addChild(node);
-                else throw new IllegalStateException(String.format(
-                        "Invalid dependency declared in annotation %s for field '%s': %s not found",
+                else throw new InvalidApplicationException(
+                        "Invalid dependency declared in application %s and annotation %s for field '%s': %s not found",
+                        application.getClass().getCanonicalName(),
                         node.getAnnotation().annotationType().getCanonicalName(),
                         node.getField().getName(),
                         dep
-                ));
+                );
             }
         if (root.getChildren().isEmpty())
-            throw new IllegalArgumentException(String.format(
+            throw new InvalidApplicationException(
                     "Detected circular dependencies in application %s",
                     application.getClass().getCanonicalName()
-            ));
+            );
         else return root;
     }
 
