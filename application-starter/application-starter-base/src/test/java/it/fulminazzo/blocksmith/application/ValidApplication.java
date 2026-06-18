@@ -11,6 +11,7 @@ import java.io.File;
 @SuppressWarnings("unused")
 final class ValidApplication implements Application {
 
+    @NoDependencies
     private Object first;
 
     @SingleDependency(dependsOn = "first")
@@ -22,6 +23,7 @@ final class ValidApplication implements Application {
     @MultipleDependencies(dependsOn = {"second", "third"})
     private Object fourth;
 
+    @NoDependencies
     private Object fifth;
 
     @Override

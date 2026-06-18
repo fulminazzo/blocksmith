@@ -3,15 +3,14 @@ package it.fulminazzo.blocksmith.application
 import spock.lang.Specification
 
 import java.lang.annotation.Annotation
-import java.lang.annotation.Documented
 import java.lang.reflect.Field
 
 class FieldAnnotationNodeTest extends Specification {
-    private static final Annotation NO_DEPENDENCIES = new Documented() {
+    private static final Annotation NO_DEPENDENCIES = new NoDependencies() {
 
         @Override
         Class<? extends Annotation> annotationType() {
-            return Documented
+            return NoDependencies
         }
 
     }
