@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.application;
 
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +18,9 @@ import java.util.Set;
  * @see ApplicationLoader
  */
 @Value
-class FieldAnnotationNode {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+class FieldAnnotationNode extends LoaderNode {
     private static final @NotNull String DEPENDENCY_FIELD_NAME = "dependsOn";
 
     @NotNull Annotation annotation;
