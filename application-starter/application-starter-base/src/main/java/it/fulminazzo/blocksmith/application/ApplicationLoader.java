@@ -5,10 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -35,6 +32,37 @@ public final class ApplicationLoader {
     ApplicationLoader(final @NotNull Application application) {
         this.application = application;
         this.reflect = Reflect.on(application);
+    }
+
+    /**
+     * Uses the given list of nodes to build a dependency tree.
+     *
+     * @param nodes the nodes to build the tree from
+     * @return the root of the tree
+     */
+    @NotNull LoaderNode buildDependencyTree(final @NotNull List<FieldAnnotationNode> nodes) {
+        final LoaderNode root = new LoaderNode();
+        if (nodes.isEmpty()) return root;
+        Map<String, FieldAnnotationNode> namedNodes = new HashMap<>();
+        nodes.forEach(n -> namedNodes.put(n.getField().getName(), n));
+        for (FieldAnnotationNode node : nodes)
+            if (node.getDependencies().isEmpty()) root.addChild(node);
+            else for (String dep : node.getDependencies()) {
+                FieldAnnotationNode depNode = namedNodes.get(dep);
+                if (depNode != null) depNode.addChild(node);
+                else throw new IllegalStateException(String.format(
+                        "Invalid dependency declared in annotation %s for field '%s': %s not found",
+                        node.getAnnotation().annotationType().getCanonicalName(),
+                        node.getField().getName(),
+                        dep
+                ));
+            }
+        if (root.getChildren().isEmpty())
+            throw new IllegalArgumentException(String.format(
+                    "Detected circular dependencies in application %s",
+                    application.getClass().getCanonicalName()
+            ));
+        else return root;
     }
 
     /**
