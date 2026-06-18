@@ -48,19 +48,19 @@ class FieldAnnotationNode {
     private static @NotNull Set<String> loadDependencies(final @NotNull Annotation annotation) {
         final Set<String> dependencies = new LinkedHashSet<>();
         Reflect reflect = Reflect.on(annotation);
-        reflect.getInstanceFields().stream()
-                .filter(f -> f.getName().equals(DEPENDENCY_FIELD_NAME))
+        reflect.getInstanceMethods().stream()
+                .filter(m -> m.getName().equals(DEPENDENCY_FIELD_NAME))
                 .findAny()
-                .ifPresent(f -> {
-                    Class<?> fieldType = f.getType();
-                    if (String.class.isAssignableFrom(fieldType))
-                        addDependency(dependencies, reflect.get(f).get());
-                    else if (String[].class.isAssignableFrom(fieldType)) {
-                        String[] deps = reflect.get(f).get();
+                .ifPresent(m -> {
+                    Class<?> returnType = m.getReturnType();
+                    if (String.class.isAssignableFrom(returnType))
+                        addDependency(dependencies, reflect.invoke(m).get());
+                    else if (String[].class.isAssignableFrom(returnType)) {
+                        String[] deps = reflect.invoke(m).get();
                         for (String dependency : deps)
                             addDependency(dependencies, dependency);
                     } else throw new IllegalArgumentException(
-                            "Unsupported dependency type: " + fieldType.getCanonicalName()
+                            "Unsupported dependency type: " + returnType.getCanonicalName()
                     );
                 });
         return dependencies;
