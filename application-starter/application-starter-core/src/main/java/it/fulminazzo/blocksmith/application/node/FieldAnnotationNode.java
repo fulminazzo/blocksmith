@@ -122,7 +122,7 @@ public class FieldAnnotationNode extends LoaderNode {
         String[] split = dependency.split("\\.");
         dependencies.put(
                 split[0],
-                String.join("", Arrays.copyOfRange(split, 1, split.length))
+                String.join(".", Arrays.copyOfRange(split, 1, split.length))
         );
     }
 
