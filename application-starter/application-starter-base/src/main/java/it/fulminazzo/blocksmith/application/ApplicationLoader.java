@@ -52,24 +52,7 @@ public final class ApplicationLoader {
      * @param node the root of the tree to validate
      */
     void validateTree(final @NotNull LoaderNode node) {
-        int occurrences = validateNode(node, node);
-        if (occurrences > 1) throw new InvalidApplicationException(
-                "Circular dependency detected in application %s",
-                application.getClass().getCanonicalName()
-        );
-        for (LoaderNode child : node.getChildren())
-            validateTree(child);
-    }
-
-    private int validateNode(final @NotNull LoaderNode node, final @NotNull LoaderNode target) {
-        int occurrences = 0;
-        for (LoaderNode child : node.getChildren())
-            if (child.equals(target)) occurrences++;
-        for (LoaderNode child : node.getChildren()) {
-            occurrences += validateNode(child, target);
-            if (occurrences > 1) return occurrences;
-        }
-        return occurrences;
+        validateTree(node, new LinkedHashSet<>());
     }
 
     /**
@@ -115,6 +98,19 @@ public final class ApplicationLoader {
         for (Field field : reflect.getInstanceFields())
             nodes.addAll(loadFieldAnnotationNodeSingle(field));
         return nodes;
+    }
+
+    private void validateTree(
+            final @NotNull LoaderNode node,
+            final @NotNull Set<LoaderNode> visiting
+    ) {
+        if (!visiting.add(node))
+            throw new InvalidApplicationException(
+                    "Circular dependency detected in application %s",
+                    application.getClass().getCanonicalName()
+            );
+        for (LoaderNode child : node.getChildren()) validateTree(child, visiting);
+        visiting.remove(node);
     }
 
     private @NotNull List<FieldAnnotationNode> loadFieldAnnotationNodeSingle(final @NotNull Field field) {
