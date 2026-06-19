@@ -202,12 +202,10 @@ final class ApplicationLoader {
             else return false;
         }
 
-        if (split.length > 1)
-            checkFieldInClass(
-                    targetClass,
-                    String.join("", Arrays.copyOfRange(split, 1, split.length))
-            );
-        return true;
+        return split.length == 1 || checkFieldInClass(
+                targetClass,
+                String.join("", Arrays.copyOfRange(split, 1, split.length))
+        );
     }
 
 }
