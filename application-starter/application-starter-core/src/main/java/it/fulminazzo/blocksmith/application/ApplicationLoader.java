@@ -68,7 +68,7 @@ final class ApplicationLoader {
                 for (String dep : fieldDependencies) {
                     FieldAnnotationNode depNode = nodes.get(dep);
                     if (depNode != null) depNode.addChild(node);
-                    else throw new InvalidApplicationException(
+                    else throw new ApplicationLoadingException(
                             "Invalid dependency declared in application %s and "
                                     + "annotation %s for field '%s': %s not found",
                             application.getClass().getCanonicalName(),
@@ -79,7 +79,7 @@ final class ApplicationLoader {
                 }
         }
         if (root.getChildren().isEmpty())
-            throw new InvalidApplicationException(
+            throw new ApplicationLoadingException(
                     "Circular dependency detected in application %s",
                     application.getClass().getCanonicalName()
             );
@@ -104,7 +104,7 @@ final class ApplicationLoader {
             final @NotNull Set<LoaderNode> visiting
     ) {
         if (!visiting.add(node))
-            throw new InvalidApplicationException(
+            throw new ApplicationLoadingException(
                     "Circular dependency detected in application %s",
                     application.getClass().getCanonicalName()
             );
@@ -166,7 +166,7 @@ final class ApplicationLoader {
                     .filter(m -> m.getName().equalsIgnoreCase(methodName) && m.getParameterCount() == 0)
                     .findAny();
             if (methodOpt.isPresent()) targetClass = methodOpt.get().getReturnType();
-            else throw new InvalidApplicationException(
+            else throw new ApplicationLoadingException(
                     "Field '%s' not found in class %s",
                     fieldPath,
                     clazz.getCanonicalName()

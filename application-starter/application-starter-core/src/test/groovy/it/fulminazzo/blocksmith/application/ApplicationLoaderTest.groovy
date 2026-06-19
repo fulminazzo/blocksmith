@@ -63,7 +63,7 @@ class ApplicationLoaderTest extends Specification {
         validLoader.validateTree(node)
 
         then:
-        def e = thrown(InvalidApplicationException)
+        def e = thrown(ApplicationLoadingException)
         e.message =~ /.*Circular.+${ValidApplication.canonicalName}.*/
     }
 
@@ -113,7 +113,7 @@ class ApplicationLoaderTest extends Specification {
         validLoader.buildDependencyTree(['first' : node])
 
         then:
-        def e = thrown(InvalidApplicationException)
+        def e = thrown(ApplicationLoadingException)
         e.message =~ /.*${ValidApplication.canonicalName}.+${NoDependencies.canonicalName}.+first.+invalid.*/
     }
 
@@ -130,7 +130,7 @@ class ApplicationLoaderTest extends Specification {
         validLoader.buildDependencyTree(['first' : node1, 'second' : node2])
 
         then:
-        def e = thrown(InvalidApplicationException)
+        def e = thrown(ApplicationLoadingException)
         e.message =~ /.*Circular.+${ValidApplication.canonicalName}.*/
     }
 
