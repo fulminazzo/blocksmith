@@ -50,10 +50,14 @@ final class ApplicationInitializer implements LoaderVisitor {
         final A annotation = (A) node.getAnnotation();
         final Field field = node.getField();
         final FieldAnnotationHandler<A> handler = (FieldAnnotationHandler<A>) node.getHandler();
-        // TODO: environment should have dependencies explicitly declared
-        //   for example: config.databaseConfig
-        Map<@NotNull String, Object> env = new HashMap<>(environment);
-        Object result = handler.handle(application, annotation, field, env);
+
+        for (String dep : node.getFieldDependencies()) {
+            String subfield = node.getFieldDependency(dep);
+            String fieldPath = dep + (subfield.isEmpty() ? "" : "." + subfield);
+            environment.computeIfAbsent(fieldPath, k -> getFieldValue(application, k));
+        }
+
+        Object result = handler.handle(application, annotation, field, Map.copyOf(environment));
         if (result != null) {
             environment.put(field.getName(), result);
             reflect.set(field, result);
