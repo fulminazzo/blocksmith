@@ -46,6 +46,15 @@ final class ApplicationInitializer implements LoaderVisitor<ApplicationEnableExc
         this.dependencyTree = dependencyTree;
     }
 
+    /**
+     * Initializes the application.
+     *
+     * @throws ApplicationEnableException if an error occurs during the initialization
+     */
+    public void initialize() throws ApplicationEnableException {
+        dependencyTree.accept(this);
+    }
+
     @SuppressWarnings("unchecked")
     private <A extends Annotation> void visitFieldImpl(
             final @NotNull FieldAnnotationNode node
