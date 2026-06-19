@@ -12,9 +12,10 @@ import java.util.Set;
  * Identifies a general node in the dependency graph.
  *
  * @see FieldAnnotationNode
+ * @see RootLoaderNode
  */
 @Data
-class LoaderNode {
+abstract class LoaderNode {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private final @NotNull Set<LoaderNode> children = new LinkedHashSet<>();

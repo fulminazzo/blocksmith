@@ -60,7 +60,7 @@ final class ApplicationLoader {
      * @return the root of the tree
      */
     @NotNull LoaderNode buildDependencyTree(final @NotNull Map<String, FieldAnnotationNode> nodes) {
-        final LoaderNode root = new LoaderNode();
+        final LoaderNode root = new RootLoaderNode();
         if (nodes.isEmpty()) return root;
         for (FieldAnnotationNode node : nodes.values()) {
             Set<String> fieldDependencies = node.getFieldDependencies();
