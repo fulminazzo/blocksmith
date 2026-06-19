@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -130,6 +131,53 @@ final class ApplicationLoader {
         Map<String, FieldAnnotationNode> namedNodes = new LinkedHashMap<>();
         nodes.forEach(n -> namedNodes.put(n.getFieldName(), n));
         return namedNodes;
+    }
+
+    /**
+     * Although the name of this function implies it only works for fields, it actually works for getter methods
+     * as well. This is how it works:
+     * <ul>
+     *     <li>Extracts the first part of the {@code fieldPath} preceding any {@code .} symbol.
+     *     This will be the target name;</li>
+     *     <li>Checks the class in search for a <b>non-static</b> field with the target name;</li>
+     *     <li>If it is not found, checks the class in search for a method named {@code get<target-name>};</li>
+     *     <li>If it was not found, an exception will be thrown;</li>
+     *     <li>If it was found, and the path is not finished (meaning there is more after the {@code .},
+     *     the method is called recursively using the target type as class.</li>
+     * </ul>
+     *
+     * @param clazz the class to check
+     * @param fieldPath the path to the field
+     */
+    static void checkFieldInClass(final @NotNull Class<?> clazz, final @NotNull String fieldPath) {
+        if (fieldPath.isEmpty()) return;
+        String[] split = fieldPath.split("\\.");
+        String fieldName = split[0];
+        final Class<?> targetClass;
+
+        Reflect reflect = Reflect.on(clazz);
+        Optional<Field> fieldOpt = reflect.getInstanceFields().stream()
+                .filter(f -> f.getName().equalsIgnoreCase(fieldName))
+                .findAny();
+        if (fieldOpt.isPresent()) targetClass = fieldOpt.get().getType();
+        else {
+            String methodName = "get" + fieldName;
+            Optional<Method> methodOpt = reflect.getInstanceMethods().stream()
+                    .filter(m -> m.getName().equalsIgnoreCase(methodName) && m.getParameterCount() == 0)
+                    .findAny();
+            if (methodOpt.isPresent()) targetClass = methodOpt.get().getReturnType();
+            else throw new InvalidApplicationException(
+                    "Field '%s' not found in class %s",
+                    fieldPath,
+                    clazz.getCanonicalName()
+            );
+        }
+
+        if (split.length > 1)
+            checkFieldInClass(
+                    targetClass,
+                    String.join("", Arrays.copyOfRange(split, 1, split.length))
+            );
     }
 
 }
