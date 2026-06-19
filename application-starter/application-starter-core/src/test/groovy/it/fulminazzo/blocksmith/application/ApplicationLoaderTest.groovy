@@ -1,3 +1,5 @@
+//file:noinspection unused
+//file:noinspection GrMethodMayBeStatic
 package it.fulminazzo.blocksmith.application
 
 import it.fulminazzo.blocksmith.reflect.Reflect
@@ -129,6 +131,36 @@ class ApplicationLoaderTest extends Specification {
         nodes == validNodes
     }
 
+    def 'test that checkFieldInClass of #fieldPath does not throw'() {
+        expect:
+        ApplicationLoader.checkFieldInClass(ContainerClass, fieldPath)
+
+        where:
+        fieldPath << [
+                'field',
+                'field.name',
+                'field.ageData',
+                'field.ageData.information',
+                'field.ageData.information.identity',
+                'method',
+                'method.age',
+                'method.information',
+                'method.information.identity',
+        ]
+    }
+
+    def 'test that checkFieldInClass throws for #fieldPath'() {
+        expect:
+        !ApplicationLoader.checkFieldInClass(ContainerClass, fieldPath)
+
+        where:
+        fieldPath << [
+                'field.notFound',
+                'method.invalid',
+                'method.localizedName'
+        ]
+    }
+
     protected static List<FieldAnnotationNode> getValidNodes() {
         return [
                 newNode(ValidApplication, 'first'),
@@ -150,6 +182,48 @@ class ApplicationLoaderTest extends Specification {
                 field,
                 ApplicationHandlers.getFieldAnnotationHandler(annotation.annotationType()).orElseThrow()
         )
+    }
+
+    private static final class ContainerClass {
+
+        private final FieldClass field = new FieldClass()
+
+        private final MethodClass method = new MethodClass()
+
+    }
+
+    private static final class FieldClass {
+
+        String name = 'Alex'
+
+        MethodClass ageData = new MethodClass()
+
+    }
+
+    private static final class MethodClass {
+
+        int getAge() {
+            return 10
+        }
+
+        void setAge(int age) {
+
+        }
+
+        NestedClass getInformation() {
+            return new NestedClass()
+        }
+
+        String getLocalizedName(final String name) {
+            throw new UnsupportedOperationException()
+        }
+
+    }
+
+    private static final class NestedClass {
+
+        String identity = 'Batman'
+
     }
 
 }
