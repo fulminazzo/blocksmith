@@ -70,10 +70,7 @@ final class ApplicationLoader {
                     nodes.get(dep).addChild(node);
         }
         if (root.getChildren().isEmpty())
-            throw new ApplicationLoadingException(
-                    "Circular dependency detected in application %s",
-                    application.getClass().getCanonicalName()
-            );
+            throw loadingException("Circular dependency detected");
         else return root;
     }
 
@@ -90,24 +87,10 @@ final class ApplicationLoader {
             for (String dep : fieldDependencies) {
                 FieldAnnotationNode depNode = nodes.get(dep);
                 if (depNode != null) {
-                    if (!checkFieldInClass(node.getField().getType(), dep))
-                        throw new ApplicationLoadingException(
-                                "Invalid dependency declared in application %s and "
-                                        + "annotation %s for field '%s': %s is not a valid subfield of %s",
-                                application.getClass().getCanonicalName(),
-                                node.getAnnotation().annotationType().getCanonicalName(),
-                                node.getField().getName(),
-                                dep,
-                                node.getField().getType().getCanonicalName()
-                        );
-                } else throw new ApplicationLoadingException(
-                        "Invalid dependency declared in application %s and "
-                                + "annotation %s for field '%s': %s not found",
-                        application.getClass().getCanonicalName(),
-                        node.getAnnotation().annotationType().getCanonicalName(),
-                        node.getField().getName(),
-                        dep
-                );
+                    String subfield = node.getFieldDependency(dep);
+                    if (!checkFieldInClass(node.getField().getType(), subfield))
+                        throw loadingException(node, "Could not find subfield '%s' in field: %s", subfield, dep);
+                } else throw loadingException(node, "Could not find field: %s", dep);
             }
         }
     }
@@ -130,10 +113,7 @@ final class ApplicationLoader {
             final @NotNull Set<LoaderNode> visiting
     ) {
         if (!visiting.add(node))
-            throw new ApplicationLoadingException(
-                    "Circular dependency detected in application %s",
-                    application.getClass().getCanonicalName()
-            );
+            throw loadingException("Circular dependency detected");
         for (LoaderNode child : node.getChildren()) checkCircularDependency(child, visiting);
         visiting.remove(node);
     }
@@ -145,6 +125,32 @@ final class ApplicationLoader {
                     nodes.add(new FieldAnnotationNode(annotation, field, h))
             );
         return nodes;
+    }
+
+    private @NotNull ApplicationLoadingException loadingException(
+            final @NotNull String message,
+            final @NotNull Object @NotNull ... args
+    ) {
+        return new ApplicationLoadingException(
+                message + String.format("(application=%s) ", application.getClass().getCanonicalName()),
+                args
+        );
+    }
+
+    private @NotNull ApplicationLoadingException loadingException(
+            final @NotNull FieldAnnotationNode fieldAnnotationNode,
+            final @NotNull String message,
+            final @NotNull Object @NotNull ... args
+    ) {
+        return new ApplicationLoadingException(
+                message + String.format(
+                        "(application=%s, annotation=%s, field=%s) ",
+                        application.getClass().getCanonicalName(),
+                        fieldAnnotationNode.getAnnotation().annotationType().getCanonicalName(),
+                        fieldAnnotationNode.getFieldName()
+                ),
+                args
+        );
     }
 
     /**

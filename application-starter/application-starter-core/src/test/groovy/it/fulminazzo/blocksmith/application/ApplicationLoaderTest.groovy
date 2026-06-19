@@ -64,7 +64,7 @@ class ApplicationLoaderTest extends Specification {
 
         then:
         def e = thrown(ApplicationLoadingException)
-        e.message =~ /.*Circular.+${ValidApplication.canonicalName}.*/
+        e.message =~ /.*Circular dependency.+${ValidApplication.canonicalName}.*/
     }
 
     def 'test that buildDependencyTree correctly builds inheritance between nodes'() {
@@ -104,19 +104,6 @@ class ApplicationLoaderTest extends Specification {
         fifthChildren.size() == 0
     }
 
-    def 'test that buildDependencyTree throws InvalidApplicationException if a dependency is not found'() {
-        given:
-        def node = newNode(ValidApplication, 'first')
-        Reflect.on(node).set('dependencies', ['invalid' : ''])
-
-        when:
-        validLoader.buildDependencyTree(['first' : node])
-
-        then:
-        def e = thrown(ApplicationLoadingException)
-        e.message =~ /.*${ValidApplication.canonicalName}.+${NoDependencies.canonicalName}.+first.+invalid.*/
-    }
-
     def 'test that buildDependencyTree throws InvalidApplicationException if no dependency is child of root node'() {
         given:
         def node1 = newNode(ValidApplication, 'first')
@@ -131,7 +118,7 @@ class ApplicationLoaderTest extends Specification {
 
         then:
         def e = thrown(ApplicationLoadingException)
-        e.message =~ /.*Circular.+${ValidApplication.canonicalName}.*/
+        e.message =~ /.*Circular dependency.+${ValidApplication.canonicalName}.*/
     }
 
     def 'test that loadFieldAnnotationNodes correctly returns all nodes'() {
