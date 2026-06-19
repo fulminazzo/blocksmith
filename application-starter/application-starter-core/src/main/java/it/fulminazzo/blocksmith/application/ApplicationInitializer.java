@@ -22,7 +22,7 @@ import java.util.*;
  * @see BlocksmithApplication
  * @see ApplicationLoader
  */
-final class ApplicationInitializer implements LoaderVisitor {
+final class ApplicationInitializer implements LoaderVisitor<ApplicationEnableException> {
     private final @NotNull Map<@NotNull String, Object> environment = new HashMap<>();
 
     private final @NotNull Application application;
@@ -47,7 +47,9 @@ final class ApplicationInitializer implements LoaderVisitor {
     }
 
     @SuppressWarnings("unchecked")
-    private <A extends Annotation> void visitFieldImpl(final @NotNull FieldAnnotationNode node) {
+    private <A extends Annotation> void visitFieldImpl(
+            final @NotNull FieldAnnotationNode node
+    ) throws ApplicationEnableException {
         final A annotation = (A) node.getAnnotation();
         final Field field = node.getField();
         final FieldAnnotationHandler<A> handler = (FieldAnnotationHandler<A>) node.getHandler();
@@ -66,12 +68,12 @@ final class ApplicationInitializer implements LoaderVisitor {
     }
 
     @Override
-    public void visitField(final @NotNull FieldAnnotationNode node) {
+    public void visitField(final @NotNull FieldAnnotationNode node) throws ApplicationEnableException {
         visitFieldImpl(node);
     }
 
     @Override
-    public void visitRoot(final @NotNull RootLoaderNode node) {
+    public void visitRoot(final @NotNull RootLoaderNode node) throws ApplicationEnableException {
         environment.clear();
         final Set<LoaderNode> current = new HashSet<>();
         final Set<LoaderNode> next = new HashSet<>();
