@@ -128,13 +128,13 @@ final class ApplicationInitializer implements LoaderVisitor<ApplicationEnableExc
         Optional<Field> fieldOpt = reflect.getInstanceFields().stream()
                 .filter(f -> f.getName().equalsIgnoreCase(fieldName))
                 .findAny();
-        if (fieldOpt.isPresent()) target = reflect.get(fieldOpt.get());
+        if (fieldOpt.isPresent()) target = reflect.get(fieldOpt.get()).get();
         else {
             String methodName = "get" + fieldName;
             Optional<Method> methodOpt = reflect.getInstanceMethods().stream()
                     .filter(m -> m.getName().equalsIgnoreCase(methodName) && m.getParameterCount() == 0)
                     .findAny();
-            if (methodOpt.isPresent()) target = reflect.invoke(methodOpt.get());
+            if (methodOpt.isPresent()) target = reflect.invoke(methodOpt.get()).get();
             else
                 // should never happen in a properly load-initialize cycle
                 throw new IllegalArgumentException("Field not found: " + fieldName);
