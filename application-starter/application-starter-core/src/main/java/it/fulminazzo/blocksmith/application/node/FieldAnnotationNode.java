@@ -90,7 +90,7 @@ public class FieldAnnotationNode extends LoaderNode {
     }
 
     @Override
-    public void accept(final @NotNull LoaderVisitor visitor) {
+    public <X extends Throwable> void accept(final @NotNull LoaderVisitor<X> visitor) throws X {
         visitor.visitField(this);
     }
 

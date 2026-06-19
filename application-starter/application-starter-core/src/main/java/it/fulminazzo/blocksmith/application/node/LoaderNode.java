@@ -25,8 +25,9 @@ public abstract class LoaderNode {
      * Inspects this node with the given visitor.
      *
      * @param visitor the visitor
+     * @throws X the exception thrown in case of visit errors
      */
-    public abstract void accept(final @NotNull LoaderVisitor visitor);
+    public abstract <X extends Throwable> void accept(final @NotNull LoaderVisitor<X> visitor) throws X;
 
     /**
      * Adds a child node to this node.
