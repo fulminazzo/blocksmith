@@ -57,7 +57,7 @@ class FieldAnnotationNodeTest extends Specification {
 
         @Override
         String[] dependsOn() {
-            return ['first', 'second', 'third']
+            return ['first', 'second', 'third.nested']
         }
 
         @Override
@@ -83,12 +83,23 @@ class FieldAnnotationNodeTest extends Specification {
     private final Field field = Mock(Field)
     private final FieldAnnotationHandler handler = Mock(FieldAnnotationHandler)
 
+    def 'test that loadDependencies correctly stored nested fields'() {
+        given:
+        final annotation = MULTIPLE_DEPENDENCIES_3
+
+        when:
+        def node = new FieldAnnotationNode(annotation, field, handler)
+
+        then:
+        node.getFieldDependency('third') == 'nested'
+    }
+
     def 'test that loadDependencies loads #annotation dependencies as #expected'() {
         when:
         def node = new FieldAnnotationNode(annotation, field, handler)
 
         then:
-        node.dependencies == expected.toSet()
+        node.fieldDependencies == expected.toSet()
 
         where:
         annotation              || expected

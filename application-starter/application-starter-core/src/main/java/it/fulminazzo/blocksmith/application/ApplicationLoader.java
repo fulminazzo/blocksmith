@@ -61,10 +61,11 @@ final class ApplicationLoader {
         if (nodes.isEmpty()) return root;
         Map<String, FieldAnnotationNode> namedNodes = new HashMap<>();
         nodes.forEach(n -> namedNodes.put(n.getField().getName(), n));
-        for (FieldAnnotationNode node : nodes)
-            if (node.getDependencies().isEmpty()) root.addChild(node);
+        for (FieldAnnotationNode node : nodes) {
+            Set<String> fieldDependencies = node.getFieldDependencies();
+            if (fieldDependencies.isEmpty()) root.addChild(node);
             else
-                for (String dep : node.getDependencies()) {
+                for (String dep : fieldDependencies) {
                     FieldAnnotationNode depNode = namedNodes.get(dep);
                     if (depNode != null) depNode.addChild(node);
                     else throw new InvalidApplicationException(
@@ -76,6 +77,7 @@ final class ApplicationLoader {
                             dep
                     );
                 }
+        }
         if (root.getChildren().isEmpty())
             throw new InvalidApplicationException(
                     "Circular dependency detected in application %s",

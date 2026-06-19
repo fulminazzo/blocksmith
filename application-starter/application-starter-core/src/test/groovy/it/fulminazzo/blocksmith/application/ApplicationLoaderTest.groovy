@@ -79,12 +79,12 @@ class ApplicationLoaderTest extends Specification {
         def first = rootChildren[0]
         def firstChildren = first.children
         firstChildren.size() == 2
-        
+
         and:
         def second = firstChildren[0]
         def secondChildren = second.children
         secondChildren.size() == 1
-        
+
         and:
         def third = firstChildren[0]
         def thirdChildren = third.children
@@ -105,7 +105,7 @@ class ApplicationLoaderTest extends Specification {
     def 'test that buildDependencyTree throws InvalidApplicationException if a dependency is not found'() {
         given:
         def node = newNode(ValidApplication, 'first')
-        Reflect.on(node).set('dependencies', ['invalid'].toSet())
+        Reflect.on(node).set('dependencies', ['invalid' : ''])
 
         when:
         validLoader.buildDependencyTree([node])
@@ -118,11 +118,11 @@ class ApplicationLoaderTest extends Specification {
     def 'test that buildDependencyTree throws InvalidApplicationException if no dependency is child of root node'() {
         given:
         def node1 = newNode(ValidApplication, 'first')
-        Reflect.on(node1).set('dependencies', ['second'].toSet())
+        Reflect.on(node1).set('dependencies', ['second' : ''])
 
         and:
         def node2 = newNode(ValidApplication, 'second')
-        Reflect.on(node2).set('dependencies', ['first'].toSet())
+        Reflect.on(node2).set('dependencies', ['first' : ''])
 
         when:
         validLoader.buildDependencyTree([node1, node2])
