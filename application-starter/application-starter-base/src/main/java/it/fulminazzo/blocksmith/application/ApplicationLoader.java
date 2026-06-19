@@ -68,20 +68,22 @@ public final class ApplicationLoader {
         nodes.forEach(n -> namedNodes.put(n.getField().getName(), n));
         for (FieldAnnotationNode node : nodes)
             if (node.getDependencies().isEmpty()) root.addChild(node);
-            else for (String dep : node.getDependencies()) {
-                FieldAnnotationNode depNode = namedNodes.get(dep);
-                if (depNode != null) depNode.addChild(node);
-                else throw new InvalidApplicationException(
-                        "Invalid dependency declared in application %s and annotation %s for field '%s': %s not found",
-                        application.getClass().getCanonicalName(),
-                        node.getAnnotation().annotationType().getCanonicalName(),
-                        node.getField().getName(),
-                        dep
-                );
-            }
+            else
+                for (String dep : node.getDependencies()) {
+                    FieldAnnotationNode depNode = namedNodes.get(dep);
+                    if (depNode != null) depNode.addChild(node);
+                    else throw new InvalidApplicationException(
+                            "Invalid dependency declared in application %s and "
+                                    + "annotation %s for field '%s': %s not found",
+                            application.getClass().getCanonicalName(),
+                            node.getAnnotation().annotationType().getCanonicalName(),
+                            node.getField().getName(),
+                            dep
+                    );
+                }
         if (root.getChildren().isEmpty())
             throw new InvalidApplicationException(
-                    "Detected circular dependencies in application %s",
+                    "Circular dependency detected in application %s",
                     application.getClass().getCanonicalName()
             );
         else return root;
