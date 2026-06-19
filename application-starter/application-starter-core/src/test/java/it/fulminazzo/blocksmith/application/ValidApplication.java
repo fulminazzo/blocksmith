@@ -2,6 +2,7 @@ package it.fulminazzo.blocksmith.application;
 
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -33,7 +34,7 @@ final class ValidApplication implements Application {
 
     @Override
     public @NotNull Logger logger() {
-        throw new UnsupportedOperationException();
+        return LoggerFactory.getLogger(getClass());
     }
 
 }
