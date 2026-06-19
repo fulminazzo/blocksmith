@@ -65,13 +65,14 @@ public interface FieldAnnotationHandler<A extends Annotation> {
      * @param annotation  the annotation
      * @param field       the field in the application
      * @param environment a map containing any result of previous computations
-     * @return the result of the computation (can be {@code null})
+     * @return the value to be set on the field
+     * @throws ApplicationEnableException if an error occurs during the processing
      */
     Object handle(
             final @NotNull Application application,
             final @NotNull A annotation,
             final @NotNull Field field,
             final @NotNull Map<@NotNull String, Object> environment
-    );
+    ) throws ApplicationEnableException;
 
 }
