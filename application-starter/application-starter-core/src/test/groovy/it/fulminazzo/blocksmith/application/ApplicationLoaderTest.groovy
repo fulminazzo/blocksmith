@@ -69,7 +69,9 @@ class ApplicationLoaderTest extends Specification {
 
     def 'test that buildDependencyTree correctly builds inheritance between nodes'() {
         when:
-        def node = validLoader.buildDependencyTree(validNodes)
+        def node = validLoader.buildDependencyTree(
+                validNodes.collectEntries { [it.field.name, it] }
+        )
 
         then:
         def rootChildren = node.children
@@ -108,7 +110,7 @@ class ApplicationLoaderTest extends Specification {
         Reflect.on(node).set('dependencies', ['invalid' : ''])
 
         when:
-        validLoader.buildDependencyTree([node])
+        validLoader.buildDependencyTree(['first' : node])
 
         then:
         def e = thrown(InvalidApplicationException)
@@ -125,7 +127,7 @@ class ApplicationLoaderTest extends Specification {
         Reflect.on(node2).set('dependencies', ['first' : ''])
 
         when:
-        validLoader.buildDependencyTree([node1, node2])
+        validLoader.buildDependencyTree(['first' : node1, 'second' : node2])
 
         then:
         def e = thrown(InvalidApplicationException)

@@ -36,7 +36,8 @@ final class ApplicationLoader {
      */
     @NotNull LoaderNode load() {
         List<FieldAnnotationNode> nodes = loadFieldAnnotationNodes();
-        LoaderNode tree = buildDependencyTree(nodes);
+        Map<String, FieldAnnotationNode> namedNodes = toNamedMap(nodes);
+        LoaderNode tree = buildDependencyTree(namedNodes);
         validateTree(tree);
         return tree;
     }
@@ -56,17 +57,15 @@ final class ApplicationLoader {
      * @param nodes the nodes to build the tree from
      * @return the root of the tree
      */
-    @NotNull LoaderNode buildDependencyTree(final @NotNull List<FieldAnnotationNode> nodes) {
+    @NotNull LoaderNode buildDependencyTree(final @NotNull Map<String, FieldAnnotationNode> nodes) {
         final LoaderNode root = new LoaderNode();
         if (nodes.isEmpty()) return root;
-        Map<String, FieldAnnotationNode> namedNodes = new HashMap<>();
-        nodes.forEach(n -> namedNodes.put(n.getField().getName(), n));
-        for (FieldAnnotationNode node : nodes) {
+        for (FieldAnnotationNode node : nodes.values()) {
             Set<String> fieldDependencies = node.getFieldDependencies();
             if (fieldDependencies.isEmpty()) root.addChild(node);
             else
                 for (String dep : fieldDependencies) {
-                    FieldAnnotationNode depNode = namedNodes.get(dep);
+                    FieldAnnotationNode depNode = nodes.get(dep);
                     if (depNode != null) depNode.addChild(node);
                     else throw new InvalidApplicationException(
                             "Invalid dependency declared in application %s and "
@@ -119,6 +118,18 @@ final class ApplicationLoader {
                     nodes.add(new FieldAnnotationNode(annotation, field, h))
             );
         return nodes;
+    }
+
+    /**
+     * Converts the given list of nodes to a map where the keys are the field names.
+     *
+     * @param nodes the nodes to convert
+     * @return the map
+     */
+    static Map<String, FieldAnnotationNode> toNamedMap(final @NotNull List<FieldAnnotationNode> nodes) {
+        Map<String, FieldAnnotationNode> namedNodes = new HashMap<>();
+        nodes.forEach(n -> namedNodes.put(n.getField().getName(), n));
+        return namedNodes;
     }
 
 }
