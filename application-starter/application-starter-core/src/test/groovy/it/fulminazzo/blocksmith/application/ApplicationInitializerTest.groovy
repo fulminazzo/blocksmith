@@ -1,8 +1,55 @@
 package it.fulminazzo.blocksmith.application
 
+import it.fulminazzo.blocksmith.application.node.FieldAnnotationNode
+import it.fulminazzo.blocksmith.application.node.RootLoaderNode
 import spock.lang.Specification
 
 class ApplicationInitializerTest extends Specification {
+    private RootLoaderNode dependencyTree
+    private FieldAnnotationNode first
+    private FieldAnnotationNode second
+    private FieldAnnotationNode third
+    private FieldAnnotationNode fourth
+    private FieldAnnotationNode fifth
+
+    private ApplicationInitializer initializer
+
+    void setup() {
+        final application = new ValidApplication()
+
+        dependencyTree = new RootLoaderNode()
+        first = ApplicationTestUtils.newNode(application.class, 'first')
+        second = ApplicationTestUtils.newNode(application.class, 'second')
+        third = ApplicationTestUtils.newNode(application.class, 'third')
+        fourth = ApplicationTestUtils.newNode(application.class, 'fourth')
+        fifth = ApplicationTestUtils.newNode(application.class, 'fifth')
+
+        dependencyTree.addChild(first)
+        dependencyTree.addChild(fifth)
+
+        first.addChild(second)
+        first.addChild(third)
+
+        third.addChild(fourth)
+
+        initializer = Spy(ApplicationInitializer, constructorArgs : [application, dependencyTree])
+    }
+
+    def 'test that visitRootNode correctly visits tree with levels'() {
+        when:
+        initializer.visitRoot(dependencyTree)
+
+        then:
+        1 * initializer.visitField(first) >> {}
+        1 * initializer.visitField(fifth) >> {}
+
+        then:
+        1 * initializer.visitField(second) >> {}
+        1 * initializer.visitField(third) >> {}
+
+        then:
+        1 * initializer.visitField(fourth) >> {}
+    }
 
     def 'test that getFieldValue of #fieldPath returns #expected'() {
         expect:
@@ -36,6 +83,5 @@ class ApplicationInitializerTest extends Specification {
                 'method.localizedName'
         ]
     }
-
 
 }
