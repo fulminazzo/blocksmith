@@ -28,21 +28,22 @@ final class ApplicationInitializer implements LoaderVisitor {
     private final @NotNull Application application;
     private final @NotNull Reflect reflect;
 
-    private final @NotNull RootLoaderNode rootLoaderNode;
+    private final @NotNull LoaderNode dependencyTree;
 
     /**
      * Instantiates a new Application initializer.
      *
-     * @param application the application
+     * @param application    the application
+     * @param dependencyTree the dependency tree
      */
     public ApplicationInitializer(
             final @NotNull Application application,
-            final @NotNull RootLoaderNode rootLoaderNode
+            final @NotNull LoaderNode dependencyTree
     ) {
         this.application = application;
         this.reflect = Reflect.on(application);
 
-        this.rootLoaderNode = rootLoaderNode;
+        this.dependencyTree = dependencyTree;
     }
 
     @SuppressWarnings("unchecked")
