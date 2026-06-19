@@ -38,6 +38,7 @@ final class ApplicationLoader {
     @NotNull LoaderNode load() {
         List<FieldAnnotationNode> nodes = loadFieldAnnotationNodes();
         Map<String, FieldAnnotationNode> namedNodes = toNamedMap(nodes);
+        validateNodesDependencies(namedNodes);
         LoaderNode tree = buildDependencyTree(namedNodes);
         validateTree(tree);
         return tree;
@@ -65,18 +66,8 @@ final class ApplicationLoader {
             Set<String> fieldDependencies = node.getFieldDependencies();
             if (fieldDependencies.isEmpty()) root.addChild(node);
             else
-                for (String dep : fieldDependencies) {
-                    FieldAnnotationNode depNode = nodes.get(dep);
-                    if (depNode != null) depNode.addChild(node);
-                    else throw new ApplicationLoadingException(
-                            "Invalid dependency declared in application %s and "
-                                    + "annotation %s for field '%s': %s not found",
-                            application.getClass().getCanonicalName(),
-                            node.getAnnotation().annotationType().getCanonicalName(),
-                            node.getField().getName(),
-                            dep
-                    );
-                }
+                for (String dep : fieldDependencies)
+                    nodes.get(dep).addChild(node);
         }
         if (root.getChildren().isEmpty())
             throw new ApplicationLoadingException(
@@ -84,6 +75,41 @@ final class ApplicationLoader {
                     application.getClass().getCanonicalName()
             );
         else return root;
+    }
+
+    /**
+     * Given a map of nodes (whose keys are the field names), this method will validate that all
+     * the dependencies declared in the nodes are either present in the map or valid subfields
+     * of the field itself.
+     *
+     * @param nodes the nodes to validate
+     */
+    void validateNodesDependencies(final Map<String, FieldAnnotationNode> nodes) {
+        for (FieldAnnotationNode node : nodes.values()) {
+            Set<String> fieldDependencies = node.getFieldDependencies();
+            for (String dep : fieldDependencies) {
+                FieldAnnotationNode depNode = nodes.get(dep);
+                if (depNode != null) {
+                    if (!checkFieldInClass(node.getField().getType(), dep))
+                        throw new ApplicationLoadingException(
+                                "Invalid dependency declared in application %s and "
+                                        + "annotation %s for field '%s': %s is not a valid subfield of %s",
+                                application.getClass().getCanonicalName(),
+                                node.getAnnotation().annotationType().getCanonicalName(),
+                                node.getField().getName(),
+                                dep,
+                                node.getField().getType().getCanonicalName()
+                        );
+                } else throw new ApplicationLoadingException(
+                        "Invalid dependency declared in application %s and "
+                                + "annotation %s for field '%s': %s not found",
+                        application.getClass().getCanonicalName(),
+                        node.getAnnotation().annotationType().getCanonicalName(),
+                        node.getField().getName(),
+                        dep
+                );
+            }
+        }
     }
 
     /**
@@ -146,11 +172,12 @@ final class ApplicationLoader {
      *     the method is called recursively using the target type as class.</li>
      * </ul>
      *
-     * @param clazz the class to check
+     * @param clazz     the class to check
      * @param fieldPath the path to the field
+     * @return {@code true} if the field was found, {@code false} otherwise
      */
-    static void checkFieldInClass(final @NotNull Class<?> clazz, final @NotNull String fieldPath) {
-        if (fieldPath.isEmpty()) return;
+    static boolean checkFieldInClass(final @NotNull Class<?> clazz, final @NotNull String fieldPath) {
+        if (fieldPath.isEmpty()) return true;
         String[] split = fieldPath.split("\\.");
         String fieldName = split[0];
         final Class<?> targetClass;
@@ -166,11 +193,7 @@ final class ApplicationLoader {
                     .filter(m -> m.getName().equalsIgnoreCase(methodName) && m.getParameterCount() == 0)
                     .findAny();
             if (methodOpt.isPresent()) targetClass = methodOpt.get().getReturnType();
-            else throw new ApplicationLoadingException(
-                    "Field '%s' not found in class %s",
-                    fieldPath,
-                    clazz.getCanonicalName()
-            );
+            else return false;
         }
 
         if (split.length > 1)
@@ -178,6 +201,7 @@ final class ApplicationLoader {
                     targetClass,
                     String.join("", Arrays.copyOfRange(split, 1, split.length))
             );
+        return true;
     }
 
 }
