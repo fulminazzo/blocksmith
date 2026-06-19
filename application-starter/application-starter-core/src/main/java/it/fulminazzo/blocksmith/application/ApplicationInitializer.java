@@ -5,13 +5,12 @@ import it.fulminazzo.blocksmith.application.node.LoaderNode;
 import it.fulminazzo.blocksmith.application.node.RootLoaderNode;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * Initializes the given {@link Application} instance.
@@ -81,6 +80,55 @@ final class ApplicationInitializer implements LoaderVisitor {
             current.addAll(next);
             next.clear();
         }
+    }
+
+    /**
+     * Although the name of this function implies it only works for fields, it actually works for getter methods
+     * as well. This is how it works:
+     * <ul>
+     *     <li>Extracts the first part of the {@code fieldPath} preceding any {@code .} symbol.
+     *     This will be the target name;</li>
+     *     <li>Checks the object class in search for a <b>non-static</b> field with the target name;</li>
+     *     <li>If it is not found, checks the object class in search for a method named {@code get<target-name>};</li>
+     *     <li>If it was not found, an exception will be thrown;</li>
+     *     <li>If it was found, and the path is not finished (meaning there is more after the {@code .},
+     *     the method is called recursively using the result as object.</li>
+     *     <li>If the result was {@code null},
+     *     then the search will be interrupted and that will be returned instead.</li>
+     * </ul>
+     *
+     * @param object    the object
+     * @param fieldPath the field path
+     * @return the field value
+     */
+    static @Nullable Object getFieldValue(final @NotNull Object object, final @NotNull String fieldPath) {
+        if (fieldPath.isEmpty()) return object;
+        String[] split = fieldPath.split("\\.");
+        String fieldName = split[0];
+        Reflect reflect = Reflect.on(object);
+
+        final Object target;
+
+        Optional<Field> fieldOpt = reflect.getInstanceFields().stream()
+                .filter(f -> f.getName().equalsIgnoreCase(fieldName))
+                .findAny();
+        if (fieldOpt.isPresent()) target = reflect.get(fieldOpt.get());
+        else {
+            String methodName = "get" + fieldName;
+            Optional<Method> methodOpt = reflect.getInstanceMethods().stream()
+                    .filter(m -> m.getName().equalsIgnoreCase(methodName) && m.getParameterCount() == 0)
+                    .findAny();
+            if (methodOpt.isPresent()) target = reflect.invoke(methodOpt.get());
+            else
+                // should never happen in a properly load-initialize cycle
+                throw new IllegalArgumentException("Field not found: " + fieldName);
+        }
+
+        if (split.length == 1) return target;
+        else return getFieldValue(
+                target,
+                String.join(".", Arrays.copyOfRange(split, 1, split.length))
+        );
     }
 
 }
