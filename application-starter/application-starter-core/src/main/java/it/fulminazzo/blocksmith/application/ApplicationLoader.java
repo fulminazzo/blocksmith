@@ -186,9 +186,10 @@ final class ApplicationLoader {
         if (fieldPath.isEmpty()) return true;
         String[] split = fieldPath.split("\\.");
         String fieldName = split[0];
+        Reflect reflect = Reflect.on(clazz);
+
         final Class<?> targetClass;
 
-        Reflect reflect = Reflect.on(clazz);
         Optional<Field> fieldOpt = reflect.getInstanceFields().stream()
                 .filter(f -> f.getName().equalsIgnoreCase(fieldName))
                 .findAny();
@@ -204,7 +205,7 @@ final class ApplicationLoader {
 
         return split.length == 1 || checkFieldInClass(
                 targetClass,
-                String.join("", Arrays.copyOfRange(split, 1, split.length))
+                String.join(".", Arrays.copyOfRange(split, 1, split.length))
         );
     }
 
