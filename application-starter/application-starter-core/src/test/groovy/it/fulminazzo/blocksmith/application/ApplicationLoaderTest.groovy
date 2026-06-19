@@ -123,6 +123,45 @@ class ApplicationLoaderTest extends Specification {
         e.message =~ /.*Circular dependency.+${ValidApplication.canonicalName}.*/
     }
 
+    def 'test that validateNodeDependencies does not throw for valid nodes'() {
+        when:
+        validLoader.validateNodesDependencies(
+                validNodes.collectEntries { [it.fieldName, it] }
+        )
+
+        then:
+        noExceptionThrown()
+    }
+
+    def 'test that validateNodesDependencies throws for subfield not found'() {
+        given:
+        def node1 = newNode(ValidApplication, 'first')
+        Reflect.on(node1).set('dependencies', ['second' : 'nested'])
+
+        and:
+        def node2 = newNode(ValidApplication, 'second')
+
+        when:
+        validLoader.validateNodesDependencies(['first' : node1, 'second' : node2])
+
+        then:
+        def e = thrown(ApplicationLoadingException)
+        e.message =~ /.* subfield.+nested.+second.*/
+    }
+
+    def 'test that validateNodesDependencies throws for field not found'() {
+        given:
+        def node = newNode(ValidApplication, 'first')
+        Reflect.on(node).set('dependencies', ['invalid' : ''])
+
+        when:
+        validLoader.validateNodesDependencies(['node' : node])
+
+        then:
+        def e = thrown(ApplicationLoadingException)
+        e.message =~ /.* field.+invalid.*/
+    }
+
     def 'test that loadFieldAnnotationNodes correctly returns all nodes'() {
         when:
         def nodes = validLoader.loadFieldAnnotationNodes()
