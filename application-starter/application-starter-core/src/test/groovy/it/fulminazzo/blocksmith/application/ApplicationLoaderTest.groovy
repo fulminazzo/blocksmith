@@ -225,46 +225,4 @@ class ApplicationLoaderTest extends Specification {
         )
     }
 
-    private static final class ContainerClass {
-
-        private final FieldClass field = new FieldClass()
-
-        private final MethodClass method = new MethodClass()
-
-    }
-
-    private static final class FieldClass {
-
-        String name = 'Alex'
-
-        MethodClass ageData = new MethodClass()
-
-    }
-
-    private static final class MethodClass {
-
-        int getAge() {
-            return 10
-        }
-
-        void setAge(int age) {
-
-        }
-
-        NestedClass getInformation() {
-            return new NestedClass()
-        }
-
-        String getLocalizedName(final String name) {
-            throw new UnsupportedOperationException()
-        }
-
-    }
-
-    private static final class NestedClass {
-
-        String identity = 'Batman'
-
-    }
-
 }
