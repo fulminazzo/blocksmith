@@ -11,9 +11,7 @@ class ApplicationLoaderTest extends Specification {
     private final ApplicationLoader loader = new ApplicationLoader(new ValidApplication())
 
     void setupSpec() {
-        ApplicationHandlers.registerFieldAnnotationHandler(NoDependencies, {})
-        ApplicationHandlers.registerFieldAnnotationHandler(SingleDependency, {})
-        ApplicationHandlers.registerFieldAnnotationHandler(MultipleDependencies, {})
+        ApplicationTestUtils.loadHandlers()
     }
 
     def 'test that load works'() {
@@ -54,8 +52,8 @@ class ApplicationLoaderTest extends Specification {
     def 'test that validateTree throws InvalidApplicationException for circular dependency'() {
         given:
         def node = new RootLoaderNode()
-        def node1 = newNode(ValidApplication, 'first')
-        def node2 = newNode(ValidApplication, 'second')
+        def node1 = ApplicationTestUtils.newNode(ValidApplication, 'first')
+        def node2 = ApplicationTestUtils.newNode(ValidApplication, 'second')
 
         and:
         node.addChild(node1)
@@ -110,11 +108,11 @@ class ApplicationLoaderTest extends Specification {
 
     def 'test that buildDependencyTree throws InvalidApplicationException if no dependency is child of root node'() {
         given:
-        def node1 = newNode(ValidApplication, 'first')
+        def node1 = ApplicationTestUtils.newNode(ValidApplication, 'first')
         Reflect.on(node1).set('dependencies', ['second' : ''])
 
         and:
-        def node2 = newNode(ValidApplication, 'second')
+        def node2 = ApplicationTestUtils.newNode(ValidApplication, 'second')
         Reflect.on(node2).set('dependencies', ['first' : ''])
 
         when:
@@ -137,11 +135,11 @@ class ApplicationLoaderTest extends Specification {
 
     def 'test that validateNodesDependencies throws for subfield not found'() {
         given:
-        def node1 = newNode(ValidApplication, 'first')
+        def node1 = ApplicationTestUtils.newNode(ValidApplication, 'first')
         Reflect.on(node1).set('dependencies', ['second' : 'nested'])
 
         and:
-        def node2 = newNode(ValidApplication, 'second')
+        def node2 = ApplicationTestUtils.newNode(ValidApplication, 'second')
 
         when:
         loader.validateNodesDependencies(['first' : node1, 'second' : node2])
@@ -153,7 +151,7 @@ class ApplicationLoaderTest extends Specification {
 
     def 'test that validateNodesDependencies throws for field not found'() {
         given:
-        def node = newNode(ValidApplication, 'first')
+        def node = ApplicationTestUtils.newNode(ValidApplication, 'first')
         Reflect.on(node).set('dependencies', ['invalid' : ''])
 
         when:
@@ -204,25 +202,12 @@ class ApplicationLoaderTest extends Specification {
 
     protected static List<FieldAnnotationNode> getValidNodes() {
         return [
-                newNode(ValidApplication, 'first'),
-                newNode(ValidApplication, 'second'),
-                newNode(ValidApplication, 'third'),
-                newNode(ValidApplication, 'fourth'),
-                newNode(ValidApplication, 'fifth')
+                ApplicationTestUtils.newNode(ValidApplication, 'first'),
+                ApplicationTestUtils.newNode(ValidApplication, 'second'),
+                ApplicationTestUtils.newNode(ValidApplication, 'third'),
+                ApplicationTestUtils.newNode(ValidApplication, 'fourth'),
+                ApplicationTestUtils.newNode(ValidApplication, 'fifth')
         ]
-    }
-
-    protected static FieldAnnotationNode newNode(
-            final Class<? extends Application> applicationClass,
-            final String fieldName
-    ) {
-        def field = applicationClass.getDeclaredField(fieldName)
-        def annotation = field.annotations[0]
-        return new FieldAnnotationNode(
-                annotation,
-                field,
-                ApplicationHandlers.getFieldAnnotationHandler(annotation.annotationType()).orElseThrow()
-        )
     }
 
 }
