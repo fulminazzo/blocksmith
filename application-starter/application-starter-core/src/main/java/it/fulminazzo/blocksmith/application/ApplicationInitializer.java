@@ -84,9 +84,8 @@ final class ApplicationInitializer implements LoaderVisitor<ApplicationEnableExc
     @Override
     public void visitRoot(final @NotNull RootLoaderNode node) throws ApplicationEnableException {
         environment.clear();
-        final Set<LoaderNode> current = new HashSet<>();
+        final Set<LoaderNode> current = new HashSet<>(node.getChildren());
         final Set<LoaderNode> next = new HashSet<>();
-        current.add(node);
         while (!current.isEmpty()) {
             for (LoaderNode child : current) {
                 child.accept(this);
