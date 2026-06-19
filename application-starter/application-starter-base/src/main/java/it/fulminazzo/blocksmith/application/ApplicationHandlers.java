@@ -27,6 +27,7 @@ public final class ApplicationHandlers {
      * @param <A>             the type of the annotation
      * @param annotationClass the annotation class to handle
      * @param handler         the handler to use
+     * @see FieldAnnotationHandler
      */
     public static <A extends Annotation> void registerFieldAnnotationHandler(
             final @NotNull Class<A> annotationClass,
