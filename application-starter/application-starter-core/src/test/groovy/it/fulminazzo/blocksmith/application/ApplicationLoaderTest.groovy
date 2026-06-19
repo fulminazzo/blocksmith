@@ -70,7 +70,7 @@ class ApplicationLoaderTest extends Specification {
     def 'test that buildDependencyTree correctly builds inheritance between nodes'() {
         when:
         def node = validLoader.buildDependencyTree(
-                validNodes.collectEntries { [it.field.name, it] }
+                validNodes.collectEntries { [it.fieldName, it] }
         )
 
         then:

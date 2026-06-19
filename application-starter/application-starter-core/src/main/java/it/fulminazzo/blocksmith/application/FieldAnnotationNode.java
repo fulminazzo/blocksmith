@@ -1,7 +1,10 @@
 package it.fulminazzo.blocksmith.application;
 
 import it.fulminazzo.blocksmith.reflect.Reflect;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
@@ -19,7 +22,6 @@ import java.util.Set;
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 class FieldAnnotationNode extends LoaderNode {
     private static final @NotNull String DEPENDENCY_FIELD_NAME = "dependsOn";
 
@@ -74,6 +76,15 @@ class FieldAnnotationNode extends LoaderNode {
      */
     public @NotNull Set<String> getFieldDependencies() {
         return dependencies.keySet();
+    }
+
+    /**
+     * Gets the name of the field.
+     *
+     * @return the name
+     */
+    public @NotNull String getFieldName() {
+        return field.getName();
     }
 
     private static @NotNull Map<String, String> loadDependencies(final @NotNull Annotation annotation) {

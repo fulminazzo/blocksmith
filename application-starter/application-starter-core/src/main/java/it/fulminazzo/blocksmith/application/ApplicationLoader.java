@@ -127,8 +127,8 @@ final class ApplicationLoader {
      * @return the map
      */
     static Map<String, FieldAnnotationNode> toNamedMap(final @NotNull List<FieldAnnotationNode> nodes) {
-        Map<String, FieldAnnotationNode> namedNodes = new HashMap<>();
-        nodes.forEach(n -> namedNodes.put(n.getField().getName(), n));
+        Map<String, FieldAnnotationNode> namedNodes = new LinkedHashMap<>();
+        nodes.forEach(n -> namedNodes.put(n.getFieldName(), n));
         return namedNodes;
     }
 
