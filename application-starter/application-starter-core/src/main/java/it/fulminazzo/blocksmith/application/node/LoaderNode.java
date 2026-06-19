@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.application;
+package it.fulminazzo.blocksmith.application.node;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,11 +11,11 @@ import java.util.Set;
 /**
  * Identifies a general node in the dependency graph.
  *
- * @see FieldAnnotationNode
  * @see RootLoaderNode
+ * @see FieldAnnotationNode
  */
 @Data
-abstract class LoaderNode {
+public abstract class LoaderNode {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private final @NotNull Set<LoaderNode> children = new LinkedHashSet<>();

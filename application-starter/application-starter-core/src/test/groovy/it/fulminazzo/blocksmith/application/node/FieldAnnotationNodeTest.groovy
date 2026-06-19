@@ -1,5 +1,10 @@
-package it.fulminazzo.blocksmith.application
+package it.fulminazzo.blocksmith.application.node
 
+import it.fulminazzo.blocksmith.application.FieldAnnotationHandler
+import it.fulminazzo.blocksmith.application.InvalidDependencies
+import it.fulminazzo.blocksmith.application.MultipleDependencies
+import it.fulminazzo.blocksmith.application.NoDependencies
+import it.fulminazzo.blocksmith.application.SingleDependency
 import spock.lang.Specification
 
 import java.lang.annotation.Annotation

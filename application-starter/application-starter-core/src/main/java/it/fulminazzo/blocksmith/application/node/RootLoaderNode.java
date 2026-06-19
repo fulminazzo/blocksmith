@@ -1,4 +1,4 @@
-package it.fulminazzo.blocksmith.application;
+package it.fulminazzo.blocksmith.application.node;
 
 import lombok.EqualsAndHashCode;
 import lombok.Value;
@@ -10,7 +10,7 @@ import lombok.Value;
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
-class RootLoaderNode extends LoaderNode {
+public class RootLoaderNode extends LoaderNode {
     // empty on purpose
 
 }

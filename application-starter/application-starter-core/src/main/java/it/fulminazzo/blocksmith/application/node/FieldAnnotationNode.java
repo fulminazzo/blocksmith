@@ -1,5 +1,6 @@
-package it.fulminazzo.blocksmith.application;
+package it.fulminazzo.blocksmith.application.node;
 
+import it.fulminazzo.blocksmith.application.FieldAnnotationHandler;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -17,12 +18,12 @@ import java.util.Set;
 /**
  * Identifies a field with an annotation.
  *
+ * @see LoaderNode
  * @see FieldAnnotationHandler
- * @see ApplicationLoader
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
-class FieldAnnotationNode extends LoaderNode {
+public class FieldAnnotationNode extends LoaderNode {
     private static final @NotNull String DEPENDENCY_FIELD_NAME = "dependsOn";
 
     @NotNull Annotation annotation;

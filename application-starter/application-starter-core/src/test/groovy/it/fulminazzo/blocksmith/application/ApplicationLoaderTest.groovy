@@ -2,6 +2,8 @@
 //file:noinspection GrMethodMayBeStatic
 package it.fulminazzo.blocksmith.application
 
+import it.fulminazzo.blocksmith.application.node.FieldAnnotationNode
+import it.fulminazzo.blocksmith.application.node.RootLoaderNode
 import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
