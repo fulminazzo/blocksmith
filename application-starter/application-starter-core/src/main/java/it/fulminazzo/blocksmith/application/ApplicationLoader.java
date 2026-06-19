@@ -4,7 +4,9 @@ import it.fulminazzo.blocksmith.application.node.FieldAnnotationNode;
 import it.fulminazzo.blocksmith.application.node.LoaderNode;
 import it.fulminazzo.blocksmith.application.node.RootLoaderNode;
 import it.fulminazzo.blocksmith.reflect.Reflect;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -12,13 +14,18 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * A loader for {@link Application} instances.
+ * Loads all the necessary data for the given {@link Application} instance.
+ * <br>
+ * <b>WARNING</b>: loading the application is not enough to consider it properly started.
+ * A second process called <b>initialization</b> is required.
  *
  * @see Application
  * @see ApplicationHandlers
  * @see BlocksmithApplication
  * @see FieldAnnotationHandler
+ * @see ApplicationInitializer
  */
+@Slf4j
 final class ApplicationLoader {
     private final @NotNull Application application;
     private final @NotNull Reflect reflect;
@@ -28,7 +35,7 @@ final class ApplicationLoader {
      *
      * @param application the application
      */
-    ApplicationLoader(final @NotNull Application application) {
+    public ApplicationLoader(final @NotNull Application application) {
         this.application = application;
         this.reflect = Reflect.on(application);
     }
@@ -38,12 +45,16 @@ final class ApplicationLoader {
      *
      * @return the root of the dependency tree
      */
-    @NotNull LoaderNode load() {
+    public @NotNull LoaderNode load() {
+        Logger logger = application.logger();
+        logger.debug("Loading application: {}", getApplicationName());
         List<FieldAnnotationNode> nodes = loadFieldAnnotationNodes();
+        logger.debug("Loaded {} nodes", nodes.size());
         Map<String, FieldAnnotationNode> namedNodes = toNamedMap(nodes);
         validateNodesDependencies(namedNodes);
         LoaderNode tree = buildDependencyTree(namedNodes);
         validateTree(tree);
+        logger.debug("Successfully built dependency tree");
         return tree;
     }
 
@@ -135,7 +146,7 @@ final class ApplicationLoader {
             final @NotNull Object @NotNull ... args
     ) {
         return new ApplicationLoadingException(
-                message + String.format("(application=%s) ", application.getClass().getCanonicalName()),
+                message + String.format("(application=%s) ", getApplicationName()),
                 args
         );
     }
@@ -148,12 +159,16 @@ final class ApplicationLoader {
         return new ApplicationLoadingException(
                 message + String.format(
                         "(application=%s, annotation=%s, field=%s) ",
-                        application.getClass().getCanonicalName(),
+                        getApplicationName(),
                         fieldAnnotationNode.getAnnotation().annotationType().getCanonicalName(),
                         fieldAnnotationNode.getFieldName()
                 ),
                 args
         );
+    }
+
+    private String getApplicationName() {
+        return application.getClass().getCanonicalName();
     }
 
     /**
