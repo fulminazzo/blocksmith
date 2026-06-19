@@ -42,12 +42,12 @@ final class ApplicationLoader {
     }
 
     /**
-     * Validates the built dependency tree by checking if any circular dependency is present.
+     * Validates the built dependency tree.
      *
      * @param node the root of the tree to validate
      */
     void validateTree(final @NotNull LoaderNode node) {
-        validateTree(node, new LinkedHashSet<>());
+        checkCircularDependency(node, new LinkedHashSet<>());
     }
 
     /**
@@ -97,7 +97,7 @@ final class ApplicationLoader {
         return nodes;
     }
 
-    private void validateTree(
+    private void checkCircularDependency(
             final @NotNull LoaderNode node,
             final @NotNull Set<LoaderNode> visiting
     ) {
@@ -106,7 +106,7 @@ final class ApplicationLoader {
                     "Circular dependency detected in application %s",
                     application.getClass().getCanonicalName()
             );
-        for (LoaderNode child : node.getChildren()) validateTree(child, visiting);
+        for (LoaderNode child : node.getChildren()) checkCircularDependency(child, visiting);
         visiting.remove(node);
     }
 

@@ -47,7 +47,7 @@ class ApplicationLoaderTest extends Specification {
         fifthChildren.size() == 0
     }
 
-    def 'test that validateTree throws InvalidApplicationException for circular dependencies'() {
+    def 'test that validateTree throws InvalidApplicationException for circular dependency'() {
         given:
         def node = new LoaderNode()
         def node1 = newNode(ValidApplication, 'first')
