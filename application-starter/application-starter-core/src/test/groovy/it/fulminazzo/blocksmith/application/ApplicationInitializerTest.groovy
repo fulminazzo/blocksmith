@@ -4,6 +4,8 @@ import it.fulminazzo.blocksmith.application.node.FieldAnnotationNode
 import it.fulminazzo.blocksmith.application.node.RootLoaderNode
 import spock.lang.Specification
 
+import java.lang.annotation.Annotation
+
 class ApplicationInitializerTest extends Specification {
     private RootLoaderNode dependencyTree
     private FieldAnnotationNode first
@@ -33,6 +35,53 @@ class ApplicationInitializerTest extends Specification {
         third.addChild(fourth)
 
         initializer = Spy(ApplicationInitializer, constructorArgs : [application, dependencyTree])
+    }
+
+    def 'test that visitFieldImpl correctly passes environment arguments'() {
+        given:
+        def contained = [
+                'method.age'        : null,
+                'field.ageData.age' : null
+        ]
+
+        and:
+        def node = new FieldAnnotationNode(
+                new MultipleDependencies() {
+
+                    @Override
+                    String[] dependsOn() {
+                        return ['method.age', 'field.ageData.age']
+                    }
+
+                    @Override
+                    Class<? extends Annotation> annotationType() {
+                        return MultipleDependencies
+                    }
+
+                },
+                ContainerClass.getDeclaredField('target'),
+                (FieldAnnotationHandler<?>) (a, an, f, e) -> {
+                    contained['method.age'] = e['method.age']
+                    contained['field.ageData.age'] = e['field.ageData.age']
+                }
+        )
+
+        and:
+        def root = new RootLoaderNode()
+        root.addChild(node)
+
+        and:
+        def initializer = new ApplicationInitializer(new ContainerClass(), root)
+
+        and:
+        initializer.environment['method.age'] = 11
+
+        when:
+        initializer.visitField(node)
+
+        then:
+        contained['method.age'] == 11
+        contained['field.ageData.age'] == 10
     }
 
     def 'test that visitRootNode correctly visits tree with levels'() {
