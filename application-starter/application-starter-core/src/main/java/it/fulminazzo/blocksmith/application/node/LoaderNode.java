@@ -1,5 +1,6 @@
 package it.fulminazzo.blocksmith.application.node;
 
+import it.fulminazzo.blocksmith.application.LoaderVisitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -19,6 +20,13 @@ public abstract class LoaderNode {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private final @NotNull Set<LoaderNode> children = new LinkedHashSet<>();
+
+    /**
+     * Inspects this node with the given visitor.
+     *
+     * @param visitor the visitor
+     */
+    public abstract void accept(final @NotNull LoaderVisitor visitor);
 
     /**
      * Adds a child node to this node.

@@ -1,6 +1,7 @@
 package it.fulminazzo.blocksmith.application.node;
 
 import it.fulminazzo.blocksmith.application.FieldAnnotationHandler;
+import it.fulminazzo.blocksmith.application.LoaderVisitor;
 import it.fulminazzo.blocksmith.reflect.Reflect;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -86,6 +87,11 @@ public class FieldAnnotationNode extends LoaderNode {
      */
     public @NotNull String getFieldName() {
         return field.getName();
+    }
+
+    @Override
+    public void accept(final @NotNull LoaderVisitor visitor) {
+        visitor.visitField(this);
     }
 
     private static @NotNull Map<String, String> loadDependencies(final @NotNull Annotation annotation) {
