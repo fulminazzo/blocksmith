@@ -8,7 +8,7 @@ import it.fulminazzo.blocksmith.reflect.Reflect
 import spock.lang.Specification
 
 class ApplicationLoaderTest extends Specification {
-    private final ApplicationLoader validLoader = new ApplicationLoader(new ValidApplication())
+    private final ApplicationLoader loader = new ApplicationLoader(new ValidApplication())
 
     void setupSpec() {
         ApplicationHandlers.registerFieldAnnotationHandler(NoDependencies, {})
@@ -18,7 +18,7 @@ class ApplicationLoaderTest extends Specification {
 
     def 'test that load works'() {
         when:
-        def node = validLoader.load()
+        def node = loader.load()
 
         then:
         def rootChildren = node.children
@@ -64,7 +64,7 @@ class ApplicationLoaderTest extends Specification {
         node2.addChild(node1)
 
         when:
-        validLoader.validateTree(node)
+        loader.validateTree(node)
 
         then:
         def e = thrown(ApplicationLoadingException)
@@ -73,7 +73,7 @@ class ApplicationLoaderTest extends Specification {
 
     def 'test that buildDependencyTree correctly builds inheritance between nodes'() {
         when:
-        def node = validLoader.buildDependencyTree(
+        def node = loader.buildDependencyTree(
                 validNodes.collectEntries { [it.fieldName, it] }
         )
 
@@ -118,7 +118,7 @@ class ApplicationLoaderTest extends Specification {
         Reflect.on(node2).set('dependencies', ['first' : ''])
 
         when:
-        validLoader.buildDependencyTree(['first' : node1, 'second' : node2])
+        loader.buildDependencyTree(['first' : node1, 'second' : node2])
 
         then:
         def e = thrown(ApplicationLoadingException)
@@ -127,7 +127,7 @@ class ApplicationLoaderTest extends Specification {
 
     def 'test that validateNodeDependencies does not throw for valid nodes'() {
         when:
-        validLoader.validateNodesDependencies(
+        loader.validateNodesDependencies(
                 validNodes.collectEntries { [it.fieldName, it] }
         )
 
@@ -144,7 +144,7 @@ class ApplicationLoaderTest extends Specification {
         def node2 = newNode(ValidApplication, 'second')
 
         when:
-        validLoader.validateNodesDependencies(['first' : node1, 'second' : node2])
+        loader.validateNodesDependencies(['first' : node1, 'second' : node2])
 
         then:
         def e = thrown(ApplicationLoadingException)
@@ -157,7 +157,7 @@ class ApplicationLoaderTest extends Specification {
         Reflect.on(node).set('dependencies', ['invalid' : ''])
 
         when:
-        validLoader.validateNodesDependencies(['node' : node])
+        loader.validateNodesDependencies(['node' : node])
 
         then:
         def e = thrown(ApplicationLoadingException)
@@ -166,7 +166,7 @@ class ApplicationLoaderTest extends Specification {
 
     def 'test that loadFieldAnnotationNodes correctly returns all nodes'() {
         when:
-        def nodes = validLoader.loadFieldAnnotationNodes()
+        def nodes = loader.loadFieldAnnotationNodes()
 
         then:
         nodes == validNodes
