@@ -6,21 +6,16 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A loader for {@link Application} instances.
  *
  * @see Application
+ * @see ApplicationHandlers
  * @see BlocksmithApplication
  * @see FieldAnnotationHandler
  */
-public final class ApplicationLoader {
-    private static final @NotNull Map<
-            Class<? extends Annotation>,
-            FieldAnnotationHandler<?>
-            > FIELD_ANNOTATION_HANDLERS = new ConcurrentHashMap<>();
-
+final class ApplicationLoader {
     private final @NotNull Application application;
     private final @NotNull Reflect reflect;
 
@@ -118,36 +113,10 @@ public final class ApplicationLoader {
     private @NotNull List<FieldAnnotationNode> loadFieldAnnotationNodeSingle(final @NotNull Field field) {
         List<FieldAnnotationNode> nodes = new LinkedList<>();
         for (Annotation annotation : field.getAnnotations())
-            getFieldAnnotationHandler(annotation.annotationType()).ifPresent(h ->
+            ApplicationHandlers.getFieldAnnotationHandler(annotation.annotationType()).ifPresent(h ->
                     nodes.add(new FieldAnnotationNode(annotation, field, h))
             );
         return nodes;
-    }
-
-    /**
-     * Register a new field annotation handler.
-     *
-     * @param <A>             the type of the annotation
-     * @param annotationClass the annotation class to handle
-     * @param handler         the handler to use
-     */
-    public static <A extends Annotation> void registerFieldAnnotationHandler(
-            final @NotNull Class<A> annotationClass,
-            final @NotNull FieldAnnotationHandler<A> handler
-    ) {
-        FIELD_ANNOTATION_HANDLERS.put(annotationClass, handler);
-    }
-
-    /**
-     * Gets the field annotation handler for the given annotation class.
-     *
-     * @param annotationClass the annotation class
-     * @return the field annotation handler (if found)
-     */
-    static @NotNull Optional<FieldAnnotationHandler<?>> getFieldAnnotationHandler(
-            final @NotNull Class<? extends Annotation> annotationClass
-    ) {
-        return Optional.ofNullable(FIELD_ANNOTATION_HANDLERS.get(annotationClass));
     }
 
 }

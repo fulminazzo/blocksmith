@@ -7,9 +7,9 @@ class ApplicationLoaderTest extends Specification {
     private final ApplicationLoader validLoader = new ApplicationLoader(new ValidApplication())
 
     void setupSpec() {
-        ApplicationLoader.registerFieldAnnotationHandler(NoDependencies, {})
-        ApplicationLoader.registerFieldAnnotationHandler(SingleDependency, {})
-        ApplicationLoader.registerFieldAnnotationHandler(MultipleDependencies, {})
+        ApplicationHandlers.registerFieldAnnotationHandler(NoDependencies, {})
+        ApplicationHandlers.registerFieldAnnotationHandler(SingleDependency, {})
+        ApplicationHandlers.registerFieldAnnotationHandler(MultipleDependencies, {})
     }
 
     def 'test that load works'() {
@@ -159,7 +159,7 @@ class ApplicationLoaderTest extends Specification {
         return new FieldAnnotationNode(
                 annotation,
                 field,
-                ApplicationLoader.getFieldAnnotationHandler(annotation.annotationType()).orElseThrow()
+                ApplicationHandlers.getFieldAnnotationHandler(annotation.annotationType()).orElseThrow()
         )
     }
 

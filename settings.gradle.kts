@@ -39,5 +39,6 @@ include(
 include(
     "application-starter",
 
-    "application-starter:application-starter-base"
+    "application-starter:application-starter-base",
+    "application-starter:application-starter-core"
 )

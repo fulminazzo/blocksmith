@@ -7,6 +7,8 @@ import java.io.File;
 
 /**
  * The basic entry point of a program. Contains useful data and basic functioning information.
+ *
+ * @see ApplicationHandlers
  */
 public interface Application {
 

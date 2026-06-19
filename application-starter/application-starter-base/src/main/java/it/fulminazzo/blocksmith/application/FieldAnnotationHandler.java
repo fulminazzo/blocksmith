@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * @param <A> the type of the annotation
  * @see Application
- * @see ApplicationLoader
+ * @see ApplicationHandlers
  */
 @FunctionalInterface
 public interface FieldAnnotationHandler<A extends Annotation> {
@@ -20,8 +20,8 @@ public interface FieldAnnotationHandler<A extends Annotation> {
      * Handles the annotation on the given field.
      *
      * @param application the application (where the field should reside on)
-     * @param annotation the annotation
-     * @param field the field in the application
+     * @param annotation  the annotation
+     * @param field       the field in the application
      * @param environment a map containing any result of previous computations
      * @return the result of the computation (can be {@code null})
      */
