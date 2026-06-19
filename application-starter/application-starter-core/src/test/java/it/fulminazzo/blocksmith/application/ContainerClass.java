@@ -1,12 +1,28 @@
 package it.fulminazzo.blocksmith.application;
 
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+
+import java.io.File;
 
 @SuppressWarnings("unused")
 @Data
-final class ContainerClass {
+final class ContainerClass implements Application {
     private final FieldClass field = new FieldClass();
     private final MethodClass method = new MethodClass();
+
+    private Object target;
+
+    @Override
+    public @NotNull File directory() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull Logger logger() {
+        throw new UnsupportedOperationException();
+    }
 
     @Data
     static final class FieldClass {
