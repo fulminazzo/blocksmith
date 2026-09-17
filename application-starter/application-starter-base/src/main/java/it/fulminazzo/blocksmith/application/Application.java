@@ -10,7 +10,7 @@ import java.io.File;
  *
  * @see BlocksmithApplication
  */
-interface Application {
+public interface Application {
 
     /**
      * Function executed when the application starts.
