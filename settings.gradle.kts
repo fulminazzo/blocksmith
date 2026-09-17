@@ -34,3 +34,10 @@ include(
 
     "base:testing"
 )
+
+// application-starter
+include(
+    "application-starter",
+
+    "application-starter:application-starter-base"
+)
