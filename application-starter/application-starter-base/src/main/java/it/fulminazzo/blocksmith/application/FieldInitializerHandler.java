@@ -17,10 +17,11 @@ public interface FieldInitializerHandler {
      *
      * @param context   the context where the handler is running
      * @param fieldData the data of the field to initialize
+     * @throws ApplicationInitializeException if an error occurs during initialization
      */
     void handle(
             final @NotNull InitializationContext context,
             final @NotNull FieldData fieldData
-    );
+    ) throws ApplicationInitializeException;
 
 }
